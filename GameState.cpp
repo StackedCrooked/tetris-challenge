@@ -31,20 +31,17 @@ namespace Tetris
 	}
 
 
-	bool GameState::addBlock(const Block & inBlock, std::set<GameState> & outGameGrids)
+	void GameState::generateFutureGameStates(const Block & inBlock, std::set<GameState> & outGameGrids)
 	{
 		size_t maxCol = mGrid.numColumns() - inBlock.grid().numColumns();
 		for (size_t colIdx = 0; colIdx <= maxCol; ++colIdx)
 		{
-			addBlock(inBlock, colIdx, outGameGrids);
+			generateFutureGameStates(inBlock, colIdx, outGameGrids);
 		}
-		// we can't insert the block in the grid at all
-		// so return false
-		return false;
 	}
 
 
-	bool GameState::addBlock(const Block & inBlock, size_t inColIdx, std::set<GameState> & outGameGrids) const
+	void GameState::generateFutureGameStates(const Block & inBlock, size_t inColIdx, std::set<GameState> & outGameGrids) const
 	{
 		size_t maxRow = mGrid.numRows() - inBlock.grid().numRows();
 		for (size_t rowIdx = 0; rowIdx <= maxRow; ++rowIdx)
@@ -57,28 +54,19 @@ namespace Tetris
 					GameState gg(*this);
 					gg.solidifyBlockPosition(inBlock, rowIdx - 1, inColIdx);
 					outGameGrids.insert(gg);
-					return true;
 				}
-				else
-				{			
-					// we're stuck at the top => return
-					return false;
-				}
+				return;
 			}
-			else
+			else if (rowIdx == maxRow)
 			{
-				if (rowIdx == maxRow)
-				{
-					// we found the bottom of the grid => solidify
-					GameState gg(*this);
-					gg.solidifyBlockPosition(inBlock, rowIdx, inColIdx);
-					outGameGrids.insert(gg);
-					return true;
-				}
+				// we found the bottom of the grid => solidify
+				GameState gg(*this);
+				gg.solidifyBlockPosition(inBlock, rowIdx, inColIdx);
+				outGameGrids.insert(gg);
+				return;
 			}
 		}
 		assert (!"We should not come here");
-		return false;
 	}
 
 
