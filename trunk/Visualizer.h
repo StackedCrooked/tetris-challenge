@@ -4,6 +4,7 @@
 
 #include "Block.h"
 #include "GameState.h"
+#include "PuzzleSolver.h"
 #include <map>
 #include <set>
 #include <windows.h>

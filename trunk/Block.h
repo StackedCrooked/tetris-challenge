@@ -22,6 +22,7 @@ namespace Tetris
 		Z_BLOCK,
 		END_BLOCK
 	};
+	typedef GenericGrid<BlockType> Grid;
 
 	/**
 	 * Helper class that identifies a block by its type and rotation.
@@ -30,11 +31,11 @@ namespace Tetris
 	 */
 	struct BlockIdentifier
 	{
-		BlockIdentifier(int inType, int inRotation);
+		BlockIdentifier(BlockType inType, int inRotation);
 
 		bool operator ==(const BlockIdentifier & rhs);
 
-		int type;
+		BlockType type;
 		int rotation;
 	};
 
@@ -59,23 +60,23 @@ namespace Tetris
 		// Returns the rotation value (in range [0..3])
 		int rotation() const;
 
-		const GenericGrid<int> & grid() const;
+		const Grid & grid() const;
 
 	private:
 		Block(BlockType inType, int inRotation);
 
-		static GenericGrid<int> makeBlock(int inType, int rotation);
-		static GenericGrid<int> makeIBlock(int rotation);
-		static GenericGrid<int> makeJBlock(int rotation);
-		static GenericGrid<int> makeLBlock(int rotation);
-		static GenericGrid<int> makeOBlock(int rotation);
-		static GenericGrid<int> makeSBlock(int rotation);
-		static GenericGrid<int> makeTBlock(int rotation);
-		static GenericGrid<int> makeZBlock(int rotation);
+		static Grid makeBlock(int inType, int rotation);
+		static Grid makeIBlock(int rotation);
+		static Grid makeJBlock(int rotation);
+		static Grid makeLBlock(int rotation);
+		static Grid makeOBlock(int rotation);
+		static Grid makeSBlock(int rotation);
+		static Grid makeTBlock(int rotation);
+		static Grid makeZBlock(int rotation);
 
 		BlockType mType;
 		int mRotation;
-		GenericGrid<int> mGrid;
+		Grid mGrid;
 		
 		typedef std::map<BlockIdentifier, Block> Cache;
 		static Cache sCache;
