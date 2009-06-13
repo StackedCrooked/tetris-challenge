@@ -1,11 +1,18 @@
 #include "GameStateNode.h"
 
 namespace Tetris
-{	
+{
 
-	bool operator <(const GameStateNode & lhs, const GameStateNode & rhs)
+	bool ChildPtrCompare::operator () (ChildPtr lhs, ChildPtr rhs)
 	{
-		return (*lhs.state) < (*rhs.state);
+		if (lhs && rhs)
+		{
+			return lhs->state < rhs->state;
+		}
+		else
+		{
+			return lhs.get() < rhs.get();
+		}
 	}
 
 } // namespace Tetris
