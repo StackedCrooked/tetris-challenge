@@ -26,15 +26,15 @@ namespace Tetris
 			for (size_t idx = 0; idx != mBlocks.size(); ++idx)
 			{
 				GameState gg;
-				std::set<GameState> nextGrids;
+				std::set<GameState> futureGameStates;
 
 				for (size_t rotIdx = 0; rotIdx != Block::NumRotations(static_cast<BlockType>(mBlocks[idx].type)); ++rotIdx)
 				{
-					gg.addBlock(Block::Get(static_cast<BlockType>(mBlocks[idx].type), rotIdx), nextGrids);
+					gg.generateFutureGameStates(Block::Get(static_cast<BlockType>(mBlocks[idx].type), rotIdx), futureGameStates);
 				}
-				if (!nextGrids.empty())
+				if (!futureGameStates.empty())
 				{
-					mGameGrid = *nextGrids.begin();
+					mGameGrid = *futureGameStates.begin();
 				}
 				mVisualizer.show();
 			}	
