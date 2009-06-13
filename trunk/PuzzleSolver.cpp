@@ -4,29 +4,35 @@
 namespace Tetris
 {
 
-	PuzzleSolver::PuzzleSolver()
+	PuzzleSolver::PuzzleSolver() :
+		mTreeDepth(0)
 	{
 		Parser p;
 		p.parse("inputs.txt", mBlocks);
 	}
 
-
-	void PuzzleSolver::start()
+	
+	bool PuzzleSolver::next()
 	{
-		for (size_t idx = 0; idx != mBlocks.size(); ++idx)
-		{
-			GameState gg;
-			std::set<GameState> futureGameStates;
+		//if (mTreeDepth < mBlocks.size())
+		//{
+		//	GameState gg;
+		//	std::set<GameState> futureGameStates;
 
-			for (size_t rotIdx = 0; rotIdx != Block::NumRotations(mBlocks[idx].type); ++rotIdx)
-			{
-				generateFutureGameStates(gg, Block::Get(mBlocks[idx].type, rotIdx), futureGameStates);
-			}
-			if (!futureGameStates.empty())
-			{
-				mGameState = *futureGameStates.begin();
-			}
-		}	
+		//	BlockType blockType = mBlocks[mTreeDepth].type;
+		//	for (size_t rotIdx = 0; rotIdx != Block::NumRotations(blockType); ++rotIdx)
+		//	{
+		//		generateFutureGameStates(gg, Block::Get(blockType, rotIdx), futureGameStates);
+		//	}
+		//	if (!futureGameStates.empty())
+		//	{
+		//		mGameState = *futureGameStates.begin();
+		//	}
+		//	mTreeDepth++;
+		//	return true;
+		//}
+		mRootNode.children.insert(GameStateNode());
+		return false;
 	}
 
 
