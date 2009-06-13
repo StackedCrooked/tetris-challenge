@@ -190,6 +190,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\GameStateNode.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\GameStateNode.h"
+			>
+		</File>
+		<File
 			RelativePath=".\GenericGrid.h"
 			>
 		</File>

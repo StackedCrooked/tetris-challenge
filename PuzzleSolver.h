@@ -3,6 +3,7 @@
 
 #include "Block.h"
 #include "GameState.h"
+#include "GameStateNode.h"
 #include <vector>
 
 namespace Tetris
@@ -13,9 +14,7 @@ namespace Tetris
 	public:
 		PuzzleSolver();
 
-
-
-		void start();
+		bool next();
 
 		// returns true when the Block was dropped successfully
 		// returns false when no suitable location was found within the bounds of the grid
@@ -24,8 +23,9 @@ namespace Tetris
 		void generateFutureGameStates(const GameState & inGameState, const Block & inBlock, size_t inColIdx, std::set<GameState> & outGameGrids) const;
 
 	private:
-		GameState mGameState;
+		GameStateNode mRootNode;
 		std::vector<BlockIdentifier> mBlocks;
+		size_t mTreeDepth;
 	};
 
 } // namespace Tetris
