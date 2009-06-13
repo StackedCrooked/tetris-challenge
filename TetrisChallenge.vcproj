@@ -210,6 +210,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\PuzzleSolver.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\PuzzleSolver.h"
+			>
+		</File>
+		<File
 			RelativePath=".\Visualizer.cpp"
 			>
 		</File>

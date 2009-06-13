@@ -25,48 +25,15 @@ namespace Tetris
 	}
 
 
-	const GenericGrid<int> & GameState::grid() const
+	const Grid & GameState::grid() const
 	{
 		return mGrid;
 	}
 
 
-	void GameState::generateFutureGameStates(const Block & inBlock, std::set<GameState> & outGameGrids)
+	Grid & GameState::grid()
 	{
-		size_t maxCol = mGrid.numColumns() - inBlock.grid().numColumns();
-		for (size_t colIdx = 0; colIdx <= maxCol; ++colIdx)
-		{
-			generateFutureGameStates(inBlock, colIdx, outGameGrids);
-		}
-	}
-
-
-	void GameState::generateFutureGameStates(const Block & inBlock, size_t inColIdx, std::set<GameState> & outGameGrids) const
-	{
-		size_t maxRow = mGrid.numRows() - inBlock.grid().numRows();
-		for (size_t rowIdx = 0; rowIdx <= maxRow; ++rowIdx)
-		{
-			if (!checkPositionValid(inBlock, rowIdx, inColIdx))
-			{
-				if (rowIdx > 0)
-				{
-					// we collided => solidify on position higher
-					GameState gg(*this);
-					gg.solidifyBlockPosition(inBlock, rowIdx - 1, inColIdx);
-					outGameGrids.insert(gg);
-				}
-				return;
-			}
-			else if (rowIdx == maxRow)
-			{
-				// we found the bottom of the grid => solidify
-				GameState gg(*this);
-				gg.solidifyBlockPosition(inBlock, rowIdx, inColIdx);
-				outGameGrids.insert(gg);
-				return;
-			}
-		}
-		assert (!"We should not come here");
+		return mGrid;
 	}
 
 
@@ -136,20 +103,21 @@ namespace Tetris
 		return true;
 	}
 
-
-	void GameState::solidifyBlockPosition(const Block & inBlock, size_t inRowIdx, size_t inColIdx)
+	
+	GameState GameState::makeGameStateWithAddedBlock(const Block & inBlock, size_t inRowIdx, size_t inColIdx) const
 	{
+		GameState result(*this);
 		for (size_t r = 0; r != inBlock.grid().numRows(); ++r)
 		{
 			for (size_t c = 0; c != inBlock.grid().numColumns(); ++c)
 			{
-				if (inBlock.grid().get(r, c) != 0)
+				if (inBlock.grid().get(r, c) != NO_BLOCK)
 				{
-					mGrid.set(inRowIdx + r, inColIdx + c, inBlock.type());
+					result.grid().set(inRowIdx + r, inColIdx + c, inBlock.type());
 				}
 			}
 		}
-		mDirty = true;
+		return result;
 	}
 
 } // namespace Tetris

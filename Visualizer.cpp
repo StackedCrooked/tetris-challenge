@@ -36,7 +36,6 @@ namespace Tetris
 		{
 			Initialize();
 		}
-		//inGameGrid.BlockMoved.connect(boost::bind(&Visualizer::refresh, this));
 	}
 
 
@@ -159,7 +158,7 @@ namespace Tetris
 		{
 			for (size_t colIdx = 0; colIdx != mGameGrid.grid().numColumns(); ++colIdx)
 			{
-				Gdiplus::SolidBrush fgBrush(GetColor(static_cast<BlockType>(mGameGrid.grid().get(rowIdx, colIdx))));
+				Gdiplus::SolidBrush fgBrush(GetColor(mGameGrid.grid().get(rowIdx, colIdx)));
 				Gdiplus::RectF rect
 				(
 					cMarginLeft + colIdx * cUnitWidth,

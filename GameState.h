@@ -14,26 +14,20 @@ namespace Tetris
 	class GameState
 	{
 	public:
-		//mutable boost::signal<void(const Block &, size_t, size_t)> BlockMoved;
-
 		GameState();
 
-		const GenericGrid<int> & grid() const;
+		const Grid & grid() const;
 
-		// returns true when the Block was dropped successfully
-		// returns false when no suitable location was found within the bounds of the grid
-		void generateFutureGameStates(const Block & inBlock, std::set<GameState> & outGameGrids);
-
-		void generateFutureGameStates(const Block & inBlock, size_t inColIdx, std::set<GameState> & outGameGrids) const;
+		Grid & grid();
 
 		int calculateScore() const;
 
-	private:
 		bool checkPositionValid(const Block & inBlock, size_t inRowIdx, size_t inColIdx) const;
 
-		void solidifyBlockPosition(const Block & inBlock, size_t inRowIdx, size_t inColIdx);
+		GameState makeGameStateWithAddedBlock(const Block & inBlock, size_t inRowIdx, size_t inColIdx) const;
 
-		GenericGrid<int> mGrid;
+	private:
+		Grid mGrid;
 
 		mutable bool mDirty;
 		mutable int mCachedScore;

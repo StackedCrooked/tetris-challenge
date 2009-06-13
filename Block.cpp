@@ -82,13 +82,13 @@ namespace Tetris
 	}
 
 
-	const GenericGrid<int> & Block::grid() const
+	const Grid & Block::grid() const
 	{
 		return mGrid;
 	}
 
 
-	BlockIdentifier::BlockIdentifier(int inType, int inRotation) :
+	BlockIdentifier::BlockIdentifier(BlockType inType, int inRotation) :
 		type(inType),
 		rotation(inRotation)
 	{
@@ -114,7 +114,7 @@ namespace Tetris
 	}
 
 
-	GenericGrid<int> Block::makeBlock(int inType, int rotation)
+	Grid Block::makeBlock(int inType, int rotation)
 	{
 		if (inType == I_BLOCK)
 		{
@@ -150,203 +150,203 @@ namespace Tetris
 		}
 		
 		// if we get here something is wrong, however we have to return something
-		static GenericGrid<int> failBlock(4, 4, 1);
+		static Grid failBlock(4, 4, NO_BLOCK);
 		return failBlock;
 	}
 
 
-	GenericGrid<int> Block::makeIBlock(int rotation)
+	Grid Block::makeIBlock(int rotation)
 	{
 		if (rotation%2 == 0)
 		{
-			GenericGrid<int> block(1, 4, 0);
-			block.set(0, 0, 1);
-			block.set(0, 1, 1);
-			block.set(0, 2, 1);
-			block.set(0, 3, 1);
+			Grid block(1, 4, NO_BLOCK);
+			block.set(0, 0, I_BLOCK);
+			block.set(0, 1, I_BLOCK);
+			block.set(0, 2, I_BLOCK);
+			block.set(0, 3, I_BLOCK);
 			return block;	
 		}
 		else
 		{
-			GenericGrid<int> block(4, 1, 0);
-			block.set(0, 0, 1);
-			block.set(1, 0, 1);
-			block.set(2, 0, 1);
-			block.set(3, 0, 1);
+			Grid block(4, 1, NO_BLOCK);
+			block.set(0, 0, I_BLOCK);
+			block.set(1, 0, I_BLOCK);
+			block.set(2, 0, I_BLOCK);
+			block.set(3, 0, I_BLOCK);
 			return block;
 		}
 	}
 
-	GenericGrid<int> Block::makeJBlock(int rotation)
+	Grid Block::makeJBlock(int rotation)
 	{
 		if (rotation%4 == 0)
 		{
-			GenericGrid<int> block(3, 2, 0);
-			block.set(0, 1, 1);
-			block.set(1, 1, 1);
-			block.set(2, 0, 1);
-			block.set(2, 1, 1);
+			Grid block(3, 2, NO_BLOCK);
+			block.set(0, 1, J_BLOCK);
+			block.set(1, 1, J_BLOCK);
+			block.set(2, 0, J_BLOCK);
+			block.set(2, 1, J_BLOCK);
 			return block;
 		}
 		else if (rotation%4 == 1)
 		{
-			GenericGrid<int> block(2, 3, 0);
-			block.set(0, 0, 1);
-			block.set(1, 0, 1);
-			block.set(1, 1, 1);
-			block.set(1, 2, 1);
+			Grid block(2, 3, NO_BLOCK);
+			block.set(0, 0, J_BLOCK);
+			block.set(1, 0, J_BLOCK);
+			block.set(1, 1, J_BLOCK);
+			block.set(1, 2, J_BLOCK);
 			return block;
 		}
 		else if (rotation%4 == 2)
 		{
-			GenericGrid<int> block(3, 2, 0);
-			block.set(0, 0, 1);
-			block.set(0, 1, 1);
-			block.set(1, 0, 1);
-			block.set(2, 0, 1);
+			Grid block(3, 2, NO_BLOCK);
+			block.set(0, 0, J_BLOCK);
+			block.set(0, 1, J_BLOCK);
+			block.set(1, 0, J_BLOCK);
+			block.set(2, 0, J_BLOCK);
 			return block;
 		}
 		else
 		{
-			GenericGrid<int> block(2, 3, 0);
-			block.set(0, 0, 1);
-			block.set(0, 1, 1);
-			block.set(0, 2, 1);
-			block.set(1, 2, 1);
+			Grid block(2, 3, NO_BLOCK);
+			block.set(0, 0, J_BLOCK);
+			block.set(0, 1, J_BLOCK);
+			block.set(0, 2, J_BLOCK);
+			block.set(1, 2, J_BLOCK);
 			return block;
 		}
 	}
 
-	GenericGrid<int> Block::makeLBlock(int rotation)
+	Grid Block::makeLBlock(int rotation)
 	{
 		if (rotation%4 == 0)
 		{
-			GenericGrid<int> block(3, 2, 0);
-			block.set(0, 0, 1);
-			block.set(1, 0, 1);
-			block.set(2, 0, 1);
-			block.set(2, 1, 1);
+			Grid block(3, 2, NO_BLOCK);
+			block.set(0, 0, L_BLOCK);
+			block.set(1, 0, L_BLOCK);
+			block.set(2, 0, L_BLOCK);
+			block.set(2, 1, L_BLOCK);
 			return block;
 		}
 		else if (rotation%4 == 1)
 		{
-			GenericGrid<int> block(2, 3, 0);
-			block.set(0, 0, 1);
-			block.set(0, 1, 1);
-			block.set(0, 2, 1);
-			block.set(1, 0, 1);
+			Grid block(2, 3, NO_BLOCK);
+			block.set(0, 0, L_BLOCK);
+			block.set(0, 1, L_BLOCK);
+			block.set(0, 2, L_BLOCK);
+			block.set(1, 0, L_BLOCK);
 			return block;
 		}
 		else if (rotation%4 == 2)
 		{
-			GenericGrid<int> block(3, 2, 0);
-			block.set(0, 0, 1);
-			block.set(0, 1, 1);
-			block.set(1, 1, 1);
-			block.set(2, 1, 1);
+			Grid block(3, 2, NO_BLOCK);
+			block.set(0, 0, L_BLOCK);
+			block.set(0, 1, L_BLOCK);
+			block.set(1, 1, L_BLOCK);
+			block.set(2, 1, L_BLOCK);
 			return block;
 		}
 		else
 		{
-			GenericGrid<int> block(2, 3, 0);
-			block.set(0, 2, 1);
-			block.set(1, 0, 1);
-			block.set(1, 1, 1);
-			block.set(1, 2, 1);
+			Grid block(2, 3, NO_BLOCK);
+			block.set(0, 2, L_BLOCK);
+			block.set(1, 0, L_BLOCK);
+			block.set(1, 1, L_BLOCK);
+			block.set(1, 2, L_BLOCK);
 			return block;
 		}
 	}
 
-	GenericGrid<int> Block::makeOBlock(int rotation)
+	Grid Block::makeOBlock(int rotation)
 	{
-		GenericGrid<int> block(2, 2, 0);
-		block.set(0, 0, 1);
-		block.set(0, 1, 1);
-		block.set(1, 0, 1);
-		block.set(1, 1, 1);
+		Grid block(2, 2, NO_BLOCK);
+		block.set(0, 0, O_BLOCK);
+		block.set(0, 1, O_BLOCK);
+		block.set(1, 0, O_BLOCK);
+		block.set(1, 1, O_BLOCK);
 		return block;
 	}
 
-	GenericGrid<int> Block::makeSBlock(int rotation)
+	Grid Block::makeSBlock(int rotation)
 	{
 		if (rotation%2 == 0)
 		{
-			GenericGrid<int> block(2, 3, 0);
-			block.set(0, 1, 1);
-			block.set(0, 2, 1);
-			block.set(1, 0, 1);
-			block.set(1, 1, 1);
+			Grid block(2, 3, NO_BLOCK);
+			block.set(0, 1, S_BLOCK);
+			block.set(0, 2, S_BLOCK);
+			block.set(1, 0, S_BLOCK);
+			block.set(1, 1, S_BLOCK);
 			return block;
 		}
 		else
 		{
-			GenericGrid<int> block(3, 2, 0);
-			block.set(0, 0, 1);
-			block.set(1, 0, 1);
-			block.set(1, 1, 1);
-			block.set(2, 1, 1);
+			Grid block(3, 2, NO_BLOCK);
+			block.set(0, 0, S_BLOCK);
+			block.set(1, 0, S_BLOCK);
+			block.set(1, 1, S_BLOCK);
+			block.set(2, 1, S_BLOCK);
 			return block;
 		}
 	}
 
-	GenericGrid<int> Block::makeTBlock(int rotation)
+	Grid Block::makeTBlock(int rotation)
 	{
 		if (rotation%4 == 0)
 		{
-			GenericGrid<int> block(2, 3, 0);
-			block.set(0, 1, 1);
-			block.set(1, 0, 1);
-			block.set(1, 1, 1);
-			block.set(1, 2, 1);
+			Grid block(2, 3, NO_BLOCK);
+			block.set(0, 1, T_BLOCK);
+			block.set(1, 0, T_BLOCK);
+			block.set(1, 1, T_BLOCK);
+			block.set(1, 2, T_BLOCK);
 			return block;
 		}
 		else if (rotation%4 == 1)
 		{
-			GenericGrid<int> block(3, 2, 0);
-			block.set(0, 0, 1);
-			block.set(1, 0, 1);
-			block.set(1, 1, 1);
-			block.set(2, 0, 1);
+			Grid block(3, 2, NO_BLOCK);
+			block.set(0, 0, T_BLOCK);
+			block.set(1, 0, T_BLOCK);
+			block.set(1, 1, T_BLOCK);
+			block.set(2, 0, T_BLOCK);
 			return block;
 		}
 		else if (rotation%4 == 2)
 		{
-			GenericGrid<int> block(2, 3, 0);
-			block.set(0, 0, 1);
-			block.set(0, 1, 1);
-			block.set(0, 2, 1);
-			block.set(1, 1, 1);
+			Grid block(2, 3, NO_BLOCK);
+			block.set(0, 0, T_BLOCK);
+			block.set(0, 1, T_BLOCK);
+			block.set(0, 2, T_BLOCK);
+			block.set(1, 1, T_BLOCK);
 			return block;
 		}
 		else
 		{
-			GenericGrid<int> block(3, 2, 0);
-			block.set(0, 1, 1);
-			block.set(1, 0, 1);
-			block.set(1, 1, 1);
-			block.set(2, 1, 1);
+			Grid block(3, 2, NO_BLOCK);
+			block.set(0, 1, T_BLOCK);
+			block.set(1, 0, T_BLOCK);
+			block.set(1, 1, T_BLOCK);
+			block.set(2, 1, T_BLOCK);
 			return block;
 		}
 	}
 
-	GenericGrid<int> Block::makeZBlock(int rotation)
+	Grid Block::makeZBlock(int rotation)
 	{
 		if (rotation%2 == 0)
 		{
-			GenericGrid<int> block(2, 3, 0);
-			block.set(0, 0, 1);
-			block.set(0, 1, 1);
-			block.set(1, 1, 1);
-			block.set(1, 2, 1);
+			Grid block(2, 3, NO_BLOCK);
+			block.set(0, 0, Z_BLOCK);
+			block.set(0, 1, Z_BLOCK);
+			block.set(1, 1, Z_BLOCK);
+			block.set(1, 2, Z_BLOCK);
 			return block;
 		}
 		else
 		{
-			GenericGrid<int> block(3, 2, 0);
-			block.set(0, 1, 1);
-			block.set(1, 0, 1);
-			block.set(1, 1, 1);
-			block.set(2, 0, 1);
+			Grid block(3, 2, NO_BLOCK);
+			block.set(0, 1, Z_BLOCK);
+			block.set(1, 0, Z_BLOCK);
+			block.set(1, 1, Z_BLOCK);
+			block.set(2, 0, Z_BLOCK);
 			return block;
 		}
 	}
