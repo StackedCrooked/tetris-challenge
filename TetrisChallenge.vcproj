@@ -182,11 +182,11 @@
 			>
 		</File>
 		<File
-			RelativePath=".\GameGrid.cpp"
+			RelativePath=".\GameState.cpp"
 			>
 		</File>
 		<File
-			RelativePath=".\GameGrid.h"
+			RelativePath=".\GameState.h"
 			>
 		</File>
 		<File

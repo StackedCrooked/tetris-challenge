@@ -3,47 +3,52 @@
 
 
 #include "Block.h"
-#include "GameGrid.h"
+#include "GameState.h"
 #include <map>
 #include <set>
 #include <windows.h>
 #include <gdiplus.h>
 
 
-class Visualizer
+namespace Tetris
 {
-public:
-	Visualizer(const GameGrid & inGameGrids);
 
-	~Visualizer();
+	class Visualizer
+	{
+	public:
+		Visualizer(const GameState & inGameGrids);
 
-	void show();
+		~Visualizer();
 
-	void refresh();
+		void show();
 
-	//void drawBlock(Gdiplus::Graphics & inGraphics, const Block & inBlock, const Gdiplus::RectF & inRect);
+		void refresh();
 
-private:
-	Visualizer(const Visualizer &);
-	Visualizer & operator=(const Visualizer &);
+		//void drawBlock(Gdiplus::Graphics & inGraphics, const Block & inBlock, const Gdiplus::RectF & inRect);
 
-	static void Initialize();
-	static void Finalize();
-	static LRESULT CALLBACK MessageHandler(HWND hWnd, UINT inMessage, WPARAM wParam, LPARAM lParam);
+	private:
+		Visualizer(const Visualizer &);
+		Visualizer & operator=(const Visualizer &);
 
-	void onPaint(HDC inHDC);
+		static void Initialize();
+		static void Finalize();
+		static LRESULT CALLBACK MessageHandler(HWND hWnd, UINT inMessage, WPARAM wParam, LPARAM lParam);
 
-	static Gdiplus::Color GetColor(Block::Type inType);
+		void onPaint(HDC inHDC);
 
-	HWND mHandle;
-	typedef std::map<HWND, Visualizer*> Instances;
+		static Gdiplus::Color GetColor(BlockType inType);
 
-	const GameGrid & mGameGrid;
+		HWND mHandle;
+		typedef std::map<HWND, Visualizer*> Instances;
 
-	static Instances sInstances;
-	static ULONG_PTR sGdiPlusToken;
-	static int sRefCount;
-};
+		const GameState & mGameGrid;
+
+		static Instances sInstances;
+		static ULONG_PTR sGdiPlusToken;
+		static int sRefCount;
+	};
+
+} // namespace Tetris
 
 
 #endif // VISUALIZER_H
