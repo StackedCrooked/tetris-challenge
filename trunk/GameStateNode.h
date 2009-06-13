@@ -7,15 +7,22 @@
 
 namespace Tetris
 {
+
+	struct GameStateNode;
+	typedef boost::shared_ptr<GameStateNode> ChildPtr;
+	
+	struct ChildPtrCompare
+	{
+		bool operator () (ChildPtr lhs, ChildPtr rhs);
+	};
 	
 	struct GameStateNode
 	{
-		boost::shared_ptr<GameState> state;
+		GameState state;
 
-		std::set<GameStateNode> children;
+		typedef std::set<ChildPtr, ChildPtrCompare> Children;
+		Children children;
 	};
-
-	bool operator <(const GameStateNode & lhs, const GameStateNode & rhs);
 
 } // namespace Tetris
 
