@@ -1,0 +1,56 @@
+A I
+B Z
+C J 2
+D L
+E L 1
+F I 1
+G I 2
+H I 1
+I Z 1
+J T 1
+K S 2
+L T 1
+M J 1
+N O
+O T 1
+P O
+Q Z 1
+R T 3
+S O
+T T
+U I
+V O
+W S
+X T 2
+Y T 2
+Z O
+a S 2
+b Z 2
+c Z
+d S 1
+e I 2
+f O
+g O
+h Z 2
+i L
+j S 2
+k T 2
+l J
+m Z 2
+n S 2
+o S 1
+p I 2
+q J 3
+r J 1
+s O
+t J
+u J
+v S 1
+w J
+x I
+y L 2
+z L 3
+1 L 3
+2 L 1
+3 Z 1
+4 L 3
