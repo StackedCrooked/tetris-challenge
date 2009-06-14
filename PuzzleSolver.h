@@ -26,7 +26,6 @@ namespace Tetris
 		size_t depth() const { return mNodes.size(); }
 
 	private:
-		void tryNextLeaf();
 		void tryNextBranch();
 
 		int depthOfOffspring(const GameStateNode * inGameStateNode, std::list<GameStateNode*> & outNodes) const;

@@ -75,21 +75,10 @@ namespace Tetris
 		}
 		else
 		{
-			tryNextLeaf();
+			tryNextBranch();
 			next();
 		}
 		return false;
-	}
-	
-	
-	void PuzzleSolver::tryNextLeaf()
-	{
-		GameStateNode::Children::iterator end = mNodes.back()->get()->parent()->children().end();
-		assert (mNodes.back() != end);		
-		if (++mNodes.back() == end)
-		{
-			tryNextBranch();
-		}
 	}
 
 	
