@@ -39,7 +39,7 @@ namespace Tetris
 
 	int GameState::calculateScore() const
 	{
-		//if (true || mDirty)
+		if (mDirty)
 		{
 			static const int cHolePenalty = 1;
 			static const int cHeightPenalty = 1;
@@ -74,9 +74,8 @@ namespace Tetris
 			result -= static_cast<int>(mGrid.numRows() - top) * cHeightPenalty;
 			mCachedScore = result;
 			mDirty = false;
-			return result;
 		}
-		//return mCachedScore;
+		return mCachedScore;
 	}
 
 
@@ -101,6 +100,7 @@ namespace Tetris
 	GameState GameState::makeGameStateWithAddedBlock(const Block & inBlock, size_t inRowIdx, size_t inColIdx) const
 	{
 		GameState result(*this);
+		result.mDirty = true;
 		for (size_t r = 0; r != inBlock.grid().numRows(); ++r)
 		{
 			for (size_t c = 0; c != inBlock.grid().numColumns(); ++c)
