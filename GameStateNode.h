@@ -8,7 +8,7 @@
 namespace Tetris
 {
 
-	struct GameStateNode;
+	class GameStateNode;
 	typedef boost::shared_ptr<GameStateNode> ChildPtr;
 	
 	struct ChildPtrCompare
@@ -16,16 +16,36 @@ namespace Tetris
 		bool operator () (ChildPtr lhs, ChildPtr rhs);
 	};
 	
-	struct GameStateNode
+	class GameStateNode
 	{
-		GameStateNode() : parent(0) {}
+	public:
+		GameStateNode(GameStateNode * inParent) : mParent(inParent), mDeadEnd(false) {}
 
-		GameState state;
+		const GameState & state() const { return mState; }
+
+		GameState & state() { return mState; }
+
+		void setState(const GameState & inState) { mState = inState; }
 
 		typedef std::multiset<ChildPtr, ChildPtrCompare> Children;
-		Children children;
 
-		GameStateNode * parent;
+		Children & children() { return mChildren; }
+
+		const Children & children() const { return mChildren; }
+
+		void setChildren(const Children & inChildren) { mChildren = inChildren; }
+
+		GameStateNode * parent() { return mParent; }
+
+		const GameStateNode * parent() const { return mParent; }
+
+		//void setParent(GameStateNode * inParent) { mParent = inParent; }
+		
+	private:
+		GameState mState;
+		GameStateNode * mParent;
+		Children mChildren;
+		bool mDeadEnd;
 	};
 
 } // namespace Tetris

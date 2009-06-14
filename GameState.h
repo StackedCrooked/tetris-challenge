@@ -24,13 +24,19 @@ namespace Tetris
 
 		bool checkPositionValid(const Block & inBlock, size_t inRowIdx, size_t inColIdx) const;
 
-		GameState makeGameStateWithAddedBlock(const Block & inBlock, size_t inRowIdx, size_t inColIdx) const;
+		GameState makeGameStateWithAddedBlock(const Block & inBlock, size_t inRowIdx, size_t inColIdx) const;		
+
+		bool isDeadEnd() const { return mDeadEnd; }
+
+		void markAsDeadEnd() const { mDeadEnd = true; }
 
 	private:
 		Grid mGrid;
 
 		mutable bool mDirty;
 		mutable int mCachedScore;
+
+		mutable bool mDeadEnd;
 	};
 
 		

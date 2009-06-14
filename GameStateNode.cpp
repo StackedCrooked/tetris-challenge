@@ -7,7 +7,7 @@ namespace Tetris
 	{
 		if (lhs && rhs)
 		{
-			return lhs->state < rhs->state;
+			return lhs->state() < rhs->state();
 		}
 		else
 		{
