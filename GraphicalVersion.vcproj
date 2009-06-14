@@ -161,11 +161,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\main.cpp"
+				RelativePath=".\Visualizer.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Visualizer.cpp"
+				RelativePath=".\WinMain.cpp"
 				>
 			</File>
 		</Filter>
