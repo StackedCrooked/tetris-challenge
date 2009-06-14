@@ -1,5 +1,3 @@
-#include "GenericGrid.h"
-#include "Parser.h"
 #include "Visualizer.h"
 #include "PuzzleSolver.h"
 #include <set>

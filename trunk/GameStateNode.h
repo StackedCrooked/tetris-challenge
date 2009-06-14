@@ -1,9 +1,11 @@
 #ifndef GAMESTATENODE_H
 #define GAMESTATENODE_H
 
+
 #include "GameState.h"
 #include <boost/shared_ptr.hpp>
 #include <set>
+
 
 namespace Tetris
 {
