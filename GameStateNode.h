@@ -18,10 +18,14 @@ namespace Tetris
 	
 	struct GameStateNode
 	{
+		GameStateNode() : parent(0) {}
+
 		GameState state;
 
-		typedef std::set<ChildPtr, ChildPtrCompare> Children;
+		typedef std::multiset<ChildPtr, ChildPtrCompare> Children;
 		Children children;
+
+		GameStateNode * parent;
 	};
 
 } // namespace Tetris

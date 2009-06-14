@@ -133,19 +133,43 @@ namespace Tetris
 	}
 
 
-	//void Visualizer::drawBlock(Gdiplus::Graphics & inGraphics, const Block & inBlock, const Gdiplus::RectF & inRect)
-	//{
-	//	Gdiplus::SolidBrush fgBrush(Gdiplus::Color::Blue);
-	//	Gdiplus::SolidBrush bgBrush(Gdiplus::Color::Yellow);
-	//	for (size_t i = 0; i != inBlock.grid().numRows(); ++i)
-	//	{
-	//		for (size_t j = 0; j != inBlock.grid().numColumns(); ++j)
-	//		{
-	//			Gdiplus::RectF rect(inRect.GetLeft() + j * cUnitWidth, inRect.GetTop() + i * cUnitHeight, cUnitWidth, cUnitHeight);
-	//			inGraphics.FillRectangle((inBlock.grid().get(i, j) != 0) ? &fgBrush : &bgBrush, rect);
-	//		}
-	//	}
-	//}
+	void Visualizer::drawState(Gdiplus::Graphics & inGraphics, const GameState & inState, const Gdiplus::RectF & inRect)
+	{
+		const Grid & grid = inState.grid();
+		const int cUnitWidth = inRect.Width / 15;
+		const int cUnitHeight = cUnitWidth;
+		for (size_t rowIdx = 0; rowIdx != grid.numRows(); ++rowIdx)
+		{
+			for (size_t colIdx = 0; colIdx != grid.numColumns(); ++colIdx)
+			{
+				Gdiplus::SolidBrush fgBrush(GetColor(grid.get(rowIdx, colIdx)));
+				Gdiplus::RectF rect
+				(
+					inRect.X + colIdx * cUnitWidth,
+					inRect.Y + rowIdx * cUnitHeight,
+					cUnitWidth,
+					cUnitHeight
+				);
+				inGraphics.FillRectangle(&fgBrush, rect);
+			}
+		}
+		std::wstringstream ss;
+		ss << L"Score: " << inState.calculateScore();
+		std::wstring info(ss.str());
+
+		Gdiplus::Font gdiFont(TEXT("Arial"), 9, Gdiplus::FontStyleRegular);			
+		
+		Gdiplus::RectF layoutRect
+		(
+			(float)inRect.X,
+			(float)inRect.Y + inRect.Height - 20,
+			(float)inRect.Width,
+			(float)20
+		);
+		Gdiplus::StringFormat stringFormat;
+		Gdiplus::SolidBrush textBrush(Gdiplus::Color::Blue);
+		inGraphics.DrawString(info.c_str(), (int)info.size(), &gdiFont, layoutRect, &stringFormat, &textBrush);
+	}
 
 
 	void Visualizer::onPaint(HDC inHDC)
@@ -153,14 +177,6 @@ namespace Tetris
 		// Obtain the client rect of the window.
 		RECT rc;
 		::GetClientRect(mHandle, &rc);
-
-		// Erase background
-		Gdiplus::Graphics g(inHDC);
-		Gdiplus::SolidBrush bgBrush(Gdiplus::Color::White);
-		Gdiplus::RectF bgRect(0, 0, rc.right-rc.left, rc.bottom-rc.top);
-		g.FillRectangle(&bgBrush, bgRect);
-
-		// Paint contents
 		const int cWidth = rc.right - rc.left;
 		const int cHeight = rc.bottom - rc.top;
 		const int cMarginLeft = static_cast<int>((0.1 * static_cast<double>(cWidth)) + 0.5);
@@ -170,39 +186,29 @@ namespace Tetris
 		const int cUnitWidth = 10;
 		const int cUnitHeight = cUnitWidth;
 
-		const GameStateNode * node = mPuzzleSolver->currentNode();
-		const Grid & grid = node->state.grid();
-		for (size_t rowIdx = 0; rowIdx != grid.numRows(); ++rowIdx)
+		// Erase background
+		Gdiplus::Graphics g(inHDC);
+		Gdiplus::SolidBrush bgBrush(Gdiplus::Color::White);
+		Gdiplus::RectF bgRect(0, 0, rc.right-rc.left, rc.bottom-rc.top);
+		g.FillRectangle(&bgBrush, bgRect);
+
+		// Paint contents
+		GameStateNode * node = mPuzzleSolver->currentNode()->parent;
+		if (node)
 		{
-			for (size_t colIdx = 0; colIdx != grid.numColumns(); ++colIdx)
+			const GameStateNode::Children & children = node->children;
+			GameStateNode::Children::const_iterator it = children.begin(), end = children.end();
+			int count = 0;
+			size_t numChildren = 8;
+			for (; it != end && count < numChildren; ++it)
 			{
-				Gdiplus::SolidBrush fgBrush(GetColor(grid.get(rowIdx, colIdx)));
-				Gdiplus::RectF rect
-				(
-					cMarginLeft + colIdx * cUnitWidth,
-					cMarginTop + rowIdx * cUnitHeight,
-					cUnitWidth,
-					cUnitHeight
-				);
-				g.FillRectangle(&fgBrush, rect);
+				int rectWidth = (bgRect.Width-40)/numChildren;
+				int rectHeight = rectWidth + 20;
+				Gdiplus::RectF rect(20 + count*rectWidth, 20 + rectHeight, rectWidth, rectHeight);
+				drawState(g, it->get()->state, rect);
+				count++;
 			}
 		}
-		std::wstringstream ss;
-		ss << L"Score: " << node->state.calculateScore();
-		std::wstring info(ss.str());
-
-		Gdiplus::Font gdiFont(TEXT("Arial"), 9, Gdiplus::FontStyleRegular);			
-		
-		Gdiplus::RectF layoutRect
-		(
-			(float)cMarginLeft,
-			(float)(cHeight - cMarginBottom/2),
-			(float)(cWidth - cMarginLeft - cMarginRight),
-			(float)cMarginBottom
-		);
-		Gdiplus::StringFormat stringFormat;
-		Gdiplus::SolidBrush textBrush(Gdiplus::Color::Blue);
-		g.DrawString(info.c_str(), (int)info.size(), &gdiFont, layoutRect, &stringFormat, &textBrush);
 
 	}
 

@@ -39,12 +39,11 @@ namespace Tetris
 
 	int GameState::calculateScore() const
 	{
-		if (mDirty)
+		//if (true || mDirty)
 		{
 			static const int cHolePenalty = 1;
 			static const int cHeightPenalty = 1;
 			int result = 0;
-			bool foundTop = false;
 			size_t top = mGrid.numRows();
 			for (size_t colIdx = 0; colIdx != mGrid.numColumns(); ++colIdx)
 			{
@@ -55,16 +54,10 @@ namespace Tetris
 					const int & value = mGrid.get(rowIdx, colIdx);
 					if (value != NO_BLOCK)
 					{
-						if (!foundTop)
-						{
-							top = rowIdx;
-							foundTop = true;
-						}
-
+						top = std::min<size_t>(top, rowIdx);
 						if (!foundColTop)
 						{
 							colTop = rowIdx;
-							result -= static_cast<int>(mGrid.numRows() - colTop) * cHeightPenalty;
 							foundColTop = true;
 						}
 					}
@@ -81,8 +74,9 @@ namespace Tetris
 			result -= static_cast<int>(mGrid.numRows() - top) * cHeightPenalty;
 			mCachedScore = result;
 			mDirty = false;
+			return result;
 		}
-		return mCachedScore;
+		//return mCachedScore;
 	}
 
 
