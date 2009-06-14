@@ -9,6 +9,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GraphicalVersion", "Graphic
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ConsoleVersion", "ConsoleVersion.vcproj", "{D4BBD843-FE20-426A-B02A-0881598F1675}"
+	ProjectSection(ProjectDependencies) = postProject
+		{743718FA-A3A5-48D8-AC6C-6102A5E0934B} = {743718FA-A3A5-48D8-AC6C-6102A5E0934B}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
