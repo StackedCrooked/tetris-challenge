@@ -113,6 +113,15 @@ namespace Tetris
 
 		sInstances.insert(std::make_pair(mHandle, this));
 
+		int count = 0;
+		while (mPuzzleSolver->depth() < 56 && count < 1000000)
+		{
+			mPuzzleSolver->next();
+			count++;
+		}
+		std::wstringstream ss;
+		ss << L"count: " << count;
+		::MessageBox(0, ss.str().c_str(), 0, MB_OK);
 		::ShowWindow(mHandle, SW_SHOW);	
 		MSG message;
 		while (GetMessage(&message, NULL, 0, 0))
@@ -130,6 +139,59 @@ namespace Tetris
 	{
 		::InvalidateRect(mHandle, 0, FALSE);
 		::UpdateWindow(mHandle);
+	}
+
+
+	void Visualizer::drawTree(Gdiplus::Graphics & inGraphics, const GameStateNode & inNode, const Gdiplus::RectF & inRect, int level)
+	{
+		int xOffset = inRect.X;
+		int yOffset = inRect.Y;
+
+		int score = inNode.state().calculateScore();
+		std::wstringstream ss;
+		ss << "Level: " << level << ". Score: " << score;
+		Gdiplus::SolidBrush textBrush(Gdiplus::Color::Green);
+		drawText(inGraphics, ss.str(), Gdiplus::RectF(xOffset, yOffset, 80, 30), textBrush);
+
+		xOffset += 80;
+		GameStateNode::Children::const_iterator it = inNode.children().begin(), end = inNode.children().end();
+		for (; it != end; ++it)
+		{
+			if (*it)
+			{
+				GameStateNode & node = *it->get();
+				std::wstringstream ss;
+				ss << node.state().calculateScore();
+				Gdiplus::SolidBrush textBrush(node.state().isDeadEnd() ? Gdiplus::Color::Red : node.children().empty() ? Gdiplus::Color::Gray : Gdiplus::Color::Green);
+				drawText(inGraphics, ss.str(), Gdiplus::RectF(xOffset, yOffset, 30, 30), textBrush);
+				yOffset += 30;
+
+				Gdiplus::RectF rect(inRect.X + xOffset + 30, inRect.Y, inRect.Width - xOffset - 30, inRect.Height);
+				drawTree(inGraphics, node, rect, level + 1);
+			}
+		}
+	}
+
+
+	void Visualizer::drawText(Gdiplus::Graphics & inGraphics, const std::wstring & inText, const Gdiplus::RectF & inRect)
+	{
+		Gdiplus::SolidBrush textBrush(Gdiplus::Color::White);
+		drawText(inGraphics, inText, inRect, textBrush);
+	}
+
+	void Visualizer::drawText(Gdiplus::Graphics & inGraphics, const std::wstring & inText, const Gdiplus::RectF & inRect, const Gdiplus::Brush & inBrush)
+	{
+		Gdiplus::Font gdiFont(TEXT("Arial"), 9, Gdiplus::FontStyleRegular);			
+		
+		Gdiplus::RectF layoutRect
+		(
+			(float)inRect.X,
+			(float)inRect.Y,
+			(float)inRect.Width,
+			(float)inRect.Height
+		);
+		Gdiplus::StringFormat stringFormat;
+		inGraphics.DrawString(inText.c_str(), (int)inText.size(), &gdiFont, layoutRect, &stringFormat, &inBrush);
 	}
 
 
@@ -156,19 +218,7 @@ namespace Tetris
 		std::wstringstream ss;
 		ss << L"Score: " << inState.calculateScore();
 		std::wstring info(ss.str());
-
-		Gdiplus::Font gdiFont(TEXT("Arial"), 9, Gdiplus::FontStyleRegular);			
-		
-		Gdiplus::RectF layoutRect
-		(
-			(float)inRect.X,
-			(float)inRect.Y + inRect.Height - 20,
-			(float)inRect.Width,
-			(float)20
-		);
-		Gdiplus::StringFormat stringFormat;
-		Gdiplus::SolidBrush textBrush(Gdiplus::Color::Blue);
-		inGraphics.DrawString(info.c_str(), (int)info.size(), &gdiFont, layoutRect, &stringFormat, &textBrush);
+		drawText(inGraphics, info, Gdiplus::RectF(inRect.X, inRect.Y + inRect.Height - 20, inRect.Width, inRect.Height));
 	}
 
 
@@ -179,36 +229,54 @@ namespace Tetris
 		::GetClientRect(mHandle, &rc);
 		const int cWidth = rc.right - rc.left;
 		const int cHeight = rc.bottom - rc.top;
-		const int cMarginLeft = static_cast<int>((0.1 * static_cast<double>(cWidth)) + 0.5);
-		const int cMarginRight = static_cast<int>((0.1 * static_cast<double>(cWidth)) + 0.5);
-		const int cMarginTop = static_cast<int>((0.1 * static_cast<double>(cHeight)) + 0.5);
-		const int cMarginBottom = static_cast<int>((0.1 * static_cast<double>(cHeight)) + 0.5);
-		const int cUnitWidth = 10;
+		const int cMarginLeft = 20;
+		const int cMarginRight = 20;
+		const int cMarginTop = 40;
+		const int cMarginBottom = 20;
+		const int cUnitWidth = 8;
 		const int cUnitHeight = cUnitWidth;
+		const int cSpacing = 10;
+		const int cTreeHeight = 0*400;
 
 		// Erase background
 		Gdiplus::Graphics g(inHDC);
-		Gdiplus::SolidBrush bgBrush(Gdiplus::Color::White);
+		Gdiplus::SolidBrush bgBrush(Gdiplus::Color::Black);
 		Gdiplus::RectF bgRect(0, 0, rc.right-rc.left, rc.bottom-rc.top);
 		g.FillRectangle(&bgBrush, bgRect);
 
 		// Paint contents
-		GameStateNode * node = mPuzzleSolver->currentNode()->parent;
+		const GameStateNode * node = mPuzzleSolver->currentNode()->parent();
+
 		if (node)
 		{
-			const GameStateNode::Children & children = node->children;
+			int offsetX = cMarginLeft;
+			int offsetY = cMarginTop;
+
+			//drawTree(g, *node, Gdiplus::RectF(offsetX, offsetY, cWidth - cMarginLeft - cMarginRight, cTreeHeight), 0);
+			offsetY += cTreeHeight;
+			
+			const GameStateNode::Children & children = node->children();
 			GameStateNode::Children::const_iterator it = children.begin(), end = children.end();
 			int count = 0;
-			size_t numChildren = 8;
+			size_t numChildren = children.size();
 			for (; it != end && count < numChildren; ++it)
 			{
-				int rectWidth = (bgRect.Width-40)/numChildren;
+				int rectWidth = it->get()->state().grid().numColumns()*cUnitWidth;
 				int rectHeight = rectWidth + 20;
-				Gdiplus::RectF rect(20 + count*rectWidth, 20 + rectHeight, rectWidth, rectHeight);
-				drawState(g, it->get()->state, rect);
+				Gdiplus::RectF rect(offsetX, offsetY, rectWidth, rectHeight);
+				drawState(g, it->get()->state(), rect);
 				count++;
+				offsetX += rectWidth + cSpacing;
+				if (offsetX + rectWidth + cMarginRight > cWidth)
+				{
+					offsetX = cMarginLeft;
+					offsetY += rectHeight + cSpacing;
+				}
 			}
 		}
+		std::wstringstream ss;
+		ss << "Depth: " << mPuzzleSolver->depth() << "/" << mPuzzleSolver->blocks().size();
+		drawText(g, ss.str(), Gdiplus::RectF(100, 10, cWidth - 100, 20));
 
 	}
 
@@ -247,7 +315,7 @@ namespace Tetris
 			}
 			case NO_BLOCK:
 			{
-				return Gdiplus::Color::Gray;
+				return Gdiplus::Color::White;
 			}
 			default:
 			{
@@ -271,6 +339,11 @@ namespace Tetris
 
 		switch (inMessage)
 		{
+			case WM_SIZE:
+			{
+				::InvalidateRect(hWnd, 0, FALSE);
+				break;
+			}
 			case WM_COMMAND:
 			{
 				if (wParam == 101)

@@ -35,6 +35,12 @@ namespace Tetris
 
 		void onPaint(HDC inHDC);
 
+		void drawTree(Gdiplus::Graphics & inGraphics, const GameStateNode & inNode, const Gdiplus::RectF & inRect, int level);
+
+		void drawText(Gdiplus::Graphics & inGraphics, const std::wstring & inText, const Gdiplus::RectF & inRect, const Gdiplus::Brush & inBrush);
+		
+		void drawText(Gdiplus::Graphics & inGraphics, const std::wstring & inText, const Gdiplus::RectF & inRect);
+
 		void drawState(Gdiplus::Graphics & inGraphics, const GameState & inState, const Gdiplus::RectF & inRect);
 
 		static Gdiplus::Color GetColor(BlockType inType);

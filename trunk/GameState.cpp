@@ -20,7 +20,8 @@ namespace Tetris
 	GameState::GameState() :
 		mGrid(cNumRows, cNumColumns, NO_BLOCK),
 		mDirty(true),
-		mCachedScore(0)
+		mCachedScore(0),
+		mDeadEnd(false)
 	{
 	}
 
@@ -41,9 +42,10 @@ namespace Tetris
 	{
 		if (mDirty)
 		{
-			static const int cHolePenalty = 1;
+			static const int cHolePenalty = 10;
 			static const int cHeightPenalty = 1;
 			int result = 0;
+			int numHoles = 0;
 			size_t top = mGrid.numRows();
 			for (size_t colIdx = 0; colIdx != mGrid.numColumns(); ++colIdx)
 			{
@@ -65,8 +67,13 @@ namespace Tetris
 					{
 						if (foundColTop)
 						{
+							numHoles++;
 							// we found a hole in the grid
 							result -= cHolePenalty;
+							if (numHoles >= 1)
+							{
+								markAsDeadEnd();
+							}
 						}
 					}
 				}
