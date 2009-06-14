@@ -3,6 +3,7 @@
 #include <string>
 #include <sstream>
 #include <assert.h>
+#include <ctime>
 
 
 namespace Tetris
@@ -113,14 +114,13 @@ namespace Tetris
 
 		sInstances.insert(std::make_pair(mHandle, this));
 
-		int count = 0;
-		while (mPuzzleSolver->depth() < 56 && count < 1000000)
+		std::time_t start = time(0);
+		while (mPuzzleSolver->depth() < 56)
 		{
 			mPuzzleSolver->next();
-			count++;
 		}
 		std::wstringstream ss;
-		ss << L"count: " << count;
+		ss << L"Duration: " << time(0) - start << L" s.";
 		::MessageBox(0, ss.str().c_str(), 0, MB_OK);
 		::ShowWindow(mHandle, SW_SHOW);	
 		MSG message;
