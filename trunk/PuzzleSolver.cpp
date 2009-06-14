@@ -27,7 +27,9 @@ namespace Tetris
 			mCurrentNode->children = futureGameStates;
 			if (!mCurrentNode->children.empty())
 			{
+				GameStateNode * parentNode = mCurrentNode;
 				mCurrentNode = (mCurrentNode->children.begin())->get();
+				mCurrentNode->parent = parentNode;
 			}
 			mTreeDepth++;
 			return true;

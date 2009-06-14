@@ -25,8 +25,6 @@ namespace Tetris
 
 		void refresh();
 
-		//void drawBlock(Gdiplus::Graphics & inGraphics, const Block & inBlock, const Gdiplus::RectF & inRect);
-
 	private:
 		Visualizer(const Visualizer &);
 		Visualizer & operator=(const Visualizer &);
@@ -36,6 +34,8 @@ namespace Tetris
 		static LRESULT CALLBACK MessageHandler(HWND hWnd, UINT inMessage, WPARAM wParam, LPARAM lParam);
 
 		void onPaint(HDC inHDC);
+
+		void drawState(Gdiplus::Graphics & inGraphics, const GameState & inState, const Gdiplus::RectF & inRect);
 
 		static Gdiplus::Color GetColor(BlockType inType);
 
