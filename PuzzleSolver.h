@@ -1,8 +1,6 @@
 #ifndef PUZZLESOLVER_H
 #define PUZZLESOLVER_H
 
-#include "Block.h"
-#include "GameState.h"
 #include "GameStateNode.h"
 #include <list>
 #include <vector>

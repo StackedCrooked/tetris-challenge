@@ -3,7 +3,6 @@
 
 #include "Block.h"
 #include "GenericGrid.h"
-#include <boost/signal.hpp>
 #include <set>
 #include <vector>
 
