@@ -8,9 +8,7 @@
 INT_PTR WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
 	Tetris::PuzzleSolver puzzleSolver;
-	while (puzzleSolver.next())
-	{
-
-	}
+	Tetris::Visualizer v(&puzzleSolver);
+	v.show();
 	return 0;
 }

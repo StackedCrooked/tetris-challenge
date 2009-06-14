@@ -28,8 +28,8 @@ namespace Tetris
 
 
 
-	Visualizer::Visualizer(const GameState & inGameGrids) :
-		mGameGrid(inGameGrids)
+	Visualizer::Visualizer(PuzzleSolver * inPuzzleSolver) :
+		mPuzzleSolver(inPuzzleSolver)
 	{
 		sRefCount++;
 		if (sRefCount == 1)
@@ -95,6 +95,22 @@ namespace Tetris
 			return;
 		}
 
+		mNextButton = CreateWindowEx
+		(
+			0,
+			L"BUTTON",
+			L"Next",
+			BS_PUSHBUTTON | WS_CHILD | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_VISIBLE,
+			10,
+			10,
+			80,
+			22,
+			mHandle,
+			(HMENU)101,
+			::GetModuleHandle(0),
+			NULL
+		);
+
 		sInstances.insert(std::make_pair(mHandle, this));
 
 		::ShowWindow(mHandle, SW_SHOW);	
@@ -151,14 +167,16 @@ namespace Tetris
 		const int cMarginRight = static_cast<int>((0.1 * static_cast<double>(cWidth)) + 0.5);
 		const int cMarginTop = static_cast<int>((0.1 * static_cast<double>(cHeight)) + 0.5);
 		const int cMarginBottom = static_cast<int>((0.1 * static_cast<double>(cHeight)) + 0.5);
-		const int cUnitWidth = (cWidth - cMarginLeft - cMarginRight)/mGameGrid.grid().numColumns();
+		const int cUnitWidth = 10;
 		const int cUnitHeight = cUnitWidth;
 
-		for (size_t rowIdx = 0; rowIdx != mGameGrid.grid().numRows(); ++rowIdx)
+		const GameStateNode * node = mPuzzleSolver->currentNode();
+		const Grid & grid = node->state.grid();
+		for (size_t rowIdx = 0; rowIdx != grid.numRows(); ++rowIdx)
 		{
-			for (size_t colIdx = 0; colIdx != mGameGrid.grid().numColumns(); ++colIdx)
+			for (size_t colIdx = 0; colIdx != grid.numColumns(); ++colIdx)
 			{
-				Gdiplus::SolidBrush fgBrush(GetColor(mGameGrid.grid().get(rowIdx, colIdx)));
+				Gdiplus::SolidBrush fgBrush(GetColor(grid.get(rowIdx, colIdx)));
 				Gdiplus::RectF rect
 				(
 					cMarginLeft + colIdx * cUnitWidth,
@@ -170,7 +188,7 @@ namespace Tetris
 			}
 		}
 		std::wstringstream ss;
-		ss << L"Score: " << mGameGrid.calculateScore();
+		ss << L"Score: " << node->state.calculateScore();
 		std::wstring info(ss.str());
 
 		Gdiplus::Font gdiFont(TEXT("Arial"), 9, Gdiplus::FontStyleRegular);			
@@ -247,6 +265,16 @@ namespace Tetris
 
 		switch (inMessage)
 		{
+			case WM_COMMAND:
+			{
+				if (wParam == 101)
+				{
+					pThis->mPuzzleSolver->next();
+					::InvalidateRect(pThis->mHandle, 0, FALSE);
+					::UpdateWindow(pThis->mHandle);
+				}
+				break;
+			}
 			case WM_PAINT:
 			{
 				PAINTSTRUCT ps;

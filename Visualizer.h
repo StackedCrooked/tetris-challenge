@@ -17,7 +17,7 @@ namespace Tetris
 	class Visualizer
 	{
 	public:
-		Visualizer(const GameState & inGameGrids);
+		Visualizer(PuzzleSolver * inPuzzleSolver);
 
 		~Visualizer();
 
@@ -40,9 +40,10 @@ namespace Tetris
 		static Gdiplus::Color GetColor(BlockType inType);
 
 		HWND mHandle;
+		HWND mNextButton;
 		typedef std::map<HWND, Visualizer*> Instances;
 
-		const GameState & mGameGrid;
+		PuzzleSolver * mPuzzleSolver;
 
 		static Instances sInstances;
 		static ULONG_PTR sGdiPlusToken;
