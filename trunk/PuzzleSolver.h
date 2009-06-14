@@ -16,13 +16,13 @@ namespace Tetris
 
 		bool next();
 
-		// returns true when the Block was dropped successfully
-		// returns false when no suitable location was found within the bounds of the grid
+		const GameStateNode * currentNode() const { return mCurrentNode; }
+
+	private:
 		void generateFutureGameStates(const GameState & inGameState, const Block & inBlock, GameStateNode::Children & outGameGrids);
 
 		void generateFutureGameStates(const GameState & inGameState, const Block & inBlock, size_t inColIdx, GameStateNode::Children & outGameGrids) const;
 
-	private:
 		GameStateNode mRootNode;
 		GameStateNode * mCurrentNode;
 		std::vector<BlockIdentifier> mBlocks;
