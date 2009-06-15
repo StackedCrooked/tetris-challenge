@@ -39,6 +39,10 @@ namespace Tetris
 		
 		void drawText(Gdiplus::Graphics & inGraphics, const std::wstring & inText, const Gdiplus::RectF & inRect);
 
+		void drawGrid(Gdiplus::Graphics & inGraphics, const Grid & inGrid, const Gdiplus::RectF & inRect);
+
+		void drawRemainingBlocks(Gdiplus::Graphics & inGraphics, const Gdiplus::RectF & inRect);
+
 		void drawState(Gdiplus::Graphics & inGraphics, const GameState & inState, const Gdiplus::RectF & inRect);
 
 		static Gdiplus::Color GetColor(BlockType inType);

@@ -113,7 +113,7 @@ namespace Tetris
 		);
 
 		sInstances.insert(std::make_pair(mHandle, this));
-		mTimerID = SetTimer(NULL, NULL, 500, &Visualizer::TimerCallback);
+		mTimerID = SetTimer(NULL, NULL, 100, &Visualizer::TimerCallback);
 		::ShowWindow(mHandle, SW_SHOW);	
 		MSG message;
 		while (GetMessage(&message, NULL, 0, 0))
@@ -187,16 +187,15 @@ namespace Tetris
 	}
 
 
-	void Visualizer::drawState(Gdiplus::Graphics & inGraphics, const GameState & inState, const Gdiplus::RectF & inRect)
+	void Visualizer::drawGrid(Gdiplus::Graphics & inGraphics, const Grid & inGrid, const Gdiplus::RectF & inRect)
 	{
-		const Grid & grid = inState.grid();
-		const int cUnitWidth = inRect.Width / 15;
+		const int cUnitWidth = inRect.Width / inGrid.numColumns();
 		const int cUnitHeight = cUnitWidth;
-		for (size_t rowIdx = 0; rowIdx != grid.numRows(); ++rowIdx)
+		for (size_t rowIdx = 0; rowIdx != inGrid.numRows(); ++rowIdx)
 		{
-			for (size_t colIdx = 0; colIdx != grid.numColumns(); ++colIdx)
+			for (size_t colIdx = 0; colIdx != inGrid.numColumns(); ++colIdx)
 			{
-				Gdiplus::SolidBrush fgBrush(GetColor(grid.get(rowIdx, colIdx)));
+				Gdiplus::SolidBrush fgBrush(GetColor(inGrid.get(rowIdx, colIdx)));
 				Gdiplus::RectF rect
 				(
 					inRect.X + colIdx * cUnitWidth,
@@ -207,6 +206,35 @@ namespace Tetris
 				inGraphics.FillRectangle(&fgBrush, rect);
 			}
 		}
+	}
+
+	
+	void Visualizer::drawRemainingBlocks(Gdiplus::Graphics & inGraphics, const Gdiplus::RectF & inRect)
+	{
+		int offsetX = inRect.X;
+		int offsetY = inRect.Y;
+		for (size_t idx = 0; idx != mPuzzleSolver->blocks().size(); ++idx)
+		{
+			if (mPuzzleSolver->depth() <= idx)
+			{
+				const Block & block = Block::Get(mPuzzleSolver->blocks()[idx].type, mPuzzleSolver->blocks()[idx].rotation);
+				drawGrid(inGraphics, block.grid(), Gdiplus::RectF(offsetX, offsetY, block.grid().numColumns()*10, block.grid().numRows()*10));
+			}
+			offsetX += 5*10;
+			if (offsetX > inRect.X + inRect.Width)
+			{
+				offsetX = inRect.X;
+				offsetY += 5*10;
+			}
+		}
+		
+	}
+	
+
+	void Visualizer::drawState(Gdiplus::Graphics & inGraphics, const GameState & inState, const Gdiplus::RectF & inRect)
+	{
+		const Grid & grid = inState.grid();
+		drawGrid(inGraphics, grid, inRect);
 		std::wstringstream ss;
 		ss << L"Score: " << inState.calculateScore();
 		std::wstring info(ss.str());
@@ -266,6 +294,9 @@ namespace Tetris
 					offsetY += rectHeight + cSpacing;
 				}
 			}
+
+			int blocksOffsetX = cMarginLeft + 15*cUnitWidth + cUnitWidth;
+			drawRemainingBlocks(g, Gdiplus::RectF(blocksOffsetX, cMarginTop, cWidth - cMarginRight - blocksOffsetX, cHeight));
 		}
 		std::wstringstream ss;
 		ss << "Depth: " << mPuzzleSolver->depth() << "/" << mPuzzleSolver->blocks().size();
