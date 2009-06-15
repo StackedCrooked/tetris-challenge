@@ -113,15 +113,7 @@ namespace Tetris
 		);
 
 		sInstances.insert(std::make_pair(mHandle, this));
-
-		std::time_t start = time(0);
-		while (mPuzzleSolver->depth() < 56)
-		{
-			mPuzzleSolver->next();
-		}
-		std::wstringstream ss;
-		ss << L"Duration: " << time(0) - start << L" s.";
-		::MessageBox(0, ss.str().c_str(), 0, MB_OK);
+		mTimerID = SetTimer(NULL, NULL, 500, &Visualizer::TimerCallback);
 		::ShowWindow(mHandle, SW_SHOW);	
 		MSG message;
 		while (GetMessage(&message, NULL, 0, 0))
@@ -233,6 +225,7 @@ namespace Tetris
 		const int cMarginRight = 20;
 		const int cMarginTop = 40;
 		const int cMarginBottom = 20;
+		const int cRight = cWidth - cMarginRight;
 		const int cUnitWidth = 8;
 		const int cUnitHeight = cUnitWidth;
 		const int cSpacing = 10;
@@ -258,7 +251,7 @@ namespace Tetris
 			const GameStateNode::Children & children = node->children();
 			GameStateNode::Children::const_iterator it = children.begin(), end = children.end();
 			int count = 0;
-			size_t numChildren = children.size();
+			size_t numChildren = 1;//children.size();
 			for (; it != end && count < numChildren; ++it)
 			{
 				int rectWidth = it->get()->state().grid().numColumns()*cUnitWidth;
@@ -315,7 +308,7 @@ namespace Tetris
 			}
 			case NO_BLOCK:
 			{
-				return Gdiplus::Color::White;
+				return Gdiplus::Color::Black;
 			}
 			default:
 			{
@@ -323,6 +316,28 @@ namespace Tetris
 				return Gdiplus::Color::Black;
 			}
 		}
+	}
+
+
+	void CALLBACK Visualizer::TimerCallback(HWND hWnd, UINT inMessage, UINT_PTR inTimerID, DWORD inTime)
+	{
+		Instances::iterator it = sInstances.begin();
+		if (it == sInstances.end())
+		{
+			return;
+		}
+
+		Visualizer * pThis = it->second;
+
+		if (inTimerID == pThis->mTimerID)
+		{
+			if (pThis->mPuzzleSolver->depth() < 56)
+			{
+				pThis->mPuzzleSolver->next();
+				::InvalidateRect(pThis->mHandle, 0, FALSE);
+			}
+		}
+		
 	}
 
 
