@@ -29,6 +29,8 @@ namespace Tetris
 		static void Finalize();
 		static LRESULT CALLBACK MessageHandler(HWND hWnd, UINT inMessage, WPARAM wParam, LPARAM lParam);
 
+		static void CALLBACK TimerCallback(HWND hWnd, UINT inMessage, UINT_PTR inTimerID, DWORD inTime);
+
 		void onPaint(HDC inHDC);
 
 		void drawTree(Gdiplus::Graphics & inGraphics, const GameStateNode & inNode, const Gdiplus::RectF & inRect, int level);
@@ -46,6 +48,7 @@ namespace Tetris
 		typedef std::map<HWND, Visualizer*> Instances;
 
 		PuzzleSolver * mPuzzleSolver;
+		UINT_PTR mTimerID;
 
 		static Instances sInstances;
 		static ULONG_PTR sGdiPlusToken;
