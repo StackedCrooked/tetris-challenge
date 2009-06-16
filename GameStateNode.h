@@ -21,27 +21,25 @@ namespace Tetris
 	class GameStateNode
 	{
 	public:
-		GameStateNode(GameStateNode * inParent) : mParent(inParent), mDeadEnd(false) {}
+		GameStateNode(GameStateNode * inParent);
 
-		const GameState & state() const { return mState; }
+		const GameState & state() const;
 
-		GameState & state() { return mState; }
+		GameState & state();
 
-		void setState(const GameState & inState) { mState = inState; }
+		void setState(const GameState & inState);
 
 		typedef std::multiset<ChildPtr, ChildPtrCompare> Children;
 
-		Children & children() { return mChildren; }
+		Children & children();
 
-		const Children & children() const { return mChildren; }
+		const Children & children() const;
 
-		void setChildren(const Children & inChildren) { mChildren = inChildren; }
+		void setChildren(const Children & inChildren);
 
-		GameStateNode * parent() { return mParent; }
+		GameStateNode * parent();
 
-		const GameStateNode * parent() const { return mParent; }
-
-		//void setParent(GameStateNode * inParent) { mParent = inParent; }
+		const GameStateNode * parent() const;
 		
 	private:
 		GameState mState;
