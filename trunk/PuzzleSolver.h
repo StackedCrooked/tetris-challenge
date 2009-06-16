@@ -7,6 +7,8 @@
 
 namespace Tetris
 {
+	// Programming Challenge 25a - Like Playing Tetris?
+	// http://cplus.about.com/b/2009/06/06/programming-challenge-25a-like-playing-tetris.htm
 
 	class PuzzleSolver
 	{
