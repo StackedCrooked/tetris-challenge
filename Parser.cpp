@@ -31,59 +31,54 @@ namespace Tetris
 		return true;
 	}
 
-
-	BlockIdentifier Parser::makeBlockIdentifierFromString(const std::string & inString)
+	
+	BlockType Parser::convertCharToBlockType(char charType)
 	{
-		char index, charType;
-		int rotation = 0;
-		sscanf(inString.c_str(), "%c %c %d", &index, &charType, &rotation);
-
-		BlockType type = I_BLOCK;
 		switch (charType)
 		{
 			case 'I':
 			{
-				type = I_BLOCK;
-				break;
+				return I_BLOCK;
 			}
 			case 'J':
 			{
-				type = J_BLOCK;
-				break;
+				return J_BLOCK;
 			}
 			case 'L':
 			{
-				type = L_BLOCK;
-				break;
+				return L_BLOCK;
 			}
 			case 'O':
 			{
-				type = O_BLOCK;
-				break;
+				return O_BLOCK;
 			}
 			case 'S':
 			{
-				type = S_BLOCK;
-				break;
+				return S_BLOCK;
 			}
 			case 'T':
 			{
-				type = T_BLOCK;
-				break;
+				return T_BLOCK;
 			}
 			case 'Z':
 			{
-				type = Z_BLOCK;
-				break;
+				return Z_BLOCK;
 			}
 			default:
 			{
 				assert(!"Parser error");
-				break;
 			}
 		}
+		return NO_BLOCK;
+	}
 
-		return BlockIdentifier(type, rotation);
+
+	BlockIdentifier Parser::makeBlockIdentifierFromString(const std::string & inString)
+	{
+		char charId, charType;
+		int rotation = 0;
+		sscanf(inString.c_str(), "%c %c %d", &charId, &charType, &rotation);
+		return BlockIdentifier(charId, convertCharToBlockType(charType), rotation);
 	}
 
 } // namespace Tetris

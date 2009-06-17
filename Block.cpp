@@ -8,14 +8,13 @@ namespace Tetris
 	Block::Cache Block::sCache;
 
 
-	const Block & Block::Get(BlockType inType, int inRotation)
+	const Block & Block::Get(const BlockIdentifier & inBlockId)
 	{
-		BlockIdentifier id(inType, inRotation);
-		Cache::iterator it = sCache.find(id);
+		Cache::iterator it = sCache.find(inBlockId);
 		if (it == sCache.end())
 		{
-			sCache.insert(std::make_pair(id, Block(inType, inRotation)));
-			it = sCache.find(id);
+			sCache.insert(std::make_pair(inBlockId, Block(inBlockId.type, inBlockId.rotation)));
+			it = sCache.find(inBlockId);
 		}
 		return it->second;
 	}
@@ -64,9 +63,10 @@ namespace Tetris
 
 	Block::Block(BlockType inType, int inRotation) :
 		mType(inType),
-		mRotation(inRotation),
 		mGrid(makeBlock(inType, inRotation))
 	{
+		
+		mRotation = inRotation % Block::NumRotations(inType);
 	}
 		
 
@@ -88,7 +88,8 @@ namespace Tetris
 	}
 
 
-	BlockIdentifier::BlockIdentifier(BlockType inType, int inRotation) :
+	BlockIdentifier::BlockIdentifier(char inCharId, BlockType inType, int inRotation) :
+		charId(inCharId),
 		type(inType),
 		rotation(inRotation)
 	{

@@ -17,8 +17,7 @@ namespace Tetris
 	
 	
 	GameStateNode::GameStateNode(GameStateNode * inParent)
-		: mParent(inParent),
-		mDeadEnd(false)
+		: mParent(inParent)
 	{
 	}
 
