@@ -31,11 +31,12 @@ namespace Tetris
 	 */
 	struct BlockIdentifier
 	{
-		BlockIdentifier(BlockType inType, int inRotation);
+		BlockIdentifier(char inCharId, BlockType inType, int inRotation);
 
 		bool operator ==(const BlockIdentifier & rhs);
 
 		BlockType type;
+		char charId;
 		int rotation;
 	};
 
@@ -51,7 +52,7 @@ namespace Tetris
 
 		// Factory method.
 		// Returns a const reference to a Block object that was created in an internal lookup table.
-		static const Block & Get(BlockType inType, int inRotation);
+		static const Block & Get(const BlockIdentifier & inBlockId);
 
 		static int NumRotations(BlockType inType);
 		

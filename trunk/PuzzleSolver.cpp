@@ -23,7 +23,7 @@ namespace Tetris
 	}
 
 
-	void PuzzleSolver::populateNode(GameStateNode * inNode, const std::vector<BlockType> & inBlockTypes) const
+	void PuzzleSolver::populateNode(GameStateNode * inNode, const std::vector<BlockIdentifier> & inBlockTypes) const
 	{
 		if (!inBlockTypes.empty())
 		{
@@ -37,7 +37,7 @@ namespace Tetris
 					inNode->setChildren(futureGameStates);
 					if (inBlockTypes.size() > 1)
 					{
-						std::vector<BlockType> blockTypes;
+						std::vector<BlockIdentifier> blockTypes;
 						for (size_t idx = 1; idx < inBlockTypes.size(); ++idx)
 						{
 							blockTypes.push_back(inBlockTypes[idx]);
@@ -60,13 +60,13 @@ namespace Tetris
 	
 	bool PuzzleSolver::next()
 	{
-		std::vector<BlockType> blockTypes;
+		std::vector<BlockIdentifier> blockIds;
 		if (mNodes.size() < mBlocks.size())
 		{
-			blockTypes.push_back(mBlocks[mNodes.size()].type);
+			blockIds.push_back(mBlocks[mNodes.size()]);
 		}
 		GameStateNode * currentNode = mNodes.empty() ? &mRootNode : mNodes.back()->get();
-		populateNode(currentNode, blockTypes);
+		populateNode(currentNode, blockIds);
 		if (!currentNode->state().isDeadEnd() && !currentNode->children().empty())
 		{
 			GameStateNode::Children::iterator newNodeIt = currentNode->children().begin();
@@ -129,11 +129,14 @@ namespace Tetris
 	}
 
 
-	void PuzzleSolver::generateFutureGameStates(GameStateNode & inGameStateNode, BlockType inBlockType, GameStateNode::Children & outGameGrids) const
+	void PuzzleSolver::generateFutureGameStates(GameStateNode & inGameStateNode, const BlockIdentifier & inBlockId, GameStateNode::Children & outGameGrids) const
 	{
-		for (size_t rotIdx = 0; rotIdx != Block::NumRotations(inBlockType); ++rotIdx)
+		
+		for (size_t rotIdx = 0; rotIdx != Block::NumRotations(inBlockId.type); ++rotIdx)
 		{
-			const Block & block(Block::Get(inBlockType, rotIdx));
+			BlockIdentifier id(inBlockId.charId, inBlockId.type, inBlockId.rotation + rotIdx);
+			const Block & block(Block::Get(id));
+			
 			size_t maxCol = inGameStateNode.state().grid().numColumns() - block.grid().numColumns();
 			for (size_t colIdx = 0; colIdx <= maxCol; ++colIdx)
 			{

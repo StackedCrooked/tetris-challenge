@@ -45,7 +45,6 @@ namespace Tetris
 		GameState mState;
 		GameStateNode * mParent;
 		Children mChildren;
-		bool mDeadEnd;
 	};
 
 } // namespace Tetris

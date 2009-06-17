@@ -15,6 +15,8 @@ namespace Tetris
 	public:
 		bool parse(const std::string & inFile, std::vector<BlockIdentifier> & outBlockIDs);
 
+		static BlockType convertCharToBlockType(char charType);
+
 		BlockIdentifier makeBlockIdentifierFromString(const std::string & inString);
 	};
 
