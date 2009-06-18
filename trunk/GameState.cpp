@@ -42,43 +42,53 @@ namespace Tetris
 	{
 		if (mDirty)
 		{
-			static const int cHolePenalty = 10;
+			static const int cHolePenalty = 20;
 			static const int cHeightPenalty = 1;
 			int result = 0;
 			int numHoles = 0;
+
+			bool foundTop = false;
 			size_t top = mGrid.numRows();
-			for (size_t colIdx = 0; colIdx != mGrid.numColumns(); ++colIdx)
+
+			size_t numOccupiedUnderTop = 0;
+
+			for (size_t rowIdx = 0; rowIdx != mGrid.numRows(); ++rowIdx)
 			{
-				bool foundColTop = false;
-				size_t colTop = mGrid.numRows();
-				for (size_t rowIdx = 0; rowIdx != mGrid.numRows(); ++rowIdx)
+				for (size_t colIdx = 0; colIdx != mGrid.numColumns(); ++colIdx)
 				{
 					const int & value = mGrid.get(rowIdx, colIdx);
 					if (value != NO_BLOCK)
 					{
-						top = std::min<size_t>(top, rowIdx);
-						if (!foundColTop)
+						if (!foundTop)
 						{
-							colTop = rowIdx;
-							foundColTop = true;
+							top = rowIdx;
+							foundTop = true;
+						}
+
+						if (foundTop)
+						{
+							numOccupiedUnderTop++;
 						}
 					}
 					else
 					{
-						if (foundColTop)
+						// check for holes
+						if (foundTop && rowIdx > 0)
 						{
-							numHoles++;
-							// we found a hole in the grid
-							result -= cHolePenalty;
-							if (numHoles >= 1)
+							if (mGrid.get(rowIdx - 1, colIdx) != NO_BLOCK)
 							{
+								numHoles++;
+								result -= cHolePenalty;
 								markAsDeadEnd();
+								return result;
 							}
 						}
 					}
 				}
 			}
-			result -= static_cast<int>(mGrid.numRows() - top) * cHeightPenalty;
+			result -= (mGrid.numRows() - top) * cHeightPenalty;
+			float density = (float)numOccupiedUnderTop / ((mGrid.numRows() - top) * mGrid.numColumns());
+			result = (int)((float)result / density);
 			mCachedScore = result;
 			mDirty = false;
 		}

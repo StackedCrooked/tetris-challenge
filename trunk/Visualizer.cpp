@@ -191,6 +191,7 @@ namespace Tetris
 	{
 		const int cUnitWidth = inRect.Width / inGrid.numColumns();
 		const int cUnitHeight = cUnitWidth;
+		Gdiplus::SolidBrush bgBrush(Gdiplus::Color::DarkGray);
 		for (size_t rowIdx = 0; rowIdx != inGrid.numRows(); ++rowIdx)
 		{
 			for (size_t colIdx = 0; colIdx != inGrid.numColumns(); ++colIdx)
@@ -339,7 +340,7 @@ namespace Tetris
 			}
 			case NO_BLOCK:
 			{
-				return Gdiplus::Color::Black;
+				return Gdiplus::Color::DarkGray;
 			}
 			default:
 			{
