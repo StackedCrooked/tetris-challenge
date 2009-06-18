@@ -26,12 +26,6 @@ namespace Tetris
 	{
 		return mState;
 	}
-
-
-	GameState & GameStateNode::state()
-	{
-		return mState;
-	}
 	
 	
 	void GameStateNode::setState(const GameState & inState)

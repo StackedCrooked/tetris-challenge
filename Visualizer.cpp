@@ -113,7 +113,7 @@ namespace Tetris
 		);
 
 		sInstances.insert(std::make_pair(mHandle, this));
-		mTimerID = SetTimer(NULL, NULL, 100, &Visualizer::TimerCallback);
+		//mTimerID = SetTimer(NULL, NULL, 100, &Visualizer::TimerCallback);
 		::ShowWindow(mHandle, SW_SHOW);	
 		MSG message;
 		while (GetMessage(&message, NULL, 0, 0))
@@ -200,8 +200,8 @@ namespace Tetris
 				(
 					inRect.X + colIdx * cUnitWidth,
 					inRect.Y + rowIdx * cUnitHeight,
-					cUnitWidth,
-					cUnitHeight
+					cUnitWidth-1,
+					cUnitHeight-1
 				);
 				inGraphics.FillRectangle(&fgBrush, rect);
 			}
@@ -279,7 +279,7 @@ namespace Tetris
 			const GameStateNode::Children & children = node->children();
 			GameStateNode::Children::const_iterator it = children.begin(), end = children.end();
 			int count = 0;
-			size_t numChildren = 1;//children.size();
+			size_t numChildren = children.size();
 			for (; it != end && count < numChildren; ++it)
 			{
 				int rectWidth = it->get()->state().grid().numColumns()*cUnitWidth;
@@ -296,7 +296,7 @@ namespace Tetris
 			}
 
 			int blocksOffsetX = cMarginLeft + 15*cUnitWidth + cUnitWidth;
-			drawRemainingBlocks(g, Gdiplus::RectF(blocksOffsetX, cMarginTop, cWidth - cMarginRight - blocksOffsetX, cHeight));
+			//drawRemainingBlocks(g, Gdiplus::RectF(blocksOffsetX, cMarginTop, cWidth - cMarginRight - blocksOffsetX, cHeight));
 		}
 		std::wstringstream ss;
 		ss << "Depth: " << mPuzzleSolver->depth() << "/" << mPuzzleSolver->blocks().size();
@@ -362,11 +362,11 @@ namespace Tetris
 
 		if (inTimerID == pThis->mTimerID)
 		{
-			if (pThis->mPuzzleSolver->depth() < 56)
+			while (pThis->mPuzzleSolver->depth() < 50)
 			{
 				pThis->mPuzzleSolver->next();
-				::InvalidateRect(pThis->mHandle, 0, FALSE);
 			}
+			::InvalidateRect(pThis->mHandle, 0, FALSE);
 		}
 		
 	}

@@ -5,8 +5,7 @@ namespace Tetris
 {
 
 	PuzzleSolver::PuzzleSolver() :
-		mRootNode(0),
-		mMinNodes(100)
+		mRootNode(0)
 	{
 		Parser p;
 		p.parse("inputs.txt", mBlocks);
@@ -85,23 +84,33 @@ namespace Tetris
 	void PuzzleSolver::tryNextBranch()
 	{
 		// Erase last node
-		Nodes::iterator it = mNodes.begin();
-		while (it != mNodes.end())
+		if (!mNodes.empty())
 		{
-			++it;
-		}
-		assert (it == mNodes.end());
-		mNodes.erase(--it);
-		if (mNodes.size() < mMinNodes)
-		{
-			mMinNodes = mNodes.size();
-		}
+			// Remove the children from this node
+			mNodes.back()->get()->children().clear();
 
-		// Try next child 
-		GameStateNode::Children::iterator end = mNodes.back()->get()->parent()->children().end();
-		if (++mNodes.back() == end)
-		{
-			tryNextBranch();
+			// Mark as dead end
+			mNodes.back()->get()->state().markAsDeadEnd();
+
+
+			GameStateNode::Children::iterator & currentNodeIt = mNodes.back();			
+			GameStateNode * parent = (*currentNodeIt)->parent();
+			if (parent)
+			{			
+				assert (currentNodeIt != parent->children().end());
+
+				// move to next branch
+				++currentNodeIt; 
+
+				// if there is no next branch, then try a level higher
+				if (currentNodeIt == parent->children().end())
+				{
+					Nodes::iterator it = mNodes.end();
+					--it;
+					mNodes.erase(it);
+					tryNextBranch();
+				}
+			}
 		}
 	}
 

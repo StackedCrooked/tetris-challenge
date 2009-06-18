@@ -38,7 +38,6 @@ namespace Tetris
 		std::vector<BlockIdentifier> mBlocks;
 		typedef std::list<GameStateNode::Children::iterator> Nodes;
 		Nodes mNodes;
-		size_t mMinNodes;
 	};
 
 } // namespace Tetris
