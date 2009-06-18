@@ -25,8 +25,6 @@ namespace Tetris
 
 		const GameState & state() const;
 
-		GameState & state();
-
 		void setState(const GameState & inState);
 
 		typedef std::multiset<ChildPtr, ChildPtrCompare> Children;
