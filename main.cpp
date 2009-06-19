@@ -18,6 +18,10 @@ int main()
 			std::cout << "Depth has reached: " << puzzleSolver.depth() << ". Count: " << count << std::endl;
 			maxDepth = puzzleSolver.depth();
 		}
+		if (count % 10000 == 0)
+		{
+			std::cout << "Count: " << count << std::endl;
+		}
 		count++;
 	}
 	std::cout << "Count: " << count << ". Duration: " << time(0) - start << " s" << std::endl;	

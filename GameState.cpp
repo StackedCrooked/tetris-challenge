@@ -21,7 +21,7 @@ namespace Tetris
 		mGrid(cNumRows, cNumColumns, NO_BLOCK),
 		mDirty(true),
 		mCachedScore(0),
-		mDeadEnd(false)
+		mNumHoles(0)
 	{
 	}
 
@@ -45,7 +45,7 @@ namespace Tetris
 			static const int cHolePenalty = 20;
 			static const int cHeightPenalty = 1;
 			int result = 0;
-			int numHoles = 0;
+			mNumHoles = 0;
 
 			bool foundTop = false;
 			size_t top = mGrid.numRows();
@@ -77,22 +77,27 @@ namespace Tetris
 						{
 							if (mGrid.get(rowIdx - 1, colIdx) != NO_BLOCK)
 							{
-								numHoles++;
+								mNumHoles++;
 								result -= cHolePenalty;
-								markAsDeadEnd();
-								return result;
 							}
 						}
 					}
 				}
 			}
+
 			result -= (mGrid.numRows() - top) * cHeightPenalty;
-			float density = (float)numOccupiedUnderTop / ((mGrid.numRows() - top) * mGrid.numColumns());
-			result = (int)((float)result / density);
+			float density = ((float)numOccupiedUnderTop) / (float) (((mGrid.numRows() - top) * mGrid.numColumns()));
+			result += static_cast<int>((10.0*density) + 0.5);
 			mCachedScore = result;
 			mDirty = false;
 		}
 		return mCachedScore;
+	}
+
+
+	int GameState::numHoles() const
+	{
+		return mNumHoles;
 	}
 
 

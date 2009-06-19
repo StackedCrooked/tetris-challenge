@@ -37,11 +37,16 @@ namespace Tetris
 
 		GameStateNode * parent();
 
-		const GameStateNode * parent() const;
+		const GameStateNode * parent() const;	
+
+		bool isDeadEnd() const { return mDeadEnd; }	
+
+		void markAsDeadEnd() { mDeadEnd = true; }
 		
 	private:
-		GameState mState;
 		GameStateNode * mParent;
+		bool mDeadEnd;
+		GameState mState;
 		Children mChildren;
 	};
 
