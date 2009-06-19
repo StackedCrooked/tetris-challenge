@@ -27,7 +27,7 @@ namespace Tetris
 		if (!inBlockTypes.empty())
 		{
 			assert(inNode->children().empty());
-			if (inNode->children().empty() && !inNode->state().isDeadEnd())
+			if (inNode->children().empty() && !inNode->isDeadEnd())
 			{
 				GameStateNode::Children futureGameStates;
 				generateFutureGameStates(*inNode, inBlockTypes[0], futureGameStates);
@@ -50,7 +50,7 @@ namespace Tetris
 				}
 				else
 				{
-					inNode->state().markAsDeadEnd();
+					inNode->markAsDeadEnd();
 				}
 			}
 		}
@@ -66,7 +66,7 @@ namespace Tetris
 		}
 		GameStateNode * currentNode = mNodes.empty() ? &mRootNode : mNodes.back()->get();
 		populateNode(currentNode, blockIds);
-		if (!currentNode->state().isDeadEnd() && !currentNode->children().empty())
+		if (!currentNode->isDeadEnd() && !currentNode->children().empty())
 		{
 			GameStateNode::Children::iterator newNodeIt = currentNode->children().begin();
 			mNodes.push_back(newNodeIt);
@@ -90,7 +90,7 @@ namespace Tetris
 			mNodes.back()->get()->children().clear();
 
 			// Mark as dead end
-			mNodes.back()->get()->state().markAsDeadEnd();
+			mNodes.back()->get()->markAsDeadEnd();
 
 
 			GameStateNode::Children::iterator & currentNodeIt = mNodes.back();			
@@ -167,6 +167,10 @@ namespace Tetris
 					// we collided => solidify on position higher
 					ChildPtr child(new GameStateNode(&inGameStateNode));
 					child->setState(inGameStateNode.state().makeGameStateWithAddedBlock(inBlock, rowIdx - 1, inColIdx));
+					if (child->state().numHoles() > 0)
+					{
+						child->markAsDeadEnd();
+					}
 					outGameGrids.insert(child);
 				}
 				return;
@@ -176,6 +180,10 @@ namespace Tetris
 				// we found the bottom of the grid => solidify
 				ChildPtr child(new GameStateNode(&inGameStateNode));
 				child->setState(inGameStateNode.state().makeGameStateWithAddedBlock(inBlock, rowIdx, inColIdx));
+				if (child->state().numHoles() > 0)
+				{
+					child->markAsDeadEnd();
+				}
 				outGameGrids.insert(child);
 				return;
 			}

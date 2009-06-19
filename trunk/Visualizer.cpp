@@ -113,7 +113,7 @@ namespace Tetris
 		);
 
 		sInstances.insert(std::make_pair(mHandle, this));
-		//mTimerID = SetTimer(NULL, NULL, 100, &Visualizer::TimerCallback);
+		mTimerID = SetTimer(NULL, NULL, 100, &Visualizer::TimerCallback);
 		::ShowWindow(mHandle, SW_SHOW);	
 		MSG message;
 		while (GetMessage(&message, NULL, 0, 0))
@@ -154,7 +154,7 @@ namespace Tetris
 				GameStateNode & node = *it->get();
 				std::wstringstream ss;
 				ss << node.state().calculateScore();
-				Gdiplus::SolidBrush textBrush(node.state().isDeadEnd() ? Gdiplus::Color::Red : node.children().empty() ? Gdiplus::Color::Gray : Gdiplus::Color::Green);
+				Gdiplus::SolidBrush textBrush(node.children().empty() ? Gdiplus::Color::Gray : Gdiplus::Color::Green);
 				drawText(inGraphics, ss.str(), Gdiplus::RectF(xOffset, yOffset, 30, 30), textBrush);
 				yOffset += 30;
 
@@ -280,7 +280,7 @@ namespace Tetris
 			const GameStateNode::Children & children = node->children();
 			GameStateNode::Children::const_iterator it = children.begin(), end = children.end();
 			int count = 0;
-			size_t numChildren = children.size();
+			size_t numChildren = 1;//children.size();
 			for (; it != end && count < numChildren; ++it)
 			{
 				int rectWidth = it->get()->state().grid().numColumns()*cUnitWidth;
@@ -363,11 +363,13 @@ namespace Tetris
 
 		if (inTimerID == pThis->mTimerID)
 		{
-			while (pThis->mPuzzleSolver->depth() < 50)
-			{
-				pThis->mPuzzleSolver->next();
-			}
+			pThis->mPuzzleSolver->next();
 			::InvalidateRect(pThis->mHandle, 0, FALSE);
+			//while (pThis->mPuzzleSolver->depth() < 50)
+			//{
+			//	pThis->mPuzzleSolver->next();
+			//}
+			//::InvalidateRect(pThis->mHandle, 0, FALSE);
 		}
 		
 	}
