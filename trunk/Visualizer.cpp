@@ -361,7 +361,7 @@ namespace Tetris
 
 		Visualizer * pThis = it->second;
 
-		if (inTimerID == pThis->mTimerID)
+		if (inTimerID == pThis->mTimerID && pThis->mPuzzleSolver->depth() != 56)
 		{
 			pThis->mPuzzleSolver->next();
 			::InvalidateRect(pThis->mHandle, 0, FALSE);

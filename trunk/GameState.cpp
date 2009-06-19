@@ -10,6 +10,10 @@ namespace Tetris
 	const int cNumColumns = 15;
 
 
+	int GameState::sMarker(10);
+	GenericGrid<int> GameState::sHelperGrid(cNumRows, cNumColumns, 10);
+
+
 	bool operator<(const GameState & lhs, const GameState & rhs)
 	{
 		// ordering is by score descending
@@ -35,6 +39,70 @@ namespace Tetris
 	Grid & GameState::grid()
 	{
 		return mGrid;
+	}
+
+
+	bool GameState::hasTopHoles() const
+	{
+		for (size_t rowIdx = 0; rowIdx != 4; ++rowIdx)
+		{
+			for (size_t colIdx = 0; colIdx != mGrid.numColumns(); ++colIdx)
+			{
+				if (mGrid.get(rowIdx, colIdx) == NO_BLOCK)
+				{
+					sMarker++;
+					int numNeighbors = countNeighbors(rowIdx, colIdx);
+					if (numNeighbors > 0 && numNeighbors < 3)
+					{
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+
+
+	int GameState::countNeighbors(size_t inRowIdx, size_t inColIdx) const
+	{
+		int result = 0;
+		sHelperGrid.set(inRowIdx, inColIdx, sMarker);
+		int value = mGrid.get(inRowIdx, inColIdx);
+
+		if (inRowIdx + 1 < mGrid.numRows() &&
+			inRowIdx + 1 < 4 &&
+			mGrid.get(inRowIdx + 1, inColIdx) == value &&
+			sHelperGrid.get(inRowIdx + 1, inColIdx) != sMarker)
+		{
+			result++;
+			result += countNeighbors(inRowIdx + 1, inColIdx);
+		}
+		
+		if (inColIdx + 1 < mGrid.numColumns() &&
+			mGrid.get(inRowIdx, inColIdx + 1) == value &&
+			sHelperGrid.get(inRowIdx, inColIdx + 1) != sMarker)
+		{
+			result++;
+			result += countNeighbors(inRowIdx, inColIdx + 1);
+		}
+
+		if (inRowIdx > 0 &&
+			mGrid.get(inRowIdx - 1, inColIdx) == value &&
+			sHelperGrid.get(inRowIdx - 1, inColIdx) != sMarker)
+		{
+			result++;
+			result += countNeighbors(inRowIdx - 1, inColIdx);
+		}
+		
+		if (inColIdx > 0 &&
+			mGrid.get(inRowIdx, inColIdx - 1) == value &&
+			sHelperGrid.get(inRowIdx, inColIdx - 1) != sMarker)
+		{
+			result++;
+			result += countNeighbors(inRowIdx, inColIdx - 1);
+		}
+
+		return result;
 	}
 
 
