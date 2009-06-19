@@ -64,4 +64,27 @@ namespace Tetris
 		return mParent;
 	}
 
+	
+	int GameStateNode::depthOfOffspring() const
+	{
+		int result = 0;
+		if (!children().empty())
+		{
+			result++;
+			GameStateNode * deepestNode = 0;
+			GameStateNode::Children::const_iterator it = children().begin(), end = children().end();
+			int deepestChildOffspring = 0;
+			for (; it != end; ++it)
+			{
+				int childOffspring = it->get()->depthOfOffspring();
+				if (childOffspring > deepestChildOffspring)
+				{
+					deepestChildOffspring = childOffspring;
+				}
+			}
+			result += deepestChildOffspring;
+		}
+		return result;
+	}
+
 } // namespace Tetris

@@ -1,5 +1,6 @@
 #include "PuzzleSolver.h"
 #include "Parser.h"
+#include <algorithm>
 
 namespace Tetris
 {
@@ -112,29 +113,6 @@ namespace Tetris
 				}
 			}
 		}
-	}
-
-	
-	int PuzzleSolver::depthOfOffspring(const GameStateNode * inGameStateNode, std::list<GameStateNode*> & outNodes) const
-	{
-		int result = 0;
-		if (!inGameStateNode->children().empty())
-		{
-			GameStateNode * deepestNode = 0;
-			GameStateNode::Children::const_iterator it = inGameStateNode->children().begin(), end = inGameStateNode->children().end();
-			for (; it != end; ++it)
-			{
-				int depth = depthOfOffspring(it->get(), outNodes);
-				if (depth > result)
-				{
-					result = depth;
-					deepestNode = it->get();
-				}
-			}
-			outNodes.push_front(deepestNode);
-			result++;
-		}
-		return result;
 	}
 
 
