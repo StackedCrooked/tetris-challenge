@@ -52,7 +52,7 @@ namespace Tetris
 				{
 					sMarker++;
 					int numNeighbors = countNeighbors(rowIdx, colIdx);
-					if (numNeighbors > 0 && numNeighbors < 3)
+					if (numNeighbors == 1 || numNeighbors == 2 || numNeighbors == 5 || numNeighbors == 6)
 					{
 						return true;
 					}
