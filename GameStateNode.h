@@ -23,9 +23,9 @@ namespace Tetris
 	public:
 		GameStateNode(GameStateNode * inParent);
 
-		const GameState & state() const;
+		const GameStateNode * parent() const;	
 
-		void setState(const GameState & inState);
+		GameStateNode * parent();
 
 		typedef std::multiset<ChildPtr, ChildPtrCompare> Children;
 
@@ -34,10 +34,12 @@ namespace Tetris
 		const Children & children() const;
 
 		void setChildren(const Children & inChildren);
+		
+		int depthOfOffspring() const;
 
-		GameStateNode * parent();
+		const GameState & state() const;
 
-		const GameStateNode * parent() const;	
+		void setState(const GameState & inState);
 
 		bool isDeadEnd() const { return mDeadEnd; }	
 
