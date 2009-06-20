@@ -44,18 +44,15 @@ namespace Tetris
 
 	bool GameState::hasTopHoles() const
 	{
-		for (size_t rowIdx = 0; rowIdx != 4; ++rowIdx)
+		for (size_t colIdx = 0; colIdx != mGrid.numColumns(); ++colIdx)
 		{
-			for (size_t colIdx = 0; colIdx != mGrid.numColumns(); ++colIdx)
+			if (mGrid.get(0, colIdx) == NO_BLOCK)
 			{
-				if (mGrid.get(rowIdx, colIdx) == NO_BLOCK)
+				sMarker++;
+				int numNeighbors = countNeighbors(0, colIdx);
+				if (numNeighbors == 1 || numNeighbors == 2 || numNeighbors == 5 || numNeighbors == 6)
 				{
-					sMarker++;
-					int numNeighbors = countNeighbors(rowIdx, colIdx);
-					if (numNeighbors == 1 || numNeighbors == 2 || numNeighbors == 5 || numNeighbors == 6)
-					{
-						return true;
-					}
+					return true;
 				}
 			}
 		}
@@ -70,7 +67,6 @@ namespace Tetris
 		int value = mGrid.get(inRowIdx, inColIdx);
 
 		if (inRowIdx + 1 < mGrid.numRows() &&
-			inRowIdx + 1 < 4 &&
 			mGrid.get(inRowIdx + 1, inColIdx) == value &&
 			sHelperGrid.get(inRowIdx + 1, inColIdx) != sMarker)
 		{
