@@ -217,7 +217,7 @@ namespace Tetris
 		{
 			if (mPuzzleSolver->depth() <= idx)
 			{
-				const Block & block = Block::Get(mPuzzleSolver->blocks()[idx]);
+				const Block & block = mPuzzleSolver->blocks()[idx];
 				drawGrid(inGraphics, block.grid(), Gdiplus::RectF(offsetX, offsetY, block.grid().numColumns()*10, block.grid().numRows()*10));
 			}
 			offsetX += 5*10;

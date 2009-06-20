@@ -23,7 +23,7 @@ namespace Tetris
 	}
 
 
-	void PuzzleSolver::populateNode(GameStateNode * inNode, const std::vector<BlockIdentifier> & inBlockTypes) const
+	void PuzzleSolver::populateNode(GameStateNode * inNode, const std::vector<Block> & inBlockTypes) const
 	{
 		if (!inBlockTypes.empty())
 		{
@@ -41,7 +41,7 @@ namespace Tetris
 					inNode->setChildren(futureGameStates);
 					if (inBlockTypes.size() > 2)
 					{
-						std::vector<BlockIdentifier> blockTypes;
+						std::vector<Block> blockTypes;
 						for (size_t idx = 1; idx < inBlockTypes.size(); ++idx)
 						{
 							blockTypes.push_back(inBlockTypes[idx]);
@@ -64,7 +64,7 @@ namespace Tetris
 	
 	bool PuzzleSolver::next()
 	{
-		std::vector<BlockIdentifier> blockIds;
+		std::vector<Block> blockIds;
 		if (mNodes.size() < mBlocks.size())
 		{
 			blockIds.push_back(mBlocks[mNodes.size()]);
@@ -120,13 +120,12 @@ namespace Tetris
 	}
 
 
-	void PuzzleSolver::generateFutureGameStates(GameStateNode & inGameStateNode, const BlockIdentifier & inBlockId, GameStateNode::Children & outGameGrids) const
+	void PuzzleSolver::generateFutureGameStates(GameStateNode & inGameStateNode, const Block & inBlock, GameStateNode::Children & outGameGrids) const
 	{
 		
-		for (size_t rotIdx = 0; rotIdx != Block::NumRotations(inBlockId.type); ++rotIdx)
+		for (size_t rotIdx = 0; rotIdx != NumRotations(inBlock.type()); ++rotIdx)
 		{
-			BlockIdentifier id(inBlockId.charId, inBlockId.type, inBlockId.rotation + rotIdx);
-			const Block & block(Block::Get(id));
+			Block block(Block(inBlock.charId(), inBlock.type(), inBlock.rotation() + rotIdx));
 			
 			size_t maxCol = inGameStateNode.state().grid().numColumns() - block.grid().numColumns();
 			for (size_t colIdx = 0; colIdx <= maxCol; ++colIdx)

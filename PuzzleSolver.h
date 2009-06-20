@@ -17,11 +17,11 @@ namespace Tetris
 
 		bool next();
 
-		void populateNode(GameStateNode * inNode, const std::vector<BlockIdentifier> & inBlockTypes) const;
+		void populateNode(GameStateNode * inNode, const std::vector<Block> & inBlockTypes) const;
 
 		const GameStateNode * currentNode() const;
 
-		const std::vector<BlockIdentifier> & blocks() const { return mBlocks; }
+		const std::vector<Block> & blocks() const { return mBlocks; }
 
 		size_t depth() const { return mNodes.size(); }
 
@@ -30,12 +30,12 @@ namespace Tetris
 
 		int depthOfOffspring(const GameStateNode * inGameStateNode, std::list<GameStateNode*> & outNodes) const;
 
-		void generateFutureGameStates(GameStateNode & inGameStateNode, const BlockIdentifier & inBlockId, GameStateNode::Children & outGameGrids) const;
+		void generateFutureGameStates(GameStateNode & inGameStateNode, const Block & inBlockId, GameStateNode::Children & outGameGrids) const;
 
 		void generateFutureGameStates(GameStateNode & inGameStateNode, const Block & inBlock, size_t inColIdx, GameStateNode::Children & outGameGrids) const;
 
 		GameStateNode mRootNode;
-		std::vector<BlockIdentifier> mBlocks;
+		std::vector<Block> mBlocks;
 		typedef std::list<GameStateNode::Children::iterator> Nodes;
 		Nodes mNodes;
 	};
