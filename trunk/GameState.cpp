@@ -9,8 +9,8 @@ namespace Tetris
 	const int cNumColumns = 15;
 
 
-	int GameState::sMarker(11);
-	GenericGrid<int> GameState::sHelperGrid(cNumRows, cNumColumns, 10);
+	int GameState::sMarker(1);
+	GenericGrid<int> GameState::sHelperGrid(cNumRows, cNumColumns, 0);
 
 
 	bool operator<(const GameState & lhs, const GameState & rhs)
@@ -49,7 +49,16 @@ namespace Tetris
 			{
 				sMarker++;
 				int numNeighbors = countNeighbors(0, colIdx);
-				if (numNeighbors == 1 || numNeighbors == 2 || numNeighbors == 5 || numNeighbors == 6)
+				if (numNeighbors == 1  || numNeighbors == 2 ||
+					numNeighbors == 5  || numNeighbors == 6 ||
+					numNeighbors == 9  || numNeighbors == 10 ||
+					numNeighbors == 13 || numNeighbors == 14 ||
+					numNeighbors == 17 || numNeighbors == 18 ||
+					numNeighbors == 21 || numNeighbors == 22 ||
+					numNeighbors == 25 || numNeighbors == 26 ||
+					numNeighbors == 29 || numNeighbors == 30 ||
+					numNeighbors == 33 || numNeighbors == 34 ||
+					numNeighbors == 37 || numNeighbors == 38)
 				{
 					return true;
 				}
