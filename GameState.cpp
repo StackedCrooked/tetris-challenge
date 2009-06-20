@@ -114,7 +114,7 @@ namespace Tetris
 	{
 		if (mDirty)
 		{
-			static const int cHolePenalty = 20;
+			static const int cHolePenalty = 2;
 			static const int cHeightPenalty = 1;
 			int result = 0;
 			mNumHoles = 0;
