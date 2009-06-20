@@ -149,7 +149,7 @@ namespace Tetris
 					// we collided => solidify on position higher
 					ChildPtr child(new GameStateNode(&inGameStateNode));
 					child->setState(inGameStateNode.state().makeGameStateWithAddedBlock(inBlock, rowIdx - 1, inColIdx));
-					if (child->state().numHoles() > 0 || child->state().hasTopHoles())
+					if (child->state().numHoles() > 0 || (rowIdx <= 1 && child->state().hasTopHoles()))
 					{
 						child->markAsDeadEnd();
 					}
