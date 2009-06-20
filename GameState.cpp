@@ -159,7 +159,7 @@ namespace Tetris
 
 			result -= (mGrid.numRows() - top) * cHeightPenalty;
 			float density = ((float)numOccupiedUnderTop) / (float) (((mGrid.numRows() - top) * mGrid.numColumns()));
-			result += static_cast<int>((10.0*density) + 0.5);
+			result += static_cast<int>((11.0*density) + 0.5);
 			mCachedScore = result;
 			mDirty = false;
 		}
