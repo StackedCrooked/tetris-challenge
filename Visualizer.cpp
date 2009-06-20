@@ -191,7 +191,6 @@ namespace Tetris
 	{
 		const int cUnitWidth = inRect.Width / inGrid.numColumns();
 		const int cUnitHeight = cUnitWidth;
-		Gdiplus::SolidBrush bgBrush(Gdiplus::Color::DarkGray);
 		for (size_t rowIdx = 0; rowIdx != inGrid.numRows(); ++rowIdx)
 		{
 			for (size_t colIdx = 0; colIdx != inGrid.numColumns(); ++colIdx)
@@ -297,7 +296,7 @@ namespace Tetris
 			}
 
 			int blocksOffsetX = cMarginLeft + 15*cUnitWidth + cUnitWidth;
-			//drawRemainingBlocks(g, Gdiplus::RectF(blocksOffsetX, cMarginTop, cWidth - cMarginRight - blocksOffsetX, cHeight));
+			drawRemainingBlocks(g, Gdiplus::RectF(blocksOffsetX, cMarginTop, cWidth - cMarginRight - blocksOffsetX, cHeight));
 		}
 		std::wstringstream ss;
 		ss << "Depth: " << mPuzzleSolver->depth() << "/" << mPuzzleSolver->blocks().size();
@@ -340,7 +339,7 @@ namespace Tetris
 			}
 			case NO_BLOCK:
 			{
-				return Gdiplus::Color::DarkGray;
+				return Gdiplus::Color::Black;
 			}
 			default:
 			{

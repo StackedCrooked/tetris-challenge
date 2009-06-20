@@ -10,7 +10,7 @@ namespace Tetris
 	const int cNumColumns = 15;
 
 
-	int GameState::sMarker(10);
+	int GameState::sMarker(11);
 	GenericGrid<int> GameState::sHelperGrid(cNumRows, cNumColumns, 10);
 
 
