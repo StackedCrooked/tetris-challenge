@@ -1,6 +1,5 @@
 #include "GameState.h"
 #include <assert.h>
-#include <windows.h>
 
 
 namespace Tetris
