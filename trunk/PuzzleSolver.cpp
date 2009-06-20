@@ -34,8 +34,12 @@ namespace Tetris
 				generateFutureGameStates(*inNode, inBlockTypes[0], futureGameStates);
 				if (!futureGameStates.empty())
 				{
+					while (futureGameStates.size() > 2)
+					{
+						futureGameStates.erase(--futureGameStates.end());
+					}
 					inNode->setChildren(futureGameStates);
-					if (inBlockTypes.size() > 1)
+					if (inBlockTypes.size() > 2)
 					{
 						std::vector<BlockIdentifier> blockTypes;
 						for (size_t idx = 1; idx < inBlockTypes.size(); ++idx)

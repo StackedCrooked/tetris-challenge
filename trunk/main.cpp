@@ -13,16 +13,16 @@ int main()
 	while (puzzleSolver.depth() != 56)
 	{
 		puzzleSolver.next();
-		if (puzzleSolver.depth() > maxDepth)
-		{
-			std::cout << "Depth has reached: " << puzzleSolver.depth() << ". Count: " << count << std::endl;
-			maxDepth = puzzleSolver.depth();
-		}
-		if (count % 10000 == 0)
-		{
-			std::cout << "Count: " << count << std::endl;
-		}
-		count++;
+		//if (puzzleSolver.depth() > maxDepth)
+		//{
+		//	std::cout << "Depth has reached: " << puzzleSolver.depth() << ". Count: " << count << std::endl;
+		//	maxDepth = puzzleSolver.depth();
+		//}
+		//if (count % 10000 == 0)
+		//{
+		//	std::cout << "Count: " << count << std::endl;
+		//}
+		//count++;
 	}
 	std::cout << "Count: " << count << ". Duration: " << time(0) - start << " s" << std::endl;	
 	std::cout << "Press ENTER to quit";
