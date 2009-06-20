@@ -21,6 +21,8 @@ namespace Tetris
 
 		const GameStateNode * currentNode() const;
 
+		const GameStateNode * rootNode() const;
+
 		const std::vector<Block> & blocks() const { return mBlocks; }
 
 		size_t depth() const { return mNodes.size(); }
