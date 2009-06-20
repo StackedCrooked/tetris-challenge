@@ -5,7 +5,7 @@
 namespace Tetris
 {
 
-	bool Parser::parse(const std::string & inFile, std::vector<BlockIdentifier> & outBlockIDs)
+	bool Parser::parse(const std::string & inFile, std::vector<Block> & outBlockIDs)
 	{
 		char str[200];
 		FILE *fp;
@@ -23,7 +23,7 @@ namespace Tetris
 			{
 				str[len] = 0;
 			}
-			BlockIdentifier bi(makeBlockIdentifierFromString(str));
+			Block bi(makeBlockIdentifierFromString(str));
 			outBlockIDs.push_back(bi);
 		}
 		fclose(fp);
@@ -73,12 +73,12 @@ namespace Tetris
 	}
 
 
-	BlockIdentifier Parser::makeBlockIdentifierFromString(const std::string & inString)
+	Block Parser::makeBlockIdentifierFromString(const std::string & inString)
 	{
 		char charId, charType;
 		int rotation = 0;
 		sscanf(inString.c_str(), "%c %c %d", &charId, &charType, &rotation);
-		return BlockIdentifier(charId, convertCharToBlockType(charType), rotation);
+		return Block(charId, convertCharToBlockType(charType), rotation);
 	}
 
 } // namespace Tetris

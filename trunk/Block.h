@@ -29,59 +29,40 @@ namespace Tetris
 	 * Also defines equality and smaller-than operators for a block so
 	 * that it can be used as the key in a key-value mapping datastructure.
 	 */
-	struct BlockIdentifier
-	{
-		BlockIdentifier(char inCharId, BlockType inType, int inRotation);
-
-		bool operator ==(const BlockIdentifier & rhs);
-
-		BlockType type;
-		char charId;
-		int rotation;
-	};
-
-	bool operator< (const BlockIdentifier & lhs, const BlockIdentifier & rhs);
-
-
-	/**
-	 * Block represents a Tetris block.
-	 */
 	class Block
 	{
 	public:
+		Block(char inCharId, BlockType inType, int inRotation);
 
-		// Factory method.
-		// Returns a const reference to a Block object that was created in an internal lookup table.
-		static const Block & Get(const BlockIdentifier & inBlockId);
+		char charId() const;
 
-		static int NumRotations(BlockType inType);
-		
 		BlockType type() const;
 
-		// Returns the rotation value (in range [0..3])
 		int rotation() const;
 
 		const Grid & grid() const;
 
 	private:
-		Block(BlockType inType, int inRotation);
-
-		static Grid makeBlock(int inType, int rotation);
-		static Grid makeIBlock(int rotation);
-		static Grid makeJBlock(int rotation);
-		static Grid makeLBlock(int rotation);
-		static Grid makeOBlock(int rotation);
-		static Grid makeSBlock(int rotation);
-		static Grid makeTBlock(int rotation);
-		static Grid makeZBlock(int rotation);
-
+		char mCharId;
 		BlockType mType;
 		int mRotation;
-		Grid mGrid;
 		
-		typedef std::map<BlockIdentifier, Block> Cache;
-		static Cache sCache;
 	};
+
+	bool operator< (const Block & lhs, const Block & rhs);
+
+	const Grid & GetGrid(const Block & inBlock);
+	int NumRotations(BlockType inType);
+	Grid MakeBlock(int inType, int rotation);
+	Grid MakeIBlock(int rotation);
+	Grid MakeJBlock(int rotation);
+	Grid MakeLBlock(int rotation);
+	Grid MakeOBlock(int rotation);
+	Grid MakeSBlock(int rotation);
+	Grid MakeTBlock(int rotation);
+	Grid MakeZBlock(int rotation);
+
+	typedef std::map<Block, Grid> Grids;
 
 } // namespace Tetris
 

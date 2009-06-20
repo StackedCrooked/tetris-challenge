@@ -13,11 +13,11 @@ namespace Tetris
 	class Parser
 	{
 	public:
-		bool parse(const std::string & inFile, std::vector<BlockIdentifier> & outBlockIDs);
+		bool parse(const std::string & inFile, std::vector<Block> & outBlockIDs);
 
 		static BlockType convertCharToBlockType(char charType);
 
-		BlockIdentifier makeBlockIdentifierFromString(const std::string & inString);
+		Block makeBlockIdentifierFromString(const std::string & inString);
 	};
 
 } // namespace Tetris

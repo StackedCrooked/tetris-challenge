@@ -5,22 +5,23 @@
 namespace Tetris
 {
 
-	Block::Cache Block::sCache;
+	static Grids sGrids;
 
 
-	const Block & Block::Get(const BlockIdentifier & inBlockId)
+	const Grid & GetGrid(const Block & inBlock)
 	{
-		Cache::iterator it = sCache.find(inBlockId);
-		if (it == sCache.end())
+		Grids::iterator it = sGrids.find(inBlock);
+		if (it == sGrids.end())
 		{
-			sCache.insert(std::make_pair(inBlockId, Block(inBlockId.type, inBlockId.rotation)));
-			it = sCache.find(inBlockId);
+			sGrids.insert(std::make_pair(inBlock, MakeBlock(inBlock.type(), inBlock.rotation())));
+			it = sGrids.find(inBlock);
 		}
 		return it->second;
 	}
 
 
-	int Block::NumRotations(BlockType inType)
+	
+	int NumRotations(BlockType inType)
 	{
 		switch (inType)
 		{
@@ -61,12 +62,17 @@ namespace Tetris
 	}
 
 
-	Block::Block(BlockType inType, int inRotation) :
+	Block::Block(char inCharId, BlockType inType, int inRotation) :
+		mCharId(inCharId),
 		mType(inType),
-		mGrid(makeBlock(inType, inRotation))
+		mRotation(inRotation)
 	{
-		
-		mRotation = inRotation % Block::NumRotations(inType);
+	}
+
+
+	char Block::charId() const
+	{
+		return mCharId;
 	}
 		
 
@@ -84,66 +90,52 @@ namespace Tetris
 
 	const Grid & Block::grid() const
 	{
-		return mGrid;
+		return GetGrid(*this);
 	}
 
 
-	BlockIdentifier::BlockIdentifier(char inCharId, BlockType inType, int inRotation) :
-		charId(inCharId),
-		type(inType),
-		rotation(inRotation)
+	bool operator< (const Block & lhs, const Block & rhs)
 	{
-	}
-
-		
-	bool BlockIdentifier::operator ==(const BlockIdentifier & rhs)
-	{
-		return type == rhs.type && rotation == rhs.rotation;
-	}
-
-
-	bool operator< (const BlockIdentifier & lhs, const BlockIdentifier & rhs)
-	{
-		if (lhs.type != rhs.type)
+		if (lhs.type() != rhs.type())
 		{
-			return lhs.type < rhs.type;
+			return lhs.type() < rhs.type();
 		}
 		else
 		{
-			return lhs.rotation < rhs.rotation;
+			return lhs.rotation() < rhs.rotation();
 		}
 	}
 
 
-	Grid Block::makeBlock(int inType, int rotation)
+	Grid MakeBlock(int inType, int rotation)
 	{
 		if (inType == I_BLOCK)
 		{
-			return makeIBlock(rotation);
+			return MakeIBlock(rotation);
 		}
 		else if (inType == J_BLOCK)
 		{
-			return makeJBlock(rotation);
+			return MakeJBlock(rotation);
 		}
 		else if (inType == L_BLOCK)
 		{
-			return makeLBlock(rotation);
+			return MakeLBlock(rotation);
 		}
 		else if (inType == O_BLOCK)
 		{
-			return makeOBlock(rotation);
+			return MakeOBlock(rotation);
 		}
 		else if (inType == S_BLOCK)
 		{
-			return makeSBlock(rotation);
+			return MakeSBlock(rotation);
 		}
 		else if (inType == T_BLOCK)
 		{
-			return makeTBlock(rotation);
+			return MakeTBlock(rotation);
 		}
 		else if (inType == Z_BLOCK)
 		{
-			return makeZBlock(rotation);
+			return MakeZBlock(rotation);
 		}
 		else
 		{
@@ -156,7 +148,7 @@ namespace Tetris
 	}
 
 
-	Grid Block::makeIBlock(int rotation)
+	Grid MakeIBlock(int rotation)
 	{
 		if (rotation%2 == 0)
 		{
@@ -178,7 +170,7 @@ namespace Tetris
 		}
 	}
 
-	Grid Block::makeJBlock(int rotation)
+	Grid MakeJBlock(int rotation)
 	{
 		if (rotation%4 == 0)
 		{
@@ -218,7 +210,7 @@ namespace Tetris
 		}
 	}
 
-	Grid Block::makeLBlock(int rotation)
+	Grid MakeLBlock(int rotation)
 	{
 		if (rotation%4 == 0)
 		{
@@ -258,7 +250,7 @@ namespace Tetris
 		}
 	}
 
-	Grid Block::makeOBlock(int rotation)
+	Grid MakeOBlock(int rotation)
 	{
 		Grid block(2, 2, NO_BLOCK);
 		block.set(0, 0, O_BLOCK);
@@ -268,7 +260,7 @@ namespace Tetris
 		return block;
 	}
 
-	Grid Block::makeSBlock(int rotation)
+	Grid MakeSBlock(int rotation)
 	{
 		if (rotation%2 == 0)
 		{
@@ -290,7 +282,7 @@ namespace Tetris
 		}
 	}
 
-	Grid Block::makeTBlock(int rotation)
+	Grid MakeTBlock(int rotation)
 	{
 		if (rotation%4 == 0)
 		{
@@ -330,7 +322,7 @@ namespace Tetris
 		}
 	}
 
-	Grid Block::makeZBlock(int rotation)
+	Grid MakeZBlock(int rotation)
 	{
 		if (rotation%2 == 0)
 		{
