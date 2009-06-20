@@ -1,5 +1,5 @@
-#ifndef GAME_H
-#define GAME_H
+#ifndef GAMESTATE_H
+#define GAMESTATE_H
 
 #include "Block.h"
 #include "GenericGrid.h"
@@ -9,7 +9,8 @@
 
 namespace Tetris
 {
-
+	
+	
 	class GameState
 	{
 	public:
@@ -50,4 +51,4 @@ namespace Tetris
 } // namespace Tetris
 
 
-#endif // GAME_H
+#endif // GAMESTATE_H

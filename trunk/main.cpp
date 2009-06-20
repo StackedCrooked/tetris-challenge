@@ -6,17 +6,18 @@
 
 namespace Tetris
 {
-
-
-	void printState(const GameState & inState)
+		
+	void printState(const GameStateNode * inRootNode)
 	{
-		for (size_t rowIdx = 0; rowIdx != inState.grid().numRows(); ++rowIdx)
-		{
-			for (size_t colIdx = 0; colIdx != inState.grid().numColumns(); ++colIdx)
-			{
-				//std::cout << inState.grid().get(rowIdx, colIdx)
-			}
-		}
+		GenericGrid<char> grid(15, 15, ' ');
+
+			//for (size_t rowIdx = 0; rowIdx != inState.grid().numRows(); ++rowIdx)
+		//{
+		//	for (size_t colIdx = 0; colIdx != inState.grid().numColumns(); ++colIdx)
+		//	{
+		//		//std::cout << inState.grid().get(rowIdx, colIdx)
+		//	}
+		//}
 	}
 
 }
@@ -45,7 +46,7 @@ int main()
 	}
 	std::cout << "Duration: " << time(0) - start << " s" << std::endl;	
 
-	printState(puzzleSolver.currentNode()->state());
+	printState(puzzleSolver.rootNode());
 	std::cout << "Press ENTER to quit";
 	getchar();
 	return 0;

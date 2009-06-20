@@ -21,11 +21,15 @@ namespace Tetris
 	class GameStateNode
 	{
 	public:
-		GameStateNode(GameStateNode * inParent);
+		GameStateNode(GameStateNode * inParent, const Block * inBlock, size_t inRowIdx, size_t inColIdx);
 
 		const GameStateNode * parent() const;	
 
 		GameStateNode * parent();
+
+		const Block * lastBlock() const;
+
+		void lastBlockPosition(size_t & outRowIdx, size_t &outColIdx) const;
 
 		typedef std::multiset<ChildPtr, ChildPtrCompare> Children;
 
@@ -47,6 +51,12 @@ namespace Tetris
 		
 	private:
 		GameStateNode * mParent;
+
+		// Info about last solidified block
+		const Block * mBlock;
+		size_t mRowIdx;
+		size_t mColIdx;
+
 		bool mDeadEnd;
 		GameState mState;
 		Children mChildren;
