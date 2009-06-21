@@ -70,23 +70,25 @@ namespace Tetris
 	
 	bool PuzzleSolver::next()
 	{
-		std::vector<Block> blockIds;
 		if (mNodes.size() < mBlocks.size())
 		{
-			blockIds.push_back(mBlocks[mNodes.size()]);
-		}
-		GameStateNode * currentNode = mNodes.empty() ? &mRootNode : mNodes.back()->get();
-		populateNode(currentNode, blockIds);
-		if (!currentNode->isDeadEnd() && !currentNode->children().empty())
-		{
-			GameStateNode::Children::iterator newNodeIt = currentNode->children().begin();
-			mNodes.push_back(newNodeIt);
-			return true;
-		}
-		else
-		{
-			tryNextBranch();
-			next();
+			std::vector<Block> blockIds;
+			{
+				blockIds.push_back(mBlocks[mNodes.size()]);
+			}
+			GameStateNode * currentNode = mNodes.empty() ? &mRootNode : mNodes.back()->get();
+			populateNode(currentNode, blockIds);
+			if (!currentNode->isDeadEnd() && !currentNode->children().empty())
+			{
+				GameStateNode::Children::iterator newNodeIt = currentNode->children().begin();
+				mNodes.push_back(newNodeIt);
+				return true;
+			}
+			else
+			{
+				tryNextBranch();
+				next();
+			}
 		}
 		return false;
 	}
