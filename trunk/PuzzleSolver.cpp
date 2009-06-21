@@ -96,13 +96,14 @@ namespace Tetris
 	
 	void PuzzleSolver::tryNextBranch()
 	{
-		// Erase last node
 		if (!mNodes.empty())
 		{
-			// Remove the children from this node
+			// Since this branch didn't deliver any results we remove
+			// its children to free up some memory
 			mNodes.back()->get()->children().clear();
 
-			// Mark as dead end
+			// ..and mark as dead end, so that we remember not to
+			// search this node again.
 			mNodes.back()->get()->markAsDeadEnd();
 
 
@@ -178,5 +179,39 @@ namespace Tetris
 			}
 		}
 		assert (!"We should not come here");
+	}
+
+
+	void PuzzleSolver::getAsciiFormat(GenericGrid<char> & grid) const
+	{
+		getAsciiFormat(&mRootNode, grid);
+	}
+
+
+	void PuzzleSolver::getAsciiFormat(const GameStateNode * inNode, GenericGrid<char> & grid) const
+	{
+		GameStateNode::Children::const_iterator it = inNode->children().begin(), end = inNode->children().end();
+		for (; it != end; ++it)
+		{
+			const GameStateNode * childNode = it->get();
+			if (!childNode->isDeadEnd())
+			{
+				char id = childNode->lastBlock().charId();
+				size_t row, col;
+				childNode->lastBlockPosition(row, col);
+				for (size_t r = row; r != row + childNode->lastBlock().grid().numRows(); ++r)
+				{
+					for (size_t c = col; c != col + childNode->lastBlock().grid().numColumns(); ++c)
+					{
+						if (childNode->lastBlock().grid().get(r - row, c - col) != NO_BLOCK)
+						{
+							grid.set(r, c, id);
+						}
+					}
+				}
+				getAsciiFormat(childNode, grid);
+				return;
+			}
+		}
 	}
 }
