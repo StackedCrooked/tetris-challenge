@@ -27,6 +27,8 @@ namespace Tetris
 
 		size_t depth() const { return mNodes.size(); }
 
+		void getAsciiFormat(GenericGrid<char> & grid) const;
+
 	private:
 		void tryNextBranch();
 
@@ -35,6 +37,8 @@ namespace Tetris
 		void generateFutureGameStates(GameStateNode & inGameStateNode, const Block & inBlockId, GameStateNode::Children & outGameGrids) const;
 
 		void generateFutureGameStates(GameStateNode & inGameStateNode, const Block & inBlock, size_t inColIdx, GameStateNode::Children & outGameGrids) const;
+
+		void getAsciiFormat(const GameStateNode * inNode, GenericGrid<char> & grid) const;
 
 		GameStateNode mRootNode;
 		std::vector<Block> mBlocks;
