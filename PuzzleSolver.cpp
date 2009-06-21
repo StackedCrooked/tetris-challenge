@@ -6,7 +6,7 @@ namespace Tetris
 {
 
 	PuzzleSolver::PuzzleSolver() :
-		mRootNode(0, 0, 0, 0)
+		mRootNode(0, Block(' ', NO_BLOCK, 0), 0, 0)
 	{
 		Parser p;
 		p.parse("inputs.txt", mBlocks);
@@ -152,7 +152,7 @@ namespace Tetris
 				if (rowIdx > 0)
 				{
 					// we collided => solidify on position higher
-					ChildPtr child(new GameStateNode(&inGameStateNode, &inBlock, rowIdx - 1, inColIdx));
+					ChildPtr child(new GameStateNode(&inGameStateNode, inBlock, rowIdx - 1, inColIdx));
 					child->setState(inGameStateNode.state().makeGameStateWithAddedBlock(inBlock, rowIdx - 1, inColIdx));
 					if (child->state().numHoles() > 0 || (rowIdx <= 2 && child->state().hasTopHoles()))
 					{
@@ -165,7 +165,7 @@ namespace Tetris
 			else if (rowIdx == maxRow)
 			{
 				// we found the bottom of the grid => solidify
-				ChildPtr child(new GameStateNode(&inGameStateNode, &inBlock, rowIdx, inColIdx));
+				ChildPtr child(new GameStateNode(&inGameStateNode, inBlock, rowIdx, inColIdx));
 				child->setState(inGameStateNode.state().makeGameStateWithAddedBlock(inBlock, rowIdx, inColIdx));
 				if (child->state().numHoles() > 0)
 				{

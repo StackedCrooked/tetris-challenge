@@ -21,13 +21,13 @@ namespace Tetris
 	class GameStateNode
 	{
 	public:
-		GameStateNode(GameStateNode * inParent, const Block * inBlock, size_t inRowIdx, size_t inColIdx);
+		GameStateNode(GameStateNode * inParent, const Block & inBlock, size_t inRowIdx, size_t inColIdx);
 
 		const GameStateNode * parent() const;	
 
 		GameStateNode * parent();
 
-		const Block * lastBlock() const;
+		const Block & lastBlock() const;
 
 		void lastBlockPosition(size_t & outRowIdx, size_t &outColIdx) const;
 
@@ -53,7 +53,7 @@ namespace Tetris
 		GameStateNode * mParent;
 
 		// Info about last solidified block
-		const Block * mBlock;
+		Block mLastBlock;
 		size_t mRowIdx;
 		size_t mColIdx;
 

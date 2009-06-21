@@ -16,9 +16,9 @@ namespace Tetris
 	}
 	
 	
-	GameStateNode::GameStateNode(GameStateNode * inParent, const Block * inBlock, size_t inRowIdx, size_t inColIdx) :
+	GameStateNode::GameStateNode(GameStateNode * inParent, const Block & inBlock, size_t inRowIdx, size_t inColIdx) :
 		mParent(inParent),
-		mBlock(inBlock),
+		mLastBlock(inBlock),
 		mRowIdx(inRowIdx),
 		mColIdx(inColIdx),
 		mDeadEnd(false)
@@ -68,9 +68,9 @@ namespace Tetris
 	}
 	
 	
-	const Block * GameStateNode::lastBlock() const
+	const Block & GameStateNode::lastBlock() const
 	{
-		return mBlock;
+		return mLastBlock;
 	}
 
 	
