@@ -29,6 +29,10 @@ namespace Tetris
 
 		void getAsciiFormat(GenericGrid<char> & grid) const;
 
+		void getListOfMoves(std::vector<std::string> & list) const;
+
+		void getListOfMoves(const GameStateNode * inNode, std::vector<std::string> & list) const;
+
 	private:
 		void tryNextBranch();
 

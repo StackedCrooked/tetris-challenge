@@ -1,24 +1,35 @@
 #include "PuzzleSolver.h"
 #include "GameState.h"
-#include <iostream>
 #include <ctime>
+#include <iostream>
+#include <string>
+#include <vector>
 
 
 namespace Tetris
 {
 
 
-	void printState(const GenericGrid<char> & grid)
+	void printState(const GenericGrid<char> & grid, std::ostream & out)
 	{
 		for (size_t rowIdx = 0; rowIdx != grid.numRows(); ++rowIdx)
 		{
 			for (size_t colIdx = 0; colIdx != grid.numColumns(); ++colIdx)
 			{
-				std::cout << grid.get(rowIdx, colIdx);
+				out << grid.get(rowIdx, colIdx);
 			}
-			std::cout << std::endl;
+			out << std::endl;
 		}
 	}
+
+	void printListOfMoves(const std::vector<std::string> & moves, std::ostream & out)
+	{
+		for (size_t idx = 0; idx != moves.size(); ++idx)
+		{
+			out << moves[idx] << std::endl;
+		}
+	}
+
 
 }
 
@@ -48,7 +59,11 @@ int main()
 
 	Tetris::GenericGrid<char> grid(15, 15, '.');
 	puzzleSolver.getAsciiFormat(grid);
-	printState(grid);
+	Tetris::printState(grid, std::cout);
+
+	std::vector<std::string> moves;
+	puzzleSolver.getListOfMoves(moves);
+	Tetris::printListOfMoves(moves, std::cout);
 	
 	
 	std::cout << "Press ENTER to quit";
