@@ -41,6 +41,8 @@ namespace Tetris
 				generateFutureGameStates(*inNode, inBlockTypes[0], futureGameStates);
 				if (!futureGameStates.empty())
 				{
+					// Optimization. We only remember the top two gamestates (with the
+					// best score). 
 					while (futureGameStates.size() > 2)
 					{
 						futureGameStates.erase(--futureGameStates.end());

@@ -27,8 +27,10 @@ namespace Tetris
 
 		GameStateNode * parent();
 
+		// Returns that last added block.
 		const Block & lastBlock() const;
 
+		// Returns the position of the last added block.
 		void lastBlockPosition(size_t & outRowIdx, size_t &outColIdx) const;
 
 		typedef std::multiset<ChildPtr, ChildPtrCompare> Children;
