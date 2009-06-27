@@ -179,6 +179,14 @@
 	</References>
 	<Files>
 		<File
+			RelativePath=".\CStopWatch.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\CStopWatch.h"
+			>
+		</File>
+		<File
 			RelativePath=".\main.cpp"
 			>
 		</File>
