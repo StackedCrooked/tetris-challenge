@@ -2,6 +2,7 @@
 #include "GameState.h"
 #include "PuzzleSolver.h"
 #include <ctime>
+#include <fstream>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -30,39 +31,49 @@ namespace Tetris
 			out << moves[idx] << std::endl;
 		}
 	}
-
-
+	
+	double getTiming(size_t inNumberOfIterations)
+	{
+		CStopWatch stopWatch;
+		stopWatch.startTimer();
+		for (size_t idx = 0; idx != inNumberOfIterations; ++idx)
+		{
+			Tetris::PuzzleSolver puzzleSolver;
+			while (puzzleSolver.depth() != 56)
+			{
+				puzzleSolver.next();
+			}
+		}
+		stopWatch.stopTimer();
+		return stopWatch.getElapsedTime() / inNumberOfIterations;
+	}
 }
+
+
 
 
 int main()
 {
-	CStopWatch stopWatch;
-	stopWatch.startTimer();
+	// Uncomment this to measure timings
+	//std::cout << "Duration: " << Tetris::getTiming(10) << "s." << std::endl;
+
+
 	Tetris::PuzzleSolver puzzleSolver;
-	int count = 0;
-	int maxDepth = 0;
 	while (puzzleSolver.depth() != 56)
 	{
 		puzzleSolver.next();
-		if (puzzleSolver.depth() > maxDepth)
-		{
-			maxDepth = puzzleSolver.depth();
-		}
-		count++;
 	}
-
+	
+	std::ofstream outFile("output.txt");
 	Tetris::GenericGrid<char> grid(15, 15, '.');
 	puzzleSolver.getAsciiFormat(grid);
-	Tetris::printState(grid, std::cout);
+	Tetris::printState(grid, outFile);
 
 	std::vector<std::string> moves;
 	puzzleSolver.getListOfMoves(moves);
-	Tetris::printListOfMoves(moves, std::cout);
+	Tetris::printListOfMoves(moves, outFile);
 	
 	
-	stopWatch.stopTimer();
-	std::cout << "Duration: " << stopWatch.getElapsedTime() << "." << std::endl;
 	std::cout << "Press ENTER to quit";
 	getchar();
 	return 0;
