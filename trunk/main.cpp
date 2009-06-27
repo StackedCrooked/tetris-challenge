@@ -18,6 +18,10 @@ namespace Tetris
 		{
 			for (size_t colIdx = 0; colIdx != grid.numColumns(); ++colIdx)
 			{
+				if (colIdx != 0)
+				{
+					out << " ";
+				}
 				out << grid.get(rowIdx, colIdx);
 			}
 			out << std::endl;
