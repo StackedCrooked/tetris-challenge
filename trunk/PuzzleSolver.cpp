@@ -1,6 +1,7 @@
 #include "PuzzleSolver.h"
 #include "Parser.h"
 #include <algorithm>
+#include <sstream>
 
 namespace Tetris
 {
@@ -131,10 +132,11 @@ namespace Tetris
 
 	void PuzzleSolver::generateFutureGameStates(GameStateNode & inGameStateNode, const Block & inBlock, GameStateNode::Children & outGameGrids) const
 	{
-		
-		for (size_t rotIdx = 0; rotIdx != NumRotations(inBlock.type()); ++rotIdx)
+		const int numRotations = NumRotations(inBlock.type());
+		for (size_t rotIdx = 0; rotIdx != numRotations; ++rotIdx)
 		{
-			Block block(Block(inBlock.charId(), inBlock.type(), inBlock.rotation() + rotIdx));
+			int rotation = (inBlock.rotation() + rotIdx)%numRotations;
+			Block block(Block(inBlock.charId(), inBlock.type(), rotation));
 			
 			size_t maxCol = inGameStateNode.state().grid().numColumns() - block.grid().numColumns();
 			for (size_t colIdx = 0; colIdx <= maxCol; ++colIdx)
@@ -210,6 +212,46 @@ namespace Tetris
 					}
 				}
 				getAsciiFormat(childNode, grid);
+				return;
+			}
+		}
+	}
+
+	void PuzzleSolver::getListOfMoves(std::vector<std::string> & list) const
+	{
+		getListOfMoves(&mRootNode, list);
+	}
+
+
+	void PuzzleSolver::getListOfMoves(const GameStateNode * inNode, std::vector<std::string> & list) const
+	{
+		GameStateNode::Children::const_iterator it = inNode->children().begin(), end = inNode->children().end();
+		for (; it != end; ++it)
+		{
+			const GameStateNode * childNode = it->get();
+			if (!childNode->isDeadEnd())
+			{
+				char id = childNode->lastBlock().charId();
+				size_t row, col;
+				childNode->lastBlockPosition(row, col);
+				int rot = childNode->lastBlock().rotation();
+				size_t pos = (row * 15) + col;
+				//Z 0 - Piece Z at location 0 with no orientation
+				//K 60 - Piece K at location 60 with no orientation.
+				//B 1
+				//H 18 3 Piece H at location 18 (See below) orientation 3.
+				std::stringstream ss;
+				ss << id << " " << pos << " - " << "Piece " << id << " at location " << pos;
+				if (rot == 0)
+				{
+					ss << " with no orientation.";
+				}
+				else
+				{
+					ss << " orientation " << rot << ".";
+				}
+				list.push_back(ss.str());
+				getListOfMoves(childNode, list);
 				return;
 			}
 		}
