@@ -34,6 +34,7 @@ namespace Tetris
 	public:
 		Block(char inCharId, BlockType inType, int inRotation);
 
+		// The ID in inputs.txt
 		char charId() const;
 
 		BlockType type() const;
