@@ -40,8 +40,6 @@ namespace Tetris
 		const Children & children() const;
 
 		void setChildren(const Children & inChildren);
-		
-		int depthOfOffspring() const;
 
 		const GameState & state() const;
 
