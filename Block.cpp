@@ -174,15 +174,6 @@ namespace Tetris
 	{
 		if (rotation%4 == 0)
 		{
-			Grid block(3, 2, NO_BLOCK);
-			block.set(0, 1, J_BLOCK);
-			block.set(1, 1, J_BLOCK);
-			block.set(2, 0, J_BLOCK);
-			block.set(2, 1, J_BLOCK);
-			return block;
-		}
-		else if (rotation%4 == 1)
-		{
 			Grid block(2, 3, NO_BLOCK);
 			block.set(0, 0, J_BLOCK);
 			block.set(1, 0, J_BLOCK);
@@ -190,7 +181,7 @@ namespace Tetris
 			block.set(1, 2, J_BLOCK);
 			return block;
 		}
-		else if (rotation%4 == 2)
+		else if (rotation%4 == 1)
 		{
 			Grid block(3, 2, NO_BLOCK);
 			block.set(0, 0, J_BLOCK);
@@ -199,7 +190,7 @@ namespace Tetris
 			block.set(2, 0, J_BLOCK);
 			return block;
 		}
-		else
+		else if (rotation%4 == 2)
 		{
 			Grid block(2, 3, NO_BLOCK);
 			block.set(0, 0, J_BLOCK);
@@ -208,11 +199,29 @@ namespace Tetris
 			block.set(1, 2, J_BLOCK);
 			return block;
 		}
+		else
+		{
+			Grid block(3, 2, NO_BLOCK);
+			block.set(0, 1, J_BLOCK);
+			block.set(1, 1, J_BLOCK);
+			block.set(2, 0, J_BLOCK);
+			block.set(2, 1, J_BLOCK);
+			return block;
+		}
 	}
 
 	Grid MakeLBlock(int rotation)
 	{
 		if (rotation%4 == 0)
+		{
+			Grid block(2, 3, NO_BLOCK);
+			block.set(0, 2, L_BLOCK);
+			block.set(1, 0, L_BLOCK);
+			block.set(1, 1, L_BLOCK);
+			block.set(1, 2, L_BLOCK);
+			return block;
+		}
+		else if (rotation%4 == 1)
 		{
 			Grid block(3, 2, NO_BLOCK);
 			block.set(0, 0, L_BLOCK);
@@ -221,7 +230,7 @@ namespace Tetris
 			block.set(2, 1, L_BLOCK);
 			return block;
 		}
-		else if (rotation%4 == 1)
+		else if (rotation%4 == 2)
 		{
 			Grid block(2, 3, NO_BLOCK);
 			block.set(0, 0, L_BLOCK);
@@ -230,22 +239,13 @@ namespace Tetris
 			block.set(1, 0, L_BLOCK);
 			return block;
 		}
-		else if (rotation%4 == 2)
+		else
 		{
 			Grid block(3, 2, NO_BLOCK);
 			block.set(0, 0, L_BLOCK);
 			block.set(0, 1, L_BLOCK);
 			block.set(1, 1, L_BLOCK);
 			block.set(2, 1, L_BLOCK);
-			return block;
-		}
-		else
-		{
-			Grid block(2, 3, NO_BLOCK);
-			block.set(0, 2, L_BLOCK);
-			block.set(1, 0, L_BLOCK);
-			block.set(1, 1, L_BLOCK);
-			block.set(1, 2, L_BLOCK);
 			return block;
 		}
 	}

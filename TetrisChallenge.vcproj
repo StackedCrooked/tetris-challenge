@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="9,00"
 	Name="TetrisChallenge"
 	ProjectGUID="{743718FA-A3A5-48D8-AC6C-6102A5E0934B}"
 	RootNamespace="TetrisChallenge"
 	Keyword="Win32Proj"
+	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
 		<Platform
