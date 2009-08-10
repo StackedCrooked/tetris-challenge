@@ -311,31 +311,31 @@ namespace Tetris
 		{
 			case I_BLOCK:
 			{
-				return Gdiplus::Color::Blue;
+				return Gdiplus::Color::Violet;
 			}
 			case J_BLOCK:
 			{
-				return Gdiplus::Color::Red;
+				return Gdiplus::Color::Blue;
 			}
 			case L_BLOCK:
 			{
-				return Gdiplus::Color::Yellow;
+				return Gdiplus::Color::Orange;
 			}
 			case O_BLOCK:
 			{
-				return Gdiplus::Color::Orange;
+				return Gdiplus::Color::Yellow;
 			}
 			case S_BLOCK:
 			{
-				return Gdiplus::Color::Green;
+				return Gdiplus::Color::LightGreen;
 			}
 			case T_BLOCK:
 			{
-				return Gdiplus::Color::Pink;
+				return Gdiplus::Color::Blue;
 			}
 			case Z_BLOCK:
 			{
-				return Gdiplus::Color::Violet;
+				return Gdiplus::Color::Red;
 			}
 			case NO_BLOCK:
 			{
