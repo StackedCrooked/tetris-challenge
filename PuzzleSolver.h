@@ -54,9 +54,17 @@ namespace Tetris
 
 		int depthOfOffspring(const GameStateNode * inGameStateNode, std::list<GameStateNode*> & outNodes) const;
 
-		void generateFutureGameStates(GameStateNode & inGameStateNode, const Block & inBlockId, GameStateNode::Children & outGameGrids) const;
-
-		void generateFutureGameStates(GameStateNode & inGameStateNode, const Block & inBlock, size_t inColIdx, GameStateNode::Children & outGameGrids) const;
+		/**
+		 * inLimitNumberOfGameStates	Indicates the maximum number of gamestates that should be generated.
+		 *								Set this value to 0 to have unlimited number of gamestates.
+		*/
+		void generateFutureGameStates(GameStateNode & inGameStateNode, const Block & inBlockId, size_t inLimitNumberOfGameStates, GameStateNode::Children & outGameGrids) const;
+		
+		/**
+		 * inLimitNumberOfGameStates	Indicates the maximum number of gamestates that should be generated.
+		 *								Set this value to 0 to have unlimited number of gamestates.
+		*/
+		void generateFutureGameStates(GameStateNode & inGameStateNode, const Block & inBlock, size_t inColIdx, size_t inLimitNumberOfGameStates, GameStateNode::Children & outGameGrids) const;
 
 		void getAsciiFormat(const GameStateNode * inNode, GenericGrid<char> & grid) const;
 
