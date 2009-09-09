@@ -61,9 +61,6 @@ namespace Tetris
 		mutable int mNumHoles;
 	};
 
-		
-	bool operator<(const GameState & lhs, const GameState & rhs);
-
 
 } // namespace Tetris
 
