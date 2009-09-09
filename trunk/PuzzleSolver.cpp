@@ -38,15 +38,9 @@ namespace Tetris
 			if (inNode->children().empty() && !inNode->isDeadEnd())
 			{
 				GameStateNode::Children futureGameStates;
-				generateFutureGameStates(*inNode, inBlockTypes[0], futureGameStates);
+				generateFutureGameStates(*inNode, inBlockTypes[0], 2, futureGameStates);
 				if (!futureGameStates.empty())
 				{
-					// Optimization. We only remember the top two gamestates (with the
-					// best score). 
-					while (futureGameStates.size() > 2)
-					{
-						futureGameStates.erase(--futureGameStates.end());
-					}
 					inNode->setChildren(futureGameStates);
 					if (inBlockTypes.size() > 1)
 					{
@@ -132,7 +126,7 @@ namespace Tetris
 	}
 
 
-	void PuzzleSolver::generateFutureGameStates(GameStateNode & inGameStateNode, const Block & inBlock, GameStateNode::Children & outGameGrids) const
+	void PuzzleSolver::generateFutureGameStates(GameStateNode & inGameStateNode, const Block & inBlock, size_t inLimitNumberOfGameStates, GameStateNode::Children & outGameGrids) const
 	{
 		const int numRotations = NumRotations(inBlock.type());
 		for (size_t rotIdx = 0; rotIdx != numRotations; ++rotIdx)
@@ -143,13 +137,23 @@ namespace Tetris
 			size_t maxCol = inGameStateNode.state().grid().numColumns() - block.grid().numColumns();
 			for (size_t colIdx = 0; colIdx <= maxCol; ++colIdx)
 			{
-				generateFutureGameStates(inGameStateNode, block, colIdx, outGameGrids);
+				generateFutureGameStates(inGameStateNode, block, colIdx, inLimitNumberOfGameStates, outGameGrids);
+			}
+		}
+
+		// The gamestates have been generated, and are already sorted.
+		// Now we will continue to remove the last one until we are within the size limit.
+		if (inLimitNumberOfGameStates != 0)
+		{
+			while (outGameGrids.size() > inLimitNumberOfGameStates)
+			{
+				outGameGrids.erase(--outGameGrids.end());
 			}
 		}
 	}
 
 
-	void PuzzleSolver::generateFutureGameStates(GameStateNode & inGameStateNode, const Block & inBlock, size_t inColIdx, GameStateNode::Children & outGameGrids) const
+	void PuzzleSolver::generateFutureGameStates(GameStateNode & inGameStateNode, const Block & inBlock, size_t inColIdx, size_t inLimitNumberOfGameStates, GameStateNode::Children & outGameGrids) const
 	{
 		size_t maxRow = inGameStateNode.state().grid().numRows() - inBlock.grid().numRows();
 		for (size_t rowIdx = 0; rowIdx <= maxRow; ++rowIdx)
