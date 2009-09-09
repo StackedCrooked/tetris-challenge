@@ -13,13 +13,6 @@ namespace Tetris
 	GenericGrid<int> GameState::sHelperGrid(cNumRows, cNumColumns, 0);
 
 
-	bool operator<(const GameState & lhs, const GameState & rhs)
-	{
-		// ordering is by score descending
-		return lhs.calculateScore() > rhs.calculateScore();
-	}
-
-
 	GameState::GameState() :
 		mGrid(cNumRows, cNumColumns, NO_BLOCK),
 		mDirty(true),
