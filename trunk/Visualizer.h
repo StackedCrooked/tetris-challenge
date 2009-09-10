@@ -48,11 +48,13 @@ namespace Tetris
 		static Gdiplus::Color GetColor(BlockType inType);
 
 		HWND mHandle;
-		HWND mNextButton;
+		HWND mUpButton;
+		HWND mDownButton;
 		typedef std::map<HWND, Visualizer*> Instances;
 
 		PuzzleSolver * mPuzzleSolver;
 		UINT_PTR mTimerID;
+		int mDelay;
 
 		static Instances sInstances;
 		static ULONG_PTR sGdiPlusToken;
