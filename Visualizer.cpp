@@ -30,7 +30,8 @@ namespace Tetris
 
 
 	Visualizer::Visualizer(PuzzleSolver * inPuzzleSolver) :
-		mPuzzleSolver(inPuzzleSolver)
+		mPuzzleSolver(inPuzzleSolver),
+		mDelay(100)
 	{
 		sRefCount++;
 		if (sRefCount == 1)
@@ -96,24 +97,40 @@ namespace Tetris
 			return;
 		}
 
-		mNextButton = CreateWindowEx
+		mUpButton = CreateWindowEx
 		(
 			0,
 			L"BUTTON",
-			L"Next",
+			L"+",
 			BS_PUSHBUTTON | WS_CHILD | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_VISIBLE,
+			0,
 			10,
-			10,
-			80,
-			22,
+			16,
+			16,
 			mHandle,
 			(HMENU)101,
 			::GetModuleHandle(0),
 			NULL
 		);
 
+		mDownButton = CreateWindowEx
+		(
+			0,
+			L"BUTTON",
+			L"-",
+			BS_PUSHBUTTON | WS_CHILD | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_VISIBLE,
+			0,
+			26,
+			16,
+			16,
+			mHandle,
+			(HMENU)102,
+			::GetModuleHandle(0),
+			NULL
+		);
+
 		sInstances.insert(std::make_pair(mHandle, this));
-		mTimerID = SetTimer(NULL, NULL, 100, &Visualizer::TimerCallback);
+		mTimerID = SetTimer(NULL, NULL, mDelay, &Visualizer::TimerCallback);
 		::ShowWindow(mHandle, SW_SHOW);	
 		MSG message;
 		while (GetMessage(&message, NULL, 0, 0))
@@ -236,7 +253,7 @@ namespace Tetris
 		const Grid & grid = inState.grid();
 		drawGrid(inGraphics, grid, inRect);
 		std::wstringstream ss;
-		ss << L"Score: " << inState.calculateScore();
+		ss << L"Delay: " << mDelay << ". Score: " << inState.calculateScore();
 		std::wstring info(ss.str());
 		drawText(inGraphics, info, Gdiplus::RectF(inRect.X, inRect.Y + inRect.Height - 20, inRect.Width, inRect.Height));
 	}
@@ -363,6 +380,11 @@ namespace Tetris
 		if (inTimerID == pThis->mTimerID && pThis->mPuzzleSolver->depth() != 56)
 		{
 			pThis->mPuzzleSolver->next();
+
+			// Reset timer because mDelay might have been changed.
+			::KillTimer(0, pThis->mTimerID);
+			pThis->mTimerID = ::SetTimer(0, 0, pThis->mDelay, &Visualizer::TimerCallback);
+
 			::InvalidateRect(pThis->mHandle, 0, FALSE);
 			//while (pThis->mPuzzleSolver->depth() < 50)
 			//{
@@ -396,9 +418,14 @@ namespace Tetris
 			{
 				if (wParam == 101)
 				{
-					pThis->mPuzzleSolver->next();
-					::InvalidateRect(pThis->mHandle, 0, FALSE);
-					::UpdateWindow(pThis->mHandle);
+					pThis->mDelay += 10;
+				}
+				else if (wParam == 102)
+				{
+					if (pThis->mDelay > 10)
+					{
+						pThis->mDelay -= 10;
+					}
 				}
 				break;
 			}
