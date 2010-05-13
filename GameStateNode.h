@@ -10,57 +10,63 @@
 namespace Tetris
 {
 
-	class GameStateNode;
-	typedef boost::shared_ptr<GameStateNode> ChildPtr;
-	
-	struct ChildPtrCompare
-	{
-		bool operator () (ChildPtr lhs, ChildPtr rhs);
-	};
-	
-	class GameStateNode
-	{
-	public:
-		GameStateNode(GameStateNode * inParent, const Block & inBlock, size_t inRowIdx, size_t inColIdx);
+    class GameStateNode;
+    typedef boost::shared_ptr<GameStateNode> ChildPtr;
 
-		const GameStateNode * parent() const;	
+    struct ChildPtrCompare
+    {
+        bool operator()(ChildPtr lhs, ChildPtr rhs);
+    };
 
-		GameStateNode * parent();
+    class GameStateNode
+    {
+    public:
+        GameStateNode(GameStateNode * inParent, const Block & inBlock, size_t inRowIdx, size_t inColIdx);
 
-		// Returns that last added block.
-		const Block & lastBlock() const;
+        const GameStateNode * parent() const;
 
-		// Returns the position of the last added block.
-		void lastBlockPosition(size_t & outRowIdx, size_t &outColIdx) const;
+        GameStateNode * parent();
 
-		typedef std::multiset<ChildPtr, ChildPtrCompare> Children;
+        // Returns that last added block.
+        const Block & lastBlock() const;
 
-		Children & children();
+        // Returns the position of the last added block.
+        void lastBlockPosition(size_t & outRowIdx, size_t & outColIdx) const;
 
-		const Children & children() const;
+        typedef std::multiset<ChildPtr, ChildPtrCompare> Children;
 
-		void setChildren(const Children & inChildren);
+        Children & children();
 
-		const GameState & state() const;
+        const Children & children() const;
 
-		void setState(const GameState & inState);
+        void setChildren(const Children & inChildren);
 
-		bool isDeadEnd() const { return mDeadEnd; }	
+        const GameState & state() const;
 
-		void markAsDeadEnd() { mDeadEnd = true; }
-		
-	private:
-		GameStateNode * mParent;
+        void setState(const GameState & inState);
 
-		// Info about last solidified block
-		Block mLastBlock;
-		size_t mRowIdx;
-		size_t mColIdx;
+        bool isDeadEnd() const
+        {
+            return mDeadEnd;
+        }
 
-		bool mDeadEnd;
-		GameState mState;
-		Children mChildren;
-	};
+        void markAsDeadEnd()
+        {
+            mDeadEnd = true;
+        }
+
+    private:
+        GameStateNode * mParent;
+
+        // Info about last solidified block
+        Block mLastBlock;
+        size_t mRowIdx;
+        size_t mColIdx;
+
+        bool mDeadEnd;
+        GameState mState;
+        Children mChildren;
+    };
 
 } // namespace Tetris
 
