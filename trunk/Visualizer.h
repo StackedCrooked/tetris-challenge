@@ -10,56 +10,56 @@
 namespace Tetris
 {
 
-	class Visualizer
-	{
-	public:
-		Visualizer(PuzzleSolver * inPuzzleSolver);
+    class Visualizer
+    {
+    public:
+        Visualizer(PuzzleSolver * inPuzzleSolver);
 
-		~Visualizer();
+        ~Visualizer();
 
-		void show();
+        void show();
 
-		void refresh();
+        void refresh();
 
-	private:
-		Visualizer(const Visualizer &);
-		Visualizer & operator=(const Visualizer &);
+    private:
+        Visualizer(const Visualizer &);
+        Visualizer & operator=(const Visualizer &);
 
-		static void Initialize();
-		static void Finalize();
-		static LRESULT CALLBACK MessageHandler(HWND hWnd, UINT inMessage, WPARAM wParam, LPARAM lParam);
+        static void Initialize();
+        static void Finalize();
+        static LRESULT CALLBACK MessageHandler(HWND hWnd, UINT inMessage, WPARAM wParam, LPARAM lParam);
 
-		static void CALLBACK TimerCallback(HWND hWnd, UINT inMessage, UINT_PTR inTimerID, DWORD inTime);
+        static void CALLBACK TimerCallback(HWND hWnd, UINT inMessage, UINT_PTR inTimerID, DWORD inTime);
 
-		void onPaint(HDC inHDC);
+        void onPaint(HDC inHDC);
 
-		void drawTree(Gdiplus::Graphics & inGraphics, const GameStateNode & inNode, const Gdiplus::RectF & inRect, int level);
+        void drawTree(Gdiplus::Graphics & inGraphics, const GameStateNode & inNode, const Gdiplus::RectF & inRect, int level);
 
-		void drawText(Gdiplus::Graphics & inGraphics, const std::wstring & inText, const Gdiplus::RectF & inRect, const Gdiplus::Brush & inBrush);
-		
-		void drawText(Gdiplus::Graphics & inGraphics, const std::wstring & inText, const Gdiplus::RectF & inRect);
+        void drawText(Gdiplus::Graphics & inGraphics, const std::wstring & inText, const Gdiplus::RectF & inRect, const Gdiplus::Brush & inBrush);
 
-		void drawGrid(Gdiplus::Graphics & inGraphics, const Grid & inGrid, const Gdiplus::RectF & inRect);
+        void drawText(Gdiplus::Graphics & inGraphics, const std::wstring & inText, const Gdiplus::RectF & inRect);
 
-		void drawRemainingBlocks(Gdiplus::Graphics & inGraphics, const Gdiplus::RectF & inRect);
+        void drawGrid(Gdiplus::Graphics & inGraphics, const Grid & inGrid, const Gdiplus::RectF & inRect);
 
-		void drawState(Gdiplus::Graphics & inGraphics, const GameState & inState, const Gdiplus::RectF & inRect);
+        void drawRemainingBlocks(Gdiplus::Graphics & inGraphics, const Gdiplus::RectF & inRect);
 
-		static Gdiplus::Color GetColor(BlockType inType);
+        void drawState(Gdiplus::Graphics & inGraphics, const GameState & inState, const Gdiplus::RectF & inRect);
 
-		HWND mHandle;
-		HWND mUpButton;
-		HWND mDownButton;
-		typedef std::map<HWND, Visualizer*> Instances;
+        static Gdiplus::Color GetColor(BlockType inType);
 
-		PuzzleSolver * mPuzzleSolver;
-		UINT_PTR mTimerID;
-		int mDelay;
+        HWND mHandle;
+        HWND mUpButton;
+        HWND mDownButton;
+        typedef std::map<HWND, Visualizer *> Instances;
 
-		static Instances sInstances;
-		static ULONG_PTR sGdiPlusToken;
-		static int sRefCount;
-	};
+        PuzzleSolver * mPuzzleSolver;
+        UINT_PTR mTimerID;
+        int mDelay;
+
+        static Instances sInstances;
+        static ULONG_PTR sGdiPlusToken;
+        static int sRefCount;
+    };
 
 } // namespace Tetris
 
