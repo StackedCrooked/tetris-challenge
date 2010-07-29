@@ -164,7 +164,7 @@ namespace Tetris
     //    drawText(inGraphics, ss.str(), Gdiplus::RectF(xOffset, yOffset, 80, 30), textBrush);
 
     //    xOffset += 80;
-    //    GameStateNode::Children::const_iterator it = inNode.children().begin(), end = inNode.children().end();
+    //    Children::const_iterator it = inNode.children().begin(), end = inNode.children().end();
     //    for (; it != end; ++it)
     //    {
     //        if (*it)
@@ -294,8 +294,8 @@ namespace Tetris
     //        //drawTree(g, *node, Gdiplus::RectF(offsetX, offsetY, cWidth - cMarginLeft - cMarginRight, cTreeHeight), 0);
     //        offsetY += cTreeHeight;
 
-    //        const GameStateNode::Children & children = node->children();
-    //        GameStateNode::Children::const_iterator it = children.begin(), end = children.end();
+    //        const Children & children = node->children();
+    //        Children::const_iterator it = children.begin(), end = children.end();
     //        int count = 0;
     //        size_t numChildren = 1;//children.size();
     //        for (; it != end && count < numChildren; ++it)
@@ -327,35 +327,35 @@ namespace Tetris
     //{
     //    switch (inType)
     //    {
-    //        case I_BLOCK:
+    //        case BlockType_I:
     //        {
     //            return Gdiplus::Color::Violet;
     //        }
-    //        case J_BLOCK:
+    //        case BlockType_J:
     //        {
     //            return Gdiplus::Color::Blue;
     //        }
-    //        case L_BLOCK:
+    //        case BlockType_L:
     //        {
     //            return Gdiplus::Color::Orange;
     //        }
-    //        case O_BLOCK:
+    //        case BlockType_O:
     //        {
     //            return Gdiplus::Color::Yellow;
     //        }
-    //        case S_BLOCK:
+    //        case BlockType_S:
     //        {
     //            return Gdiplus::Color::LightGreen;
     //        }
-    //        case T_BLOCK:
+    //        case BlockType_T:
     //        {
     //            return Gdiplus::Color::Blue;
     //        }
-    //        case Z_BLOCK:
+    //        case BlockType_Z:
     //        {
     //            return Gdiplus::Color::Red;
     //        }
-    //        case NO_BLOCK:
+    //        case BlockType_Unknown:
     //        {
     //            return Gdiplus::Color::Black;
     //        }
