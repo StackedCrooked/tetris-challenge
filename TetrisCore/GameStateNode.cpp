@@ -7,7 +7,7 @@ namespace Tetris
     {
         if (lhs && rhs)
         {
-            return lhs->state().calculateScore() > rhs->state().calculateScore();
+            return lhs->state().quality() > rhs->state().quality();
         }
         else
         {

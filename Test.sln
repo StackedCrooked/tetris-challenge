@@ -1,0 +1,29 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual C++ Express 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Test", "Test\Test.vcproj", "{4EE3F34C-3D0C-473E-8824-08F133C58879}"
+	ProjectSection(ProjectDependencies) = postProject
+		{4BD68C95-9B2E-47C9-9A19-1DA5475F2E9B} = {4BD68C95-9B2E-47C9-9A19-1DA5475F2E9B}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TetrisCore", "TetrisCore\TetrisCore.vcproj", "{4BD68C95-9B2E-47C9-9A19-1DA5475F2E9B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4EE3F34C-3D0C-473E-8824-08F133C58879}.Debug|Win32.ActiveCfg = Debug|Win32
+		{4EE3F34C-3D0C-473E-8824-08F133C58879}.Debug|Win32.Build.0 = Debug|Win32
+		{4EE3F34C-3D0C-473E-8824-08F133C58879}.Release|Win32.ActiveCfg = Release|Win32
+		{4EE3F34C-3D0C-473E-8824-08F133C58879}.Release|Win32.Build.0 = Release|Win32
+		{4BD68C95-9B2E-47C9-9A19-1DA5475F2E9B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{4BD68C95-9B2E-47C9-9A19-1DA5475F2E9B}.Debug|Win32.Build.0 = Debug|Win32
+		{4BD68C95-9B2E-47C9-9A19-1DA5475F2E9B}.Release|Win32.ActiveCfg = Release|Win32
+		{4BD68C95-9B2E-47C9-9A19-1DA5475F2E9B}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
