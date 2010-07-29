@@ -2,14 +2,16 @@
 #define GAMESTATENODE_H
 
 
-#include "GameState.h"
 #include <boost/shared_ptr.hpp>
+#include <boost/scoped_ptr.hpp>
 #include <set>
 
 
 namespace Tetris
 {
 
+    class Block;
+    class GameState;
     class GameStateNode;
     typedef boost::shared_ptr<GameStateNode> ChildPtr;
 
@@ -17,54 +19,39 @@ namespace Tetris
     {
         bool operator()(ChildPtr lhs, ChildPtr rhs);
     };
+    
+
+    // We use a multiset because quality which is not always a unique value.
+    typedef std::set<ChildPtr, ChildPtrCompare> Children;
+
 
     class GameStateNode
     {
     public:
-        GameStateNode(GameStateNode * inParent, const Block & inBlock, size_t inRowIdx, size_t inColIdx);
+        // Creates a root node
+        GameStateNode();
+
+        GameStateNode(GameStateNode * inParent, GameState * inGameState);
 
         const GameStateNode * parent() const;
 
         GameStateNode * parent();
 
-        // Returns that last added block.
-        const Block & lastBlock() const;
-
-        // Returns the position of the last added block.
-        void lastBlockPosition(size_t & outRowIdx, size_t & outColIdx) const;
-
-        typedef std::multiset<ChildPtr, ChildPtrCompare> Children;
+        const Children & children() const;
 
         Children & children();
 
-        const Children & children() const;
-
-        void setChildren(const Children & inChildren);
-
         const GameState & state() const;
 
-        void setState(const GameState & inState);
+        bool isDeadEnd() const;
 
-        bool isDeadEnd() const
-        {
-            return mDeadEnd;
-        }
-
-        void markAsDeadEnd()
-        {
-            mDeadEnd = true;
-        }
+        void markAsDeadEnd();
 
     private:
+        int mId;
         GameStateNode * mParent;
-
-        // Info about last solidified block
-        Block mLastBlock;
-        size_t mRowIdx;
-        size_t mColIdx;
-
-        bool mDeadEnd;
-        GameState mState;
+        bool mIsDeadEnd;
+        boost::scoped_ptr<GameState> mGameState;
         Children mChildren;
     };
 

@@ -5,16 +5,9 @@
 namespace Tetris
 {
 
-    const int cNumRows = 15;
-    const int cNumColumns = 15;
 
-
-    int GameState::sMarker(1);
-    GenericGrid<int> GameState::sHelperGrid(cNumRows, cNumColumns, 0);
-
-
-    GameState::GameState() :
-        mGrid(cNumRows, cNumColumns, NO_BLOCK),
+    GameState::GameState(int inNumRows, int inNumColumns) :
+        mGrid(inNumRows, inNumColumns, BlockType_Unknown),
         mNumLines(0),
         mNumSingles(0),
         mNumDoubles(0),
@@ -64,75 +57,6 @@ namespace Tetris
     }
 
 
-    bool GameState::hasTopHoles() const
-    {
-        for (size_t colIdx = 0; colIdx != mGrid.numColumns(); ++colIdx)
-        {
-            if (mGrid.get(0, colIdx) == NO_BLOCK)
-            {
-                sMarker++;
-                int numNeighbors = countNeighbors(0, colIdx);
-                if (numNeighbors == 1  || numNeighbors == 2 ||
-                        numNeighbors == 5  || numNeighbors == 6 ||
-                        numNeighbors == 9  || numNeighbors == 10 ||
-                        numNeighbors == 13 || numNeighbors == 14 ||
-                        numNeighbors == 17 || numNeighbors == 18 ||
-                        numNeighbors == 21 || numNeighbors == 22 ||
-                        numNeighbors == 25 || numNeighbors == 26 ||
-                        numNeighbors == 29 || numNeighbors == 30 ||
-                        numNeighbors == 33 || numNeighbors == 34 ||
-                        numNeighbors == 37 || numNeighbors == 38)
-                {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-
-    int GameState::countNeighbors(size_t inRowIdx, size_t inColIdx) const
-    {
-        int result = 0;
-        sHelperGrid.set(inRowIdx, inColIdx, sMarker);
-        int value = mGrid.get(inRowIdx, inColIdx);
-
-        if (inRowIdx + 1 < mGrid.numRows() &&
-                mGrid.get(inRowIdx + 1, inColIdx) == value &&
-                sHelperGrid.get(inRowIdx + 1, inColIdx) != sMarker)
-        {
-            result++;
-            result += countNeighbors(inRowIdx + 1, inColIdx);
-        }
-
-        if (inColIdx + 1 < mGrid.numColumns() &&
-                mGrid.get(inRowIdx, inColIdx + 1) == value &&
-                sHelperGrid.get(inRowIdx, inColIdx + 1) != sMarker)
-        {
-            result++;
-            result += countNeighbors(inRowIdx, inColIdx + 1);
-        }
-
-        if (inRowIdx > 0 &&
-                mGrid.get(inRowIdx - 1, inColIdx) == value &&
-                sHelperGrid.get(inRowIdx - 1, inColIdx) != sMarker)
-        {
-            result++;
-            result += countNeighbors(inRowIdx - 1, inColIdx);
-        }
-
-        if (inColIdx > 0 &&
-                mGrid.get(inRowIdx, inColIdx - 1) == value &&
-                sHelperGrid.get(inRowIdx, inColIdx - 1) != sMarker)
-        {
-            result++;
-            result += countNeighbors(inRowIdx, inColIdx - 1);
-        }
-
-        return result;
-    }
-
-
     int GameState::quality() const
     {
         if (mDirty)
@@ -152,7 +76,7 @@ namespace Tetris
                 for (size_t colIdx = 0; colIdx != mGrid.numColumns(); ++colIdx)
                 {
                     const int & value = mGrid.get(rowIdx, colIdx);
-                    if (value != NO_BLOCK)
+                    if (value != BlockType_Unknown)
                     {
                         if (!foundTop)
                         {
@@ -170,7 +94,7 @@ namespace Tetris
                         // check for holes
                         if (foundTop && rowIdx > 0)
                         {
-                            if (mGrid.get(rowIdx - 1, colIdx) != NO_BLOCK)
+                            if (mGrid.get(rowIdx - 1, colIdx) != BlockType_Unknown)
                             {
                                 mNumHoles++;
                                 result -= cHolePenalty;
@@ -204,7 +128,7 @@ namespace Tetris
         {
             for (size_t c = 0; c != inBlock.grid().numColumns(); ++c)
             {
-                if (inBlock.grid().get(r, c) != 0 && mGrid.get(inRowIdx + r, inColIdx + c) != NO_BLOCK)
+                if (inBlock.grid().get(r, c) != 0 && mGrid.get(inRowIdx + r, inColIdx + c) != BlockType_Unknown)
                 {
                     return false;
                 }
@@ -222,7 +146,7 @@ namespace Tetris
         {
             for (size_t c = 0; c != inBlock.grid().numColumns(); ++c)
             {
-                if (inBlock.grid().get(r, c) != NO_BLOCK)
+                if (inBlock.grid().get(r, c) != BlockType_Unknown)
                 {
                     result.grid().set(inRowIdx + r, inColIdx + c, inBlock.type());
                 }

@@ -14,7 +14,7 @@ namespace Tetris
     class GameState
     {
     public:
-        GameState();
+        GameState(int inNumRows, int inNumColumns);
 
         const Grid & grid() const;
 
@@ -32,13 +32,6 @@ namespace Tetris
         // Caches the value.
         int quality() const;
 
-        // When most blocks have been dropped in the field sometimes
-        // the remaining openings don't fit a tetris block anymore
-        // (for example an opening consisting of 2 or 3 holes). This
-        // makes it impossible to finish the puzzle, and thus is an
-        // indicator that the current game state is a dead end.
-        bool hasTopHoles() const;
-
         // Checks if a block can be placed at a given location without
         // overlapping with previously placed blocks.
         bool checkPositionValid(const Block & inBlock, size_t inRowIdx, size_t inColIdx) const;
@@ -50,10 +43,6 @@ namespace Tetris
         int numHoles() const;
 
     private:
-        // For a given square, counts the number of neighor squares
-        // that have the same value. This is a helper method for
-        // the method 'hasTopHoles'.
-        int countNeighbors(size_t inRowIdx, size_t inColIdx) const;
 
         Grid mGrid;
         int mNumLines;
@@ -66,10 +55,6 @@ namespace Tetris
         mutable bool mDirty;
         mutable int mCachedScore;
         mutable int mNumHoles;
-
-        // check for top holes
-        static GenericGrid<int> sHelperGrid;
-        static int sMarker;
     };
 
 

@@ -1,58 +1,46 @@
 #include "GameStateNode.h"
+#include "ErrorHandling.h"
+#include "GameState.h"
+#include "Block.h"
 
 namespace Tetris
 {
 
-    bool ChildPtrCompare::operator()(ChildPtr lhs, ChildPtr rhs)
+    GameStateNode::GameStateNode() :
+        mParent(0),
+        mGameState()
     {
-        if (lhs && rhs)
-        {
-            return lhs->state().quality() > rhs->state().quality();
-        }
-        else
-        {
-            return lhs.get() < rhs.get();
-        }
+
     }
 
 
-    GameStateNode::GameStateNode(GameStateNode * inParent, const Block & inBlock, size_t inRowIdx, size_t inColIdx) :
+    GameStateNode::GameStateNode(GameStateNode * inParent, GameState * inGameState) :
         mParent(inParent),
-        mLastBlock(inBlock),
-        mRowIdx(inRowIdx),
-        mColIdx(inColIdx),
-        mDeadEnd(false)
+        mGameState(inGameState),
+        mIsDeadEnd(false)
     {
     }
 
 
     const GameState & GameStateNode::state() const
     {
-        return mState;
+        if (!mGameState)
+        {
+            throw std::logic_error("Attempt to dereference uninitialized pointer.");
+        }
+        return *mGameState;
     }
 
 
-    void GameStateNode::setState(const GameState & inState)
-    {
-        mState = inState;
-    }
-
-
-    GameStateNode::Children & GameStateNode::children()
+    Children & GameStateNode::children()
     {
         return mChildren;
     }
 
 
-    const GameStateNode::Children & GameStateNode::children() const
+    const Children & GameStateNode::children() const
     {
         return mChildren;
-    }
-
-
-    void GameStateNode::setChildren(const Children & inChildren)
-    {
-        mChildren = inChildren;
     }
 
 
@@ -68,16 +56,35 @@ namespace Tetris
     }
 
 
-    const Block & GameStateNode::lastBlock() const
+    bool GameStateNode::isDeadEnd() const
     {
-        return mLastBlock;
+        return mIsDeadEnd;
+    }
+
+    void GameStateNode::markAsDeadEnd()
+    {
+        mIsDeadEnd = true;
     }
 
 
-    void GameStateNode::lastBlockPosition(size_t & outRowIdx, size_t & outColIdx) const
+    bool ChildPtrCompare::operator()(ChildPtr lhs, ChildPtr rhs)
     {
-        outRowIdx = mRowIdx;
-        outColIdx = mColIdx;
+        LogicAssert(lhs && rhs, "Comparison fails because ChildPtr objects are null!");
+        LogicAssert(lhs.get() != rhs.get(), "Comparison game state against itself. This is wrong!");
+
+        // Order by quality descending.
+        int q1 = lhs->state().quality();
+        int q2 = rhs->state().quality();
+        if (q1 != q2)
+        {
+            // Order by score descending.
+            return q2 >= q1;
+        }
+        else
+        {
+            // If the scores are equal, then order by pointer.
+            return lhs.get() < rhs.get();
+        }
     }
 
 } // namespace Tetris
