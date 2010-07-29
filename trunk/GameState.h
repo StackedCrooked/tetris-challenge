@@ -20,8 +20,17 @@ namespace Tetris
 
         Grid & grid();
 
+        int numLines() const;
+
+        int numDoubles() const;
+
+        int numTriples() const;
+
+        int numTetrises() const;
+
         // Calculates the quality of the playing field.
-        int calculateScore() const;
+        // Caches the value.
+        int quality() const;
 
         // When most blocks have been dropped in the field sometimes
         // the remaining openings don't fit a tetris block anymore
@@ -37,11 +46,7 @@ namespace Tetris
         // Creates a copy of this gamestate with an added block at the given location.
         GameState makeGameStateWithAddedBlock(const Block & inBlock, size_t inRowIdx, size_t inColIdx) const;
 
-        // Returns the number of holes. A hole is an empty square
-        // surrounded by non-empty squares. The puzzle only allows
-        // 1 hole, otherwise it won't fit all blocks. So we can use
-        // this information to indicate the current game state as a
-        // dead end.
+        // Returns the number of holes. A hole is an empty square is covered by blocks.
         int numHoles() const;
 
     private:
@@ -51,14 +56,20 @@ namespace Tetris
         int countNeighbors(size_t inRowIdx, size_t inColIdx) const;
 
         Grid mGrid;
+        int mNumLines;
+        int mNumSingles;
+        int mNumDoubles;
+        int mNumTriples;
+        int mNumTetrises;
+
+        // Do we need to recalculate the score?
+        mutable bool mDirty;
+        mutable int mCachedScore;
+        mutable int mNumHoles;
 
         // check for top holes
         static GenericGrid<int> sHelperGrid;
         static int sMarker;
-
-        mutable bool mDirty;
-        mutable int mCachedScore;
-        mutable int mNumHoles;
     };
 
 
