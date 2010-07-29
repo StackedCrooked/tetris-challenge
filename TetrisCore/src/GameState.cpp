@@ -138,17 +138,17 @@ namespace Tetris
     }
 
 
-    GameState GameState::makeGameStateWithAddedBlock(const Block & inBlock, size_t inRowIdx, size_t inColIdx) const
+    std::auto_ptr<GameState> GameState::createNext(const Block & inBlock) const
     {
-        GameState result(*this);
-        result.mDirty = true;
+        std::auto_ptr<GameState> result(new GameState(*this));
+        result->mDirty = true;
         for (size_t r = 0; r != inBlock.grid().numRows(); ++r)
         {
             for (size_t c = 0; c != inBlock.grid().numColumns(); ++c)
             {
                 if (inBlock.grid().get(r, c) != BlockType_Unknown)
                 {
-                    result.grid().set(inRowIdx + r, inColIdx + c, inBlock.type());
+                    result->grid().set(inBlock.row() + r, inBlock.column() + c, inBlock.type());
                 }
             }
         }

@@ -1,15 +1,15 @@
 #ifndef GAMESTATE_H
 #define GAMESTATE_H
 
-#include "Block.h"
+
 #include "GenericGrid.h"
+#include "Block.h"
 #include <set>
 #include <vector>
 
 
 namespace Tetris
 {
-
 
     class GameState
     {
@@ -37,13 +37,12 @@ namespace Tetris
         bool checkPositionValid(const Block & inBlock, size_t inRowIdx, size_t inColIdx) const;
 
         // Creates a copy of this gamestate with an added block at the given location.
-        GameState makeGameStateWithAddedBlock(const Block & inBlock, size_t inRowIdx, size_t inColIdx) const;
+        std::auto_ptr<GameState> createNext(const Block & inBlock) const;
 
         // Returns the number of holes. A hole is an empty square is covered by blocks.
         int numHoles() const;
 
     private:
-
         Grid mGrid;
         int mNumLines;
         int mNumSingles;

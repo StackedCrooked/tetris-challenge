@@ -18,12 +18,9 @@ namespace Tetris
     struct ChildPtrCompare
     {
         bool operator()(ChildPtr lhs, ChildPtr rhs);
-    };
-    
+    };    
 
-    // We use a multiset because quality which is not always a unique value.
     typedef std::set<ChildPtr, ChildPtrCompare> Children;
-
 
     class GameStateNode
     {

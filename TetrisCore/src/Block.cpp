@@ -24,11 +24,27 @@ namespace Tetris
     Grid GetZGrid(int rotation);
 
 
-
     Block::Block(BlockType inType, int inRotation) :
         mId(GetBlockIdentifier(inType, inRotation)),
         mType(inType),
         mRotation(inRotation),
+        mRow(0),
+        mColumn(0),
+        mGrid(GetGrid(mId))
+    {
+        if (mRotation < 0 || mRotation > 3)
+        {
+            throw std::logic_error("Rotation must have value 0, 1, 2 or 3.");
+        }
+    }
+
+
+    Block::Block(BlockType inType, int inRotation, size_t inRow, size_t inColumn) :
+        mId(GetBlockIdentifier(inType, inRotation)),
+        mType(inType),
+        mRotation(inRotation),
+        mRow(inRow),
+        mColumn(inColumn),
         mGrid(GetGrid(mId))
     {
         if (mRotation < 0 || mRotation > 3)
