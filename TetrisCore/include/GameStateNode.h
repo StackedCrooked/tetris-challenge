@@ -26,9 +26,12 @@ namespace Tetris
     {
     public:
         // Creates a root node
-        GameStateNode();
+        GameStateNode(GameState * inGameState);
 
         GameStateNode(GameStateNode * inParent, GameState * inGameState);
+
+        // Distance from the root node.
+        int depth() const;
 
         const GameStateNode * parent() const;
 
@@ -45,8 +48,8 @@ namespace Tetris
         void markAsDeadEnd();
 
     private:
-        int mId;
         GameStateNode * mParent;
+        int mDepth;
         bool mIsDeadEnd;
         boost::scoped_ptr<GameState> mGameState;
         Children mChildren;

@@ -6,9 +6,10 @@
 namespace Tetris
 {
 
-    GameStateNode::GameStateNode() :
+    GameStateNode::GameStateNode(GameState * inGameState) :
         mParent(0),
-        mGameState()
+        mDepth(0),
+        mGameState(inGameState)
     {
 
     }
@@ -16,6 +17,7 @@ namespace Tetris
 
     GameStateNode::GameStateNode(GameStateNode * inParent, GameState * inGameState) :
         mParent(inParent),
+        mDepth(inParent->depth() + 1),
         mGameState(inGameState),
         mIsDeadEnd(false)
     {
@@ -47,6 +49,12 @@ namespace Tetris
     GameStateNode * GameStateNode::parent()
     {
         return mParent;
+    }
+
+
+    int GameStateNode::depth() const
+    {
+        return mDepth;
     }
 
 
