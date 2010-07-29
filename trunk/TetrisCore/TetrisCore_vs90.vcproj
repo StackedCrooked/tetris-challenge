@@ -168,6 +168,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\include\Game.h"
+				>
+			</File>
+			<File
 				RelativePath=".\include\GameState.h"
 				>
 			</File>
@@ -193,6 +197,10 @@
 			</File>
 			<File
 				RelativePath=".\src\ErrorHandling.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\Game.cpp"
 				>
 			</File>
 			<File
