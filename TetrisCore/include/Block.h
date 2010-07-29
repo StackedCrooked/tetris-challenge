@@ -27,13 +27,12 @@ namespace Tetris
 
     /**
      * Represents an (active) Tetris block.
+     * Non-copyable
      */
     class Block
     {
     public:
         Block(BlockType inType, int inRotation);
-
-        Block(BlockType inType, int inRotation, size_t inRow, size_t inColumn);
 
         int id() const;
 
@@ -44,17 +43,34 @@ namespace Tetris
         // Get the grid associated with this block
         const Grid & grid() const;
 
-        size_t row() const;
-
-        size_t column() const;
-
     private:
         int mId;
         BlockType mType;
         int mRotation;
+        const Grid & mGrid;
+    };
+
+
+    class ActiveBlock
+    {
+    public:
+        // Block and it's position in the Grid
+        ActiveBlock(const Block & inBlock, size_t inRow, size_t inColumn);
+
+        const Block & block() const;
+
+        size_t row() const;
+
+        size_t column() const;
+
+        void setRow(size_t inRow);
+
+        void setColumn(size_t inColumn);
+
+    private:
+        const Block & mBlock;
         size_t mRow;
         size_t mColumn;
-        const Grid & mGrid;
     };
 
 } // namespace Tetris

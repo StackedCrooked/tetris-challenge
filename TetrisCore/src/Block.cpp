@@ -28,23 +28,6 @@ namespace Tetris
         mId(GetBlockIdentifier(inType, inRotation)),
         mType(inType),
         mRotation(inRotation),
-        mRow(0),
-        mColumn(0),
-        mGrid(GetGrid(mId))
-    {
-        if (mRotation < 0 || mRotation > 3)
-        {
-            throw std::logic_error("Rotation must have value 0, 1, 2 or 3.");
-        }
-    }
-
-
-    Block::Block(BlockType inType, int inRotation, size_t inRow, size_t inColumn) :
-        mId(GetBlockIdentifier(inType, inRotation)),
-        mType(inType),
-        mRotation(inRotation),
-        mRow(inRow),
-        mColumn(inColumn),
         mGrid(GetGrid(mId))
     {
         if (mRotation < 0 || mRotation > 3)
@@ -76,7 +59,45 @@ namespace Tetris
     {
         return mGrid;
     }
+
+
+    ActiveBlock::ActiveBlock(const Block & inBlock, size_t inRow, size_t inColumn) :
+        mBlock(inBlock),
+        mRow(inRow),
+        mColumn(inColumn)
+    {
+    }
+
+        
+    const Block & ActiveBlock::block() const
+    {
+        return mBlock;
+    }
  
+        
+    size_t ActiveBlock::row() const
+    {
+        return mRow;
+    }
+ 
+        
+    size_t ActiveBlock::column() const
+    {
+        return mColumn;
+    }
+ 
+        
+    void ActiveBlock::setRow(size_t inRow)
+    {
+        mRow = inRow;
+    }
+
+
+    void ActiveBlock::setColumn(size_t inColumn)
+    {
+        mColumn = inColumn;
+    }
+
 
     int GetBlockIdentifier(BlockType inType, int inRotation)
     {

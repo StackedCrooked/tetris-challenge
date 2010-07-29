@@ -5,6 +5,11 @@
 namespace Tetris
 {
 
+    size_t Half(size_t inValue)
+    {
+        return (int)((inValue / 2.0) + 0.5);
+    }
+
 
     GameState::GameState(int inNumRows, int inNumColumns) :
         mGrid(inNumRows, inNumColumns, BlockType_Unknown),
@@ -55,7 +60,6 @@ namespace Tetris
     {
         return mGrid;
     }
-
 
     int GameState::quality() const
     {
@@ -138,20 +142,24 @@ namespace Tetris
     }
 
 
-    std::auto_ptr<GameState> GameState::createNext(const Block & inBlock) const
+    std::auto_ptr<GameState> GameState::commit(const ActiveBlock & inBlock) const
     {
         std::auto_ptr<GameState> result(new GameState(*this));
         result->mDirty = true;
-        for (size_t r = 0; r != inBlock.grid().numRows(); ++r)
+        for (size_t r = 0; r != inBlock.block().grid().numRows(); ++r)
         {
-            for (size_t c = 0; c != inBlock.grid().numColumns(); ++c)
+            for (size_t c = 0; c != inBlock.block().grid().numColumns(); ++c)
             {
-                if (inBlock.grid().get(r, c) != BlockType_Unknown)
+                if (inBlock.block().grid().get(r, c) != BlockType_Unknown)
                 {
-                    result->grid().set(inBlock.row() + r, inBlock.column() + c, inBlock.type());
+                    result->grid().set(inBlock.row() + r, inBlock.column() + c, inBlock.block().type());
                 }
             }
         }
+
+        // Clear lines
+        // Update scores
+        // etc...
         return result;
     }
 
