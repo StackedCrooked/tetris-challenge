@@ -15,10 +15,40 @@ namespace Tetris
 
     GameState::GameState() :
         mGrid(cNumRows, cNumColumns, NO_BLOCK),
+        mNumLines(0),
+        mNumSingles(0),
+        mNumDoubles(0),
+        mNumTriples(0),
+        mNumTetrises(0),
         mDirty(true),
         mCachedScore(0),
         mNumHoles(0)
     {
+    }
+
+
+    int GameState::numLines() const
+    {
+        return mNumLines;
+    }
+
+
+    int GameState::numDoubles() const
+    {
+        return mNumDoubles;
+    }
+
+
+    int GameState::numTriples() const
+    {
+        
+        return mNumTriples;
+    }
+
+
+    int GameState::numTetrises() const
+    {
+        return mNumTetrises;
     }
 
 
@@ -103,7 +133,7 @@ namespace Tetris
     }
 
 
-    int GameState::calculateScore() const
+    int GameState::quality() const
     {
         if (mDirty)
         {
@@ -150,7 +180,7 @@ namespace Tetris
                 }
             }
 
-            result -= (mGrid.numRows() - top) * cHeightPenalty;
+            result -= static_cast<int>(mGrid.numRows() - top) * cHeightPenalty;
             float density = ((float)numOccupiedUnderTop) / (float)(((mGrid.numRows() - top) * mGrid.numColumns()));
             result += static_cast<int>((11.0*density) + 0.5);
             mCachedScore = result;
