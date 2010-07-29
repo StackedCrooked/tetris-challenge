@@ -164,6 +164,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\include\ErrorHandling.h"
+				>
+			</File>
+			<File
 				RelativePath=".\include\GameState.h"
 				>
 			</File>
@@ -175,6 +179,10 @@
 				RelativePath=".\include\GenericGrid.h"
 				>
 			</File>
+			<File
+				RelativePath=".\include\Unicode.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Source Files"
@@ -184,11 +192,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\ErrorHandling.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\src\GameState.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\src\GameStateNode.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\Unicode.cpp"
 				>
 			</File>
 		</Filter>

@@ -1,78 +1,46 @@
 #include "Block.h"
+#include <stdexcept>
 #include <assert.h>
 
 
 namespace Tetris
 {
-
-    static Grids sGrids;
-
-
-    const Grid & GetGrid(const Block & inBlock)
-    {
-        Grids::iterator it = sGrids.find(inBlock);
-        if (it == sGrids.end())
-        {
-            sGrids.insert(std::make_pair(inBlock, MakeBlock(inBlock.type(), inBlock.rotation())));
-            it = sGrids.find(inBlock);
-        }
-        return it->second;
-    }
-
-
-
-    int NumRotations(BlockType inType)
-    {
-        switch (inType)
-        {
-            case I_BLOCK:
-            {
-                return 2;
-            }
-            case J_BLOCK:
-            {
-                return 4;
-            }
-            case L_BLOCK:
-            {
-                return 4;
-            }
-            case O_BLOCK:
-            {
-                return 1;
-            }
-            case S_BLOCK:
-            {
-                return 2;
-            }
-            case T_BLOCK:
-            {
-                return 4;
-            }
-            case Z_BLOCK:
-            {
-                return 2;
-            }
-            default:
-            {
-                assert(!"No valid block type given.");
-                return 1;
-            }
-        }
-    }
+    
+    // Returns the number of rotations that a block can have.
+    int GetBlockRotationCount(BlockType inType);
+    
+    // Calculates the block identifier using the formula:
+    //   BlockType_End * inType + inRotation
+    int GetBlockIdentifier(BlockType inType, int inRotation);
+    
+    // Gets the Grid object that is associated with a block identifier
+    const Grid & GetGrid(int inBlockIdentifier);
+    Grid GetIGrid(int rotation);
+    Grid GetJGrid(int rotation);
+    Grid GetLGrid(int rotation);
+    Grid GetOGrid(int rotation);
+    Grid GetSGrid(int rotation);
+    Grid GetTGrid(int rotation);
+    Grid GetZGrid(int rotation);
 
 
-    Block::Block(char inCharId, BlockType inType, int inRotation) :
-        mCharId(inCharId),
+
+    Block::Block(BlockType inType, int inRotation) :
+        mId(GetBlockIdentifier(inType, inRotation)),
         mType(inType),
-        mRotation(inRotation)
+        mRotation(inRotation),
+        mGrid(GetGrid(mId))
     {
+        if (mRotation < 0 || mRotation > 3)
+        {
+            throw std::logic_error("Rotation must have value 0, 1, 2 or 3.");
+        }
     }
 
 
-    char Block::charId() const
+    int Block::id() const
     {
-        return mCharId;
+        return mId;
     }
 
 
@@ -90,257 +58,273 @@ namespace Tetris
 
     const Grid & Block::grid() const
     {
-        return GetGrid(*this);
+        return mGrid;
     }
+ 
 
-
-    bool operator< (const Block & lhs, const Block & rhs)
+    int GetBlockIdentifier(BlockType inType, int inRotation)
     {
-        if (lhs.type() != rhs.type())
+        if (inType < BlockType_Begin || inType >= BlockType_End)
         {
-            return lhs.type() < rhs.type();
+            throw std::logic_error("Invalid block type.");
         }
-        else
-        {
-            return lhs.rotation() < rhs.rotation();
-        }
+        return static_cast<int>(BlockType_End - 1) * static_cast<int>(inType - 1) + inRotation;
     }
 
 
-    Grid MakeBlock(int inType, int rotation)
+    int GetBlockRotationCount(BlockType inType)
     {
-        if (inType == I_BLOCK)
+        if (inType < BlockType_Begin || inType >= BlockType_End)
         {
-            return MakeIBlock(rotation);
+            throw std::logic_error("Invalid block type.");
         }
-        else if (inType == J_BLOCK)
-        {
-            return MakeJBlock(rotation);
-        }
-        else if (inType == L_BLOCK)
-        {
-            return MakeLBlock(rotation);
-        }
-        else if (inType == O_BLOCK)
-        {
-            return MakeOBlock(rotation);
-        }
-        else if (inType == S_BLOCK)
-        {
-            return MakeSBlock(rotation);
-        }
-        else if (inType == T_BLOCK)
-        {
-            return MakeTBlock(rotation);
-        }
-        else if (inType == Z_BLOCK)
-        {
-            return MakeZBlock(rotation);
-        }
-        else
-        {
-            assert(!"No valid block type given!");
-        }
-
-        // if we get here something is wrong, however we have to return something
-        static Grid failBlock(4, 4, NO_BLOCK);
-        return failBlock;
+        static const int fRotationCounts[] = {2, 4, 4, 1, 2, 4, 2};
+        return fRotationCounts[static_cast<int>(inType) - 1];
     }
 
 
-    Grid MakeIBlock(int rotation)
+    const Grid & GetGrid(int inId)
     {
-        if (rotation%2 == 0)
+        if (inId < 0 || inId >= 28)
         {
-            Grid block(1, 4, NO_BLOCK);
-            block.set(0, 0, I_BLOCK);
-            block.set(0, 1, I_BLOCK);
-            block.set(0, 2, I_BLOCK);
-            block.set(0, 3, I_BLOCK);
-            return block;
+            throw std::logic_error("Invalid block identifier.");
         }
-        else
+
+        static Grid fBlocks[] =
         {
-            Grid block(4, 1, NO_BLOCK);
-            block.set(0, 0, I_BLOCK);
-            block.set(1, 0, I_BLOCK);
-            block.set(2, 0, I_BLOCK);
-            block.set(3, 0, I_BLOCK);
-            return block;
-        }
+            Grid(GetIGrid(0)),
+            Grid(GetIGrid(1)),
+            Grid(GetIGrid(2)),
+            Grid(GetIGrid(3)),
+
+            Grid(GetJGrid(0)),
+            Grid(GetJGrid(1)),
+            Grid(GetJGrid(2)),
+            Grid(GetJGrid(3)),
+
+            Grid(GetLGrid(0)),
+            Grid(GetLGrid(1)),
+            Grid(GetLGrid(2)),
+            Grid(GetLGrid(3)),
+
+            Grid(GetOGrid(0)),
+            Grid(GetOGrid(1)),
+            Grid(GetOGrid(2)),
+            Grid(GetOGrid(3)),
+
+            Grid(GetSGrid(0)),
+            Grid(GetSGrid(1)),
+            Grid(GetSGrid(2)),
+            Grid(GetSGrid(3)),
+
+            Grid(GetTGrid(0)),
+            Grid(GetTGrid(1)),
+            Grid(GetTGrid(2)),
+            Grid(GetTGrid(3)),
+
+            Grid(GetZGrid(0)),
+            Grid(GetZGrid(1)),
+            Grid(GetZGrid(2)),
+            Grid(GetZGrid(3))
+        };
+        return fBlocks[inId];
     }
 
-    Grid MakeJBlock(int rotation)
-    {
-        if (rotation%4 == 0)
-        {
-            Grid block(2, 3, NO_BLOCK);
-            block.set(0, 0, J_BLOCK);
-            block.set(1, 0, J_BLOCK);
-            block.set(1, 1, J_BLOCK);
-            block.set(1, 2, J_BLOCK);
-            return block;
-        }
-        else if (rotation%4 == 1)
-        {
-            Grid block(3, 2, NO_BLOCK);
-            block.set(0, 0, J_BLOCK);
-            block.set(0, 1, J_BLOCK);
-            block.set(1, 0, J_BLOCK);
-            block.set(2, 0, J_BLOCK);
-            return block;
-        }
-        else if (rotation%4 == 2)
-        {
-            Grid block(2, 3, NO_BLOCK);
-            block.set(0, 0, J_BLOCK);
-            block.set(0, 1, J_BLOCK);
-            block.set(0, 2, J_BLOCK);
-            block.set(1, 2, J_BLOCK);
-            return block;
-        }
-        else
-        {
-            Grid block(3, 2, NO_BLOCK);
-            block.set(0, 1, J_BLOCK);
-            block.set(1, 1, J_BLOCK);
-            block.set(2, 0, J_BLOCK);
-            block.set(2, 1, J_BLOCK);
-            return block;
-        }
-    }
 
-    Grid MakeLBlock(int rotation)
-    {
-        if (rotation%4 == 0)
-        {
-            Grid block(2, 3, NO_BLOCK);
-            block.set(0, 2, L_BLOCK);
-            block.set(1, 0, L_BLOCK);
-            block.set(1, 1, L_BLOCK);
-            block.set(1, 2, L_BLOCK);
-            return block;
-        }
-        else if (rotation%4 == 1)
-        {
-            Grid block(3, 2, NO_BLOCK);
-            block.set(0, 0, L_BLOCK);
-            block.set(1, 0, L_BLOCK);
-            block.set(2, 0, L_BLOCK);
-            block.set(2, 1, L_BLOCK);
-            return block;
-        }
-        else if (rotation%4 == 2)
-        {
-            Grid block(2, 3, NO_BLOCK);
-            block.set(0, 0, L_BLOCK);
-            block.set(0, 1, L_BLOCK);
-            block.set(0, 2, L_BLOCK);
-            block.set(1, 0, L_BLOCK);
-            return block;
-        }
-        else
-        {
-            Grid block(3, 2, NO_BLOCK);
-            block.set(0, 0, L_BLOCK);
-            block.set(0, 1, L_BLOCK);
-            block.set(1, 1, L_BLOCK);
-            block.set(2, 1, L_BLOCK);
-            return block;
-        }
-    }
-
-    Grid MakeOBlock(int rotation)
-    {
-        Grid block(2, 2, NO_BLOCK);
-        block.set(0, 0, O_BLOCK);
-        block.set(0, 1, O_BLOCK);
-        block.set(1, 0, O_BLOCK);
-        block.set(1, 1, O_BLOCK);
-        return block;
-    }
-
-    Grid MakeSBlock(int rotation)
+    Grid GetIGrid(int rotation)
     {
         if (rotation%2 == 0)
         {
-            Grid block(2, 3, NO_BLOCK);
-            block.set(0, 1, S_BLOCK);
-            block.set(0, 2, S_BLOCK);
-            block.set(1, 0, S_BLOCK);
-            block.set(1, 1, S_BLOCK);
-            return block;
+            Grid grid(1, 4, BlockType_Unknown);
+            grid.set(0, 0, BlockType_I);
+            grid.set(0, 1, BlockType_I);
+            grid.set(0, 2, BlockType_I);
+            grid.set(0, 3, BlockType_I);
+            return grid;
         }
         else
         {
-            Grid block(3, 2, NO_BLOCK);
-            block.set(0, 0, S_BLOCK);
-            block.set(1, 0, S_BLOCK);
-            block.set(1, 1, S_BLOCK);
-            block.set(2, 1, S_BLOCK);
-            return block;
+            Grid grid(4, 1, BlockType_Unknown);
+            grid.set(0, 0, BlockType_I);
+            grid.set(1, 0, BlockType_I);
+            grid.set(2, 0, BlockType_I);
+            grid.set(3, 0, BlockType_I);
+            return grid;
         }
     }
 
-    Grid MakeTBlock(int rotation)
+
+    Grid GetJGrid(int rotation)
     {
         if (rotation%4 == 0)
         {
-            Grid block(2, 3, NO_BLOCK);
-            block.set(0, 1, T_BLOCK);
-            block.set(1, 0, T_BLOCK);
-            block.set(1, 1, T_BLOCK);
-            block.set(1, 2, T_BLOCK);
-            return block;
+            Grid grid(2, 3, BlockType_Unknown);
+            grid.set(0, 0, BlockType_J);
+            grid.set(1, 0, BlockType_J);
+            grid.set(1, 1, BlockType_J);
+            grid.set(1, 2, BlockType_J);
+            return grid;
         }
         else if (rotation%4 == 1)
         {
-            Grid block(3, 2, NO_BLOCK);
-            block.set(0, 0, T_BLOCK);
-            block.set(1, 0, T_BLOCK);
-            block.set(1, 1, T_BLOCK);
-            block.set(2, 0, T_BLOCK);
-            return block;
+            Grid grid(3, 2, BlockType_Unknown);
+            grid.set(0, 0, BlockType_J);
+            grid.set(0, 1, BlockType_J);
+            grid.set(1, 0, BlockType_J);
+            grid.set(2, 0, BlockType_J);
+            return grid;
         }
         else if (rotation%4 == 2)
         {
-            Grid block(2, 3, NO_BLOCK);
-            block.set(0, 0, T_BLOCK);
-            block.set(0, 1, T_BLOCK);
-            block.set(0, 2, T_BLOCK);
-            block.set(1, 1, T_BLOCK);
-            return block;
+            Grid grid(2, 3, BlockType_Unknown);
+            grid.set(0, 0, BlockType_J);
+            grid.set(0, 1, BlockType_J);
+            grid.set(0, 2, BlockType_J);
+            grid.set(1, 2, BlockType_J);
+            return grid;
         }
         else
         {
-            Grid block(3, 2, NO_BLOCK);
-            block.set(0, 1, T_BLOCK);
-            block.set(1, 0, T_BLOCK);
-            block.set(1, 1, T_BLOCK);
-            block.set(2, 1, T_BLOCK);
-            return block;
+            Grid grid(3, 2, BlockType_Unknown);
+            grid.set(0, 1, BlockType_J);
+            grid.set(1, 1, BlockType_J);
+            grid.set(2, 0, BlockType_J);
+            grid.set(2, 1, BlockType_J);
+            return grid;
         }
     }
 
-    Grid MakeZBlock(int rotation)
+    Grid GetLGrid(int rotation)
     {
-        if (rotation%2 == 0)
+        if (rotation%4 == 0)
         {
-            Grid block(2, 3, NO_BLOCK);
-            block.set(0, 0, Z_BLOCK);
-            block.set(0, 1, Z_BLOCK);
-            block.set(1, 1, Z_BLOCK);
-            block.set(1, 2, Z_BLOCK);
-            return block;
+            Grid grid(2, 3, BlockType_Unknown);
+            grid.set(0, 2, BlockType_L);
+            grid.set(1, 0, BlockType_L);
+            grid.set(1, 1, BlockType_L);
+            grid.set(1, 2, BlockType_L);
+            return grid;
+        }
+        else if (rotation%4 == 1)
+        {
+            Grid grid(3, 2, BlockType_Unknown);
+            grid.set(0, 0, BlockType_L);
+            grid.set(1, 0, BlockType_L);
+            grid.set(2, 0, BlockType_L);
+            grid.set(2, 1, BlockType_L);
+            return grid;
+        }
+        else if (rotation%4 == 2)
+        {
+            Grid grid(2, 3, BlockType_Unknown);
+            grid.set(0, 0, BlockType_L);
+            grid.set(0, 1, BlockType_L);
+            grid.set(0, 2, BlockType_L);
+            grid.set(1, 0, BlockType_L);
+            return grid;
         }
         else
         {
-            Grid block(3, 2, NO_BLOCK);
-            block.set(0, 1, Z_BLOCK);
-            block.set(1, 0, Z_BLOCK);
-            block.set(1, 1, Z_BLOCK);
-            block.set(2, 0, Z_BLOCK);
-            return block;
+            Grid grid(3, 2, BlockType_Unknown);
+            grid.set(0, 0, BlockType_L);
+            grid.set(0, 1, BlockType_L);
+            grid.set(1, 1, BlockType_L);
+            grid.set(2, 1, BlockType_L);
+            return grid;
+        }
+    }
+
+    Grid GetOGrid(int rotation)
+    {
+        Grid grid(2, 2, BlockType_Unknown);
+        grid.set(0, 0, BlockType_O);
+        grid.set(0, 1, BlockType_O);
+        grid.set(1, 0, BlockType_O);
+        grid.set(1, 1, BlockType_O);
+        return grid;
+    }
+
+    Grid GetSGrid(int rotation)
+    {
+        if (rotation%2 == 0)
+        {
+            Grid grid(2, 3, BlockType_Unknown);
+            grid.set(0, 1, BlockType_S);
+            grid.set(0, 2, BlockType_S);
+            grid.set(1, 0, BlockType_S);
+            grid.set(1, 1, BlockType_S);
+            return grid;
+        }
+        else
+        {
+            Grid grid(3, 2, BlockType_Unknown);
+            grid.set(0, 0, BlockType_S);
+            grid.set(1, 0, BlockType_S);
+            grid.set(1, 1, BlockType_S);
+            grid.set(2, 1, BlockType_S);
+            return grid;
+        }
+    }
+
+    Grid GetTGrid(int rotation)
+    {
+        if (rotation%4 == 0)
+        {
+            Grid grid(2, 3, BlockType_Unknown);
+            grid.set(0, 1, BlockType_T);
+            grid.set(1, 0, BlockType_T);
+            grid.set(1, 1, BlockType_T);
+            grid.set(1, 2, BlockType_T);
+            return grid;
+        }
+        else if (rotation%4 == 1)
+        {
+            Grid grid(3, 2, BlockType_Unknown);
+            grid.set(0, 0, BlockType_T);
+            grid.set(1, 0, BlockType_T);
+            grid.set(1, 1, BlockType_T);
+            grid.set(2, 0, BlockType_T);
+            return grid;
+        }
+        else if (rotation%4 == 2)
+        {
+            Grid grid(2, 3, BlockType_Unknown);
+            grid.set(0, 0, BlockType_T);
+            grid.set(0, 1, BlockType_T);
+            grid.set(0, 2, BlockType_T);
+            grid.set(1, 1, BlockType_T);
+            return grid;
+        }
+        else
+        {
+            Grid grid(3, 2, BlockType_Unknown);
+            grid.set(0, 1, BlockType_T);
+            grid.set(1, 0, BlockType_T);
+            grid.set(1, 1, BlockType_T);
+            grid.set(2, 1, BlockType_T);
+            return grid;
+        }
+    }
+
+    Grid GetZGrid(int rotation)
+    {
+        if (rotation%2 == 0)
+        {
+            Grid grid(2, 3, BlockType_Unknown);
+            grid.set(0, 0, BlockType_Z);
+            grid.set(0, 1, BlockType_Z);
+            grid.set(1, 1, BlockType_Z);
+            grid.set(1, 2, BlockType_Z);
+            return grid;
+        }
+        else
+        {
+            Grid grid(3, 2, BlockType_Unknown);
+            grid.set(0, 1, BlockType_Z);
+            grid.set(1, 0, BlockType_Z);
+            grid.set(1, 1, BlockType_Z);
+            grid.set(2, 0, BlockType_Z);
+            return grid;
         }
     }
 
