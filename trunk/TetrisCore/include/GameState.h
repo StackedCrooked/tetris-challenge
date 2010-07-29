@@ -14,6 +14,7 @@ namespace Tetris
     class GameState
     {
     public:
+        // Creates a new GameState
         GameState(int inNumRows, int inNumColumns);
 
         const Grid & grid() const;
@@ -32,15 +33,15 @@ namespace Tetris
         // Caches the value.
         int quality() const;
 
-        // Checks if a block can be placed at a given location without
+        // Checks if a activeBlock can be placed at a given location without
         // overlapping with previously placed blocks.
         bool checkPositionValid(const Block & inBlock, size_t inRowIdx, size_t inColIdx) const;
 
-        // Creates a copy of this gamestate with an added block at the given location.
-        std::auto_ptr<GameState> createNext(const Block & inBlock) const;
-
         // Returns the number of holes. A hole is an empty square is covered by blocks.
         int numHoles() const;
+
+        // Creates a copy of the current gamestate with the given active block committed.        
+        std::auto_ptr<GameState> commit(const ActiveBlock & inBlock) const;
 
     private:
         Grid mGrid;
