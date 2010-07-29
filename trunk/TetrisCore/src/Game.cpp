@@ -4,6 +4,8 @@
 
 namespace Tetris
 {
+
+
     Game::Game(int inNumRows, int inNumColumns) :
         mRootNode(new GameState(inNumRows, inNumColumns))
     {
@@ -32,5 +34,5 @@ namespace Tetris
     }
 
 
-
 } // namespace Tetris
+
