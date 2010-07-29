@@ -126,8 +126,6 @@ namespace Tetris
 
     bool GameState::checkPositionValid(const Block & inBlock, size_t inRowIdx, size_t inColIdx) const
     {
-        const size_t maxRows = mGrid.numRows() - inBlock.grid().numRows();
-        const size_t maxCols = mGrid.numColumns() - inBlock.grid().numColumns();
         for (size_t r = 0; r != inBlock.grid().numRows(); ++r)
         {
             for (size_t c = 0; c != inBlock.grid().numColumns(); ++c)
