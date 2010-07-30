@@ -13,7 +13,7 @@ namespace Tetris
 
 
     GameState::GameState(int inNumRows, int inNumColumns) :
-        mGrid(inNumRows, inNumColumns, BlockType_Void),
+        mGrid(inNumRows, inNumColumns, BlockType_Nil),
         mStats(),
         mIsGameOver(false),
         mOriginalActiveBlock(0),
@@ -82,7 +82,7 @@ namespace Tetris
                 for (size_t colIdx = 0; colIdx != mGrid.numColumns(); ++colIdx)
                 {
                     const int & value = mGrid.get(rowIdx, colIdx);
-                    if (value != BlockType_Void)
+                    if (value != BlockType_Nil)
                     {
                         if (!foundTop)
                         {
@@ -100,7 +100,7 @@ namespace Tetris
                         // check for holes
                         if (foundTop && rowIdx > 0)
                         {
-                            if (mGrid.get(rowIdx - 1, colIdx) != BlockType_Void)
+                            if (mGrid.get(rowIdx - 1, colIdx) != BlockType_Nil)
                             {
                                 mQuality.mNumHoles++;
                                 result -= cHolePenalty;
@@ -132,7 +132,7 @@ namespace Tetris
         {
             for (size_t c = 0; c != inBlock.grid().numColumns(); ++c)
             {
-                if (inBlock.grid().get(r, c) != 0 && mGrid.get(inRowIdx + r, inColIdx + c) != BlockType_Void)
+                if (inBlock.grid().get(r, c) != 0 && mGrid.get(inRowIdx + r, inColIdx + c) != BlockType_Nil)
                 {
                     return false;
                 }
@@ -186,7 +186,7 @@ namespace Tetris
         {
             for (size_t c = 0; c != grid.numColumns(); ++c)
             {
-                if (grid.get(r, c) != BlockType_Void)
+                if (grid.get(r, c) != BlockType_Nil)
                 {
                     mGrid.set(inActiveBlock->row() + r, inActiveBlock->column() + c, block.type());
                 }
@@ -226,7 +226,7 @@ namespace Tetris
         }
 
         
-        std::vector<BlockType> newData(mGrid.data().size(), BlockType_Void);
+        std::vector<BlockType> newData(mGrid.data().size(), BlockType_Nil);
         
         // Get newData
         {

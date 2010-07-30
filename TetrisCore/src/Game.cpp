@@ -1,5 +1,6 @@
 #include "Game.h"
 #include "Block.h"
+#include "ErrorHandling.h"
 #include "GameState.h"
 
 
@@ -28,7 +29,76 @@ namespace Tetris
     }
 
 
-    void Game::fallCurrentBlock()
+    const ActiveBlock & Game::activeBlock() const
+    {
+        CheckPrecondition(mActiveBlock.get() != 0, "Tried to dereference null pointer.");
+        return *mActiveBlock;
+    }
+
+
+    ActiveBlock & Game::activeBlock()
+    {
+        CheckPrecondition(mActiveBlock.get() != 0, "Tried to dereference null pointer.");
+        return *mActiveBlock;
+    }
+
+
+    static int GetRowDelta(Direction inDirection)
+    {
+        switch (inDirection)
+        {
+            case Direction_Up:
+            {
+                return -1;
+            }
+            case Direction_Down:
+            {
+                return 1;
+            }
+            default:
+            {
+                return 0;
+            }
+        }
+    }
+
+
+    static int GetColumnDelta(Direction inDirection)
+    {
+        switch (inDirection)
+        {
+            case Direction_Left:
+            {
+                return -1;
+            }
+            case Direction_Right:
+            {
+                return 1;
+            }
+            default:
+            {
+                return 0;
+            }
+        }
+    }
+
+
+    bool Game::move(Direction inDirection)
+    {
+        const GameState & gameState = mCurrentNode->state();
+        size_t newRow = mActiveBlock->row() + GetRowDelta(inDirection);
+        size_t newCol = mActiveBlock->column() + GetColumnDelta(inDirection);
+        bool isMoveAllowed = gameState.checkPositionValid(mActiveBlock->block(), newRow, newCol);
+        if (isMoveAllowed)
+        {
+            mActiveBlock->setRow(newRow);
+            mActiveBlock->setColumn(newCol);
+        }
+        return isMoveAllowed;
+    }
+
+
+    void Game::moveDown()
     {
         const GameState & gameState = mCurrentNode->state();
 
@@ -52,24 +122,6 @@ namespace Tetris
             size_t middleX = static_cast<int>(0.5 + (static_cast<float>(gameState.grid().numColumns() - newBlock->grid().numColumns())/2));
             mActiveBlock.reset(new ActiveBlock(newBlock, 0, middleX));
         }
-    }
-
-
-    void Game::autoMove()
-    {
-        //if (!mCurrentNode->children().empty())
-        //{
-        //    ChildPtr bestChild = mCurrentNode->children().begin();
-        //    bestChild->
-        //}
-    }
-
-
-    void Game::commitActiveBlock()
-    {
-        //const Block & nextBlock = getNextBlock(mCurrentNode->depth());
-        //ChildPtr child(mRootNode.state().commit(nextBlock);
-        //mCurrentNode->children().insert(child);
     }
 
 
