@@ -1,5 +1,5 @@
-#ifndef GAMESTATE_H
-#define GAMESTATE_H
+#ifndef GAMESTATE_H_INCLUDED
+#define GAMESTATE_H_INCLUDED
 
 
 #include "GenericGrid.h"
@@ -100,5 +100,5 @@ namespace Tetris
 } // namespace Tetris
 
 
-#endif // GAMESTATE_H
+#endif // GAMESTATE_H_INCLUDED
 
