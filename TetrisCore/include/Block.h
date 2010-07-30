@@ -12,8 +12,8 @@ namespace Tetris
 
     enum BlockType
     {
-        BlockType_Unknown = 0,              // value 0 enables us to type code like: `if (blockType)' and `if (!blockType)'
-        BlockType_Begin,                    // 'begin' is value 1.
+        BlockType_Void = 0,              // value 0 enables us to type code like: `if (blockType)' and `if (!blockType)'
+        BlockType_Begin,                 // 'begin' is value 1.
         BlockType_I = BlockType_Begin,
         BlockType_J,
         BlockType_L,
@@ -21,7 +21,7 @@ namespace Tetris
         BlockType_S,
         BlockType_T,
         BlockType_Z,
-        BlockType_End                      // 'end' is one past the last value (like stl iterators)
+        BlockType_End                    // 'end' is one past the last value (like stl iterators)
     };
 
     const size_t cBlockTypeCount = static_cast<int>(BlockType_End) - 1;
@@ -58,7 +58,7 @@ namespace Tetris
     {
     public:
         // Block and it's position in the Grid
-        ActiveBlock(const Block & inBlock, size_t inRow, size_t inColumn);
+        ActiveBlock(std::auto_ptr<Block> inBlock, size_t inRow, size_t inColumn);
 
         const Block & block() const;
 
@@ -83,7 +83,7 @@ namespace Tetris
         void setRotation(size_t inRotation);
 
     private:
-        boost::scoped_ptr<Block> mBlock;
+        std::auto_ptr<Block> mBlock;
         size_t mRow;
         size_t mColumn;
     };

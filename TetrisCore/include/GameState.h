@@ -21,6 +21,9 @@ namespace Tetris
 
         Grid & grid();
 
+        // The ActiveBlock that was used in the commit(...) call.
+        const ActiveBlock * originalActiveBlock() const;
+
         int numLines() const;
 
         int numDoubles() const;
@@ -44,21 +47,53 @@ namespace Tetris
 
         // Creates a copy of the current gamestate with the given active block committed.
         // Use inGameOver = true to mark the new gamestate as "game over".
-        std::auto_ptr<GameState> commit(const ActiveBlock & inBlock, bool inGameOver) const;
+        std::auto_ptr<GameState> commit(std::auto_ptr<ActiveBlock> inBlock, bool inGameOver) const;
+
+        std::auto_ptr<GameState> clone() const;
 
     private:
-        Grid mGrid;
-        int mNumLines;
-        int mNumSingles;
-        int mNumDoubles;
-        int mNumTriples;
-        int mNumTetrises;
-        bool mIsGameOver;
+        void solidifyBlock(const ActiveBlock * inActiveBlock);
 
-        // Do we need to recalculate the score?
-        mutable bool mDirty;
-        mutable int mCachedScore;
-        mutable int mNumHoles;
+        void clearLines();
+
+        struct Stats
+        {
+            Stats() :
+                mNumLines(0),
+                mNumSingles(0),
+                mNumDoubles(0),
+                mNumTriples(0),
+                mNumTetrises(0)
+            {
+            }
+
+            int mNumLines;
+            int mNumSingles;
+            int mNumDoubles;
+            int mNumTriples;
+            int mNumTetrises;
+        };
+
+        Grid mGrid;
+        Stats mStats;
+        bool mIsGameOver;
+        std::auto_ptr<ActiveBlock> mOriginalActiveBlock;
+
+        struct Quality
+        {
+            Quality() :
+                mDirty(true),
+                mScore(0),
+                mNumHoles(0)
+            {
+            }
+
+            bool mDirty;
+            int mScore;
+            int mNumHoles;
+        };
+
+        mutable Quality mQuality;
     };
 
 

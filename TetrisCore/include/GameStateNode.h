@@ -46,7 +46,7 @@ namespace Tetris
     private:
         GameStateNode * mParent;
         int mDepth;
-        boost::scoped_ptr<GameState> mGameState;
+        std::auto_ptr<GameState> mGameState;
         Children mChildren;
     };
 

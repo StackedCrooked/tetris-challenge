@@ -16,6 +16,8 @@ namespace Tetris
     class GenericGrid
     {
     public:
+        typedef std::vector<T> Data;
+
         GenericGrid(size_t numRows, size_t numColumns);
 
         GenericGrid(size_t numRows, size_t numColumns, const T & inInitialValue);
@@ -30,10 +32,14 @@ namespace Tetris
 
         size_t numColumns() const;
 
+        const Data & data() const;
+
+        Data & data();
+
     private:
         size_t mNumRows;
         size_t mNumColumns;
-        std::vector<T> mData;
+        Data mData;
     };
 
 
@@ -87,6 +93,20 @@ namespace Tetris
     size_t GenericGrid<T>::numColumns() const
     {
         return mNumColumns;
+    }
+
+    
+    template<class T>
+    const std::vector<T> & GenericGrid<T>::data() const
+    {
+        return mData;
+    }
+
+    
+    template<class T>
+    std::vector<T> & GenericGrid<T>::data()
+    {
+        return mData;
     }
 
 

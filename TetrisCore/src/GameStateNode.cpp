@@ -9,7 +9,7 @@ namespace Tetris
     GameStateNode::GameStateNode(std::auto_ptr<GameState> inGameState) :
         mParent(0),
         mDepth(0),
-        mGameState(inGameState.release())
+        mGameState(inGameState)
     {
 
     }
@@ -18,14 +18,13 @@ namespace Tetris
     GameStateNode::GameStateNode(GameStateNode * inParent, std::auto_ptr<GameState> inGameState) :
         mParent(inParent),
         mDepth(inParent->depth() + 1),
-        mGameState(inGameState.release())
+        mGameState(inGameState)
     {
     }
 
 
     const GameState & GameStateNode::state() const
     {
-        CheckPrecondition(mGameState, "Attempted to dereference null pointer.");
         return *mGameState;
     }
 

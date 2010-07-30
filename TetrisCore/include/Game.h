@@ -20,6 +20,8 @@ namespace Tetris
         // Drops the active block one square
         void fallCurrentBlock();
 
+        void autoMove();
+
         void commitActiveBlock();
 
     private:
@@ -27,8 +29,8 @@ namespace Tetris
         GameStateNode mRootNode;
         GameStateNode * mCurrentNode;
 
-        boost::scoped_ptr<ActiveBlock> mActiveBlock;
         BlockFactory mBlockFactory;
+        std::auto_ptr<ActiveBlock> mActiveBlock;
         std::vector<GameStateNode*> mHistory;
         std::vector<BlockType> mNextBlocks;
     };
@@ -36,4 +38,3 @@ namespace Tetris
 } // namespace Tetris
 
 #endif // GAME_H
-
