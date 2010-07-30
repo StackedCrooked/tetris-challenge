@@ -6,19 +6,19 @@
 namespace Tetris
 {
 
-    GameStateNode::GameStateNode(GameState * inGameState) :
+    GameStateNode::GameStateNode(std::auto_ptr<GameState> inGameState) :
         mParent(0),
         mDepth(0),
-        mGameState(inGameState)
+        mGameState(inGameState.release())
     {
 
     }
 
 
-    GameStateNode::GameStateNode(GameStateNode * inParent, GameState * inGameState) :
+    GameStateNode::GameStateNode(GameStateNode * inParent, std::auto_ptr<GameState> inGameState) :
         mParent(inParent),
         mDepth(inParent->depth() + 1),
-        mGameState(inGameState),
+        mGameState(inGameState.release()),
         mIsDeadEnd(false)
     {
     }

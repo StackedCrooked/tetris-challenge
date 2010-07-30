@@ -62,7 +62,7 @@ namespace Tetris
 
 
     ActiveBlock::ActiveBlock(const Block & inBlock, size_t inRow, size_t inColumn) :
-        mBlock(inBlock),
+        mBlock(new Block(inBlock)),
         mRow(inRow),
         mColumn(inColumn)
     {
@@ -71,7 +71,7 @@ namespace Tetris
         
     const Block & ActiveBlock::block() const
     {
-        return mBlock;
+        return *mBlock;
     }
  
         
@@ -87,6 +87,12 @@ namespace Tetris
     }
  
         
+    size_t ActiveBlock::rotation() const
+    {
+        return mBlock->rotation();
+    }
+ 
+        
     void ActiveBlock::setRow(size_t inRow)
     {
         mRow = inRow;
@@ -96,6 +102,43 @@ namespace Tetris
     void ActiveBlock::setColumn(size_t inColumn)
     {
         mColumn = inColumn;
+    }
+
+
+
+    void ActiveBlock::setRotation(size_t inRotation)
+    {
+        mBlock.reset(new Block(mBlock->type(), inRotation));
+    }
+
+
+    void ActiveBlock::moveLeft()
+    {
+        if (mColumn > 0)
+        {
+            mColumn -= 1;
+        }
+    }
+
+
+    void ActiveBlock::moveRight()
+    {
+        mColumn++;
+    }
+
+
+    void ActiveBlock::moveUp()
+    {
+        if (mRow > 0)
+        {
+            mRow--;
+        }
+    }
+
+    
+    void ActiveBlock::moveDown()
+    {
+        mRow++;
     }
 
 

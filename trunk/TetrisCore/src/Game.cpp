@@ -7,22 +7,38 @@ namespace Tetris
 
 
     Game::Game(int inNumRows, int inNumColumns) :
-        mRootNode(new GameState(inNumRows, inNumColumns))
+        mRootNode(std::auto_ptr<GameState>(new GameState(inNumRows, inNumColumns))),
+        mBlockFactory(cBlockTypeCount)
     {
         mCurrentNode = &mRootNode;
     }
 
 
-    void Game::tick()
+    bool Game::isGameOver() const
     {
-        //mRootNode->tick();
+        return mCurrentNode->state().isGameOver();
     }
 
 
-    const Block & getNextBlock(int inDepth)
+    void Game::fallCurrentBlock()
     {
-        static Block block(BlockType_J, 0);
-        return block;
+        const GameState & gameState = mCurrentNode->state();
+
+        bool canMoveDown = gameState.checkPositionValid(mActiveBlock->block(),
+                                                        mActiveBlock->row() + 1,
+                                                        mActiveBlock->column());
+        if (canMoveDown)
+        {
+            mActiveBlock->moveDown();
+        }
+        else
+        {
+            // If we can't move a new block down then the game is over.
+            bool gameOver = (mActiveBlock->row() == 0);
+            ChildPtr child(new GameStateNode(mCurrentNode->state().commit(*mActiveBlock, gameOver)));
+            mCurrentNode->children().insert(child);
+            mCurrentNode = child.get();
+        }
     }
 
 

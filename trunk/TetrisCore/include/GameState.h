@@ -29,6 +29,8 @@ namespace Tetris
 
         int numTetrises() const;
 
+        bool isGameOver() const;
+
         // Calculates the quality of the playing field.
         // Caches the value.
         int quality() const;
@@ -40,8 +42,9 @@ namespace Tetris
         // Returns the number of holes. A hole is an empty square is covered by blocks.
         int numHoles() const;
 
-        // Creates a copy of the current gamestate with the given active block committed.        
-        std::auto_ptr<GameState> commit(const ActiveBlock & inBlock) const;
+        // Creates a copy of the current gamestate with the given active block committed.
+        // Use inGameOver = true to mark the new gamestate as "game over".
+        std::auto_ptr<GameState> commit(const ActiveBlock & inBlock, bool inGameOver) const;
 
     private:
         Grid mGrid;
@@ -50,6 +53,7 @@ namespace Tetris
         int mNumDoubles;
         int mNumTriples;
         int mNumTetrises;
+        bool mIsGameOver;
 
         // Do we need to recalculate the score?
         mutable bool mDirty;

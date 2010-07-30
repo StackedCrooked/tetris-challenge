@@ -164,6 +164,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\include\BlockFactory.h"
+				>
+			</File>
+			<File
 				RelativePath=".\include\ErrorHandling.h"
 				>
 			</File>
@@ -193,6 +197,10 @@
 			>
 			<File
 				RelativePath=".\src\Block.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\BlockFactory.cpp"
 				>
 			</File>
 			<File
