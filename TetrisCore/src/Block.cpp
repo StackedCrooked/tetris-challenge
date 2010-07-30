@@ -1,4 +1,5 @@
 #include "Block.h"
+#include "ErrorHandling.h"
 #include <stdexcept>
 #include <assert.h>
 
@@ -30,10 +31,7 @@ namespace Tetris
         mRotation(inRotation),
         mGrid(GetGrid(mId))
     {
-        if (mRotation < 0 || mRotation > 3)
-        {
-            throw std::logic_error("Rotation must have value 0, 1, 2 or 3.");
-        }
+        CheckArgument(mRotation >= 0 && mRotation <= 3, "Invalid rotation value.");
     }
 
 
