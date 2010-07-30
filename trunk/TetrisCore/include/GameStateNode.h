@@ -43,14 +43,9 @@ namespace Tetris
 
         const GameState & state() const;
 
-        bool isDeadEnd() const;
-
-        void markAsDeadEnd();
-
     private:
         GameStateNode * mParent;
         int mDepth;
-        bool mIsDeadEnd;
         boost::scoped_ptr<GameState> mGameState;
         Children mChildren;
     };
