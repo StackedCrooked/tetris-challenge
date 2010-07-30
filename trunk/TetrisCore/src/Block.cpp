@@ -212,7 +212,7 @@ namespace Tetris
     {
         if (rotation%2 == 0)
         {
-            Grid grid(1, 4, BlockType_Void);
+            Grid grid(1, 4, BlockType_Nil);
             grid.set(0, 0, BlockType_I);
             grid.set(0, 1, BlockType_I);
             grid.set(0, 2, BlockType_I);
@@ -221,7 +221,7 @@ namespace Tetris
         }
         else
         {
-            Grid grid(4, 1, BlockType_Void);
+            Grid grid(4, 1, BlockType_Nil);
             grid.set(0, 0, BlockType_I);
             grid.set(1, 0, BlockType_I);
             grid.set(2, 0, BlockType_I);
@@ -235,7 +235,7 @@ namespace Tetris
     {
         if (rotation%4 == 0)
         {
-            Grid grid(2, 3, BlockType_Void);
+            Grid grid(2, 3, BlockType_Nil);
             grid.set(0, 0, BlockType_J);
             grid.set(1, 0, BlockType_J);
             grid.set(1, 1, BlockType_J);
@@ -244,7 +244,7 @@ namespace Tetris
         }
         else if (rotation%4 == 1)
         {
-            Grid grid(3, 2, BlockType_Void);
+            Grid grid(3, 2, BlockType_Nil);
             grid.set(0, 0, BlockType_J);
             grid.set(0, 1, BlockType_J);
             grid.set(1, 0, BlockType_J);
@@ -253,7 +253,7 @@ namespace Tetris
         }
         else if (rotation%4 == 2)
         {
-            Grid grid(2, 3, BlockType_Void);
+            Grid grid(2, 3, BlockType_Nil);
             grid.set(0, 0, BlockType_J);
             grid.set(0, 1, BlockType_J);
             grid.set(0, 2, BlockType_J);
@@ -262,7 +262,7 @@ namespace Tetris
         }
         else
         {
-            Grid grid(3, 2, BlockType_Void);
+            Grid grid(3, 2, BlockType_Nil);
             grid.set(0, 1, BlockType_J);
             grid.set(1, 1, BlockType_J);
             grid.set(2, 0, BlockType_J);
@@ -275,7 +275,7 @@ namespace Tetris
     {
         if (rotation%4 == 0)
         {
-            Grid grid(2, 3, BlockType_Void);
+            Grid grid(2, 3, BlockType_Nil);
             grid.set(0, 2, BlockType_L);
             grid.set(1, 0, BlockType_L);
             grid.set(1, 1, BlockType_L);
@@ -284,7 +284,7 @@ namespace Tetris
         }
         else if (rotation%4 == 1)
         {
-            Grid grid(3, 2, BlockType_Void);
+            Grid grid(3, 2, BlockType_Nil);
             grid.set(0, 0, BlockType_L);
             grid.set(1, 0, BlockType_L);
             grid.set(2, 0, BlockType_L);
@@ -293,7 +293,7 @@ namespace Tetris
         }
         else if (rotation%4 == 2)
         {
-            Grid grid(2, 3, BlockType_Void);
+            Grid grid(2, 3, BlockType_Nil);
             grid.set(0, 0, BlockType_L);
             grid.set(0, 1, BlockType_L);
             grid.set(0, 2, BlockType_L);
@@ -302,7 +302,7 @@ namespace Tetris
         }
         else
         {
-            Grid grid(3, 2, BlockType_Void);
+            Grid grid(3, 2, BlockType_Nil);
             grid.set(0, 0, BlockType_L);
             grid.set(0, 1, BlockType_L);
             grid.set(1, 1, BlockType_L);
@@ -313,7 +313,7 @@ namespace Tetris
 
     Grid GetOGrid(int rotation)
     {
-        Grid grid(2, 2, BlockType_Void);
+        Grid grid(2, 2, BlockType_Nil);
         grid.set(0, 0, BlockType_O);
         grid.set(0, 1, BlockType_O);
         grid.set(1, 0, BlockType_O);
@@ -325,7 +325,7 @@ namespace Tetris
     {
         if (rotation%2 == 0)
         {
-            Grid grid(2, 3, BlockType_Void);
+            Grid grid(2, 3, BlockType_Nil);
             grid.set(0, 1, BlockType_S);
             grid.set(0, 2, BlockType_S);
             grid.set(1, 0, BlockType_S);
@@ -334,7 +334,7 @@ namespace Tetris
         }
         else
         {
-            Grid grid(3, 2, BlockType_Void);
+            Grid grid(3, 2, BlockType_Nil);
             grid.set(0, 0, BlockType_S);
             grid.set(1, 0, BlockType_S);
             grid.set(1, 1, BlockType_S);
@@ -347,7 +347,7 @@ namespace Tetris
     {
         if (rotation%4 == 0)
         {
-            Grid grid(2, 3, BlockType_Void);
+            Grid grid(2, 3, BlockType_Nil);
             grid.set(0, 1, BlockType_T);
             grid.set(1, 0, BlockType_T);
             grid.set(1, 1, BlockType_T);
@@ -356,7 +356,7 @@ namespace Tetris
         }
         else if (rotation%4 == 1)
         {
-            Grid grid(3, 2, BlockType_Void);
+            Grid grid(3, 2, BlockType_Nil);
             grid.set(0, 0, BlockType_T);
             grid.set(1, 0, BlockType_T);
             grid.set(1, 1, BlockType_T);
@@ -365,7 +365,7 @@ namespace Tetris
         }
         else if (rotation%4 == 2)
         {
-            Grid grid(2, 3, BlockType_Void);
+            Grid grid(2, 3, BlockType_Nil);
             grid.set(0, 0, BlockType_T);
             grid.set(0, 1, BlockType_T);
             grid.set(0, 2, BlockType_T);
@@ -374,7 +374,7 @@ namespace Tetris
         }
         else
         {
-            Grid grid(3, 2, BlockType_Void);
+            Grid grid(3, 2, BlockType_Nil);
             grid.set(0, 1, BlockType_T);
             grid.set(1, 0, BlockType_T);
             grid.set(1, 1, BlockType_T);
@@ -387,7 +387,7 @@ namespace Tetris
     {
         if (rotation%2 == 0)
         {
-            Grid grid(2, 3, BlockType_Void);
+            Grid grid(2, 3, BlockType_Nil);
             grid.set(0, 0, BlockType_Z);
             grid.set(0, 1, BlockType_Z);
             grid.set(1, 1, BlockType_Z);
@@ -396,7 +396,7 @@ namespace Tetris
         }
         else
         {
-            Grid grid(3, 2, BlockType_Void);
+            Grid grid(3, 2, BlockType_Nil);
             grid.set(0, 1, BlockType_Z);
             grid.set(1, 0, BlockType_Z);
             grid.set(1, 1, BlockType_Z);

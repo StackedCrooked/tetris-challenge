@@ -2,33 +2,25 @@
 #define GAMECONTROLLER_H_INCLUDED
 
 
+#include "Direction.h"
+#include <boost/scoped_ptr.hpp>
+
+
 namespace Tetris
 {
+    class Game;
+    class GameController
+    {
+    public:
+        GameController(size_t inNumRows, size_t inNumColumns);
 
-    //class GameController
-    //{
-    //public:
-    //    GameController();
+        void move(Direction inDirection);
 
-    //    bool isGameOver() const;
+        void autoMove();
 
-    //    // Drops the active block one square
-    //    void fallCurrentBlock();
-
-    //    void autoMove();
-
-    //    void commitActiveBlock();
-
-    //private:
-
-    //    GameStateNode mRootNode;
-    //    GameStateNode * mCurrentNode;
-
-    //    BlockFactory mBlockFactory;
-    //    std::auto_ptr<ActiveBlock> mActiveBlock;
-    //    std::vector<GameStateNode*> mHistory;
-    //    std::vector<BlockType> mNextBlocks;
-    //};
+    private:
+        boost::scoped_ptr<Game> mGame;
+    };
 
 } // namespace Tetris
 

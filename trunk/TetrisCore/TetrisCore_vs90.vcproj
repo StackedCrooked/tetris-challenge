@@ -172,6 +172,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\include\Direction.h"
+				>
+			</File>
+			<File
 				RelativePath=".\include\ErrorHandling.h"
 				>
 			</File>

@@ -3,6 +3,7 @@
 
 
 #include "BlockFactory.h"
+#include "Direction.h"
 #include "GameStateNode.h"
 #include <memory>
 #include <vector>
@@ -18,14 +19,16 @@ namespace Tetris
     public:
         Game(int inNumRows, int inNumColumns);
 
+        const ActiveBlock & activeBlock() const;
+
+        ActiveBlock & activeBlock();
+
         bool isGameOver() const;
 
+        bool move(Direction inDirection);
+
         // Drops the active block one square
-        void fallCurrentBlock();
-
-        void autoMove();
-
-        void commitActiveBlock();
+        void moveDown();
 
     private:
 
