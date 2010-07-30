@@ -25,10 +25,7 @@ namespace Tetris
 
     const GameState & GameStateNode::state() const
     {
-        if (!mGameState)
-        {
-            throw std::logic_error("Attempt to dereference uninitialized pointer.");
-        }
+        CheckPrecondition(mGameState, "Attempted to dereference null pointer.");
         return *mGameState;
     }
 
@@ -65,8 +62,8 @@ namespace Tetris
 
     bool ChildPtrCompare::operator()(ChildPtr lhs, ChildPtr rhs)
     {
-        LogicAssert(lhs && rhs, "Comparison fails because ChildPtr objects are null!");
-        LogicAssert(lhs.get() != rhs.get(), "Comparison game state against itself. This is wrong!");
+        CheckArgument(lhs && rhs, "Comparison fails because ChildPtr objects are null!");
+        CheckArgument(lhs.get() != rhs.get(), "Comparison game state against itself. This is wrong!");
 
         // Order by quality descending.
         int q1 = lhs->state().quality();
