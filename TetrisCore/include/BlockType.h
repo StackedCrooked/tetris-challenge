@@ -19,7 +19,7 @@ namespace Tetris
         BlockType_End                    // 'end' is one past the last value (like stl iterators)
     };
 
-    const size_t cBlockTypeCount = static_cast<int>(BlockType_End) - 1;
+    static const size_t cBlockTypeCount = static_cast<size_t>(BlockType_End) - 1;
 
 
 } // namespace Tetris
