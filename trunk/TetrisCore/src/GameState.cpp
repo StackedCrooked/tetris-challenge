@@ -198,7 +198,7 @@ namespace Tetris
     void GameState::clearLines()
     {
         size_t numLines = 0;
-        std::vector<bool> lines(mGrid.numRows(), 0);
+        std::vector<bool> lines(mGrid.numRows(), false);
         
         // Get numLines and lines
         {
@@ -279,6 +279,10 @@ namespace Tetris
             {
                 mStats.mNumTetrises++;
                 break;
+            }
+            default:
+            {
+                throw std::logic_error("Invalid enum value.");
             }
         }
     }
