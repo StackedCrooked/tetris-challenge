@@ -2,14 +2,15 @@
 #define GAMESTATE_H_INCLUDED
 
 
-#include "GenericGrid.h"
-#include "Block.h"
-#include <set>
-#include <vector>
+#include "Grid.h"
+#include <memory>
 
 
 namespace Tetris
 {
+
+    class Block;
+    class ActiveBlock;
 
     class GameState
     {

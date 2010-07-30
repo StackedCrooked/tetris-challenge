@@ -168,11 +168,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\include\BlockType.h"
+				>
+			</File>
+			<File
 				RelativePath=".\include\ErrorHandling.h"
 				>
 			</File>
 			<File
 				RelativePath=".\include\Game.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\GameController.h"
 				>
 			</File>
 			<File
@@ -185,6 +193,10 @@
 			</File>
 			<File
 				RelativePath=".\include\GenericGrid.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\Grid.h"
 				>
 			</File>
 			<File
@@ -209,6 +221,10 @@
 			</File>
 			<File
 				RelativePath=".\src\Game.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\GameController.cpp"
 				>
 			</File>
 			<File
