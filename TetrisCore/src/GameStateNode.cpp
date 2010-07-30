@@ -18,8 +18,7 @@ namespace Tetris
     GameStateNode::GameStateNode(GameStateNode * inParent, std::auto_ptr<GameState> inGameState) :
         mParent(inParent),
         mDepth(inParent->depth() + 1),
-        mGameState(inGameState.release()),
-        mIsDeadEnd(false)
+        mGameState(inGameState.release())
     {
     }
 
@@ -61,17 +60,6 @@ namespace Tetris
     const GameStateNode * GameStateNode::parent() const
     {
         return mParent;
-    }
-
-
-    bool GameStateNode::isDeadEnd() const
-    {
-        return mIsDeadEnd;
-    }
-
-    void GameStateNode::markAsDeadEnd()
-    {
-        mIsDeadEnd = true;
     }
 
 
