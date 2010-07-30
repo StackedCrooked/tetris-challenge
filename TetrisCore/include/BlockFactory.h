@@ -3,11 +3,13 @@
 
 
 #include "Block.h"
-#include <map>
+#include <vector>
 
 
 namespace Tetris
 {
+    
+    class Block;
 
     class BlockFactory
     {

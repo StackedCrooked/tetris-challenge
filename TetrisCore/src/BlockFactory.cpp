@@ -1,4 +1,5 @@
 #include "BlockFactory.h"
+#include "Block.h"
 #include <algorithm>
 
 

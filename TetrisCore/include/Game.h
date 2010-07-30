@@ -2,13 +2,16 @@
 #define GAME_H_INCLUDED
 
 
-#include "Block.h"
 #include "BlockFactory.h"
 #include "GameStateNode.h"
+#include <memory>
+#include <vector>
 
 
 namespace Tetris
 {
+
+    class ActiveBlock;
 
     class Game
     {

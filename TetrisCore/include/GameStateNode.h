@@ -3,14 +3,13 @@
 
 
 #include <boost/shared_ptr.hpp>
-#include <boost/scoped_ptr.hpp>
+#include <memory>
 #include <set>
 
 
 namespace Tetris
 {
 
-    class Block;
     class GameState;
     class GameStateNode;
     typedef boost::shared_ptr<GameStateNode> ChildPtr;
