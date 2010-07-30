@@ -1,5 +1,5 @@
-#ifndef GAMESTATENODE_H
-#define GAMESTATENODE_H
+#ifndef GAMESTATENODE_H_INCLUDED
+#define GAMESTATENODE_H_INCLUDED
 
 
 #include <boost/shared_ptr.hpp>
@@ -52,4 +52,4 @@ namespace Tetris
 
 } // namespace Tetris
 
-#endif // GAMESTATENODE_H
+#endif // GAMESTATENODE_H_INCLUDED

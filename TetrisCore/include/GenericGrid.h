@@ -1,5 +1,5 @@
-#ifndef GENERIC_GRID_H
-#define GENERIC_GRID_H
+#ifndef GENERICGRID_H_INCLUDED
+#define GENERICGRID_H_INCLUDED
 
 
 #include <vector>
@@ -112,4 +112,4 @@ namespace Tetris
 
 } // namespace Tetris
 
-#endif // GENERIC_GRID_H
+#endif // GENERICGRID_H_INCLUDED

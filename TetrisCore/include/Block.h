@@ -1,5 +1,5 @@
-#ifndef BLOCKS_H
-#define BLOCKS_H
+#ifndef BLOCK_H_INCLUDED
+#define BLOCK_H_INCLUDED
 
 
 #include "GenericGrid.h"
@@ -92,4 +92,4 @@ namespace Tetris
 
 
 
-#endif // BLOCKS_H
+#endif // BLOCK_H_INCLUDED
