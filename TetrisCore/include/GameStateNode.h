@@ -26,9 +26,9 @@ namespace Tetris
     {
     public:
         // Creates a root node
-        GameStateNode(GameState * inGameState);
+        GameStateNode(std::auto_ptr<GameState> inGameState);
 
-        GameStateNode(GameStateNode * inParent, GameState * inGameState);
+        GameStateNode(GameStateNode * inParent, std::auto_ptr<GameState> inGameState);
 
         // Distance from the root node.
         int depth() const;

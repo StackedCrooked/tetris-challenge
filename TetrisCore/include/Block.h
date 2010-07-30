@@ -3,6 +3,7 @@
 
 
 #include "GenericGrid.h"
+#include <boost/scoped_ptr.hpp>
 #include <map>
 
 
@@ -22,6 +23,8 @@ namespace Tetris
         BlockType_Z,
         BlockType_End                      // 'end' is one past the last value (like stl iterators)
     };
+
+    const size_t cBlockTypeCount = static_cast<int>(BlockType_End) - 1;
     
     typedef GenericGrid<BlockType> Grid;
 
@@ -63,12 +66,24 @@ namespace Tetris
 
         size_t column() const;
 
+        size_t rotation() const;
+
+        void moveLeft();
+
+        void moveRight();
+
+        void moveUp();
+
+        void moveDown();
+
         void setRow(size_t inRow);
 
         void setColumn(size_t inColumn);
 
+        void setRotation(size_t inRotation);
+
     private:
-        const Block & mBlock;
+        boost::scoped_ptr<Block> mBlock;
         size_t mRow;
         size_t mColumn;
     };

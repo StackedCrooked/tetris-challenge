@@ -3,28 +3,33 @@
 
 
 #include "Block.h"
+#include "BlockFactory.h"
 #include "GameStateNode.h"
 
 
 namespace Tetris
 {
 
-    // This is the model, not the controller
     class Game
     {
     public:
         Game(int inNumRows, int inNumColumns);
 
+        bool isGameOver() const;
+
         // Drops the active block one square
-        void tick();
+        void fallCurrentBlock();
 
         void commitActiveBlock();
 
     private:
-        const Block & getNextBlock(int inDepth);
 
         GameStateNode mRootNode;
         GameStateNode * mCurrentNode;
+
+        boost::scoped_ptr<ActiveBlock> mActiveBlock;
+        BlockFactory mBlockFactory;
+        std::vector<GameStateNode*> mHistory;
         std::vector<BlockType> mNextBlocks;
     };
 

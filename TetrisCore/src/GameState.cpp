@@ -18,6 +18,7 @@ namespace Tetris
         mNumDoubles(0),
         mNumTriples(0),
         mNumTetrises(0),
+        mIsGameOver(false),
         mDirty(true),
         mCachedScore(0),
         mNumHoles(0)
@@ -38,8 +39,7 @@ namespace Tetris
 
 
     int GameState::numTriples() const
-    {
-        
+    {        
         return mNumTriples;
     }
 
@@ -47,6 +47,12 @@ namespace Tetris
     int GameState::numTetrises() const
     {
         return mNumTetrises;
+    }
+
+
+    bool GameState::isGameOver() const
+    {
+        return mIsGameOver;
     }
 
 
@@ -140,9 +146,10 @@ namespace Tetris
     }
 
 
-    std::auto_ptr<GameState> GameState::commit(const ActiveBlock & inBlock) const
+    std::auto_ptr<GameState> GameState::commit(const ActiveBlock & inBlock, bool inGameOver) const
     {
         std::auto_ptr<GameState> result(new GameState(*this));
+        result->mIsGameOver = inGameOver;
         result->mDirty = true;
         for (size_t r = 0; r != inBlock.block().grid().numRows(); ++r)
         {
