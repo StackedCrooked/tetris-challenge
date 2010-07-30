@@ -200,21 +200,24 @@ namespace Tetris
         size_t numLines = 0;
         std::vector<bool> lines(mGrid.numRows(), 0);
         
-        Grid::Data::iterator begin = mGrid.data().begin();
-        Grid::Data::iterator end = begin + mGrid.numColumns();
+        // Get numLines and lines
+        {
+            Grid::Data::iterator begin = mGrid.data().begin();
+            Grid::Data::iterator end = begin + mGrid.numColumns();
 
-        for (size_t rowIndex = mOriginalActiveBlock->row();
-             rowIndex != mOriginalActiveBlock->row() + mOriginalActiveBlock->block().grid().numRows();
-             ++rowIndex)
-        {  
-            bool isLine = std::find(begin, end, 0) != end;
-            lines.push_back(isLine);
-            if (isLine)
-            {
-                numLines++;
+            for (size_t rowIndex = mOriginalActiveBlock->row();
+                 rowIndex != mOriginalActiveBlock->row() + mOriginalActiveBlock->block().grid().numRows();
+                 ++rowIndex)
+            {  
+                bool isLine = std::find(begin, end, 0) != end;
+                lines.push_back(isLine);
+                if (isLine)
+                {
+                    numLines++;
+                }
+                begin = end;
+                end += mGrid.numColumns();
             }
-            begin = end;
-            end += mGrid.numColumns();
         }
 
         if (numLines == 0)
@@ -224,31 +227,26 @@ namespace Tetris
 
         
         std::vector<BlockType> newData(mGrid.data().size(), BlockType_Void);
-
-        for (size_t rowIndex = 0; rowIndex != mGrid.numRows(); ++rowIndex)
-        {  
-
-            // First do all the empty rows
-            if (rowIndex < numLines)
-            {
-                for (size_t columnIndex = 0; columnIndex != mGrid.numColumns(); ++columnIndex)
+        
+        // Get newData
+        {
+            
+            // Start at the firstNonEmptyRow.
+            size_t firstNonEmptyRow = mOriginalActiveBlock->row() + numLines;
+            size_t offset = firstNonEmptyRow * mGrid.numColumns();
+            Grid::Data::iterator begin = mGrid.data().begin() + offset;
+            Grid::Data::iterator end = begin + mGrid.numColumns();
+            Grid::Data::iterator destination = newData.begin() + offset;
+            for (size_t rowIndex = firstNonEmptyRow; rowIndex != mGrid.numRows(); ++rowIndex)
+            {                  
+                // If the row is not a full line, then copy it.
+                if (!lines[rowIndex])
                 {
-                    newData.push_back(BlockType_Void);
+                    std::copy(begin, end, destination);
                 }
-                continue;
-            }
-
-
-            // If the row is a line skip it.
-            if (lines[rowIndex])
-            {
-                continue;
-            }
-
-            // Copy incomplete rows
-            for (size_t columnIndex = 0; columnIndex != mGrid.numColumns(); ++columnIndex)
-            {
-                newData.push_back(mGrid.get(rowIndex, columnIndex));
+                begin = end;
+                end += mGrid.numColumns();
+                destination += mGrid.numColumns();
             }
         }
         
