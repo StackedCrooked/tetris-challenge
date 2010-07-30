@@ -1,5 +1,5 @@
 #include "GameState.h"
-#include <assert.h>
+#include <algorithm>
 
 
 namespace Tetris
@@ -12,41 +12,36 @@ namespace Tetris
 
 
     GameState::GameState(int inNumRows, int inNumColumns) :
-        mGrid(inNumRows, inNumColumns, BlockType_Unknown),
-        mNumLines(0),
-        mNumSingles(0),
-        mNumDoubles(0),
-        mNumTriples(0),
-        mNumTetrises(0),
+        mGrid(inNumRows, inNumColumns, BlockType_Void),
+        mStats(),
         mIsGameOver(false),
-        mDirty(true),
-        mCachedScore(0),
-        mNumHoles(0)
+        mOriginalActiveBlock(0),
+        mQuality()
     {
     }
 
 
     int GameState::numLines() const
     {
-        return mNumLines;
+        return mStats.mNumLines;
     }
 
 
     int GameState::numDoubles() const
     {
-        return mNumDoubles;
+        return mStats.mNumDoubles;
     }
 
 
     int GameState::numTriples() const
     {        
-        return mNumTriples;
+        return mStats.mNumTriples;
     }
 
 
     int GameState::numTetrises() const
     {
-        return mNumTetrises;
+        return mStats.mNumTetrises;
     }
 
 
@@ -69,12 +64,12 @@ namespace Tetris
 
     int GameState::quality() const
     {
-        if (mDirty)
+        if (mQuality.mDirty)
         {
             static const int cHolePenalty = 2;
             static const int cHeightPenalty = 1;
             int result = 0;
-            mNumHoles = 0;
+            mQuality.mNumHoles = 0;
 
             bool foundTop = false;
             size_t top = mGrid.numRows();
@@ -86,7 +81,7 @@ namespace Tetris
                 for (size_t colIdx = 0; colIdx != mGrid.numColumns(); ++colIdx)
                 {
                     const int & value = mGrid.get(rowIdx, colIdx);
-                    if (value != BlockType_Unknown)
+                    if (value != BlockType_Void)
                     {
                         if (!foundTop)
                         {
@@ -104,9 +99,9 @@ namespace Tetris
                         // check for holes
                         if (foundTop && rowIdx > 0)
                         {
-                            if (mGrid.get(rowIdx - 1, colIdx) != BlockType_Unknown)
+                            if (mGrid.get(rowIdx - 1, colIdx) != BlockType_Void)
                             {
-                                mNumHoles++;
+                                mQuality.mNumHoles++;
                                 result -= cHolePenalty;
                             }
                         }
@@ -117,16 +112,16 @@ namespace Tetris
             result -= static_cast<int>(mGrid.numRows() - top) * cHeightPenalty;
             float density = ((float)numOccupiedUnderTop) / (float)(((mGrid.numRows() - top) * mGrid.numColumns()));
             result += static_cast<int>((11.0*density) + 0.5);
-            mCachedScore = result;
-            mDirty = false;
+            mQuality.mScore = result;
+            mQuality.mDirty = false;
         }
-        return mCachedScore;
+        return mQuality.mScore;
     }
 
 
     int GameState::numHoles() const
     {
-        return mNumHoles;
+        return mQuality.mNumHoles;
     }
 
 
@@ -136,7 +131,7 @@ namespace Tetris
         {
             for (size_t c = 0; c != inBlock.grid().numColumns(); ++c)
             {
-                if (inBlock.grid().get(r, c) != 0 && mGrid.get(inRowIdx + r, inColIdx + c) != BlockType_Unknown)
+                if (inBlock.grid().get(r, c) != 0 && mGrid.get(inRowIdx + r, inColIdx + c) != BlockType_Void)
                 {
                     return false;
                 }
@@ -146,27 +141,149 @@ namespace Tetris
     }
 
 
-    std::auto_ptr<GameState> GameState::commit(const ActiveBlock & inBlock, bool inGameOver) const
+    const ActiveBlock * GameState::originalActiveBlock() const
     {
-        std::auto_ptr<GameState> result(new GameState(*this));
+        return mOriginalActiveBlock.get();
+    }
+
+
+    std::auto_ptr<GameState> GameState::clone() const
+    {
+        // We can't use the copy constructor because the std::auto_ptr member would invalidate itself on copy (!).
+        std::auto_ptr<GameState> result(new GameState(mGrid.numRows(), mGrid.numColumns()));
+        result->mGrid = mGrid;
+        result->mIsGameOver = mIsGameOver;
+        result->mStats = mStats;
+        result->mQuality = mQuality;
+        return result;
+    }
+
+
+    std::auto_ptr<GameState> GameState::commit(std::auto_ptr<ActiveBlock> inBlock, bool inGameOver) const
+    {
+        std::auto_ptr<GameState> result(clone());
         result->mIsGameOver = inGameOver;
-        result->mDirty = true;
-        for (size_t r = 0; r != inBlock.block().grid().numRows(); ++r)
+        result->mQuality.mDirty = true;
+
+        result->solidifyBlock(inBlock.get());
+
+        // transfer ownership of the active block
+        result->mOriginalActiveBlock = inBlock;
+
+        // Clear lines and update score
+        result->clearLines();
+
+        return result;
+    }
+
+
+    void GameState::solidifyBlock(const ActiveBlock * inActiveBlock)
+    {
+        const Block & block = inActiveBlock->block();
+        const Grid & grid = block.grid();
+        for (size_t r = 0; r != grid.numRows(); ++r)
         {
-            for (size_t c = 0; c != inBlock.block().grid().numColumns(); ++c)
+            for (size_t c = 0; c != grid.numColumns(); ++c)
             {
-                if (inBlock.block().grid().get(r, c) != BlockType_Unknown)
+                if (grid.get(r, c) != BlockType_Void)
                 {
-                    result->grid().set(inBlock.row() + r, inBlock.column() + c, inBlock.block().type());
+                    mGrid.set(inActiveBlock->row() + r, inActiveBlock->column() + c, block.type());
                 }
             }
         }
-
-        // Clear lines
-        // Update scores
-        // etc...
-        return result;
     }
+
+    
+    void GameState::clearLines()
+    {
+        size_t numLines = 0;
+        std::vector<bool> lines(mGrid.numRows(), 0);
+        
+        Grid::Data::iterator begin = mGrid.data().begin();
+        Grid::Data::iterator end = begin + mGrid.numColumns();
+
+        for (size_t rowIndex = mOriginalActiveBlock->row();
+             rowIndex != mOriginalActiveBlock->row() + mOriginalActiveBlock->block().grid().numRows();
+             ++rowIndex)
+        {  
+            bool isLine = std::find(begin, end, 0) != end;
+            lines.push_back(isLine);
+            if (isLine)
+            {
+                numLines++;
+            }
+            begin = end;
+            end += mGrid.numColumns();
+        }
+
+        if (numLines == 0)
+        {
+            return;
+        }
+
+        
+        std::vector<BlockType> newData(mGrid.data().size(), BlockType_Void);
+
+        for (size_t rowIndex = 0; rowIndex != mGrid.numRows(); ++rowIndex)
+        {  
+
+            // First do all the empty rows
+            if (rowIndex < numLines)
+            {
+                for (size_t columnIndex = 0; columnIndex != mGrid.numColumns(); ++columnIndex)
+                {
+                    newData.push_back(BlockType_Void);
+                }
+                continue;
+            }
+
+
+            // If the row is a line skip it.
+            if (lines[rowIndex])
+            {
+                continue;
+            }
+
+            // Copy incomplete rows
+            for (size_t columnIndex = 0; columnIndex != mGrid.numColumns(); ++columnIndex)
+            {
+                newData.push_back(mGrid.get(rowIndex, columnIndex));
+            }
+        }
+        
+        mGrid.data() = newData;
+        mStats.mNumLines += numLines;
+        
+        switch (numLines)
+        {
+            case 0:
+            {
+                // Do nothing;
+                break;
+            }
+            case 1:
+            {
+                // Do nothing, mNumLines has already been incremented.
+                break;
+            }
+            case 2:
+            {
+                mStats.mNumDoubles++;
+                break;
+            }
+            case 3:
+            {
+                mStats.mNumTriples++;
+                break;
+            }
+            case 4:
+            {
+                mStats.mNumTetrises++;
+                break;
+            }
+        }
+    }
+
 
 } // namespace Tetris
 

@@ -2,7 +2,6 @@
 #include <boost/bind.hpp>
 #include <string>
 #include <sstream>
-#include <assert.h>
 #include <ctime>
 #include <gdiplus.h>
 
@@ -355,7 +354,7 @@ namespace Tetris
     //        {
     //            return Gdiplus::Color::Red;
     //        }
-    //        case BlockType_Unknown:
+    //        case BlockType_Void:
     //        {
     //            return Gdiplus::Color::Black;
     //        }
