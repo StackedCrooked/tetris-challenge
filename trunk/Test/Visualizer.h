@@ -6,6 +6,7 @@
 #include "GameController.h"
 #include "Grid.h"
 #include <boost/noncopyable.hpp>
+#include <ctime>
 #include <map>
 #include <string>
 #include <windows.h>
@@ -62,6 +63,7 @@ namespace Tetris
         GameController * mGameController;
         UINT_PTR mTimerID;
         int mDelay;
+        clock_t mElapsed;
 
         static Instances sInstances;
         static ULONG_PTR sGdiPlusToken;
