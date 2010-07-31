@@ -1,4 +1,6 @@
 #include "Visualizer.h"
+#include "GameState.h"
+#include "Game.h"
 #include <boost/bind.hpp>
 #include <string>
 #include <sstream>
@@ -10,445 +12,375 @@ namespace Tetris
 {
 
 
-    //std::map<HWND, Visualizer *> Visualizer::sInstances;
-    //ULONG_PTR Visualizer::sGdiPlusToken = 0;
-    //int Visualizer::sRefCount = 0;
+    std::map<HWND, Visualizer *> Visualizer::sInstances;
+    ULONG_PTR Visualizer::sGdiPlusToken = 0;
+    int Visualizer::sRefCount = 0;
 
 
-    //void Visualizer::Initialize()
-    //{
-    //    Gdiplus::GdiplusStartupInput gdiplusStartupInput;
-    //    Gdiplus::GdiplusStartup(&sGdiPlusToken, &gdiplusStartupInput, NULL);
-    //}
+    void Visualizer::Initialize()
+    {
+        Gdiplus::GdiplusStartupInput gdiplusStartupInput;
+        Gdiplus::GdiplusStartup(&sGdiPlusToken, &gdiplusStartupInput, NULL);
+    }
 
 
-    //void Visualizer::Finalize()
-    //{
-    //    Gdiplus::GdiplusShutdown(sGdiPlusToken);
-    //}
-
-
-
-    //Visualizer::Visualizer(PuzzleSolver * inPuzzleSolver) :
-    //    mPuzzleSolver(inPuzzleSolver),
-    //    mDelay(100)
-    //{
-    //    sRefCount++;
-    //    if (sRefCount == 1)
-    //    {
-    //        Initialize();
-    //    }
-    //}
-
-
-    //Visualizer::~Visualizer()
-    //{
-    //    sRefCount--;
-    //    if (sRefCount == 0)
-    //    {
-    //        Finalize();
-    //    }
-    //    ::DestroyWindow(mHandle);
-    //}
-
-
-    //void Visualizer::show()
-    //{
-    //    static TCHAR * fClassName = L"ShowBlocksWindow";
-    //    static bool fClassRegistered = false;
-    //    if (! fClassRegistered)
-    //    {
-    //        // initialize window
-    //        WNDCLASSEX wndClass;
-    //        wndClass.cbSize = sizeof(WNDCLASSEX);
-    //        wndClass.style = 0;
-    //        wndClass.lpfnWndProc = &Visualizer::MessageHandler;
-    //        wndClass.cbClsExtra = 0;
-    //        wndClass.cbWndExtra = 0;
-    //        wndClass.hInstance  = ::GetModuleHandle(0);
-    //        wndClass.hIcon = 0;
-    //        wndClass.hCursor = ::LoadCursor(NULL, IDC_ARROW);
-    //        wndClass.hbrBackground = 0; // covered by content so no color needed (reduces flicker)
-    //        wndClass.lpszMenuName = NULL;
-    //        wndClass.lpszClassName = fClassName;
-    //        wndClass.hIconSm = 0;
-    //        RegisterClassEx(&wndClass);
-    //        fClassRegistered = true;
-    //    }
-
-    //    mHandle = CreateWindowEx
-    //              (
-    //                  0,
-    //                  fClassName,
-    //                  L"All blocks",
-    //                  WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_OVERLAPPEDWINDOW,
-    //                  (1280 - 640)/2,
-    //                  (1024 - 640)/2,
-    //                  640,
-    //                  640,
-    //                  NULL,
-    //                  NULL,
-    //                  ::GetModuleHandle(0),
-    //                  NULL
-    //              );
-    //    if (!mHandle)
-    //    {
-    //        MessageBox(0, L"Failed to create window", L"Tetris Challenge", MB_OK);
-    //        return;
-    //    }
-
-    //    mUpButton = CreateWindowEx
-    //                (
-    //                    0,
-    //                    L"BUTTON",
-    //                    L"+",
-    //                    BS_PUSHBUTTON | WS_CHILD | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_VISIBLE,
-    //                    0,
-    //                    10,
-    //                    16,
-    //                    16,
-    //                    mHandle,
-    //                    (HMENU)101,
-    //                    ::GetModuleHandle(0),
-    //                    NULL
-    //                );
-
-    //    mDownButton = CreateWindowEx
-    //                  (
-    //                      0,
-    //                      L"BUTTON",
-    //                      L"-",
-    //                      BS_PUSHBUTTON | WS_CHILD | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_VISIBLE,
-    //                      0,
-    //                      26,
-    //                      16,
-    //                      16,
-    //                      mHandle,
-    //                      (HMENU)102,
-    //                      ::GetModuleHandle(0),
-    //                      NULL
-    //                  );
-
-    //    sInstances.insert(std::make_pair(mHandle, this));
-    //    mTimerID = SetTimer(NULL, NULL, mDelay, &Visualizer::TimerCallback);
-    //    ::ShowWindow(mHandle, SW_SHOW);
-    //    MSG message;
-    //    while (GetMessage(&message, NULL, 0, 0))
-    //    {
-    //        HWND hActive = GetActiveWindow();
-    //        if (! IsDialogMessage(hActive, &message))
-    //        {
-    //            TranslateMessage(&message);
-    //            DispatchMessage(&message);
-    //        }
-    //    }
-    //}
-
-    //void Visualizer::refresh()
-    //{
-    //    ::InvalidateRect(mHandle, 0, FALSE);
-    //    ::UpdateWindow(mHandle);
-    //}
-
-
-    //void Visualizer::drawTree(Gdiplus::Graphics & inGraphics, const GameStateNode & inNode, const Gdiplus::RectF & inRect, int level)
-    //{
-    //    int xOffset = inRect.X;
-    //    int yOffset = inRect.Y;
-
-    //    int score = inNode.state().quality();
-    //    std::wstringstream ss;
-    //    ss << "Level: " << level << ". Score: " << score;
-    //    Gdiplus::SolidBrush textBrush(Gdiplus::Color::Green);
-    //    drawText(inGraphics, ss.str(), Gdiplus::RectF(xOffset, yOffset, 80, 30), textBrush);
-
-    //    xOffset += 80;
-    //    Children::const_iterator it = inNode.children().begin(), end = inNode.children().end();
-    //    for (; it != end; ++it)
-    //    {
-    //        if (*it)
-    //        {
-    //            GameStateNode & node = *it->get();
-    //            std::wstringstream ss;
-    //            ss << node.state().quality();
-    //            Gdiplus::SolidBrush textBrush(node.children().empty() ? Gdiplus::Color::Gray : Gdiplus::Color::Green);
-    //            drawText(inGraphics, ss.str(), Gdiplus::RectF(xOffset, yOffset, 30, 30), textBrush);
-    //            yOffset += 30;
-
-    //            Gdiplus::RectF rect(inRect.X + xOffset + 30, inRect.Y, inRect.Width - xOffset - 30, inRect.Height);
-    //            drawTree(inGraphics, node, rect, level + 1);
-    //        }
-    //    }
-    //}
-
-
-    //void Visualizer::drawText(Gdiplus::Graphics & inGraphics, const std::wstring & inText, const Gdiplus::RectF & inRect)
-    //{
-    //    Gdiplus::SolidBrush textBrush(Gdiplus::Color::White);
-    //    drawText(inGraphics, inText, inRect, textBrush);
-    //}
-
-    //void Visualizer::drawText(Gdiplus::Graphics & inGraphics, const std::wstring & inText, const Gdiplus::RectF & inRect, const Gdiplus::Brush & inBrush)
-    //{
-    //    Gdiplus::Font gdiFont(TEXT("Arial"), 9, Gdiplus::FontStyleRegular);
-
-    //    Gdiplus::RectF layoutRect
-    //    (
-    //        (float)inRect.X,
-    //        (float)inRect.Y,
-    //        (float)inRect.Width,
-    //        (float)inRect.Height
-    //    );
-    //    Gdiplus::StringFormat stringFormat;
-    //    inGraphics.DrawString(inText.c_str(), (int)inText.size(), &gdiFont, layoutRect, &stringFormat, &inBrush);
-    //}
-
-
-    //void Visualizer::drawGrid(Gdiplus::Graphics & inGraphics, const Grid & inGrid, const Gdiplus::RectF & inRect)
-    //{
-    //    const int cUnitWidth = inRect.Width / inGrid.numColumns();
-    //    const int cUnitHeight = cUnitWidth;
-    //    for (size_t rowIdx = 0; rowIdx != inGrid.numRows(); ++rowIdx)
-    //    {
-    //        for (size_t colIdx = 0; colIdx != inGrid.numColumns(); ++colIdx)
-    //        {
-    //            Gdiplus::SolidBrush fgBrush(GetColor(inGrid.get(rowIdx, colIdx)));
-    //            Gdiplus::RectF rect
-    //            (
-    //                inRect.X + colIdx * cUnitWidth,
-    //                inRect.Y + rowIdx * cUnitHeight,
-    //                cUnitWidth-1,
-    //                cUnitHeight-1
-    //            );
-    //            inGraphics.FillRectangle(&fgBrush, rect);
-    //        }
-    //    }
-    //}
-
-
-    //void Visualizer::drawRemainingBlocks(Gdiplus::Graphics & inGraphics, const Gdiplus::RectF & inRect)
-    //{
-    //    int offsetX = inRect.X;
-    //    int offsetY = inRect.Y;
-    //    for (size_t idx = 0; idx != mPuzzleSolver->blocks().size(); ++idx)
-    //    {
-    //        if (mPuzzleSolver->depth() <= idx)
-    //        {
-    //            const Block & block = mPuzzleSolver->blocks()[idx];
-    //            drawGrid(inGraphics, block.grid(), Gdiplus::RectF(offsetX, offsetY, block.grid().numColumns()*10, block.grid().numRows()*10));
-    //        }
-    //        offsetX += 5*10;
-    //        if (offsetX > inRect.X + inRect.Width)
-    //        {
-    //            offsetX = inRect.X;
-    //            offsetY += 5*10;
-    //        }
-    //    }
-
-    //}
-
-
-    //void Visualizer::drawState(Gdiplus::Graphics & inGraphics, const GameState & inState, const Gdiplus::RectF & inRect)
-    //{
-    //    const Grid & grid = inState.grid();
-    //    drawGrid(inGraphics, grid, inRect);
-    //    std::wstringstream ss;
-    //    ss << L"Delay: " << mDelay << ". Score: " << inState.quality();
-    //    std::wstring info(ss.str());
-    //    drawText(inGraphics, info, Gdiplus::RectF(inRect.X, inRect.Y + inRect.Height - 20, inRect.Width, inRect.Height));
-    //}
-
-
-    //void Visualizer::onPaint(HDC inHDC)
-    //{
-    //    // Obtain the client rect of the window.
-    //    RECT rc;
-    //    ::GetClientRect(mHandle, &rc);
-    //    const int cWidth = rc.right - rc.left;
-    //    const int cHeight = rc.bottom - rc.top;
-    //    const int cMarginLeft = 20;
-    //    const int cMarginRight = 20;
-    //    const int cMarginTop = 40;
-    //    const int cMarginBottom = 20;
-    //    const int cRight = cWidth - cMarginRight;
-    //    const int cUnitWidth = 8;
-    //    const int cUnitHeight = cUnitWidth;
-    //    const int cSpacing = 10;
-    //    const int cTreeHeight = 0*400;
-
-    //    // Erase background
-    //    Gdiplus::Graphics g(inHDC);
-    //    Gdiplus::SolidBrush bgBrush(Gdiplus::Color::Black);
-    //    Gdiplus::RectF bgRect(0, 0, rc.right-rc.left, rc.bottom-rc.top);
-    //    g.FillRectangle(&bgBrush, bgRect);
-
-    //    // Paint contents
-    //    const GameStateNode * node = mPuzzleSolver->currentNode()->parent();
-
-    //    if (node)
-    //    {
-    //        int offsetX = cMarginLeft;
-    //        int offsetY = cMarginTop;
-
-    //        //drawTree(g, *node, Gdiplus::RectF(offsetX, offsetY, cWidth - cMarginLeft - cMarginRight, cTreeHeight), 0);
-    //        offsetY += cTreeHeight;
-
-    //        const Children & children = node->children();
-    //        Children::const_iterator it = children.begin(), end = children.end();
-    //        int count = 0;
-    //        size_t numChildren = 1;//children.size();
-    //        for (; it != end && count < numChildren; ++it)
-    //        {
-    //            int rectWidth = it->get()->state().grid().numColumns()*cUnitWidth;
-    //            int rectHeight = rectWidth + 20;
-    //            Gdiplus::RectF rect(offsetX, offsetY, rectWidth, rectHeight);
-    //            drawState(g, it->get()->state(), rect);
-    //            count++;
-    //            offsetX += rectWidth + cSpacing;
-    //            if (offsetX + rectWidth + cMarginRight > cWidth)
-    //            {
-    //                offsetX = cMarginLeft;
-    //                offsetY += rectHeight + cSpacing;
-    //            }
-    //        }
-
-    //        int blocksOffsetX = cMarginLeft + 15*cUnitWidth + cUnitWidth;
-    //        drawRemainingBlocks(g, Gdiplus::RectF(blocksOffsetX, cMarginTop, cWidth - cMarginRight - blocksOffsetX, cHeight));
-    //    }
-    //    std::wstringstream ss;
-    //    ss << "Depth: " << mPuzzleSolver->depth() << "/" << mPuzzleSolver->blocks().size();
-    //    drawText(g, ss.str(), Gdiplus::RectF(100, 10, cWidth - 100, 20));
-
-    //}
-
-
-    //Gdiplus::Color Visualizer::GetColor(BlockType inType)
-    //{
-    //    switch (inType)
-    //    {
-    //        case BlockType_I:
-    //        {
-    //            return Gdiplus::Color::Violet;
-    //        }
-    //        case BlockType_J:
-    //        {
-    //            return Gdiplus::Color::Blue;
-    //        }
-    //        case BlockType_L:
-    //        {
-    //            return Gdiplus::Color::Orange;
-    //        }
-    //        case BlockType_O:
-    //        {
-    //            return Gdiplus::Color::Yellow;
-    //        }
-    //        case BlockType_S:
-    //        {
-    //            return Gdiplus::Color::LightGreen;
-    //        }
-    //        case BlockType_T:
-    //        {
-    //            return Gdiplus::Color::Blue;
-    //        }
-    //        case BlockType_Z:
-    //        {
-    //            return Gdiplus::Color::Red;
-    //        }
-    //        case BlockType_Void:
-    //        {
-    //            return Gdiplus::Color::Black;
-    //        }
-    //        default:
-    //        {
-    //            assert(!"No valid block type given.");
-    //            return Gdiplus::Color::Black;
-    //        }
-    //    }
-    //}
-
-
-    //void CALLBACK Visualizer::TimerCallback(HWND hWnd, UINT inMessage, UINT_PTR inTimerID, DWORD inTime)
-    //{
-    //    Instances::iterator it = sInstances.begin();
-    //    if (it == sInstances.end())
-    //    {
-    //        return;
-    //    }
-
-    //    Visualizer * pThis = it->second;
-
-    //    if (inTimerID == pThis->mTimerID && pThis->mPuzzleSolver->depth() != 56)
-    //    {
-    //        pThis->mPuzzleSolver->next();
-
-    //        // Reset timer because mDelay might have been changed.
-    //        ::KillTimer(0, pThis->mTimerID);
-    //        pThis->mTimerID = ::SetTimer(0, 0, pThis->mDelay, &Visualizer::TimerCallback);
-
-    //        ::InvalidateRect(pThis->mHandle, 0, FALSE);
-    //        //while (pThis->mPuzzleSolver->depth() < 50)
-    //        //{
-    //        //  pThis->mPuzzleSolver->next();
-    //        //}
-    //        //::InvalidateRect(pThis->mHandle, 0, FALSE);
-    //    }
-
-    //}
+    void Visualizer::Finalize()
+    {
+        Gdiplus::GdiplusShutdown(sGdiPlusToken);
+    }
 
 
 
-    //LRESULT CALLBACK Visualizer::MessageHandler(HWND hWnd, UINT inMessage, WPARAM wParam, LPARAM lParam)
-    //{
-    //    Instances::iterator it = sInstances.find(hWnd);
-    //    if (it == sInstances.end())
-    //    {
-    //        return ::DefWindowProc(hWnd, inMessage, wParam, lParam);
-    //    }
+    Visualizer::Visualizer(GameController * inGameController) :
+        mGameController(inGameController),
+        mDelay(100)
+    {
+        sRefCount++;
+        if (sRefCount == 1)
+        {
+            Initialize();
+        }
+    }
 
-    //    Visualizer * pThis = it->second;
 
-    //    switch (inMessage)
-    //    {
-    //        case WM_SIZE:
-    //        {
-    //            ::InvalidateRect(hWnd, 0, FALSE);
-    //            break;
-    //        }
-    //        case WM_COMMAND:
-    //        {
-    //            if (wParam == 101)
-    //            {
-    //                pThis->mDelay += 10;
-    //            }
-    //            else if (wParam == 102)
-    //            {
-    //                if (pThis->mDelay > 10)
-    //                {
-    //                    pThis->mDelay -= 10;
-    //                }
-    //            }
-    //            break;
-    //        }
-    //        case WM_PAINT:
-    //        {
-    //            PAINTSTRUCT ps;
-    //            ::BeginPaint(hWnd, &ps);
-    //            pThis->onPaint(ps.hdc);
-    //            ::EndPaint(hWnd, &ps);
-    //            return TRUE;
-    //        }
-    //        case WM_ERASEBKGND:
-    //        {
-    //            return TRUE; // say we handled it
-    //        }
-    //        case WM_CLOSE:
-    //        {
-    //            ::PostQuitMessage(0);
-    //            return TRUE;
-    //        }
-    //    }
-    //    return ::DefWindowProc(hWnd, inMessage, wParam, lParam);
-    //}
+    Visualizer::~Visualizer()
+    {
+        sRefCount--;
+        if (sRefCount == 0)
+        {
+            Finalize();
+        }
+        ::DestroyWindow(mHandle);
+    }
+
+
+    void Visualizer::show()
+    {
+        static TCHAR * fClassName = L"VisualizerWindow";
+        static bool fClassRegistered = false;
+        if (! fClassRegistered)
+        {
+            // initialize window
+            WNDCLASSEX wndClass;
+            wndClass.cbSize = sizeof(WNDCLASSEX);
+            wndClass.style = 0;
+            wndClass.lpfnWndProc = &Visualizer::MessageHandler;
+            wndClass.cbClsExtra = 0;
+            wndClass.cbWndExtra = 0;
+            wndClass.hInstance  = ::GetModuleHandle(0);
+            wndClass.hIcon = 0;
+            wndClass.hCursor = ::LoadCursor(NULL, IDC_ARROW);
+            wndClass.hbrBackground = 0; // covered by content so no color needed (reduces flicker)
+            wndClass.lpszMenuName = NULL;
+            wndClass.lpszClassName = fClassName;
+            wndClass.hIconSm = 0;
+            if (RegisterClassEx(&wndClass) == 0)
+            {
+                throw std::runtime_error("RegisterClassEx failed.");
+            }
+            fClassRegistered = true;
+        }
+
+        mHandle = CreateWindowEx(0,
+                                 fClassName,
+                                 L"Tetris",
+                                 WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_OVERLAPPEDWINDOW,
+                                 (1280 - 640)/2,
+                                 (1024 - 640)/2,
+                                 640,
+                                 640,
+                                 NULL,
+                                 NULL,
+                                 ::GetModuleHandle(0),
+                                 NULL);
+        
+        if (!mHandle)
+        {
+            throw std::runtime_error("Failed to create the main window");
+        }
+
+        mUpButton = CreateWindowEx
+                    (
+                        0,
+                        L"BUTTON",
+                        L"+",
+                        BS_PUSHBUTTON | WS_CHILD | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_VISIBLE,
+                        0,
+                        10,
+                        16,
+                        16,
+                        mHandle,
+                        (HMENU)101,
+                        ::GetModuleHandle(0),
+                        NULL
+                    );
+
+        mDownButton = CreateWindowEx
+                      (
+                          0,
+                          L"BUTTON",
+                          L"-",
+                          BS_PUSHBUTTON | WS_CHILD | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_VISIBLE,
+                          0,
+                          26,
+                          16,
+                          16,
+                          mHandle,
+                          (HMENU)102,
+                          ::GetModuleHandle(0),
+                          NULL
+                      );
+
+        sInstances.insert(std::make_pair(mHandle, this));
+        mTimerID = SetTimer(NULL, NULL, mDelay, &Visualizer::TimerCallback);
+        ::ShowWindow(mHandle, SW_SHOW);
+        MSG message;
+        while (GetMessage(&message, NULL, 0, 0))
+        {
+            HWND hActive = GetActiveWindow();
+            if (! IsDialogMessage(hActive, &message))
+            {
+                TranslateMessage(&message);
+                DispatchMessage(&message);
+            }
+        }
+    }
+
+
+    HWND Visualizer::handle()
+    {
+        return mHandle;
+    }
+
+
+    void Visualizer::refresh()
+    {
+        ::InvalidateRect(mHandle, 0, FALSE);
+        ::UpdateWindow(mHandle);
+    }
+
+
+    static const int cBlockWidth = 10;
+    static const int cBlockHeight = 10;
+
+
+    void Visualizer::paintUnit(Gdiplus::Graphics & g, int x, int y, BlockType inBlockType)
+    {
+        Gdiplus::SolidBrush solidBrush(GetColor(inBlockType));
+        g.FillRectangle(&solidBrush, Gdiplus::RectF(static_cast<float>(x), static_cast<float>(y), static_cast<float>(cBlockWidth), static_cast<float>(cBlockHeight)));
+    }
+
+
+    void Visualizer::clearScreen(Gdiplus::Graphics & g)
+    {
+        g.Clear(Gdiplus::Color::Black);
+    }
+
+
+    void Visualizer::paintGrid(Gdiplus::Graphics & g)
+    {
+        const Grid & grid = mGameController->game().currentNode().state().grid();
+        int offsetX = 40;
+        int offsetY = 40;
+        for (size_t r = 0; r != grid.numRows(); ++r)
+        {
+            for (size_t c = 0; c != grid.numColumns(); ++c)
+            {
+                paintUnit(g, offsetX + c * cBlockHeight, offsetY + r * cBlockWidth, grid.get(r, c));
+            }
+        }
+
+        const ActiveBlock & activeBlock = mGameController->game().activeBlock();
+        const Grid & blockGrid = activeBlock.block().grid();
+        for (size_t r = 0; r != blockGrid.numRows(); ++r)
+        {
+            for (size_t c = 0; c != blockGrid.numColumns(); ++c)
+            {
+                int x = offsetX + (c + activeBlock.column()) * cBlockWidth;
+                int y = offsetY + (r + activeBlock.row()) * cBlockHeight;
+                BlockType blockType = blockGrid.get(r, c);
+                paintUnit(g, x, y, blockType);
+            }
+        }
+    }
+
+
+    void Visualizer::bufferedPaint(HDC inHDC)
+    {
+
+        //
+        // Get the size of the client rectangle.
+        //
+        RECT rc;
+        GetClientRect(handle(), &rc);
+
+        HDC compatibleDC = CreateCompatibleDC(inHDC);
+
+
+        //
+        // Create a bitmap big enough for our client rectangle.
+        //
+        HBITMAP backgroundBuffer = CreateCompatibleBitmap(inHDC, rc.right - rc.left, rc.bottom - rc.top);
+
+
+        //
+        // Select the bitmap into the off-screen DC.
+        //
+        HBITMAP backgroundBitmap = (HBITMAP)SelectObject(compatibleDC, backgroundBuffer);
+
+
+        //
+        // Erase the background.
+        //
+        HBRUSH backgroundBrush = CreateSolidBrush(GetSysColor(COLOR_WINDOW));
+        FillRect(compatibleDC, &rc, backgroundBrush);
+        DeleteObject(backgroundBrush);
+
+        //
+        // Render the image into the offscreen DC.
+        //
+        SetBkMode(compatibleDC, TRANSPARENT);
+
+
+        paint(compatibleDC);
+
+
+        //
+        // Blt the changes to the screen DC.
+        //
+        BitBlt
+        (
+            inHDC,
+            rc.left,
+            rc.top,
+            rc.right - rc.left,
+            rc.bottom - rc.top,
+            compatibleDC, 0, 0, SRCCOPY
+        );
+
+        //
+        // Done with off-screen bitmap and DC.
+        //
+        SelectObject(compatibleDC, backgroundBitmap);
+        DeleteObject(backgroundBuffer);
+        DeleteDC(compatibleDC);
+    }
+
+
+    void Visualizer::paint(HDC inHDC)
+    {
+        Gdiplus::Graphics g(inHDC);
+        clearScreen(g);
+        paintGrid(g);
+    }
+
+
+    const Gdiplus::Color & Visualizer::GetColor(BlockType inBlockType)
+    {
+        if (inBlockType < BlockType_Nil || inBlockType >= BlockType_End)
+        {
+            throw std::logic_error("Invalid BlockType enum value.");
+        }
+
+        static const Gdiplus::Color fColors[] =
+        {
+            Gdiplus::Color(Gdiplus::Color::DarkGray),
+            Gdiplus::Color(Gdiplus::Color::Violet),
+            Gdiplus::Color(Gdiplus::Color::Blue),
+            Gdiplus::Color(Gdiplus::Color::Orange),
+            Gdiplus::Color(Gdiplus::Color::Yellow),
+            Gdiplus::Color(Gdiplus::Color::LightGreen),
+            Gdiplus::Color(Gdiplus::Color::Blue),
+            Gdiplus::Color(Gdiplus::Color::Red)
+        };
+
+        return fColors[static_cast<int>(inBlockType)];
+    }
+
+
+    void Visualizer::timerCallback()
+    {
+        //mGameController->game().moveDown();
+        ::InvalidateRect(mHandle, 0, FALSE);
+    }
+
+
+    void CALLBACK Visualizer::TimerCallback(HWND hWnd, UINT inMessage, UINT_PTR inTimerID, DWORD inTime)
+    {
+        Instances::iterator it = sInstances.begin();
+        if (it == sInstances.end())
+        {
+            return;
+        }
+
+        Visualizer * pThis = it->second;
+        if (inTimerID == pThis->mTimerID)
+        {
+            pThis->timerCallback();
+
+            // Reset timer because mDelay might have been changed.
+            ::KillTimer(0, pThis->mTimerID);
+            pThis->mTimerID = ::SetTimer(0, 0, pThis->mDelay, &Visualizer::TimerCallback);
+        }
+    }
+
+
+
+    LRESULT CALLBACK Visualizer::MessageHandler(HWND hWnd, UINT inMessage, WPARAM wParam, LPARAM lParam)
+    {
+        Instances::iterator it = sInstances.find(hWnd);
+        if (it == sInstances.end())
+        {
+            return ::DefWindowProc(hWnd, inMessage, wParam, lParam);
+        }
+
+        Visualizer * pThis = it->second;
+
+        switch (inMessage)
+        {
+            case WM_SIZE:
+            {
+                ::InvalidateRect(hWnd, 0, FALSE);
+                break;
+            }
+            case WM_COMMAND:
+            {
+                if (wParam == 101)
+                {
+                    pThis->mDelay += 10;
+                }
+                else if (wParam == 102)
+                {
+                    if (pThis->mDelay > 10)
+                    {
+                        pThis->mDelay -= 10;
+                    }
+                }
+                break;
+            }
+            case WM_PAINT:
+            {                
+                HDC hDC = ::GetDC(hWnd);
+                PAINTSTRUCT ps;
+                ps.hdc = hDC;
+                ::BeginPaint(hWnd, &ps);
+                pThis->bufferedPaint(hDC);
+                ::EndPaint(hWnd, &ps);
+                ::ReleaseDC(hWnd, hDC);                
+                return TRUE;
+            }
+            case WM_ERASEBKGND:
+            {
+                return TRUE; // say we handled it
+            }
+            case WM_CLOSE:
+            {
+                ::PostQuitMessage(0);
+                return TRUE;
+            }
+        }
+        return ::DefWindowProc(hWnd, inMessage, wParam, lParam);
+    }
 
 
 } // namespace Tetris

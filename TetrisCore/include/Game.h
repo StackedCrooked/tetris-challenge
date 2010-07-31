@@ -23,6 +23,10 @@ namespace Tetris
 
         ActiveBlock & activeBlock();
 
+        GameStateNode & currentNode();
+
+        const GameStateNode & currentNode() const;
+
         bool isGameOver() const;
 
         bool move(Direction inDirection);

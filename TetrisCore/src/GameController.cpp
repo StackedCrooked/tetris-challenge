@@ -13,6 +13,18 @@ namespace Tetris
     }
 
 
+    Game & GameController::game()
+    {
+        return *mGame;
+    }
+
+
+    const Game & GameController::game() const
+    {
+        return *mGame;
+    }
+
+
     void GameController::move(Direction inDirection)
     {
         mGame->move(inDirection);

@@ -42,6 +42,8 @@ namespace Tetris
 
         const GameState & state() const;
 
+        GameState & state();
+
     private:
         GameStateNode * mParent;
         int mDepth;
