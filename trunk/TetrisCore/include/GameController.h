@@ -8,7 +8,9 @@
 
 namespace Tetris
 {
+
     class Game;
+
     class GameController
     {
     public:
