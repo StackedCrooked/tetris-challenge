@@ -171,12 +171,6 @@ namespace Tetris
     }
 
 
-    void Visualizer::clearScreen(Gdiplus::Graphics & g)
-    {
-        g.Clear(Gdiplus::Color::Black);
-    }
-
-
     void Visualizer::paintGrid(Gdiplus::Graphics & g)
     {
         const Grid & grid = mGameController->game().currentNode().state().grid();
@@ -198,8 +192,10 @@ namespace Tetris
             {
                 int x = offsetX + (c + block.column()) * cBlockWidth;
                 int y = offsetY + (r + block.row()) * cBlockHeight;
-                BlockType blockType = blockGrid.get(r, c);
-                paintUnit(g, x, y, blockType);
+                if (BlockType blockType = blockGrid.get(r, c))
+                {
+                    paintUnit(g, x, y, blockType);
+                }
             }
         }
     }
@@ -232,7 +228,7 @@ namespace Tetris
         //
         // Erase the background.
         //
-        HBRUSH backgroundBrush = CreateSolidBrush(GetSysColor(COLOR_WINDOW));
+        HBRUSH backgroundBrush = CreateSolidBrush(RGB(0, 0, 0));
         FillRect(compatibleDC, &rc, backgroundBrush);
         DeleteObject(backgroundBrush);
 
@@ -270,7 +266,6 @@ namespace Tetris
     void Visualizer::paint(HDC inHDC)
     {
         Gdiplus::Graphics g(inHDC);
-        clearScreen(g);
         paintGrid(g);
     }
 
