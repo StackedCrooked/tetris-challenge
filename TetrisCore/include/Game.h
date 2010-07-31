@@ -12,16 +12,14 @@
 namespace Tetris
 {
 
-    class ActiveBlock;
-
     class Game
     {
     public:
         Game(int inNumRows, int inNumColumns);
 
-        const ActiveBlock & activeBlock() const;
+        const Block & activeBlock() const;
 
-        ActiveBlock & activeBlock();
+        Block & activeBlock();
 
         GameStateNode & currentNode();
 
@@ -42,7 +40,7 @@ namespace Tetris
         GameStateNode * mCurrentNode;
 
         BlockFactory mBlockFactory;
-        std::auto_ptr<ActiveBlock> mActiveBlock;
+        std::auto_ptr<Block> mBlock;
         std::vector<GameStateNode*> mHistory;
         std::vector<BlockType> mNextBlocks;
     };

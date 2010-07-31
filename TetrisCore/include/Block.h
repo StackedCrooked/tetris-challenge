@@ -12,38 +12,17 @@ namespace Tetris
     typedef GenericGrid<BlockType> Grid;
 
     /**
-     * Represents an (active) Tetris block.
-     * Non-copyable
+     * Represents a Tetris block.
      */
     class Block
     {
     public:
-        Block(BlockType inType, int inRotation);
-
-        int id() const;
+        Block(BlockType inType, size_t inRow, size_t inColumn, size_t inRotation);
 
         BlockType type() const;
 
-        int rotation() const;
-
         // Get the grid associated with this block
         const Grid & grid() const;
-
-    private:
-        int mId;
-        BlockType mType;
-        int mRotation;
-        const Grid & mGrid;
-    };
-
-
-    class ActiveBlock
-    {
-    public:
-        // Block and it's position in the Grid
-        ActiveBlock(std::auto_ptr<Block> inBlock, size_t inRow, size_t inColumn);
-
-        const Block & block() const;
 
         size_t row() const;
 
@@ -59,6 +38,8 @@ namespace Tetris
 
         void moveDown();
 
+        void rotate();
+
         void setRow(size_t inRow);
 
         void setColumn(size_t inColumn);
@@ -66,13 +47,14 @@ namespace Tetris
         void setRotation(size_t inRotation);
 
     private:
-        std::auto_ptr<Block> mBlock;
+        BlockType mType;
         size_t mRow;
         size_t mColumn;
+        size_t mRotation;
+        const Grid * mGrid;
     };
 
 } // namespace Tetris
-
 
 
 #endif // BLOCK_H_INCLUDED

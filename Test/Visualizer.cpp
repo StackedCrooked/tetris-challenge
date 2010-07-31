@@ -190,14 +190,14 @@ namespace Tetris
             }
         }
 
-        const ActiveBlock & activeBlock = mGameController->game().activeBlock();
-        const Grid & blockGrid = activeBlock.block().grid();
+        const Block & block = mGameController->game().activeBlock();
+        const Grid & blockGrid = block.grid();
         for (size_t r = 0; r != blockGrid.numRows(); ++r)
         {
             for (size_t c = 0; c != blockGrid.numColumns(); ++c)
             {
-                int x = offsetX + (c + activeBlock.column()) * cBlockWidth;
-                int y = offsetY + (r + activeBlock.row()) * cBlockHeight;
+                int x = offsetX + (c + block.column()) * cBlockWidth;
+                int y = offsetY + (r + block.row()) * cBlockHeight;
                 BlockType blockType = blockGrid.get(r, c);
                 paintUnit(g, x, y, blockType);
             }
