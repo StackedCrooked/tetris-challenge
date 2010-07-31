@@ -110,6 +110,13 @@ namespace Tetris
     }
 
 
+    void Game::rotate()
+    {
+        const Block & block = mActiveBlock->block();
+        mActiveBlock.reset(new ActiveBlock(std::auto_ptr<Block>(new Block(block.type(), (block.rotation() + 1)%4)), mActiveBlock->row(), mActiveBlock->column()));
+    }
+
+
     void Game::moveDown()
     {
         const GameState & gameState = mCurrentNode->state();
@@ -128,12 +135,12 @@ namespace Tetris
         ChildPtr child(new GameStateNode(mCurrentNode->state().commit(mActiveBlock, gameOver)));
         mCurrentNode->children().insert(child);
         mCurrentNode = child.get();
-        if (!gameOver)
-        {
-            std::auto_ptr<Block> newBlock(mBlockFactory.getNext());
-            size_t middleX = static_cast<int>(0.5 + (static_cast<float>(gameState.grid().numColumns() - newBlock->grid().numColumns())/2));
-            mActiveBlock.reset(new ActiveBlock(newBlock, 0, middleX));
-        }
+        
+        // Currently mActiveBlock is a null pointer (due to the copy semantics of std::auto_ptr).
+        // Therefore we always (also in the case of game-over) get a new one from the factory.
+        std::auto_ptr<Block> newBlock(mBlockFactory.getNext());
+        size_t middleX = static_cast<int>(0.5 + (static_cast<float>(gameState.grid().numColumns() - newBlock->grid().numColumns())/2));
+        mActiveBlock.reset(new ActiveBlock(newBlock, 0, middleX));
     }
 
 

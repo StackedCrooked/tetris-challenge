@@ -28,13 +28,12 @@ namespace Tetris
     
     std::auto_ptr<Block> BlockFactory::getNext() const
     {
-        size_t index = mCurrentIndex++;
-        if (index >= mBagSize)
+        if (mCurrentIndex >= mBagSize)
         {
             std::random_shuffle(mBag.begin(), mBag.end());
-            index = 0;
+            mCurrentIndex = 0;
         }
-        return std::auto_ptr<Block>(new Block(mBag[index], 0));
+        return std::auto_ptr<Block>(new Block(mBag[mCurrentIndex++], 0));
     }
 
 

@@ -359,7 +359,7 @@ namespace Tetris
                 }
                 else if (wParam == 0x57)
                 {
-                    pThis->mGameController->move(Direction_Up);
+                    pThis->mGameController->rotate();
                 }
                 else if (wParam == VK_SPACE)
                 {
