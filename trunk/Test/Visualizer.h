@@ -1,65 +1,75 @@
-#ifndef VISUALIZER_H
-#define VISUALIZER_H
+#ifndef VISUALIZER_H_INCLUDED
+#define VISUALIZER_H_INCLUDED
 
 
+#include "BlockType.h"
+#include "GameController.h"
+#include "Grid.h"
+#include <boost/noncopyable.hpp>
+#include <map>
+#include <string>
 #include <windows.h>
+
+
+namespace Gdiplus
+{
+    class Brush;
+    class Color;
+    class Graphics;
+    class RectF;
+}
 
 
 namespace Tetris
 {
 
-    //class Visualizer
-    //{
-    //public:
-    //    Visualizer(PuzzleSolver * inPuzzleSolver);
+    class GameState;
 
-    //    ~Visualizer();
+    class Visualizer : boost::noncopyable
+    {
+    public:
+        Visualizer(GameController * inGameController);
 
-    //    void show();
+        ~Visualizer();
 
-    //    void refresh();
+        void show();
 
-    //private:
-    //    Visualizer(const Visualizer &);
-    //    Visualizer & operator=(const Visualizer &);
+        void refresh();
 
-    //    static void Initialize();
-    //    static void Finalize();
-    //    static LRESULT CALLBACK MessageHandler(HWND hWnd, UINT inMessage, WPARAM wParam, LPARAM lParam);
+        HWND handle();
 
-    //    static void CALLBACK TimerCallback(HWND hWnd, UINT inMessage, UINT_PTR inTimerID, DWORD inTime);
+    private:
+        static void Initialize();
+        static void Finalize();
+        static LRESULT CALLBACK MessageHandler(HWND hWnd, UINT inMessage, WPARAM wParam, LPARAM lParam);
 
-    //    void onPaint(HDC inHDC);
+        static void CALLBACK TimerCallback(HWND hWnd, UINT inMessage, UINT_PTR inTimerID, DWORD inTime);
 
-    //    void drawTree(Gdiplus::Graphics & inGraphics, const GameStateNode & inNode, const Gdiplus::RectF & inRect, int level);
+        void timerCallback();
+        
+        void paint(HDC inHDC);
+        void bufferedPaint(HDC inHDC);
+        void clearScreen(Gdiplus::Graphics & g);
+        void paintGrid(Gdiplus::Graphics & g);
+        void paintUnit(Gdiplus::Graphics & g, int x, int y, BlockType inBlockType);
 
-    //    void drawText(Gdiplus::Graphics & inGraphics, const std::wstring & inText, const Gdiplus::RectF & inRect, const Gdiplus::Brush & inBrush);
+        static const Gdiplus::Color & GetColor(BlockType inType);
 
-    //    void drawText(Gdiplus::Graphics & inGraphics, const std::wstring & inText, const Gdiplus::RectF & inRect);
+        HWND mHandle;
+        HWND mUpButton;
+        HWND mDownButton;
+        typedef std::map<HWND, Visualizer *> Instances;
 
-    //    void drawGrid(Gdiplus::Graphics & inGraphics, const Grid & inGrid, const Gdiplus::RectF & inRect);
+        GameController * mGameController;
+        UINT_PTR mTimerID;
+        int mDelay;
 
-    //    void drawRemainingBlocks(Gdiplus::Graphics & inGraphics, const Gdiplus::RectF & inRect);
-
-    //    void drawState(Gdiplus::Graphics & inGraphics, const GameState & inState, const Gdiplus::RectF & inRect);
-
-    //    static Gdiplus::Color GetColor(BlockType inType);
-
-    //    HWND mHandle;
-    //    HWND mUpButton;
-    //    HWND mDownButton;
-    //    typedef std::map<HWND, Visualizer *> Instances;
-
-    //    PuzzleSolver * mPuzzleSolver;
-    //    UINT_PTR mTimerID;
-    //    int mDelay;
-
-    //    static Instances sInstances;
-    //    static ULONG_PTR sGdiPlusToken;
-    //    static int sRefCount;
-    //};
+        static Instances sInstances;
+        static ULONG_PTR sGdiPlusToken;
+        static int sRefCount;
+    };
 
 } // namespace Tetris
 
 
-#endif // VISUALIZER_H
+#endif // VISUALIZER_H_INCLUDED

@@ -16,6 +16,10 @@ namespace Tetris
     public:
         GameController(size_t inNumRows, size_t inNumColumns);
 
+        Game & game();
+
+        const Game & game() const;
+
         void move(Direction inDirection);
 
         void drop();

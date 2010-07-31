@@ -29,6 +29,12 @@ namespace Tetris
     }
 
 
+    GameState & GameStateNode::state()
+    {
+        return *mGameState;
+    }
+
+
     Children & GameStateNode::children()
     {
         return mChildren;

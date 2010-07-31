@@ -43,6 +43,18 @@ namespace Tetris
     }
 
 
+    GameStateNode & Game::currentNode()
+    {
+        return *mCurrentNode;
+    }
+
+
+    const GameStateNode & Game::currentNode() const
+    {
+        return *mCurrentNode;
+    }
+
+
     static int GetRowDelta(Direction inDirection)
     {
         switch (inDirection)

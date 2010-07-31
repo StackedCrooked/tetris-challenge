@@ -1,3 +1,6 @@
+#include "Game.h"
+#include "GameState.h"
+#include "GameStateNode.h"
 #include "Visualizer.h"
 #include "Unicode.h"
 #include <stdexcept>
@@ -10,7 +13,9 @@ using namespace Tetris;
 
 void StartTest()
 {
-    // do stuff...
+    GameController gameController(20, 10);
+    Visualizer visualizer(&gameController);
+    visualizer.show();
 }
 
 
