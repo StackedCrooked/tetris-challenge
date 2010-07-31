@@ -31,6 +31,12 @@ namespace Tetris
     }
 
 
+    void GameController::rotate()
+    {
+        mGame->rotate();
+    }
+
+
     void GameController::drop()
     {
         // Simply keep moving the block down. But don't solidify yet.

@@ -272,14 +272,14 @@ namespace Tetris
             }
         }
         
-        mGrid.data() = newData;
+        mGrid.data().swap(newData);
         mStats.mNumLines += numLines;
         
         switch (numLines)
         {
             case 0:
             {
-                // Do nothing;
+                // Do nothing.
                 break;
             }
             case 1:
@@ -304,7 +304,7 @@ namespace Tetris
             }
             default:
             {
-                throw std::logic_error("Invalid enum value.");
+                throw std::logic_error("Invalid number of lines scored! ...?");
             }
         }
     }

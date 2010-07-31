@@ -31,6 +31,8 @@ namespace Tetris
 
         bool move(Direction inDirection);
 
+        void rotate();
+
         // Drops the active block one square
         void moveDown();
 
