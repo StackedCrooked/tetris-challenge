@@ -7,11 +7,11 @@ namespace Tetris
 {
     
     // Returns the number of rotations that a block can have.
-    int GetBlockRotationCount(BlockType inType);
+    size_t GetBlockRotationCount(BlockType inType);
     
     // Calculates the block identifier using the formula:
     //   BlockType_End * inType + inRotation
-    int GetBlockIdentifier(BlockType inType, int inRotation);
+    size_t GetBlockIdentifier(BlockType inType, size_t inRotation);
     
     // Gets the Grid object that is associated with a block identifier
     const Grid & GetGrid(int inBlockIdentifier);
@@ -24,19 +24,14 @@ namespace Tetris
     Grid GetZGrid(int rotation);
 
 
-    Block::Block(BlockType inType, int inRotation) :
-        mId(GetBlockIdentifier(inType, inRotation)),
+    Block::Block(BlockType inType, size_t inRotation, size_t inRow, size_t inColumn) :
         mType(inType),
+        mRow(inRow),
+        mColumn(inColumn),
         mRotation(inRotation),
-        mGrid(GetGrid(mId))
+        mGrid(&GetGrid(GetBlockIdentifier(inType, inRotation)))
     {
         CheckArgument(mRotation >= 0 && mRotation <= 3, "Invalid rotation value.");
-    }
-
-
-    int Block::id() const
-    {
-        return mId;
     }
 
 
@@ -46,7 +41,7 @@ namespace Tetris
     }
 
 
-    int Block::rotation() const
+    size_t Block::rotation() const
     {
         return mRotation;
     }
@@ -54,62 +49,42 @@ namespace Tetris
 
     const Grid & Block::grid() const
     {
-        return mGrid;
-    }
-
-
-    ActiveBlock::ActiveBlock(std::auto_ptr<Block> inBlock, size_t inRow, size_t inColumn) :
-        mBlock(inBlock),
-        mRow(inRow),
-        mColumn(inColumn)
-    {
-    }
-
-        
-    const Block & ActiveBlock::block() const
-    {
-        return *mBlock;
+        return *mGrid;
     }
  
         
-    size_t ActiveBlock::row() const
+    size_t Block::row() const
     {
         return mRow;
     }
  
         
-    size_t ActiveBlock::column() const
+    size_t Block::column() const
     {
         return mColumn;
     }
  
         
-    size_t ActiveBlock::rotation() const
-    {
-        return mBlock->rotation();
-    }
- 
-        
-    void ActiveBlock::setRow(size_t inRow)
+    void Block::setRow(size_t inRow)
     {
         mRow = inRow;
     }
 
 
-    void ActiveBlock::setColumn(size_t inColumn)
+    void Block::setColumn(size_t inColumn)
     {
         mColumn = inColumn;
     }
 
 
-
-    void ActiveBlock::setRotation(size_t inRotation)
+    void Block::setRotation(size_t inRotation)
     {
-        mBlock.reset(new Block(mBlock->type(), inRotation));
+        mRotation = inRotation;
+        mGrid = &GetGrid(GetBlockIdentifier(mType, inRotation));
     }
 
 
-    void ActiveBlock::moveLeft()
+    void Block::moveLeft()
     {
         if (mColumn > 0)
         {
@@ -118,13 +93,13 @@ namespace Tetris
     }
 
 
-    void ActiveBlock::moveRight()
+    void Block::moveRight()
     {
         mColumn++;
     }
 
 
-    void ActiveBlock::moveUp()
+    void Block::moveUp()
     {
         if (mRow > 0)
         {
@@ -133,13 +108,19 @@ namespace Tetris
     }
 
     
-    void ActiveBlock::moveDown()
+    void Block::moveDown()
     {
         mRow++;
     }
 
 
-    int GetBlockIdentifier(BlockType inType, int inRotation)
+    void Block::rotate()
+    {
+        setRotation((mRotation + 1) % 4);
+    }
+
+
+    size_t GetBlockIdentifier(BlockType inType, size_t inRotation)
     {
         if (inType < BlockType_Begin || inType >= BlockType_End)
         {
@@ -150,7 +131,7 @@ namespace Tetris
     }
 
 
-    int GetBlockRotationCount(BlockType inType)
+    size_t GetBlockRotationCount(BlockType inType)
     {
         if (inType < BlockType_Begin || inType >= BlockType_End)
         {

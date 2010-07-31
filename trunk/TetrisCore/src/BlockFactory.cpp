@@ -33,7 +33,7 @@ namespace Tetris
             std::random_shuffle(mBag.begin(), mBag.end());
             mCurrentIndex = 0;
         }
-        return std::auto_ptr<Block>(new Block(mBag[mCurrentIndex++], 0));
+        return std::auto_ptr<Block>(new Block(mBag[mCurrentIndex++], 0, 0, 0));
     }
 
 
