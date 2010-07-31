@@ -16,6 +16,8 @@ namespace Tetris
 
         void move(Direction inDirection);
 
+        void drop();
+
         void autoMove();
 
     private:

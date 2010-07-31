@@ -15,30 +15,14 @@ namespace Tetris
 
     void GameController::move(Direction inDirection)
     {
-        switch (inDirection)
-        {
-            case Direction_Up:
-            {
-                
-                break;
-            }
-            case Direction_Down:
-            {
-                break;
-            }
-            case Direction_Left:
-            {
-                break;
-            }
-            case Direction_Right:
-            {
-                break;
-            }
-            default:
-            {
-                throw std::logic_error("Invalid enum value");
-            }
-        }
+        mGame->move(inDirection);
+    }
+
+
+    void GameController::drop()
+    {
+        // Simply keep moving the block down. But don't solidify yet.
+        while (mGame->move(Direction_Down));
     }
 
 
@@ -53,4 +37,3 @@ namespace Tetris
 
 
 } // namespace Tetris
-
