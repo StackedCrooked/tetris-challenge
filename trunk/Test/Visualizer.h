@@ -49,7 +49,6 @@ namespace Tetris
         
         void paint(HDC inHDC);
         void bufferedPaint(HDC inHDC);
-        void clearScreen(Gdiplus::Graphics & g);
         void paintGrid(Gdiplus::Graphics & g);
         void paintUnit(Gdiplus::Graphics & g, int x, int y, BlockType inBlockType);
 
