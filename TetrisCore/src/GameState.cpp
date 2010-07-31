@@ -128,13 +128,34 @@ namespace Tetris
 
     bool GameState::checkPositionValid(const Block & inBlock, size_t inRowIdx, size_t inColIdx) const
     {
+        if (inRowIdx >= mGrid.numRows() || inColIdx >= mGrid.numColumns())
+        {
+            return false;
+        }
+
         for (size_t r = 0; r != inBlock.grid().numRows(); ++r)
         {
             for (size_t c = 0; c != inBlock.grid().numColumns(); ++c)
             {
-                if (inBlock.grid().get(r, c) != 0 && mGrid.get(inRowIdx + r, inColIdx + c) != BlockType_Nil)
+
+                if (inBlock.grid().get(r, c) != 0)
                 {
-                    return false;
+                    int rowIdx = inRowIdx + r;
+                    if (rowIdx >= mGrid.numRows())
+                    {
+                        return false;
+                    }
+
+                    int colIdx = inColIdx + c;
+                    if (colIdx >= mGrid.numColumns())
+                    {
+                        return false;
+                    }
+
+                    if (mGrid.get(rowIdx, colIdx) != BlockType_Nil)
+                    {
+                        return false;
+                    }
                 }
             }
         }
@@ -209,7 +230,7 @@ namespace Tetris
                  rowIndex != mOriginalActiveBlock->row() + mOriginalActiveBlock->block().grid().numRows();
                  ++rowIndex)
             {  
-                bool isLine = std::find(begin, end, 0) != end;
+                bool isLine = std::find(begin, end, 0) == end;
                 lines.push_back(isLine);
                 if (isLine)
                 {

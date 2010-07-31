@@ -33,7 +33,7 @@ namespace Tetris
 
     Visualizer::Visualizer(GameController * inGameController) :
         mGameController(inGameController),
-        mDelay(100)
+        mDelay(500)
     {
         sRefCount++;
         if (sRefCount == 1)
@@ -160,8 +160,8 @@ namespace Tetris
     }
 
 
-    static const int cBlockWidth = 10;
-    static const int cBlockHeight = 10;
+    static const int cBlockWidth = 20;
+    static const int cBlockHeight = 20;
 
 
     void Visualizer::paintUnit(Gdiplus::Graphics & g, int x, int y, BlockType inBlockType)
@@ -300,7 +300,7 @@ namespace Tetris
 
     void Visualizer::timerCallback()
     {
-        //mGameController->game().moveDown();
+        mGameController->game().moveDown();
         ::InvalidateRect(mHandle, 0, FALSE);
     }
 
@@ -341,6 +341,62 @@ namespace Tetris
             case WM_SIZE:
             {
                 ::InvalidateRect(hWnd, 0, FALSE);
+                break;
+            }
+            case WM_KEYDOWN:
+            {
+                if (wParam == 0x41)
+                {
+                    pThis->mGameController->move(Direction_Left);
+                }
+                else if (wParam == 0x44)
+                {
+                    pThis->mGameController->move(Direction_Right);
+                }
+                else if (wParam == 0x53)
+                {
+                    pThis->mGameController->move(Direction_Down);
+                }
+                else if (wParam == 0x57)
+                {
+                    pThis->mGameController->move(Direction_Up);
+                }
+                else if (wParam == VK_SPACE)
+                {
+                    pThis->mGameController->drop();
+                }
+                ::InvalidateRect(hWnd, 0, FALSE);
+                // Right    D 
+                // Down     S 
+                // Rotate   W 
+                //switch(wParam)
+                //{
+                //    case VK_UP:
+                //    {
+                //        pThis->mGameController->move(Direction_Up);
+                //        break;
+                //    }
+                //    case VK_DOWN:
+                //    {
+                //        pThis->mGameController->move(Direction_Down);
+                //        break;
+                //    }
+                //    case VK_LEFT:
+                //    {
+                //        pThis->mGameController->move(Direction_Left);
+                //        break;
+                //    }
+                //    case VK_RIGHT:
+                //    {
+                //        pThis->mGameController->move(Direction_Right);
+                //        break;
+                //    }
+                //    default:
+                //    {
+                //        // No action.
+                //        break;
+                //    }
+                //}
                 break;
             }
             case WM_COMMAND:

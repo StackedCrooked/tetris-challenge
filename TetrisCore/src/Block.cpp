@@ -145,7 +145,8 @@ namespace Tetris
         {
             throw std::logic_error("Invalid block type.");
         }
-        return static_cast<int>(BlockType_End - 1) * static_cast<int>(inType - 1) + inRotation;
+        // Max 4 rotations.
+        return 4 * static_cast<int>(inType - 1) + inRotation;
     }
 
 
