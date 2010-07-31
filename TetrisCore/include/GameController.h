@@ -18,8 +18,6 @@ namespace Tetris
 
         void drop();
 
-        void autoMove();
-
     private:
         boost::scoped_ptr<Game> mGame;
     };

@@ -26,14 +26,4 @@ namespace Tetris
     }
 
 
-    void GameController::autoMove()
-    {
-        //if (!mCurrentNode->children().empty())
-        //{
-        //    ChildPtr bestChild = mCurrentNode->children().begin();
-        //    bestChild->
-        //}
-    }
-
-
 } // namespace Tetris
