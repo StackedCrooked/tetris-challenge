@@ -5,7 +5,6 @@
 #include "Unicode.h"
 #include <stdexcept>
 #include <string>
-#include <windows.h>
 
 
 using namespace Tetris;

@@ -17,6 +17,12 @@ namespace Tetris
     int Visualizer::sRefCount = 0;
 
 
+    clock_t GetClockMs()
+    {
+        return std::clock() * CLOCKS_PER_SEC / 1000;
+    }
+
+
     void Visualizer::Initialize()
     {
         Gdiplus::GdiplusStartupInput gdiplusStartupInput;
@@ -33,7 +39,8 @@ namespace Tetris
 
     Visualizer::Visualizer(GameController * inGameController) :
         mGameController(inGameController),
-        mDelay(500)
+        mDelay(10),
+        mElapsed(GetClockMs())
     {
         sRefCount++;
         if (sRefCount == 1)
@@ -295,7 +302,12 @@ namespace Tetris
 
     void Visualizer::timerCallback()
     {
-        mGameController->game().moveDown();
+        clock_t elapsed = GetClockMs();
+        if (elapsed - mElapsed > 500)
+        {
+            mGameController->game().moveDown();
+            mElapsed = elapsed;
+        }
         ::InvalidateRect(mHandle, 0, FALSE);
     }
 
@@ -318,7 +330,6 @@ namespace Tetris
             pThis->mTimerID = ::SetTimer(0, 0, pThis->mDelay, &Visualizer::TimerCallback);
         }
     }
-
 
 
     LRESULT CALLBACK Visualizer::MessageHandler(HWND hWnd, UINT inMessage, WPARAM wParam, LPARAM lParam)
@@ -392,21 +403,6 @@ namespace Tetris
                 //        break;
                 //    }
                 //}
-                break;
-            }
-            case WM_COMMAND:
-            {
-                if (wParam == 101)
-                {
-                    pThis->mDelay += 10;
-                }
-                else if (wParam == 102)
-                {
-                    if (pThis->mDelay > 10)
-                    {
-                        pThis->mDelay -= 10;
-                    }
-                }
                 break;
             }
             case WM_PAINT:
