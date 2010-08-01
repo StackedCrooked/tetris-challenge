@@ -425,7 +425,7 @@ namespace Tetris
 
     void Visualizer::nextComputerMove(GameStateNode & inNode)
     {
-        Children children = inNode.children();  // BUG: AI stops here.
+        Children children = inNode.children();
         if (children.empty())
         {
             return;
@@ -449,14 +449,18 @@ namespace Tetris
             {
                 mGame->move(Direction_Left);
             }
+            else if (activeBlock.row() + 1 < gotoBlock.row())
+            {
+                mGame->move(Direction_Down);
+            }
             else
             {
-                mGame->drop();                       // BUG: drop will result in a NEW gamestate, with NO children. So the AI stops at the next call to nextComputerMove(..).
+                mGame->setCurrentNode(mGame->currentNode().bestChild(1));
                 mAvailableMoves.pop_front();
-                //if (mAvailableMoves.empty())   // Commented out, to force (hack) continuous autoplay.
-                //{
+                if (mAvailableMoves.empty())
+                {
                     newComputerMove(cAIDepth);
-                //}
+                }
             }
         }
     }
