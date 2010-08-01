@@ -8,6 +8,7 @@
 #include <boost/noncopyable.hpp>
 #include <ctime>
 #include <map>
+#include <list>
 #include <string>
 #include <windows.h>
 
@@ -88,14 +89,15 @@ namespace Tetris
         std::vector<unsigned int> mKeys;
 
         HWND mHandle;
-        //HHOOK mKeyboardHook;
+        HHOOK mKeyboardHook;
 
         Game * mGame;
         UINT_PTR mTimerID;
         int mDelay;
         clock_t mElapsed;
         clock_t mLastComputerMove;
-        size_t mAvailableDepth;
+        std::list<Block> mAvailableMoves;
+
 
         typedef std::map<HWND, Visualizer *> Instances;
         static Instances sInstances;
