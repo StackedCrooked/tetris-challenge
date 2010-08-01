@@ -200,6 +200,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\include\Player.h"
+				>
+			</File>
+			<File
 				RelativePath=".\include\Unicode.h"
 				>
 			</File>
@@ -229,6 +233,10 @@
 			</File>
 			<File
 				RelativePath=".\src\GameStateNode.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\Player.cpp"
 				>
 			</File>
 			<File

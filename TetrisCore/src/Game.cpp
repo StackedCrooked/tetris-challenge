@@ -56,6 +56,77 @@ namespace Tetris
     }
 
 
+    bool Game::navigateNodeUp()
+    {
+        if (mCurrentNode->parent())
+        {
+            mCurrentNode = mCurrentNode->parent();
+            return true;
+        }
+        return false;
+    }
+
+
+    bool Game::navigateNodeDown()
+    {
+        if (!mCurrentNode->children().empty())
+        {
+            mCurrentNode = mCurrentNode->children().begin()->get();
+        }
+        return false;
+    }
+
+
+    bool Game::navigateNodeLeft()
+    {
+        if (GameStateNode * parent = mCurrentNode->parent())
+        {
+            Children & children = parent->children();
+            Children::iterator it = children.begin(), end = children.end();
+            Children::iterator * previous(0);
+            for (; it != end; ++it)
+            {
+                if (it->get() == mCurrentNode)
+                {
+                    if (!previous)
+                    {
+                        return false;
+                    }
+                    mCurrentNode = (*previous)->get();
+                    return true;
+                }
+                previous = &it;
+            }
+        }
+        return false;
+    }
+
+
+    bool Game::navigateNodeRight()
+    {
+        if (GameStateNode * parent = mCurrentNode->parent())
+        {
+            Children & children = parent->children();
+            Children::iterator it = children.begin(), end = children.end();
+            Children::iterator * previous(0);
+            for (; it != end; ++it)
+            {
+                if (it->get() == mCurrentNode)
+                {
+                    ++it;
+                    if (it != end)
+                    {
+                        mCurrentNode = it->get();
+                        return true;
+                    }
+                    return false;
+                }
+            }
+        }
+        return false;
+    }
+
+
     static int GetRowDelta(Direction inDirection)
     {
         switch (inDirection)
