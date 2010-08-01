@@ -101,44 +101,34 @@ namespace Tetris
         const GameState & gameState = mCurrentNode->state();
         size_t newRow = mBlock->row() + GetRowDelta(inDirection);
         size_t newCol = mBlock->column() + GetColumnDelta(inDirection);
-        bool isMoveAllowed = gameState.checkPositionValid(*mBlock, newRow, newCol);
-        if (isMoveAllowed)
+        if (gameState.checkPositionValid(*mBlock, newRow, newCol))
         {
             mBlock->setRow(newRow);
             mBlock->setColumn(newCol);
+            return true;
         }
-        return isMoveAllowed;
+        
+        if (inDirection != Direction_Down)
+        {
+            // Do nothing
+            return false;
+        }
+
+        // Commit the block
+        ChildPtr child(new GameStateNode(mCurrentNode->state().commit(mBlock, mBlock->row() == 0)));
+        mCurrentNode->children().insert(child);
+        mCurrentNode = child.get();
+    
+        // Currently mBlock is a null pointer (due to the copy semantics of std::auto_ptr).
+        // Therefore we always (also in the case of game-over) get a new one from the factory.
+        mBlock = CenterBlock(mBlockFactory.getNext(), gameState.grid().numColumns());
+        return false;
     }
 
 
     void Game::rotate()
     {
         mBlock->rotate();
-    }
-
-
-    void Game::moveDown()
-    {
-        const GameState & gameState = mCurrentNode->state();
-
-        bool canMoveDown = gameState.checkPositionValid(*mBlock,
-                                                        mBlock->row() + 1,
-                                                        mBlock->column());
-        if (canMoveDown)
-        {
-            mBlock->moveDown();
-            return;
-        }
-
-        // If we can't move a new block down then the game is over.
-        bool gameOver = (mBlock->row() == 0);
-        ChildPtr child(new GameStateNode(mCurrentNode->state().commit(mBlock, gameOver)));
-        mCurrentNode->children().insert(child);
-        mCurrentNode = child.get();
-        
-        // Currently mBlock is a null pointer (due to the copy semantics of std::auto_ptr).
-        // Therefore we always (also in the case of game-over) get a new one from the factory.
-        mBlock = CenterBlock(mBlockFactory.getNext(), gameState.grid().numColumns());
     }
 
 

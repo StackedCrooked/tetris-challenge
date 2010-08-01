@@ -8,10 +8,8 @@
 
 namespace Tetris
 {
-    
 
     typedef GenericGrid<BlockType> Grid;
-
 
 } // namespace Tetris
 
