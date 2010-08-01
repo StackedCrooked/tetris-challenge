@@ -19,9 +19,9 @@ namespace Tetris
 
         size_t numCreated() const;
 
-        std::auto_ptr<Block> getPrevious(size_t inIndex) const;
+        Block getPrevious(size_t inIndex) const;
 
-        std::auto_ptr<Block> getNext() const;
+        Block getNext() const;
 
     private:
         void reset();

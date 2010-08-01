@@ -1,7 +1,7 @@
 #include "GameStateNode.h"
+#include "Block.h"
 #include "ErrorHandling.h"
 #include "GameState.h"
-#include "Block.h"
 
 namespace Tetris
 {
@@ -62,6 +62,38 @@ namespace Tetris
     const GameStateNode * GameStateNode::parent() const
     {
         return mParent;
+    }
+
+
+    void GameStateNode::populate(const Block & inBlock)
+    {
+        CheckPrecondition(mChildren.empty(), "GameStateNode::populate(): already has children.");
+        
+        Grid & grid = mGameState->grid();
+        for (size_t col = 0; col != grid.numColumns(); ++col)
+        {
+            Block block = inBlock;
+            block.setColumn(0);
+            block.setRow(0);
+            for (size_t rt = 0; rt != 4; ++rt)
+            {
+                std::auto_ptr<GameState> newGameState;
+                block.setRotation(rt);
+                size_t row = 0;
+                while (mGameState->checkPositionValid(block, row++, col));
+                if (row > 0)
+                {
+                    block.setRow(row - 1);
+                    newGameState = mGameState->commit(block, false);
+                }
+                else
+                {
+                    newGameState = mGameState->commit(block, true);
+                }
+                ChildPtr childState(new GameStateNode(newGameState));
+                mChildren.insert(childState);
+            }
+        }
     }
 
 

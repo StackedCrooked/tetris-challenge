@@ -2,15 +2,13 @@
 #define GAMESTATE_H_INCLUDED
 
 
+#include "Block.h"
 #include "Grid.h"
 #include <memory>
 
 
 namespace Tetris
 {
-
-    class Block;
-    class Block;
 
     class GameState
     {
@@ -23,7 +21,7 @@ namespace Tetris
         Grid & grid();
 
         // The Block that was used in the commit(...) call.
-        const Block * originalBlock() const;
+        const Block & originalBlock() const;
 
         int numLines() const;
 
@@ -48,7 +46,7 @@ namespace Tetris
 
         // Creates a copy of the current gamestate with the given active block committed.
         // Use inGameOver = true to mark the new gamestate as "game over".
-        std::auto_ptr<GameState> commit(std::auto_ptr<Block> inBlock, bool inGameOver) const;
+        std::auto_ptr<GameState> commit(const Block & inBlock, bool inGameOver) const;
 
         std::auto_ptr<GameState> clone() const;
 
@@ -73,14 +71,14 @@ namespace Tetris
         const Stats & stats() const;
 
     private:
-        void solidifyBlock(const Block * inBlock);
+        void solidifyBlock(const Block & inBlock);
 
         void clearLines();
 
         Grid mGrid;
         Stats mStats;
         bool mIsGameOver;
-        std::auto_ptr<Block> mOriginalBlock;
+        Block mOriginalBlock;
 
         struct Quality
         {

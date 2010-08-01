@@ -2,6 +2,7 @@
 #define GAME_H_INCLUDED
 
 
+#include "Block.h"
 #include "BlockFactory.h"
 #include "Direction.h"
 #include "GameStateNode.h"
@@ -46,7 +47,7 @@ namespace Tetris
         GameStateNode * mCurrentNode;
 
         BlockFactory mBlockFactory;
-        std::auto_ptr<Block> mBlock;
+        Block mBlock;
         std::vector<GameStateNode*> mHistory;
         std::vector<BlockType> mNextBlocks;
     };

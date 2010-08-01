@@ -7,10 +7,10 @@
 namespace Tetris
 {
 
-    static std::auto_ptr<Block> CenterBlock(std::auto_ptr<Block> inNewBlock, size_t inNumColumns)
+    static Block & CenterBlock(Block & inNewBlock, size_t inNumColumns)
     {
-        size_t column = static_cast<int>(0.5 + (static_cast<float>(inNumColumns - inNewBlock->grid().numColumns())/2));
-        inNewBlock->setColumn(column);
+        size_t column = static_cast<int>(0.5 + (static_cast<float>(inNumColumns - inNewBlock.grid().numColumns())/2));
+        inNewBlock.setColumn(column);
         return inNewBlock;
     }
 
@@ -32,15 +32,13 @@ namespace Tetris
 
     const Block & Game::activeBlock() const
     {
-        CheckPrecondition(mBlock.get() != 0, "Tried to dereference null pointer.");
-        return *mBlock;
+        return mBlock;
     }
 
 
     Block & Game::activeBlock()
     {
-        CheckPrecondition(mBlock.get() != 0, "Tried to dereference null pointer.");
-        return *mBlock;
+        return mBlock;
     }
 
 
@@ -175,12 +173,12 @@ namespace Tetris
         }
 
         const GameState & gameState = mCurrentNode->state();
-        size_t newRow = mBlock->row() + GetRowDelta(inDirection);
-        size_t newCol = mBlock->column() + GetColumnDelta(inDirection);
-        if (gameState.checkPositionValid(*mBlock, newRow, newCol))
+        size_t newRow = mBlock.row() + GetRowDelta(inDirection);
+        size_t newCol = mBlock.column() + GetColumnDelta(inDirection);
+        if (gameState.checkPositionValid(mBlock, newRow, newCol))
         {
-            mBlock->setRow(newRow);
-            mBlock->setColumn(newCol);
+            mBlock.setRow(newRow);
+            mBlock.setColumn(newCol);
             return true;
         }
         
@@ -191,7 +189,7 @@ namespace Tetris
         }
 
         // Commit the block
-        ChildPtr child(new GameStateNode(mCurrentNode->state().commit(mBlock, mBlock->row() == 0)));
+        ChildPtr child(new GameStateNode(mCurrentNode->state().commit(mBlock, mBlock.row() == 0)));
         mCurrentNode->children().insert(child);
         mCurrentNode = child.get();
     
@@ -206,7 +204,7 @@ namespace Tetris
     {
         if (!isGameOver())
         {
-            mBlock->rotate();
+            mBlock.rotate();
         }
     }
 
