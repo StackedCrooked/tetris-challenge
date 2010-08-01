@@ -67,8 +67,6 @@ namespace Tetris
     {
         if (mQuality.mDirty)
         {
-            static const int cHolePenalty = 2;
-            static const int cHeightPenalty = 1;
             int result = 0;
             mQuality.mNumHoles = 0;
 
@@ -103,21 +101,20 @@ namespace Tetris
                             if (mGrid.get(rowIdx - 1, colIdx) != BlockType_Nil)
                             {
                                 mQuality.mNumHoles++;
-                                result -= cHolePenalty;
                             }
                         }
                     }
                 }
             }
+            size_t height = mGrid.numRows() - top;
+            size_t lastBlockHeight = mGrid.numRows() - mOriginalBlock.row();
 
-            result -= static_cast<int>(mGrid.numRows() - top) * cHeightPenalty;
-            float density = ((float)numOccupiedUnderTop) / (float)(((mGrid.numRows() - top) * mGrid.numColumns()));
-            result += static_cast<int>((11.0*density) + 0.5);
-            
-            result -= 1 * mStats.mNumSingles;
-            result += 0 * mStats.mNumDoubles;
-            result += 4 * mStats.mNumTriples;
-            result += 8 * mStats.mNumTetrises;
+
+            result -= 3 * mQuality.mNumHoles;
+            result -= 2 * height;
+            result -= 1 * lastBlockHeight;
+            result -= 0 * mStats.mNumSingles;
+            result += 10 * mStats.mNumDoubles;
 
             mQuality.mScore = result;
             mQuality.mDirty = false;
