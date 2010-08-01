@@ -394,13 +394,16 @@ namespace Tetris
     }
 
 
+    const int cAIDepth = 4;
+
+
     void Visualizer::newComputerMove(int inDepth)
     {
         Player p(mGame);
         std::vector<int> depths;
         for (int i = 0; i < inDepth; ++i)
         {
-            depths.push_back(inDepth + 1 - i);
+            depths.push_back(4);
         }
         p.move(depths);
 
@@ -422,7 +425,7 @@ namespace Tetris
 
     void Visualizer::nextComputerMove(GameStateNode & inNode)
     {
-        Children children = inNode.children();
+        Children children = inNode.children();  // BUG: AI stops here.
         if (children.empty())
         {
             return;
@@ -448,9 +451,12 @@ namespace Tetris
             }
             else
             {
-                mGame->drop();
+                mGame->drop();                       // BUG: drop will result in a NEW gamestate, with NO children. So the AI stops at the next call to nextComputerMove(..).
                 mAvailableMoves.pop_front();
-                newComputerMove(3);
+                //if (mAvailableMoves.empty())   // Commented out, to force (hack) continuous autoplay.
+                //{
+                    newComputerMove(cAIDepth);
+                //}
             }
         }
     }
@@ -542,7 +548,7 @@ namespace Tetris
             }
             case VK_DELETE:
             {
-                newComputerMove(3);
+                newComputerMove(cAIDepth);
                 break;
             }
             default:
