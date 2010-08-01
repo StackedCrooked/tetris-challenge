@@ -52,11 +52,6 @@ namespace Tetris
 
         std::auto_ptr<GameState> clone() const;
 
-    private:
-        void solidifyBlock(const Block * inBlock);
-
-        void clearLines();
-
         struct Stats
         {
             Stats() :
@@ -74,6 +69,13 @@ namespace Tetris
             int mNumTriples;
             int mNumTetrises;
         };
+
+        const Stats & stats() const;
+
+    private:
+        void solidifyBlock(const Block * inBlock);
+
+        void clearLines();
 
         Grid mGrid;
         Stats mStats;

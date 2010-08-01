@@ -1,6 +1,7 @@
 #include "Visualizer.h"
 #include "GameState.h"
 #include "Game.h"
+#include "Unicode.h"
 #include <boost/bind.hpp>
 #include <string>
 #include <sstream>
@@ -145,9 +146,35 @@ namespace Tetris
         ::UpdateWindow(mHandle);
     }
 
+    void Visualizer::drawText(Gdiplus::Graphics & inGraphics, const std::wstring & inText, const Gdiplus::RectF & inRect)
+    {
+        Gdiplus::SolidBrush textBrush(Gdiplus::Color::Green);
+        drawText(inGraphics, inText, inRect, textBrush);
+    }
+
+    void Visualizer::drawText(Gdiplus::Graphics & inGraphics, const std::wstring & inText, const Gdiplus::RectF & inRect, const Gdiplus::Brush & inBrush)
+    {
+        Gdiplus::Font gdiFont(TEXT("Arial"), 9, Gdiplus::FontStyleRegular);
+
+        Gdiplus::RectF layoutRect
+        (
+            (float)inRect.X,
+            (float)inRect.Y,
+            (float)inRect.Width,
+            (float)inRect.Height
+        );
+        Gdiplus::StringFormat stringFormat;
+        inGraphics.DrawString(inText.c_str(), (int)inText.size(), &gdiFont, layoutRect, &stringFormat, &inBrush);
+    }
+
 
     static const int cBlockWidth = 20;
     static const int cBlockHeight = 20;
+    static const int cGridOffsetX = 40;
+    static const int cGridOffsetY = 40;
+    static const int cSpacing = 20;
+    static const int cScoresOffsetX = cGridOffsetX + 10 * cBlockWidth + cSpacing;
+    static const int cScoresOffsetY = cGridOffsetY;
 
 
     void Visualizer::paintUnit(Gdiplus::Graphics & g, int x, int y, BlockType inBlockType)
@@ -157,16 +184,38 @@ namespace Tetris
     }
 
 
+    static std::wstring GetScoreText(const std::string & inTitle, int inScore)
+    {
+        std::stringstream ss;
+        ss << inTitle << ": " << inScore;
+        return ToUTF16(ss.str());
+    }
+
+
+    void Visualizer::paintScores(Gdiplus::Graphics & g)
+    {
+        const GameState::Stats & stats = mGameController->game().currentNode().state().stats();
+
+
+        drawText(g, GetScoreText("Lines", stats.mNumLines), Gdiplus::RectF(cScoresOffsetX, cScoresOffsetY, 200, 40));
+        drawText(g, GetScoreText("x1", stats.mNumSingles), Gdiplus::RectF(cScoresOffsetX, cScoresOffsetY + 40, 200, 40));
+        drawText(g, GetScoreText("x2", stats.mNumDoubles), Gdiplus::RectF(cScoresOffsetX, cScoresOffsetY + 80, 200, 40));
+        drawText(g, GetScoreText("x3", stats.mNumTriples), Gdiplus::RectF(cScoresOffsetX, cScoresOffsetY + 120, 200, 40));
+        drawText(g, GetScoreText("x4", stats.mNumTetrises), Gdiplus::RectF(cScoresOffsetX, cScoresOffsetY + 160, 200, 40));
+    }
+
+
+
     void Visualizer::paintGrid(Gdiplus::Graphics & g)
     {
         const Grid & grid = mGameController->game().currentNode().state().grid();
-        int offsetX = 40;
-        int offsetY = 40;
+        int cGridOffsetX = 40;
+        int cGridOffsetY = 40;
         for (size_t r = 0; r != grid.numRows(); ++r)
         {
             for (size_t c = 0; c != grid.numColumns(); ++c)
             {
-                paintUnit(g, offsetX + c * cBlockHeight, offsetY + r * cBlockWidth, grid.get(r, c));
+                paintUnit(g, cGridOffsetX + c * cBlockHeight, cGridOffsetY + r * cBlockWidth, grid.get(r, c));
             }
         }
 
@@ -176,8 +225,8 @@ namespace Tetris
         {
             for (size_t c = 0; c != blockGrid.numColumns(); ++c)
             {
-                int x = offsetX + (c + block.column()) * cBlockWidth;
-                int y = offsetY + (r + block.row()) * cBlockHeight;
+                int x = cGridOffsetX + (c + block.column()) * cBlockWidth;
+                int y = cGridOffsetY + (r + block.row()) * cBlockHeight;
                 if (BlockType blockType = blockGrid.get(r, c))
                 {
                     paintUnit(g, x, y, blockType);
@@ -253,6 +302,7 @@ namespace Tetris
     {
         Gdiplus::Graphics g(inHDC);
         paintGrid(g);
+        paintScores(g);
     }
 
 
