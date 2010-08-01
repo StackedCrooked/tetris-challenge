@@ -39,6 +39,8 @@ namespace Tetris
 
     Visualizer::Visualizer(GameController * inGameController) :
         mGameController(inGameController),
+        mHandle(0),
+        mKeyboardHook(0),
         mDelay(10),
         mElapsed(GetClockMs())
     {
@@ -52,6 +54,12 @@ namespace Tetris
 
     Visualizer::~Visualizer()
     {
+        if (mKeyboardHook)
+        {
+            ::UnhookWindowsHookEx(mKeyboardHook);
+        }
+
+
         sRefCount--;
         if (sRefCount == 0)
         {
@@ -106,37 +114,8 @@ namespace Tetris
             throw std::runtime_error("Failed to create the main window");
         }
 
-        mUpButton = CreateWindowEx
-                    (
-                        0,
-                        L"BUTTON",
-                        L"+",
-                        BS_PUSHBUTTON | WS_CHILD | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_VISIBLE,
-                        0,
-                        10,
-                        16,
-                        16,
-                        mHandle,
-                        (HMENU)101,
-                        ::GetModuleHandle(0),
-                        NULL
-                    );
-
-        mDownButton = CreateWindowEx
-                      (
-                          0,
-                          L"BUTTON",
-                          L"-",
-                          BS_PUSHBUTTON | WS_CHILD | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_VISIBLE,
-                          0,
-                          26,
-                          16,
-                          16,
-                          mHandle,
-                          (HMENU)102,
-                          ::GetModuleHandle(0),
-                          NULL
-                      );
+        // Hook keyboard
+        mKeyboardHook = ::SetWindowsHookEx(WH_KEYBOARD, (HOOKPROC)Visualizer::KeyboardProc, ::GetModuleHandle(0), 0);
 
         sInstances.insert(std::make_pair(mHandle, this));
         mTimerID = SetTimer(NULL, NULL, mDelay, &Visualizer::TimerCallback);
@@ -305,7 +284,7 @@ namespace Tetris
         clock_t elapsed = GetClockMs();
         if (elapsed - mElapsed > 500)
         {
-            mGameController->game().moveDown();
+            mGameController->game().move(Direction_Down);
             mElapsed = elapsed;
         }
         ::InvalidateRect(mHandle, 0, FALSE);
@@ -332,6 +311,47 @@ namespace Tetris
     }
 
 
+    LRESULT CALLBACK Visualizer::KeyboardProc(int inCode, WPARAM wParam, LPARAM lParam)
+    {
+        Visualizer * pThis = sInstances.begin()->second; // i suck
+
+
+        if (inCode == HC_ACTION && !(HIWORD(lParam) & KF_UP))
+        {
+            switch (wParam)
+            {
+                case VK_LEFT:
+                {
+                    pThis->mGameController->move(Direction_Left);
+                    break;
+                }
+                case VK_RIGHT:
+                {
+                    pThis->mGameController->move(Direction_Right);
+                    break;
+                }
+                case VK_UP:
+                {
+                    pThis->mGameController->rotate();
+                    break;
+                }
+                case VK_DOWN:
+                {
+                    pThis->mGameController->move(Direction_Down);
+                    break;
+                }
+                case VK_SPACE:
+                {
+                    pThis->mGameController->drop();
+                    break;
+                }
+            }
+        }
+        
+        return ::CallNextHookEx(pThis->mKeyboardHook, inCode, wParam, lParam);
+    }
+
+
     LRESULT CALLBACK Visualizer::MessageHandler(HWND hWnd, UINT inMessage, WPARAM wParam, LPARAM lParam)
     {
         Instances::iterator it = sInstances.find(hWnd);
@@ -347,62 +367,6 @@ namespace Tetris
             case WM_SIZE:
             {
                 ::InvalidateRect(hWnd, 0, FALSE);
-                break;
-            }
-            case WM_KEYDOWN:
-            {
-                if (wParam == 0x41)
-                {
-                    pThis->mGameController->move(Direction_Left);
-                }
-                else if (wParam == 0x44)
-                {
-                    pThis->mGameController->move(Direction_Right);
-                }
-                else if (wParam == 0x53)
-                {
-                    pThis->mGameController->move(Direction_Down);
-                }
-                else if (wParam == 0x57)
-                {
-                    pThis->mGameController->rotate();
-                }
-                else if (wParam == VK_SPACE)
-                {
-                    pThis->mGameController->drop();
-                }
-                ::InvalidateRect(hWnd, 0, FALSE);
-                // Right    D 
-                // Down     S 
-                // Rotate   W 
-                //switch(wParam)
-                //{
-                //    case VK_UP:
-                //    {
-                //        pThis->mGameController->move(Direction_Up);
-                //        break;
-                //    }
-                //    case VK_DOWN:
-                //    {
-                //        pThis->mGameController->move(Direction_Down);
-                //        break;
-                //    }
-                //    case VK_LEFT:
-                //    {
-                //        pThis->mGameController->move(Direction_Left);
-                //        break;
-                //    }
-                //    case VK_RIGHT:
-                //    {
-                //        pThis->mGameController->move(Direction_Right);
-                //        break;
-                //    }
-                //    default:
-                //    {
-                //        // No action.
-                //        break;
-                //    }
-                //}
                 break;
             }
             case WM_PAINT:

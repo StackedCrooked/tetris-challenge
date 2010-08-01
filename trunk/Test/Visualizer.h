@@ -42,6 +42,7 @@ namespace Tetris
     private:
         static void Initialize();
         static void Finalize();
+        static LRESULT CALLBACK KeyboardProc(int inCode, WPARAM wParam, LPARAM lParam);
         static LRESULT CALLBACK MessageHandler(HWND hWnd, UINT inMessage, WPARAM wParam, LPARAM lParam);
 
         static void CALLBACK TimerCallback(HWND hWnd, UINT inMessage, UINT_PTR inTimerID, DWORD inTime);
@@ -56,15 +57,14 @@ namespace Tetris
         static const Gdiplus::Color & GetColor(BlockType inType);
 
         HWND mHandle;
-        HWND mUpButton;
-        HWND mDownButton;
-        typedef std::map<HWND, Visualizer *> Instances;
+        HHOOK mKeyboardHook;
 
         GameController * mGameController;
         UINT_PTR mTimerID;
         int mDelay;
         clock_t mElapsed;
 
+        typedef std::map<HWND, Visualizer *> Instances;
         static Instances sInstances;
         static ULONG_PTR sGdiPlusToken;
         static int sRefCount;

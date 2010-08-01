@@ -31,9 +31,6 @@ namespace Tetris
 
         void rotate();
 
-        // Drops the active block one square
-        void moveDown();
-
     private:
 
         GameStateNode mRootNode;
