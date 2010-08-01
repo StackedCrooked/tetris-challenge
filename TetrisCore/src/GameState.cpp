@@ -199,6 +199,12 @@ namespace Tetris
     }
 
 
+    const GameState::Stats & GameState::stats() const
+    {
+        return mStats;
+    }
+
+
     void GameState::solidifyBlock(const Block * inBlock)
     {
         const Grid & grid = inBlock->grid();

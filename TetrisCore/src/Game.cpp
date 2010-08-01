@@ -98,6 +98,11 @@ namespace Tetris
 
     bool Game::move(Direction inDirection)
     {
+        if (isGameOver())
+        {
+            return false;
+        }
+
         const GameState & gameState = mCurrentNode->state();
         size_t newRow = mBlock->row() + GetRowDelta(inDirection);
         size_t newCol = mBlock->column() + GetColumnDelta(inDirection);
@@ -128,7 +133,10 @@ namespace Tetris
 
     void Game::rotate()
     {
-        mBlock->rotate();
+        if (!isGameOver())
+        {
+            mBlock->rotate();
+        }
     }
 
 
