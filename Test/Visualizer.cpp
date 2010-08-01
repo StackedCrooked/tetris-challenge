@@ -394,11 +394,16 @@ namespace Tetris
     }
 
 
-    const int cAIDepth = 3;
+    const int cAIDepth = 4;
 
 
     void Visualizer::newComputerMove(int inDepth)
     {
+        if (mGame->isGameOver())
+        {
+            return;
+        }
+
         Player p(mGame);
         std::vector<int> depths;
         for (int i = 0; i < inDepth; ++i)
@@ -411,12 +416,20 @@ namespace Tetris
 
     void Visualizer::nextComputerMove()
     {
+        if (mGame->isGameOver())
+        {
+            return;
+        }
         nextComputerMove(mGame->currentNode());
     }
 
 
     void Visualizer::nextComputerMove(GameStateNode & inNode)
     {
+        if (mGame->isGameOver())
+        {
+            return;
+        }
         Children children = inNode.children();
         if (children.empty())
         {
