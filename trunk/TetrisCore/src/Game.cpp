@@ -7,19 +7,21 @@
 namespace Tetris
 {
 
-    static Block & CenterBlock(Block & inNewBlock, size_t inNumColumns)
+    static Block CenterBlock(const Block & inBlock, size_t inNumColumns)
     {
-        size_t column = static_cast<int>(0.5 + (static_cast<float>(inNumColumns - inNewBlock.grid().numColumns())/2));
-        inNewBlock.setColumn(column);
-        return inNewBlock;
+        Block block = inBlock;
+        size_t column = static_cast<int>(0.5 + (static_cast<float>(inNumColumns - inBlock.grid().numColumns())/2));
+        block.setColumn(column);
+        return block;
     }
 
 
     Game::Game(int inNumRows, int inNumColumns) :
         mRootNode(std::auto_ptr<GameState>(new GameState(inNumRows, inNumColumns))),
         mBlockFactory(cBlockTypeCount),
-        mBlock(CenterBlock(mBlockFactory.getNext(), inNumColumns))
+        mCurrentBlockIndex(0)
     {
+        mBlocks.push_back(CenterBlock(mBlockFactory.getNext(), inNumColumns));
         mCurrentNode = &mRootNode;
     }
 
@@ -32,13 +34,26 @@ namespace Tetris
 
     const Block & Game::activeBlock() const
     {
-        return mBlock;
+        return mBlocks[mCurrentBlockIndex];
     }
 
 
     Block & Game::activeBlock()
     {
-        return mBlock;
+        return mBlocks[mCurrentBlockIndex];
+    }
+
+
+    std::vector<Block> Game::getFutureBlocks(size_t inCount) const
+    {
+        std::vector<Block> blocks;
+        blocks.push_back(activeBlock());
+
+        while (mCurrentBlockIndex + inCount - 1 >= mBlocks.size())
+        {
+            mBlocks.push_back(CenterBlock(mBlockFactory.getNext(), mCurrentNode->state().grid().numColumns()));
+        }
+        return blocks;
     }
 
 
@@ -173,12 +188,14 @@ namespace Tetris
         }
 
         const GameState & gameState = mCurrentNode->state();
-        size_t newRow = mBlock.row() + GetRowDelta(inDirection);
-        size_t newCol = mBlock.column() + GetColumnDelta(inDirection);
-        if (gameState.checkPositionValid(mBlock, newRow, newCol))
+        
+        Block & block = activeBlock();
+        size_t newRow = block.row() + GetRowDelta(inDirection);
+        size_t newCol = block.column() + GetColumnDelta(inDirection);
+        if (gameState.checkPositionValid(block, newRow, newCol))
         {
-            mBlock.setRow(newRow);
-            mBlock.setColumn(newCol);
+            block.setRow(newRow);
+            block.setColumn(newCol);
             return true;
         }
         
@@ -189,13 +206,16 @@ namespace Tetris
         }
 
         // Commit the block
-        ChildPtr child(new GameStateNode(mCurrentNode->state().commit(mBlock, mBlock.row() == 0)));
+        ChildPtr child(new GameStateNode(mCurrentNode->state().commit(block, block.row() == 0)));
         mCurrentNode->children().insert(child);
         mCurrentNode = child.get();
     
-        // Currently mBlock is a null pointer (due to the copy semantics of std::auto_ptr).
-        // Therefore we always (also in the case of game-over) get a new one from the factory.
-        mBlock = CenterBlock(mBlockFactory.getNext(), gameState.grid().numColumns());
+        
+        mCurrentBlockIndex++;
+        while (mCurrentBlockIndex >= mBlocks.size())
+        {
+            mBlocks.push_back(CenterBlock(mBlockFactory.getNext(), gameState.grid().numColumns()));
+        }
         return false;
     }
 
@@ -204,7 +224,7 @@ namespace Tetris
     {
         if (!isGameOver())
         {
-            mBlock.rotate();
+            activeBlock().rotate();
         }
     }
 
