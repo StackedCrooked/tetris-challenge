@@ -57,9 +57,17 @@ namespace Tetris
         std::vector<Block> blocks;
         blocks.push_back(activeBlock());
 
-        while (blocks.size() < inCount)
+        while (mBlocks.size() - mCurrentBlockIndex < inCount)
         {
-            blocks.push_back(CenterBlock(mBlockFactory.getNext(), mCurrentNode->state().grid().numColumns()));
+            mBlocks.push_back(CenterBlock(mBlockFactory.getNext(), mCurrentNode->state().grid().numColumns()));
+        }
+
+        if (inCount > 0)
+        {
+            for (size_t idx = 0; idx < inCount - 1; ++idx)
+            {
+                blocks.push_back(mBlocks[mCurrentBlockIndex + 1 + idx]);
+            }
         }
         return blocks;
     }
