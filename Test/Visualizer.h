@@ -3,7 +3,7 @@
 
 
 #include "BlockType.h"
-#include "GameController.h"
+#include "Game.h"
 #include "Grid.h"
 #include <boost/noncopyable.hpp>
 #include <ctime>
@@ -46,7 +46,7 @@ namespace Tetris
     class Visualizer : boost::noncopyable
     {
     public:
-        Visualizer(GameController * inGameController);
+        Visualizer(Game * inGame);
 
         ~Visualizer();
 
@@ -79,7 +79,7 @@ namespace Tetris
         HWND mHandle;
         HHOOK mKeyboardHook;
 
-        GameController * mGameController;
+        Game * mGame;
         UINT_PTR mTimerID;
         int mDelay;
         clock_t mElapsed;

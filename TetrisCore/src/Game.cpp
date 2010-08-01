@@ -140,5 +140,11 @@ namespace Tetris
     }
 
 
+    void Game::drop()
+    {
+        while (move(Direction_Down));
+    }
+
+
 } // namespace Tetris
 
