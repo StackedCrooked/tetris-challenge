@@ -25,6 +25,14 @@ namespace Tetris
 
         const GameStateNode & currentNode() const;
 
+        bool navigateNodeUp();
+
+        bool navigateNodeDown();
+
+        bool navigateNodeLeft();
+
+        bool navigateNodeRight();
+
         bool isGameOver() const;
 
         bool move(Direction inDirection);
@@ -34,7 +42,6 @@ namespace Tetris
         void drop();
 
     private:
-
         GameStateNode mRootNode;
         GameStateNode * mCurrentNode;
 
