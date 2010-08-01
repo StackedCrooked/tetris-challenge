@@ -209,8 +209,12 @@ namespace Tetris
     static const int cGridOffsetX = 40;
     static const int cGridOffsetY = 40;
     static const int cSpacing = 20;
-    static const int cScoresOffsetX = cGridOffsetX + 10 * cBlockWidth + cSpacing;
+    static const int cBlocksOffsetX = cGridOffsetX + 10 * cBlockWidth + cSpacing;
+    static const int cBlocksOffsetY = cGridOffsetY;
+    static const int cScoresOffsetX = cBlocksOffsetX + 4 * cBlockWidth + cSpacing;
     static const int cScoresOffsetY = cGridOffsetY;
+
+    static const int cNumFutureBlocks = 5;
 
 
     void Visualizer::paintUnit(Gdiplus::Graphics & g, int x, int y, BlockType inBlockType)
@@ -236,6 +240,34 @@ namespace Tetris
         drawText(g, GetScoreText("x2", stats.mNumDoubles), Rect(cScoresOffsetX, cScoresOffsetY + 80, 200, 40));
         drawText(g, GetScoreText("x3", stats.mNumTriples), Rect(cScoresOffsetX, cScoresOffsetY + 120, 200, 40));
         drawText(g, GetScoreText("x4", stats.mNumTetrises), Rect(cScoresOffsetX, cScoresOffsetY + 160, 200, 40));
+    }
+    
+    
+    void Visualizer::paintFutureBlocks(Gdiplus::Graphics & g)
+    {
+        std::vector<Block> blocks = mGame->getFutureBlocks(5);
+
+        for (size_t i = 0; i < cNumFutureBlocks; ++i)
+        {
+            const Block & block = blocks[i];
+            const Grid & grid = block.grid();
+            paintGrid(g, grid, cBlocksOffsetX, cBlocksOffsetY + i * 5 * cBlockHeight);
+        }
+    }
+
+
+    void Visualizer::paintGrid(Gdiplus::Graphics & g, const Grid & inGrid, int x, int y)
+    {
+        for (size_t r = 0; r != inGrid.numRows(); ++r)
+        {
+            for (size_t c = 0; c != inGrid.numColumns(); ++c)
+            {
+                if (inGrid.get(r, c))
+                {
+                    paintUnit(g, x + c * cBlockWidth, y + r * cBlockHeight, inGrid.get(r, c));
+                }
+            }
+        }
     }
 
 
@@ -335,6 +367,7 @@ namespace Tetris
     {
         Gdiplus::Graphics g(inHDC);
         paintGrid(g);
+        paintFutureBlocks(g);
         paintScores(g);
     }
 
@@ -407,7 +440,7 @@ namespace Tetris
     {
         clock_t elapsed = GetClockMs();
 
-        if (elapsed - mLastComputerMove > 500)
+        if (elapsed - mLastComputerMove > 50)
         {
             nextComputerMove();
             mLastComputerMove = elapsed;
@@ -487,9 +520,9 @@ namespace Tetris
                 mGame->drop();
                 break;
             }
-            case VK_RETURN:
+            case VK_DELETE:
             {
-                newComputerMove(3);
+                newComputerMove(5);
                 break;
             }
             default:
@@ -534,30 +567,8 @@ namespace Tetris
             }
             case WM_KEYDOWN:
             {
-                if (wParam == 0x41)
-                {
-                    pThis->mGame->move(Direction_Left);
-                }
-                else if (wParam == 0x44)
-                {
-                    pThis->mGame->move(Direction_Right);
-                }
-                else if (wParam == 0x53)
-                {
-                    pThis->mGame->move(Direction_Down);
-                }
-                else if (wParam == 0x57)
-                {
-                    pThis->mGame->move(Direction_Up);
-                }
-                else if (wParam == VK_SPACE)
-                {
-                    pThis->mGame->drop();
-                }
-                else if (wParam == VK_DELETE)
-                {
-                    pThis->newComputerMove(3);
-                }
+                pThis->processKey(wParam);
+                break;
             }
             case WM_PAINT:
             {                
