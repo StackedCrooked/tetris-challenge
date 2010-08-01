@@ -394,7 +394,7 @@ namespace Tetris
     }
 
 
-    const int cAIDepth = 4;
+    const int cAIDepth = 3;
 
 
     void Visualizer::newComputerMove(int inDepth)
@@ -403,7 +403,7 @@ namespace Tetris
         std::vector<int> depths;
         for (int i = 0; i < inDepth; ++i)
         {
-            depths.push_back(4);
+            depths.push_back(3);
         }
         p.move(depths);
 
