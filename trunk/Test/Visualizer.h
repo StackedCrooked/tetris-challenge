@@ -26,6 +26,23 @@ namespace Tetris
 
     class GameState;
 
+    class Rect
+    {
+    public:
+        Rect(int x, int y, int w, int h);
+
+        int x() const;
+
+        int y() const;
+
+        int width() const;
+
+        int height() const;
+
+    private:
+        int mX, mY, mWidth, mHeight;
+    };
+
     class Visualizer : boost::noncopyable
     {
     public:
@@ -51,8 +68,8 @@ namespace Tetris
         
         void paint(HDC inHDC);
         void bufferedPaint(HDC inHDC);
-        void drawText(Gdiplus::Graphics & inGraphics, const std::wstring & inText, const Gdiplus::RectF & inRect);
-        void drawText(Gdiplus::Graphics & inGraphics, const std::wstring & inText, const Gdiplus::RectF & inRect, const Gdiplus::Brush & inBrush);
+        void drawText(Gdiplus::Graphics & inGraphics, const std::wstring & inText, const Rect & inRect);
+        void drawText(Gdiplus::Graphics & inGraphics, const std::wstring & inText, const Rect & inRect, const Gdiplus::Brush & inBrush);
         void paintGrid(Gdiplus::Graphics & g);
         void paintScores(Gdiplus::Graphics & g);
         void paintUnit(Gdiplus::Graphics & g, int x, int y, BlockType inBlockType);

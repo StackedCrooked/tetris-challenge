@@ -13,6 +13,36 @@ namespace Tetris
 {
 
 
+    Rect::Rect(int x, int y, int w, int h) :
+        mX(x), mY(y), mWidth(w), mHeight(h)
+    {
+    }
+
+
+    int Rect::x() const
+    {
+        return mX;
+    }
+
+
+    int Rect::y() const
+    {
+        return mY;
+    }
+
+
+    int Rect::width() const
+    {
+        return mWidth;
+    }
+
+
+    int Rect::height() const
+    {
+        return mHeight;
+    }
+
+
     std::map<HWND, Visualizer *> Visualizer::sInstances;
     ULONG_PTR Visualizer::sGdiPlusToken = 0;
     int Visualizer::sRefCount = 0;
@@ -146,25 +176,28 @@ namespace Tetris
         ::UpdateWindow(mHandle);
     }
 
-    void Visualizer::drawText(Gdiplus::Graphics & inGraphics, const std::wstring & inText, const Gdiplus::RectF & inRect)
+
+    Gdiplus::RectF ToRectF(const Rect & inRect)
+    {
+        return Gdiplus::RectF(static_cast<float>(inRect.x()),
+                              static_cast<float>(inRect.y()),
+                              static_cast<float>(inRect.width()),
+                              static_cast<float>(inRect.height()));
+    }
+
+
+    void Visualizer::drawText(Gdiplus::Graphics & inGraphics, const std::wstring & inText, const Rect & inRect)
     {
         Gdiplus::SolidBrush textBrush(Gdiplus::Color::Green);
         drawText(inGraphics, inText, inRect, textBrush);
     }
 
-    void Visualizer::drawText(Gdiplus::Graphics & inGraphics, const std::wstring & inText, const Gdiplus::RectF & inRect, const Gdiplus::Brush & inBrush)
+    void Visualizer::drawText(Gdiplus::Graphics & inGraphics, const std::wstring & inText, const Rect & inRect, const Gdiplus::Brush & inBrush)
     {
         Gdiplus::Font gdiFont(TEXT("Arial"), 9, Gdiplus::FontStyleRegular);
 
-        Gdiplus::RectF layoutRect
-        (
-            (float)inRect.X,
-            (float)inRect.Y,
-            (float)inRect.Width,
-            (float)inRect.Height
-        );
         Gdiplus::StringFormat stringFormat;
-        inGraphics.DrawString(inText.c_str(), (int)inText.size(), &gdiFont, layoutRect, &stringFormat, &inBrush);
+        inGraphics.DrawString(inText.c_str(), (int)inText.size(), &gdiFont, ToRectF(inRect), &stringFormat, &inBrush);
     }
 
 
@@ -195,15 +228,12 @@ namespace Tetris
     void Visualizer::paintScores(Gdiplus::Graphics & g)
     {
         const GameState::Stats & stats = mGameController->game().currentNode().state().stats();
-
-
-        drawText(g, GetScoreText("Lines", stats.mNumLines), Gdiplus::RectF(cScoresOffsetX, cScoresOffsetY, 200, 40));
-        drawText(g, GetScoreText("x1", stats.mNumSingles), Gdiplus::RectF(cScoresOffsetX, cScoresOffsetY + 40, 200, 40));
-        drawText(g, GetScoreText("x2", stats.mNumDoubles), Gdiplus::RectF(cScoresOffsetX, cScoresOffsetY + 80, 200, 40));
-        drawText(g, GetScoreText("x3", stats.mNumTriples), Gdiplus::RectF(cScoresOffsetX, cScoresOffsetY + 120, 200, 40));
-        drawText(g, GetScoreText("x4", stats.mNumTetrises), Gdiplus::RectF(cScoresOffsetX, cScoresOffsetY + 160, 200, 40));
+        drawText(g, GetScoreText("Lines", stats.mNumLines), Rect(cScoresOffsetX, cScoresOffsetY, 200, 40));
+        drawText(g, GetScoreText("x1", stats.mNumSingles), Rect(cScoresOffsetX, cScoresOffsetY + 40, 200, 40));
+        drawText(g, GetScoreText("x2", stats.mNumDoubles), Rect(cScoresOffsetX, cScoresOffsetY + 80, 200, 40));
+        drawText(g, GetScoreText("x3", stats.mNumTriples), Rect(cScoresOffsetX, cScoresOffsetY + 120, 200, 40));
+        drawText(g, GetScoreText("x4", stats.mNumTetrises), Rect(cScoresOffsetX, cScoresOffsetY + 160, 200, 40));
     }
-
 
 
     void Visualizer::paintGrid(Gdiplus::Graphics & g)
