@@ -1,6 +1,7 @@
 #include "Visualizer.h"
 #include "GameState.h"
 #include "Game.h"
+#include "Player.h"
 #include "Unicode.h"
 #include <boost/bind.hpp>
 #include <string>
@@ -71,9 +72,11 @@ namespace Tetris
     Visualizer::Visualizer(Game * inGame) :
         mGame(inGame),
         mHandle(0),
-        mKeyboardHook(0),
+        //mKeyboardHook(0),
         mDelay(10),
-        mElapsed(GetClockMs())
+        mElapsed(GetClockMs()),
+        mLastComputerMove(GetClockMs()),
+        mAvailableDepth(0)
     {
         sRefCount++;
         if (sRefCount == 1)
@@ -85,10 +88,10 @@ namespace Tetris
 
     Visualizer::~Visualizer()
     {
-        if (mKeyboardHook)
-        {
-            ::UnhookWindowsHookEx(mKeyboardHook);
-        }
+        //if (mKeyboardHook)
+        //{
+        //    ::UnhookWindowsHookEx(mKeyboardHook);
+        //}
 
 
         sRefCount--;
@@ -146,7 +149,7 @@ namespace Tetris
         }
 
         // Hook keyboard
-        mKeyboardHook = ::SetWindowsHookEx(WH_KEYBOARD, (HOOKPROC)Visualizer::KeyboardProc, ::GetModuleHandle(0), 0);
+        //mKeyboardHook = ::SetWindowsHookEx(WH_KEYBOARD, (HOOKPROC)Visualizer::KeyboardProc, ::GetModuleHandle(0), 0);
 
         sInstances.insert(std::make_pair(mHandle, this));
         mTimerID = SetTimer(NULL, NULL, mDelay, &Visualizer::TimerCallback);
@@ -359,14 +362,65 @@ namespace Tetris
     }
 
 
+    void Visualizer::newComputerMove(int inDepth)
+    {
+        Player p(mGame);
+        std::vector<int> depths;
+        for (int i = 0; i < inDepth; ++i)
+        {
+            depths.push_back(3);
+        }
+        p.move(depths);
+        mAvailableDepth = inDepth;
+    }
+
+
+    void Visualizer::nextComputerMove()
+    {
+        nextComputerMove(mGame->currentNode());
+    }
+
+
+    void Visualizer::nextComputerMove(GameStateNode & inNode)
+    {
+        Children children = inNode.children();
+        if (children.empty())
+        {
+            return;
+        }
+
+        if (mAvailableDepth > 0)
+        {
+            GameStateNode * bestChild = mGame->currentNode().bestChild(mAvailableDepth--);
+            GameStateNode * bestChildNext = 0;
+            while (&mGame->currentNode() != bestChild)
+            {
+                bestChildNext = bestChild;
+                bestChild = bestChild->parent();
+            }
+            mGame->setCurrentNode(bestChildNext);
+        }
+    }
+
+
     void Visualizer::timerCallback()
     {
         clock_t elapsed = GetClockMs();
+
+        if (elapsed - mLastComputerMove > 500)
+        {
+            nextComputerMove();
+            mLastComputerMove = elapsed;
+        }
+
         if (elapsed - mElapsed > 500)
         {
-            mGame->move(Direction_Down);
             mElapsed = elapsed;
+            mGame->move(Direction_Down);
         }
+
+        processKeys();
+
         ::InvalidateRect(mHandle, 0, FALSE);
     }
 
@@ -391,45 +445,74 @@ namespace Tetris
     }
 
 
-    LRESULT CALLBACK Visualizer::KeyboardProc(int inCode, WPARAM wParam, LPARAM lParam)
+    void Visualizer::appendKey(unsigned int inKeyCode)
     {
-        Visualizer * pThis = sInstances.begin()->second; // i suck
+        mKeys.push_back(inKeyCode);
+    }
 
 
-        if (inCode == HC_ACTION && !(HIWORD(lParam) & KF_UP))
+    void Visualizer::processKeys()
+    {
+        std::for_each(mKeys.begin(), mKeys.end(), boost::bind(&Visualizer::processKey, this, _1));
+        mKeys.clear();
+    }
+
+
+    void Visualizer::processKey(unsigned int inKeyCode)
+    {
+        switch (inKeyCode)
         {
-            switch (wParam)
+            case VK_LEFT:
             {
-                case VK_LEFT:
-                {
-                    pThis->mGame->move(Direction_Left);
-                    break;
-                }
-                case VK_RIGHT:
-                {
-                    pThis->mGame->move(Direction_Right);
-                    break;
-                }
-                case VK_UP:
-                {
-                    pThis->mGame->rotate();
-                    break;
-                }
-                case VK_DOWN:
-                {
-                    pThis->mGame->move(Direction_Down);
-                    break;
-                }
-                case VK_SPACE:
-                {
-                    pThis->mGame->drop();
-                    break;
-                }
+                mGame->move(Direction_Left);
+                break;
+            }
+            case VK_RIGHT:
+            {
+                mGame->move(Direction_Right);
+                break;
+            }
+            case VK_UP:
+            {
+                mGame->rotate();
+                break;
+            }
+            case VK_DOWN:
+            {
+                mGame->move(Direction_Down);
+                break;
+            }
+            case VK_SPACE:
+            {
+                mGame->drop();
+                break;
+            }
+            case VK_RETURN:
+            {
+                newComputerMove(3);
+                break;
+            }
+            default:
+            {
+                // Do nothing.
+                break;
             }
         }
-        
-        return ::CallNextHookEx(pThis->mKeyboardHook, inCode, wParam, lParam);
     }
+
+
+    //LRESULT CALLBACK Visualizer::KeyboardProc(int inCode, WPARAM wParam, LPARAM lParam)
+    //{
+    //    Visualizer * pThis = sInstances.begin()->second; // i suck
+
+
+    //    if (inCode == HC_ACTION && !(HIWORD(lParam) & KF_UP))
+    //    {
+    //        pThis->appendKey(wParam);
+    //    }
+    //    
+    //    return ::CallNextHookEx(pThis->mKeyboardHook, inCode, wParam, lParam);
+    //}
 
 
     LRESULT CALLBACK Visualizer::MessageHandler(HWND hWnd, UINT inMessage, WPARAM wParam, LPARAM lParam)
@@ -448,6 +531,33 @@ namespace Tetris
             {
                 ::InvalidateRect(hWnd, 0, FALSE);
                 break;
+            }
+            case WM_KEYDOWN:
+            {
+                if (wParam == 0x41)
+                {
+                    pThis->mGame->move(Direction_Left);
+                }
+                else if (wParam == 0x44)
+                {
+                    pThis->mGame->move(Direction_Right);
+                }
+                else if (wParam == 0x53)
+                {
+                    pThis->mGame->move(Direction_Down);
+                }
+                else if (wParam == 0x57)
+                {
+                    pThis->mGame->move(Direction_Up);
+                }
+                else if (wParam == VK_SPACE)
+                {
+                    pThis->mGame->drop();
+                }
+                else if (wParam == VK_DELETE)
+                {
+                    pThis->newComputerMove(3);
+                }
             }
             case WM_PAINT:
             {                

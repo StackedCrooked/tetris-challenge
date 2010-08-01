@@ -13,22 +13,23 @@ namespace Tetris
     class Block;
     class GameState;
     class GameStateNode;
-    typedef boost::shared_ptr<GameStateNode> ChildPtr;
+    typedef boost::shared_ptr<GameStateNode> ChildNodePtr;
 
     struct ChildPtrCompare
     {
-        bool operator()(ChildPtr lhs, ChildPtr rhs);
+        bool operator()(ChildNodePtr lhs, ChildNodePtr rhs);
     };    
 
-    typedef std::set<ChildPtr, ChildPtrCompare> Children;
+    typedef std::multiset<ChildNodePtr, ChildPtrCompare> Children;
 
     class GameStateNode
     {
     public:
-        // Creates a root node
-        GameStateNode(std::auto_ptr<GameState> inGameState);
+        static std::auto_ptr<GameStateNode> CreateRootNode(size_t inNumRows, size_t inNumColumns);
 
         GameStateNode(GameStateNode * inParent, std::auto_ptr<GameState> inGameState);
+
+        GameStateNode * bestChild(int inDepth);
 
         // Distance from the root node.
         int depth() const;
@@ -48,6 +49,9 @@ namespace Tetris
         GameState & state();
 
     private:
+        // Creates a root node
+        GameStateNode(std::auto_ptr<GameState> inGameState);
+
         GameStateNode * mParent;
         int mDepth;
         std::auto_ptr<GameState> mGameState;

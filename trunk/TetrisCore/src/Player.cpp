@@ -33,15 +33,15 @@ namespace Tetris
         }
 
         inNode.populate(inBlocks.front());
-        for (size_t i = 0; i != inSelectionCounts.size(); ++i)
+        Children & children = inNode.children();
+        Children::iterator it = children.begin();
+        int selection = 0;
+        while (selection < inSelectionCounts.front() && it != children.end())
         {
-            Children & children = inNode.children();
-            Children::iterator it = children.begin();
-            const int selectionCount = inSelectionCounts[i];
-            for (int j = 0; j < selectionCount && it != children.end(); ++j)
-            {
-                PopulateNode(*(it->get()), DropFirst(inBlocks), DropFirst(inSelectionCounts));
-            }
+            ChildNodePtr childNode = *it;
+            PopulateNode(*childNode, DropFirst(inBlocks), DropFirst(inSelectionCounts));
+            selection++;
+            ++it;
         }
     }
 
