@@ -403,17 +403,9 @@ namespace Tetris
         std::vector<int> depths;
         for (int i = 0; i < inDepth; ++i)
         {
-            depths.push_back(3);
+            depths.push_back(inDepth); // ???
         }
         p.move(depths);
-
-        // Fill available moves
-        GameStateNode * bestChild = mGame->currentNode().bestChild(inDepth);
-        while (&mGame->currentNode() != bestChild)
-        {
-            mAvailableMoves.push_front(bestChild->state().originalBlock());
-            bestChild = bestChild->parent();
-        }
     }
 
 
@@ -432,9 +424,9 @@ namespace Tetris
         }
 
 
-        if (!mAvailableMoves.empty())
+        if (GameStateNode * node = mGame->currentNode().bestChild(1))
         {
-            const Block & gotoBlock = mAvailableMoves.front();
+            const Block & gotoBlock = node->state().originalBlock();
             const Block & activeBlock = mGame->activeBlock();
 
             if (activeBlock.rotation() != gotoBlock.rotation())
@@ -455,12 +447,8 @@ namespace Tetris
             }
             else
             {
-                mGame->setCurrentNode(mGame->currentNode().bestChild(1));
-                mAvailableMoves.pop_front();
-                if (mAvailableMoves.empty())
-                {
-                    newComputerMove(cAIDepth);
-                }
+                mGame->setCurrentNode(node);
+                newComputerMove(cAIDepth);
             }
         }
     }
