@@ -29,6 +29,7 @@ namespace Tetris
 
         GameStateNode(GameStateNode * inParent, std::auto_ptr<GameState> inGameState);
 
+        // Search existing nodes only, does not create any new ones.
         GameStateNode * bestChild(int inDepth);
 
         // Distance from the root node.

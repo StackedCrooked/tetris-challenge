@@ -5,23 +5,6 @@
 
 namespace Tetris
 {
-    
-    // Returns the number of rotations that a block can have.
-    size_t GetBlockRotationCount(BlockType inType);
-    
-    // Calculates the block identifier using the formula:
-    //   BlockType_End * inType + inRotation
-    size_t GetBlockIdentifier(BlockType inType, size_t inRotation);
-    
-    // Gets the Grid object that is associated with a block identifier
-    const Grid & GetGrid(int inBlockIdentifier);
-    Grid GetIGrid(int rotation);
-    Grid GetJGrid(int rotation);
-    Grid GetLGrid(int rotation);
-    Grid GetOGrid(int rotation);
-    Grid GetSGrid(int rotation);
-    Grid GetTGrid(int rotation);
-    Grid GetZGrid(int rotation);
 
 
     Block::Block(BlockType inType, size_t inRotation, size_t inRow, size_t inColumn) :
@@ -44,6 +27,12 @@ namespace Tetris
     size_t Block::rotation() const
     {
         return mRotation;
+    }
+
+
+    size_t Block::numRotations() const
+    {
+        return GetBlockRotationCount(mType);
     }
 
 

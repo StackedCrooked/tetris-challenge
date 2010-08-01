@@ -30,6 +30,8 @@ namespace Tetris
 
         size_t rotation() const;
 
+        size_t numRotations() const;
+
         void moveLeft();
 
         void moveRight();
@@ -53,6 +55,24 @@ namespace Tetris
         size_t mRotation;
         const Grid * mGrid;
     };
+
+   
+    
+    size_t GetBlockRotationCount(BlockType inType);
+    
+    size_t GetBlockIdentifier(BlockType inType, size_t inRotation);
+    
+    // Gets the Grid object that is associated with a block identifier
+    const Grid & GetGrid(int inBlockIdentifier);
+    
+    Grid GetIGrid(int rotation);
+    Grid GetJGrid(int rotation);
+    Grid GetLGrid(int rotation);
+    Grid GetOGrid(int rotation);
+    Grid GetSGrid(int rotation);
+    Grid GetTGrid(int rotation);
+    Grid GetZGrid(int rotation);
+
 
 } // namespace Tetris
 

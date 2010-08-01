@@ -120,7 +120,7 @@ namespace Tetris
             Block block = inBlock;
             block.setColumn(col);
             block.setRow(0);
-            for (size_t rt = 0; rt != 4; ++rt)
+            for (size_t rt = 0; rt != block.numRotations(); ++rt)
             {
                 std::auto_ptr<GameState> newGameState;
                 block.setRotation(rt);

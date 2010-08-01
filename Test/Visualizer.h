@@ -96,7 +96,6 @@ namespace Tetris
         int mDelay;
         clock_t mElapsed;
         clock_t mLastComputerMove;
-        std::list<Block> mAvailableMoves;
 
 
         typedef std::map<HWND, Visualizer *> Instances;
