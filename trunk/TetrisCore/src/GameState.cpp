@@ -1,5 +1,5 @@
 #include "GameState.h"
-#include "Block.h"
+#include "BlockType.h"
 #include <algorithm>
 
 
@@ -16,7 +16,7 @@ namespace Tetris
         mGrid(inNumRows, inNumColumns, BlockType_Nil),
         mStats(),
         mIsGameOver(false),
-        mOriginalBlock(0),
+        mOriginalBlock(BlockType_L, 0, 0, 0),
         mQuality()
     {
     }
@@ -163,9 +163,9 @@ namespace Tetris
     }
 
 
-    const Block * GameState::originalBlock() const
+    const Block & GameState::originalBlock() const
     {
-        return mOriginalBlock.get();
+        return mOriginalBlock;
     }
 
 
@@ -181,13 +181,13 @@ namespace Tetris
     }
 
 
-    std::auto_ptr<GameState> GameState::commit(std::auto_ptr<Block> inBlock, bool inGameOver) const
+    std::auto_ptr<GameState> GameState::commit(const Block & inBlock, bool inGameOver) const
     {
         std::auto_ptr<GameState> result(clone());
         result->mIsGameOver = inGameOver;
         result->mQuality.mDirty = true;
 
-        result->solidifyBlock(inBlock.get());
+        result->solidifyBlock(inBlock);
 
         // transfer ownership of the active block
         result->mOriginalBlock = inBlock;
@@ -205,16 +205,16 @@ namespace Tetris
     }
 
 
-    void GameState::solidifyBlock(const Block * inBlock)
+    void GameState::solidifyBlock(const Block & inBlock)
     {
-        const Grid & grid = inBlock->grid();
+        const Grid & grid = inBlock.grid();
         for (size_t r = 0; r != grid.numRows(); ++r)
         {
             for (size_t c = 0; c != grid.numColumns(); ++c)
             {
                 if (grid.get(r, c) != BlockType_Nil)
                 {
-                    mGrid.set(inBlock->row() + r, inBlock->column() + c, inBlock->type());
+                    mGrid.set(inBlock.row() + r, inBlock.column() + c, inBlock.type());
                 }
             }
         }
@@ -228,8 +228,8 @@ namespace Tetris
         
         // Get numLines and lines
         {
-            for (size_t rowIndex = mOriginalBlock->row();
-                 rowIndex < mOriginalBlock->row() + mOriginalBlock->grid().numRows();
+            for (size_t rowIndex = mOriginalBlock.row();
+                 rowIndex < mOriginalBlock.row() + mOriginalBlock.grid().numRows();
                  ++rowIndex)
             {  
                 lines[rowIndex] = true;

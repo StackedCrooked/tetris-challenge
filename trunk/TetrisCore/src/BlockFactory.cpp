@@ -29,14 +29,14 @@ namespace Tetris
     }
 
     
-    std::auto_ptr<Block> BlockFactory::getNext() const
+    Block BlockFactory::getNext() const
     {
         if (mCurrentIndex >= mBagSize)
         {
             const_cast<BlockFactory*>(this)->reset();
         }
         mPrevious.push_back(mBag[mCurrentIndex]);
-        return std::auto_ptr<Block>(new Block(mBag[mCurrentIndex++], 0, 0, 0));
+        return Block(mBag[mCurrentIndex++], 0, 0, 0);
     }
 
 
@@ -46,10 +46,10 @@ namespace Tetris
     }
 
     
-    std::auto_ptr<Block> BlockFactory::getPrevious(size_t inIndex) const
+    Block BlockFactory::getPrevious(size_t inIndex) const
     {
         CheckArgument(inIndex < mPrevious.size(), "Invalid index for getPrevious.");
-        return std::auto_ptr<Block>(new Block(mPrevious[inIndex], 0, 0, 0));        
+        return Block(mPrevious[inIndex], 0, 0, 0);
     }
 
 

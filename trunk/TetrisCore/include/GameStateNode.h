@@ -10,6 +10,7 @@
 namespace Tetris
 {
 
+    class Block;
     class GameState;
     class GameStateNode;
     typedef boost::shared_ptr<GameStateNode> ChildPtr;
@@ -35,6 +36,8 @@ namespace Tetris
         const GameStateNode * parent() const;
 
         GameStateNode * parent();
+
+        void populate(const Block & inBlock);
 
         const Children & children() const;
 
