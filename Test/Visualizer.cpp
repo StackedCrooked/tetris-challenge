@@ -441,14 +441,13 @@ namespace Tetris
             {
                 mGame->move(Direction_Left);
             }
-            else if (activeBlock.row() + 1 < gotoBlock.row())
+            else if (activeBlock.row() < gotoBlock.row())
             {
                 mGame->move(Direction_Down);
             }
             else
             {
                 mGame->setCurrentNode(node);
-                newComputerMove(cAIDepth);
             }
         }
     }
@@ -458,7 +457,13 @@ namespace Tetris
     {
         clock_t elapsed = GetClockMs();
 
-        if (elapsed - mLastComputerMove > 50)
+        
+        if (!mGame->currentNode().bestChild(1))
+        {
+            newComputerMove(cAIDepth);
+        }
+
+        if (elapsed - mLastComputerMove > 1)
         {
             nextComputerMove();
             mLastComputerMove = elapsed;
