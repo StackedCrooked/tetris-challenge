@@ -31,6 +31,8 @@ namespace Tetris
 
         void rotate();
 
+        void drop();
+
     private:
 
         GameStateNode mRootNode;

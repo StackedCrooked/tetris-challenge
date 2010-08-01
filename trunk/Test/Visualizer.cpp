@@ -68,8 +68,8 @@ namespace Tetris
 
 
 
-    Visualizer::Visualizer(GameController * inGameController) :
-        mGameController(inGameController),
+    Visualizer::Visualizer(Game * inGame) :
+        mGame(inGame),
         mHandle(0),
         mKeyboardHook(0),
         mDelay(10),
@@ -227,7 +227,7 @@ namespace Tetris
 
     void Visualizer::paintScores(Gdiplus::Graphics & g)
     {
-        const GameState::Stats & stats = mGameController->game().currentNode().state().stats();
+        const GameState::Stats & stats = mGame->currentNode().state().stats();
         drawText(g, GetScoreText("Lines", stats.mNumLines), Rect(cScoresOffsetX, cScoresOffsetY, 200, 40));
         drawText(g, GetScoreText("x1", stats.mNumSingles), Rect(cScoresOffsetX, cScoresOffsetY + 40, 200, 40));
         drawText(g, GetScoreText("x2", stats.mNumDoubles), Rect(cScoresOffsetX, cScoresOffsetY + 80, 200, 40));
@@ -238,7 +238,7 @@ namespace Tetris
 
     void Visualizer::paintGrid(Gdiplus::Graphics & g)
     {
-        const Grid & grid = mGameController->game().currentNode().state().grid();
+        const Grid & grid = mGame->currentNode().state().grid();
         int cGridOffsetX = 40;
         int cGridOffsetY = 40;
         for (size_t r = 0; r != grid.numRows(); ++r)
@@ -249,7 +249,7 @@ namespace Tetris
             }
         }
 
-        const Block & block = mGameController->game().activeBlock();
+        const Block & block = mGame->activeBlock();
         const Grid & blockGrid = block.grid();
         for (size_t r = 0; r != blockGrid.numRows(); ++r)
         {
@@ -364,7 +364,7 @@ namespace Tetris
         clock_t elapsed = GetClockMs();
         if (elapsed - mElapsed > 500)
         {
-            mGameController->game().move(Direction_Down);
+            mGame->move(Direction_Down);
             mElapsed = elapsed;
         }
         ::InvalidateRect(mHandle, 0, FALSE);
@@ -402,27 +402,27 @@ namespace Tetris
             {
                 case VK_LEFT:
                 {
-                    pThis->mGameController->move(Direction_Left);
+                    pThis->mGame->move(Direction_Left);
                     break;
                 }
                 case VK_RIGHT:
                 {
-                    pThis->mGameController->move(Direction_Right);
+                    pThis->mGame->move(Direction_Right);
                     break;
                 }
                 case VK_UP:
                 {
-                    pThis->mGameController->rotate();
+                    pThis->mGame->rotate();
                     break;
                 }
                 case VK_DOWN:
                 {
-                    pThis->mGameController->move(Direction_Down);
+                    pThis->mGame->move(Direction_Down);
                     break;
                 }
                 case VK_SPACE:
                 {
-                    pThis->mGameController->drop();
+                    pThis->mGame->drop();
                     break;
                 }
             }
