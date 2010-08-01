@@ -17,12 +17,12 @@ namespace Tetris
 
 
     Game::Game(int inNumRows, int inNumColumns) :
-        mRootNode(std::auto_ptr<GameState>(new GameState(inNumRows, inNumColumns))),
+        mRootNode(GameStateNode::CreateRootNode(inNumRows, inNumColumns)),
         mBlockFactory(cBlockTypeCount),
         mCurrentBlockIndex(0)
     {
         mBlocks.push_back(CenterBlock(mBlockFactory.getNext(), inNumColumns));
-        mCurrentNode = &mRootNode;
+        mCurrentNode = mRootNode.get();
     }
 
 
@@ -34,12 +34,20 @@ namespace Tetris
 
     const Block & Game::activeBlock() const
     {
+        while (mCurrentBlockIndex >= mBlocks.size())
+        {
+            mBlocks.push_back(CenterBlock(mBlockFactory.getNext(), currentNode().state().grid().numColumns()));
+        }
         return mBlocks[mCurrentBlockIndex];
     }
 
 
     Block & Game::activeBlock()
     {
+        while (mCurrentBlockIndex >= mBlocks.size())
+        {
+            mBlocks.push_back(CenterBlock(mBlockFactory.getNext(), currentNode().state().grid().numColumns()));
+        }
         return mBlocks[mCurrentBlockIndex];
     }
 
@@ -49,9 +57,9 @@ namespace Tetris
         std::vector<Block> blocks;
         blocks.push_back(activeBlock());
 
-        while (mCurrentBlockIndex + inCount - 1 >= mBlocks.size())
+        while (blocks.size() < inCount)
         {
-            mBlocks.push_back(CenterBlock(mBlockFactory.getNext(), mCurrentNode->state().grid().numColumns()));
+            blocks.push_back(CenterBlock(mBlockFactory.getNext(), mCurrentNode->state().grid().numColumns()));
         }
         return blocks;
     }
@@ -66,6 +74,14 @@ namespace Tetris
     const GameStateNode & Game::currentNode() const
     {
         return *mCurrentNode;
+    }
+
+
+    void Game::setCurrentNode(GameStateNode * inCurrentNode)
+    {
+        CheckPrecondition(mCurrentBlockIndex == mCurrentNode->depth(), "mCurrentBlockIndex == mCurrentNode->depth() is false.");
+        mCurrentNode = inCurrentNode;
+        mCurrentBlockIndex = mCurrentNode->depth();
     }
 
 
@@ -206,7 +222,7 @@ namespace Tetris
         }
 
         // Commit the block
-        ChildPtr child(new GameStateNode(mCurrentNode->state().commit(block, block.row() == 0)));
+        ChildNodePtr child(new GameStateNode(mCurrentNode, mCurrentNode->state().commit(block, block.row() == 0)));
         mCurrentNode->children().insert(child);
         mCurrentNode = child.get();
     

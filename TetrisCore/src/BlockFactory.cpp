@@ -23,9 +23,9 @@ namespace Tetris
         {
             BlockType blockType = static_cast<BlockType>(1 + (idx % cBlockTypeCount));
             mBag.push_back(blockType);
-        }
-        std::random_shuffle(mBag.begin(), mBag.end());
+        }        
         mCurrentIndex = 0;
+        std::random_shuffle(mBag.begin(), mBag.end());
     }
 
     

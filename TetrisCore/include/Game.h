@@ -29,6 +29,8 @@ namespace Tetris
 
         const GameStateNode & currentNode() const;
 
+        void setCurrentNode(GameStateNode * inCurrentNode);
+
         bool navigateNodeUp();
 
         bool navigateNodeDown();
@@ -46,7 +48,7 @@ namespace Tetris
         void drop();
 
     private:
-        GameStateNode mRootNode;
+        std::auto_ptr<GameStateNode> mRootNode;
         GameStateNode * mCurrentNode;
 
         BlockFactory mBlockFactory;

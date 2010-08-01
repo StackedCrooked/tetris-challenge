@@ -65,6 +65,9 @@ namespace Tetris
         static void CALLBACK TimerCallback(HWND hWnd, UINT inMessage, UINT_PTR inTimerID, DWORD inTime);
 
         void timerCallback();
+        void newComputerMove(int inDepth);
+        void nextComputerMove();
+        void nextComputerMove(GameStateNode & inNode);
         
         void paint(HDC inHDC);
         void bufferedPaint(HDC inHDC);
@@ -76,13 +79,21 @@ namespace Tetris
 
         static const Gdiplus::Color & GetColor(BlockType inType);
 
+
+        void appendKey(unsigned int inKeyCode);
+        void processKeys();
+        void processKey(unsigned int inKeyCode);
+        std::vector<unsigned int> mKeys;
+
         HWND mHandle;
-        HHOOK mKeyboardHook;
+        //HHOOK mKeyboardHook;
 
         Game * mGame;
         UINT_PTR mTimerID;
         int mDelay;
         clock_t mElapsed;
+        clock_t mLastComputerMove;
+        size_t mAvailableDepth;
 
         typedef std::map<HWND, Visualizer *> Instances;
         static Instances sInstances;
