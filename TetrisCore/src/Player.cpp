@@ -46,9 +46,9 @@ namespace Tetris
     }
 
 
-    void Player::move(const std::vector<int> & inDepths)
+    void Player::move(const std::vector<int> & inSelectionCounts)
     {
-        PopulateNode(mGame->currentNode(), mGame->getFutureBlocks(inDepths.size()), inDepths);
+        PopulateNode(mGame->currentNode(), mGame->getFutureBlocks(inSelectionCounts.size()), inSelectionCounts);
     }
 
 

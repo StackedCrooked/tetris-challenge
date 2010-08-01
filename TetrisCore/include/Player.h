@@ -14,7 +14,7 @@ namespace Tetris
     public:
         Player(Game * inGame);
 
-        void move(const std::vector<int> & inDepths);
+        void move(const std::vector<int> & inSelectionCounts);
 
     private:
         Game * mGame;

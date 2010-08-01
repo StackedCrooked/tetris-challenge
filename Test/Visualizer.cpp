@@ -72,11 +72,10 @@ namespace Tetris
     Visualizer::Visualizer(Game * inGame) :
         mGame(inGame),
         mHandle(0),
-        //mKeyboardHook(0),
+        mKeyboardHook(0),
         mDelay(10),
         mElapsed(GetClockMs()),
-        mLastComputerMove(GetClockMs()),
-        mAvailableDepth(0)
+        mLastComputerMove(GetClockMs())
     {
         sRefCount++;
         if (sRefCount == 1)
@@ -88,10 +87,10 @@ namespace Tetris
 
     Visualizer::~Visualizer()
     {
-        //if (mKeyboardHook)
-        //{
-        //    ::UnhookWindowsHookEx(mKeyboardHook);
-        //}
+        if (mKeyboardHook)
+        {
+            ::UnhookWindowsHookEx(mKeyboardHook);
+        }
 
 
         sRefCount--;
@@ -149,7 +148,7 @@ namespace Tetris
         }
 
         // Hook keyboard
-        //mKeyboardHook = ::SetWindowsHookEx(WH_KEYBOARD, (HOOKPROC)Visualizer::KeyboardProc, ::GetModuleHandle(0), 0);
+        mKeyboardHook = ::SetWindowsHookEx(WH_KEYBOARD, (HOOKPROC)Visualizer::KeyboardProc, ::GetModuleHandle(0), 0);
 
         sInstances.insert(std::make_pair(mHandle, this));
         mTimerID = SetTimer(NULL, NULL, mDelay, &Visualizer::TimerCallback);
@@ -247,11 +246,11 @@ namespace Tetris
     {
         std::vector<Block> blocks = mGame->getFutureBlocks(5);
 
-        for (size_t i = 0; i < cNumFutureBlocks; ++i)
+        for (size_t i = 1; i < cNumFutureBlocks; ++i)
         {
             const Block & block = blocks[i];
             const Grid & grid = block.grid();
-            paintGrid(g, grid, cBlocksOffsetX, cBlocksOffsetY + i * 5 * cBlockHeight);
+            paintGrid(g, grid, cBlocksOffsetX, cBlocksOffsetY + (i - 1) * 5 * cBlockHeight);
         }
     }
 
@@ -401,10 +400,17 @@ namespace Tetris
         std::vector<int> depths;
         for (int i = 0; i < inDepth; ++i)
         {
-            depths.push_back(3);
+            depths.push_back(inDepth + 1 - i);
         }
         p.move(depths);
-        mAvailableDepth = inDepth;
+
+        // Fill available moves
+        GameStateNode * bestChild = mGame->currentNode().bestChild(inDepth);
+        while (&mGame->currentNode() != bestChild)
+        {
+            mAvailableMoves.push_front(bestChild->state().originalBlock());
+            bestChild = bestChild->parent();
+        }
     }
 
 
@@ -422,16 +428,30 @@ namespace Tetris
             return;
         }
 
-        if (mAvailableDepth > 0)
+
+        if (!mAvailableMoves.empty())
         {
-            GameStateNode * bestChild = mGame->currentNode().bestChild(mAvailableDepth--);
-            GameStateNode * bestChildNext = 0;
-            while (&mGame->currentNode() != bestChild)
+            const Block & gotoBlock = mAvailableMoves.front();
+            const Block & activeBlock = mGame->activeBlock();
+
+            if (activeBlock.rotation() != gotoBlock.rotation())
             {
-                bestChildNext = bestChild;
-                bestChild = bestChild->parent();
+                mGame->rotate();
             }
-            mGame->setCurrentNode(bestChildNext);
+            else if (activeBlock.column() < gotoBlock.column())
+            {
+                mGame->move(Direction_Right);
+            }
+            else if (activeBlock.column() > gotoBlock.column())
+            {
+                mGame->move(Direction_Left);
+            }
+            else
+            {
+                mGame->drop();
+                mAvailableMoves.pop_front();
+                newComputerMove(3);
+            }
         }
     }
 
@@ -522,7 +542,7 @@ namespace Tetris
             }
             case VK_DELETE:
             {
-                newComputerMove(5);
+                newComputerMove(3);
                 break;
             }
             default:
@@ -534,18 +554,18 @@ namespace Tetris
     }
 
 
-    //LRESULT CALLBACK Visualizer::KeyboardProc(int inCode, WPARAM wParam, LPARAM lParam)
-    //{
-    //    Visualizer * pThis = sInstances.begin()->second; // i suck
+    LRESULT CALLBACK Visualizer::KeyboardProc(int inCode, WPARAM wParam, LPARAM lParam)
+    {
+        Visualizer * pThis = sInstances.begin()->second; // i suck
 
 
-    //    if (inCode == HC_ACTION && !(HIWORD(lParam) & KF_UP))
-    //    {
-    //        pThis->appendKey(wParam);
-    //    }
-    //    
-    //    return ::CallNextHookEx(pThis->mKeyboardHook, inCode, wParam, lParam);
-    //}
+        if (inCode == HC_ACTION && !(HIWORD(lParam) & KF_UP))
+        {
+            pThis->appendKey(wParam);
+        }
+        
+        return ::CallNextHookEx(pThis->mKeyboardHook, inCode, wParam, lParam);
+    }
 
 
     LRESULT CALLBACK Visualizer::MessageHandler(HWND hWnd, UINT inMessage, WPARAM wParam, LPARAM lParam)
@@ -565,11 +585,11 @@ namespace Tetris
                 ::InvalidateRect(hWnd, 0, FALSE);
                 break;
             }
-            case WM_KEYDOWN:
-            {
-                pThis->processKey(wParam);
-                break;
-            }
+            //case WM_KEYDOWN:
+            //{
+            //    pThis->processKey(wParam);
+            //    break;
+            //}
             case WM_PAINT:
             {                
                 HDC hDC = ::GetDC(hWnd);
