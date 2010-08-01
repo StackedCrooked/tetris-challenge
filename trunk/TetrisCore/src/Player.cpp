@@ -16,7 +16,8 @@ namespace Tetris
         GameStateNode & node = mGame->currentNode();
         GameState & state = node.state();
         
-        
+
+        mGame->drop();
     }
 
 
