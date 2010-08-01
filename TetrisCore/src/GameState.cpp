@@ -113,6 +113,12 @@ namespace Tetris
             result -= static_cast<int>(mGrid.numRows() - top) * cHeightPenalty;
             float density = ((float)numOccupiedUnderTop) / (float)(((mGrid.numRows() - top) * mGrid.numColumns()));
             result += static_cast<int>((11.0*density) + 0.5);
+            
+            result -= 1 * mStats.mNumSingles;
+            result += 0 * mStats.mNumDoubles;
+            result += 4 * mStats.mNumTriples;
+            result += 8 * mStats.mNumTetrises;
+
             mQuality.mScore = result;
             mQuality.mDirty = false;
         }
@@ -289,7 +295,7 @@ namespace Tetris
             }
             case 1:
             {
-                // Do nothing, mNumLines has already been incremented.
+                mStats.mNumSingles++;
                 break;
             }
             case 2:
