@@ -3,6 +3,7 @@
 
 
 #include "BlockType.h"
+#include "Direction.h"
 #include "Grid.h"
 
 
@@ -31,14 +32,6 @@ namespace Tetris
         size_t rotation() const;
 
         size_t numRotations() const;
-
-        void moveLeft();
-
-        void moveRight();
-
-        void moveUp();
-
-        void moveDown();
 
         void rotate();
 

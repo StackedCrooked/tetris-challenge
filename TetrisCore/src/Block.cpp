@@ -73,36 +73,6 @@ namespace Tetris
     }
 
 
-    void Block::moveLeft()
-    {
-        if (mColumn > 0)
-        {
-            mColumn -= 1;
-        }
-    }
-
-
-    void Block::moveRight()
-    {
-        mColumn++;
-    }
-
-
-    void Block::moveUp()
-    {
-        if (mRow > 0)
-        {
-            mRow--;
-        }
-    }
-
-    
-    void Block::moveDown()
-    {
-        mRow++;
-    }
-
-
     void Block::rotate()
     {
         setRotation((mRotation + 1) % 4);
