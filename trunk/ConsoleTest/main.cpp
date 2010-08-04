@@ -29,8 +29,8 @@ int Test(const std::vector<int> inDepths)
     {
         player.move(inDepths);
         game.setCurrentNode(game.currentNode().bestChild(inDepths.size()));
-        std::cout << "Blocks: " << game.currentNode().depth() <<  "\tLines: " << game.currentNode().state().stats().mNumLines << "\r";
     }
+    std::cout << "Blocks: " << game.currentNode().depth() <<  "\tLines: " << game.currentNode().state().stats().mNumLines << "\r";
     std::cout << std::endl;
     return game.currentNode().state().stats().mNumLines;
 }
@@ -70,9 +70,9 @@ int main()
     }
     catch (const std::exception & exc)
     {
-        std::cout << "Unhandled exception: " << exc.what() << "\n";
+        std::cout << "Unhandled exception: " << exc.what() << std::endl;
     }
-    std::cout << "\nPress ENTER to quit.";
+    std::cout << std::endl << "Press ENTER to quit.";
     std::cin.get();
     return 0;
 }
