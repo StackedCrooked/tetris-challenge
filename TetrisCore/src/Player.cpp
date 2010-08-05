@@ -180,8 +180,26 @@ namespace Tetris
             {
                 child = mGame->currentNode().bestChild(depth--);
             }
-            CheckCondition(child != 0, "No child!?");
-            CheckCondition(inDepths.size() == depth || child->state().isGameOver(), "Should have been Game Over");
+
+            GameStateNode * immediateChildParent = child->parent();
+            GameStateNode * immediateChild = child;
+            while (immediateChild->depth() - mGame->currentNode().depth() > 0)
+            {
+                ChildNodes::iterator it = immediateChildParent->children().begin(), end = immediateChildParent->children().end();
+                for (; it != end; ++it)
+                {
+                    ChildNodePtr child = *it;
+                    if (child.get() == immediateChild)
+                    {
+                        immediateChildParent->children().clear();
+                        immediateChildParent->children().insert(child);
+                        break;
+                    }
+                }
+                immediateChild = immediateChild->parent();
+                immediateChildParent = immediateChild->parent();
+            }
+
             mGame->setCurrentNode(child);
         }
     }
