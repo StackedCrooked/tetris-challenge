@@ -16,19 +16,27 @@ namespace Tetris
     public:
         Player(Game * inGame);
 
-        void move(const std::vector<int> & inSelectionCounts);
+        void move(const std::vector<int> & inSelectionCounts, bool inMultiThreaded);
 
         void setThreadCount(size_t inThreadCount);
+
+        // Returns old value
+        size_t incrementThreadCount();
+
+        // Returns old value
+        size_t decrementThreadCount();
 
         size_t getThreadCount() const;
 
         void populateNodeMultiThreaded(GameStateNode & inNode, const std::vector<BlockType> & inBlocks, const std::vector<int> & inSelectionCounts);
 
-        void playUntilGameOver(const std::vector<int> & inDepths);
+        void playUntilGameOver(const std::vector<int> & inDepths, bool inMultiThreaded);
 
         void print(const std::string & inMessage);
 
     private:
+        void cleanup(GameStateNode * child, size_t inDepth);
+
         Game * mGame;
         size_t mThreadCount;
         mutable Poco::Mutex mThreadCountMutex;

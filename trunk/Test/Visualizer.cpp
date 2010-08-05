@@ -409,7 +409,7 @@ namespace Tetris
         {
             depths.push_back(inDepth); // ???
         }
-        p.move(depths);
+        p.move(depths, true);
     }
 
 
