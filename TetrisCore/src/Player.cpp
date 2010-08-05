@@ -28,17 +28,29 @@ namespace Tetris
         
     void Player::setThreadCount(size_t inThreadCount)
     {
-        //Poco::Mutex::ScopedLock lock(mThreadCountMutex);
-        //mThreadCount = inThreadCount;
-        //print("Thread count is now: " + boost::lexical_cast<std::string>(getThreadCount()));
+        Poco::Mutex::ScopedLock lock(mThreadCountMutex);
+        mThreadCount = inThreadCount;
+    }
+        
+        
+    size_t Player::incrementThreadCount()
+    {
+        Poco::Mutex::ScopedLock lock(mThreadCountMutex);
+        return mThreadCount++;
+    }
+        
+        
+    size_t Player::decrementThreadCount()
+    {
+        Poco::Mutex::ScopedLock lock(mThreadCountMutex);
+        return mThreadCount--;
     }
 
     
     size_t Player::getThreadCount() const
     {
-        //Poco::Mutex::ScopedLock lock(mThreadCountMutex);
-        //return mThreadCount;
-        return 0;
+        Poco::Mutex::ScopedLock lock(mThreadCountMutex);
+        return mThreadCount;
     }
 
 
@@ -104,6 +116,7 @@ namespace Tetris
         {
             // Thread-fest.
             mPlayer.populateNodeMultiThreaded(mNode, mBlocks, mSelectionCounts);
+            //PopulateNode(mNode, mBlocks, mSelectionCounts);
         }
 
     private:
@@ -141,39 +154,54 @@ namespace Tetris
         std::vector<boost::shared_ptr<Poco::Runnable> > runnables;
         std::vector<boost::shared_ptr<Poco::Thread> > threads;
         
-
+        static const int cMaxThreadCount = 128; //32;
         while (selection < inSelectionCounts.front() && it != children.end())
-        {
+        {            
             ChildNodePtr childNode = *it;
-            threads.push_back(boost::shared_ptr<Poco::Thread>(new Poco::Thread));
-            threads.back()->setPriority(Poco::Thread::PRIO_HIGH);
-            runnables.push_back(boost::shared_ptr<Poco::Runnable>(new ThreadedPopulator(*this, *childNode, DropFirst(inBlocks), DropFirst(inSelectionCounts))));
-            threads.back()->start(*runnables.back());
+            if (getThreadCount() < cMaxThreadCount)
+            {
+                threads.push_back(boost::shared_ptr<Poco::Thread>(new Poco::Thread));
+                threads.back()->setPriority(Poco::Thread::PRIO_HIGHEST);
+                runnables.push_back(boost::shared_ptr<Poco::Runnable>(new ThreadedPopulator(*this, *childNode, DropFirst(inBlocks), DropFirst(inSelectionCounts))));
+                threads.back()->start(*runnables.back());
+                incrementThreadCount();
+            }
+            else
+            {
+                PopulateNode(*childNode, DropFirst(inBlocks), DropFirst(inSelectionCounts));
+            }
             selection++;
             ++it;
         }
-        setThreadCount(getThreadCount() + threads.size());
 
         // Wait for all thread to finish.
         for (size_t idx = 0; idx != threads.size(); ++idx)
         {
             threads[idx]->join();
-            setThreadCount(getThreadCount() - 1);
+            decrementThreadCount();
         }
     }
 
 
-    void Player::move(const std::vector<int> & inSelectionCounts)
+    void Player::move(const std::vector<int> & inSelectionCounts, bool inMultiThreaded)
     {
-        populateNodeMultiThreaded(mGame->currentNode(), mGame->getFutureBlocks(inSelectionCounts.size()), inSelectionCounts);
+        if (inMultiThreaded)
+        {
+            populateNodeMultiThreaded(mGame->currentNode(), mGame->getFutureBlocks(inSelectionCounts.size()), inSelectionCounts);
+        }
+        else
+        {
+            PopulateNode(mGame->currentNode(), mGame->getFutureBlocks(inSelectionCounts.size()), inSelectionCounts);
+        }
     }
 
 
-    void Player::playUntilGameOver(const std::vector<int> & inDepths)
+    void Player::playUntilGameOver(const std::vector<int> & inDepths, bool inMultiThreaded)
     {
         while (!mGame->isGameOver())
         {
-            move(inDepths);
+            move(inDepths, inMultiThreaded);
+            //cleanup(&mGame->currentNode(), inDepths.size());
             size_t depth = inDepths.size();
             GameStateNode * child = mGame->currentNode().bestChild(depth);
             while (!child && depth > 0)
@@ -202,6 +230,11 @@ namespace Tetris
 
             mGame->setCurrentNode(child);
         }
+    }
+    
+    
+    void Player::cleanup(GameStateNode * child, size_t inDepth)
+    {
     }
 
 
