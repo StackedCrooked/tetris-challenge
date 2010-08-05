@@ -181,15 +181,9 @@ namespace Tetris
         std::auto_ptr<GameState> result(clone());
         result->mIsGameOver = inGameOver;
         result->mQuality.mDirty = true;
-
         result->solidifyBlock(inBlock);
-
-        // transfer ownership of the active block
         result->mOriginalBlock = inBlock;
-
-        // Clear lines and update score
         result->clearLines();
-
         return result;
     }
 

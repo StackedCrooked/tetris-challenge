@@ -100,6 +100,7 @@ namespace Tetris
         CheckPrecondition(mCurrentBlockIndex == mCurrentNode->depth(), "mCurrentBlockIndex == mCurrentNode->depth() is false.");
         mCurrentNode = inCurrentNode;
         mCurrentBlockIndex = mCurrentNode->depth();
+        supplyBlocks();
         mActiveBlock = CreateDefaultBlock(mBlocks[mCurrentBlockIndex], mNumColumns);
     }
 
