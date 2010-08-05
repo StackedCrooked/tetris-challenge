@@ -9,6 +9,14 @@
 namespace Tetris
 {
 
+    inline void CheckCondition(bool inCondition, const std::string & inErrorMessage)
+    {
+        if (!inCondition)
+        {
+            throw std::logic_error(inErrorMessage);
+        }
+    }
+
     inline void CheckArgument(bool inCondition, const std::string & inErrorMessage)
     {
         if (!inCondition)
