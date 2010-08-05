@@ -39,7 +39,7 @@ int Test(const std::vector<int> inDepths)
 void Test(const std::vector<int> inDepths, size_t inCount)
 {
     std::cout << "Testing with depths: ";
-    for (int i = 0; i < inDepths.size(); ++i)
+    for (size_t i = 0; i < inDepths.size(); ++i)
     {
         if (i > 0)
         {

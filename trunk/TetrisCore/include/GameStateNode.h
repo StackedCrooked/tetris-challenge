@@ -39,6 +39,8 @@ namespace Tetris
 
         GameStateNode * parent();
 
+        // Populate the node with all possible child nodes that can be
+        // created by combining the game state and the given block.
         void populate(const Block & inBlock);
 
         const Children & children() const;
