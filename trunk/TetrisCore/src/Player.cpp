@@ -3,7 +3,9 @@
 #include "ErrorHandling.h"
 #include "Poco/Runnable.h"
 #include "Poco/Thread.h"
+#include <boost/lexical_cast.hpp>
 #include <boost/shared_ptr.hpp>
+#include <iostream>
 
 
 namespace Tetris
@@ -11,8 +13,32 @@ namespace Tetris
 
 
     Player::Player(Game * inGame) :
-        mGame(inGame)
+        mGame(inGame),
+        mThreadCount(0)
     {
+    }
+
+
+    void Player::print(const std::string & inMessage)
+    {
+        //Poco::Mutex::ScopedLock lock(mIOMutex);
+        //std::cout << inMessage << "\n";
+    }
+        
+        
+    void Player::setThreadCount(size_t inThreadCount)
+    {
+        //Poco::Mutex::ScopedLock lock(mThreadCountMutex);
+        //mThreadCount = inThreadCount;
+        //print("Thread count is now: " + boost::lexical_cast<std::string>(getThreadCount()));
+    }
+
+    
+    size_t Player::getThreadCount() const
+    {
+        //Poco::Mutex::ScopedLock lock(mThreadCountMutex);
+        //return mThreadCount;
+        return 0;
     }
 
 
@@ -62,14 +88,11 @@ namespace Tetris
     }
 
 
-    // Forward declaration.
-    void PopulateNode_MultiThreaded(GameStateNode & inNode, const std::vector<BlockType> & inBlocks, const std::vector<int> & inSelectionCounts);
-
-
     class ThreadedPopulator : public Poco::Runnable
     {
     public:
-        ThreadedPopulator(GameStateNode & inNode, const std::vector<BlockType> & inBlocks, const std::vector<int> & inSelectionCounts) :
+        ThreadedPopulator(Player & inPlayer, GameStateNode & inNode, const std::vector<BlockType> & inBlocks, const std::vector<int> & inSelectionCounts) :
+            mPlayer(inPlayer),
             mNode(inNode),
             mBlocks(inBlocks),
             mSelectionCounts(inSelectionCounts)
@@ -80,18 +103,20 @@ namespace Tetris
         virtual void run()
         {
             // Thread-fest.
-            PopulateNode_MultiThreaded(mNode, mBlocks, mSelectionCounts);
+            mPlayer.populateNodeMultiThreaded(mNode, mBlocks, mSelectionCounts);
         }
 
     private:
+        Player & mPlayer;
         GameStateNode & mNode;
-        const std::vector<BlockType> & mBlocks;
-        const std::vector<int> & mSelectionCounts;
+        std::vector<BlockType> mBlocks;
+        std::vector<int> mSelectionCounts;
     };
     
 
-    void PopulateNode_MultiThreaded(GameStateNode & inNode, const std::vector<BlockType> & inBlocks, const std::vector<int> & inSelectionCounts)
+    void Player::populateNodeMultiThreaded(GameStateNode & inNode, const std::vector<BlockType> & inBlocks, const std::vector<int> & inSelectionCounts)
     {
+        print("Thread id: " + boost::lexical_cast<std::string>(Poco::Thread::current() ? Poco::Thread::current()->id() : 0));
         CheckArgument(inBlocks.size() == inSelectionCounts.size(), "PopulateNode got inBlocks.size() != inSelectionCounts.size()");
         if (inBlocks.empty())
         {
@@ -121,23 +146,26 @@ namespace Tetris
         {
             ChildNodePtr childNode = *it;
             threads.push_back(boost::shared_ptr<Poco::Thread>(new Poco::Thread));
-            runnables.push_back(boost::shared_ptr<Poco::Runnable>(new ThreadedPopulator(*childNode, DropFirst(inBlocks), DropFirst(inSelectionCounts))));
+            threads.back()->setPriority(Poco::Thread::PRIO_HIGH);
+            runnables.push_back(boost::shared_ptr<Poco::Runnable>(new ThreadedPopulator(*this, *childNode, DropFirst(inBlocks), DropFirst(inSelectionCounts))));
             threads.back()->start(*runnables.back());
             selection++;
             ++it;
         }
+        setThreadCount(getThreadCount() + threads.size());
 
         // Wait for all thread to finish.
         for (size_t idx = 0; idx != threads.size(); ++idx)
         {
             threads[idx]->join();
+            setThreadCount(getThreadCount() - 1);
         }
     }
 
 
     void Player::move(const std::vector<int> & inSelectionCounts)
     {
-        PopulateNode_MultiThreaded(mGame->currentNode(), mGame->getFutureBlocks(inSelectionCounts.size()), inSelectionCounts);
+        populateNodeMultiThreaded(mGame->currentNode(), mGame->getFutureBlocks(inSelectionCounts.size()), inSelectionCounts);
     }
 
 

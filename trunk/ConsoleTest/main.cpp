@@ -1,4 +1,5 @@
 #include "Game.h"
+#include "ErrorHandling.h"
 #include "GameState.h"
 #include "GameStateNode.h"
 #include "Player.h"
@@ -28,7 +29,15 @@ int Test(const std::vector<int> inDepths)
     while (!game.isGameOver())
     {
         player.move(inDepths);
-        game.setCurrentNode(game.currentNode().bestChild(inDepths.size()));
+        size_t depth = inDepths.size();
+        GameStateNode * child = game.currentNode().bestChild(depth);
+        while (!child && depth > 0)
+        {
+            child = game.currentNode().bestChild(depth--);
+        }
+        CheckCondition(child != 0, "No child!?");
+        CheckCondition(inDepths.size() == depth || child->state().isGameOver(), "Should have been Game Over");
+        game.setCurrentNode(child);
     }
     std::cout << "Blocks: " << game.currentNode().depth() <<  "\tLines: " << game.currentNode().state().stats().mNumLines << "\r";
     std::cout << std::endl;
@@ -62,11 +71,12 @@ int main()
 {
     try
     {
-        Test(GetDepths(1), 5);
-        Test(GetDepths(2), 5);
-        Test(GetDepths(3), 5);
-        Test(GetDepths(4), 5);
-        Test(GetDepths(5), 5);
+        int repeat = 5;
+        Test(GetDepths(1), repeat);
+        Test(GetDepths(2), repeat);
+        Test(GetDepths(3), repeat);
+        Test(GetDepths(4), repeat);
+        Test(GetDepths(5), repeat);
     }
     catch (const std::exception & exc)
     {
