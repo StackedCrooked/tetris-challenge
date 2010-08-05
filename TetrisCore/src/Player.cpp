@@ -1,4 +1,5 @@
 #include "Player.h"
+#include "GameState.h"
 #include "ErrorHandling.h"
 
 
@@ -32,7 +33,19 @@ namespace Tetris
             return;
         }
 
-        inNode.populate(inBlocks.front());
+        
+        if (inNode.state().isGameOver())
+        {
+            // Game over state has no children.
+            return;
+        }
+
+
+        // Generate the child nodes for inNode
+        GenerateOffspring(inBlocks.front(), inNode, inNode.children());
+
+
+        
         ChildNodes & children = inNode.children();
         ChildNodes::iterator it = children.begin();
         int selection = 0;
