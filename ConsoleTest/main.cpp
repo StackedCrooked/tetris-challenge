@@ -21,24 +21,11 @@ std::vector<int> GetDepths(int inDepth)
 }
 
 
-int Test(const std::vector<int> inDepths)
+int Test(const std::vector<int> & inDepths)
 {
     Game game(20, 10);
     Player player(&game);
-
-    while (!game.isGameOver())
-    {
-        player.move(inDepths);
-        size_t depth = inDepths.size();
-        GameStateNode * child = game.currentNode().bestChild(depth);
-        while (!child && depth > 0)
-        {
-            child = game.currentNode().bestChild(depth--);
-        }
-        CheckCondition(child != 0, "No child!?");
-        CheckCondition(inDepths.size() == depth || child->state().isGameOver(), "Should have been Game Over");
-        game.setCurrentNode(child);
-    }
+    player.playUntilGameOver(inDepths);
     std::cout << "Blocks: " << game.currentNode().depth() <<  "\tLines: " << game.currentNode().state().stats().mNumLines << "\r";
     std::cout << std::endl;
     return game.currentNode().state().stats().mNumLines;

@@ -169,4 +169,22 @@ namespace Tetris
     }
 
 
+    void Player::playUntilGameOver(const std::vector<int> & inDepths)
+    {
+        while (!mGame->isGameOver())
+        {
+            move(inDepths);
+            size_t depth = inDepths.size();
+            GameStateNode * child = mGame->currentNode().bestChild(depth);
+            while (!child && depth > 0)
+            {
+                child = mGame->currentNode().bestChild(depth--);
+            }
+            CheckCondition(child != 0, "No child!?");
+            CheckCondition(inDepths.size() == depth || child->state().isGameOver(), "Should have been Game Over");
+            mGame->setCurrentNode(child);
+        }
+    }
+
+
 } // namespace Tetris
