@@ -20,7 +20,7 @@ namespace Tetris
         bool operator()(ChildNodePtr lhs, ChildNodePtr rhs);
     };    
 
-    typedef std::multiset<ChildNodePtr, ChildPtrCompare> Children;
+    typedef std::multiset<ChildNodePtr, ChildPtrCompare> ChildNodes;
 
     class GameStateNode
     {
@@ -43,9 +43,9 @@ namespace Tetris
         // created by combining the game state and the given block.
         void populate(const Block & inBlock);
 
-        const Children & children() const;
+        const ChildNodes & children() const;
 
-        Children & children();
+        ChildNodes & children();
 
         const GameState & state() const;
 
@@ -58,7 +58,7 @@ namespace Tetris
         GameStateNode * mParent;
         int mDepth;
         std::auto_ptr<GameState> mGameState;
-        Children mChildren;
+        ChildNodes mChildren;
     };
 
 } // namespace Tetris

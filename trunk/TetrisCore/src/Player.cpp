@@ -33,8 +33,8 @@ namespace Tetris
         }
 
         inNode.populate(inBlocks.front());
-        Children & children = inNode.children();
-        Children::iterator it = children.begin();
+        ChildNodes & children = inNode.children();
+        ChildNodes::iterator it = children.begin();
         int selection = 0;
         while (selection < inSelectionCounts.front() && it != children.end())
         {

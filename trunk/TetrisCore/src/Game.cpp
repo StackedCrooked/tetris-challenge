@@ -118,9 +118,9 @@ namespace Tetris
     {
         if (GameStateNode * parent = mCurrentNode->parent())
         {
-            Children & children = parent->children();
-            Children::iterator it = children.begin(), end = children.end();
-            Children::iterator * previous(0);
+            ChildNodes & children = parent->children();
+            ChildNodes::iterator it = children.begin(), end = children.end();
+            ChildNodes::iterator * previous(0);
             for (; it != end; ++it)
             {
                 if (it->get() == mCurrentNode)
@@ -143,9 +143,9 @@ namespace Tetris
     {
         if (GameStateNode * parent = mCurrentNode->parent())
         {
-            Children & children = parent->children();
-            Children::iterator it = children.begin(), end = children.end();
-            Children::iterator * previous(0);
+            ChildNodes & children = parent->children();
+            ChildNodes::iterator it = children.begin(), end = children.end();
+            ChildNodes::iterator * previous(0);
             for (; it != end; ++it)
             {
                 if (it->get() == mCurrentNode)

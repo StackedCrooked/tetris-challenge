@@ -430,7 +430,7 @@ namespace Tetris
         {
             return;
         }
-        Children children = inNode.children();
+        ChildNodes children = inNode.children();
         if (children.empty())
         {
             return;

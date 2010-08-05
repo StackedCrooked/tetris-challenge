@@ -30,20 +30,20 @@ namespace Tetris
     }
 
 
-    void CollectAll(GameStateNode * inChild, int inDepth, Children & outChildren)
+    void CollectAll(GameStateNode * inChild, int inDepth, ChildNodes & outChildren)
     {
         if (inDepth > 1)
         {
-            Children children = inChild->children();
-            for (Children::iterator it = children.begin(); it != children.end(); ++it)
+            ChildNodes children = inChild->children();
+            for (ChildNodes::iterator it = children.begin(); it != children.end(); ++it)
             {
                 CollectAll(it->get(), inDepth - 1, outChildren);
             }
         }
         else
         {
-            Children children = inChild->children();
-            for (Children::iterator it = children.begin(); it != children.end(); ++it)
+            ChildNodes children = inChild->children();
+            for (ChildNodes::iterator it = children.begin(); it != children.end(); ++it)
             {
                 outChildren.insert(*it);
             }
@@ -54,7 +54,7 @@ namespace Tetris
     GameStateNode * GameStateNode::bestChild(int inDepth)
     {
         ChildNodePtr result;
-        Children collectAll;
+        ChildNodes collectAll;
         CollectAll(this, inDepth, collectAll);
         if (!collectAll.empty())
         {
@@ -76,13 +76,13 @@ namespace Tetris
     }
 
 
-    Children & GameStateNode::children()
+    ChildNodes & GameStateNode::children()
     {
         return mChildren;
     }
 
 
-    const Children & GameStateNode::children() const
+    const ChildNodes & GameStateNode::children() const
     {
         return mChildren;
     }
@@ -106,13 +106,71 @@ namespace Tetris
     }
 
 
-    void GameStateNode::populate(const Block & inBlock)
+    bool IsGameOver(const GameState & inGameState, BlockType inBlockType, int inRotation)
     {
-        //CheckPrecondition(mChildren.empty(), "GameStateNode::populate(): already has children.");
-        if (!mChildren.empty())
+        const Grid & blockGrid = GetGrid(GetBlockIdentifier(inBlockType, inRotation));
+        const Grid & gameGrid = inGameState.grid();
+        size_t initialColumn = DivideByTwo(inGameState.grid().numColumns() - blockGrid.numColumns());
+        for (size_t row = 0; row < blockGrid.numRows(); ++row)
+        {
+            for (size_t col = 0; col < blockGrid.numColumns(); ++col)
+            {
+                if (blockGrid.get(row, col) != BlockType_Nil && gameGrid.get(row, initialColumn + col) != BlockType_Nil)
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+
+    void GenerateOffspring(const Block & inBlock, GameStateNode & ioGameStateNode, ChildNodes outChildNodes)
+    {
+        CheckPrecondition(outChildNodes.empty(), "GenerateOffspring: outChildNodes already has children.");
+        
+        const GameState & gameState = ioGameStateNode.state();
+        const Grid & gameGrid = gameState.grid();
+
+        if (IsGameOver(gameState, inBlock.type(), inBlock.rotation()))
         {
             return;
         }
+
+        for (size_t col = 0; col != gameGrid.numColumns(); ++col)
+        {
+            Block block = inBlock;
+            block.setColumn(col);
+            block.setRow(0);
+            for (size_t rt = 0; rt != block.numRotations(); ++rt)
+            {
+                std::auto_ptr<GameState> newGameState;
+                block.setRotation(rt);
+                size_t row = 0;
+                while (gameState.checkPositionValid(block, row, col))
+                {
+                    block.setRow(row);
+                    row++;
+                }
+
+                if (row > 0)
+                {
+                    newGameState = gameState.commit(block, false);
+                }
+                else
+                {
+                    newGameState = gameState.commit(block, true);
+                }
+                ChildNodePtr childState(new GameStateNode(&ioGameStateNode, newGameState));
+                outChildNodes.insert(childState);
+            }
+        }
+    }
+
+
+    void GameStateNode::populate(const Block & inBlock)
+    {
+        CheckPrecondition(mChildren.empty(), "GameStateNode::populate(): already has children.");
         
         Grid & grid = mGameState->grid();
         for (size_t col = 0; col != grid.numColumns(); ++col)
