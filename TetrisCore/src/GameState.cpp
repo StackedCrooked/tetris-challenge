@@ -11,12 +11,20 @@ namespace Tetris
         return (int)((inValue / 2.0) + 0.5);
     }
 
+    static Block CenterBlock(const Block & inBlock, size_t inNumColumns)
+    {
+        Block block = inBlock;
+        size_t column = static_cast<int>(0.5 + (static_cast<float>(inNumColumns - inBlock.grid().numColumns())/2));
+        block.setColumn(column);
+        return block;
+    }
+
 
     GameState::GameState(int inNumRows, int inNumColumns) :
         mGrid(inNumRows, inNumColumns, BlockType_Nil),
         mStats(),
         mIsGameOver(false),
-        mOriginalBlock(BlockType_L, 0, 0, 0),
+        mOriginalBlock(BlockType_L, Rotation(0), Row(0), Column(0)),
         mQuality()
     {
     }

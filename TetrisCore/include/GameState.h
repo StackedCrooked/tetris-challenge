@@ -10,6 +10,8 @@
 namespace Tetris
 {
 
+    static Block CenterBlock(const Block & inBlock, size_t inNumColumns);
+
     class GameState
     {
     public:

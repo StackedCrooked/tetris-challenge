@@ -7,21 +7,32 @@
 namespace Tetris
 {
 
-    static Block CenterBlock(const Block & inBlock, size_t inNumColumns)
+    //static Block CenterBlock(const Block & inBlock, size_t inNumColumns)
+    //{
+    //    Block block = inBlock;
+    //    size_t column = static_cast<int>(0.5 + (static_cast<float>(inNumColumns - inBlock.grid().numColumns())/2));
+    //    block.setColumn(column);
+    //    return block;
+    //}
+    std::auto_ptr<Block> CreateDefaultBlock(BlockType inBlockType, size_t inNumColumns)
     {
-        Block block = inBlock;
-        size_t column = static_cast<int>(0.5 + (static_cast<float>(inNumColumns - inBlock.grid().numColumns())/2));
-        block.setColumn(column);
-        return block;
+        return std::auto_ptr<Block>(new Block(
+            inBlockType,
+            Rotation(0),
+            Row(0),
+            Column(DivideByTwo(inNumColumns - GetGrid(GetBlockIdentifier(inBlockType, 0)).numColumns()))));
     }
 
 
     Game::Game(int inNumRows, int inNumColumns) :
+        mNumRows(inNumRows),
+        mNumColumns(inNumColumns),
         mRootNode(GameStateNode::CreateRootNode(inNumRows, inNumColumns)),
         mBlockFactory(cBlockTypeCount),
         mCurrentBlockIndex(0)
     {
-        mBlocks.push_back(CenterBlock(mBlockFactory.getNext(), inNumColumns));
+        mBlocks.push_back(mBlockFactory.getNext());
+        mActiveBlock = CreateDefaultBlock(mBlocks.front(), inNumColumns);
         mCurrentNode = mRootNode.get();
     }
 
@@ -32,35 +43,40 @@ namespace Tetris
     }
 
 
-    const Block & Game::activeBlock() const
+    void Game::supplyBlocks() const
     {
         while (mCurrentBlockIndex >= mBlocks.size())
         {
-            mBlocks.push_back(CenterBlock(mBlockFactory.getNext(), currentNode().state().grid().numColumns()));
+            mBlocks.push_back(mBlockFactory.getNext());
         }
-        return mBlocks[mCurrentBlockIndex];
+    }
+
+
+    const Block & Game::activeBlock() const
+    {
+        supplyBlocks();
+        return *mActiveBlock;
     }
 
 
     Block & Game::activeBlock()
     {
-        while (mCurrentBlockIndex >= mBlocks.size())
-        {
-            mBlocks.push_back(CenterBlock(mBlockFactory.getNext(), currentNode().state().grid().numColumns()));
-        }
-        return mBlocks[mCurrentBlockIndex];
+        supplyBlocks();
+        return *mActiveBlock;
     }
 
 
-    std::vector<Block> Game::getFutureBlocks(size_t inCount) const
+    std::vector<BlockType> Game::getFutureBlocks(size_t inCount) const
     {
-        std::vector<Block> blocks;
-        blocks.push_back(activeBlock());
 
+        // Make sure we have all blocks we need.
         while (mBlocks.size() - mCurrentBlockIndex < inCount)
         {
-            mBlocks.push_back(CenterBlock(mBlockFactory.getNext(), mCurrentNode->state().grid().numColumns()));
+            mBlocks.push_back(mBlockFactory.getNext());
         }
+
+        std::vector<BlockType> blocks;
+        blocks.push_back(mBlocks[mCurrentBlockIndex]);
 
         if (inCount > 0)
         {
@@ -91,6 +107,7 @@ namespace Tetris
         CheckPrecondition(mCurrentBlockIndex == mCurrentNode->depth(), "mCurrentBlockIndex == mCurrentNode->depth() is false.");
         mCurrentNode = inCurrentNode;
         mCurrentBlockIndex = mCurrentNode->depth();
+        mActiveBlock = CreateDefaultBlock(mBlocks[mCurrentBlockIndex], mNumColumns);
     }
 
 
@@ -234,13 +251,9 @@ namespace Tetris
         ChildNodePtr child(new GameStateNode(mCurrentNode, mCurrentNode->state().commit(block, block.row() == 0)));
         mCurrentNode->children().insert(child);
         mCurrentNode = child.get();
-    
-        
+            
         mCurrentBlockIndex++;
-        while (mCurrentBlockIndex >= mBlocks.size())
-        {
-            mBlocks.push_back(CenterBlock(mBlockFactory.getNext(), gameState.grid().numColumns()));
-        }
+        supplyBlocks();
         return false;
     }
 

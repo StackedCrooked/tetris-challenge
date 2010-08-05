@@ -148,7 +148,7 @@ namespace Tetris
         }
 
         // Hook keyboard
-        mKeyboardHook = ::SetWindowsHookEx(WH_KEYBOARD, (HOOKPROC)Visualizer::KeyboardProc, ::GetModuleHandle(0), 0);
+        //mKeyboardHook = ::SetWindowsHookEx(WH_KEYBOARD, (HOOKPROC)Visualizer::KeyboardProc, ::GetModuleHandle(0), 0);
 
         sInstances.insert(std::make_pair(mHandle, this));
         mTimerID = SetTimer(NULL, NULL, mDelay, &Visualizer::TimerCallback);
@@ -244,12 +244,11 @@ namespace Tetris
     
     void Visualizer::paintFutureBlocks(Gdiplus::Graphics & g)
     {
-        std::vector<Block> blocks = mGame->getFutureBlocks(5);
+        std::vector<BlockType> blocks = mGame->getFutureBlocks(5);
 
         for (size_t i = 1; i < cNumFutureBlocks; ++i)
         {
-            const Block & block = blocks[i];
-            const Grid & grid = block.grid();
+            const Grid & grid = GetGrid(GetBlockIdentifier(blocks[i], 0));
             paintGrid(g, grid, cBlocksOffsetX, cBlocksOffsetY + (i - 1) * 5 * cBlockHeight);
         }
     }
@@ -482,13 +481,13 @@ namespace Tetris
             mLastComputerMove = elapsed;
         }
 
-        if (elapsed - mElapsed > 500)
-        {
-            mElapsed = elapsed;
-            mGame->move(Direction_Down);
-        }
+        //if (elapsed - mElapsed > 500)
+        //{
+        //    mElapsed = elapsed;
+        //    mGame->move(Direction_Down);
+        //}
 
-        processKeys();
+        //processKeys();
 
         ::InvalidateRect(mHandle, 0, FALSE);
     }

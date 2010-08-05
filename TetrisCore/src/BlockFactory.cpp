@@ -29,27 +29,14 @@ namespace Tetris
     }
 
     
-    Block BlockFactory::getNext() const
+    BlockType BlockFactory::getNext() const
     {
         if (mCurrentIndex >= mBagSize)
         {
+            // Reshuffle the bag.
             const_cast<BlockFactory*>(this)->reset();
         }
-        mPrevious.push_back(mBag[mCurrentIndex]);
-        return Block(mBag[mCurrentIndex++], 0, 0, 0);
-    }
-
-
-    size_t BlockFactory::numCreated() const
-    {
-        return mPrevious.size();
-    }
-
-    
-    Block BlockFactory::getPrevious(size_t inIndex) const
-    {
-        CheckArgument(inIndex < mPrevious.size(), "Invalid index for getPrevious.");
-        return Block(mPrevious[inIndex], 0, 0, 0);
+        return mBag[mCurrentIndex++];
     }
 
 

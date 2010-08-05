@@ -125,7 +125,7 @@ namespace Tetris
     }
 
 
-    void GenerateOffspring(const Block & inBlock, GameStateNode & ioGameStateNode, ChildNodes & outChildNodes)
+    void GenerateOffspring(BlockType inBlockType, GameStateNode & ioGameStateNode, ChildNodes & outChildNodes)
     {
         CheckPrecondition(outChildNodes.empty(), "GenerateOffspring: outChildNodes already has children.");
         
@@ -134,18 +134,17 @@ namespace Tetris
 
         // Is this a "game over" situation?
         // If yes then append the final "broken" game state as only child.
-        if (IsGameOver(gameState, inBlock.type(), inBlock.rotation()))
+        if (IsGameOver(gameState, inBlockType, 0))
         {
-            ChildNodePtr childState(new GameStateNode(&ioGameStateNode, gameState.commit(inBlock, true)));
+            size_t initialColumn = DivideByTwo(gameGrid.numColumns() - GetGrid(GetBlockIdentifier(inBlockType, 0)).numColumns());
+            ChildNodePtr childState(new GameStateNode(&ioGameStateNode, gameState.commit(Block(inBlockType, Rotation(0), Row(0), Column(initialColumn)), true)));
             outChildNodes.insert(childState);
             return;
         }
 
         for (size_t col = 0; col != gameGrid.numColumns(); ++col)
         {
-            Block block = inBlock;
-            block.setColumn(col);
-            block.setRow(0);
+            Block block(inBlockType, Rotation(0), Row(0), Column(col));
             for (size_t rt = 0; rt != block.numRotations(); ++rt)
             {
                 std::auto_ptr<GameState> newGameState;
@@ -158,6 +157,24 @@ namespace Tetris
                 }
                 ChildNodePtr childState(new GameStateNode(&ioGameStateNode, gameState.commit(block, false)));
                 outChildNodes.insert(childState);
+            }
+        }
+    }
+
+
+    void GenerateOffspring(std::vector<BlockType> inBlockTypes, size_t inOffset, GameStateNode & ioGameStateNode, ChildNodes & outChildNodes)
+    {
+        CheckPrecondition(inOffset < inBlockTypes.size(), "GenerateOffspring: inOffset must be smaller than inBlockTypes.size().");
+        
+        GenerateOffspring(inBlockTypes[inOffset], ioGameStateNode, outChildNodes);
+
+        if (inOffset + 1 < inBlockTypes.size())
+        {
+            ChildNodes::iterator it = outChildNodes.begin(), end = outChildNodes.end();
+            for (; it != end; ++it)
+            {
+                ChildNodePtr childNode = *it;
+                GenerateOffspring(inBlockTypes, inOffset + 1, *childNode, childNode->children());
             }
         }
     }
