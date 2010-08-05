@@ -132,8 +132,12 @@ namespace Tetris
         const GameState & gameState = ioGameStateNode.state();
         const Grid & gameGrid = gameState.grid();
 
+        // Is this a "game over" situation?
+        // If yes then append the final "broken" game state as only child.
         if (IsGameOver(gameState, inBlock.type(), inBlock.rotation()))
         {
+            ChildNodePtr childState(new GameStateNode(&ioGameStateNode, gameState.commit(inBlock, true)));
+            outChildNodes.insert(childState);
             return;
         }
 
@@ -152,25 +156,10 @@ namespace Tetris
                     block.setRow(row);
                     row++;
                 }
-
-                if (row > 0)
-                {
-                    newGameState = gameState.commit(block, false);
-                }
-                else
-                {
-                    newGameState = gameState.commit(block, true);
-                }
-                ChildNodePtr childState(new GameStateNode(&ioGameStateNode, newGameState));
+                ChildNodePtr childState(new GameStateNode(&ioGameStateNode, gameState.commit(block, false)));
                 outChildNodes.insert(childState);
             }
         }
-    }
-
-
-    void GameStateNode::populate(const Block & inBlock)
-    {
-        GenerateOffspring(inBlock, *this, mChildren);
     }
 
 

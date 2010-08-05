@@ -2,6 +2,7 @@
 #define GAMESTATENODE_H_INCLUDED
 
 
+#include "BlockType.h"
 #include <boost/shared_ptr.hpp>
 #include <memory>
 #include <set>
@@ -39,10 +40,6 @@ namespace Tetris
 
         GameStateNode * parent();
 
-        // Populate the node with all possible child nodes that can be
-        // created by combining the game state and the given block.
-        void populate(const Block & inBlock);
-
         const ChildNodes & children() const;
 
         ChildNodes & children();
@@ -60,6 +57,18 @@ namespace Tetris
         std::auto_ptr<GameState> mGameState;
         ChildNodes mChildren;
     };
+
+
+    //
+    // Helper functions
+    //
+
+    // Populate the node with all possible child nodes that can be
+    // created by combining the game state and the given block.
+    void GenerateOffspring(const Block & inBlock, GameStateNode & ioGameStateNode, ChildNodes & outChildNodes);
+
+    bool IsGameOver(const GameState & inGameState, BlockType inBlockType, int inRotation);
+
 
 } // namespace Tetris
 
