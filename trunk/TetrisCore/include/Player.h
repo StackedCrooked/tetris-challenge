@@ -24,6 +24,8 @@ namespace Tetris
 
         void populateNodeMultiThreaded(GameStateNode & inNode, const std::vector<BlockType> & inBlocks, const std::vector<int> & inSelectionCounts);
 
+        void playUntilGameOver(const std::vector<int> & inDepths);
+
         void print(const std::string & inMessage);
 
     private:
