@@ -57,6 +57,7 @@ namespace Tetris
         return mGrid;
     }
 
+
     int GameState::quality() const
     {
         if (mQuality.mDirty)
