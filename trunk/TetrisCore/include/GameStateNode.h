@@ -65,7 +65,10 @@ namespace Tetris
 
     // Populate the node with all possible child nodes that can be
     // created by combining the game state and the given block.
-    void GenerateOffspring(const Block & inBlock, GameStateNode & ioGameStateNode, ChildNodes & outChildNodes);
+    void GenerateOffspring(BlockType inBlockType, GameStateNode & ioGameStateNode, ChildNodes & outChildNodes);
+
+    // Same as GenerateOffspring, but multiple levels deep.
+    void GenerateOffspring(size_t inDepth, const Block & inBlock, GameStateNode & ioGameStateNode, ChildNodes & outChildNodes);
 
     bool IsGameOver(const GameState & inGameState, BlockType inBlockType, int inRotation);
 

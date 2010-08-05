@@ -25,7 +25,7 @@ namespace Tetris
     }
 
 
-    void PopulateNode(GameStateNode & inNode, const std::vector<Block> & inBlocks, const std::vector<int> & inSelectionCounts)
+    void PopulateNode(GameStateNode & inNode, const std::vector<BlockType> & inBlocks, const std::vector<int> & inSelectionCounts)
     {
         CheckArgument(inBlocks.size() == inSelectionCounts.size(), "PopulateNode got inBlocks.size() != inSelectionCounts.size()");
         if (inBlocks.empty())

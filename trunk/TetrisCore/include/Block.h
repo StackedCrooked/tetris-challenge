@@ -12,13 +12,33 @@ namespace Tetris
 
     typedef GenericGrid<BlockType> Grid;
 
+
+#define GENERATE_TYPESAFE_WRAPPER(WrappedType, ClassName) \
+    class ClassName \
+    { \
+    public: \
+        explicit ClassName(size_t inValue) : mValue(inValue) {} \
+        size_t get() const \
+        { return mValue; } \
+    private: \
+        WrappedType mValue; \
+    };
+
+    // Typesafe wrappers for Rotation, Row and Column.
+    // Now you can't accidentally mix up the order of
+    // arguments in the Block constructor.
+    GENERATE_TYPESAFE_WRAPPER(size_t, Rotation)
+    GENERATE_TYPESAFE_WRAPPER(size_t, Row)
+    GENERATE_TYPESAFE_WRAPPER(size_t, Column)
+
+
     /**
      * Represents a Tetris block.
      */
     class Block
     {
     public:
-        Block(BlockType inType, size_t inRow, size_t inColumn, size_t inRotation);
+        Block(BlockType inType, Rotation inRotation, Row inRow, Column inColumn);
 
         BlockType type() const;
 
@@ -43,9 +63,9 @@ namespace Tetris
 
     private:
         BlockType mType;
+        size_t mRotation;
         size_t mRow;
         size_t mColumn;
-        size_t mRotation;
         const Grid * mGrid;
     };
 

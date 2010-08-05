@@ -7,12 +7,12 @@ namespace Tetris
 {
 
 
-    Block::Block(BlockType inType, size_t inRotation, size_t inRow, size_t inColumn) :
+    Block::Block(BlockType inType, Rotation inRotation, Row inRow, Column inColumn) :
         mType(inType),
-        mRow(inRow),
-        mColumn(inColumn),
-        mRotation(inRotation),
-        mGrid(&GetGrid(GetBlockIdentifier(inType, inRotation)))
+        mRotation(inRotation.get()),
+        mRow(inRow.get()),
+        mColumn(inColumn.get()),
+        mGrid(&GetGrid(GetBlockIdentifier(inType, inRotation.get())))
     {
         CheckArgument(mRotation >= 0 && mRotation <= 3, "Invalid rotation value.");
     }

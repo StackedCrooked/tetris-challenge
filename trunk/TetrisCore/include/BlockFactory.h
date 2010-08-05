@@ -17,11 +17,7 @@ namespace Tetris
         // The size of the bag of blocks that shuffled and taken from.
         BlockFactory(int inBagSize = cBlockTypeCount);
 
-        size_t numCreated() const;
-
-        Block getPrevious(size_t inIndex) const;
-
-        Block getNext() const;
+        BlockType getNext() const;
 
     private:
         void reset();
@@ -29,7 +25,6 @@ namespace Tetris
         size_t mBagSize;
         mutable size_t mCurrentIndex;
         mutable std::vector<BlockType> mBag;
-        mutable std::vector<BlockType> mPrevious;
     };
 
 } // namespace Tetris
