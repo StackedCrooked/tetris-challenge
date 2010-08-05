@@ -125,7 +125,7 @@ namespace Tetris
     }
 
 
-    void GenerateOffspring(const Block & inBlock, GameStateNode & ioGameStateNode, ChildNodes outChildNodes)
+    void GenerateOffspring(const Block & inBlock, GameStateNode & ioGameStateNode, ChildNodes & outChildNodes)
     {
         CheckPrecondition(outChildNodes.empty(), "GenerateOffspring: outChildNodes already has children.");
         
@@ -170,37 +170,7 @@ namespace Tetris
 
     void GameStateNode::populate(const Block & inBlock)
     {
-        CheckPrecondition(mChildren.empty(), "GameStateNode::populate(): already has children.");
-        
-        Grid & grid = mGameState->grid();
-        for (size_t col = 0; col != grid.numColumns(); ++col)
-        {
-            Block block = inBlock;
-            block.setColumn(col);
-            block.setRow(0);
-            for (size_t rt = 0; rt != block.numRotations(); ++rt)
-            {
-                std::auto_ptr<GameState> newGameState;
-                block.setRotation(rt);
-                size_t row = 0;
-                while (mGameState->checkPositionValid(block, row, col))
-                {
-                    block.setRow(row);
-                    row++;
-                }
-
-                if (row > 0)
-                {
-                    newGameState = mGameState->commit(block, false);
-                }
-                else
-                {
-                    newGameState = mGameState->commit(block, true);
-                }
-                ChildNodePtr childState(new GameStateNode(this, newGameState));
-                mChildren.insert(childState);
-            }
-        }
+        GenerateOffspring(inBlock, *this, mChildren);
     }
 
 

@@ -87,6 +87,7 @@ namespace Tetris
 
     void Game::setCurrentNode(GameStateNode * inCurrentNode)
     {
+        CheckPrecondition(inCurrentNode != 0, "inCurrentNode must not be null.");
         CheckPrecondition(mCurrentBlockIndex == mCurrentNode->depth(), "mCurrentBlockIndex == mCurrentNode->depth() is false.");
         mCurrentNode = inCurrentNode;
         mCurrentBlockIndex = mCurrentNode->depth();
