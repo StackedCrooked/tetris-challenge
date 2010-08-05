@@ -7,13 +7,6 @@
 namespace Tetris
 {
 
-    //static Block CenterBlock(const Block & inBlock, size_t inNumColumns)
-    //{
-    //    Block block = inBlock;
-    //    size_t column = static_cast<int>(0.5 + (static_cast<float>(inNumColumns - inBlock.grid().numColumns())/2));
-    //    block.setColumn(column);
-    //    return block;
-    //}
     std::auto_ptr<Block> CreateDefaultBlock(BlockType inBlockType, size_t inNumColumns)
     {
         return std::auto_ptr<Block>(new Block(
