@@ -13,6 +13,14 @@
 namespace Tetris
 {
 
+    /**
+     * Game is a top-level class for the Tetris core. It manages the following things:
+     *   - the currently active block
+     *   - the list of future blocks
+     *   - the root gamestate node
+     *
+     * It is the class that needs to be exposed to the client.
+     */
     class Game
     {
     public:
@@ -31,6 +39,21 @@ namespace Tetris
 
         void setCurrentNode(GameStateNode * inCurrentNode);
 
+        bool isGameOver() const;
+
+        //
+        // Game commands
+        //
+        bool move(Direction inDirection);
+
+        void rotate();
+
+        void drop();
+
+        //
+        // Navigate the game history and alternative histories.
+        // Experimental.
+        //
         bool navigateNodeUp();
 
         bool navigateNodeDown();
@@ -38,14 +61,6 @@ namespace Tetris
         bool navigateNodeLeft();
 
         bool navigateNodeRight();
-
-        bool isGameOver() const;
-
-        bool move(Direction inDirection);
-
-        void rotate();
-
-        void drop();
 
     private:
         std::auto_ptr<GameStateNode> mRootNode;
