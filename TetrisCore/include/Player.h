@@ -34,9 +34,11 @@ namespace Tetris
 
         void print(const std::string & inMessage);
 
-    private:
-        void cleanup(GameStateNode * child, size_t inDepth);
+        void cleanup(GameStateNode * currentNode, GameStateNode * child, bool inMultiThreaded);
 
+        void cleanup(GameStateNode * currentNode, GameStateNode * child);
+
+    private:
         Game * mGame;
         size_t mThreadCount;
         mutable Poco::Mutex mThreadCountMutex;

@@ -115,8 +115,8 @@ namespace Tetris
         virtual void run()
         {
             // Thread-fest.
-            mPlayer.populateNodeMultiThreaded(mNode, mBlocks, mSelectionCounts);
-            //PopulateNode(mNode, mBlocks, mSelectionCounts);
+            //mPlayer.populateNodeMultiThreaded(mNode, mBlocks, mSelectionCounts);
+            PopulateNode(mNode, mBlocks, mSelectionCounts);
         }
 
     private:
@@ -154,7 +154,7 @@ namespace Tetris
         std::vector<boost::shared_ptr<Poco::Runnable> > runnables;
         std::vector<boost::shared_ptr<Poco::Thread> > threads;
         
-        static const int cMaxThreadCount = 128; //32;
+        static const int cMaxThreadCount = 32; //32;
         while (selection < inSelectionCounts.front() && it != children.end())
         {            
             ChildNodePtr childNode = *it;
@@ -201,40 +201,72 @@ namespace Tetris
         while (!mGame->isGameOver())
         {
             move(inDepths, inMultiThreaded);
-            //cleanup(&mGame->currentNode(), inDepths.size());
             size_t depth = inDepths.size();
             GameStateNode * child = mGame->currentNode().bestChild(depth);
             while (!child && depth > 0)
             {
                 child = mGame->currentNode().bestChild(depth--);
             }
-
-            GameStateNode * immediateChildParent = child->parent();
-            GameStateNode * immediateChild = child;
-            while (immediateChild->depth() - mGame->currentNode().depth() > 0)
-            {
-                ChildNodes::iterator it = immediateChildParent->children().begin(), end = immediateChildParent->children().end();
-                for (; it != end; ++it)
-                {
-                    ChildNodePtr child = *it;
-                    if (child.get() == immediateChild)
-                    {
-                        immediateChildParent->children().clear();
-                        immediateChildParent->children().insert(child);
-                        break;
-                    }
-                }
-                immediateChild = immediateChild->parent();
-                immediateChildParent = immediateChild->parent();
-            }
+            
+            cleanup(&mGame->currentNode(), child);
 
             mGame->setCurrentNode(child);
         }
     }
-    
-    
-    void Player::cleanup(GameStateNode * child, size_t inDepth)
+
+    class ThreadedCleaner : public Poco::Runnable
     {
+    public:
+        ThreadedCleaner(Player * inPlayer, GameStateNode * inCurrentNode, GameStateNode * inChild) :
+            mPlayer(inPlayer),
+            mCurrentNode(inCurrentNode),
+            mChild(inChild)
+        {
+        }
+
+        virtual void run()
+        {
+            mPlayer->cleanup(mCurrentNode, mChild);
+        }
+
+    private:
+        Player * mPlayer;
+        GameStateNode * mCurrentNode;
+        GameStateNode * mChild;
+    };
+    
+    
+    void Player::cleanup(GameStateNode * currentNode, GameStateNode * child, bool inMultiThreaded)
+    {
+        if (inMultiThreaded)
+        {
+            ThreadedCleaner runner(this, currentNode, child);
+            Poco::Thread thread;
+            thread.start(runner);            
+        }
+    }
+    
+    
+    void Player::cleanup(GameStateNode * currentNode, GameStateNode * child)
+    {
+        GameStateNode * immediateChildParent = child->parent();
+        GameStateNode * immediateChild = child;
+        while (immediateChild->depth() - currentNode->depth() > 0)
+        {
+            ChildNodes::iterator it = immediateChildParent->children().begin(), end = immediateChildParent->children().end();
+            for (; it != end; ++it)
+            {
+                ChildNodePtr child = *it;
+                if (child.get() == immediateChild)
+                {
+                    immediateChildParent->children().clear();
+                    immediateChildParent->children().insert(child);
+                    break;
+                }
+            }
+            immediateChild = immediateChild->parent();
+            immediateChildParent = immediateChild->parent();
+        }
     }
 
 
