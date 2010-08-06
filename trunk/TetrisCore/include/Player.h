@@ -5,6 +5,7 @@
 #include "Game.h"
 #include "Poco/Mutex.h"
 #include "Poco/ScopedLock.h"
+#include "Poco/ThreadPool.h"
 #include <vector>
 
 
@@ -41,6 +42,7 @@ namespace Tetris
     private:
         Game * mGame;
         size_t mThreadCount;
+        Poco::ThreadPool mThreadPool;
         mutable Poco::Mutex mThreadCountMutex;
         mutable Poco::Mutex mIOMutex;
     };
