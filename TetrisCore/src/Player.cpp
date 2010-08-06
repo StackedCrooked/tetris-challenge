@@ -114,8 +114,6 @@ namespace Tetris
 
         virtual void run()
         {
-            // Thread-fest.
-            //mPlayer.populateNodeMultiThreaded(mNode, mBlocks, mSelectionCounts);
             PopulateNode(mNode, mBlocks, mSelectionCounts);
             delete this;
         }
@@ -155,7 +153,7 @@ namespace Tetris
         while (selection < inSelectionCounts.front() && it != children.end())
         {            
             ChildNodePtr childNode = *it;
-            if (true) //getThreadCount() < cMaxThreadCount)
+            if (mThreadPool.used() < mThreadPool.capacity())
             {
                 mThreadPool.startWithPriority
                 (
@@ -170,8 +168,6 @@ namespace Tetris
             selection++;
             ++it;
         }
-
-        mThreadPool.joinAll();
     }
 
 
@@ -179,7 +175,8 @@ namespace Tetris
     {
         if (inMultiThreaded)
         {
-            populateNodeMultiThreaded(mGame->currentNode(), mGame->getFutureBlocks(inSelectionCounts.size()), inSelectionCounts);
+            populateNodeMultiThreaded(mGame->currentNode(), mGame->getFutureBlocks(inSelectionCounts.size()), inSelectionCounts);            
+            mThreadPool.joinAll();
         }
         else
         {
@@ -228,12 +225,15 @@ namespace Tetris
         GameStateNode * mChild;
     };
     
-    
+
     void Player::cleanup(GameStateNode * currentNode, GameStateNode * child, bool inMultiThreaded)
     {
         if (inMultiThreaded)
         {
-            mThreadPool.startWithPriority(Poco::Thread::PRIO_LOW, *(new ThreadedCleaner(this, currentNode, child)));
+            // Not using thread pool here to avoid 
+            Poco::Thread * theThread = new Poco::Thread;
+            theThread->setPriority(Poco::Thread::PRIO_LOW);
+            theThread->start(*(new ThreadedCleaner(this, currentNode, child)));            
         }
         else
         {
