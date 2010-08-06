@@ -233,7 +233,7 @@ namespace Tetris
 
     void Visualizer::paintScores(Gdiplus::Graphics & g)
     {
-        const GameState::Stats & stats = mGame->currentNode().state().stats();
+        const GameState::Stats & stats = mGame->currentNode()->state().stats();
         drawText(g, GetScoreText("Lines", stats.mNumLines), Rect(cScoresOffsetX, cScoresOffsetY, 200, 40));
         drawText(g, GetScoreText("x1", stats.mNumSingles), Rect(cScoresOffsetX, cScoresOffsetY + 40, 200, 40));
         drawText(g, GetScoreText("x2", stats.mNumDoubles), Rect(cScoresOffsetX, cScoresOffsetY + 80, 200, 40));
@@ -271,7 +271,7 @@ namespace Tetris
 
     void Visualizer::paintGrid(Gdiplus::Graphics & g)
     {
-        const Grid & grid = mGame->currentNode().state().grid();
+        const Grid & grid = mGame->currentNode()->state().grid();
         int cGridOffsetX = 40;
         int cGridOffsetY = 40;
         for (size_t r = 0; r != grid.numRows(); ++r)
@@ -393,23 +393,25 @@ namespace Tetris
     }
 
 
-    const int cAIDepth = 3;
-
-
-    void Visualizer::newComputerMove(int inDepth)
+    void Visualizer::newComputerMove()
     {
         if (mGame->isGameOver())
         {
             return;
         }
 
+
+        const int cDepth = 4;
+        const int cWidth = 4;
+
+
         Player p(mGame);
         std::vector<int> depths;
-        for (int i = 0; i < inDepth; ++i)
+        for (int i = 0; i < cDepth; ++i)
         {
-            depths.push_back(6);
+            depths.push_back(cWidth);
         }
-        p.move(depths, true);
+        p.move(depths);
     }
 
 
@@ -419,24 +421,14 @@ namespace Tetris
         {
             return;
         }
-        nextComputerMove(mGame->currentNode());
-    }
-
-
-    void Visualizer::nextComputerMove(GameStateNode & inNode)
-    {
-        if (mGame->isGameOver())
-        {
-            return;
-        }
-        ChildNodes children = inNode.children();
+        ChildNodes children = mGame->currentNode()->children();
         if (children.empty())
         {
             return;
         }
 
 
-        if (GameStateNode * node = mGame->currentNode().bestChild(1))
+        if (GameStateNode * node = mGame->currentNode()->bestChild(1))
         {
             const Block & gotoBlock = node->state().originalBlock();
             const Block & activeBlock = mGame->activeBlock();
@@ -470,9 +462,9 @@ namespace Tetris
         clock_t elapsed = GetClockMs();
 
         
-        if (!mGame->currentNode().bestChild(1))
+        if (!mGame->currentNode()->bestChild(1))
         {
-            newComputerMove(cAIDepth);
+            newComputerMove();
         }
 
         if (elapsed - mLastComputerMove > 1)
@@ -557,7 +549,7 @@ namespace Tetris
             }
             case VK_DELETE:
             {
-                newComputerMove(cAIDepth);
+                newComputerMove();
                 break;
             }
             default:

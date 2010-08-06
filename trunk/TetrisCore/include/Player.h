@@ -3,48 +3,35 @@
 
 
 #include "Game.h"
-#include "Poco/Mutex.h"
-#include "Poco/ScopedLock.h"
-#include "Poco/ThreadPool.h"
+#include <boost/function.hpp>
+#include <boost/thread.hpp>
 #include <vector>
 
 
 namespace Tetris
 {
 
+    typedef boost::function<void(void*)> Job;
+    typedef std::vector<Job> Jobs;
+
     class Player
     {
     public:
         Player(Game * inGame);
 
-        void move(const std::vector<int> & inSelectionCounts, bool inMultiThreaded);
+        void setMaxThreadCount(size_t inMaxThreadCount);
 
-        void setThreadCount(size_t inThreadCount);
+        void move(const std::vector<int> & inWidths);
 
-        // Returns old value
-        size_t incrementThreadCount();
+        void playUntilGameOver(const std::vector<int> & inDepths);
 
-        // Returns old value
-        size_t decrementThreadCount();
-
-        size_t getThreadCount() const;
-
-        void populateNodeMultiThreaded(GameStateNode & inNode, const std::vector<BlockType> & inBlocks, const std::vector<int> & inSelectionCounts);
-
-        void playUntilGameOver(const std::vector<int> & inDepths, bool inMultiThreaded);
-
-        void print(const std::string & inMessage);
-
-        void cleanup(GameStateNode * currentNode, GameStateNode * child, bool inMultiThreaded);
-
-        void cleanup(GameStateNode * currentNode, GameStateNode * child);
+        void populateNodeMultiThreaded(GameStateNode & inNode, const BlockTypes & inBlocks, const std::vector<int> & inWidths, size_t inOffset);
 
     private:
         Game * mGame;
-        size_t mThreadCount;
-        Poco::ThreadPool mThreadPool;
-        mutable Poco::Mutex mThreadCountMutex;
-        mutable Poco::Mutex mIOMutex;
+        size_t mMaxThreadCount;
+        Jobs mJobs;
+        boost::mutex mMutex;
     };
 
 } // namespace Tetris

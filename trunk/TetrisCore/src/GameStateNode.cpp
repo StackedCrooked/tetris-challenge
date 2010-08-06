@@ -162,7 +162,7 @@ namespace Tetris
     }
 
 
-    void GenerateOffspring(std::vector<BlockType> inBlockTypes, size_t inOffset, GameStateNode & ioGameStateNode, ChildNodes & outChildNodes)
+    void GenerateOffspring(BlockTypes inBlockTypes, size_t inOffset, GameStateNode & ioGameStateNode, ChildNodes & outChildNodes)
     {
         CheckPrecondition(inOffset < inBlockTypes.size(), "GenerateOffspring: inOffset must be smaller than inBlockTypes.size().");
         

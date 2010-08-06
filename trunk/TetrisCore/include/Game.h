@@ -31,11 +31,11 @@ namespace Tetris
         Block & activeBlock();
 
         // Includes the currently active block
-        std::vector<BlockType> getFutureBlocks(size_t inCount) const;
+        BlockTypes getFutureBlocks(size_t inCount) const;
 
-        GameStateNode & currentNode();
+        GameStateNode * currentNode();
 
-        const GameStateNode & currentNode() const;
+        const GameStateNode * currentNode() const;
 
         void setCurrentNode(GameStateNode * inCurrentNode);
 
@@ -75,7 +75,7 @@ namespace Tetris
         
         // All blocks, previous, current and future.
         // This list grows during the game.
-        mutable std::vector<BlockType> mBlocks;
+        mutable BlockTypes mBlocks;
         size_t mCurrentBlockIndex;
     };
 

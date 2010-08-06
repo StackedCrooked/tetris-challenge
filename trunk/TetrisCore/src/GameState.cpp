@@ -244,7 +244,7 @@ namespace Tetris
         }
 
         
-        std::vector<BlockType> newData(mGrid.data().size(), BlockType_Nil);
+        BlockTypes newData(mGrid.data().size(), BlockType_Nil);
         
         // Get newData
         {
