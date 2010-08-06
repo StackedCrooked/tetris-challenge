@@ -117,6 +117,7 @@ namespace Tetris
             // Thread-fest.
             //mPlayer.populateNodeMultiThreaded(mNode, mBlocks, mSelectionCounts);
             PopulateNode(mNode, mBlocks, mSelectionCounts);
+            delete this;
         }
 
     private:
@@ -151,20 +152,16 @@ namespace Tetris
         ChildNodes::iterator it = children.begin();
         int selection = 0;
         
-        std::vector<boost::shared_ptr<Poco::Runnable> > runnables;
-        std::vector<boost::shared_ptr<Poco::Thread> > threads;
-        
-        static const int cMaxThreadCount = 32; //32;
         while (selection < inSelectionCounts.front() && it != children.end())
         {            
             ChildNodePtr childNode = *it;
-            if (getThreadCount() < cMaxThreadCount)
+            if (true) //getThreadCount() < cMaxThreadCount)
             {
-                threads.push_back(boost::shared_ptr<Poco::Thread>(new Poco::Thread));
-                threads.back()->setPriority(Poco::Thread::PRIO_HIGHEST);
-                runnables.push_back(boost::shared_ptr<Poco::Runnable>(new ThreadedPopulator(*this, *childNode, DropFirst(inBlocks), DropFirst(inSelectionCounts))));
-                threads.back()->start(*runnables.back());
-                incrementThreadCount();
+                mThreadPool.startWithPriority
+                (
+                    Poco::Thread::PRIO_HIGH,
+                    *(new ThreadedPopulator(*this, *childNode, DropFirst(inBlocks), DropFirst(inSelectionCounts)))
+                );
             }
             else
             {
@@ -174,12 +171,7 @@ namespace Tetris
             ++it;
         }
 
-        // Wait for all thread to finish.
-        for (size_t idx = 0; idx != threads.size(); ++idx)
-        {
-            threads[idx]->join();
-            decrementThreadCount();
-        }
+        mThreadPool.joinAll();
     }
 
 
@@ -227,6 +219,7 @@ namespace Tetris
         virtual void run()
         {
             mPlayer->cleanup(mCurrentNode, mChild);
+            delete this;
         }
 
     private:
@@ -240,9 +233,11 @@ namespace Tetris
     {
         if (inMultiThreaded)
         {
-            ThreadedCleaner runner(this, currentNode, child);
-            Poco::Thread thread;
-            thread.start(runner);            
+            mThreadPool.startWithPriority(Poco::Thread::PRIO_LOW, *(new ThreadedCleaner(this, currentNode, child)));
+        }
+        else
+        {
+            cleanup(currentNode, child);
         }
     }
     
