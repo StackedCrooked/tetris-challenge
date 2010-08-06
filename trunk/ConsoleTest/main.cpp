@@ -24,7 +24,7 @@ std::vector<int> GetParameters(int inDepth, int inWidth)
 
 int Test(const std::vector<int> & inDepths, bool inMultiThreaded)
 {
-    Game game(10, 10); // 10 rows to have game-over quicker :)
+    Game game(20, 10); // 10 rows to have game-over quicker :)
     Player player(&game);
     player.playUntilGameOver(inDepths, inMultiThreaded);
     std::cout << "Blocks: " << game.currentNode().depth() <<  "\tLines: " << game.currentNode().state().stats().mNumLines << "\r";
@@ -35,6 +35,7 @@ int Test(const std::vector<int> & inDepths, bool inMultiThreaded)
 
 void Test(const std::vector<int> inDepths, size_t inCount, bool inMultiThreaded)
 {
+
     Poco::Stopwatch stopWatch;
     stopWatch.start();
     std::cout << "TEST: " << (inMultiThreaded ? "MULTITHREADED" : "SINGLE THREADED") << std::endl;
@@ -66,10 +67,10 @@ int main()
         int repeat = 20;
         //Test(GetDepths(1), repeat, false);
         //Test(GetDepths(1), repeat, true);
-        //Test(GetDepths(2), repeat, false);
-        //Test(GetDepths(2), repeat, true);
-        Test(GetParameters(3, 4), repeat, false);
-        Test(GetParameters(3, 4), repeat, true);
+        Test(GetParameters(2, 4), repeat, false);
+        Test(GetParameters(2, 4), repeat, true);
+        Test(GetParameters(3, 3), repeat, false);
+        Test(GetParameters(3, 3), repeat, true);
         //Test(GetDepths(4), repeat, false);
         //Test(GetDepths(4), repeat, true);
     }
