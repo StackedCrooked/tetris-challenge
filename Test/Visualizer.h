@@ -66,9 +66,8 @@ namespace Tetris
         static void CALLBACK TimerCallback(HWND hWnd, UINT inMessage, UINT_PTR inTimerID, DWORD inTime);
 
         void timerCallback();
-        void newComputerMove(int inDepth);
+        void newComputerMove();
         void nextComputerMove();
-        void nextComputerMove(GameStateNode & inNode);
         
         void paint(HDC inHDC);
         void bufferedPaint(HDC inHDC);

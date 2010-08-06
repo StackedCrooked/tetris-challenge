@@ -6,6 +6,7 @@
 #include "Poco/Stopwatch.h"
 #include <stdexcept>
 #include <iostream>
+#include <windows.h>
 
 
 using namespace Tetris;
@@ -26,10 +27,10 @@ int Test(const std::vector<int> & inDepths, bool inMultiThreaded)
 {
     Game game(20, 10); // 10 rows to have game-over quicker :)
     Player player(&game);
-    player.playUntilGameOver(inDepths, inMultiThreaded);
-    std::cout << "Blocks: " << game.currentNode().depth() <<  "\tLines: " << game.currentNode().state().stats().mNumLines << "\r";
+    player.playUntilGameOver(inDepths);
+    std::cout << "Blocks: " << game.currentNode()->depth() <<  "\tLines: " << game.currentNode()->state().stats().mNumLines << "\r";
     std::cout << std::endl;
-    return game.currentNode().state().stats().mNumLines;
+    return game.currentNode()->state().stats().mNumLines;
 }
 
 
@@ -55,8 +56,14 @@ void Test(const std::vector<int> inDepths, size_t inCount, bool inMultiThreaded)
     {
         sumLines += Test(inDepths, inMultiThreaded);
     }
-    std::cout << "AVG line count: " << (int)(0.5 + (float)sumLines/(float)inCount) << std::endl;
-    std::cout << "Duration: " << (stopWatch.elapsed() / 1000) << "ms" << std::endl << std::endl;
+
+    int avgLines = (int)(0.5 + (float)sumLines/(float)inCount);
+    std::cout << "AVG line count: " << avgLines << std::endl;
+
+    int duration = (int)stopWatch.elapsed();
+    std::cout << "Duration: " << duration << "ms" << std::endl;
+
+    std::cout << "Duration/line: " << duration/avgLines << std::endl << std::endl;
 }
 
 
@@ -64,13 +71,17 @@ int main()
 {
     try
     {
-        int repeat = 20;
+        SYSTEM_INFO sysinfo;
+        GetSystemInfo( &sysinfo );
+        std::cout << "CPU count: " << sysinfo.dwNumberOfProcessors << std::endl;
+
+        //int repeat = 10;
         //Test(GetDepths(1), repeat, false);
         //Test(GetDepths(1), repeat, true);
-        Test(GetParameters(2, 4), repeat, false);
-        Test(GetParameters(2, 4), repeat, true);
-        Test(GetParameters(3, 3), repeat, false);
-        Test(GetParameters(3, 3), repeat, true);
+        //Test(GetParameters(4, 4), repeat, true);
+        //Test(GetParameters(4, 4), repeat, false);
+        //Test(GetParameters(3, 3), repeat, true);
+        //Test(GetParameters(3, 3), repeat, false);
         //Test(GetDepths(4), repeat, false);
         //Test(GetDepths(4), repeat, true);
     }

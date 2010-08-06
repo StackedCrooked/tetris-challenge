@@ -24,7 +24,7 @@ namespace Tetris
 
         size_t mBagSize;
         mutable size_t mCurrentIndex;
-        mutable std::vector<BlockType> mBag;
+        mutable BlockTypes mBag;
     };
 
 } // namespace Tetris

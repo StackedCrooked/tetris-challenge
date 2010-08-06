@@ -2,6 +2,9 @@
 #define BLOCKTYPE_H_INCLUDED
 
 
+#include <vector>
+
+
 namespace Tetris
 {
 
@@ -20,6 +23,8 @@ namespace Tetris
     };
 
     static const size_t cBlockTypeCount = static_cast<size_t>(BlockType_End) - 1;
+
+    typedef std::vector<BlockType> BlockTypes;
 
 
 } // namespace Tetris

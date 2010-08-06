@@ -59,7 +59,7 @@ namespace Tetris
     }
 
 
-    std::vector<BlockType> Game::getFutureBlocks(size_t inCount) const
+    BlockTypes Game::getFutureBlocks(size_t inCount) const
     {
 
         // Make sure we have all blocks we need.
@@ -68,7 +68,7 @@ namespace Tetris
             mBlocks.push_back(mBlockFactory.getNext());
         }
 
-        std::vector<BlockType> blocks;
+        BlockTypes blocks;
         blocks.push_back(mBlocks[mCurrentBlockIndex]);
 
         if (inCount > 0)
@@ -82,15 +82,15 @@ namespace Tetris
     }
 
 
-    GameStateNode & Game::currentNode()
+    GameStateNode * Game::currentNode()
     {
-        return *mCurrentNode;
+        return mCurrentNode;
     }
 
 
-    const GameStateNode & Game::currentNode() const
+    const GameStateNode * Game::currentNode() const
     {
-        return *mCurrentNode;
+        return mCurrentNode;
     }
 
 
