@@ -152,10 +152,10 @@ namespace Tetris
     }
 
 
-    std::auto_ptr<GameState> GameState::commit(const Block & inBlock, bool inGameOver) const
+    std::auto_ptr<GameState> GameState::commit(const Block & inBlock, GameOver inGameOver) const
     {
         std::auto_ptr<GameState> result(clone());
-        result->mIsGameOver = inGameOver;
+        result->mIsGameOver = inGameOver.get();
         result->mQuality.mDirty = true;
         result->solidifyBlock(inBlock);
         result->mOriginalBlock = inBlock;
