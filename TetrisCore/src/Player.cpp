@@ -1,10 +1,11 @@
 #include "Player.h"
 #include "GameState.h"
 #include "ErrorHandling.h"
+#include "Poco/Stopwatch.h"
 #include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/shared_ptr.hpp>
-#include <iostream>
+#include <ostream>
 
 
 namespace Tetris
@@ -91,9 +92,58 @@ namespace Tetris
 
 
     Player::Player(Game * inGame) :
-        mGame(inGame)
+        mGame(inGame),
+        mOutStream(0)
     {
     }
+
+
+    void PopulateChildNodes_Mt(const ChildNodes & ioChildNodes,
+                               const BlockTypes & inBlocks,
+                               const std::vector<int> & inWidths,
+                               boost::thread_group & ioThreadPool)
+    {
+        // These variables must not be destroyed until after the 'threadPool.join_all()' below.
+        std::vector<boost::shared_ptr<BlockTypes> > keepAlive_BlockTypes;
+        std::vector<boost::shared_ptr<Widths> > keepAlive_Widths;
+        std::vector<boost::shared_ptr<GameStateNode> > keepAlive_GameStateNodes;
+
+        int count = 0;
+        const int cMaxChildCount = inWidths[0];
+        ChildNodes::const_iterator it = ioChildNodes.begin(), end = ioChildNodes.end();
+        while (it != end && count != cMaxChildCount)
+        {
+            GameStateNode & node = **it;
+            
+            // WARNING!
+            // The PopulateNodesRecursively method takes const ref arguments. We must make sure
+            // any arguments lifetime will last until after the threadPool.join_all call below.
+
+            // One BIG advantage however is that each thread will have its own copy of the data structures.
+            // This leads to greatly reduced interthread synchronization, which in turn leads to much
+            // more efficient CPU utilization and thus better performance.
+            keepAlive_BlockTypes.push_back(boost::shared_ptr<BlockTypes>(new BlockTypes(inBlocks)));
+            keepAlive_Widths.push_back(boost::shared_ptr<Widths>(new Widths(inWidths)));
+            
+            // Call the PopulateNodesRecursively function in a separate thread.
+            std::auto_ptr<GameStateNode> clonedGameState(node.clone());
+            ioThreadPool.create_thread(
+                boost::bind(&PopulateNodesRecursively,
+                            clonedGameState.get(),
+                            *keepAlive_BlockTypes.back(),
+                            *keepAlive_Widths.back(),
+                            1));
+            
+            // Give owner-ship of the cloned game-state to the keepAlive object.
+            keepAlive_GameStateNodes.push_back(boost::shared_ptr<GameStateNode>(clonedGameState.release()));
+            count++;
+            ++it;
+        }
+
+        // Wait for all threads to complete.
+        ioThreadPool.join_all();
+    }
+
 
 
     void Player::move(const Widths & inWidths)
@@ -119,52 +169,19 @@ namespace Tetris
             return;
         }
 
-
-        // These variables must not be destroyed until after the 'threadPool.join_all()' below.
-        std::vector<boost::shared_ptr<BlockTypes> > keepAlive_BlockTypes;
-        std::vector<boost::shared_ptr<Widths> > keepAlive_Widths;
-        std::vector<boost::shared_ptr<GameStateNode> > keepAlive_GameStateNodes;
         boost::thread_group threadPool;
-
-        int count = 0;
-        const int cMaxChildCount = inWidths[0];
-        ChildNodes::iterator it = childNodes.begin(), end = childNodes.end();
-        while (it != end && count != cMaxChildCount)
-        {
-            GameStateNode & node = **it;
-            
-            // WARNING!
-            // The PopulateNodesRecursively method takes const ref arguments. We must make sure
-            // any arguments lifetime will last until after the threadPool.join_all call below.
-
-            // One BIG advantage however is that each thread will have its own copy of the data structures.
-            // This leads to greatly reduced interthread synchronization, which in turn leads to much
-            // more efficient CPU utilization and thus better performance.
-            keepAlive_BlockTypes.push_back(boost::shared_ptr<BlockTypes>(new BlockTypes(mGame->getFutureBlocks(inWidths.size()))));
-            keepAlive_Widths.push_back(boost::shared_ptr<Widths>(new Widths(inWidths)));
-            
-            // Call the PopulateNodesRecursively function in a separate thread.
-            std::auto_ptr<GameStateNode> clonedGameState(node.clone());
-            threadPool.create_thread(
-                boost::bind(&PopulateNodesRecursively,
-                            clonedGameState.get(),
-                            *keepAlive_BlockTypes.back(),
-                            *keepAlive_Widths.back(),
-                            1));
-            
-            // Give owner-ship of the cloned game-state to the keepAlive object.
-            keepAlive_GameStateNodes.push_back(boost::shared_ptr<GameStateNode>(clonedGameState.release()));
-            count++;
-            ++it;
-        }
-
-        // Wait for all threads to complete.
-        threadPool.join_all();
+        PopulateChildNodes_Mt(childNodes,
+                              mGame->getFutureBlocks(inWidths.size()),
+                              inWidths,
+                              threadPool);
     }
 
 
     void Player::playUntilGameOver(const std::vector<int> & inWidths)
     {
+        Poco::Stopwatch stopWatch;
+        stopWatch.start();
+
         int printHelper = mGame->currentNode()->depth();
         while (!mGame->isGameOver())
         {
@@ -178,12 +195,30 @@ namespace Tetris
             
             CarvePath(mGame->currentNode(), child);
             mGame->setCurrentNode(child);
-            if (mGame->currentNode()->depth() - printHelper >= 100)
+
+            int durationMs = (int)(stopWatch.elapsed() / 1000);
+            if (durationMs > 500)
             {
-                std::cout << "Blocks: " << mGame->currentNode()->depth() << "\tLines: " << mGame->currentNode()->state().stats().numLines() << "\r";
+                log("Blocks: " + boost::lexical_cast<std::string>(mGame->currentNode()->depth()) + "\tLines: " + boost::lexical_cast<std::string>(mGame->currentNode()->state().stats().numLines()));
                 printHelper = mGame->currentNode()->depth();
+                stopWatch.restart();
             }
-        }        
+        }
+    }
+
+
+    void Player::setLogger(std::ostream & inOutStream)
+    {
+        mOutStream = &inOutStream;
+    }
+
+    
+    void Player::log(const std::string & inMessage)
+    {
+        if (mOutStream)
+        {
+            *mOutStream << inMessage << "\r";
+        }
     }
 
 
