@@ -87,6 +87,7 @@ namespace Tetris
         void paintGrid(Gdiplus::Graphics & g, const Grid & inGrid, int x, int y);
         void paintGrid(Gdiplus::Graphics & g);
         void paintScores(Gdiplus::Graphics & g);
+        void paintFPS(Gdiplus::Graphics & g);
         void paintFutureBlocks(Gdiplus::Graphics & g);
         void paintUnit(Gdiplus::Graphics & g, int x, int y, BlockType inBlockType);
 
@@ -106,6 +107,11 @@ namespace Tetris
         int mDelay;
         clock_t mElapsed;
         clock_t mLastComputerMove;
+
+        // FPS code
+        clock_t mElapsedMs;
+        size_t mFrameCounter;
+        size_t mFPS;
 
 
         typedef std::map<HWND, Visualizer *> Instances;
