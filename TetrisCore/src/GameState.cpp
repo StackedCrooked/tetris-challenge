@@ -16,30 +16,6 @@ namespace Tetris
     }
 
 
-    int GameState::numLines() const
-    {
-        return mStats.mNumLines;
-    }
-
-
-    int GameState::numDoubles() const
-    {
-        return mStats.mNumDoubles;
-    }
-
-
-    int GameState::numTriples() const
-    {        
-        return mStats.mNumTriples;
-    }
-
-
-    int GameState::numTetrises() const
-    {
-        return mStats.mNumTetrises;
-    }
-
-
     bool GameState::isGameOver() const
     {
         return mIsGameOver;

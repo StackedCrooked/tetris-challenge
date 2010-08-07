@@ -234,11 +234,11 @@ namespace Tetris
     void Visualizer::paintScores(Gdiplus::Graphics & g)
     {
         const GameState::Stats & stats = mGame->currentNode()->state().stats();
-        drawText(g, GetScoreText("Lines", stats.mNumLines), Rect(cScoresOffsetX, cScoresOffsetY, 200, 40));
-        drawText(g, GetScoreText("x1", stats.mNumSingles), Rect(cScoresOffsetX, cScoresOffsetY + 40, 200, 40));
-        drawText(g, GetScoreText("x2", stats.mNumDoubles), Rect(cScoresOffsetX, cScoresOffsetY + 80, 200, 40));
-        drawText(g, GetScoreText("x3", stats.mNumTriples), Rect(cScoresOffsetX, cScoresOffsetY + 120, 200, 40));
-        drawText(g, GetScoreText("x4", stats.mNumTetrises), Rect(cScoresOffsetX, cScoresOffsetY + 160, 200, 40));
+        drawText(g, GetScoreText("Lines", stats.numLines()), Rect(cScoresOffsetX, cScoresOffsetY, 200, 40));
+        drawText(g, GetScoreText("x1", stats.numSingles()), Rect(cScoresOffsetX, cScoresOffsetY + 40, 200, 40));
+        drawText(g, GetScoreText("x2", stats.numDoubles()), Rect(cScoresOffsetX, cScoresOffsetY + 80, 200, 40));
+        drawText(g, GetScoreText("x3", stats.numTriples()), Rect(cScoresOffsetX, cScoresOffsetY + 120, 200, 40));
+        drawText(g, GetScoreText("x4", stats.numTetrises()), Rect(cScoresOffsetX, cScoresOffsetY + 160, 200, 40));
     }
     
     
