@@ -16,7 +16,7 @@ namespace Tetris
     GameStateNode::GameStateNode(std::auto_ptr<GameState> inGameState) :
         mParent(0),
         mDepth(0),
-        mGameState(inGameState)
+        mGameState(inGameState.release())
     {
 
     }
@@ -25,8 +25,23 @@ namespace Tetris
     GameStateNode::GameStateNode(GameStateNode * inParent, std::auto_ptr<GameState> inGameState) :
         mParent(inParent),
         mDepth(inParent->depth() + 1),
-        mGameState(inGameState)
+        mGameState(inGameState.release())
     {
+    }
+
+
+    std::auto_ptr<GameStateNode> GameStateNode::clone() const
+    {
+        std::auto_ptr<GameStateNode> result(new GameStateNode(mParent, std::auto_ptr<GameState>(new GameState(*mGameState))));
+        result->mDepth = mDepth;
+
+        ChildNodes::const_iterator it = mChildren.begin(), end = mChildren.end();
+        for (; it != end; ++it)
+        {
+            GameStateNode & node(*(*it));
+            result->mChildren.insert(ChildNodePtr(node.clone().release()));
+        }
+        return result;
     }
 
 
