@@ -50,8 +50,9 @@ namespace Tetris
 
         std::auto_ptr<GameState> clone() const;
 
-        struct Stats
+        class Stats
         {
+        public:
             Stats() :
                 mNumLines(0),
                 mNumSingles(0),
@@ -61,6 +62,23 @@ namespace Tetris
             {
             }
 
+            inline int numLines() const
+            { return mNumLines; }
+
+            inline int numSingles() const
+            { return mNumSingles; }
+
+            inline int numDoubles() const
+            { return mNumDoubles; }
+
+            inline int numTriples() const
+            { return mNumTriples; }
+
+            inline int numTetrises() const
+            { return mNumTetrises; }
+
+        private:
+            friend class GameState;
             int mNumLines;
             int mNumSingles;
             int mNumDoubles;

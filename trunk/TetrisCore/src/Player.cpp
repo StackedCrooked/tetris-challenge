@@ -221,7 +221,7 @@ namespace Tetris
             mGame->setCurrentNode(child);
             if (mGame->currentNode()->depth() - printHelper >= 100)
             {
-                std::cout << "Blocks: " << mGame->currentNode()->depth() << "\tLines: " << mGame->currentNode()->state().stats().mNumLines << "\r";
+                std::cout << "Blocks: " << mGame->currentNode()->depth() << "\tLines: " << mGame->currentNode()->state().stats().numLines() << "\r";
                 printHelper = mGame->currentNode()->depth();
             }
         }        

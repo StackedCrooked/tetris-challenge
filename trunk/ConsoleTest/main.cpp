@@ -28,9 +28,9 @@ int Test(const std::vector<int> & inWidths, bool inMultiThreaded)
     Game game(20, 10); // 10 rows to have game-over quicker :)
     Player player(&game);
     player.playUntilGameOver(inWidths);
-    std::cout << "Blocks: " << game.currentNode()->depth() <<  "\tLines: " << game.currentNode()->state().stats().mNumLines << "\r";
+    std::cout << "Blocks: " << game.currentNode()->depth() <<  "\tLines: " << game.currentNode()->state().stats().numLines() << "\r";
     std::cout << std::endl;
-    return game.currentNode()->state().stats().mNumLines;
+    return game.currentNode()->state().stats().numLines();
 }
 
 
