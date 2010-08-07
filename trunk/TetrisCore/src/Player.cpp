@@ -11,10 +11,14 @@ namespace Tetris
 {
     
     
-    // Remove all the children from srcNode except the good one that leads to dstNode.
-    // This is recursively repeated on the good one until all children have been exterminated.
-    // In the end only the path between srcNode and dstNode remains.
-    void Cleanup(GameStateNode * srcNode, GameStateNode * dstNode)
+    // Remove all the children from srcNode except the one on the path that leads to dstNode.
+    // The children of the 'good one' are also exterminated, except the one that brings us a 
+    // step closer to dstNode. This algorithm is recursively repeated until only the path between
+    // srcNode and dstNode remains.
+    //
+    // The purpose of this function is mainly to free up memory.
+    //
+    void CarvePath(GameStateNode * srcNode, GameStateNode * dstNode)
     {
         CheckPrecondition(srcNode != NULL, "Goddamn.");
         CheckPrecondition(dstNode != NULL, "Goddamn.");
@@ -191,7 +195,7 @@ namespace Tetris
                 child = mGame->currentNode()->bestChild(depth--);
             }
             
-            Cleanup(mGame->currentNode(), child);
+            CarvePath(mGame->currentNode(), child);
             mGame->setCurrentNode(child);
             if (mGame->currentNode()->depth() - printHelper >= 100)
             {
