@@ -80,34 +80,6 @@ namespace Tetris
     }
 
 
-    //void DoJobs(const JobList & inJobs)
-    //{       
-    //    if (inJobs.empty())
-    //    {
-    //        return;
-    //    }
-
-    //    JobList newJobs;
-    //    for (size_t idx = 0; idx != inJobs.size(); ++idx)
-    //    {
-    //        const Job & job = inJobs.get(idx);
-
-    //        // Execute the job in a new thread. Each thread
-    //        // will add items to the new JobList. (Good thing
-    //        // it is protected by a mutex)
-    //        job((void*)&newJobs);
-    //        mT
-    //    }
-
-    //    
-
-    //    // Recursive call.
-    //    // This will continue until the inOffset value
-    //    // in PopulateNode reaches inBlocks.size().
-    //    DoJobs(newJobs);
-    //}
-
-
     const Job & JobList::get(size_t inIndex) const
     {
         boost::mutex::scoped_lock lock(mMutex);
@@ -162,45 +134,49 @@ namespace Tetris
         mMaxThreadCount = inMaxThreadCount;
     }
 
+    
+    
+    // Thread locals
+    boost::condition_variable mtJobDone;
+    boost::thread_specific_ptr<JobList> mtJobList;
 
     class Worker
     {
     public:
-        typedef boost::function<void ()> DoneAction;
-
-        Worker(const Job & inJob, boost::mutex & inMutex, boost::condition_variable & inCondition) :
-            mJobList(),
-            mDone(false),
-            mMutex(inMutex),
-            mCondition(inCondition)
+        Worker() :
+            mDone(false)
         {
-            mJobList.add(inJob);
-        }
-
+        }        
 
         bool done() const
         {
+            boost::mutex::scoped_lock lock(mDoneMutex);
             return mDone;
         }
 
-
-        void work()
+        // Worker thread
+        void work(Job inJob)
         {
-            for (size_t idx = 0; idx < mJobList.size(); ++idx)
+            mtJobList.reset(new JobList);
+            mtJobList->add(inJob);
+
+            for (size_t idx = 0; idx < mtJobList->size(); ++idx)
             {
-                const Job & job = mJobList.get(idx);
-                job((void*)&mJobList);
+                const Job & job = mtJobList->get(idx);
+                job((void*)mtJobList.get());
             }
 
-            mDone = true;
-            mCondition.notify_one();
+            // Update the mDone value.
+            {
+                boost::mutex::scoped_lock lock(mDoneMutex);
+                mDone = true;
+            }
+            mtJobDone.notify_one();
         }
 
     private:
-        JobList mJobList;
+        mutable boost::mutex mDoneMutex;
         bool mDone;
-        boost::mutex & mMutex;
-        boost::condition_variable & mCondition;
     };
 
     const int cMaxThreads = 20;
@@ -223,18 +199,21 @@ namespace Tetris
 
     void Player::doJobsAndWait(const JobList & inJobs)
     {
-        boost::mutex conditionMutex;        
-        boost::condition_variable condition;
+        
         
         boost::thread_group threadGroup;
         Workers workers;
         for (size_t idx = 0; idx < inJobs.size(); ++idx)
         {
-            boost::mutex::scoped_lock conditionLock(conditionMutex);
-            condition.wait(conditionLock, boost::bind(&ActiveWorkerCount, workers) < cMaxThreads);
+            {
+                boost::mutex here_is_a_mutex;
+                boost::mutex::scoped_lock this_is_a_lock(here_is_a_mutex);
+                mtJobDone.wait(this_is_a_lock, boost::bind(&ActiveWorkerCount, workers) < cMaxThreads);
+            }
             const Job & job(inJobs.get(idx));
-            workers.push_back(boost::shared_ptr<Worker>(new Worker(job, conditionMutex, condition)));
-            threadGroup.create_thread(boost::bind(&Worker::work, workers.back()));
+            workers.push_back(boost::shared_ptr<Worker>(new Worker));
+            Worker * worker(workers.back().get());            
+            threadGroup.create_thread(boost::bind(&Worker::work, worker, job));
         }
         threadGroup.join_all();
     }
