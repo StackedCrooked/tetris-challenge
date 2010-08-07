@@ -79,8 +79,16 @@ int main()
 {
     try
     {
+
         int repeat = 5;
-        Test(GetParameters(8, 8), repeat, true);
+        //Test(GetDepths(1), repeat, false);
+        //Test(GetDepths(1), repeat, true);
+        //Test(GetParameters(4, 4), repeat, true);
+        //Test(GetParameters(4, 4), repeat, false);
+        Test(GetParameters(3, 3), repeat, true);
+        Test(GetParameters(3, 3), repeat, false);
+        //Test(GetDepths(4), repeat, false);
+        //Test(GetDepths(4), repeat, true);
     }
     catch (const std::exception & exc)
     {

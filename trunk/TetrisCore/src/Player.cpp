@@ -1,7 +1,6 @@
 #include "Player.h"
 #include "GameState.h"
 #include "ErrorHandling.h"
-#include "Poco/Stopwatch.h"
 #include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/shared_ptr.hpp>
@@ -36,8 +35,8 @@ namespace Tetris
 
 
     void PopulateNode(GameStateNode * inNode,
-                      BlockTypes inBlocks,              // No const-ref here because I want to minimize sharing, for now...
-                      std::vector<int> inWidths,
+                      const BlockTypes & inBlocks,
+                      const std::vector<int> & inWidths,
                       size_t inOffset,
                       void * outJobsAsVoidPtr)
     {
@@ -78,6 +77,34 @@ namespace Tetris
             ++it;
         }
     }
+
+
+    //void DoJobs(const JobList & inJobs)
+    //{       
+    //    if (inJobs.empty())
+    //    {
+    //        return;
+    //    }
+
+    //    JobList newJobs;
+    //    for (size_t idx = 0; idx != inJobs.size(); ++idx)
+    //    {
+    //        const Job & job = inJobs.get(idx);
+
+    //        // Execute the job in a new thread. Each thread
+    //        // will add items to the new JobList. (Good thing
+    //        // it is protected by a mutex)
+    //        job((void*)&newJobs);
+    //        mT
+    //    }
+
+    //    
+
+    //    // Recursive call.
+    //    // This will continue until the inOffset value
+    //    // in PopulateNode reaches inBlocks.size().
+    //    DoJobs(newJobs);
+    //}
 
 
     const Job & JobList::get(size_t inIndex) const
@@ -134,88 +161,24 @@ namespace Tetris
         mMaxThreadCount = inMaxThreadCount;
     }
 
-    
-    
-    // Thread locals
-    boost::condition_variable mtJobDone;
-    boost::thread_specific_ptr<JobList> mtJobList;
-
-    class Worker
-    {
-    public:
-        Worker() :
-            mDone(false)
-        {
-        }        
-
-        bool done() const
-        {
-            boost::mutex::scoped_lock lock(mDoneMutex);
-            return mDone;
-        }
-
-        // Worker thread
-        void work(Job inJob)
-        {
-            mtJobList.reset(new JobList);
-            mtJobList->add(inJob);
-
-            for (size_t idx = 0; idx < mtJobList->size(); ++idx)
-            {
-                const Job & job = mtJobList->get(idx);
-                job((void*)mtJobList.get());
-            }
-
-            // Update the mDone value.
-            {
-                boost::mutex::scoped_lock lock(mDoneMutex);
-                mDone = true;
-            }
-            mtJobDone.notify_one();
-        }
-
-    private:
-        mutable boost::mutex mDoneMutex;
-        bool mDone;
-    };
-
-    const int cMaxThreads = 20;
-    typedef std::vector<boost::shared_ptr<Worker> > Workers;
-    
-    
-    int ActiveWorkerCount(const Workers & inWorkers)
-    {
-        int result = inWorkers.size();
-        for (size_t idx = 0; idx != inWorkers.size(); ++idx)
-        {
-            if (inWorkers[idx]->done())
-            {
-                result--;
-            }
-        }
-        return result;
-    }
-
 
     void Player::doJobsAndWait(const JobList & inJobs)
     {
-        
-        
-        boost::thread_group threadGroup;
-        Workers workers;
-        for (size_t idx = 0; idx < inJobs.size(); ++idx)
+        if (!inJobs.empty())
         {
+            std::vector<boost::thread * > localThreads;
+            localThreads.reserve(inJobs.size());
+            JobList newJobs;
+            for (size_t idx = 0; idx != inJobs.size(); ++idx)
             {
-                boost::mutex here_is_a_mutex;
-                boost::mutex::scoped_lock this_is_a_lock(here_is_a_mutex);
-                mtJobDone.wait(this_is_a_lock, boost::bind(&ActiveWorkerCount, workers) < cMaxThreads);
+                // Call PopulateNode in a separate thread for the given job.
+                // Each thread created here will add jobs to newJobs.
+                localThreads.push_back(mThreadGroup.create_thread(boost::bind(inJobs.get(idx), (void*)&newJobs)));
             }
-            const Job & job(inJobs.get(idx));
-            workers.push_back(boost::shared_ptr<Worker>(new Worker));
-            Worker * worker(workers.back().get());            
-            threadGroup.create_thread(boost::bind(&Worker::work, worker, job));
+            mThreadGroup.join_all();
+            std::for_each(localThreads.begin(), localThreads.end(), boost::bind(&boost::thread_group::remove_thread, &mThreadGroup, _1));
+            doJobsAndWait(newJobs);
         }
-        threadGroup.join_all();
     }
 
 
@@ -229,8 +192,7 @@ namespace Tetris
 
     void Player::playUntilGameOver(const std::vector<int> & inDepths)
     {
-        Poco::Stopwatch stopWatch;
-        stopWatch.start();
+        int printHelper = mGame->currentNode()->depth();
         while (!mGame->isGameOver())
         {
             move(inDepths);
@@ -242,11 +204,10 @@ namespace Tetris
             }
             Cleanup(mGame->currentNode(), child);
             mGame->setCurrentNode(child);
-
-            if (stopWatch.elapsed() > 100 * 1000)
+            if (mGame->currentNode()->depth() - printHelper >= 100)
             {
                 std::cout << "Blocks: " << mGame->currentNode()->depth() << "\tLines: " << mGame->currentNode()->state().stats().mNumLines << "\r";
-                stopWatch.restart();
+                printHelper = mGame->currentNode()->depth();
             }
         }        
     }
