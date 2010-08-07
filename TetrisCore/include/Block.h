@@ -17,8 +17,8 @@ namespace Tetris
     class ClassName \
     { \
     public: \
-        explicit ClassName(size_t inValue) : mValue(inValue) {} \
-        size_t get() const \
+        explicit ClassName(WrappedType inValue) : mValue(inValue) {} \
+        WrappedType get() const \
         { return mValue; } \
     private: \
         WrappedType mValue; \
@@ -30,6 +30,7 @@ namespace Tetris
     GENERATE_TYPESAFE_WRAPPER(size_t, Rotation)
     GENERATE_TYPESAFE_WRAPPER(size_t, Row)
     GENERATE_TYPESAFE_WRAPPER(size_t, Column)
+    GENERATE_TYPESAFE_WRAPPER(bool, GameOver)
 
 
     /**

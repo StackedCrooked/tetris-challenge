@@ -152,7 +152,12 @@ namespace Tetris
         if (IsGameOver(gameState, inBlockType, 0))
         {
             size_t initialColumn = DivideByTwo(gameGrid.numColumns() - GetGrid(GetBlockIdentifier(inBlockType, 0)).numColumns());
-            ChildNodePtr childState(new GameStateNode(&ioGameStateNode, gameState.commit(Block(inBlockType, Rotation(0), Row(0), Column(initialColumn)), true)));
+            ChildNodePtr childState(new GameStateNode(&ioGameStateNode,
+                                                      gameState.commit(Block(inBlockType,
+                                                                             Rotation(0),
+                                                                             Row(0),
+                                                                             Column(initialColumn)),
+                                                                             GameOver(true))));
             outChildNodes.insert(childState);
             return;
         }
@@ -170,7 +175,7 @@ namespace Tetris
                     block.setRow(row);
                     row++;
                 }
-                ChildNodePtr childState(new GameStateNode(&ioGameStateNode, gameState.commit(block, false)));
+                ChildNodePtr childState(new GameStateNode(&ioGameStateNode, gameState.commit(block, GameOver(false))));
                 outChildNodes.insert(childState);
             }
         }
