@@ -25,7 +25,7 @@ std::vector<int> GetParameters(int inDepth, int inWidth)
 
 int Test(const std::vector<int> & inDepths, bool inMultiThreaded)
 {
-    Game game(10, 10); // 10 rows to have game-over quicker :)
+    Game game(20, 10); // 10 rows to have game-over quicker :)
     Player player(&game);
     player.playUntilGameOver(inDepths);
     std::cout << "Blocks: " << game.currentNode()->depth() <<  "\tLines: " << game.currentNode()->state().stats().mNumLines << "\r";
@@ -79,8 +79,10 @@ int main()
 {
     try
     {
-        int repeat = 10;
-        Test(GetParameters(50, 50), repeat, true);
+        int repeat = 5;
+        Test(GetParameters(3, 8), repeat, true);
+        Test(GetParameters(3, 8), repeat, false);
+        //Test(GetParameters(4, 4), repeat, false);
         //Test(GetParameters(2, 2), repeat, true);
         //Test(GetParameters(2, 2), repeat, false);
         //Test(GetParameters(3, 3), repeat, true);
