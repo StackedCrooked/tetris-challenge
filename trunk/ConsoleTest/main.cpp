@@ -23,38 +23,38 @@ std::vector<int> GetParameters(int inDepth, int inWidth)
 }
 
 
-int Test(const std::vector<int> & inDepths, bool inMultiThreaded)
+int Test(const std::vector<int> & inWidths, bool inMultiThreaded)
 {
     Game game(20, 10); // 10 rows to have game-over quicker :)
     Player player(&game);
-    player.playUntilGameOver(inDepths);
+    player.playUntilGameOver(inWidths);
     std::cout << "Blocks: " << game.currentNode()->depth() <<  "\tLines: " << game.currentNode()->state().stats().mNumLines << "\r";
     std::cout << std::endl;
     return game.currentNode()->state().stats().mNumLines;
 }
 
 
-void Test(const std::vector<int> inDepths, size_t inCount, bool inMultiThreaded)
+void Test(const std::vector<int> inWidths, size_t inCount, bool inMultiThreaded)
 {
 
     Poco::Stopwatch stopWatch;
     stopWatch.start();
     std::cout << "TEST: " << (inMultiThreaded ? "MULTITHREADED" : "SINGLE THREADED") << std::endl;
-    std::cout << "Testing with depths: ";
-    for (size_t i = 0; i < inDepths.size(); ++i)
+    std::cout << "Testing with retention counts: ";
+    for (size_t i = 0; i < inWidths.size(); ++i)
     {
         if (i > 0)
         {
             std::cout << ", ";
         }
-        std::cout << inDepths[i];
+        std::cout << inWidths[i];
     }
 
     std::cout << std::endl;
     int sumLines = 0;
     for (size_t idx = 0; idx != inCount; ++idx)
     {
-        sumLines += Test(inDepths, inMultiThreaded);
+        sumLines += Test(inWidths, inMultiThreaded);
     }
 
     int avgLines = (int)(0.5 + (float)sumLines/(float)inCount);
@@ -79,9 +79,10 @@ int main()
 {
     try
     {
-        int repeat = 5;
-        Test(GetParameters(3, 8), repeat, true);
-        Test(GetParameters(3, 8), repeat, false);
+        int repeat = 4;
+        Test(GetParameters(4, 4), repeat, false);
+        Test(GetParameters(4, 4), repeat, true);
+        //Test(GetParameters(3, 12), repeat, false);
         //Test(GetParameters(4, 4), repeat, false);
         //Test(GetParameters(2, 2), repeat, true);
         //Test(GetParameters(2, 2), repeat, false);

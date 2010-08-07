@@ -52,13 +52,11 @@ namespace Tetris
     // It ends when it has recursed as many times as (inBlocks.size() - inOffset).
     // The inWidths argument how many children should be kept. This is needed to curb the exponential explosion.
     //
-    void PopulateNodesRecursively(GameStateNode * inClonedNode,
+    void PopulateNodesRecursively(GameStateNode * inNode,
                                   const BlockTypes & inBlocks,
                                   const std::vector<int> & inWidths,
                                   size_t inOffset)
     {
-        // Claim ownership, and protect against memory leaks.
-        boost::scoped_ptr<GameStateNode> node(inClonedNode);
 
         CheckArgument(inBlocks.size() == inWidths.size(), "PopulateNodesRecursively got inBlocks.size() != inWidths.size()");
         if (inOffset >= inBlocks.size())
@@ -67,7 +65,7 @@ namespace Tetris
         }
 
         
-        if (node->state().isGameOver())
+        if (inNode->state().isGameOver())
         {
             // Game over state has no children.
             return;
@@ -75,17 +73,17 @@ namespace Tetris
 
 
         // Generate the child nodes
-        GenerateOffspring(inBlocks[inOffset], *node, node->children());
+        GenerateOffspring(inBlocks[inOffset], *inNode, inNode->children());
 
         // Populate each child node.
         int idx = 0;
         const int cMaxChilds = inWidths[inOffset];
-        ChildNodes & children = node->children();
+        ChildNodes & children = inNode->children();
         ChildNodes::iterator it = children.begin();
         while (idx < cMaxChilds && it != children.end())
         {
             GameStateNode & childNode = **it;
-            PopulateNodesRecursively(childNode.clone().release(), inBlocks, inWidths, inOffset + 1);
+            PopulateNodesRecursively(inNode, inBlocks, inWidths, inOffset + 1);
             ++idx;
             ++it;
         }
@@ -166,6 +164,7 @@ namespace Tetris
         // These variables must not be destroyed until after the 'threadPool.join_all()' below.
         std::vector<boost::shared_ptr<BlockTypes> > keepAlive_BlockTypes;
         std::vector<boost::shared_ptr<Widths> > keepAlive_Widths;
+        std::vector<boost::shared_ptr<GameStateNode> > keepAlive_GameStateNodes;
         boost::thread_group threadPool;
 
         int count = 0;
@@ -178,16 +177,24 @@ namespace Tetris
             // WARNING!
             // The PopulateNodesRecursively method takes const ref arguments. We must make sure
             // any arguments lifetime will last until after the threadPool.join_all call below.
+
+            // An BIG advantage however is that each thread will have its own copy of the data structures.
+            // This leads to greatly reduced interthread synchronization, which in turn leads to much
+            // more efficient CPU utilization and thus better performance.
             keepAlive_BlockTypes.push_back(boost::shared_ptr<BlockTypes>(new BlockTypes(mGame->getFutureBlocks(inWidths.size()))));
             keepAlive_Widths.push_back(boost::shared_ptr<Widths>(new Widths(inWidths)));
             
             // Call the PopulateNodesRecursively function in a separate thread.
+            std::auto_ptr<GameStateNode> clonedGameState(node.clone());
             threadPool.create_thread(
                 boost::bind(&PopulateNodesRecursively,
-                            node.clone().release(),
+                            clonedGameState.get(),
                             *keepAlive_BlockTypes.back(),
                             *keepAlive_Widths.back(),
                             1));
+            
+            // Give owner-ship of the cloned game-state to the keepAlive object.
+            keepAlive_GameStateNodes.push_back(boost::shared_ptr<GameStateNode>(clonedGameState.release()));
             count++;
             ++it;
         }

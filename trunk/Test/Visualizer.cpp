@@ -401,8 +401,8 @@ namespace Tetris
         }
 
 
-        const int cDepth = 4;
-        const int cWidth = 4;
+        const int cDepth = 3;
+        const int cWidth = 3;
 
 
         Player p(mGame);
@@ -445,7 +445,7 @@ namespace Tetris
             {
                 mGame->move(Direction_Left);
             }
-            else if (activeBlock.row() < gotoBlock.row())
+            else if (activeBlock.row() + 1 < gotoBlock.row())
             {
                 mGame->move(Direction_Down);
             }
