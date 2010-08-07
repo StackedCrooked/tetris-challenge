@@ -91,52 +91,11 @@ namespace Tetris
 
 
     Player::Player(Game * inGame) :
-        mGame(inGame),
-        mMaxThreadCount(1)
+        mGame(inGame)
     {
     }
 
 
-    void Player::setMaxThreadCount(size_t inMaxThreadCount)
-    {
-        mMaxThreadCount = inMaxThreadCount;
-    }
-
-
-    void Player::doJobsAndWait(const JobList & inJobs)
-    {
-        if (!inJobs.empty())
-        {
-            std::vector<boost::thread * > localThreads;
-            localThreads.reserve(inJobs.size());
-            JobList newJobs;
-            for (size_t idx = 0; idx != inJobs.size(); ++idx)
-            {
-                // Call PopulateNodesRecursively in a separate thread for the given job.
-                // Each thread created here will add jobs to newJobs.
-                localThreads.push_back(mThreadGroup.create_thread(boost::bind(inJobs.get(idx), (void*)&newJobs)));
-            }
-            mThreadGroup.join_all();
-            std::for_each(localThreads.begin(), localThreads.end(), boost::bind(&boost::thread_group::remove_thread, &mThreadGroup, _1));
-            doJobsAndWait(newJobs);
-        }
-    }
-
-
-    // Returns a copy of the given vector minus its first element.
-    template<class T>
-    std::vector<T> DropFirst(const std::vector<T> & inVector)
-    {
-        std::vector<T> result;
-        for (size_t idx = 1; idx < inVector.size(); ++idx)
-        {
-            result.push_back(inVector[idx]);
-        }
-        return result;
-    }
-
-
-    typedef std::vector<int> Widths;
     void Player::move(const Widths & inWidths)
     {
         CheckPrecondition(!inWidths.empty(), "Player::move: depth should be at least 1.");
@@ -178,7 +137,7 @@ namespace Tetris
             // The PopulateNodesRecursively method takes const ref arguments. We must make sure
             // any arguments lifetime will last until after the threadPool.join_all call below.
 
-            // An BIG advantage however is that each thread will have its own copy of the data structures.
+            // One BIG advantage however is that each thread will have its own copy of the data structures.
             // This leads to greatly reduced interthread synchronization, which in turn leads to much
             // more efficient CPU utilization and thus better performance.
             keepAlive_BlockTypes.push_back(boost::shared_ptr<BlockTypes>(new BlockTypes(mGame->getFutureBlocks(inWidths.size()))));
@@ -204,13 +163,13 @@ namespace Tetris
     }
 
 
-    void Player::playUntilGameOver(const std::vector<int> & inDepths)
+    void Player::playUntilGameOver(const std::vector<int> & inWidths)
     {
         int printHelper = mGame->currentNode()->depth();
         while (!mGame->isGameOver())
         {
-            move(inDepths);
-            size_t depth = inDepths.size();
+            move(inWidths);
+            size_t depth = inWidths.size();
             GameStateNode * child = mGame->currentNode()->bestChild(depth);
             while (!child && depth > 0) // in case of game-over this can happen
             {
