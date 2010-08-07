@@ -20,7 +20,7 @@ namespace Tetris
     Game::Game(int inNumRows, int inNumColumns) :
         mNumRows(inNumRows),
         mNumColumns(inNumColumns),
-        mRootNode(GameStateNode::CreateRootNode(inNumRows, inNumColumns)),
+        mRootNode(GameStateNode::CreateRootNode(inNumRows, inNumColumns).release()),
         mBlockFactory(cBlockTypeCount),
         mCurrentBlockIndex(0)
     {

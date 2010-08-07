@@ -51,6 +51,8 @@ namespace Tetris
     }
 
 
+    // Collect all children at the requested depth from all branches,
+    // and return the one with the highest quality score.
     GameStateNode * GameStateNode::bestChild(int inDepth)
     {
         ChildNodePtr result;
@@ -126,9 +128,7 @@ namespace Tetris
 
 
     void GenerateOffspring(BlockType inBlockType, GameStateNode & ioGameStateNode, ChildNodes & outChildNodes)
-    {
-        CheckPrecondition(outChildNodes.empty(), "GenerateOffspring: outChildNodes already has children.");
-        
+    {        
         const GameState & gameState = ioGameStateNode.state();
         const Grid & gameGrid = gameState.grid();
 
