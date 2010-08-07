@@ -12,7 +12,26 @@ namespace Tetris
 {
 
     typedef boost::function<void(void*)> Job;
-    typedef std::vector<Job> Jobs;
+
+    class JobList
+    {
+    public:
+        const Job & get(size_t inIndex) const;
+
+        Job & get(size_t inIndex);
+
+        void add(const Job & inJob);
+
+        void clear();
+
+        size_t size() const;
+
+        bool empty() const;
+
+    private:
+        std::vector<Job> mJobs;
+        mutable boost::mutex mMutex;
+    };
 
     class Player
     {
@@ -20,6 +39,8 @@ namespace Tetris
         Player(Game * inGame);
 
         void setMaxThreadCount(size_t inMaxThreadCount);
+
+        void doJobsAndWait(const JobList & inJobs);
 
         void move(const std::vector<int> & inWidths);
 
@@ -30,7 +51,7 @@ namespace Tetris
     private:
         Game * mGame;
         size_t mMaxThreadCount;
-        Jobs mJobs;
+        boost::thread_group mThreadGroup;
         boost::mutex mMutex;
     };
 

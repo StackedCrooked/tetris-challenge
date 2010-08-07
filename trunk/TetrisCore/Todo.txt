@@ -1,2 +1,3 @@
+- Find most optimal depth/width ratio (fastest and best scoring)
 - Use official Tetris colors
 - Js client
