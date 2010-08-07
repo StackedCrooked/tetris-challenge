@@ -52,12 +52,14 @@ namespace Tetris
     // It ends when it has recursed as many times as (inBlocks.size() - inOffset).
     // The inWidths argument how many children should be kept. This is needed to curb the exponential explosion.
     //
-    void PopulateNodesRecursively(GameStateNode * inNode,
-                                  BlockTypes inBlocks,          // => Not a const ref because this function is likely to be executed
-                                  std::vector<int> inWidths,    //    in a separate thread while the original arguments passed to this
-                                  size_t inOffset)              //    function (in the form of a boost::function via boost::bind will
-                                                                //    have expired long ago.
+    void PopulateNodesRecursively(GameStateNode * inClonedNode,
+                                  const BlockTypes & inBlocks,
+                                  const std::vector<int> & inWidths,
+                                  size_t inOffset)
     {
+        // Claim ownership, and protect against memory leaks.
+        boost::scoped_ptr<GameStateNode> node(inClonedNode);
+
         CheckArgument(inBlocks.size() == inWidths.size(), "PopulateNodesRecursively got inBlocks.size() != inWidths.size()");
         if (inOffset >= inBlocks.size())
         {
@@ -65,25 +67,25 @@ namespace Tetris
         }
 
         
-        if (inNode->state().isGameOver())
+        if (node->state().isGameOver())
         {
             // Game over state has no children.
             return;
         }
 
 
-        // Generate the child nodes for inNode
-        GenerateOffspring(inBlocks[inOffset], *inNode, inNode->children());
+        // Generate the child nodes
+        GenerateOffspring(inBlocks[inOffset], *node, node->children());
 
         // Populate each child node.
         int idx = 0;
         const int cMaxChilds = inWidths[inOffset];
-        ChildNodes & children = inNode->children();
+        ChildNodes & children = node->children();
         ChildNodes::iterator it = children.begin();
         while (idx < cMaxChilds && it != children.end())
         {
             GameStateNode & childNode = **it;
-            PopulateNodesRecursively(&childNode, inBlocks, inWidths, inOffset + 1);
+            PopulateNodesRecursively(childNode.clone().release(), inBlocks, inWidths, inOffset + 1);
             ++idx;
             ++it;
         }
@@ -139,7 +141,8 @@ namespace Tetris
     }
 
 
-    void Player::move(const std::vector<int> & inWidths)
+    typedef std::vector<int> Widths;
+    void Player::move(const Widths & inWidths)
     {
         CheckPrecondition(!inWidths.empty(), "Player::move: depth should be at least 1.");
 
@@ -161,24 +164,38 @@ namespace Tetris
             node.children().insert(bestChild);
             return;
         }
-        else
-        {
-            int count = 0;
-            const int cMaxChildCount = inWidths[0];
-            ChildNodes::iterator it = childNodes.begin(), end = childNodes.end();
-            while (it != end && count != cMaxChildCount)
-            {
-                GameStateNode & node = **it;
-                // Call the PopulateNodesRecursively function in a separate thread.
-                BlockTypes blocks = mGame->getFutureBlocks(inWidths.size());
-                gThreadPool.create_thread(boost::bind(&PopulateNodesRecursively, &node, blocks, inWidths, 1));
-                count++;
-                ++it;
-            }
 
-            // Wait for all threads to complete.
-            gThreadPool.join_all();
+
+        // These variables must not be destroyed until after the 'gThreadPool.join_all()' below.
+        std::vector<boost::shared_ptr<BlockTypes> > keepAlive_BlockTypes;
+        std::vector<boost::shared_ptr<Widths> > keepAlive_Widths;
+
+        int count = 0;
+        const int cMaxChildCount = inWidths[0];
+        ChildNodes::iterator it = childNodes.begin(), end = childNodes.end();
+        while (it != end && count != cMaxChildCount)
+        {
+            GameStateNode & node = **it;
+            
+            // WARNING!
+            // The PopulateNodesRecursively method takes const ref arguments. We must make sure
+            // any arguments lifetime will last until after the gThreadPool.join_all call below.
+            keepAlive_BlockTypes.push_back(boost::shared_ptr<BlockTypes>(new BlockTypes(mGame->getFutureBlocks(inWidths.size()))));
+            keepAlive_Widths.push_back(boost::shared_ptr<Widths>(new Widths(inWidths)));
+            
+            // Call the PopulateNodesRecursively function in a separate thread.
+            gThreadPool.create_thread(
+                boost::bind(&PopulateNodesRecursively,
+                            node.clone().release(),
+                            *keepAlive_BlockTypes.back(),
+                            *keepAlive_Widths.back(),
+                            1));
+            count++;
+            ++it;
         }
+
+        // Wait for all threads to complete.
+        gThreadPool.join_all();
     }
 
 
