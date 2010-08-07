@@ -4,6 +4,7 @@
 #include "Player.h"
 #include "Unicode.h"
 #include <boost/bind.hpp>
+#include <boost/lexical_cast.hpp>
 #include <string>
 #include <sstream>
 #include <ctime>
@@ -73,9 +74,12 @@ namespace Tetris
         mGame(inGame),
         mHandle(0),
         mKeyboardHook(0),
-        mDelay(10),
+        mDelay(5),
         mElapsed(GetClockMs()),
-        mLastComputerMove(GetClockMs())
+        mLastComputerMove(GetClockMs()),
+        mElapsedMs(0),
+        mFrameCounter(0),
+        mFPS(0)
     {
         sRefCount++;
         if (sRefCount == 1)
@@ -119,6 +123,7 @@ namespace Tetris
         cScoresY_2    =   cScoresY_1 + 4 * cUnitHeight,
         cScoresY_3    =   cScoresY_2 + 4 * cUnitHeight,
         cScoresY_4    =   cScoresY_3 + 4 * cUnitHeight,
+        cFPS          =   cScoresY_4 + 4 * cUnitHeight,
         cScoresWidth  =                6 * cUnitWidth,
         cScoresHeight =                6 * cUnitHeight
     };
@@ -263,6 +268,13 @@ namespace Tetris
         drawText(g, GetScoreText("x3", stats.numTriples()), Rect(cScoresX, cScoresY_3, cScoresWidth, cScoresHeight));
         drawText(g, GetScoreText("x4", stats.numTetrises()), Rect(cScoresX, cScoresY_4, cScoresWidth, cScoresHeight));
     }
+
+
+    void Visualizer::paintFPS(Gdiplus::Graphics & g)
+    {        
+        std::wstring utf16Text = ToUTF16("FPS: " + boost::lexical_cast<std::string>(mFPS));
+        drawText(g, utf16Text, Rect(cScoresX, cFPS, cScoresWidth, cScoresHeight));
+    }
     
     
     void Visualizer::paintFutureBlocks(Gdiplus::Graphics & g)
@@ -388,6 +400,17 @@ namespace Tetris
         paintGrid(g);
         paintFutureBlocks(g);
         paintScores(g);
+        paintFPS(g);
+
+        // Calculate FPS
+        clock_t currentTime = GetClockMs();
+        if (currentTime - mElapsedMs >= 1000)
+        {            
+            mFPS = (size_t)((float)(1000 * mFrameCounter) / (float)(currentTime - mElapsedMs));
+            mFrameCounter = 0;
+            mElapsedMs = currentTime;
+        }
+        mFrameCounter++;
     }
 
 
