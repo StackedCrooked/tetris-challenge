@@ -79,7 +79,11 @@ int main()
 {
     try
     {
-        int repeat = 1;
+        int repeat = 10;
+        Test(GetParameters(2, 2), repeat, true);
+        Test(GetParameters(2, 2), repeat, false);
+        Test(GetParameters(3, 3), repeat, true);
+        Test(GetParameters(3, 3), repeat, false);
         Test(GetParameters(4, 4), repeat, true);
         Test(GetParameters(4, 4), repeat, false);
     }

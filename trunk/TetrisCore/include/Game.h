@@ -6,6 +6,7 @@
 #include "BlockFactory.h"
 #include "Direction.h"
 #include "GameStateNode.h"
+#include <boost/scoped_ptr.hpp>
 #include <memory>
 #include <vector>
 
@@ -67,7 +68,7 @@ namespace Tetris
 
         size_t mNumRows;
         size_t mNumColumns;
-        std::auto_ptr<GameStateNode> mRootNode;
+        boost::scoped_ptr<GameStateNode> mRootNode;
         GameStateNode * mCurrentNode;
         std::auto_ptr<Block> mActiveBlock;
 
