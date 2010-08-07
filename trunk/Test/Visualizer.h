@@ -10,7 +10,12 @@
 #include <map>
 #include <list>
 #include <string>
+// Always include this file instead of <windows.h>
+#if !defined(_WIN32_WINNT)
+#define _WIN32_WINNT 0x0501
+#endif
 #include <windows.h>
+#include <CommCtrl.h>
 
 
 namespace Gdiplus
@@ -24,6 +29,12 @@ namespace Gdiplus
 
 namespace Tetris
 {
+    
+    enum
+    {
+        cAIDepth = 4,
+        cAIWidth = 4
+    };
 
     class GameState;
 

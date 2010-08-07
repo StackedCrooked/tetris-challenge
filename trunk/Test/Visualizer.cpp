@@ -101,6 +101,28 @@ namespace Tetris
         ::DestroyWindow(mHandle);
     }
 
+    
+
+    enum Coords
+    {
+        cUnitWidth    =               20,
+        cUnitHeight   =               20,        
+        cWindowWidth  =               30 * cUnitHeight,
+        cWindowHeight =               30 * cUnitWidth,        
+        cFieldX       =                2 * cUnitWidth,
+        cFieldY       =                2 * cUnitHeight,
+        cNextBlocksX  =               14 * cUnitWidth,
+        cNextBlocksY  =                4 * cUnitHeight,
+        cScoresX      = cNextBlocksX + 6 * cUnitWidth,
+        cScoresY_0    =                4 * cUnitHeight,
+        cScoresY_1    =   cScoresY_0 + 4 * cUnitHeight,
+        cScoresY_2    =   cScoresY_1 + 4 * cUnitHeight,
+        cScoresY_3    =   cScoresY_2 + 4 * cUnitHeight,
+        cScoresY_4    =   cScoresY_3 + 4 * cUnitHeight,
+        cScoresWidth  =                6 * cUnitWidth,
+        cScoresHeight =                6 * cUnitHeight
+    };
+
 
     void Visualizer::show()
     {
@@ -146,6 +168,8 @@ namespace Tetris
         {
             throw std::runtime_error("Failed to create the main window");
         }
+
+        //HWND updown = ::CreateUpDownControl(WS_VISIBLE | WS_CHILD, 200, 20, 40, 40, mHandle, 103, ::GetModuleHandle(0), 0, 10, 1, 2);
 
         // Hook keyboard
         //mKeyboardHook = ::SetWindowsHookEx(WH_KEYBOARD, (HOOKPROC)Visualizer::KeyboardProc, ::GetModuleHandle(0), 0);
@@ -202,24 +226,19 @@ namespace Tetris
         inGraphics.DrawString(inText.c_str(), (int)inText.size(), &gdiFont, ToRectF(inRect), &stringFormat, &inBrush);
     }
 
-
-    static const int cBlockWidth = 20;
-    static const int cBlockHeight = 20;
-    static const int cGridOffsetX = 40;
-    static const int cGridOffsetY = 40;
-    static const int cSpacing = 20;
-    static const int cBlocksOffsetX = cGridOffsetX + 10 * cBlockWidth + cSpacing;
-    static const int cBlocksOffsetY = cGridOffsetY;
-    static const int cScoresOffsetX = cBlocksOffsetX + 4 * cBlockWidth + cSpacing;
-    static const int cScoresOffsetY = cGridOffsetY;
-
     static const int cNumFutureBlocks = 5;
 
 
     void Visualizer::paintUnit(Gdiplus::Graphics & g, int x, int y, BlockType inBlockType)
     {
         Gdiplus::SolidBrush solidBrush(GetColor(inBlockType));
-        g.FillRectangle(&solidBrush, Gdiplus::RectF(static_cast<float>(x), static_cast<float>(y), static_cast<float>(cBlockWidth), static_cast<float>(cBlockHeight)));
+        g.FillRectangle(
+            &solidBrush,
+            Gdiplus::RectF(
+                static_cast<float>(x),
+                static_cast<float>(y),
+                static_cast<float>(cUnitWidth),
+                static_cast<float>(cUnitHeight)));
     }
 
 
@@ -234,11 +253,15 @@ namespace Tetris
     void Visualizer::paintScores(Gdiplus::Graphics & g)
     {
         const GameState::Stats & stats = mGame->currentNode()->state().stats();
-        drawText(g, GetScoreText("Lines", stats.numLines()), Rect(cScoresOffsetX, cScoresOffsetY, 200, 40));
-        drawText(g, GetScoreText("x1", stats.numSingles()), Rect(cScoresOffsetX, cScoresOffsetY + 40, 200, 40));
-        drawText(g, GetScoreText("x2", stats.numDoubles()), Rect(cScoresOffsetX, cScoresOffsetY + 80, 200, 40));
-        drawText(g, GetScoreText("x3", stats.numTriples()), Rect(cScoresOffsetX, cScoresOffsetY + 120, 200, 40));
-        drawText(g, GetScoreText("x4", stats.numTetrises()), Rect(cScoresOffsetX, cScoresOffsetY + 160, 200, 40));
+        drawText(
+            g,
+            GetScoreText("Lines", stats.numLines()),
+            Rect(cScoresX, cScoresY_0, cScoresWidth, cScoresHeight));
+
+        drawText(g, GetScoreText("x1", stats.numSingles()), Rect(cScoresX, cScoresY_1, cScoresWidth, cScoresHeight));
+        drawText(g, GetScoreText("x2", stats.numDoubles()), Rect(cScoresX, cScoresY_2, cScoresWidth, cScoresHeight));
+        drawText(g, GetScoreText("x3", stats.numTriples()), Rect(cScoresX, cScoresY_3, cScoresWidth, cScoresHeight));
+        drawText(g, GetScoreText("x4", stats.numTetrises()), Rect(cScoresX, cScoresY_4, cScoresWidth, cScoresHeight));
     }
     
     
@@ -249,7 +272,7 @@ namespace Tetris
         for (size_t i = 1; i < cNumFutureBlocks; ++i)
         {
             const Grid & grid = GetGrid(GetBlockIdentifier(blocks[i], 0));
-            paintGrid(g, grid, cBlocksOffsetX, cBlocksOffsetY + (i - 1) * 5 * cBlockHeight);
+            paintGrid(g, grid, cNextBlocksX, cNextBlocksY + (i - 1) * 5 * cUnitHeight);
         }
     }
 
@@ -262,7 +285,7 @@ namespace Tetris
             {
                 if (inGrid.get(r, c))
                 {
-                    paintUnit(g, x + c * cBlockWidth, y + r * cBlockHeight, inGrid.get(r, c));
+                    paintUnit(g, x + c * cUnitWidth, y + r * cUnitHeight, inGrid.get(r, c));
                 }
             }
         }
@@ -272,13 +295,11 @@ namespace Tetris
     void Visualizer::paintGrid(Gdiplus::Graphics & g)
     {
         const Grid & grid = mGame->currentNode()->state().grid();
-        int cGridOffsetX = 40;
-        int cGridOffsetY = 40;
         for (size_t r = 0; r != grid.numRows(); ++r)
         {
             for (size_t c = 0; c != grid.numColumns(); ++c)
             {
-                paintUnit(g, cGridOffsetX + c * cBlockHeight, cGridOffsetY + r * cBlockWidth, grid.get(r, c));
+                paintUnit(g, cFieldX + c * cUnitHeight, cFieldY + r * cUnitWidth, grid.get(r, c));
             }
         }
 
@@ -288,8 +309,8 @@ namespace Tetris
         {
             for (size_t c = 0; c != blockGrid.numColumns(); ++c)
             {
-                int x = cGridOffsetX + (c + block.column()) * cBlockWidth;
-                int y = cGridOffsetY + (r + block.row()) * cBlockHeight;
+                int x = cFieldX + (c + block.column()) * cUnitWidth;
+                int y = cFieldY + (r + block.row()) * cUnitHeight;
                 if (BlockType blockType = blockGrid.get(r, c))
                 {
                     paintUnit(g, x, y, blockType);
@@ -400,16 +421,11 @@ namespace Tetris
             return;
         }
 
-
-        const int cDepth = 3;
-        const int cWidth = 3;
-
-
         Player p(mGame);
         std::vector<int> depths;
-        for (int i = 0; i < cDepth; ++i)
+        for (int i = 0; i < cAIDepth; ++i)
         {
-            depths.push_back(cWidth);
+            depths.push_back(cAIWidth);
         }
         p.move(depths);
     }
@@ -421,6 +437,7 @@ namespace Tetris
         {
             return;
         }
+
         ChildNodes children = mGame->currentNode()->children();
         if (children.empty())
         {
