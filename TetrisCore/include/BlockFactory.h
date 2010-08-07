@@ -15,8 +15,9 @@ namespace Tetris
     {
     public:
         // The size of the bag of blocks that shuffled and taken from.
-        BlockFactory(int inBagSize = cBlockTypeCount);
+        BlockFactory(int inBagSize = 1);
 
+        // Returns a random block type.
         BlockType getNext() const;
 
     private:

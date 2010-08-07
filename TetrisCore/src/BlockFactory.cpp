@@ -11,7 +11,7 @@ namespace Tetris
         mBagSize(inBagSize),
         mCurrentIndex(0)
     {
-        mBag.reserve(mBagSize);
+        mBag.reserve(cBlockTypeCount * mBagSize);
         reset();
     }
 
