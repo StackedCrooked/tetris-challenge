@@ -92,9 +92,6 @@ namespace Tetris
     }
 
 
-    boost::thread_group gThreadPool;
-
-
     Player::Player(Game * inGame) :
         mGame(inGame),
         mMaxThreadCount(1)
@@ -166,9 +163,10 @@ namespace Tetris
         }
 
 
-        // These variables must not be destroyed until after the 'gThreadPool.join_all()' below.
+        // These variables must not be destroyed until after the 'threadPool.join_all()' below.
         std::vector<boost::shared_ptr<BlockTypes> > keepAlive_BlockTypes;
         std::vector<boost::shared_ptr<Widths> > keepAlive_Widths;
+        boost::thread_group threadPool;
 
         int count = 0;
         const int cMaxChildCount = inWidths[0];
@@ -179,12 +177,12 @@ namespace Tetris
             
             // WARNING!
             // The PopulateNodesRecursively method takes const ref arguments. We must make sure
-            // any arguments lifetime will last until after the gThreadPool.join_all call below.
+            // any arguments lifetime will last until after the threadPool.join_all call below.
             keepAlive_BlockTypes.push_back(boost::shared_ptr<BlockTypes>(new BlockTypes(mGame->getFutureBlocks(inWidths.size()))));
             keepAlive_Widths.push_back(boost::shared_ptr<Widths>(new Widths(inWidths)));
             
             // Call the PopulateNodesRecursively function in a separate thread.
-            gThreadPool.create_thread(
+            threadPool.create_thread(
                 boost::bind(&PopulateNodesRecursively,
                             node.clone().release(),
                             *keepAlive_BlockTypes.back(),
@@ -195,7 +193,7 @@ namespace Tetris
         }
 
         // Wait for all threads to complete.
-        gThreadPool.join_all();
+        threadPool.join_all();
     }
 
 
