@@ -166,17 +166,17 @@ namespace Tetris
     {
         if (!inJobs.empty())
         {
+            std::vector<boost::thread * > localThreads;
+            localThreads.reserve(inJobs.size());
             JobList newJobs;
             for (size_t idx = 0; idx != inJobs.size(); ++idx)
             {
-                // Execute each job.
-                // Q: What is the job?
-                // A: PopuplateNode
-                // Q: What are we going to do with all the newJobs?
-                // A: Populate them until 
-                mThreadGroup.create_thread(boost::bind(inJobs.get(idx), (void*)&newJobs));
+                // Call PopulateNode in a separate thread for the given job.
+                // Each thread created here will add jobs to newJobs.
+                localThreads.push_back(mThreadGroup.create_thread(boost::bind(inJobs.get(idx), (void*)&newJobs)));
             }
             mThreadGroup.join_all();
+            std::for_each(localThreads.begin(), localThreads.end(), boost::bind(&boost::thread_group::remove_thread, &mThreadGroup, _1));
             doJobsAndWait(newJobs);
         }
     }
@@ -187,7 +187,6 @@ namespace Tetris
         JobList jobs;
         PopulateNode(mGame->currentNode(), mGame->getFutureBlocks(inWidths.size()), inWidths, 0, (void*)&jobs);
         doJobsAndWait(jobs);
-        // The ENTIRE move (including all depths and widths) is done. Return.
     }
 
 
