@@ -25,7 +25,7 @@ std::vector<int> GetParameters(int inDepth, int inWidth)
 
 int Test(const std::vector<int> & inDepths, bool inMultiThreaded)
 {
-    Game game(20, 10); // 10 rows to have game-over quicker :)
+    Game game(10, 10); // 10 rows to have game-over quicker :)
     Player player(&game);
     player.playUntilGameOver(inDepths);
     std::cout << "Blocks: " << game.currentNode()->depth() <<  "\tLines: " << game.currentNode()->state().stats().mNumLines << "\r";
@@ -60,10 +60,18 @@ void Test(const std::vector<int> inDepths, size_t inCount, bool inMultiThreaded)
     int avgLines = (int)(0.5 + (float)sumLines/(float)inCount);
     std::cout << "AVG line count: " << avgLines << std::endl;
 
-    int duration = (int)stopWatch.elapsed();
+    int duration = (int)(stopWatch.elapsed() / 1000);
     std::cout << "Duration: " << duration << "ms" << std::endl;
 
     std::cout << "Duration/line: " << duration/avgLines << std::endl << std::endl;
+}
+
+
+int GetCPUCount()
+{    
+    SYSTEM_INFO sysinfo;
+    GetSystemInfo(&sysinfo);
+    return static_cast<int>(sysinfo.dwNumberOfProcessors);
 }
 
 
@@ -71,17 +79,14 @@ int main()
 {
     try
     {
-        SYSTEM_INFO sysinfo;
-        GetSystemInfo( &sysinfo );
-        std::cout << "CPU count: " << sysinfo.dwNumberOfProcessors << std::endl;
 
-        //int repeat = 10;
+        int repeat = 5;
         //Test(GetDepths(1), repeat, false);
         //Test(GetDepths(1), repeat, true);
         //Test(GetParameters(4, 4), repeat, true);
         //Test(GetParameters(4, 4), repeat, false);
-        //Test(GetParameters(3, 3), repeat, true);
-        //Test(GetParameters(3, 3), repeat, false);
+        Test(GetParameters(3, 3), repeat, true);
+        Test(GetParameters(3, 3), repeat, false);
         //Test(GetDepths(4), repeat, false);
         //Test(GetDepths(4), repeat, true);
     }

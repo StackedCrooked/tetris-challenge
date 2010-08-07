@@ -62,7 +62,7 @@ namespace Tetris
         const int cMaxChilds = inWidths[inOffset];
         ChildNodes & children = inNode->children();
         ChildNodes::iterator it = children.begin();
-        Jobs * jobs = (Jobs *)outJobsAsVoidPtr;
+        JobList * jobs = (JobList *)outJobsAsVoidPtr;
         while (idx < cMaxChilds && it != children.end())
         {
             GameStateNode * childNode = it->get();
@@ -72,33 +72,80 @@ namespace Tetris
                                   inWidths,
                                   inOffset + 1,
                                   _1);
-            jobs->push_back(job);
+            jobs->add(job);
             ++idx;
             ++it;
         }
     }
 
 
-    void DoJobs(const Jobs & inJobs)
-    {       
-        if (inJobs.empty())
-        {
-            return;
-        }
+    //void DoJobs(const JobList & inJobs)
+    //{       
+    //    if (inJobs.empty())
+    //    {
+    //        return;
+    //    }
 
-        Jobs newJobs;
-        for (size_t idx = 0; idx != inJobs.size(); ++idx)
-        {
-            const Job & job = inJobs[idx];
+    //    JobList newJobs;
+    //    for (size_t idx = 0; idx != inJobs.size(); ++idx)
+    //    {
+    //        const Job & job = inJobs.get(idx);
 
-            // Execute the job, and fetch new jobs.
-            job((void*)&newJobs);
-        }
+    //        // Execute the job in a new thread. Each thread
+    //        // will add items to the new JobList. (Good thing
+    //        // it is protected by a mutex)
+    //        job((void*)&newJobs);
+    //        mT
+    //    }
 
-        // Recursive call.
-        // This will continue until the inOffset value
-        // in PopulateNode reaches inBlocks.size().
-        DoJobs(newJobs);
+    //    
+
+    //    // Recursive call.
+    //    // This will continue until the inOffset value
+    //    // in PopulateNode reaches inBlocks.size().
+    //    DoJobs(newJobs);
+    //}
+
+
+    const Job & JobList::get(size_t inIndex) const
+    {
+        boost::mutex::scoped_lock lock(mMutex);
+        return mJobs[inIndex];
+    }
+
+
+    Job & JobList::get(size_t inIndex)
+    {
+        boost::mutex::scoped_lock lock(mMutex);
+        return mJobs[inIndex];
+    }
+
+
+    void JobList::add(const Job & inJob)
+    {
+        boost::mutex::scoped_lock lock(mMutex);
+        return mJobs.push_back(inJob);
+    }
+
+
+    void JobList::clear()
+    {
+        boost::mutex::scoped_lock lock(mMutex);
+        return mJobs.clear();
+    }
+
+
+    size_t JobList::size() const
+    {
+        boost::mutex::scoped_lock lock(mMutex);
+        return mJobs.size();
+    }
+
+
+    bool JobList::empty() const
+    {
+        boost::mutex::scoped_lock lock(mMutex);
+        return mJobs.empty();
     }
 
 
@@ -115,32 +162,55 @@ namespace Tetris
     }
 
 
+    void Player::doJobsAndWait(const JobList & inJobs)
+    {
+        if (!inJobs.empty())
+        {
+            JobList newJobs;
+            for (size_t idx = 0; idx != inJobs.size(); ++idx)
+            {
+                // Execute each job.
+                // Q: What is the job?
+                // A: PopuplateNode
+                // Q: What are we going to do with all the newJobs?
+                // A: Populate them until 
+                mThreadGroup.create_thread(boost::bind(inJobs.get(idx), (void*)&newJobs));
+            }
+            mThreadGroup.join_all();
+            doJobsAndWait(newJobs);
+        }
+    }
+
+
     void Player::move(const std::vector<int> & inWidths)
     {
-        Jobs jobs;
+        JobList jobs;
         PopulateNode(mGame->currentNode(), mGame->getFutureBlocks(inWidths.size()), inWidths, 0, (void*)&jobs);
-        DoJobs(jobs);
-        
+        doJobsAndWait(jobs);
+        // The ENTIRE move (including all depths and widths) is done. Return.
     }
 
 
     void Player::playUntilGameOver(const std::vector<int> & inDepths)
     {
+        int printHelper = mGame->currentNode()->depth();
         while (!mGame->isGameOver())
         {
             move(inDepths);
             size_t depth = inDepths.size();
             GameStateNode * child = mGame->currentNode()->bestChild(depth);
-            while (!child && depth > 0) // if we didn't reach the requested depth, for some reason??
+            while (!child && depth > 0) // in case of game-over this can happen
             {
-                CheckCondition(false, "Actually, we should never come here.");
                 child = mGame->currentNode()->bestChild(depth--);
             }
-            
             Cleanup(mGame->currentNode(), child);
-
             mGame->setCurrentNode(child);
-        }
+            if (mGame->currentNode()->depth() - printHelper >= 100)
+            {
+                std::cout << "Blocks: " << mGame->currentNode()->depth() << "\tLines: " << mGame->currentNode()->state().stats().mNumLines << "\r";
+                printHelper = mGame->currentNode()->depth();
+            }
+        }        
     }
 
 
