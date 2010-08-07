@@ -30,6 +30,21 @@ namespace Tetris
     }
 
 
+    std::auto_ptr<GameStateNode> GameStateNode::clone() const
+    {
+        std::auto_ptr<GameStateNode> result(new GameStateNode(mParent, std::auto_ptr<GameState>(new GameState(*mGameState))));
+        result->mDepth = mDepth;
+
+        ChildNodes::const_iterator it = mChildren.begin(), end = mChildren.end();
+        for (; it != end; ++it)
+        {
+            GameStateNode & node(*(*it));
+            result->mChildren.insert(ChildNodePtr(node.clone().release()));
+        }
+        return result;
+    }
+
+
     void CollectAll(GameStateNode * inChild, int inDepth, ChildNodes & outChildren)
     {
         if (inDepth > 1)
