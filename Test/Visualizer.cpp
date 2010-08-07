@@ -379,14 +379,14 @@ namespace Tetris
 
         static const Gdiplus::Color fColors[] =
         {
-            Gdiplus::Color(Gdiplus::Color::DarkGray),
-            Gdiplus::Color(Gdiplus::Color::Violet),
-            Gdiplus::Color(Gdiplus::Color::Blue),
-            Gdiplus::Color(Gdiplus::Color::Orange),
-            Gdiplus::Color(Gdiplus::Color::Yellow),
-            Gdiplus::Color(Gdiplus::Color::LightGreen),
-            Gdiplus::Color(Gdiplus::Color::Blue),
-            Gdiplus::Color(Gdiplus::Color::Red)
+            Gdiplus::Color(Gdiplus::Color::DarkGray),       // Background
+            Gdiplus::Color(Gdiplus::Color::Cyan),           // I-Shape
+            Gdiplus::Color(Gdiplus::Color::Blue),           // J-Shape
+            Gdiplus::Color(Gdiplus::Color::Orange),         // L-Shape
+            Gdiplus::Color(Gdiplus::Color::Yellow),         // O-Shape
+            Gdiplus::Color(Gdiplus::Color::LightGreen),     // S-Shape
+            Gdiplus::Color(Gdiplus::Color::Purple),         // T-Shape
+            Gdiplus::Color(Gdiplus::Color::Red)             // Z-Shape
         };
 
         return fColors[static_cast<int>(inBlockType)];
