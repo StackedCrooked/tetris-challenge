@@ -1,6 +1,7 @@
 #include "Player.h"
 #include "GameState.h"
 #include "ErrorHandling.h"
+#include "Poco/Stopwatch.h"
 #include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/shared_ptr.hpp>
@@ -35,8 +36,8 @@ namespace Tetris
 
 
     void PopulateNode(GameStateNode * inNode,
-                      const BlockTypes & inBlocks,
-                      const std::vector<int> & inWidths,
+                      BlockTypes inBlocks,              // No const-ref here because I want to minimize sharing, for now...
+                      std::vector<int> inWidths,
                       size_t inOffset,
                       void * outJobsAsVoidPtr)
     {
@@ -162,23 +163,80 @@ namespace Tetris
     }
 
 
+    class Worker
+    {
+    public:
+        typedef boost::function<void ()> DoneAction;
+
+        Worker(const Job & inJob, boost::mutex & inMutex, boost::condition_variable & inCondition) :
+            mJobList(),
+            mDone(false),
+            mMutex(inMutex),
+            mCondition(inCondition)
+        {
+            mJobList.add(inJob);
+        }
+
+
+        bool done() const
+        {
+            return mDone;
+        }
+
+
+        void work()
+        {
+            for (size_t idx = 0; idx < mJobList.size(); ++idx)
+            {
+                const Job & job = mJobList.get(idx);
+                job((void*)&mJobList);
+            }
+
+            mDone = true;
+            mCondition.notify_one();
+        }
+
+    private:
+        JobList mJobList;
+        bool mDone;
+        boost::mutex & mMutex;
+        boost::condition_variable & mCondition;
+    };
+
+    const int cMaxThreads = 20;
+    typedef std::vector<boost::shared_ptr<Worker> > Workers;
+    
+    
+    int ActiveWorkerCount(const Workers & inWorkers)
+    {
+        int result = inWorkers.size();
+        for (size_t idx = 0; idx != inWorkers.size(); ++idx)
+        {
+            if (inWorkers[idx]->done())
+            {
+                result--;
+            }
+        }
+        return result;
+    }
+
+
     void Player::doJobsAndWait(const JobList & inJobs)
     {
-        if (!inJobs.empty())
+        boost::mutex conditionMutex;        
+        boost::condition_variable condition;
+        
+        boost::thread_group threadGroup;
+        Workers workers;
+        for (size_t idx = 0; idx < inJobs.size(); ++idx)
         {
-            std::vector<boost::thread * > localThreads;
-            localThreads.reserve(inJobs.size());
-            JobList newJobs;
-            for (size_t idx = 0; idx != inJobs.size(); ++idx)
-            {
-                // Call PopulateNode in a separate thread for the given job.
-                // Each thread created here will add jobs to newJobs.
-                localThreads.push_back(mThreadGroup.create_thread(boost::bind(inJobs.get(idx), (void*)&newJobs)));
-            }
-            mThreadGroup.join_all();
-            std::for_each(localThreads.begin(), localThreads.end(), boost::bind(&boost::thread_group::remove_thread, &mThreadGroup, _1));
-            doJobsAndWait(newJobs);
+            boost::mutex::scoped_lock conditionLock(conditionMutex);
+            condition.wait(conditionLock, boost::bind(&ActiveWorkerCount, workers) < cMaxThreads);
+            const Job & job(inJobs.get(idx));
+            workers.push_back(boost::shared_ptr<Worker>(new Worker(job, conditionMutex, condition)));
+            threadGroup.create_thread(boost::bind(&Worker::work, workers.back()));
         }
+        threadGroup.join_all();
     }
 
 
@@ -192,7 +250,8 @@ namespace Tetris
 
     void Player::playUntilGameOver(const std::vector<int> & inDepths)
     {
-        int printHelper = mGame->currentNode()->depth();
+        Poco::Stopwatch stopWatch;
+        stopWatch.start();
         while (!mGame->isGameOver())
         {
             move(inDepths);
@@ -204,10 +263,11 @@ namespace Tetris
             }
             Cleanup(mGame->currentNode(), child);
             mGame->setCurrentNode(child);
-            if (mGame->currentNode()->depth() - printHelper >= 100)
+
+            if (stopWatch.elapsed() > 100 * 1000)
             {
                 std::cout << "Blocks: " << mGame->currentNode()->depth() << "\tLines: " << mGame->currentNode()->state().stats().mNumLines << "\r";
-                printHelper = mGame->currentNode()->depth();
+                stopWatch.restart();
             }
         }        
     }
