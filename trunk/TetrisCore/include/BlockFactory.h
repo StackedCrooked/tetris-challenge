@@ -30,5 +30,4 @@ namespace Tetris
 } // namespace Tetris
 
 
-
 #endif // BLOCKFACTORY_H
