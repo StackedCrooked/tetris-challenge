@@ -11,25 +11,20 @@
 
 namespace Tetris
 {
+    
+    typedef std::vector<int> Widths;
 
     class Player
     {
     public:
         Player(Game * inGame);
 
-        void setMaxThreadCount(size_t inMaxThreadCount);
-
-        void doJobsAndWait(const JobList & inJobs);
-
         void move(const std::vector<int> & inWidths);
 
-        void playUntilGameOver(const std::vector<int> & inDepths);
-
-        void populateNodeMultiThreaded(GameStateNode & inNode, const BlockTypes & inBlocks, const std::vector<int> & inWidths, size_t inOffset);
+        void playUntilGameOver(const std::vector<int> & inWidths);
 
     private:
         Game * mGame;
-        size_t mMaxThreadCount;
         boost::thread_group mThreadGroup;
         boost::mutex mMutex;
     };
