@@ -4,7 +4,7 @@
 
 #include "BlockType.h"
 #include <boost/shared_ptr.hpp>
-#include <boost/scoped_ptr.hpp>
+#include <memory>
 #include <set>
 
 
@@ -30,9 +30,6 @@ namespace Tetris
 
         GameStateNode(GameStateNode * inParent, std::auto_ptr<GameState> inGameState);
 
-        // Performs a deep copy.
-        std::auto_ptr<GameStateNode> clone() const;
-
         // Search existing nodes only, does not create any new ones.
         GameStateNode * bestChild(int inDepth);
 
@@ -57,7 +54,7 @@ namespace Tetris
 
         GameStateNode * mParent;
         int mDepth;
-        boost::scoped_ptr<GameState> mGameState;
+        std::auto_ptr<GameState> mGameState;
         ChildNodes mChildren;
     };
 
