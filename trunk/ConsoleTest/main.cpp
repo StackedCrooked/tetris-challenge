@@ -12,29 +12,6 @@
 using namespace Tetris;
 
 
-std::vector<int> GetParameters(int inDepth, int inWidth)
-{
-    std::vector<int> result;
-    for (int i = 0; i < inDepth; ++i)
-    {
-        result.push_back(inWidth);
-    }
-    return result;
-}
-
-
-int Test(const std::vector<int> & inWidths)
-{
-    Game game(20, 10); // 10 rows to have game-over quicker :)
-    Player player(&game);
-    player.setLogger(std::cout);
-    player.playUntilGameOver(inWidths);
-    std::cout << "Blocks: " << game.currentNode()->depth() <<  "\tLines: " << game.currentNode()->state().stats().numLines() << "\r";
-    std::cout << std::endl;
-    return game.currentNode()->state().stats().numLines();
-}
-
-
 int round(float value)
 {
   return (int)(0.5 + value);
@@ -66,9 +43,32 @@ int median(const std::vector<int> & inValues)
 }
 
 
-void Test(const std::vector<int> inWidths, size_t inCount)
+std::vector<int> GetParameters(int inDepth, int inWidth)
 {
+    std::vector<int> result;
+    for (int i = 0; i < inDepth; ++i)
+    {
+        result.push_back(inWidth);
+    }
+    return result;
+}
 
+
+int Test(const std::vector<int> & inWidths, const Game & inGame)
+{
+    std::auto_ptr<Game> gameCopy(inGame.clone());
+    Player player(gameCopy.get());
+    player.setLogger(std::cout);
+    player.playUntilGameOver(inWidths);
+    std::cout << "Blocks: " << gameCopy->currentNode()->depth() <<  "\tLines: " << gameCopy->currentNode()->state().stats().numLines() << "\r";
+    std::cout << std::endl;
+    return gameCopy->currentNode()->state().stats().numLines();
+}
+
+
+void Test(const std::vector<int> inWidths, size_t inCount, const Game & game)
+{
+    CheckArgument(inCount > 0, "Invalid count");
     Poco::Stopwatch stopWatch;
     stopWatch.start();
     std::cout << "Testing with retention counts: ";
@@ -86,7 +86,7 @@ void Test(const std::vector<int> inWidths, size_t inCount)
     int sumLines = 0;
     for (size_t idx = 0; idx != inCount; ++idx)
     {
-        lineCounts.push_back(Test(inWidths));
+        lineCounts.push_back(Test(inWidths, game));
         sumLines += lineCounts.back();
     }
 
@@ -102,7 +102,10 @@ void Test(const std::vector<int> inWidths, size_t inCount)
     int duration = (int)(stopWatch.elapsed() / 1000);
     std::cout << "Duration: " << duration << "ms" << std::endl;
 
-    std::cout << "Duration/line: " << duration/avgLines << std::endl << std::endl;
+    if (avgLines != 0)
+    {
+        std::cout << "Duration/line: " << duration/avgLines << std::endl << std::endl;
+    }
 }
 
 
@@ -119,11 +122,15 @@ int main()
     try
     {
         int repeat = 1;
-        Test(GetParameters(2, 4), repeat);
-        Test(GetParameters(3, 4), repeat);
-        Test(GetParameters(4, 4), repeat);
-        Test(GetParameters(5, 4), repeat);
-        Test(GetParameters(6, 4), repeat);
+        
+        Game game(20, 10);
+        // Generate 100000 blocks in advance.
+        game.reserveBlocks(100 * 1000);
+        Test(GetParameters(2, 4), repeat, game);
+        Test(GetParameters(3, 4), repeat, game);
+        Test(GetParameters(4, 4), repeat, game);
+        Test(GetParameters(5, 4), repeat, game);
+        Test(GetParameters(6, 4), repeat, game);
     }
     catch (const std::exception & exc)
     {

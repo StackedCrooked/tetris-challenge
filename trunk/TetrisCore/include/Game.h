@@ -27,6 +27,10 @@ namespace Tetris
     public:
         Game(int inNumRows, int inNumColumns);
 
+        std::auto_ptr<Game> clone() const;
+
+        void reserveBlocks(size_t inCount);
+
         const Block & activeBlock() const;
 
         Block & activeBlock();
@@ -64,6 +68,8 @@ namespace Tetris
         bool navigateNodeRight();
 
     private:
+        Game(const Game & inGame);
+
         void supplyBlocks() const;
 
         size_t mNumRows;

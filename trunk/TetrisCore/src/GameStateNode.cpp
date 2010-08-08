@@ -32,7 +32,8 @@ namespace Tetris
 
     std::auto_ptr<GameStateNode> GameStateNode::clone() const
     {
-        std::auto_ptr<GameStateNode> result(new GameStateNode(mParent, std::auto_ptr<GameState>(new GameState(*mGameState))));
+        std::auto_ptr<GameStateNode> result(mParent ? new GameStateNode(mParent, std::auto_ptr<GameState>(new GameState(*mGameState)))
+                                                    : new GameStateNode(std::auto_ptr<GameState>(new GameState(*mGameState))));
         result->mDepth = mDepth;
 
         ChildNodes::const_iterator it = mChildren.begin(), end = mChildren.end();
@@ -170,13 +171,17 @@ namespace Tetris
                 std::auto_ptr<GameState> newGameState;
                 block.setRotation(rt);
                 size_t row = 0;
-                while (gameState.checkPositionValid(block, row, col))
+                if (gameState.checkPositionValid(block, 0, col))
                 {
-                    block.setRow(row);
-                    row++;
+                    do
+                    {
+                        block.setRow(row);
+                        ChildNodePtr childState(new GameStateNode(&ioGameStateNode, gameState.commit(block, GameOver(false))));
+                        outChildNodes.insert(childState);                        
+                        row++;
+                    }
+                    while (gameState.checkPositionValid(block, row, col));
                 }
-                ChildNodePtr childState(new GameStateNode(&ioGameStateNode, gameState.commit(block, GameOver(false))));
-                outChildNodes.insert(childState);
             }
         }
     }

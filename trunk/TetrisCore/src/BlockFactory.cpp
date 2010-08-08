@@ -2,6 +2,8 @@
 #include "Block.h"
 #include "ErrorHandling.h"
 #include <algorithm>
+#include <cstdlib>
+#include <ctime>
 
 
 namespace Tetris
@@ -11,6 +13,9 @@ namespace Tetris
         mBagSize(inBagSize),
         mCurrentIndex(0)
     {
+        // Pick a new seed.
+        srand(static_cast<unsigned int>(time(NULL)));
+
         mBag.reserve(cBlockTypeCount * mBagSize);
         reset();
     }
@@ -19,7 +24,8 @@ namespace Tetris
     void BlockFactory::reset()
     {
         mBag.clear();
-        for (size_t idx = 0; idx != mBagSize; ++idx)
+        size_t totalSize = mBagSize * cBlockTypeCount;
+        for (size_t idx = 0; idx != totalSize; ++idx)
         {
             BlockType blockType = static_cast<BlockType>(1 + (idx % cBlockTypeCount));
             mBag.push_back(blockType);
@@ -31,7 +37,7 @@ namespace Tetris
     
     BlockType BlockFactory::getNext() const
     {
-        if (mCurrentIndex >= mBagSize)
+        if (mCurrentIndex >= mBagSize * cBlockTypeCount)
         {
             // Reshuffle the bag.
             const_cast<BlockFactory*>(this)->reset();
