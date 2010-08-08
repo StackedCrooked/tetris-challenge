@@ -21,12 +21,63 @@ namespace Tetris
         mNumColumns(inNumColumns),
         mRootNode(GameStateNode::CreateRootNode(inNumRows, inNumColumns).release()),        
         mActiveBlock(),
-        mBlockFactory(cBlockTypeCount),
+        mBlockFactory(),
         mCurrentBlockIndex(0)
     {
         mBlocks.push_back(mBlockFactory.getNext());        
         mActiveBlock.reset(CreateDefaultBlock(mBlocks.front(), inNumColumns).release());
         mCurrentNode = mRootNode.get();
+    }
+
+
+    GameStateNode * FindCurrentNode(GameStateNode * inRootNode, size_t inDepth)
+    {
+        if (inDepth == 0)
+        {
+            return inRootNode;
+        }       
+        
+        if (inRootNode->children().size() == 1)
+        {
+            return FindCurrentNode(inRootNode->children().begin()->get(), inDepth - 1);
+        }
+        else if (inRootNode->children().empty())
+        {
+            throw std::logic_error("There are no nodes at the requested depth at all!");
+        }
+        else
+        {
+            throw std::logic_error("Failed to find the current node. Childnodes require cleanup first.");
+        }
+    }
+        
+        
+    Game::Game(const Game & inGame) :
+        mNumRows(inGame.mNumRows),
+        mNumColumns(inGame.mNumColumns),
+        mRootNode(inGame.mRootNode->clone().release()),
+        mCurrentNode(0),
+        mActiveBlock(new Block(*(inGame.mActiveBlock))),
+        mBlockFactory(inGame.mBlockFactory),
+        mBlocks(inGame.mBlocks),
+        mCurrentBlockIndex(inGame.mCurrentBlockIndex)
+    {
+        mCurrentNode = FindCurrentNode(mRootNode.get(), inGame.mCurrentNode->depth());
+    }
+
+
+    std::auto_ptr<Game> Game::clone() const
+    {
+        return std::auto_ptr<Game>(new Game(*this));
+    }
+
+
+    void Game::reserveBlocks(size_t inCount)
+    {
+        while (mBlocks.size() < inCount)
+        {
+            mBlocks.push_back(mBlockFactory.getNext());
+        }
     }
 
 

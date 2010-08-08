@@ -157,7 +157,10 @@ namespace Tetris
         std::auto_ptr<GameState> result(clone());
         result->mIsGameOver = inGameOver.get();
         result->mQuality.mDirty = true;
-        result->solidifyBlock(inBlock);
+        if (!inGameOver.get())
+        {
+            result->solidifyBlock(inBlock);
+        }
         result->mOriginalBlock = inBlock;
         result->clearLines();
         return result;
@@ -194,7 +197,7 @@ namespace Tetris
         // Get numLines and lines
         {
             for (size_t rowIndex = mOriginalBlock.row();
-                 rowIndex < mOriginalBlock.row() + mOriginalBlock.grid().numRows();
+                 rowIndex < std::min<int>(mGrid.numRows(), mOriginalBlock.row() + mOriginalBlock.grid().numRows());
                  ++rowIndex)
             {  
                 lines[rowIndex] = true;
