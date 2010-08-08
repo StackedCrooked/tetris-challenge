@@ -30,6 +30,7 @@ namespace Tetris
 
         GameStateNode(GameStateNode * inParent, std::auto_ptr<GameState> inGameState);
 
+        // Creates a deep copy of this node and all child nodes.
         std::auto_ptr<GameStateNode> clone() const;
 
         // Search existing nodes only, does not create any new ones.

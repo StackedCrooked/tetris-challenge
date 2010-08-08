@@ -170,8 +170,10 @@ namespace Tetris
         }
 
         boost::thread_group threadPool;
+        BlockTypes futureBlocks;
+        mGame->getFutureBlocks(inWidths.size(), futureBlocks);
         PopulateChildNodes_Mt(childNodes,
-                              mGame->getFutureBlocks(inWidths.size()),
+                              futureBlocks,
                               inWidths,
                               threadPool);
     }
