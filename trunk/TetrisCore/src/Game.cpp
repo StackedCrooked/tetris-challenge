@@ -7,24 +7,25 @@
 namespace Tetris
 {
 
-    Block MakeDefaultBlock(BlockType inBlockType, size_t inNumColumns)
+    std::auto_ptr<Block> CreateDefaultBlock(BlockType inBlockType, size_t inNumColumns)
     {
-        return Block(inBlockType,
-                     Rotation(0), 
-                     Row(0),
-                     Column(DivideByTwo(inNumColumns - GetGrid(GetBlockIdentifier(inBlockType, 0)).numColumns())));
+        return std::auto_ptr<Block>(new Block(inBlockType,
+                                              Rotation(0), 
+                                              Row(0),
+                                              Column(DivideByTwo(inNumColumns - GetGrid(GetBlockIdentifier(inBlockType, 0)).numColumns()))));
     }
 
 
     Game::Game(int inNumRows, int inNumColumns) :
         mNumRows(inNumRows),
         mNumColumns(inNumColumns),
-        mRootNode(GameStateNode::CreateRootNode(inNumRows, inNumColumns).release()),
-        mActiveBlock(MakeDefaultBlock(mBlocks.front(), inNumColumns)),
+        mRootNode(GameStateNode::CreateRootNode(inNumRows, inNumColumns).release()),        
+        mActiveBlock(),
         mBlockFactory(cBlockTypeCount),
         mCurrentBlockIndex(0)
     {
         mBlocks.push_back(mBlockFactory.getNext());        
+        mActiveBlock.reset(CreateDefaultBlock(mBlocks.front(), inNumColumns).release());
         mCurrentNode = mRootNode.get();
     }
 
@@ -47,18 +48,18 @@ namespace Tetris
     const Block & Game::activeBlock() const
     {
         supplyBlocks();
-        return mActiveBlock;
+        return *mActiveBlock;
     }
 
 
     Block & Game::activeBlock()
     {
         supplyBlocks();
-        return mActiveBlock;
+        return *mActiveBlock;
     }
 
 
-    BlockTypes Game::getFutureBlocks(size_t inCount) const
+    void Game::getFutureBlocks(size_t inCount, BlockTypes & outBlocks) const
     {
 
         // Make sure we have all blocks we need.
@@ -67,17 +68,16 @@ namespace Tetris
             mBlocks.push_back(mBlockFactory.getNext());
         }
 
-        BlockTypes blocks;
-        blocks.push_back(mBlocks[mCurrentBlockIndex]);
+        
+        outBlocks.push_back(mBlocks[mCurrentBlockIndex]);
 
         if (inCount > 0)
         {
             for (size_t idx = 0; idx < inCount - 1; ++idx)
             {
-                blocks.push_back(mBlocks[mCurrentBlockIndex + 1 + idx]);
+                outBlocks.push_back(mBlocks[mCurrentBlockIndex + 1 + idx]);
             }
         }
-        return blocks;
     }
 
 
@@ -100,7 +100,7 @@ namespace Tetris
         mCurrentNode = inCurrentNode;
         mCurrentBlockIndex = mCurrentNode->depth();
         supplyBlocks();
-        mActiveBlock = MakeDefaultBlock(mBlocks[mCurrentBlockIndex], mNumColumns);
+        mActiveBlock.reset(CreateDefaultBlock(mBlocks[mCurrentBlockIndex], mNumColumns).release());
     }
 
 

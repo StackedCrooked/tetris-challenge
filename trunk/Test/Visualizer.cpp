@@ -278,7 +278,8 @@ namespace Tetris
     
     void Visualizer::paintFutureBlocks(Gdiplus::Graphics & g)
     {
-        std::vector<BlockType> blocks = mGame->getFutureBlocks(5);
+        std::vector<BlockType> blocks;
+        mGame->getFutureBlocks(5, blocks);
 
         for (size_t i = 1; i < cNumFutureBlocks; ++i)
         {

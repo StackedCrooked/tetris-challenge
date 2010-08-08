@@ -32,7 +32,7 @@ namespace Tetris
         Block & activeBlock();
 
         // Includes the currently active block
-        BlockTypes getFutureBlocks(size_t inCount) const;
+        void getFutureBlocks(size_t inCount, BlockTypes & outBlocks) const;
 
         GameStateNode * currentNode();
 
@@ -70,7 +70,7 @@ namespace Tetris
         size_t mNumColumns;
         boost::scoped_ptr<GameStateNode> mRootNode;
         GameStateNode * mCurrentNode;
-        Block mActiveBlock;
+        boost::scoped_ptr<Block> mActiveBlock;
 
         BlockFactory mBlockFactory;
         
