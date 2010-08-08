@@ -69,7 +69,6 @@ namespace Tetris
     }
 
 
-
     Visualizer::Visualizer(Game * inGame) :
         mGame(inGame),
         mHandle(0),

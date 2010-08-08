@@ -119,13 +119,11 @@ int main()
     try
     {
         int repeat = 1;
-        Test(GetParameters(2, 2), repeat);
-        Test(GetParameters(2, 3), repeat);
         Test(GetParameters(2, 4), repeat);
-        Test(GetParameters(2, 5), repeat);
-        Test(GetParameters(2, 6), repeat);
-        Test(GetParameters(2, 7), repeat);
-        Test(GetParameters(2, 8), repeat);
+        Test(GetParameters(3, 4), repeat);
+        Test(GetParameters(4, 4), repeat);
+        Test(GetParameters(5, 4), repeat);
+        Test(GetParameters(6, 4), repeat);
     }
     catch (const std::exception & exc)
     {
