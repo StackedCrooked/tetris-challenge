@@ -70,7 +70,7 @@ namespace Tetris
         size_t mNumColumns;
         boost::scoped_ptr<GameStateNode> mRootNode;
         GameStateNode * mCurrentNode;
-        std::auto_ptr<Block> mActiveBlock;
+        Block mActiveBlock;
 
         BlockFactory mBlockFactory;
         

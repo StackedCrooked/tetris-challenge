@@ -7,13 +7,12 @@
 namespace Tetris
 {
 
-    std::auto_ptr<Block> CreateDefaultBlock(BlockType inBlockType, size_t inNumColumns)
+    Block MakeDefaultBlock(BlockType inBlockType, size_t inNumColumns)
     {
-        return std::auto_ptr<Block>(new Block(
-            inBlockType,
-            Rotation(0),
-            Row(0),
-            Column(DivideByTwo(inNumColumns - GetGrid(GetBlockIdentifier(inBlockType, 0)).numColumns()))));
+        return Block(inBlockType,
+                     Rotation(0), 
+                     Row(0),
+                     Column(DivideByTwo(inNumColumns - GetGrid(GetBlockIdentifier(inBlockType, 0)).numColumns())));
     }
 
 
@@ -21,11 +20,11 @@ namespace Tetris
         mNumRows(inNumRows),
         mNumColumns(inNumColumns),
         mRootNode(GameStateNode::CreateRootNode(inNumRows, inNumColumns).release()),
+        mActiveBlock(MakeDefaultBlock(mBlocks.front(), inNumColumns)),
         mBlockFactory(cBlockTypeCount),
         mCurrentBlockIndex(0)
     {
-        mBlocks.push_back(mBlockFactory.getNext());
-        mActiveBlock = CreateDefaultBlock(mBlocks.front(), inNumColumns);
+        mBlocks.push_back(mBlockFactory.getNext());        
         mCurrentNode = mRootNode.get();
     }
 
@@ -48,14 +47,14 @@ namespace Tetris
     const Block & Game::activeBlock() const
     {
         supplyBlocks();
-        return *mActiveBlock;
+        return mActiveBlock;
     }
 
 
     Block & Game::activeBlock()
     {
         supplyBlocks();
-        return *mActiveBlock;
+        return mActiveBlock;
     }
 
 
@@ -101,7 +100,7 @@ namespace Tetris
         mCurrentNode = inCurrentNode;
         mCurrentBlockIndex = mCurrentNode->depth();
         supplyBlocks();
-        mActiveBlock = CreateDefaultBlock(mBlocks[mCurrentBlockIndex], mNumColumns);
+        mActiveBlock = MakeDefaultBlock(mBlocks[mCurrentBlockIndex], mNumColumns);
     }
 
 
