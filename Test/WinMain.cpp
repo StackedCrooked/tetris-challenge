@@ -12,7 +12,7 @@ using namespace Tetris;
 
 void StartTest()
 {
-    Game gameController(10, 10);
+    Game gameController(20, 10);
     Visualizer visualizer(&gameController);
     visualizer.show();
 }

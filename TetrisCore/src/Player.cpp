@@ -145,19 +145,22 @@ namespace Tetris
     }
 
 
-
-    void Player::move(const Widths & inWidths)
+    void Move(GameStateNode * ioStartingNode,
+              const BlockTypes & inBlockTypes,
+              const Widths & inWidths,
+              boost::thread_group & ioThreadPool)
     {
         CheckPrecondition(!inWidths.empty(), "Player::move: depth should be at least 1.");
+        CheckPrecondition(!inBlockTypes.empty(), "Number of future blocks must be at least one.");
 
         // Generate the offspring.
-        ChildNodes & childNodes = mGame->currentNode()->children();
-        GenerateOffspring(mGame->activeBlock().type(), *mGame->currentNode(), childNodes);
+        ChildNodes & childNodes = ioStartingNode->children();
+        GenerateOffspring(inBlockTypes[0], *ioStartingNode, childNodes);
 
         // If the dept is only 1, then we take this shortcut.
         if (inWidths.size() == 1)
         {
-            GameStateNode & node = *mGame->currentNode();
+            GameStateNode & node = *ioStartingNode;
             
             // Keep-alive
             ChildNodePtr bestChild = *node.children().begin();
@@ -168,14 +171,23 @@ namespace Tetris
             node.children().insert(bestChild);
             return;
         }
+        else
+        {
+            PopulateChildNodes_Mt(childNodes,
+                                  inBlockTypes,
+                                  inWidths,
+                                  ioThreadPool);
+        }
+    }
 
+
+    void Player::move(const Widths & inWidths)
+    {
         boost::thread_group threadPool;
-        BlockTypes futureBlocks;
-        mGame->getFutureBlocks(inWidths.size(), futureBlocks);
-        PopulateChildNodes_Mt(childNodes,
-                              futureBlocks,
-                              inWidths,
-                              threadPool);
+        BlockTypes blockTypes;
+        mGame->getFutureBlocks(inWidths.size(), blockTypes);
+        Move(mGame->currentNode(), blockTypes, inWidths, threadPool);
+        threadPool.join_all();
     }
 
 
