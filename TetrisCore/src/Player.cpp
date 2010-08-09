@@ -10,7 +10,18 @@
 
 namespace Tetris
 {
-    
+
+
+    GameStateNode * FindBestChild(GameStateNode * start, size_t inDepth)
+    {
+        GameStateNode * child = start->bestChild(inDepth);
+        while (!child && inDepth > 0) // in case of game-over this can happen
+        {
+            child = start->bestChild(inDepth--);
+        }
+        return child;
+    }
+
     
     // Remove all the children from srcNode except the one on the path that leads to dstNode.
     // The children of the 'good one' are also exterminated, except the one that brings us a 
@@ -19,7 +30,7 @@ namespace Tetris
     //
     // The purpose of this function is mainly to free up memory.
     //
-    void CarvePath(GameStateNode * srcNode, GameStateNode * dstNode)
+    void DestroyInferiorChildren(GameStateNode * srcNode, GameStateNode * dstNode)
     {
         CheckPrecondition(srcNode != NULL, "Goddamn.");
         CheckPrecondition(dstNode != NULL, "Goddamn.");
@@ -45,6 +56,13 @@ namespace Tetris
             dst = dst->parent();
             dstParent = dst->parent();
         }
+    }
+
+
+    void DestroyInferiorChildren(GameStateNode * start, size_t inDepth)
+    {
+        GameStateNode * child = FindBestChild(start, inDepth);
+        DestroyInferiorChildren(start, child);
     }
 
 
@@ -187,6 +205,7 @@ namespace Tetris
         BlockTypes blockTypes;
         mGame->getFutureBlocks(inWidths.size(), blockTypes);
         Move(mGame->currentNode(), blockTypes, inWidths, threadPool);
+        DestroyInferiorChildren(mGame->currentNode(), inWidths.size());
         threadPool.join_all();
     }
 
@@ -201,13 +220,9 @@ namespace Tetris
         {
             move(inWidths);
             size_t depth = inWidths.size();
-            GameStateNode * child = mGame->currentNode()->bestChild(depth);
-            while (!child && depth > 0) // in case of game-over this can happen
-            {
-                child = mGame->currentNode()->bestChild(depth--);
-            }
             
-            CarvePath(mGame->currentNode(), child);
+            GameStateNode * child = FindBestChild(mGame->currentNode(), depth);
+            DestroyInferiorChildren(mGame->currentNode(), child);
             mGame->setCurrentNode(child);
 
             int durationMs = (int)(stopWatch.elapsed() / 1000);
