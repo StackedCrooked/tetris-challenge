@@ -11,9 +11,15 @@ using namespace Tetris;
 
 
 void StartTest()
-{
-    Game gameController(20, 10);
-    Visualizer visualizer(&gameController);
+{   
+    BlockTypes blockTypes;
+    BlockFactory blockFactory;
+    for (size_t idx = 0; idx < 100000; ++idx)
+    {
+        blockTypes.push_back(blockFactory.getNext());
+    }
+    Game game(10, 10, blockTypes);
+    Visualizer visualizer(&game);
     visualizer.show();
 }
 

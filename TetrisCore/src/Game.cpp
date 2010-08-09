@@ -16,15 +16,19 @@ namespace Tetris
     }
 
 
-    Game::Game(int inNumRows, int inNumColumns) :
+    Game::Game(int inNumRows, int inNumColumns, const BlockTypes & inBlockTypes) :
         mNumRows(inNumRows),
         mNumColumns(inNumColumns),
         mRootNode(GameStateNode::CreateRootNode(inNumRows, inNumColumns).release()),        
         mActiveBlock(),
         mBlockFactory(),
+        mBlocks(inBlockTypes),
         mCurrentBlockIndex(0)
     {
-        mBlocks.push_back(mBlockFactory.getNext());        
+        if (mBlocks.empty())
+        {
+            mBlocks.push_back(mBlockFactory.getNext());        
+        }
         mActiveBlock.reset(CreateDefaultBlock(mBlocks.front(), inNumColumns).release());
         mCurrentNode = mRootNode.get();
     }

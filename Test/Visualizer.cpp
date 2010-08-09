@@ -473,23 +473,23 @@ namespace Tetris
             const Block & gotoBlock = node->state().originalBlock();
             const Block & activeBlock = mGame->activeBlock();
 
-            //if (activeBlock.rotation() != gotoBlock.rotation())
-            //{
-            //    mGame->rotate();
-            //}
-            //else if (activeBlock.column() < gotoBlock.column())
-            //{
-            //    mGame->move(Direction_Right);
-            //}
-            //else if (activeBlock.column() > gotoBlock.column())
-            //{
-            //    mGame->move(Direction_Left);
-            //}
-            //else if (activeBlock.row() + 1 < gotoBlock.row())
-            //{
-            //    mGame->move(Direction_Down);
-            //}
-            //else
+            if (activeBlock.rotation() != gotoBlock.rotation())
+            {
+                mGame->rotate();
+            }
+            else if (activeBlock.column() < gotoBlock.column())
+            {
+                mGame->move(Direction_Right);
+            }
+            else if (activeBlock.column() > gotoBlock.column())
+            {
+                mGame->move(Direction_Left);
+            }
+            else if (activeBlock.row() + 1 < gotoBlock.row())
+            {
+                mGame->move(Direction_Down);
+            }
+            else
             {
                 mGame->setCurrentNode(node);
             }

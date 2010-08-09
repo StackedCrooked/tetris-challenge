@@ -32,8 +32,8 @@ namespace Tetris
     
     enum
     {
-        cAIDepth = 2,
-        cAIWidth = 2
+        cAIDepth = 4,
+        cAIWidth = 4
     };
 
     class GameState;
