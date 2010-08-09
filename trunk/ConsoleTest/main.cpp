@@ -120,11 +120,11 @@ int GetCPUCount()
 int main()
 {
     try
-    {
-        int repeat = 1;
-        
+    {        
         Game game(20, 10);
         // Generate 100000 blocks in advance.
+        
+        int repeat = 1;
         game.reserveBlocks(100 * 1000);
         Test(GetParameters(2, 4), repeat, game);
         Test(GetParameters(3, 4), repeat, game);
