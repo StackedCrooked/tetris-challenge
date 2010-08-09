@@ -1,41 +1,30 @@
 #include "JobList.h"
-#include "GameState.h"
-#include "ErrorHandling.h"
-#include <boost/bind.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/shared_ptr.hpp>
-#include <iostream>
 
 
 namespace Tetris
 {
 
 
-    const Job & JobList::get(size_t inIndex) const
+    const Job & JobList::peek() const
     {
         boost::mutex::scoped_lock lock(mMutex);
-        return mJobs[inIndex];
+        return mJobs.front();
     }
 
 
-    Job & JobList::get(size_t inIndex)
+    Job JobList::pop()
     {
         boost::mutex::scoped_lock lock(mMutex);
-        return mJobs[inIndex];
+        Job result = mJobs.front();
+        mJobs.pop();
+        return result;
     }
 
 
-    void JobList::add(const Job & inJob)
+    void JobList::push(const Job & inJob)
     {
         boost::mutex::scoped_lock lock(mMutex);
-        return mJobs.push_back(inJob);
-    }
-
-
-    void JobList::clear()
-    {
-        boost::mutex::scoped_lock lock(mMutex);
-        return mJobs.clear();
+        return mJobs.push(inJob);
     }
 
 

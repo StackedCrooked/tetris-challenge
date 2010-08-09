@@ -4,31 +4,29 @@
 
 #include <boost/function.hpp>
 #include <boost/thread.hpp>
-#include <vector>
+#include <queue>
 
 
 namespace Tetris
 {
 
-    typedef boost::function<void(void*)> Job;
+    typedef boost::function<void()> Job;
 
     class JobList
     {
     public:
-        const Job & get(size_t inIndex) const;
+        const Job & peek() const;
 
-        Job & get(size_t inIndex);
+        Job pop();
 
-        void add(const Job & inJob);
-
-        void clear();
+        void push(const Job & inJob);
 
         size_t size() const;
 
         bool empty() const;
 
     private:
-        std::vector<Job> mJobs;
+        std::queue<Job> mJobs;
         mutable boost::mutex mMutex;
     };
 
