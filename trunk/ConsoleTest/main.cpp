@@ -121,16 +121,29 @@ int main()
 {
     try
     {        
-        Game game(20, 10);
+        BlockTypes blockTypes;
+        BlockFactory blockFactory;
+        for (size_t idx = 0; idx < 100000; ++idx)
+        {
+            blockTypes.push_back(blockFactory.getNext());
+        }
+        Game game(20, 10, blockTypes);
         // Generate 100000 blocks in advance.
         
         int repeat = 1;
         game.reserveBlocks(100 * 1000);
-        Test(GetParameters(2, 4), repeat, game);
-        Test(GetParameters(3, 4), repeat, game);
-        Test(GetParameters(4, 4), repeat, game);
-        Test(GetParameters(5, 4), repeat, game);
-        Test(GetParameters(6, 4), repeat, game);
+        Test(GetParameters(2, 2), repeat, Game(10, 10, blockTypes));
+        Test(GetParameters(2, 3), repeat, Game(10, 10, blockTypes));
+        Test(GetParameters(2, 4), repeat, Game(10, 10, blockTypes));
+        Test(GetParameters(3, 2), repeat, Game(10, 10, blockTypes));
+        Test(GetParameters(3, 3), repeat, Game(10, 10, blockTypes));
+        Test(GetParameters(3, 4), repeat, Game(10, 10, blockTypes));
+        Test(GetParameters(4, 2), repeat, Game(10, 10, blockTypes));
+        Test(GetParameters(4, 3), repeat, Game(10, 10, blockTypes));
+        Test(GetParameters(4, 4), repeat, Game(10, 10, blockTypes));
+        Test(GetParameters(5, 2), repeat, Game(10, 10, blockTypes));
+        Test(GetParameters(5, 3), repeat, Game(10, 10, blockTypes));
+        Test(GetParameters(5, 4), repeat, Game(10, 10, blockTypes));
     }
     catch (const std::exception & exc)
     {

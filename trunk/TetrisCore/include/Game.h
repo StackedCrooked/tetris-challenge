@@ -25,7 +25,7 @@ namespace Tetris
     class Game
     {
     public:
-        Game(int inNumRows, int inNumColumns);
+        Game(int inNumRows, int inNumColumns, const BlockTypes & inBlocks);
 
         std::auto_ptr<Game> clone() const;
 
