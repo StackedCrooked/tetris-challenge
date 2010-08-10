@@ -22,7 +22,7 @@ namespace Tetris
     public:
         typedef TetrisComponent ComponentType;
 
-        static XULWin::ElementPtr Create(XULWin::Element *, const XULWin::AttributesMapping &);
+        static XULWin::ElementPtr Create(XULWin::Element * inParent, const XULWin::AttributesMapping & inAttr);
 
         static const char * TagName() { return "tetris"; }
 

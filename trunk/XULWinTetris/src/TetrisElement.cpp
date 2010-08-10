@@ -15,8 +15,8 @@ namespace Tetris
 
     TetrisElement::TetrisElement(XULWin::Element * inParent, const XULWin::AttributesMapping & inAttr) :
         XULWin::Element(TetrisElement::TagName(),
-                inParent,
-                CreateTetrisComponent(inParent->component(), inAttr))
+                        inParent,
+                        CreateTetrisComponent(inParent->component(), inAttr))
     {
     }
 
