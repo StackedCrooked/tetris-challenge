@@ -4,7 +4,9 @@
 namespace Tetris
 {
 
+    // Forward declaration.
     XULWin::Component * CreateTetrisComponent(XULWin::Component *, const XULWin::AttributesMapping&);
+
 
     XULWin::ElementPtr TetrisElement::Create(XULWin::Element * inParent, const XULWin::AttributesMapping & inAttr)
     {
@@ -17,9 +19,5 @@ namespace Tetris
                 CreateTetrisComponent(inParent->component(), inAttr))
     {
     }
-
-    
-
-
 
 } // namespace Tetris
