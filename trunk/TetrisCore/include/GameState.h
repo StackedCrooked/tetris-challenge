@@ -23,14 +23,6 @@ namespace Tetris
         // The Block that was used in the commit(...) call.
         const Block & originalBlock() const;
 
-        int numLines() const;
-
-        int numDoubles() const;
-
-        int numTriples() const;
-
-        int numTetrises() const;
-
         bool isGameOver() const;
 
         // Calculates the quality of the playing field.
