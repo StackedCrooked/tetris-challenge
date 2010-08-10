@@ -36,10 +36,11 @@ namespace Tetris
 
     int GameState::quality() const
     {
-        if (mQuality.mDirty)
+        if (!mQuality.isInitialized())
         {
+            mQuality.reset();
+
             int result = 0;
-            mQuality.mNumHoles = 0;
 
             bool foundTop = false;
             size_t top = mGrid.numRows();
@@ -71,7 +72,7 @@ namespace Tetris
                         {
                             if (mGrid.get(rowIdx - 1, colIdx) != BlockType_Nil)
                             {
-                                mQuality.mNumHoles++;
+                                mQuality.setNumHoles(mQuality.numHoles() + 1);
                             }
                         }
                     }
@@ -80,20 +81,14 @@ namespace Tetris
             size_t height = mGrid.numRows() - top;
             size_t lastBlockHeight = mGrid.numRows() - mOriginalBlock.row();
 
-            result -= 5 * mQuality.mNumHoles;
+            result -= 5 * mQuality.numHoles();
             result -= 1 * height;
             result -= 2 * lastBlockHeight;
 
-            mQuality.mScore = result;
-            mQuality.mDirty = false;
+            mQuality.setScore(result);
+            mQuality.setInitialized(true);
         }
-        return mQuality.mScore;
-    }
-
-
-    int GameState::numHoles() const
-    {
-        return mQuality.mNumHoles;
+        return mQuality.score();
     }
 
 
@@ -156,7 +151,7 @@ namespace Tetris
     {
         std::auto_ptr<GameState> result(clone());
         result->mIsGameOver = inGameOver.get();
-        result->mQuality.mDirty = true;
+        result->mQuality.setInitialized(false);
         if (!inGameOver.get())
         {
             result->solidifyBlock(inBlock);
