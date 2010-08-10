@@ -22,41 +22,30 @@
 #include <shellapi.h>
 
 
-
-LRESULT ForwardKeyDownMessage(HWND inHWND, WPARAM wParam, LPARAM lParam)
+INT_PTR WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-    return SendMessage(inHWND, WM_KEYDOWN, wParam, lParam);
-}
+    XULWin::Initializer initializer(hInstance);
+    XULWin::WinAPI::CommonControlsInitializer ccInit;
+    XULWin::ElementFactory::Instance().registerElement<Tetris::TetrisElement>();
 
-
-void run(HMODULE inModuleHandle)
-{
     XULWin::ErrorCatcher errorCatcher;
     errorCatcher.disableLogging(true);
-    XULWin::XULRunner runner(inModuleHandle);
+
+    XULWin::XULRunner runner(hInstance);
     XULWin::ElementPtr rootElement = runner.loadXULFromFile("XULWinTetrisTest.xul");
     if (!rootElement)
     {
         XULWin::ReportError("Failed to load the root element");
-        return;
+        return 1;
     }
 
     XULWin::Window * wnd = rootElement->component()->downcast<XULWin::Window>();
     if (!wnd)
     {
         XULWin::ReportError("Root element is not of type winodw.");
-        return;
+        return 1;
     }
 
     wnd->showModal(XULWin::WindowPos_CenterInScreen);
-}
-
-
-INT_PTR WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
-{
-    XULWin::Initializer initializer(hInstance);
-    XULWin::WinAPI::CommonControlsInitializer ccInit;
-    XULWin::ElementFactory::Instance().registerElement<Tetris::TetrisElement>();
-    run(hInstance);
     return 0;
 }
