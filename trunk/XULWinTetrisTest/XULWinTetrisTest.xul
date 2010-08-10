@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+
+<!-- Stylesheet ignored by XULWin, inluded for compatibility with Mozilla XUL -->
+<?xul-overlay href="chrome://global/content/globalOverlay.xul"?>
+
+<window id="XULWinTetrisTestWindow"
+  xmlns:html="http://www.w3.org/1999/xhtml"
+  xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+  orient="vertical"
+  align="center"
+  title="XULWin Tetris Tester"
+>
+  <hbox>
+    <tetris flex="0" style="text-align:center; margin: 1px" />
+    <tetris flex="0" style="text-align:center; margin: 1px" />
+    <tetris flex="0" style="text-align:center; margin: 1px" />
+    <tetris flex="0" style="text-align:center; margin: 1px" />
+    <tetris flex="0" style="text-align:center; margin: 1px" />
+  </hbox>
+  <label value="Tetris" />
+</window>
