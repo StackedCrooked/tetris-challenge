@@ -197,7 +197,8 @@ namespace Tetris
         // Get numLines and lines
         {
             for (size_t rowIndex = mOriginalBlock.row();
-                 rowIndex < std::min<int>(mGrid.numRows(), mOriginalBlock.row() + mOriginalBlock.grid().numRows());
+                 rowIndex < std::min<size_t>(mGrid.numRows(),
+                                             mOriginalBlock.row() + mOriginalBlock.grid().numRows());
                  ++rowIndex)
             {  
                 lines[rowIndex] = true;
@@ -229,19 +230,15 @@ namespace Tetris
         {
             int newRowIdx = numLines;
             for (size_t r = 0; r != mGrid.numRows(); ++r)
-            {                
-                bool isLine = lines[r];
-                for (size_t c = 0; c != mGrid.numColumns(); ++c)
-                {
-                    if (!isLine)
-                    {
-                        newData[newRowIdx * mGrid.numColumns() + c] = mGrid.get(r, c);
-                    }
-                }
-                if (!isLine)
-                {
+            {
+				if (!lines[r])
+				{
+					for (size_t c = 0; c != mGrid.numColumns(); ++c)
+					{
+						newData[newRowIdx * mGrid.numColumns() + c] = mGrid.get(r, c);
+					}					
                     newRowIdx++;
-                }
+				}
             }
         }
         
