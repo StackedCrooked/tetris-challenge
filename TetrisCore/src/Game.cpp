@@ -298,9 +298,7 @@ namespace Tetris
         // Commit the block
         ChildNodePtr child(new GameStateNode(mCurrentNode, mCurrentNode->state().commit(block, GameOver(block.row() == 0))));
         mCurrentNode->children().insert(child);
-        mCurrentNode = child.get();
-            
-        mCurrentBlockIndex++;
+        setCurrentNode(child.get());
         supplyBlocks();
         return false;
     }
