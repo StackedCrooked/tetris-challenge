@@ -33,9 +33,6 @@ namespace Tetris
         // overlapping with previously placed blocks.
         bool checkPositionValid(const Block & inBlock, size_t inRowIdx, size_t inColIdx) const;
 
-        // Returns the number of holes. A hole is an empty square is covered by blocks.
-        int numHoles() const;
-
         // Creates a copy of the current gamestate with the given active block committed.
         // Use inGameOver = true to mark the new gamestate as "game over".
         std::auto_ptr<GameState> commit(const Block & inBlock, GameOver inGameOver) const;
@@ -90,16 +87,42 @@ namespace Tetris
         bool mIsGameOver;
         Block mOriginalBlock;
 
-        struct Quality
+        class Quality
         {
+        public:
             Quality() :
-                mDirty(true),
+                mIsInitialized(false),
                 mScore(0),
                 mNumHoles(0)
             {
             }
 
-            bool mDirty;
+            bool isInitialized() const
+            { return mIsInitialized; }
+
+            void setInitialized(bool inIsInitialized)
+            { mIsInitialized = inIsInitialized; }
+
+            int score() const
+            { return mScore; }
+
+            void setScore(int inScore)
+            { mScore = inScore; }
+
+            int numHoles() const
+            { return mNumHoles; }
+
+            void setNumHoles(int inNumHoles)
+            { mNumHoles = inNumHoles; }
+
+            void reset()
+            {
+                mScore = 0;
+                mNumHoles = 0;
+            }
+
+        private:
+            bool mIsInitialized;
             int mScore;
             int mNumHoles;
         };
