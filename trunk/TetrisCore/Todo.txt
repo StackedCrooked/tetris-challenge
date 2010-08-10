@@ -1,4 +1,4 @@
-- Find out why deeper and wider searcher don't give better results.
+- Find out why deeper and wider searches don't give better results.
 	- Use the same set of blocks for each test.
 - Create nicer reporting utitliy
 - Release a version to demo purposes?
