@@ -45,7 +45,7 @@ namespace Tetris
 
     void PaintUnit(Gdiplus::Graphics & g, int x, int y, BlockType inBlockType);
 
-    void PaintGrid(Gdiplus::Graphics & g, const Grid & inGrid, int x, int y);
+    void PaintGrid(Gdiplus::Graphics & g, const Grid & inGrid, int x, int y, bool inPaintBackground);
     
     //void PaintFutureBlocks(Gdiplus::Graphics & g, const BlockTypes & inBlockTypes);
 

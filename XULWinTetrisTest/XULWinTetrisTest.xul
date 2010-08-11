@@ -10,5 +10,5 @@
   align="center"
   title="XULWin Tetris Tester"
 >
-    <tetris id="tetris-component" flex="0"  />
+    <tetris id="tetris-component" flex="0" numfutureblocks="3" />
 </window>

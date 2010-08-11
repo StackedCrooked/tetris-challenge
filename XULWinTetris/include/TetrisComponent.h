@@ -3,6 +3,7 @@
 
 
 #include "XULWin/Component.h"
+#include "XULWin/AttributeController.h"
 #include "XULWin/Decorator.h"
 #include "XULWin/EventListener.h"
 #include "XULWin/GdiplusLoader.h"
@@ -15,7 +16,32 @@ namespace Tetris
 {
     class Game;
 
+
+    /**
+     * Attribute: numfutureblocks
+     * Type: string (representing an integer)
+     * Purpose: The number of future blocks to show in the Tetris component
+     */
+    class NumFutureBlocksController : public XULWin::AttributeController
+    {
+    public:
+        static const char * AttributeName()
+        {
+            return "numfutureblocks";
+        }
+
+        virtual void get(std::string & outValue);
+
+        virtual void set(const std::string & inValue);
+
+        virtual int getNumFutureBlocks() const = 0;
+
+        virtual void setNumFutureBlocks(int inNumFutureBlocks) = 0;
+    };
+
+
     class TetrisComponent : public XULWin::NativeControl,
+                            public NumFutureBlocksController,
                             public XULWin::GdiplusLoader
     {
     public:
@@ -31,11 +57,18 @@ namespace Tetris
 
         Game & getGame();
 
+        virtual bool initAttributeControllers();
+
         virtual int calculateWidth(XULWin::SizeConstraint inSizeConstraint) const;
 
         virtual int calculateHeight(XULWin::SizeConstraint inSizeConstraint) const;
 
         virtual LRESULT handleMessage(UINT inMessage, WPARAM wParam, LPARAM lParam);
+
+        // NumFutureBlocksController
+        virtual int getNumFutureBlocks() const;
+
+        virtual void setNumFutureBlocks(int inNumFutureBlocks);
 
     private:
         LRESULT onKeyDown(WPARAM wParam, LPARAM lParam);
@@ -49,9 +82,9 @@ namespace Tetris
         virtual void paint(HDC inHDC);
 
         boost::scoped_ptr<Game> mGame;
+        int mNumFutureBlocks;
     };
 
-    
 } // namespace Tetris
 
 
