@@ -9,9 +9,6 @@
   title="XULWin Tetris Tester"
   orient="vertical"
   align="stretch"
-  style="background-color: blue"
 >
-  <hbox>
-    <tetris id="tetris-component" flex="0" numfutureblocks="3" keyboardenabled="true" />
-  </hbox>
+  <tetris id="tetris-component" flex="1" numfutureblocks="1" keyboardenabled="true" />
 </window>
