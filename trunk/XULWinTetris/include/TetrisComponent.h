@@ -57,6 +57,9 @@ namespace Tetris
 
         Game & getGame();
 
+        // Listen to keyboard (arrow keys + space button)
+        void setKeyboardEnabled(bool inEnable);
+
         virtual bool initAttributeControllers();
 
         virtual int calculateWidth(XULWin::SizeConstraint inSizeConstraint) const;
@@ -83,6 +86,7 @@ namespace Tetris
 
         boost::scoped_ptr<Game> mGame;
         int mNumFutureBlocks;
+        bool mKeyboardEnabled;
     };
 
 } // namespace Tetris
