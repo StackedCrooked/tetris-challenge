@@ -1,3 +1,7 @@
+#define POCO_BLOATED_WIN32    // }
+#include "Poco/Foundation.h"  // } => fixes compile errors with combining Gdiplus and Poco includes
+
+
 #include "Visualizer.h"
 #include "GameState.h"
 #include "Game.h"
