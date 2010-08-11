@@ -6,9 +6,12 @@
 <window id="XULWinTetrisTestWindow"
   xmlns:html="http://www.w3.org/1999/xhtml"
   xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-  orient="vertical"
-  align="center"
   title="XULWin Tetris Tester"
+  orient="vertical"
+  align="stretch"
+  style="background-color: blue"
 >
-    <tetris id="tetris-component" flex="0" numfutureblocks="3" />
+  <hbox>
+    <tetris id="tetris-component" flex="0" numfutureblocks="3" keyboardenabled="true" />
+  </hbox>
 </window>

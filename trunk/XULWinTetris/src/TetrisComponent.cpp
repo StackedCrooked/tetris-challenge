@@ -33,6 +33,18 @@ namespace Tetris
         setNumFutureBlocks(XULWin::String2Int(inValue, 1));
     }
 
+    
+    void KeyboardEnabledController::get(std::string & outValue)
+    {
+        outValue = XULWin::Bool2String(getKeyboardEnabled());
+    }
+
+    
+    void KeyboardEnabledController::set(const std::string & inValue)
+    {
+        setKeyboardEnabled(XULWin::String2Bool(inValue, true));
+    }
+
 
     TetrisComponent::TetrisComponent(XULWin::Component * inParent, const XULWin::AttributesMapping & inAttr) :
         XULWin::NativeControl(inParent, inAttr, TEXT("STATIC"), 0, 0),
@@ -76,6 +88,17 @@ namespace Tetris
     void TetrisComponent::setNumFutureBlocks(int inNumFutureBlocks)
     {
         mNumFutureBlocks = inNumFutureBlocks;
+    }
+
+
+    bool TetrisComponent::getKeyboardEnabled() const
+    {
+        return mKeyboardEnabled;
+    }
+
+    void TetrisComponent::setKeyboardEnabled(bool inKeyboardEnabled)
+    {
+        mKeyboardEnabled = inKeyboardEnabled;
     }
         
         
@@ -130,15 +153,10 @@ namespace Tetris
     }
 
 
-    void TetrisComponent::setKeyboardEnabled(bool inEnable)
-    {
-        mKeyboardEnabled = inEnable;
-    }
-
-
     bool TetrisComponent::initAttributeControllers()
     {
         setAttributeController<NumFutureBlocksController>(this);
+        setAttributeController<KeyboardEnabledController>(this);
         return Super::initAttributeControllers();
     }
 

@@ -40,8 +40,32 @@ namespace Tetris
     };
 
 
+    /**
+     * Attribute: keyboardenabled
+     * Type: string (representing an integer)
+     * Purpose: The number of future blocks to show in the Tetris component
+     */
+    class KeyboardEnabledController : public XULWin::AttributeController
+    {
+    public:
+        static const char * AttributeName()
+        {
+            return "keyboardenabled";
+        }
+
+        virtual void get(std::string & outValue);
+
+        virtual void set(const std::string & inValue);
+
+        virtual bool getKeyboardEnabled() const = 0;
+
+        virtual void setKeyboardEnabled(bool inKeyboardEnabled) = 0;
+    };
+
+
     class TetrisComponent : public XULWin::NativeControl,
                             public NumFutureBlocksController,
+                            public KeyboardEnabledController,
                             public XULWin::GdiplusLoader
     {
     public:
@@ -57,9 +81,6 @@ namespace Tetris
 
         Game & getGame();
 
-        // Listen to keyboard (arrow keys + space button)
-        void setKeyboardEnabled(bool inEnable);
-
         virtual bool initAttributeControllers();
 
         virtual int calculateWidth(XULWin::SizeConstraint inSizeConstraint) const;
@@ -72,6 +93,10 @@ namespace Tetris
         virtual int getNumFutureBlocks() const;
 
         virtual void setNumFutureBlocks(int inNumFutureBlocks);
+
+        virtual bool getKeyboardEnabled() const;
+
+        virtual void setKeyboardEnabled(bool inKeyboardEnabled);
 
     private:
         LRESULT onKeyDown(WPARAM wParam, LPARAM lParam);

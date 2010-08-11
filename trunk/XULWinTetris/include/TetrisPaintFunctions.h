@@ -22,8 +22,8 @@ namespace Tetris
 
     enum Coords
     {
-        cUnitWidth    =               20,
-        cUnitHeight   =               20
+        cUnitWidth    = 20,
+        cUnitHeight   = 20
         //cWindowWidth  =               30 * cUnitHeight,
         //cWindowHeight =               30 * cUnitWidth,        
         //cFieldX       =                2 * cUnitWidth,
