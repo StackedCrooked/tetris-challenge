@@ -37,7 +37,8 @@ namespace Tetris
     TetrisComponent::TetrisComponent(XULWin::Component * inParent, const XULWin::AttributesMapping & inAttr) :
         XULWin::NativeControl(inParent, inAttr, TEXT("STATIC"), 0, 0),
         mGame(new Tetris::Game(20, 10, Tetris::BlockTypes())),
-        mNumFutureBlocks(1)
+        mNumFutureBlocks(1),
+        mKeyboardEnabled(true)
     {
         if (sTetrisComponentInstances.empty())
         {
@@ -126,6 +127,12 @@ namespace Tetris
     Game & TetrisComponent::getGame()
     {
         return *mGame;
+    }
+
+
+    void TetrisComponent::setKeyboardEnabled(bool inEnable)
+    {
+        mKeyboardEnabled = inEnable;
     }
 
 
@@ -289,7 +296,7 @@ namespace Tetris
 
     LRESULT TetrisComponent::keyboardProc(int inCode, WPARAM wParam, LPARAM lParam)
     {
-        if (inCode == HC_ACTION && !(HIWORD(lParam) & KF_UP))
+        if (mKeyboardEnabled && inCode == HC_ACTION && !(HIWORD(lParam) & KF_UP))
         {
             onKeyDown(wParam, lParam);
         }
