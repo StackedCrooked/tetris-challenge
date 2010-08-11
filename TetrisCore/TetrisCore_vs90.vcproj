@@ -192,6 +192,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\include\GameTimer.h"
+				>
+			</File>
+			<File
 				RelativePath=".\include\GenericGrid.h"
 				>
 			</File>
@@ -241,6 +245,10 @@
 			</File>
 			<File
 				RelativePath=".\src\GameStateNode.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\GameTimer.cpp"
 				>
 			</File>
 			<File
