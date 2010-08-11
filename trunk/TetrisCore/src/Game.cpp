@@ -75,6 +75,18 @@ namespace Tetris
         return std::auto_ptr<Game>(new Game(*this));
     }
 
+    
+    int Game::numRows() const
+    {
+        return mNumRows;
+    }
+
+
+    int Game::numColumns() const
+    {
+        return mNumColumns;
+    }
+
 
     void Game::reserveBlocks(size_t inCount)
     {

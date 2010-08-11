@@ -29,6 +29,10 @@ namespace Tetris
 
         std::auto_ptr<Game> clone() const;
 
+        int numRows() const;
+
+        int numColumns() const;
+
         void reserveBlocks(size_t inCount);
 
         const Block & activeBlock() const;

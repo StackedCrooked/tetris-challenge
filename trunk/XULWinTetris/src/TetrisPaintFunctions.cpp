@@ -54,13 +54,13 @@ namespace Tetris
     }
 
 
-    void PaintGrid(Gdiplus::Graphics & g, const Grid & inGrid, int x, int y)
+    void PaintGrid(Gdiplus::Graphics & g, const Grid & inGrid, int x, int y, bool inPaintBackground)
     {
         for (size_t r = 0; r != inGrid.numRows(); ++r)
         {
             for (size_t c = 0; c != inGrid.numColumns(); ++c)
             {
-                if (inGrid.get(r, c))
+                if (inPaintBackground || inGrid.get(r, c))
                 {
                     PaintUnit(g, x + c * cUnitWidth, y + r * cUnitHeight, inGrid.get(r, c));
                 }

@@ -1,7 +1,6 @@
+- Paint future blocks in XULWin TetrisComponent (future-blocks-count is attribute?)
 - AI depth has no impact.
-- Game class should implement the timer
 - Non-blocking AI
 - Release a version to demo purposes?
-- Make a Tetris XULWin component??
 - Use official Tetris colors
 - Js client

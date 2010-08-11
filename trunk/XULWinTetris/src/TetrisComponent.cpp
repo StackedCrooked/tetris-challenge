@@ -1,6 +1,7 @@
 #include "TetrisComponent.h"
 #include "TetrisPaintFunctions.h"
 #include "Game.h"
+#include "XULWin/Conversions.h"
 #include "XULWin/ErrorReporter.h"
 #include "XULWin/Gdiplus.h"
 #include <boost/bind.hpp>
@@ -20,10 +21,23 @@ namespace Tetris
         return new XULWin::Decorator(new TetrisComponent(inParent, inAttr));
     }
 
+    
+    void NumFutureBlocksController::get(std::string & outValue)
+    {
+        outValue = XULWin::Int2String(getNumFutureBlocks());
+    }
+
+    
+    void NumFutureBlocksController::set(const std::string & inValue)
+    {
+        setNumFutureBlocks(XULWin::String2Int(inValue, 1));
+    }
+
 
     TetrisComponent::TetrisComponent(XULWin::Component * inParent, const XULWin::AttributesMapping & inAttr) :
         XULWin::NativeControl(inParent, inAttr, TEXT("STATIC"), 0, 0),
-        mGame(new Tetris::Game(20, 10, Tetris::BlockTypes()))
+        mGame(new Tetris::Game(20, 10, Tetris::BlockTypes())),
+        mNumFutureBlocks(1)
     {
         if (sTetrisComponentInstances.empty())
         {
@@ -49,6 +63,18 @@ namespace Tetris
     bool TetrisComponent::init()
     {
         return Super::init();
+    }
+
+    
+    int TetrisComponent::getNumFutureBlocks() const
+    {
+        return mNumFutureBlocks;
+    }
+
+
+    void TetrisComponent::setNumFutureBlocks(int inNumFutureBlocks)
+    {
+        mNumFutureBlocks = inNumFutureBlocks;
     }
         
         
@@ -103,29 +129,52 @@ namespace Tetris
     }
 
 
+    bool TetrisComponent::initAttributeControllers()
+    {
+        setAttributeController<NumFutureBlocksController>(this);
+        return Super::initAttributeControllers();
+    }
+
+
     int TetrisComponent::calculateWidth(XULWin::SizeConstraint inSizeConstraint) const
     {
+        int result = 0;
         if (!mGame)
         {
-            return cUnitWidth * 10;
+            result += cUnitWidth * 10;
         }
         else
         {
-            return cUnitWidth * mGame->currentNode()->state().grid().numColumns();
+            result += cUnitWidth * mGame->numColumns();
         }
+
+        if (getNumFutureBlocks() > 0)
+        {
+            result += 5 * cUnitWidth;
+        }
+
+        return result;
     }
 
 
     int TetrisComponent::calculateHeight(XULWin::SizeConstraint inSizeConstraint) const
     {
+        int result = 0;
         if (!mGame)
         {
-            return cUnitWidth * 20;
+            result += cUnitWidth * 20;
         }
         else
         {
-            return cUnitHeight * mGame->currentNode()->state().grid().numRows();
+            result += cUnitHeight * mGame->numRows();
         }
+
+        int requiredHeightForFutureBlocks = cUnitHeight + (5 * getNumFutureBlocks() * cUnitHeight);
+        if (requiredHeightForFutureBlocks > result)
+        {
+            result = requiredHeightForFutureBlocks;
+        }
+        return result;
     }
 
 
@@ -134,11 +183,24 @@ namespace Tetris
         Gdiplus::Graphics g(inHDC);
         g.SetInterpolationMode(Gdiplus::InterpolationModeHighQuality);
         g.SetSmoothingMode(Gdiplus::SmoothingModeHighQuality);
-        const Grid & grid = mGame->currentNode()->state().grid();
-        PaintGrid(g, grid, 0, 0);
 
+        // Paint the current game grid
+        const Grid & grid = mGame->currentNode()->state().grid();
+        PaintGrid(g, grid, 0, 0, true);
+
+        // Paint the currently active block
         const Block & block = mGame->activeBlock();
-        PaintGrid(g, block.grid(), block.column() * cUnitWidth, block.row() * cUnitHeight);
+        PaintGrid(g, block.grid(), block.column() * cUnitWidth, block.row() * cUnitHeight, false);
+
+        // Paint future blocks
+        BlockTypes futureBlockTypes;
+        mGame->getFutureBlocks(mNumFutureBlocks + 1, futureBlockTypes);
+        for (size_t idx = 1; idx < futureBlockTypes.size(); ++idx)
+        {
+            int x = cUnitWidth * (mGame->numColumns() + 1);
+            int y = cUnitHeight + (idx - 1) * (5 * cUnitHeight);
+            PaintGrid(g, GetGrid(GetBlockIdentifier(futureBlockTypes[idx], 0)), x, y, false);
+        }
     }
 
 
