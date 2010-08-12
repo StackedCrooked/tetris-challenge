@@ -60,6 +60,8 @@ namespace Tetris
                                                                         ::GetCurrentThreadId());
         }
         sTetrisComponentInstances.insert(this);
+
+        mWinAPITimer.start(boost::bind(&TetrisComponent::onTimerEvent, this), 10);
     }
 
 
@@ -76,6 +78,12 @@ namespace Tetris
     bool TetrisComponent::init()
     {
         return Super::init();
+    }
+
+
+    void TetrisComponent::onTimerEvent()
+    {
+        ::InvalidateRect(handle(), 0, FALSE);
     }
 
     
@@ -332,9 +340,5 @@ namespace Tetris
         }        
         return ::CallNextHookEx(sTetrisComponentInstances_KeyboardHook, inCode, wParam, lParam);
     }
-
-    
-
-
 
 } // namespace Tetris

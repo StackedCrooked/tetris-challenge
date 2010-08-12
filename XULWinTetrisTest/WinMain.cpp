@@ -1,4 +1,5 @@
 #include "TetrisElement.h"
+#include "GameTimer.h"
 #include "TetrisComponent.h"
 #include "Game.h"
 #include "Unicode.h"
@@ -15,6 +16,7 @@
 #include "XULWin/Window.h"
 #include "XULWin/WinUtils.h"
 #include "XULWin/Unicode.h"
+#include <boost/scoped_ptr.hpp>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -45,6 +47,20 @@ INT_PTR WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmd
         XULWin::ReportError("Root element is not of type winodw.");
         return 1;
     }
+
+    boost::scoped_ptr<Tetris::GameTimer> timedGame;
+
+    std::vector<Tetris::TetrisElement *> tetrisElements;
+    rootElement->getElementsByType<Tetris::TetrisElement>(tetrisElements);
+    for (size_t idx = 0; idx != tetrisElements.size(); ++idx)
+    {
+        Tetris::TetrisComponent * tetris = tetrisElements[idx]->component()->downcast<Tetris::TetrisComponent>();
+        timedGame.reset(new Tetris::GameTimer(&tetris->getGame()));
+        break;
+    }
+
+	// TODO: Make multi-threaded!!
+    timedGame->start();
 
     wnd->showModal(XULWin::WindowPos_CenterInScreen);
     return 0;

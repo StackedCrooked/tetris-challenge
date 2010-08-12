@@ -1,5 +1,5 @@
-#ifndef GAMETIMER_H_INCLUDED
-#define GAMETIMER_H_INCLUDED
+#ifndef TIMEDGAME_H_INCLUDED
+#define TIMEDGAME_H_INCLUDED
 
 
 #include "Game.h"
@@ -10,12 +10,12 @@ namespace Tetris
 {
 
     /**
-     * GameTimer adds the timed lowering of the active block.
+     * TimedGame adds the timed lowering of the active block.
      */
-    class GameTimer
+    class TimedGame
     {
     public:
-        GameTimer(Game * inGame);
+        TimedGame(Game * inGame);
 
         void start();
 
@@ -37,4 +37,4 @@ namespace Tetris
 } // namespace Tetris
 
 
-#endif // GAMETIMER_H_INCLUDED
+#endif // TIMEDGAME_H_INCLUDED
