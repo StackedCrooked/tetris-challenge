@@ -1,4 +1,4 @@
-#include "GameTimer.h"
+#include "TimedGame.h"
 
 
 namespace Tetris
@@ -14,22 +14,22 @@ namespace Tetris
 
     static const int sIntervalCount = sizeof(sIntervals)/sizeof(int);
 
-    GameTimer::GameTimer(Game * inGame) :
+    TimedGame::TimedGame(Game * inGame) :
         mGame(inGame),
         mLevel(0)
     {
     }
 
 
-    void GameTimer::start()
+    void TimedGame::start()
     {
-        mTimer.start(Poco::TimerCallback<GameTimer>(*this, &GameTimer::onTimerEvent));        
+        mTimer.start(Poco::TimerCallback<TimedGame>(*this, &TimedGame::onTimerEvent));        
     }
 
 
-    void GameTimer::onTimerEvent(Poco::Timer & inTimer)
+    void TimedGame::onTimerEvent(Poco::Timer & inTimer)
     {
-        if (mGame->isGameOver())
+        if (!mGame->isGameOver())
         {
             mGame->move(Direction_Down);
         }
@@ -38,13 +38,13 @@ namespace Tetris
     }
 
 
-    int GameTimer::level() const
+    int TimedGame::level() const
     {
         return mLevel;
     }
 
 
-    void GameTimer::setLevel(int inLevel)
+    void TimedGame::setLevel(int inLevel)
     {
         mLevel = std::min<int>(inLevel, sIntervalCount - 1);
     }

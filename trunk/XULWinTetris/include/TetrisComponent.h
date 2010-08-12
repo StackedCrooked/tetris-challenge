@@ -9,6 +9,7 @@
 #include "XULWin/GdiplusLoader.h"
 #include "XULWin/NativeControl.h"
 #include "XULWin/VirtualComponent.h"
+#include "XULWin/WinUtils.h"
 #include <boost/scoped_ptr.hpp>
 
 
@@ -105,6 +106,8 @@ namespace Tetris
 
         LRESULT keyboardProc(int inCode, WPARAM wParam, LPARAM lParam);
 
+        void onTimerEvent();
+
         void bufferedPaint(HDC inHDC);
 
         virtual void paint(HDC inHDC);
@@ -112,6 +115,7 @@ namespace Tetris
         boost::scoped_ptr<Game> mGame;
         int mNumFutureBlocks;
         bool mKeyboardEnabled;
+        XULWin::WinAPI::Timer mWinAPITimer;
     };
 
 } // namespace Tetris
