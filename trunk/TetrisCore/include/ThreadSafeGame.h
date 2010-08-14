@@ -13,45 +13,63 @@ namespace Tetris
 {
 
     class Game;
+    struct GameAndMutex
+    {
+        GameAndMutex(std::auto_ptr<Game> inGame) : mGame(inGame.release()) { }
+        boost::scoped_ptr<Game> mGame;
+        mutable boost::mutex mMutex;
+    };
 
-    /**
-     * ThreadSafeGame
-     *
-     * Takes ownership of a Game object and pairs it with a mutex.
-     * The Game object is stored in a shared_ptr so that you can create
-     * multiple copies of the same ThreadSafeGame object.
-     *
-     * Users of this class should always first lock the mutex before
-     * accessing the Game pointer.
-     *
-     * Example usage:
-     *
-     * // Assuming "threadSafeGame" is pointer to a ThreadSafeGame object.
-     * // Create an additional scope to define the scope of the scoped_lock object.
-     * {
-     *     // First lock the game object.
-     *     boost::mutex::scoped_lock lock(threadSafeGame->getMutex());
-     *
-     *     // Then access it.
-     *     Game * game = threadSafeGame->getGame();
-     *     game->move(Direction_Down);
-     * }
-     *
-     */
+
     class ThreadSafeGame
     {
     public:
-        ThreadSafeGame(std::auto_ptr<Game> inGame);
-
-        const Game * getGame() const;
-
-        Game * getGame();
-
-        boost::mutex & getMutex() const;
-
+        ThreadSafeGame(std::auto_ptr<Game> inGame) :
+            mGameAndMutex(new GameAndMutex(inGame))
+        {
+        }
     private:
-        boost::shared_ptr<Game> mGame;
-        mutable boost::mutex mMutex;
+        friend class WritableGame;
+        friend class ReadOnlyGame;
+        boost::shared_ptr<GameAndMutex> mGameAndMutex;
+    };
+
+
+    class WritableGame
+    {
+    public:
+        WritableGame(ThreadSafeGame & inThreadSafeGame) :
+            mLock(inThreadSafeGame.mGameAndMutex->mMutex),
+            mGame(inThreadSafeGame.mGameAndMutex->mGame.get())
+        {
+        }
+
+        Game * operator->()
+        {
+            return mGame;
+        }
+    private:
+        boost::mutex::scoped_lock mLock;
+        Game * mGame;
+    };
+
+
+    class ReadOnlyGame
+    {
+    public:
+        ReadOnlyGame(const ThreadSafeGame & inThreadSafeGame) :
+            mLock(inThreadSafeGame.mGameAndMutex->mMutex),
+            mGame(inThreadSafeGame.mGameAndMutex->mGame.get())
+        {
+        }
+
+        const Game * operator->() const
+        {
+            return mGame;
+        }
+    private:
+        boost::mutex::scoped_lock mLock;
+        const Game * mGame;
     };
 
 } // namespace Tetris
