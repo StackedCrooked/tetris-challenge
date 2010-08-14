@@ -37,8 +37,6 @@ namespace Tetris
         // Use inGameOver = true to mark the new gamestate as "game over".
         std::auto_ptr<GameState> commit(const Block & inBlock, GameOver inGameOver) const;
 
-        std::auto_ptr<GameState> clone() const;
-
         class Stats
         {
         public:

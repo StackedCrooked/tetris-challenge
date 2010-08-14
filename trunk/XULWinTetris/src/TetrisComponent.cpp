@@ -1,4 +1,5 @@
 #include "TetrisComponent.h"
+#include "Player.h"
 #include "TetrisPaintFunctions.h"
 #include "XULWin/Conversions.h"
 #include "XULWin/ErrorReporter.h"
@@ -113,32 +114,46 @@ namespace Tetris
     {       
         // Scoped lock
         {
-            WritableGame game(*mThreadSafeGame);
             switch (wParam)
             {
                 case VK_LEFT:
                 {   
+                    WritableGame game(*mThreadSafeGame);
                     game->move(Direction_Left);
                     break;
                 }
                 case VK_RIGHT:
                 {
+                    WritableGame game(*mThreadSafeGame);
                     game->move(Direction_Right);
                     break;
                 }
                 case VK_UP:
                 {
+                    WritableGame game(*mThreadSafeGame);
                     game->rotate();
                     break;
                 }
                 case VK_DOWN:
                 {
+                    WritableGame game(*mThreadSafeGame);
                     game->move(Direction_Down);
                     break;
                 }
                 case VK_SPACE:
                 {
+                    WritableGame game(*mThreadSafeGame);
                     game->drop();
+                    break;
+                }
+                case VK_DELETE:
+                {
+                    Tetris::Player player(getThreadSafeGame());
+                    Tetris::Widths widths;
+                    widths.push_back(3);
+                    widths.push_back(3);
+                    widths.push_back(3);
+                    player.move(widths);
                     break;
                 }
                 default:

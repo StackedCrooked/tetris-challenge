@@ -135,21 +135,9 @@ namespace Tetris
     }
 
 
-    std::auto_ptr<GameState> GameState::clone() const
-    {
-        // We can't use the copy constructor because the std::auto_ptr member would invalidate itself on copy (!).
-        std::auto_ptr<GameState> result(new GameState(mGrid.numRows(), mGrid.numColumns()));
-        result->mGrid = mGrid;
-        result->mIsGameOver = mIsGameOver;
-        result->mStats = mStats;
-        result->mQuality = mQuality;
-        return result;
-    }
-
-
     std::auto_ptr<GameState> GameState::commit(const Block & inBlock, GameOver inGameOver) const
     {
-        std::auto_ptr<GameState> result(clone());
+        std::auto_ptr<GameState> result(new GameState(*this));
         result->mIsGameOver = inGameOver.get();
         result->mQuality.setInitialized(false);
         if (!inGameOver.get())

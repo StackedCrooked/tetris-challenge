@@ -14,6 +14,11 @@ namespace Tetris
 
     GameStateNode * FindBestChild(GameStateNode * start, size_t inDepth)
     {
+        if (start->children().empty())
+        {
+            return start;
+        }
+
         GameStateNode * child = start->bestChild(inDepth);
         while (!child && inDepth > 0) // in case of game-over this can happen
         {
@@ -61,7 +66,9 @@ namespace Tetris
 
     void DestroyInferiorChildren(GameStateNode * start, size_t inDepth)
     {
+        CheckCondition(start != 0, "Start node must not be null.");
         GameStateNode * child = FindBestChild(start, inDepth);
+        CheckCondition(child != 0, "FindBestChild must not return null.");
         DestroyInferiorChildren(start, child);
     }
 
@@ -102,77 +109,80 @@ namespace Tetris
         while (idx < cMaxChilds && it != children.end())
         {
             GameStateNode & childNode = **it;
-            PopulateNodesRecursively(inNode, inBlocks, inWidths, inOffset + 1);
+            PopulateNodesRecursively(&childNode, inBlocks, inWidths, inOffset + 1);
             ++idx;
             ++it;
         }
     }
 
 
-    Player::Player(Game * inGame) :
-        mGame(inGame),
+    Player::Player(const ThreadSafeGame & inThreadSafeGame) :
+        mThreadSafeGame(inThreadSafeGame),
         mOutStream(0)
     {
     }
 
 
-    void PopulateChildNodes_Mt(const ChildNodes & ioChildNodes,
+    struct ClonedData
+    {
+        ClonedData(std::auto_ptr<GameStateNode> inNode, const BlockTypes & inBlockTypes, const Widths & inWidths) :
+            node(inNode.release()),
+            blockTypes(inBlockTypes),
+            widths(inWidths)
+        {
+        }
+        boost::shared_ptr<GameStateNode> node;
+        BlockTypes blockTypes;
+        Widths widths;
+    };
+
+    typedef boost::shared_ptr<ClonedData> ClonedDataPtr;
+    typedef std::vector<ClonedDataPtr> ClonedDatas;
+
+
+    void PopulateChildNodes_Mt(const ChildNodes & inChildNodes,
                                const BlockTypes & inBlocks,
                                const std::vector<int> & inWidths,
-                               boost::thread_group & ioThreadPool)
+                               ClonedDatas & ioClonedDatas,
+                               boost::thread_group & outThreadPool)
     {
-        // These variables must not be destroyed until after the 'threadPool.join_all()' below.
-        std::vector<boost::shared_ptr<BlockTypes> > keepAlive_BlockTypes;
-        std::vector<boost::shared_ptr<Widths> > keepAlive_Widths;
-        std::vector<boost::shared_ptr<GameStateNode> > keepAlive_GameStateNodes;
-
         int count = 0;
         const int cMaxChildCount = inWidths[0];
-        ChildNodes::const_iterator it = ioChildNodes.begin(), end = ioChildNodes.end();
+        ChildNodes::const_iterator it = inChildNodes.begin(), end = inChildNodes.end();
         while (it != end && count != cMaxChildCount)
         {
             GameStateNode & node = **it;
             
-            // WARNING!
-            // The PopulateNodesRecursively method takes const ref arguments. We must make sure
-            // any arguments lifetime will last until after the threadPool.join_all call below.
-
-            // One BIG advantage however is that each thread will have its own copy of the data structures.
-            // This leads to greatly reduced interthread synchronization, which in turn leads to much
-            // more efficient CPU utilization and thus better performance.
-            keepAlive_BlockTypes.push_back(boost::shared_ptr<BlockTypes>(new BlockTypes(inBlocks)));
-            keepAlive_Widths.push_back(boost::shared_ptr<Widths>(new Widths(inWidths)));
+            // Clone the data, to be passed to the new thread
+            boost::shared_ptr<ClonedData> clonedData(new ClonedData(node.clone(), inBlocks, inWidths));
+            ioClonedDatas.push_back(clonedData);
             
             // Call the PopulateNodesRecursively function in a separate thread.
             std::auto_ptr<GameStateNode> clonedGameState(node.clone());
-            ioThreadPool.create_thread(
+            outThreadPool.create_thread(
                 boost::bind(&PopulateNodesRecursively,
-                            clonedGameState.get(),
-                            *keepAlive_BlockTypes.back(),
-                            *keepAlive_Widths.back(),
+                            clonedData->node.get(),
+                            clonedData->blockTypes,
+                            clonedData->widths,
                             1));
-            
-            // Give owner-ship of the cloned game-state to the keepAlive object.
-            keepAlive_GameStateNodes.push_back(boost::shared_ptr<GameStateNode>(clonedGameState.release()));
             count++;
             ++it;
         }
-
-        // Wait for all threads to complete.
-        ioThreadPool.join_all();
     }
 
 
     void Move(GameStateNode * ioStartingNode,
               const BlockTypes & inBlockTypes,
               const Widths & inWidths,
-              boost::thread_group & ioThreadPool)
+              ClonedDatas & ioClonedDatas,
+              boost::thread_group & outThreadPool)
     {
         CheckPrecondition(!inWidths.empty(), "Player::move: depth should be at least 1.");
         CheckPrecondition(!inBlockTypes.empty(), "Number of future blocks must be at least one.");
 
         // Generate the offspring.
         ChildNodes & childNodes = ioStartingNode->children();
+        CheckCondition(childNodes.empty(), "Child nodes should be empty before generating its offspring.");
         GenerateOffspring(inBlockTypes[0], *ioStartingNode, childNodes);
 
         // If the dept is only 1, then we take this shortcut.
@@ -194,46 +204,76 @@ namespace Tetris
             PopulateChildNodes_Mt(childNodes,
                                   inBlockTypes,
                                   inWidths,
-                                  ioThreadPool);
+                                  ioClonedDatas,
+                                  outThreadPool);
         }
     }
 
 
     void Player::move(const Widths & inWidths)
     {
-        boost::thread_group threadPool;
-        BlockTypes blockTypes;
-        mGame->getFutureBlocks(inWidths.size(), blockTypes);
-        Move(mGame->currentNode(), blockTypes, inWidths, threadPool);
-        DestroyInferiorChildren(mGame->currentNode(), inWidths.size());
-        threadPool.join_all();
-    }
+        // This will keep alive the thread datas.
+        ClonedDatas clonedDatas;
 
+        std::auto_ptr<GameStateNode> clonedCurrentNode;
 
-    void Player::playUntilGameOver(const std::vector<int> & inWidths)
-    {
-        Poco::Stopwatch stopWatch;
-        stopWatch.start();
+        // Limit scope of thread_group
+        {            
+            boost::thread_group threadPool;
+            BlockTypes blockTypes;
 
-        int printHelper = mGame->currentNode()->depth();
-        while (!mGame->isGameOver())
-        {
-            move(inWidths);
-            size_t depth = inWidths.size();
-            
-            GameStateNode * child = FindBestChild(mGame->currentNode(), depth);
-            DestroyInferiorChildren(mGame->currentNode(), child);
-            mGame->setCurrentNode(child);
-
-            int durationMs = (int)(stopWatch.elapsed() / 1000);
-            if (durationMs > 500)
+            // Start critical section
             {
-                log("Blocks: " + boost::lexical_cast<std::string>(mGame->currentNode()->depth()) + "\tLines: " + boost::lexical_cast<std::string>(mGame->currentNode()->state().stats().numLines()));
-                printHelper = mGame->currentNode()->depth();
-                stopWatch.restart();
+                WritableGame game(mThreadSafeGame);
+                clonedCurrentNode = game->currentNode()->clone();
+                game->getFutureBlocks(inWidths.size(), blockTypes);                
             }
+            
+            Move(clonedCurrentNode.get(), blockTypes, inWidths, clonedDatas, threadPool);
+            threadPool.join_all();
         }
+
+        WritableGame game(mThreadSafeGame);
+        game->currentNode()->children().clear(); // cheating
+        ChildNodes::iterator it = clonedCurrentNode->children().begin(), end = clonedCurrentNode->children().end();
+        size_t idx = 0;
+        for (; idx != clonedDatas.size() && it != end; ++it, ++idx)
+        {
+            GameStateNode & node = **it;
+            CheckCondition(node.children().empty(), "Must be empty."); // THIS WILL FAIL IF OTHER THREAD POPULATED IT ALREADY!
+            ClonedData & data = *clonedDatas[idx];
+            game->currentNode()->children().insert(data.node);
+        }
+        DestroyInferiorChildren(game->currentNode(), inWidths.size());
+        game->setCurrentNode(FindBestChild(game->currentNode(), inWidths.size()));
     }
+
+
+    //void Player::playUntilGameOver(const std::vector<int> & inWidths)
+    //{
+    //    Poco::Stopwatch stopWatch;
+    //    stopWatch.start();
+
+    //    WritableGame game(mThreadSafeGame);
+    //    int printHelper = game->currentNode()->depth();
+    //    while (!game->isGameOver())
+    //    {
+    //        move(inWidths);
+    //        size_t depth = inWidths.size();
+    //        
+    //        GameStateNode * child = FindBestChild(game->currentNode(), depth);
+    //        DestroyInferiorChildren(game->currentNode(), child);
+    //        game->setCurrentNode(child);
+
+    //        int durationMs = (int)(stopWatch.elapsed() / 1000);
+    //        if (durationMs > 500)
+    //        {
+    //            log("Blocks: " + boost::lexical_cast<std::string>(game->currentNode()->depth()) + "\tLines: " + boost::lexical_cast<std::string>(game->currentNode()->state().stats().numLines()));
+    //            printHelper = game->currentNode()->depth();
+    //            stopWatch.restart();
+    //        }
+    //    }
+    //}
 
 
     void Player::setLogger(std::ostream & inOutStream)
