@@ -3,6 +3,7 @@
 
 
 #include "BlockType.h"
+#include "GameState.h"
 #include <boost/shared_ptr.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <set>
