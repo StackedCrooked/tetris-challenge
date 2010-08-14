@@ -31,8 +31,7 @@ namespace Tetris
     {
         // Scoped lock
         {
-            boost::mutex::scoped_lock lock(mThreadSafeGame->getMutex());
-            Game * game = mThreadSafeGame->getGame();
+            WritableGame game(*mThreadSafeGame);
             if (!game->isGameOver())
             {
                 game->move(Direction_Down);

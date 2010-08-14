@@ -113,8 +113,7 @@ namespace Tetris
     {       
         // Scoped lock
         {
-            boost::mutex::scoped_lock lock(mThreadSafeGame->getMutex());
-            Game * game = mThreadSafeGame->getGame();
+            WritableGame game(*mThreadSafeGame);
             switch (wParam)
             {
                 case VK_LEFT:
@@ -182,8 +181,7 @@ namespace Tetris
         }
         else
         {
-            boost::mutex::scoped_lock lock(mThreadSafeGame->getMutex());
-            Game * game = mThreadSafeGame->getGame();
+            ReadOnlyGame game(*mThreadSafeGame);
             result += cUnitWidth * game->numColumns();
         }
 
@@ -205,8 +203,7 @@ namespace Tetris
         }
         else
         {
-            boost::mutex::scoped_lock lock(mThreadSafeGame->getMutex());
-            Game * game = mThreadSafeGame->getGame();
+            ReadOnlyGame game(*mThreadSafeGame);
             result += cUnitHeight * game->numRows();
         }
 
@@ -226,9 +223,8 @@ namespace Tetris
         g.SetSmoothingMode(Gdiplus::SmoothingModeHighQuality);
 
         // Scoped lock
-        {            
-            boost::mutex::scoped_lock lock(mThreadSafeGame->getMutex());
-            Game * game = mThreadSafeGame->getGame();
+        {
+            ReadOnlyGame game(*mThreadSafeGame);
 
             // Paint the current game grid
             const Grid & grid = game->currentNode()->state().grid();
