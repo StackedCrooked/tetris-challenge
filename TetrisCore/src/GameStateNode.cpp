@@ -145,6 +145,7 @@ namespace Tetris
 
     void GenerateOffspring(BlockType inBlockType, GameStateNode & ioGameStateNode, ChildNodes & outChildNodes)
     {        
+        CheckPrecondition(outChildNodes.empty(), "outChildNodes should most likely be empty!");
         const GameState & gameState = ioGameStateNode.state();
         const Grid & gameGrid = gameState.grid();
 
@@ -171,16 +172,15 @@ namespace Tetris
                 std::auto_ptr<GameState> newGameState;
                 block.setRotation(rt);
                 size_t row = 0;
-                if (gameState.checkPositionValid(block, 0, col))
+                while (gameState.checkPositionValid(block, row, col))
                 {
-                    do
-                    {
-                        block.setRow(row);
-                        ChildNodePtr childState(new GameStateNode(&ioGameStateNode, gameState.commit(block, GameOver(false))));
-                        outChildNodes.insert(childState);                        
-                        row++;
-                    }
-                    while (gameState.checkPositionValid(block, row, col));
+                    row++;
+                }
+                if (row > 0)
+                {
+                    block.setRow(row - 1);
+                    ChildNodePtr childState(new GameStateNode(&ioGameStateNode, gameState.commit(block, GameOver(false))));
+                    outChildNodes.insert(childState);
                 }
             }
         }

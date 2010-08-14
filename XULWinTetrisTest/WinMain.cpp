@@ -1,7 +1,8 @@
 #include "TetrisElement.h"
+#include "Game.h"
+#include "Player.h"
 #include "TimedGame.h"
 #include "TetrisComponent.h"
-#include "Game.h"
 #include "Unicode.h"
 #include "XULWin/XULRunner.h"
 #include "XULWin/Decorator.h"
@@ -48,19 +49,25 @@ INT_PTR WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmd
         return 1;
     }
 
-    boost::scoped_ptr<Tetris::TimedGame> timedGame;
-
-    std::vector<Tetris::TetrisElement *> tetrisElements;
-    rootElement->getElementsByType<Tetris::TetrisElement>(tetrisElements);
-    for (size_t idx = 0; idx != tetrisElements.size(); ++idx)
+    Tetris::TetrisComponent * tetrisComponent(0);
     {
-        Tetris::TetrisComponent * tetris = tetrisElements[idx]->component()->downcast<Tetris::TetrisComponent>();
-        timedGame.reset(new Tetris::TimedGame(&tetris->getThreadSafeGame()));
-        break;
+        std::vector<Tetris::TetrisElement *> tetrisElements;
+        rootElement->getElementsByType<Tetris::TetrisElement>(tetrisElements);
+        for (size_t idx = 0; idx != tetrisElements.size(); ++idx)
+        {
+            tetrisComponent = tetrisElements[idx]->component()->downcast<Tetris::TetrisComponent>();
+            break;
+        }
     }
 
-	// TODO: Make multi-threaded!!
-    timedGame->start();
+    if (!tetrisComponent)
+    {
+        return 0;
+    }
+
+    // Add the timer
+    Tetris::TimedGame timedGame(tetrisComponent->getThreadSafeGame());
+    timedGame.start();
 
     wnd->showModal(XULWin::WindowPos_CenterInScreen);
     return 0;

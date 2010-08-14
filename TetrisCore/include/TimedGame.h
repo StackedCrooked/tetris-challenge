@@ -15,7 +15,7 @@ namespace Tetris
     class TimedGame
     {
     public:
-        TimedGame(ThreadSafeGame * inGame);
+        TimedGame(const ThreadSafeGame & inGame);
 
         void start();
 
@@ -29,7 +29,7 @@ namespace Tetris
         void onTimerEvent(Poco::Timer & inTimer);
 
     private:
-        ThreadSafeGame * mThreadSafeGame;
+        ThreadSafeGame mThreadSafeGame;
         int mLevel;
         Poco::Timer mTimer;
     };
