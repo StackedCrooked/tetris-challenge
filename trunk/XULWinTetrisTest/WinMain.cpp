@@ -1,5 +1,5 @@
 #include "TetrisElement.h"
-#include "GameTimer.h"
+#include "TimedGame.h"
 #include "TetrisComponent.h"
 #include "Game.h"
 #include "Unicode.h"
@@ -48,14 +48,14 @@ INT_PTR WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmd
         return 1;
     }
 
-    boost::scoped_ptr<Tetris::GameTimer> timedGame;
+    boost::scoped_ptr<Tetris::TimedGame> timedGame;
 
     std::vector<Tetris::TetrisElement *> tetrisElements;
     rootElement->getElementsByType<Tetris::TetrisElement>(tetrisElements);
     for (size_t idx = 0; idx != tetrisElements.size(); ++idx)
     {
         Tetris::TetrisComponent * tetris = tetrisElements[idx]->component()->downcast<Tetris::TetrisComponent>();
-        timedGame.reset(new Tetris::GameTimer(&tetris->getGame()));
+        timedGame.reset(new Tetris::TimedGame(&tetris->getGame()));
         break;
     }
 
