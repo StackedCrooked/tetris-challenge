@@ -150,9 +150,9 @@ namespace Tetris
                 {
                     Tetris::Player player(getThreadSafeGame());
                     Tetris::Widths widths;
-                    widths.push_back(3);
-                    widths.push_back(3);
-                    widths.push_back(3);
+                    widths.push_back(4);
+                    widths.push_back(4);
+                    widths.push_back(4);
                     player.move(widths);
                     break;
                 }

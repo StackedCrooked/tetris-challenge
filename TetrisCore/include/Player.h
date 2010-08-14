@@ -25,7 +25,7 @@ namespace Tetris
 
         void setLogger(std::ostream & inOutStream);
 
-        //void playUntilGameOver(const std::vector<int> & inWidths);
+        void playUntilGameOver(const std::vector<int> & inWidths);
 
     private:
         void log(const std::string & inMessage);
