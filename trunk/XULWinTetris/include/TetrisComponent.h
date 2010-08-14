@@ -2,6 +2,8 @@
 #define TETRISCOMPONENT_H_INCLUDED
 
 
+#include "Game.h"
+#include "ThreadSafeGame.h"
 #include "XULWin/Component.h"
 #include "XULWin/AttributeController.h"
 #include "XULWin/Decorator.h"
@@ -78,9 +80,9 @@ namespace Tetris
 
         virtual bool init();
 
-        const Game & getGame() const;
+        const ThreadSafeGame & getThreadSafeGame() const;
 
-        Game & getGame();
+        ThreadSafeGame & getThreadSafeGame();
 
         virtual bool initAttributeControllers();
 
@@ -112,7 +114,7 @@ namespace Tetris
 
         virtual void paint(HDC inHDC);
 
-        boost::scoped_ptr<Game> mGame;
+        boost::scoped_ptr<ThreadSafeGame> mThreadSafeGame;
         int mNumFutureBlocks;
         bool mKeyboardEnabled;
         XULWin::WinAPI::Timer mWinAPITimer;

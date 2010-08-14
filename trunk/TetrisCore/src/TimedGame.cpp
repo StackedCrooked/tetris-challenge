@@ -14,8 +14,8 @@ namespace Tetris
 
     static const int sIntervalCount = sizeof(sIntervals)/sizeof(int);
 
-    TimedGame::TimedGame(Game * inGame) :
-        mGame(inGame),
+    TimedGame::TimedGame(ThreadSafeGame * inThreadSafeGame) :
+        mThreadSafeGame(inThreadSafeGame),
         mLevel(0)
     {
     }
@@ -29,11 +29,15 @@ namespace Tetris
 
     void TimedGame::onTimerEvent(Poco::Timer & inTimer)
     {
-        if (!mGame->isGameOver())
+        // Scoped lock
         {
-            mGame->move(Direction_Down);
+            boost::mutex::scoped_lock lock(mThreadSafeGame->getMutex());
+            Game * game = mThreadSafeGame->getGame();
+            if (!game->isGameOver())
+            {
+                game->move(Direction_Down);
+            }
         }
-
         mTimer.setPeriodicInterval(sIntervals[mLevel]);
     }
 

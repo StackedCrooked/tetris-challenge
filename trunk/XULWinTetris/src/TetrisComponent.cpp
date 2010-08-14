@@ -1,6 +1,5 @@
 #include "TetrisComponent.h"
 #include "TetrisPaintFunctions.h"
-#include "Game.h"
 #include "XULWin/Conversions.h"
 #include "XULWin/ErrorReporter.h"
 #include "XULWin/Gdiplus.h"
@@ -48,7 +47,7 @@ namespace Tetris
 
     TetrisComponent::TetrisComponent(XULWin::Component * inParent, const XULWin::AttributesMapping & inAttr) :
         XULWin::NativeControl(inParent, inAttr, TEXT("STATIC"), 0, 0),
-        mGame(new Tetris::Game(20, 10, Tetris::BlockTypes())),
+        mThreadSafeGame(new ThreadSafeGame(std::auto_ptr<Game>(new Tetris::Game(20, 10, Tetris::BlockTypes())))),
         mNumFutureBlocks(1),
         mKeyboardEnabled(true)
     {
@@ -111,37 +110,42 @@ namespace Tetris
         
         
     LRESULT TetrisComponent::onKeyDown(WPARAM wParam, LPARAM lParam)
-    {        
-        switch (wParam)
+    {       
+        // Scoped lock
         {
-            case VK_LEFT:
+            boost::mutex::scoped_lock lock(mThreadSafeGame->getMutex());
+            Game * game = mThreadSafeGame->getGame();
+            switch (wParam)
             {
-                mGame->move(Direction_Left);
-                break;
-            }
-            case VK_RIGHT:
-            {
-                mGame->move(Direction_Right);
-                break;
-            }
-            case VK_UP:
-            {
-                mGame->rotate();
-                break;
-            }
-            case VK_DOWN:
-            {
-                mGame->move(Direction_Down);
-                break;
-            }
-            case VK_SPACE:
-            {
-                mGame->drop();
-                break;
-            }
-            default:
-            {
-                return XULWin::cUnhandled;
+                case VK_LEFT:
+                {   
+                    game->move(Direction_Left);
+                    break;
+                }
+                case VK_RIGHT:
+                {
+                    game->move(Direction_Right);
+                    break;
+                }
+                case VK_UP:
+                {
+                    game->rotate();
+                    break;
+                }
+                case VK_DOWN:
+                {
+                    game->move(Direction_Down);
+                    break;
+                }
+                case VK_SPACE:
+                {
+                    game->drop();
+                    break;
+                }
+                default:
+                {
+                    return XULWin::cUnhandled;
+                }
             }
         }
         ::InvalidateRect(handle(), 0, FALSE);
@@ -149,15 +153,15 @@ namespace Tetris
     }
 
 
-    const Game & TetrisComponent::getGame() const
+    const ThreadSafeGame & TetrisComponent::getThreadSafeGame() const
     {
-        return *mGame;
+        return *mThreadSafeGame;
     }
 
 
-    Game & TetrisComponent::getGame()
+    ThreadSafeGame & TetrisComponent::getThreadSafeGame()
     {
-        return *mGame;
+        return *mThreadSafeGame;
     }
 
 
@@ -172,13 +176,15 @@ namespace Tetris
     int TetrisComponent::calculateWidth(XULWin::SizeConstraint inSizeConstraint) const
     {
         int result = 0;
-        if (!mGame)
+        if (!mThreadSafeGame)
         {
             result += cUnitWidth * 10;
         }
         else
         {
-            result += cUnitWidth * mGame->numColumns();
+            boost::mutex::scoped_lock lock(mThreadSafeGame->getMutex());
+            Game * game = mThreadSafeGame->getGame();
+            result += cUnitWidth * game->numColumns();
         }
 
         if (getNumFutureBlocks() > 0)
@@ -193,13 +199,15 @@ namespace Tetris
     int TetrisComponent::calculateHeight(XULWin::SizeConstraint inSizeConstraint) const
     {
         int result = 0;
-        if (!mGame)
+        if (!mThreadSafeGame)
         {
             result += cUnitWidth * 20;
         }
         else
         {
-            result += cUnitHeight * mGame->numRows();
+            boost::mutex::scoped_lock lock(mThreadSafeGame->getMutex());
+            Game * game = mThreadSafeGame->getGame();
+            result += cUnitHeight * game->numRows();
         }
 
         int requiredHeightForFutureBlocks = cUnitHeight + (5 * getNumFutureBlocks() * cUnitHeight);
@@ -217,22 +225,28 @@ namespace Tetris
         g.SetInterpolationMode(Gdiplus::InterpolationModeHighQuality);
         g.SetSmoothingMode(Gdiplus::SmoothingModeHighQuality);
 
-        // Paint the current game grid
-        const Grid & grid = mGame->currentNode()->state().grid();
-        PaintGrid(g, grid, 0, 0, true);
+        // Scoped lock
+        {            
+            boost::mutex::scoped_lock lock(mThreadSafeGame->getMutex());
+            Game * game = mThreadSafeGame->getGame();
 
-        // Paint the currently active block
-        const Block & block = mGame->activeBlock();
-        PaintGrid(g, block.grid(), block.column() * cUnitWidth, block.row() * cUnitHeight, false);
+            // Paint the current game grid
+            const Grid & grid = game->currentNode()->state().grid();
+            PaintGrid(g, grid, 0, 0, true);
 
-        // Paint future blocks
-        BlockTypes futureBlockTypes;
-        mGame->getFutureBlocks(mNumFutureBlocks + 1, futureBlockTypes);
-        for (size_t idx = 1; idx < futureBlockTypes.size(); ++idx)
-        {
-            int x = cUnitWidth * (mGame->numColumns() + 1);
-            int y = cUnitHeight + (idx - 1) * (5 * cUnitHeight);
-            PaintGrid(g, GetGrid(GetBlockIdentifier(futureBlockTypes[idx], 0)), x, y, false);
+            // Paint the currently active block
+            const Block & block = game->activeBlock();
+            PaintGrid(g, block.grid(), block.column() * cUnitWidth, block.row() * cUnitHeight, false);
+
+            // Paint future blocks
+            BlockTypes futureBlockTypes;
+            game->getFutureBlocks(mNumFutureBlocks + 1, futureBlockTypes);
+            for (size_t idx = 1; idx < futureBlockTypes.size(); ++idx)
+            {
+                int x = cUnitWidth * (game->numColumns() + 1);
+                int y = cUnitHeight + (idx - 1) * (5 * cUnitHeight);
+                PaintGrid(g, GetGrid(GetBlockIdentifier(futureBlockTypes[idx], 0)), x, y, false);
+            }
         }
     }
 

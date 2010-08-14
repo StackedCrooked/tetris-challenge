@@ -22,52 +22,11 @@ namespace Tetris
     public:
         ThreadSafeGame(std::auto_ptr<Game> inGame);
 
-        // A function that can modify the game object
-        typedef boost::function<void(Game*)> Action;
+        const Game * getGame() const;
 
-        void doto(const Action & inAction);        
+        Game * getGame();
 
-        int numRows() const;
-
-        int numColumns() const;
-
-        void reserveBlocks(size_t inCount);
-
-        const Block & activeBlock() const;
-
-        Block & activeBlock();
-
-        // Includes the currently active block
-        void getFutureBlocks(size_t inCount, BlockTypes & outBlocks) const;
-
-        GameStateNode * currentNode();
-
-        const GameStateNode * currentNode() const;
-
-        void setCurrentNode(GameStateNode * inCurrentNode);
-
-        bool isGameOver() const;
-
-        //
-        // Game commands
-        //
-        bool move(Direction inDirection);
-
-        void rotate();
-
-        void drop();
-
-        //
-        // Navigate the game history and alternative histories.
-        // Experimental.
-        //
-        bool navigateNodeUp();
-
-        bool navigateNodeDown();
-
-        bool navigateNodeLeft();
-
-        bool navigateNodeRight();
+        boost::mutex & getMutex() const;
 
     private:
         boost::scoped_ptr<Game> mGame;
