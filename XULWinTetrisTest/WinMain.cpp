@@ -55,7 +55,7 @@ INT_PTR WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmd
     for (size_t idx = 0; idx != tetrisElements.size(); ++idx)
     {
         Tetris::TetrisComponent * tetris = tetrisElements[idx]->component()->downcast<Tetris::TetrisComponent>();
-        timedGame.reset(new Tetris::TimedGame(&tetris->getGame()));
+        timedGame.reset(new Tetris::TimedGame(&tetris->getThreadSafeGame()));
         break;
     }
 

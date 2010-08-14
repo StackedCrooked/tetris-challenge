@@ -2,7 +2,7 @@
 #define TIMEDGAME_H_INCLUDED
 
 
-#include "Game.h"
+#include "ThreadSafeGame.h"
 #include "Poco/Timer.h"
 
 
@@ -15,7 +15,7 @@ namespace Tetris
     class TimedGame
     {
     public:
-        TimedGame(Game * inGame);
+        TimedGame(ThreadSafeGame * inGame);
 
         void start();
 
@@ -29,7 +29,7 @@ namespace Tetris
         void onTimerEvent(Poco::Timer & inTimer);
 
     private:
-        Game * mGame;
+        ThreadSafeGame * mThreadSafeGame;
         int mLevel;
         Poco::Timer mTimer;
     };
