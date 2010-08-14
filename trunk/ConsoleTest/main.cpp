@@ -1,7 +1,8 @@
-#include "Game.h"
 #include "ErrorHandling.h"
+#include "Game.h"
 #include "GameState.h"
 #include "GameStateNode.h"
+#include "ThreadSafeGame.h"
 #include "Player.h"
 #include "Poco/Stopwatch.h"
 #include <stdexcept>
@@ -56,13 +57,24 @@ std::vector<int> GetParameters(int inDepth, int inWidth)
 
 int Test(const std::vector<int> & inWidths, const Game & inGame)
 {
-    std::auto_ptr<Game> gameCopy(inGame.clone());
-    Player player(gameCopy.get());
-    player.setLogger(std::cout);
-    player.playUntilGameOver(inWidths);
-    std::cout << "Blocks: " << gameCopy->currentNode()->depth() <<  "\tLines: " << gameCopy->currentNode()->state().stats().numLines() << "\r";
-    std::cout << std::endl;
-    return gameCopy->currentNode()->state().stats().numLines();
+    int result = 0;
+    ThreadSafeGame threadSafeGame(inGame.clone());
+    {
+        WritableGame game(threadSafeGame);
+        game->reserveBlocks(100000);
+    }
+    {
+        Player player(threadSafeGame);
+        player.setLogger(std::cout);
+        player.playUntilGameOver(inWidths);
+    }
+    {
+        ReadOnlyGame game(threadSafeGame);
+        std::cout << "Blocks: " << game->currentNode()->depth() <<  "\tLines: " << game->currentNode()->state().stats().numLines() << "\r";
+        std::cout << std::endl;
+        result = game->currentNode()->state().stats().numLines();
+    }
+    return result;
 }
 
 
@@ -126,24 +138,20 @@ int main()
         for (size_t idx = 0; idx < 100000; ++idx)
         {
             blockTypes.push_back(blockFactory.getNext());
-        }
-        Game game(20, 10, blockTypes);
-        // Generate 100000 blocks in advance.
-        
+        }        
         int repeat = 1;
-        game.reserveBlocks(100 * 1000);
-        Test(GetParameters(2, 2), repeat, Game(10, 10, blockTypes));
-        Test(GetParameters(2, 3), repeat, Game(10, 10, blockTypes));
-        Test(GetParameters(2, 4), repeat, Game(10, 10, blockTypes));
-        Test(GetParameters(3, 2), repeat, Game(10, 10, blockTypes));
-        Test(GetParameters(3, 3), repeat, Game(10, 10, blockTypes));
-        Test(GetParameters(3, 4), repeat, Game(10, 10, blockTypes));
-        Test(GetParameters(4, 2), repeat, Game(10, 10, blockTypes));
-        Test(GetParameters(4, 3), repeat, Game(10, 10, blockTypes));
-        Test(GetParameters(4, 4), repeat, Game(10, 10, blockTypes));
-        Test(GetParameters(5, 2), repeat, Game(10, 10, blockTypes));
-        Test(GetParameters(5, 3), repeat, Game(10, 10, blockTypes));
-        Test(GetParameters(5, 4), repeat, Game(10, 10, blockTypes));
+        Test(GetParameters(2, 2), repeat, Game(20, 10, blockTypes));
+        Test(GetParameters(2, 3), repeat, Game(20, 10, blockTypes));
+        Test(GetParameters(2, 4), repeat, Game(20, 10, blockTypes));
+        Test(GetParameters(3, 2), repeat, Game(20, 10, blockTypes));
+        Test(GetParameters(3, 3), repeat, Game(20, 10, blockTypes));
+        Test(GetParameters(3, 4), repeat, Game(20, 10, blockTypes));
+        Test(GetParameters(4, 2), repeat, Game(20, 10, blockTypes));
+        Test(GetParameters(4, 3), repeat, Game(20, 10, blockTypes));
+        Test(GetParameters(4, 4), repeat, Game(20, 10, blockTypes));
+        Test(GetParameters(5, 2), repeat, Game(20, 10, blockTypes));
+        Test(GetParameters(5, 3), repeat, Game(20, 10, blockTypes));
+        Test(GetParameters(5, 4), repeat, Game(20, 10, blockTypes));
     }
     catch (const std::exception & exc)
     {

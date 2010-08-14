@@ -234,7 +234,6 @@ namespace Tetris
         }
 
         WritableGame game(mThreadSafeGame);
-        game->currentNode()->children().clear(); // cheating
         ChildNodes::iterator it = clonedCurrentNode->children().begin(), end = clonedCurrentNode->children().end();
         size_t idx = 0;
         for (; idx != clonedDatas.size() && it != end; ++it, ++idx)
@@ -249,31 +248,26 @@ namespace Tetris
     }
 
 
-    //void Player::playUntilGameOver(const std::vector<int> & inWidths)
-    //{
-    //    Poco::Stopwatch stopWatch;
-    //    stopWatch.start();
+    void Player::playUntilGameOver(const std::vector<int> & inWidths)
+    {
+        Poco::Stopwatch stopWatch;
+        stopWatch.start();
 
-    //    WritableGame game(mThreadSafeGame);
-    //    int printHelper = game->currentNode()->depth();
-    //    while (!game->isGameOver())
-    //    {
-    //        move(inWidths);
-    //        size_t depth = inWidths.size();
-    //        
-    //        GameStateNode * child = FindBestChild(game->currentNode(), depth);
-    //        DestroyInferiorChildren(game->currentNode(), child);
-    //        game->setCurrentNode(child);
+        int printHelper = ReadOnlyGame(mThreadSafeGame)->currentNode()->depth();
+        while (!ReadOnlyGame(mThreadSafeGame)->isGameOver())
+        {
+            move(inWidths);
 
-    //        int durationMs = (int)(stopWatch.elapsed() / 1000);
-    //        if (durationMs > 500)
-    //        {
-    //            log("Blocks: " + boost::lexical_cast<std::string>(game->currentNode()->depth()) + "\tLines: " + boost::lexical_cast<std::string>(game->currentNode()->state().stats().numLines()));
-    //            printHelper = game->currentNode()->depth();
-    //            stopWatch.restart();
-    //        }
-    //    }
-    //}
+            int durationMs = (int)(stopWatch.elapsed() / 1000);
+            if (durationMs > 500)
+            {
+                ReadOnlyGame game(mThreadSafeGame);
+                log("Blocks: " + boost::lexical_cast<std::string>(game->currentNode()->depth()) + "\tLines: " + boost::lexical_cast<std::string>(game->currentNode()->state().stats().numLines()));
+                printHelper = game->currentNode()->depth();
+                stopWatch.restart();
+            }
+        }
+    }
 
 
     void Player::setLogger(std::ostream & inOutStream)
