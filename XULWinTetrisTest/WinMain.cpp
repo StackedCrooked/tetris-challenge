@@ -28,21 +28,9 @@
 
 boost::scoped_ptr<Tetris::GameCommandQueue> gCommander;
 
+
 namespace Tetris
 {
- 
-    void test()
-    {
-        ThreadSafeGame threadSafeGame(std::auto_ptr<Game>(new Game));
-        GameCommandQueue queue(threadSafeGame);
-        queue.append(boost::bind(&Game::move, _1, Direction_Down));
-    }
-
-
-    void PlayInBackground()
-    {
-    }
-
 
     void ProcessKey(int inKey)
     {
@@ -56,6 +44,14 @@ namespace Tetris
         }
     }
 
+}
+
+
+LRESULT SaySomething(const std::string & inMessage)
+{
+    std::wstring utf16Message = Tetris::ToUTF16(inMessage);
+    ::MessageBox(0, utf16Message.c_str(), L"Tetris", MB_OK);
+    return XULWin::cHandled;
 }
 
 
@@ -81,6 +77,14 @@ INT_PTR WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmd
     {
         XULWin::ReportError("Root element is not of type winodw.");
         return 1;
+    }
+    XULWin::ScopedEventListener listener;
+    listener.connect(rootElement->getElementById("yesButton"), boost::bind(SaySomething, "Yes!!!"));
+    listener.connect(rootElement->getElementById("noButton"), boost::bind(SaySomething, "No :("));
+
+    if (XULWin::Element * yesButtonEl = rootElement->getElementById("yesButton"))
+    {
+        
     }
 
     Tetris::TetrisComponent * tetrisComponent(0);
