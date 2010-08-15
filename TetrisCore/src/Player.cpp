@@ -73,11 +73,9 @@ namespace Tetris
     }
 
 
-    //
-    // Populates the given node with children. Then it continues to populate each of the children, and their children, ...
-    // It ends when it has recursed as many times as (inBlocks.size() - inOffset).
-    // The inWidths argument how many children should be kept. This is needed to curb the exponential explosion.
-    //
+    // Populates the given node with children. Then it continues to populate
+    // each of the children, and their children, ... until the we have reached
+    // the requested depth.
     void PopulateNodesRecursively(GameStateNode * inNode,
                                   const BlockTypes & inBlocks,
                                   const std::vector<int> & inWidths,
@@ -239,7 +237,6 @@ namespace Tetris
         for (; idx != clonedDatas.size() && it != end; ++it, ++idx)
         {
             GameStateNode & node = **it;
-            CheckCondition(node.children().empty(), "Must be empty."); // THIS WILL FAIL IF OTHER THREAD POPULATED IT ALREADY!
             ClonedData & data = *clonedDatas[idx];
             game->currentNode()->children().insert(data.node);
         }

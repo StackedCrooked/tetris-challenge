@@ -1,6 +1,4 @@
 - Non-blocking visual Player
-- AI depth has no impact.
-- Paint future blocks in XULWin TetrisComponent (future-blocks-count is attribute?)
 - Release a version to demo purposes?
 - Use official Tetris colors
 - Js client

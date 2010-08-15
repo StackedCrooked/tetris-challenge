@@ -13,6 +13,7 @@
 #include "XULWin/VirtualComponent.h"
 #include "XULWin/WinUtils.h"
 #include <boost/scoped_ptr.hpp>
+#include <boost/signals.hpp>
 
 
 namespace Tetris
@@ -77,6 +78,8 @@ namespace Tetris
         TetrisComponent(XULWin::Component * inParent, const XULWin::AttributesMapping & inAttr);
 
         virtual ~TetrisComponent();
+
+        boost::signal<void(int)> OnKeyboardPressed;
 
         virtual bool init();
 
