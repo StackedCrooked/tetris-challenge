@@ -146,22 +146,14 @@ namespace Tetris
                     game->drop();
                     break;
                 }
-                case VK_DELETE:
-                {
-                    Tetris::Player player(getThreadSafeGame());
-                    Tetris::Widths widths;
-                    widths.push_back(4);
-                    widths.push_back(4);
-                    widths.push_back(4);
-                    player.move(widths);
-                    break;
-                }
                 default:
                 {
-                    return XULWin::cUnhandled;
+                    OnKeyboardPressed(wParam);
+                    break;
                 }
             }
         }
+
         ::InvalidateRect(handle(), 0, FALSE);
         return XULWin::cHandled;
     }

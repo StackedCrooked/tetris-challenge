@@ -1,5 +1,6 @@
 #include "TetrisElement.h"
 #include "Game.h"
+#include "GameCommandQueue.h"
 #include "Player.h"
 #include "TimedGame.h"
 #include "TetrisComponent.h"
@@ -23,6 +24,39 @@
 #include <string>
 #include <windows.h>
 #include <shellapi.h>
+
+
+boost::scoped_ptr<Tetris::GameCommandQueue> gCommander;
+
+namespace Tetris
+{
+ 
+    void test()
+    {
+        ThreadSafeGame threadSafeGame(std::auto_ptr<Game>(new Game));
+        GameCommandQueue queue(threadSafeGame);
+        queue.append(boost::bind(&Game::move, _1, Direction_Down));
+    }
+
+
+    void PlayInBackground()
+    {
+    }
+
+
+    void ProcessKey(int inKey)
+    {
+        if (inKey == VK_RETURN)
+        {
+            Player p(gCommander->threadSafeGame());
+            Widths widths;
+            widths.push_back(40);
+            widths.push_back(40);
+            p.move(widths);            
+        }
+    }
+
+}
 
 
 INT_PTR WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
@@ -69,6 +103,14 @@ INT_PTR WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmd
     Tetris::TimedGame timedGame(tetrisComponent->getThreadSafeGame());
     timedGame.start();
 
+
+    // Init the command queue
+    gCommander.reset(new Tetris::GameCommandQueue(tetrisComponent->getThreadSafeGame()));
+
+    // Register the keyboard listener
+    tetrisComponent->OnKeyboardPressed.connect(boost::bind(Tetris::ProcessKey, _1));
+
     wnd->showModal(XULWin::WindowPos_CenterInScreen);
+    gCommander.reset();
     return 0;
 }

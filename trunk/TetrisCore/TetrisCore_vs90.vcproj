@@ -184,6 +184,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\include\GameCommandQueue.h"
+				>
+			</File>
+			<File
 				RelativePath=".\include\GameState.h"
 				>
 			</File>
@@ -241,6 +245,10 @@
 			</File>
 			<File
 				RelativePath=".\src\Game.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\GameCommandQueue.cpp"
 				>
 			</File>
 			<File

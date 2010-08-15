@@ -44,10 +44,11 @@ namespace Tetris
         {
         }
 
+        Game * get()
+        { return mGame; }
+
         Game * operator->()
-        {
-            return mGame;
-        }
+        { return mGame; }
     private:
         boost::mutex::scoped_lock mLock;
         Game * mGame;
@@ -63,10 +64,12 @@ namespace Tetris
         {
         }
 
+        const Game * get() const
+        { return mGame; }
+
         const Game * operator->() const
-        {
-            return mGame;
-        }
+        { return mGame; }
+
     private:
         boost::mutex::scoped_lock mLock;
         const Game * mGame;
