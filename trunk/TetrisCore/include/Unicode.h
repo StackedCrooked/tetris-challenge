@@ -1,5 +1,5 @@
-#ifndef UNICODE_H_INCLUDED
-#define UNICODE_H_INCLUDED
+#ifndef TETRIS_UNICODE_H_INCLUDED
+#define TETRIS_UNICODE_H_INCLUDED
 
 
 #include <string>
@@ -15,4 +15,4 @@ namespace Tetris
 } // namespace Tetris
 
 
-#endif // UNICODE_H_INCLUDED
+#endif // TETRIS_UNICODE_H_INCLUDED
