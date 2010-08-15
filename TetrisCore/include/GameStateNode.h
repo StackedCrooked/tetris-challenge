@@ -35,6 +35,7 @@ namespace Tetris
         std::auto_ptr<GameStateNode> clone() const;
 
         // Search existing nodes only, does not create any new ones.
+        const GameStateNode * bestChild(int inDepth) const;
         GameStateNode * bestChild(int inDepth);
 
         // Distance from the root node.

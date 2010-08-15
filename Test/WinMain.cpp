@@ -18,8 +18,8 @@ void StartTest()
     {
         blockTypes.push_back(blockFactory.getNext());
     }
-    Game game(10, 10, blockTypes);
-    Visualizer visualizer(&game);
+    ThreadSafeGame threadSafeGame(std::auto_ptr<Game>(new Game(20, 10, blockTypes)));
+    Visualizer visualizer(threadSafeGame);
     visualizer.show();
 }
 
