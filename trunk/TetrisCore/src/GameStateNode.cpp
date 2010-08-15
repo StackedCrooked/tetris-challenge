@@ -46,7 +46,7 @@ namespace Tetris
     }
 
 
-    void CollectAll(GameStateNode * inChild, int inDepth, ChildNodes & outChildren)
+    void CollectAll(const GameStateNode * inChild, int inDepth, ChildNodes & outChildren)
     {
         if (inDepth > 1)
         {
@@ -69,7 +69,7 @@ namespace Tetris
 
     // Collect all children at the requested depth from all branches,
     // and return the one with the highest quality score.
-    GameStateNode * GameStateNode::bestChild(int inDepth)
+    const GameStateNode * GameStateNode::bestChild(int inDepth) const
     {
         ChildNodePtr result;
         ChildNodes collectAll;
@@ -79,6 +79,12 @@ namespace Tetris
             result = *collectAll.begin();
         }
         return result.get();
+    }
+
+
+    GameStateNode * GameStateNode::bestChild(int inDepth)
+    {
+        return const_cast<GameStateNode*>(static_cast<const GameStateNode*>(this)->bestChild(inDepth));
     }
 
 

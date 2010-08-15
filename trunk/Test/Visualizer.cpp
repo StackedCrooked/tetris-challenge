@@ -73,11 +73,11 @@ namespace Tetris
     }
 
 
-    Visualizer::Visualizer(Game * inGame) :
-        mGame(inGame),
+    Visualizer::Visualizer(const ThreadSafeGame & inThreadSafeGame) :
+        mThreadSafeGame(inThreadSafeGame),
         mHandle(0),
         mKeyboardHook(0),
-        mDelay(5),
+        mDelay(100),
         mElapsed(GetClockMs()),
         mLastComputerMove(GetClockMs()),
         mElapsedMs(0),
@@ -260,7 +260,8 @@ namespace Tetris
 
     void Visualizer::paintScores(Gdiplus::Graphics & g)
     {
-        const GameState::Stats & stats = mGame->currentNode()->state().stats();
+        ReadOnlyGame game(mThreadSafeGame);
+        const GameState::Stats & stats = game->currentNode()->state().stats();
         drawText(
             g,
             GetScoreText("Lines", stats.numLines()),
@@ -283,7 +284,7 @@ namespace Tetris
     void Visualizer::paintFutureBlocks(Gdiplus::Graphics & g)
     {
         std::vector<BlockType> blocks;
-        mGame->getFutureBlocks(5, blocks);
+        ReadOnlyGame(mThreadSafeGame)->getFutureBlocks(5, blocks);
 
         for (size_t i = 1; i < cNumFutureBlocks; ++i)
         {
@@ -310,7 +311,8 @@ namespace Tetris
 
     void Visualizer::paintGrid(Gdiplus::Graphics & g)
     {
-        const Grid & grid = mGame->currentNode()->state().grid();
+        ReadOnlyGame game(mThreadSafeGame);
+        const Grid & grid = game->currentNode()->state().grid();
         for (size_t r = 0; r != grid.numRows(); ++r)
         {
             for (size_t c = 0; c != grid.numColumns(); ++c)
@@ -319,7 +321,7 @@ namespace Tetris
             }
         }
 
-        const Block & block = mGame->activeBlock();
+        const Block & block = game->activeBlock();
         const Grid & blockGrid = block.grid();
         for (size_t r = 0; r != blockGrid.numRows(); ++r)
         {
@@ -443,12 +445,12 @@ namespace Tetris
 
     void Visualizer::newComputerMove()
     {
-        if (mGame->isGameOver())
+        if (ReadOnlyGame(mThreadSafeGame)->isGameOver())
         {
             return;
         }
 
-        Player p(mGame);
+        Player p(mThreadSafeGame);
         std::vector<int> depths;
         for (int i = 0; i < cAIDepth; ++i)
         {
@@ -460,42 +462,46 @@ namespace Tetris
 
     void Visualizer::nextComputerMove()
     {
-        if (mGame->isGameOver())
+        if (ReadOnlyGame(mThreadSafeGame)->isGameOver())
         {
             return;
         }
 
-        ChildNodes children = mGame->currentNode()->children();
-        if (children.empty())
         {
-            return;
+            ReadOnlyGame game(mThreadSafeGame);
+            ChildNodes children = game->currentNode()->children();
+            if (children.empty())
+            {
+                return;
+            }
         }
 
 
-        if (GameStateNode * node = mGame->currentNode()->bestChild(1))
+        WritableGame game(mThreadSafeGame);
+        if (GameStateNode * node = game->currentNode()->bestChild(1))
         {
             const Block & gotoBlock = node->state().originalBlock();
-            const Block & activeBlock = mGame->activeBlock();
+            const Block & activeBlock = game->activeBlock();
 
             if (activeBlock.rotation() != gotoBlock.rotation())
             {
-                mGame->rotate();
+                game->rotate();
             }
             else if (activeBlock.column() < gotoBlock.column())
             {
-                mGame->move(Direction_Right);
+                game->move(Direction_Right);
             }
             else if (activeBlock.column() > gotoBlock.column())
             {
-                mGame->move(Direction_Left);
+                game->move(Direction_Left);
             }
             else if (activeBlock.row() + 1 < gotoBlock.row())
             {
-                mGame->move(Direction_Down);
+                game->move(Direction_Down);
             }
             else
             {
-                mGame->setCurrentNode(node);
+                game->setCurrentNode(node);
             }
         }
     }
@@ -506,7 +512,7 @@ namespace Tetris
         clock_t elapsed = GetClockMs();
 
         
-        if (!mGame->currentNode()->bestChild(1))
+        if (!ReadOnlyGame(mThreadSafeGame)->currentNode()->bestChild(1))
         {
             newComputerMove();
         }
@@ -568,27 +574,32 @@ namespace Tetris
         {
             case VK_LEFT:
             {
-                mGame->move(Direction_Left);
+                WritableGame game(mThreadSafeGame);
+                game->move(Direction_Left);
                 break;
             }
             case VK_RIGHT:
             {
-                mGame->move(Direction_Right);
+                WritableGame game(mThreadSafeGame);
+                game->move(Direction_Right);
                 break;
             }
             case VK_UP:
             {
-                mGame->rotate();
+                WritableGame game(mThreadSafeGame);
+                game->rotate();
                 break;
             }
             case VK_DOWN:
             {
-                mGame->move(Direction_Down);
+                WritableGame game(mThreadSafeGame);
+                game->move(Direction_Down);
                 break;
             }
             case VK_SPACE:
             {
-                mGame->drop();
+                WritableGame game(mThreadSafeGame);
+                game->drop();
                 break;
             }
             case VK_DELETE:

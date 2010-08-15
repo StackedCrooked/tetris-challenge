@@ -5,6 +5,7 @@
 #include "BlockType.h"
 #include "Game.h"
 #include "Grid.h"
+#include "ThreadSafeGame.h"
 #include <boost/noncopyable.hpp>
 #include <ctime>
 #include <map>
@@ -58,7 +59,7 @@ namespace Tetris
     class Visualizer : boost::noncopyable
     {
     public:
-        Visualizer(Game * inGame);
+        Visualizer(const ThreadSafeGame & inThreadSafeGame);
 
         ~Visualizer();
 
@@ -102,7 +103,7 @@ namespace Tetris
         HWND mHandle;
         HHOOK mKeyboardHook;
 
-        Game * mGame;
+        ThreadSafeGame mThreadSafeGame;
         UINT_PTR mTimerID;
         int mDelay;
         clock_t mElapsed;
