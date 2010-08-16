@@ -13,8 +13,16 @@ namespace Tetris
     }
 
 
+    static int GetIdentifier(const GameState & inGameState)
+    {
+        const Block & block = inGameState.originalBlock();
+        return block.numRotations() * block.column() + block.rotation();
+    }
+
+
     GameStateNode::GameStateNode(std::auto_ptr<GameState> inGameState) :
         mParent(0),
+        mIdentifier(GetIdentifier(*inGameState)),
         mDepth(0),
         mGameState(inGameState)
     {
@@ -43,6 +51,12 @@ namespace Tetris
             result->mChildren.insert(ChildNodePtr(node.clone().release()));
         }
         return result;
+    }
+
+
+    int GameStateNode::identifier() const
+    {
+        return mIdentifier;
     }
 
 

@@ -34,6 +34,9 @@ namespace Tetris
         // Creates a deep copy of this node and all child nodes.
         std::auto_ptr<GameStateNode> clone() const;
 
+        // Each node is produced by a unique combination of the current block's column and rotation.
+        int identifier() const;
+
         // Search existing nodes only, does not create any new ones.
         const GameStateNode * bestChild(int inDepth) const;
         GameStateNode * bestChild(int inDepth);
@@ -58,6 +61,7 @@ namespace Tetris
         GameStateNode(std::auto_ptr<GameState> inGameState);
 
         GameStateNode * mParent;
+        int mIdentifier;
         int mDepth;
         boost::scoped_ptr<GameState> mGameState;
         ChildNodes mChildren;
