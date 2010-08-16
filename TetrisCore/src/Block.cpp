@@ -68,14 +68,14 @@ namespace Tetris
 
     void Block::setRotation(size_t inRotation)
     {
-        mRotation = inRotation;
+        mRotation = inRotation % GetBlockRotationCount(mType);
         mGrid = &GetGrid(GetBlockIdentifier(mType, inRotation));
     }
 
 
     void Block::rotate()
     {
-        setRotation((mRotation + 1) % 4);
+        setRotation((mRotation + 1) % GetBlockRotationCount(mType));
     }
 
 

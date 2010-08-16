@@ -164,7 +164,27 @@ namespace Tetris
     {
         CheckPrecondition(inCurrentNode != 0, "inCurrentNode must not be null.");
         CheckPrecondition(mCurrentBlockIndex == mCurrentNode->depth(), "mCurrentBlockIndex == mCurrentNode->depth() is false.");
-        mCurrentNode = inCurrentNode;
+        
+        // Check if a node with the same identifier already exists among the current node's children.
+        // If yes, then we simply set that one to be the new current node.
+        if (mCurrentNode)
+        {
+            ChildNodes & children = mCurrentNode->children();
+            mCurrentNode = 0;
+            for (ChildNodes::iterator it = children.begin(), end = children.end(); it != end; ++it)
+            {
+                GameStateNode & node = **it;
+                if (node.identifier() == inCurrentNode->identifier())
+                {
+                    mCurrentNode = &node;
+                }
+            }
+        }
+
+        if (!mCurrentNode)
+        {
+            mCurrentNode = inCurrentNode;
+        }
         mCurrentBlockIndex = mCurrentNode->depth();
         supplyBlocks();
         mActiveBlock.reset(CreateDefaultBlock(mBlocks[mCurrentBlockIndex], mNumColumns).release());

@@ -208,10 +208,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\JobRunner.h"
-				>
-			</File>
-			<File
 				RelativePath=".\include\Player.h"
 				>
 			</File>
@@ -261,10 +257,6 @@
 			</File>
 			<File
 				RelativePath=".\src\JobList.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\JobRunner.cpp"
 				>
 			</File>
 			<File
