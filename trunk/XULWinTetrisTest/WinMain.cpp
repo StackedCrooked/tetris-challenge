@@ -27,6 +27,7 @@
 
 
 boost::scoped_ptr<Tetris::GameCommandQueue> gCommander;
+boost::scoped_ptr<boost::thread> gThread;
 
 
 namespace Tetris
@@ -34,13 +35,37 @@ namespace Tetris
 
     void ProcessKey(int inKey)
     {
-        if (inKey == VK_RETURN)
+        if (inKey == VK_DELETE)
         {
-            Player p(gCommander->threadSafeGame());
-            Widths widths;
-            widths.push_back(40);
-            widths.push_back(40);
-            p.move(widths);            
+            BlockTypes blockTypes;
+            std::auto_ptr<GameStateNode> clonedGameState;
+
+            // Critical section
+            {
+                WritableGame game(gCommander->threadSafeGame());
+                game->getFutureBlocks(19, blockTypes);
+                clonedGameState = game->currentNode()->clone();
+            }
+
+            int currentGameDepth = clonedGameState->depth();
+            TimedNodePopulator populator(clonedGameState, blockTypes, 1000);
+            populator.start();                
+            ChildNodePtr bestChild = populator.getBestChild();
+            GameStateNode * selectedChild = bestChild.get();
+            while (selectedChild->depth() > currentGameDepth + 1)
+            {
+                selectedChild = selectedChild->parent();
+            }
+
+            // Critical section
+            {
+                WritableGame game(gCommander->threadSafeGame());
+                assert(game->currentNode()->children().empty());
+                game->currentNode()->children().insert(ChildNodePtr(selectedChild->clone().release())); // HOPE I'M NOT MESSING (LATE NIGHT CODE)
+                ChildNodePtr child = *(game->currentNode()->children().begin());
+                game->setCurrentNode(child.get());
+            }
+
         }
     }
 

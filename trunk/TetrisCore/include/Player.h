@@ -56,13 +56,12 @@ namespace Tetris
         bool isTimeExpired() const;
 
         // Returns best child and its depth.
-        std::pair<ChildNodePtr, int> getBestChild() const;
+        ChildNodePtr getBestChild() const;
 
     private:
-        void populateNode(std::auto_ptr<GameStateNode> ioNode);
         void populateNodesInBackground(GameStateNode * ioNode, BlockTypes * inBlockTypes, size_t inOffset);
         void populateNodesRecursively(GameStateNode & ioNode, const BlockTypes & inBlockTypes, size_t inOffset);
-        void addToFlattenedNodes(std::auto_ptr<GameStateNode> inNode, size_t inOffset);
+        void addToFlattenedNodes(ChildNodePtr inChildNode, size_t inOffset);
 
         boost::scoped_ptr<GameStateNode> mNode;
         BlockTypes mBlockTypes;

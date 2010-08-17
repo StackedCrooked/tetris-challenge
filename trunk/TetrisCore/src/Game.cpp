@@ -160,6 +160,9 @@ namespace Tetris
     }
 
 
+    //
+    // TODO: SET PARENT NODE FOR inCurrentNode CORRECTLY HERE??
+    //
     void Game::setCurrentNode(GameStateNode * inCurrentNode)
     {
         CheckPrecondition(inCurrentNode != 0, "inCurrentNode must not be null.");
