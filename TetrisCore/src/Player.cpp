@@ -293,41 +293,24 @@ namespace Tetris
     }
 
 
-    std::pair<ChildNodePtr, int> TimedNodePopulator::getBestChild() const
+    ChildNodePtr TimedNodePopulator::getBestChild() const
     {
         if (mFlattenedNodes.empty())
         {
             throw std::runtime_error("No child nodes were generated? This is exceptionally unlikely!");
         }
-        int cMaxDepth = static_cast<int>(std::min<size_t>(mFlattenedNodes.size(), mBlockTypes.size())) - 1;
-        int numColumns = (*mFlattenedNodes.begin()->begin())->state().grid().numColumns();
-        for (int idx = cMaxDepth; idx >= 0; --idx)
-        {
-            const ChildNodes & nodes = mFlattenedNodes[idx];
-            const BlockType & blockType = mBlockTypes[idx];
-            size_t blockPositionCount = GetBlockPositionCount(blockType, numColumns);            
-            if (nodes.size() > blockPositionCount)
-            {
-                throw std::runtime_error("We generated more child nodes than there are possible combinations to drop a block.");
-            }
-            else if (nodes.size() == GetBlockPositionCount(blockType, numColumns))
-            {
-                ChildNodePtr childNode = *nodes.begin();
-                return std::make_pair(childNode, idx);
-            }
-            idx--;
-        }
+        return *mFlattenedNodes.back().begin();
     }
 
 
-    void TimedNodePopulator::addToFlattenedNodes(std::auto_ptr<GameStateNode> inNode, size_t inOffset)
+    void TimedNodePopulator::addToFlattenedNodes(ChildNodePtr inChildNode, size_t inOffset)
     {
         boost::mutex::scoped_lock lock(mFlattenedNodesMutex);
         while (inOffset >= mFlattenedNodes.size())
         {
             mFlattenedNodes.push_back(ChildNodes());
         }
-        mFlattenedNodes[inOffset].insert(ChildNodePtr(inNode.release()));
+        mFlattenedNodes[inOffset].insert(inChildNode);
     }
 
 
@@ -357,19 +340,19 @@ namespace Tetris
         }
 
         // Generate the child nodes
-        GenerateOffspring(inBlockTypes[inOffset], ioNode, ioNode.children());
-
-        // Populate each child node.
+        GenerateOffspring(inBlockTypes[inOffset], ioNode, ioNode.children());        
         ChildNodes & children = ioNode.children();
-        ChildNodes::iterator it = children.begin(), end = children.end();
-        while (it != end)
+
+        // Store the fruit of our labor.
+        for (ChildNodes::iterator it = children.begin(); it != children.end(); ++it)
         {
-            if (isTimeExpired())
-            {
-                return;
-            }
+            addToFlattenedNodes(*it, inOffset);
+        }
+
+        // Recursion.
+        for (ChildNodes::iterator it = children.begin(); it != children.end(); ++it)
+        {
             GameStateNode & childNode = **it;
-            addToFlattenedNodes(childNode.clone(), inOffset);
             populateNodesRecursively(childNode, inBlockTypes, inOffset + 1);
         }
     }
@@ -377,26 +360,16 @@ namespace Tetris
 
     void TimedNodePopulator::populateNodesInBackground(GameStateNode * inNode, BlockTypes * inBlockTypes, size_t inOffset)
     {
+        // Thread entry point
         try
         {
-            boost::scoped_ptr<GameStateNode> node(inNode);
-            boost::scoped_ptr<BlockTypes> blockTypes(inBlockTypes);
-            populateNodesRecursively(*node, *blockTypes, inOffset);
+            boost::scoped_ptr<BlockTypes> takeOwnership(inBlockTypes);
+            populateNodesRecursively(*inNode, *inBlockTypes, inOffset);
         }
         catch (const std::exception &)
         {
             // Logger
         }
-    }
-
-
-    void TimedNodePopulator::populateNode(std::auto_ptr<GameStateNode> inNode)
-    {
-        GameStateNode * node = inNode.release();
-        BlockTypes * blockTypes = new BlockTypes(mBlockTypes);
-        mThreadPool.create_thread(
-            boost::bind(&TimedNodePopulator::populateNodesInBackground, this,
-                        node, blockTypes, 1));
     }
 
 
@@ -412,8 +385,13 @@ namespace Tetris
         ChildNodes::const_iterator it = childNodes.begin(), end = childNodes.end();
         for (; it != end; ++it)
         {
-            GameStateNode & node = **it;
-            populateNode(node.clone());            
+            GameStateNode & firstGenerationChildNode = **it;
+            mThreadPool.create_thread(
+                boost::bind(&TimedNodePopulator::populateNodesInBackground,
+                            this,
+                            &firstGenerationChildNode,  // maybe clone here (I'm not sure...)
+                            new BlockTypes(mBlockTypes),
+                            1));
         }
 
         mThreadPool.join_all();
