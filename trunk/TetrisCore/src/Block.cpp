@@ -101,6 +101,19 @@ namespace Tetris
     }
 
 
+    size_t GetBlockPositionCount(BlockType inType, size_t inNumColumns)
+    {
+        size_t result = 0;
+        size_t numRotations = GetBlockRotationCount(inType);
+        for (size_t idx = 0; idx != numRotations; ++idx)
+        {
+            const Grid & grid = GetGrid(GetBlockIdentifier(inType, idx));
+            result += inNumColumns - grid.numColumns();
+        }
+        return result;
+    }
+
+
     const Grid & GetGrid(int inId)
     {
         if (inId < 0 || inId >= 28)

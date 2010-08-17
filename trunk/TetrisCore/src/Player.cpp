@@ -293,35 +293,48 @@ namespace Tetris
     }
 
 
+    std::pair<ChildNodePtr, int> TimedNodePopulator::getBestChild() const
+    {
+        if (mFlattenedNodes.empty())
+        {
+            throw std::runtime_error("No child nodes were generated? This is exceptionally unlikely!");
+        }
+        int cMaxDepth = static_cast<int>(std::min<size_t>(mFlattenedNodes.size(), mBlockTypes.size())) - 1;
+        int numColumns = (*mFlattenedNodes.begin()->begin())->state().grid().numColumns();
+        for (int idx = cMaxDepth; idx >= 0; --idx)
+        {
+            const ChildNodes & nodes = mFlattenedNodes[idx];
+            const BlockType & blockType = mBlockTypes[idx];
+            size_t blockPositionCount = GetBlockPositionCount(blockType, numColumns);            
+            if (nodes.size() > blockPositionCount)
+            {
+                throw std::runtime_error("We generated more child nodes than there are possible combinations to drop a block.");
+            }
+            else if (nodes.size() == GetBlockPositionCount(blockType, numColumns))
+            {
+                ChildNodePtr childNode = *nodes.begin();
+                return std::make_pair(childNode, idx);
+            }
+            idx--;
+        }
+    }
+
+
+    void TimedNodePopulator::addToFlattenedNodes(std::auto_ptr<GameStateNode> inNode, size_t inOffset)
+    {
+        boost::mutex::scoped_lock lock(mFlattenedNodesMutex);
+        while (inOffset >= mFlattenedNodes.size())
+        {
+            mFlattenedNodes.push_back(ChildNodes());
+        }
+        mFlattenedNodes[inOffset].insert(ChildNodePtr(inNode.release()));
+    }
+
+
     bool TimedNodePopulator::isTimeExpired() const
     {
         boost::mutex::scoped_lock lock(mStopwatchMutex);
         return mStopwatch.elapsed() > mTimeMicroseconds;
-    }
-
-
-    void TimedNodePopulator::populateNode(std::auto_ptr<GameStateNode> inNode)
-    {
-        GameStateNode * node = inNode.release();
-        BlockTypes * blockTypes = new BlockTypes(mBlockTypes);
-        mThreadPool.create_thread(
-            boost::bind(&TimedNodePopulator::populateNodesInBackground, this,
-                        node, blockTypes, 1));
-    }
-
-
-    void TimedNodePopulator::populateNodesInBackground(GameStateNode * inNode, BlockTypes * inBlockTypes, size_t inOffset)
-    {
-        try
-        {
-            boost::scoped_ptr<GameStateNode> node(inNode);
-            boost::scoped_ptr<BlockTypes> blockTypes(inBlockTypes);
-            populateNodesRecursively(*node, *blockTypes, inOffset);
-        }
-        catch (const std::exception &)
-        {
-            // Logger
-        }
     }
 
 
@@ -362,14 +375,28 @@ namespace Tetris
     }
 
 
-    void TimedNodePopulator::addToFlattenedNodes(std::auto_ptr<GameStateNode> inNode, size_t inOffset)
+    void TimedNodePopulator::populateNodesInBackground(GameStateNode * inNode, BlockTypes * inBlockTypes, size_t inOffset)
     {
-        boost::mutex::scoped_lock lock(mFlattenedNodesMutex);
-        while (inOffset >= mFlattenedNodes.size())
+        try
         {
-            mFlattenedNodes.push_back(ChildNodes());
+            boost::scoped_ptr<GameStateNode> node(inNode);
+            boost::scoped_ptr<BlockTypes> blockTypes(inBlockTypes);
+            populateNodesRecursively(*node, *blockTypes, inOffset);
         }
-        mFlattenedNodes[inOffset].insert(ChildNodePtr(inNode.release()));
+        catch (const std::exception &)
+        {
+            // Logger
+        }
+    }
+
+
+    void TimedNodePopulator::populateNode(std::auto_ptr<GameStateNode> inNode)
+    {
+        GameStateNode * node = inNode.release();
+        BlockTypes * blockTypes = new BlockTypes(mBlockTypes);
+        mThreadPool.create_thread(
+            boost::bind(&TimedNodePopulator::populateNodesInBackground, this,
+                        node, blockTypes, 1));
     }
 
 
@@ -388,6 +415,8 @@ namespace Tetris
             GameStateNode & node = **it;
             populateNode(node.clone());            
         }
+
+        mThreadPool.join_all();
     }
 
 
