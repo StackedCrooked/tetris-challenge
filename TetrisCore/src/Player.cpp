@@ -4,6 +4,7 @@
 #include "Poco/Stopwatch.h"
 #include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
 #include <ostream>
 
@@ -278,6 +279,114 @@ namespace Tetris
         if (mOutStream)
         {
             *mOutStream << inMessage << "\r";
+        }
+    }
+
+
+    TimedNodePopulator::TimedNodePopulator(std::auto_ptr<GameStateNode> inNode,
+                                           const BlockTypes & inBlockTypes,
+                                           int inTimeMs) :
+        mNode(inNode.release()),
+        mBlockTypes(inBlockTypes),
+        mTimeMicroseconds(1000 * inTimeMs)
+    {
+    }
+
+
+    bool TimedNodePopulator::isTimeExpired() const
+    {
+        boost::mutex::scoped_lock lock(mStopwatchMutex);
+        return mStopwatch.elapsed() > mTimeMicroseconds;
+    }
+
+
+    void TimedNodePopulator::populateNode(std::auto_ptr<GameStateNode> inNode)
+    {
+        GameStateNode * node = inNode.release();
+        BlockTypes * blockTypes = new BlockTypes(mBlockTypes);
+        mThreadPool.create_thread(
+            boost::bind(&TimedNodePopulator::populateNodesInBackground, this,
+                        node, blockTypes, 1));
+    }
+
+
+    void TimedNodePopulator::populateNodesInBackground(GameStateNode * inNode, BlockTypes * inBlockTypes, size_t inOffset)
+    {
+        try
+        {
+            boost::scoped_ptr<GameStateNode> node(inNode);
+            boost::scoped_ptr<BlockTypes> blockTypes(inBlockTypes);
+            populateNodesRecursively(*node, *blockTypes, inOffset);
+        }
+        catch (const std::exception &)
+        {
+            // Logger
+        }
+    }
+
+
+    void TimedNodePopulator::populateNodesRecursively(GameStateNode & ioNode, const BlockTypes & inBlockTypes, size_t inOffset)
+    {
+        if (isTimeExpired())
+        {
+            return;
+        }
+
+        if (inOffset >= inBlockTypes.size())
+        {
+            return;
+        }
+        
+        if (ioNode.state().isGameOver())
+        {
+            // Game over state has no children.
+            return;
+        }
+
+        // Generate the child nodes
+        GenerateOffspring(inBlockTypes[inOffset], ioNode, ioNode.children());
+
+        // Populate each child node.
+        ChildNodes & children = ioNode.children();
+        ChildNodes::iterator it = children.begin(), end = children.end();
+        while (it != end)
+        {
+            if (isTimeExpired())
+            {
+                return;
+            }
+            GameStateNode & childNode = **it;
+            addToFlattenedNodes(childNode.clone(), inOffset);
+            populateNodesRecursively(childNode, inBlockTypes, inOffset + 1);
+        }
+    }
+
+
+    void TimedNodePopulator::addToFlattenedNodes(std::auto_ptr<GameStateNode> inNode, size_t inOffset)
+    {
+        boost::mutex::scoped_lock lock(mFlattenedNodesMutex);
+        while (inOffset >= mFlattenedNodes.size())
+        {
+            mFlattenedNodes.push_back(ChildNodes());
+        }
+        mFlattenedNodes[inOffset].insert(ChildNodePtr(inNode.release()));
+    }
+
+
+    void TimedNodePopulator::start()
+    {
+        mStopwatch.start();
+
+        // Generate children of the root node
+        ChildNodes childNodes;
+        GenerateOffspring(mBlockTypes[0], *mNode, childNodes);
+
+        // For each child node:
+        ChildNodes::const_iterator it = childNodes.begin(), end = childNodes.end();
+        for (; it != end; ++it)
+        {
+            GameStateNode & node = **it;
+            populateNode(node.clone());            
         }
     }
 
