@@ -95,8 +95,17 @@ namespace Tetris
         if (inType < BlockType_Begin || inType >= BlockType_End)
         {
             throw std::logic_error("Invalid block type.");
-        }
-        static const int fRotationCounts[] = {2, 4, 4, 1, 2, 4, 2};
+        }        
+        static const int fRotationCounts[] =
+        {
+            2, // BlockType_I
+            4, // BlockType_J
+            4, // BlockType_L
+            1, // BlockType_O
+            2, // BlockType_S
+            4, // BlockType_T
+            2  // BlockType_Z
+        };
         return fRotationCounts[static_cast<int>(inType) - 1];
     }
 
@@ -108,7 +117,7 @@ namespace Tetris
         for (size_t idx = 0; idx != numRotations; ++idx)
         {
             const Grid & grid = GetGrid(GetBlockIdentifier(inType, idx));
-            result += inNumColumns - grid.numColumns();
+            result += inNumColumns - grid.numColumns() + 1;
         }
         return result;
     }
