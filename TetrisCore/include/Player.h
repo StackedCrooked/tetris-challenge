@@ -41,12 +41,22 @@ namespace Tetris
     {
     public:
         TimedNodePopulator(std::auto_ptr<GameStateNode> inNode,
-                           const BlockTypes & inBlockTypes,
+                           const BlockTypes & inBlockTypes, // defines maximum depth
                            int inTimeMs);
-
+        
+        
+        // Starts recursively populating the child nodes.
+        // Uses a separate thread for each immediate child of the starting node.
+        // Given a game grid width of 10 columns, this means that at least 9
+        // and at most 32 threads will be running simultaneously.
+        //
+        // Blocking! Call this method in a separate thread to avoid blocking the main game.
         void start();
 
         bool isTimeExpired() const;
+
+        // Returns best child and its depth.
+        std::pair<ChildNodePtr, int> getBestChild() const;
 
     private:
         void populateNode(std::auto_ptr<GameStateNode> ioNode);
@@ -56,17 +66,15 @@ namespace Tetris
 
         boost::scoped_ptr<GameStateNode> mNode;
         BlockTypes mBlockTypes;
-        Poco::Int64 mTimeMicroseconds;
-        
+        Poco::Int64 mTimeMicroseconds;        
         std::vector<ChildNodes> mFlattenedNodes;
         mutable boost::mutex mFlattenedNodesMutex;        
-
         Poco::Stopwatch mStopwatch;
         mutable boost::mutex mStopwatchMutex;
-
         boost::thread_group mThreadPool;
     };
 
 } // namespace Tetris
+
 
 #endif // PLAYER_H_INCLUDED
