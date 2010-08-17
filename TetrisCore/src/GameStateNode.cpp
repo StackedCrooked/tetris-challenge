@@ -32,6 +32,7 @@ namespace Tetris
 
     GameStateNode::GameStateNode(GameStateNode * inParent, std::auto_ptr<GameState> inGameState) :
         mParent(inParent),
+        mIdentifier(GetIdentifier(*inGameState)),
         mDepth(inParent->depth() + 1),
         mGameState(inGameState)
     {
