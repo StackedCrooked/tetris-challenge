@@ -37,12 +37,8 @@ namespace Tetris
     {
     public:
         BlockMover(ThreadSafeGame & inGame,
-                   size_t inRotation,
-                   size_t inColumn,
                    boost::function<void()> inFinishedCallback) :
             mGame(inGame),
-            mRotation(inRotation),
-            mColumn(inColumn),
             mFinished(false),
             mFinishedCallback(inFinishedCallback)
         {
@@ -88,34 +84,42 @@ namespace Tetris
 
         void move()
         {
-            assert (!mFinished);
 
             // Critical section
+            while (true)
             {
                 WritableGame game(mGame);
-                Block & block = game->activeBlock();                
-                if (block.rotation() != mRotation)
+                ChildNodes & children = game->currentNode()->children();
+                if (children.empty())
+                {
+                    mFinished = true;
+                    break;
+                }
+
+                Block & block = game->activeBlock();
+                const Block & targetBlock = (*children.begin())->state().originalBlock();
+                if (block.rotation() != targetBlock.rotation())
                 {
                     if (!game->rotate())
                     {
                         throw std::runtime_error(MakeString() << "Rotation failed.");
                     }
                 }
-                else if (block.column() < mColumn)
+                else if (block.column() < targetBlock.column())
                 {
                     if (!game->move(Direction_Right))
                     {
                         throw std::runtime_error(MakeString() << "Move to right failed. Current column: " << block.column()
-                                                              << ", target column: " << mColumn << ".");
+                                                              << ", target column: " << targetBlock.column() << ".");
                     }
                 }
-                else if (block.column() > mColumn)
+                else if (block.column() > targetBlock.column())
                 {
                     if (!game->move(Direction_Left))
                     {
                         throw std::runtime_error(MakeString() << "Move to left failed. "
                                                               << "Current column: " << block.column() << ", "
-                                                              << "target column: " << mColumn << ".");
+                                                              << "target column: " << targetBlock.column() << ".");
                     }
                 }
                 else
@@ -125,23 +129,12 @@ namespace Tetris
                     {
                         game->move(Direction_Down);
                     }
-                    else
-                    {                        
-                        if (!game->currentNode()->children().empty())
-                        {
-                            if (!game->navigateNodeDown())
-                            {
-                                throw std::runtime_error("Failed to navigate the game state one node down.");
-                            }
-                        }
-                        else
-                        {
-                            // Drop the last block.
-                            game->move(Direction_Down);
-                            mFinished = true;
-                        }
+                    else if (!game->navigateNodeDown())
+                    {
+                        throw std::runtime_error("Failed to navigate the game state one node down.");
                     }
                 }
+                break;
             }
 
             if (mFinished)
@@ -156,8 +149,6 @@ namespace Tetris
         
         ThreadSafeGame & mGame;
         XULWin::WinAPI::Timer mTimer; // Use non-threaded timer where we can.
-        size_t mRotation;
-        size_t mColumn;
         bool mFinished;
         boost::function<void()> mFinishedCallback;
     };
@@ -167,30 +158,11 @@ namespace Tetris
 
     void MoveNextQueuedBlock()
     {
-
-        const Block * nextMove(0);
-
-        // Critical section: get the next queued move (if any)
-        {
-            WritableGame game(gCommander->threadSafeGame());
-            ChildNodes children = game->currentNode()->children();
-            if (!children.empty())
-            {
-                assert(children.size() == 1);
-
-                GameStateNode & firstChild = **children.begin();
-                nextMove = &firstChild.state().originalBlock();
-            }
-        } 
-
-
         // Move to the next precalculated position.
         // Note: AI should use this time for calculating next moves.
-        if (nextMove)
+        if (!ReadOnlyGame(gCommander->threadSafeGame())->currentNode()->children().empty())
         {
             gBlockMover.reset(new BlockMover(gCommander->threadSafeGame(),
-                                             nextMove->rotation(),
-                                             nextMove->column(),
                                              boost::bind(MoveNextQueuedBlock)));
         }
 
@@ -273,8 +245,6 @@ namespace Tetris
             assert(firstChild->state().checkPositionValid(targetBlock, targetBlock.rotation(), targetBlock.column()));
             gBlockMover.reset(
                 new BlockMover(gCommander->threadSafeGame(),
-                               targetBlock.rotation(),
-                               targetBlock.column(),
                                boost::bind(MoveNextQueuedBlock)));
         }
     }
