@@ -316,12 +316,22 @@ namespace Tetris
     }
 
 
-    void Game::rotate()
+    bool Game::rotate()
     {
-        if (!isGameOver())
+        if (isGameOver())
         {
-            activeBlock().rotate();
+            return false;
         }
+        
+        Block & block = activeBlock();
+        size_t oldRotation = block.rotation();
+        block.rotate();
+        if (!mCurrentNode->state().checkPositionValid(block, block.row(), block.column()))
+        {
+            block.setRotation(oldRotation);
+            return false;
+        }
+        return true;
     }
 
 

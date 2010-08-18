@@ -53,7 +53,7 @@ namespace Tetris
         //
         bool move(Direction inDirection);
 
-        void rotate();
+        bool rotate();
 
         void drop();
 
