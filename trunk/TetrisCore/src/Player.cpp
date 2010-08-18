@@ -243,7 +243,7 @@ namespace Tetris
             game->currentNode()->children().insert(data.node);
         }
         DestroyInferiorChildren(game->currentNode(), inWidths.size());
-        game->setCurrentNode(FindBestChild(game->currentNode(), inWidths.size()));
+        //game->setCurrentNode(FindBestChild(game->currentNode(), inWidths.size()));
     }
 
 
@@ -379,18 +379,17 @@ namespace Tetris
         mStopwatch.start();
 
         // Generate children of the root node
-        ChildNodes childNodes;
-        GenerateOffspring(mBlockTypes[0], *mNode, childNodes);
+        GenerateOffspring(mBlockTypes[0], *mNode, mNode->children());
 
         // For each child node:
-        ChildNodes::const_iterator it = childNodes.begin(), end = childNodes.end();
+        ChildNodes::const_iterator it = mNode->children().begin(), end = mNode->children().end();
         for (; it != end; ++it)
         {
             GameStateNode & firstGenerationChildNode = **it;
             mThreadPool.create_thread(
                 boost::bind(&TimedNodePopulator::populateNodesInBackground,
                             this,
-                            &firstGenerationChildNode,  // maybe clone here (I'm not sure...)
+                            &firstGenerationChildNode,
                             new BlockTypes(mBlockTypes),
                             1));
         }
