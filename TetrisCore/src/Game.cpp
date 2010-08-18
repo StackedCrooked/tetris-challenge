@@ -160,34 +160,9 @@ namespace Tetris
     }
 
 
-    //
-    // TODO: SET PARENT NODE FOR inCurrentNode CORRECTLY HERE??
-    //
     void Game::setCurrentNode(GameStateNode * inCurrentNode)
     {
-        CheckPrecondition(inCurrentNode != 0, "inCurrentNode must not be null.");
-        CheckPrecondition(mCurrentBlockIndex == mCurrentNode->depth(), "mCurrentBlockIndex == mCurrentNode->depth() is false.");
-        
-        // Check if a node with the same identifier already exists among the current node's children.
-        // If yes, then we simply set that one to be the new current node.
-        if (mCurrentNode)
-        {
-            ChildNodes & children = mCurrentNode->children();
-            mCurrentNode = 0;
-            for (ChildNodes::iterator it = children.begin(), end = children.end(); it != end; ++it)
-            {
-                GameStateNode & node = **it;
-                if (node.identifier() == inCurrentNode->identifier())
-                {
-                    mCurrentNode = &node;
-                }
-            }
-        }
-
-        if (!mCurrentNode)
-        {
-            mCurrentNode = inCurrentNode;
-        }
+        mCurrentNode = inCurrentNode;
         mCurrentBlockIndex = mCurrentNode->depth();
         supplyBlocks();
         mActiveBlock.reset(CreateDefaultBlock(mBlocks[mCurrentBlockIndex], mNumColumns).release());
@@ -198,7 +173,7 @@ namespace Tetris
     {
         if (mCurrentNode->parent())
         {
-            mCurrentNode = mCurrentNode->parent();
+            setCurrentNode(mCurrentNode->parent());
             return true;
         }
         return false;
@@ -207,11 +182,13 @@ namespace Tetris
 
     bool Game::navigateNodeDown()
     {
-        if (!mCurrentNode->children().empty())
+        if (mCurrentNode->children().empty())
         {
-            mCurrentNode = mCurrentNode->children().begin()->get();
+            return false;
         }
-        return false;
+
+        setCurrentNode(mCurrentNode->children().begin()->get());
+        return true;
     }
 
 
@@ -230,7 +207,7 @@ namespace Tetris
                     {
                         return false;
                     }
-                    mCurrentNode = (*previous)->get();
+                    setCurrentNode((*previous)->get());
                     return true;
                 }
                 previous = &it;
@@ -254,7 +231,7 @@ namespace Tetris
                     ++it;
                     if (it != end)
                     {
-                        mCurrentNode = it->get();
+                        setCurrentNode(it->get());
                         return true;
                     }
                     return false;

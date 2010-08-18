@@ -50,20 +50,33 @@ namespace Tetris
             int currentGameDepth = clonedGameState->depth();
             TimedNodePopulator populator(clonedGameState, blockTypes, 1000);
             populator.start();                
-            ChildNodePtr bestChild = populator.getBestChild();
-            GameStateNode * selectedChild = bestChild.get();
-            while (selectedChild->depth() > currentGameDepth + 1)
+            ChildNodePtr bestLastChild = populator.getBestChild();
+            GameStateNode * bestFirstChild = bestLastChild.get();
+            while (bestFirstChild->depth() > currentGameDepth + 1)
             {
-                selectedChild = selectedChild->parent();
+                bestFirstChild = bestFirstChild->parent();
             }
+            DestroyInferiorChildren(bestFirstChild, bestLastChild.get());
+            
+            ChildNodePtr firstChild;
+            for (ChildNodes::iterator it = populator.node()->children().begin(); it != populator.node()->children().end(); ++it)
+            {
+                ChildNodePtr child = *it;
+                if (child.get() == bestFirstChild)
+                {
+                    firstChild = child;
+                    break;
+                }
+            }
+
+            assert(firstChild);
 
             // Critical section
             {
                 WritableGame game(gCommander->threadSafeGame());
-                assert(game->currentNode()->children().empty());
-                game->currentNode()->children().insert(ChildNodePtr(selectedChild->clone().release())); // HOPE I'M NOT MESSING (LATE NIGHT CODE)
-                ChildNodePtr child = *(game->currentNode()->children().begin());
-                game->setCurrentNode(child.get());
+                assert(game->currentNode()->children().empty()); // FOR NOW!
+                game->currentNode()->children().insert(ChildNodePtr(firstChild));
+                while(game->navigateNodeDown());
             }
 
         }

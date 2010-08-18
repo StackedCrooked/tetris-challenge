@@ -46,8 +46,6 @@ namespace Tetris
 
         const GameStateNode * currentNode() const;
 
-        void setCurrentNode(GameStateNode * inCurrentNode);
-
         bool isGameOver() const;
 
         //
@@ -73,6 +71,8 @@ namespace Tetris
 
     private:
         Game(const Game & inGame);
+
+        void setCurrentNode(GameStateNode * inCurrentNode);
 
         void supplyBlocks() const;
 

@@ -17,6 +17,7 @@ namespace Tetris
 {
     
     typedef std::vector<int> Widths;
+    void DestroyInferiorChildren(GameStateNode * srcNode, GameStateNode * dstNode);
 
     class Player
     {
@@ -52,6 +53,10 @@ namespace Tetris
         //
         // Blocking! Call this method in a separate thread to avoid blocking the main game.
         void start();
+
+        GameStateNode * node() { return mNode.get(); }
+
+        const GameStateNode * node() const { return mNode.get(); }
 
         bool isTimeExpired() const;
 
