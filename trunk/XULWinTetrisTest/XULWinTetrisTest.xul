@@ -17,5 +17,10 @@
     <tetris id="tetris-component" flex="0" numfutureblocks="3" keyboardenabled="true" />
     <spacer flex="1" />
   </hbox>
+  <hbox>
+    <label id="blocksLabel" value="Blocks:"/>
+    <textbox id="blocksTextBox" value="0" />
+    <spacer flex="1" />
+  </hbox>
   <textbox id="logging-textbox" multiline="true" flex="1" rows="8" readonly="true" />
 </window>

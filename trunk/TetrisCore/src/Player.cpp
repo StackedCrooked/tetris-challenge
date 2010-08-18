@@ -296,6 +296,7 @@ namespace Tetris
 
     ChildNodePtr TimedNodePopulator::getBestChild() const
     {
+        boost::mutex::scoped_lock lock(mFlattenedNodesMutex);
         if (mFlattenedNodes.empty())
         {
             throw std::runtime_error("No child nodes were generated? This is exceptionally unlikely!");
