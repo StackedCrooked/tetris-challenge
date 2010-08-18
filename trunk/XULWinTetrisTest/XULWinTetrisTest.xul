@@ -11,5 +11,5 @@
   align="stretch"
 >
   <tetris id="tetris-component" flex="0" numfutureblocks="3" keyboardenabled="true" />
-  <textbox id="logging-textbox" multiline="true" flex="1" rows="4" />
+  <textbox id="logging-textbox" multiline="true" flex="1" rows="4" readonly="true" />
 </window>

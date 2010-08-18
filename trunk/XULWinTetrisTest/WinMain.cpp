@@ -27,12 +27,11 @@
 #include <shellapi.h>
 
 
-boost::scoped_ptr<Tetris::GameCommandQueue> gCommander;
-boost::scoped_ptr<boost::thread> gThread;
-
-
 namespace Tetris
 {
+    boost::scoped_ptr<Tetris::GameCommandQueue> gCommander;
+    boost::scoped_ptr<boost::thread> gThread;
+
 
     class BlockMover
     {
@@ -47,7 +46,7 @@ namespace Tetris
             mFinished(false),
             mFinishedCallback(inFinishedCallback)
         {
-            mTimer.start(boost::bind(&BlockMover::onTimer, this), 100);
+            mTimer.start(boost::bind(&BlockMover::onTimer, this), 10);
         }       
 
         bool isFinished()
@@ -64,8 +63,26 @@ namespace Tetris
             }
             catch (const std::exception & inException)
             {
-                mTimer.stop();
                 LogError(inException.what());
+
+                // Critical section
+                {
+                    WritableGame wg(gCommander->threadSafeGame());
+                    Game & game = *wg.get();
+                    
+                    // Try to cheat our way out of it
+                    if (game.navigateNodeDown())
+                    {
+                        LogWarning("I can't move the block to where I planned to so I'm cheating now.");
+                    }
+                    else
+                    {
+                        LogError("Application state has become corrupted for an unknown reason. Clearing all AI data.");
+                        mTimer.stop();
+                        game.currentNode()->children().clear();
+                        mFinished = true;
+                    }
+                }
             }
         }
 
@@ -182,6 +199,7 @@ namespace Tetris
             if (gBlockMover && !gBlockMover->isFinished())
             {
                 // Busy moving blocks.
+                LogWarning("Can't start AI while moving blocks.");
                 return;
             }
 
@@ -194,6 +212,7 @@ namespace Tetris
                     assert(children.size() == 1);
 
                     // There are still some queued blocks that need to be moved by the blockmover.
+                    LogWarning("AI not started is still moving the blocks.");
                     return;
                 }
             }
@@ -214,7 +233,7 @@ namespace Tetris
             }
 
             int currentGameDepth = clonedGameState->depth();
-            TimedNodePopulator populator(clonedGameState, blockTypes, 1000);
+            TimedNodePopulator populator(clonedGameState, blockTypes, 3000);
             populator.start();                
             ChildNodePtr bestLastChild = populator.getBestChild();
             GameStateNode * bestFirstChild = bestLastChild.get();
@@ -257,13 +276,16 @@ namespace Tetris
 }
 
 
+using namespace Tetris;
+
+
 void AppendLog(XULWin::Element * inTextBoxElement, const std::string & inMessage)
 {
     inTextBoxElement->setAttribute("value", inTextBoxElement->getAttribute("value") + inMessage + "\r\n");
 }
 
 
-INT_PTR WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+int StartProgram(HINSTANCE hInstance)
 {
     XULWin::Initializer initializer(hInstance);
     XULWin::WinAPI::CommonControlsInitializer ccInit;
@@ -318,7 +340,28 @@ INT_PTR WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmd
     // Register the keyboard listener
     tetrisComponent->OnKeyboardPressed.connect(boost::bind(Tetris::ProcessKey, _1));
 
+    LogInfo("Press the DELETE button to let the computer play");
+
     wnd->showModal(XULWin::WindowPos_CenterInScreen);
     gCommander.reset();
+    gBlockMover.reset();
+    return 0;
+}
+
+
+INT_PTR WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+{
+    try
+    {
+        return StartProgram(hInstance);
+    }
+    catch (const std::exception & inError)
+    {
+        ::MessageBox(0, XULWin::ToUTF16(inError.what()).c_str(), L"XULWin Tetris Component", MB_OK);
+    }
+    catch (...)
+    {
+        ::MessageBox(0, TEXT("Program is terminated due to unhandled and unknown exception."), L"XULWin Tetris Component", MB_OK);
+    }
     return 0;
 }
