@@ -1,6 +1,7 @@
 #include "TetrisElement.h"
 #include "Game.h"
 #include "GameCommandQueue.h"
+#include "Logger.h"
 #include "Player.h"
 #include "TimedGame.h"
 #include "TetrisComponent.h"
@@ -33,10 +34,175 @@ boost::scoped_ptr<boost::thread> gThread;
 namespace Tetris
 {
 
+    class BlockMover
+    {
+    public:
+        BlockMover(ThreadSafeGame & inGame,
+                   size_t inRotation,
+                   size_t inColumn,
+                   boost::function<void()> inFinishedCallback) :
+            mGame(inGame),
+            mRotation(inRotation),
+            mColumn(inColumn),
+            mFinished(false),
+            mFinishedCallback(inFinishedCallback)
+        {
+            mTimer.start(boost::bind(&BlockMover::onTimer, this), 100);
+        }       
+
+        bool isFinished()
+        {
+            return mFinished;
+        }
+
+    private:
+        void onTimer()
+        {
+            try
+            {
+                move();
+            }
+            catch (const std::exception & inException)
+            {
+                mTimer.stop();
+                LogError(inException.what());
+            }
+        }
+
+        void move()
+        {
+            assert (!mFinished);
+
+            // Critical section
+            {
+                WritableGame game(mGame);
+                Block & block = game->activeBlock();
+                if (block.rotation() != mRotation)
+                {
+                    if (!game->rotate())
+                    {
+                        throw std::runtime_error(MakeString() << "Rotation failed.");
+                    }
+                }
+                else if (block.column() < mColumn)
+                {
+                    if (!game->move(Direction_Right))
+                    {
+                        throw std::runtime_error(MakeString() <<
+                            "Move to right failed. "
+                            "Current column: " << game->activeBlock().column() << ", "
+                            "target column: " << game->activeBlock().row() << ".");
+                    }
+                }
+                else if (block.column() > mColumn)
+                {
+                    if (!game->move(Direction_Left))
+                    {
+                        throw std::runtime_error(MakeString() <<
+                            "Move to left failed. "
+                            "Current column: " << game->activeBlock().column() << ", "
+                            "target column: " << game->activeBlock().row() << ".");
+                    }
+                }
+                else
+                {
+                    GameState & gameState = game->currentNode()->state();
+                    if (gameState.checkPositionValid(block, block.row() + 1, block.column()))
+                    {
+                        game->move(Direction_Down);
+                    }
+                    else
+                    {
+                        if (!game->navigateNodeDown())
+                        {
+                            throw std::runtime_error("Failed to navigate the game state one node down.");
+                        }
+                        mFinished = true;
+                    }
+                }
+            }
+
+            if (mFinished)
+            {
+                mTimer.stop();
+                if (mFinishedCallback)
+                {
+                    mFinishedCallback();
+                }
+            }
+        }        
+        
+        ThreadSafeGame & mGame;
+        XULWin::WinAPI::Timer mTimer; // Use non-threaded timer where we can.
+        size_t mRotation;
+        size_t mColumn;
+        bool mFinished;
+        boost::function<void()> mFinishedCallback;
+    };
+
+    boost::scoped_ptr<BlockMover> gBlockMover;
+
+
+    void MoveNextQueuedBlock()
+    {
+
+        const Block * nextMove(0);
+
+        // Critical section: get the next queued move (if any)
+        {
+            WritableGame game(gCommander->threadSafeGame());
+            ChildNodes children = game->currentNode()->children();
+            if (!children.empty())
+            {
+                assert(children.size() == 1);
+
+                GameStateNode & firstChild = **children.begin();
+                nextMove = &firstChild.state().originalBlock();
+            }
+        } 
+
+
+        // Move to the next precalculated position.
+        // Note: AI should use this time for calculating next moves.
+        if (nextMove)
+        {
+            gBlockMover.reset(new BlockMover(gCommander->threadSafeGame(),
+                                             nextMove->rotation(),
+                                             nextMove->column(),
+                                             boost::bind(MoveNextQueuedBlock)));
+        }
+
+    }
+
+
     void ProcessKey(int inKey)
     {
         if (inKey == VK_DELETE)
         {
+            if (gBlockMover && !gBlockMover->isFinished())
+            {
+                // Busy moving blocks.
+                return;
+            }
+
+            // Critical section
+            {
+                ReadOnlyGame game(gCommander->threadSafeGame());
+                ChildNodes children = game->currentNode()->children();
+                if (!children.empty())
+                {
+                    assert(children.size() == 1);
+
+                    // There are still some queued blocks that need to be moved by the blockmover.
+                    return;
+                }
+            }
+
+
+            //
+            // No more queued moves, so let's create some...
+            //
+
             BlockTypes blockTypes;
             std::auto_ptr<GameStateNode> clonedGameState;
 
@@ -57,6 +223,7 @@ namespace Tetris
                 bestFirstChild = bestFirstChild->parent();
             }
             DestroyInferiorChildren(bestFirstChild, bestLastChild.get());
+            LogInfo(MakeString() << "AI searched " << (bestLastChild->depth() - bestFirstChild->depth()) << " nodes deep.");
             
             ChildNodePtr firstChild;
             for (ChildNodes::iterator it = populator.node()->children().begin(); it != populator.node()->children().end(); ++it)
@@ -75,21 +242,24 @@ namespace Tetris
             {
                 WritableGame game(gCommander->threadSafeGame());
                 assert(game->currentNode()->children().empty()); // FOR NOW!
-                game->currentNode()->children().insert(ChildNodePtr(firstChild));
-                while(game->navigateNodeDown());
+                game->currentNode()->children().insert(firstChild);
             }
 
+            const Block & targetBlock = firstChild->state().originalBlock();
+            gBlockMover.reset(
+                new BlockMover(gCommander->threadSafeGame(),
+                               targetBlock.rotation(),
+                               targetBlock.column(),
+                               boost::bind(MoveNextQueuedBlock)));
         }
     }
 
 }
 
 
-LRESULT SaySomething(const std::string & inMessage)
+void AppendLog(XULWin::Element * inTextBoxElement, const std::string & inMessage)
 {
-    std::wstring utf16Message = Tetris::ToUTF16(inMessage);
-    ::MessageBox(0, utf16Message.c_str(), L"Tetris", MB_OK);
-    return XULWin::cHandled;
+    inTextBoxElement->setAttribute("value", inTextBoxElement->getAttribute("value") + inMessage + "\r\n");
 }
 
 
@@ -116,29 +286,25 @@ INT_PTR WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmd
         XULWin::ReportError("Root element is not of type winodw.");
         return 1;
     }
-    XULWin::ScopedEventListener listener;
-    listener.connect(rootElement->getElementById("yesButton"), boost::bind(SaySomething, "Yes!!!"));
-    listener.connect(rootElement->getElementById("noButton"), boost::bind(SaySomething, "No :("));
-
-    if (XULWin::Element * yesButtonEl = rootElement->getElementById("yesButton"))
-    {
-        
-    }
 
     Tetris::TetrisComponent * tetrisComponent(0);
+    std::vector<Tetris::TetrisElement *> tetrisElements;
+    rootElement->getElementsByType<Tetris::TetrisElement>(tetrisElements);
+    for (size_t idx = 0; idx != tetrisElements.size(); ++idx)
     {
-        std::vector<Tetris::TetrisElement *> tetrisElements;
-        rootElement->getElementsByType<Tetris::TetrisElement>(tetrisElements);
-        for (size_t idx = 0; idx != tetrisElements.size(); ++idx)
-        {
-            tetrisComponent = tetrisElements[idx]->component()->downcast<Tetris::TetrisComponent>();
-            break;
-        }
+        tetrisComponent = tetrisElements[idx]->component()->downcast<Tetris::TetrisComponent>();
+        break;
     }
 
     if (!tetrisComponent)
     {
         return 0;
+    }
+
+    // Init the logging
+    if (XULWin::Element * loggingElement = rootElement->getElementById("logging-textbox"))
+    {
+        Tetris::Logger::Instance().setHandler(boost::bind(AppendLog, loggingElement, _1));
     }
 
     // Add the timer

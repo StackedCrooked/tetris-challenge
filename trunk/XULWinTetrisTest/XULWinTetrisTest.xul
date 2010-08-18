@@ -10,11 +10,6 @@
   orient="vertical"
   align="stretch"
 >
-  <tetris id="tetris-component" flex="1" numfutureblocks="3" keyboardenabled="true" />
-  <hbox align="center">
-    <label value="This is Tetris."  />
-    <spacer flex="1"/>
-    <button id="yesButton" label="Yes" />
-    <button id="noButton" label="No" />
-  </hbox>
+  <tetris id="tetris-component" flex="0" numfutureblocks="3" keyboardenabled="true" />
+  <textbox id="logging-textbox" multiline="true" flex="1" rows="4" />
 </window>
