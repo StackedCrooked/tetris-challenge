@@ -156,6 +156,9 @@ namespace Tetris
     boost::scoped_ptr<BlockMover> gBlockMover;
 
 
+    void StartAI();
+
+
     void MoveNextQueuedBlock()
     {
         // Move to the next precalculated position.
@@ -165,7 +168,93 @@ namespace Tetris
             gBlockMover.reset(new BlockMover(gCommander->threadSafeGame(),
                                              boost::bind(MoveNextQueuedBlock)));
         }
+        else
+        {
+            // Play AI endlessly
+            StartAI();
+        }
 
+    }
+
+
+    void StartAI()
+    {
+        if (gBlockMover && !gBlockMover->isFinished())
+        {
+            // Busy moving blocks.
+            LogWarning("Can't start AI while moving blocks.");
+            return;
+        }
+
+        // Critical section
+        {
+            ReadOnlyGame game(gCommander->threadSafeGame());
+            ChildNodes children = game->currentNode()->children();
+            if (!children.empty())
+            {
+                assert(children.size() == 1);
+
+                // There are still some queued blocks that need to be moved by the blockmover.
+                LogWarning("AI not started is still moving the blocks.");
+                return;
+            }
+        }
+
+
+        //
+        // No more queued moves, so let's create some...
+        //
+
+        BlockTypes blockTypes;
+        std::auto_ptr<GameStateNode> clonedGameState;
+
+        // Critical section
+        {
+            WritableGame game(gCommander->threadSafeGame());
+            game->getFutureBlocks(1000, blockTypes);
+            clonedGameState = game->currentNode()->clone();
+        }
+
+        int currentGameDepth = clonedGameState->depth();
+        TimedNodePopulator populator(clonedGameState, blockTypes, 5000);
+        populator.start();                
+        ChildNodePtr bestLastChild = populator.getBestChild();
+        GameStateNode * bestFirstChild = bestLastChild.get();
+        int realDepth = 0;
+        while (bestFirstChild->depth() > currentGameDepth + 1)
+        {
+            bestFirstChild = bestFirstChild->parent();
+            realDepth++;
+        }
+        LogInfo(MakeString() << "AI searched " << (bestLastChild->depth() - bestFirstChild->depth()) << " nodes deep.");
+        LogInfo(MakeString() << "Verified depth: " << realDepth << ".");
+        DestroyInferiorChildren(bestFirstChild, bestLastChild.get());
+        
+        ChildNodePtr firstChild;
+        for (ChildNodes::iterator it = populator.node()->children().begin(); it != populator.node()->children().end(); ++it)
+        {
+            ChildNodePtr child = *it;
+            if (child.get() == bestFirstChild)
+            {
+                firstChild = child;
+                break;
+            }
+        }
+
+        assert(firstChild);
+
+        // Critical section
+        {
+            WritableGame game(gCommander->threadSafeGame());
+            assert(game->currentNode()->children().empty()); // FOR NOW!
+            game->currentNode()->children().insert(firstChild);
+        }
+
+        const Block & targetBlock = firstChild->state().originalBlock();
+        assert(firstChild->state().checkPositionValid(targetBlock, targetBlock.rotation(), targetBlock.column()));
+        gBlockMover.reset(
+            new BlockMover(gCommander->threadSafeGame(),
+                           boost::bind(MoveNextQueuedBlock)));
     }
 
 
@@ -173,79 +262,7 @@ namespace Tetris
     {
         if (inKey == VK_DELETE)
         {
-            if (gBlockMover && !gBlockMover->isFinished())
-            {
-                // Busy moving blocks.
-                LogWarning("Can't start AI while moving blocks.");
-                return;
-            }
-
-            // Critical section
-            {
-                ReadOnlyGame game(gCommander->threadSafeGame());
-                ChildNodes children = game->currentNode()->children();
-                if (!children.empty())
-                {
-                    assert(children.size() == 1);
-
-                    // There are still some queued blocks that need to be moved by the blockmover.
-                    LogWarning("AI not started is still moving the blocks.");
-                    return;
-                }
-            }
-
-
-            //
-            // No more queued moves, so let's create some...
-            //
-
-            BlockTypes blockTypes;
-            std::auto_ptr<GameStateNode> clonedGameState;
-
-            // Critical section
-            {
-                WritableGame game(gCommander->threadSafeGame());
-                game->getFutureBlocks(19, blockTypes);
-                clonedGameState = game->currentNode()->clone();
-            }
-
-            int currentGameDepth = clonedGameState->depth();
-            TimedNodePopulator populator(clonedGameState, blockTypes, 5000);
-            populator.start();                
-            ChildNodePtr bestLastChild = populator.getBestChild();
-            GameStateNode * bestFirstChild = bestLastChild.get();
-            while (bestFirstChild->depth() > currentGameDepth + 1)
-            {
-                bestFirstChild = bestFirstChild->parent();
-            }
-            DestroyInferiorChildren(bestFirstChild, bestLastChild.get());
-            LogInfo(MakeString() << "AI searched " << (bestLastChild->depth() - bestFirstChild->depth()) << " nodes deep.");
-            
-            ChildNodePtr firstChild;
-            for (ChildNodes::iterator it = populator.node()->children().begin(); it != populator.node()->children().end(); ++it)
-            {
-                ChildNodePtr child = *it;
-                if (child.get() == bestFirstChild)
-                {
-                    firstChild = child;
-                    break;
-                }
-            }
-
-            assert(firstChild);
-
-            // Critical section
-            {
-                WritableGame game(gCommander->threadSafeGame());
-                assert(game->currentNode()->children().empty()); // FOR NOW!
-                game->currentNode()->children().insert(firstChild);
-            }
-
-            const Block & targetBlock = firstChild->state().originalBlock();
-            assert(firstChild->state().checkPositionValid(targetBlock, targetBlock.rotation(), targetBlock.column()));
-            gBlockMover.reset(
-                new BlockMover(gCommander->threadSafeGame(),
-                               boost::bind(MoveNextQueuedBlock)));
+            StartAI();
         }
     }
 
@@ -258,6 +275,13 @@ using namespace Tetris;
 void AppendLog(XULWin::Element * inTextBoxElement, const std::string & inMessage)
 {
     inTextBoxElement->setAttribute("value", inTextBoxElement->getAttribute("value") + inMessage + "\r\n");
+}
+
+
+void UpdateStats(XULWin::Element * inBlocksTextBox)
+{
+    ReadOnlyGame game(gCommander->threadSafeGame());
+    inBlocksTextBox->setAttribute("value", MakeString() << game->currentBlockIndex());
 }
 
 
@@ -317,6 +341,9 @@ int StartProgram(HINSTANCE hInstance)
     tetrisComponent->OnKeyboardPressed.connect(boost::bind(Tetris::ProcessKey, _1));
 
     LogInfo("Press the DELETE button to let the computer play");
+
+    XULWin::WinAPI::Timer timer;
+    timer.start(boost::bind(UpdateStats, rootElement->getElementById("blocksTextBox")), 100);
 
     wnd->showModal(XULWin::WindowPos_CenterInScreen);
     gCommander.reset();

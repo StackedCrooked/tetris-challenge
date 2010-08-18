@@ -85,9 +85,9 @@ namespace Tetris
             result -= 1 * height;
             result -= 2 * lastBlockHeight;
 
-            //result -= 8 * mStats.numSingles();
-            //result -= 4 * mStats.numDoubles();
-            //result -= 2 * mStats.numTriples();
+            result -= 2 * mStats.numSingles();
+            result -= 1 * mStats.numDoubles();
+            result -= 0 * mStats.numTriples();
             result += 8 * mStats.numTetrises();
 
             mQuality.setScore(result);

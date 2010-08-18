@@ -48,6 +48,10 @@ namespace Tetris
 
         bool isGameOver() const;
 
+        // For statistics
+        size_t currentBlockIndex() const
+        { return mCurrentBlockIndex; }
+
         //
         // Game commands
         //
