@@ -208,6 +208,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\include\Logger.h"
+				>
+			</File>
+			<File
 				RelativePath=".\include\Player.h"
 				>
 			</File>
@@ -257,6 +261,10 @@
 			</File>
 			<File
 				RelativePath=".\src\JobList.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\Logger.cpp"
 				>
 			</File>
 			<File

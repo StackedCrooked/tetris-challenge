@@ -1,6 +1,7 @@
 #include "Player.h"
 #include "GameState.h"
 #include "ErrorHandling.h"
+#include "Logger.h"
 #include "Poco/Stopwatch.h"
 #include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
@@ -366,9 +367,9 @@ namespace Tetris
             boost::scoped_ptr<BlockTypes> takeOwnership(inBlockTypes);
             populateNodesRecursively(*inNode, *inBlockTypes, inOffset);
         }
-        catch (const std::exception &)
+        catch (const std::exception & inException)
         {
-            // Logger
+            LogError(MakeString() << "populateNodesInBackground failed: " << inException.what());
         }
     }
 
