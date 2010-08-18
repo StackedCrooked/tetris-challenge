@@ -190,7 +190,6 @@ namespace Tetris
             Block block(inBlockType, Rotation(0), Row(0), Column(col));
             for (size_t rt = 0; rt != block.numRotations(); ++rt)
             {
-                std::auto_ptr<GameState> newGameState;
                 block.setRotation(rt);
                 size_t row = 0;
                 while (gameState.checkPositionValid(block, row, col))

@@ -10,6 +10,7 @@
   orient="vertical"
   align="stretch"
   width="640"
+  style="background-color:black"
 >
   <hbox flex="0">
     <spacer flex="1" />
