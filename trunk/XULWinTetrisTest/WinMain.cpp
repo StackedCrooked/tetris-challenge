@@ -93,8 +93,15 @@ namespace Tetris
             // Critical section
             {
                 WritableGame game(mGame);
-                Block & block = game->activeBlock();
-                if (block.column() < mColumn)
+                Block & block = game->activeBlock();                
+                if (block.rotation() != mRotation)
+                {
+                    if (!game->rotate())
+                    {
+                        throw std::runtime_error(MakeString() << "Rotation failed.");
+                    }
+                }
+                else if (block.column() < mColumn)
                 {
                     if (!game->move(Direction_Right))
                     {
@@ -111,14 +118,6 @@ namespace Tetris
                                                               << "target column: " << mColumn << ".");
                     }
                 }
-                // Do rotation after setting the column correctly, because rotation changes the column, if you know what I mean.
-                else if (block.rotation() != mRotation)
-                {
-                    if (!game->rotate())
-                    {
-                        throw std::runtime_error(MakeString() << "Rotation failed.");
-                    }
-                }
                 else
                 {
                     GameState & gameState = game->currentNode()->state();
@@ -127,12 +126,20 @@ namespace Tetris
                         game->move(Direction_Down);
                     }
                     else
-                    {
-                        if (!game->navigateNodeDown())
+                    {                        
+                        if (!game->currentNode()->children().empty())
                         {
-                            throw std::runtime_error("Failed to navigate the game state one node down.");
+                            if (!game->navigateNodeDown())
+                            {
+                                throw std::runtime_error("Failed to navigate the game state one node down.");
+                            }
                         }
-                        mFinished = true;
+                        else
+                        {
+                            // Drop the last block.
+                            game->move(Direction_Down);
+                            mFinished = true;
+                        }
                     }
                 }
             }
