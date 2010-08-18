@@ -94,31 +94,29 @@ namespace Tetris
             {
                 WritableGame game(mGame);
                 Block & block = game->activeBlock();
-                if (block.rotation() != mRotation)
-                {
-                    if (!game->rotate())
-                    {
-                        throw std::runtime_error(MakeString() << "Rotation failed.");
-                    }
-                }
-                else if (block.column() < mColumn)
+                if (block.column() < mColumn)
                 {
                     if (!game->move(Direction_Right))
                     {
-                        throw std::runtime_error(MakeString() <<
-                            "Move to right failed. "
-                            "Current column: " << game->activeBlock().column() << ", "
-                            "target column: " << game->activeBlock().row() << ".");
+                        throw std::runtime_error(MakeString() << "Move to right failed. Current column: " << block.column()
+                                                              << ", target column: " << mColumn << ".");
                     }
                 }
                 else if (block.column() > mColumn)
                 {
                     if (!game->move(Direction_Left))
                     {
-                        throw std::runtime_error(MakeString() <<
-                            "Move to left failed. "
-                            "Current column: " << game->activeBlock().column() << ", "
-                            "target column: " << game->activeBlock().row() << ".");
+                        throw std::runtime_error(MakeString() << "Move to left failed. "
+                                                              << "Current column: " << block.column() << ", "
+                                                              << "target column: " << mColumn << ".");
+                    }
+                }
+                // Do rotation after setting the column correctly, because rotation changes the column, if you know what I mean.
+                else if (block.rotation() != mRotation)
+                {
+                    if (!game->rotate())
+                    {
+                        throw std::runtime_error(MakeString() << "Rotation failed.");
                     }
                 }
                 else
@@ -233,7 +231,7 @@ namespace Tetris
             }
 
             int currentGameDepth = clonedGameState->depth();
-            TimedNodePopulator populator(clonedGameState, blockTypes, 3000);
+            TimedNodePopulator populator(clonedGameState, blockTypes, 5000);
             populator.start();                
             ChildNodePtr bestLastChild = populator.getBestChild();
             GameStateNode * bestFirstChild = bestLastChild.get();
@@ -265,6 +263,7 @@ namespace Tetris
             }
 
             const Block & targetBlock = firstChild->state().originalBlock();
+            assert(firstChild->state().checkPositionValid(targetBlock, targetBlock.rotation(), targetBlock.column()));
             gBlockMover.reset(
                 new BlockMover(gCommander->threadSafeGame(),
                                targetBlock.rotation(),
