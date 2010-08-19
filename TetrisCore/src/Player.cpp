@@ -291,28 +291,47 @@ namespace Tetris
         mBlockTypes(inBlockTypes),
         mTimeMicroseconds(1000 * inTimeMs)
     {
+        if (mBlockTypes.size() > cMaxDepth)
+        {
+            LogWarning(MakeString() << "The number of blocks (" << mBlockTypes.size() << ") exceeds the maximum depth (" << cMaxDepth << "). They will be ignored.");
+        }
+    }
+
+
+    size_t TimedNodePopulator::getCurrentDepth() const
+    {
+        size_t maxIdx = cMaxDepth - 1;
+        while (maxIdx >= 0)
+        {
+            ScopedConstAtom<ChildNodes> childNodes(mResults[maxIdx]);
+            if (!childNodes->empty())
+            {
+                break;
+            }
+            maxIdx--;
+        }
+        return maxIdx;
     }
 
 
     ChildNodePtr TimedNodePopulator::getBestChild() const
     {
-        boost::mutex::scoped_lock lock(mFlattenedNodesMutex);
-        if (mFlattenedNodes.empty())
-        {
-            throw std::runtime_error("No child nodes were generated? This is exceptionally unlikely!");
-        }
-        return *mFlattenedNodes.back().begin();
+        int currentDepth = getCurrentDepth();
+        ScopedConstAtom<ChildNodes> childNodes(mResults[currentDepth]);
+        return *childNodes->begin();
     }
 
 
     void TimedNodePopulator::addToFlattenedNodes(ChildNodePtr inChildNode, size_t inOffset)
-    {
-        boost::mutex::scoped_lock lock(mFlattenedNodesMutex);
-        while (inOffset >= mFlattenedNodes.size())
+    {        
+        if (inOffset >= cMaxDepth)
         {
-            mFlattenedNodes.push_back(ChildNodes());
+            std::string message(MakeString() << "Tried to exceed max node depth " << inOffset << ". Max entries is " << cMaxDepth << ".");
+            throw std::out_of_range(message.c_str());
         }
-        mFlattenedNodes[inOffset].insert(inChildNode);
+
+        ScopedAtom<ChildNodes> childNodes(mResults[inOffset]);
+        childNodes->insert(inChildNode);
     }
 
 
@@ -330,7 +349,7 @@ namespace Tetris
             return;
         }
 
-        if (inOffset >= inBlockTypes.size())
+        if (inOffset >= inBlockTypes.size() || inOffset >= cMaxDepth)
         {
             return;
         }
