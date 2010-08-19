@@ -32,7 +32,7 @@ namespace Tetris
 {
 
     enum {
-        cAIMaxDepth = 10,       // max depth of the AI
+        cAIMaxDepth = 5,        // max depth of the AI
         cAIThinkingTime = 5000  // number of ms the AI is allowed to think
     };
 

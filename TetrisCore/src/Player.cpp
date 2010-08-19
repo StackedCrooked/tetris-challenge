@@ -448,9 +448,6 @@ namespace Tetris
     }
         
     
-    const int cNumCPU = 8;
-
-
     void TimedNodePopulator::start()
     {
         Poco::TimerCallback<TimedNodePopulator> timerCallback(*this, &TimedNodePopulator::onTimer);
@@ -461,9 +458,10 @@ namespace Tetris
 
         // For each child node:
         ChildNodes::const_iterator it = mNode->children().begin(), end = mNode->children().end();
-        size_t count = 0;
-        for (; it != end && count != cNumCPU; ++it)
-        {
+        size_t count = 1;
+        for (; it != end; ++it)
+        { 
+
             GameStateNode & firstGenerationChildNode = **it;
             mThreadPool.create_thread(
                 boost::bind(&TimedNodePopulator::populateNodesInBackground,
@@ -471,10 +469,24 @@ namespace Tetris
                             &firstGenerationChildNode,
                             new BlockTypes(mBlockTypes),
                             1));
+
+            if (count % 4 == 0)
+            {
+                mThreadPool.join_all();
+                LogInfo(MakeString() << "Completed " << count << " nodes.");
+            }
             count++;
         }
 
         mThreadPool.join_all();
+
+
+        ScopedConstAtom<Result> result(mResult);
+        for (size_t idx = 0; idx != cMaxDepth; ++idx)
+        {
+            LogInfo(MakeString() << "Depth: " << idx << ". Node count: " << result->sizeAtDepth(idx));
+        }
+
     }
 
 
