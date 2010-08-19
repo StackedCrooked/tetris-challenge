@@ -81,11 +81,11 @@ namespace Tetris
     void PopulateNodesRecursively(GameStateNode * inNode,
                                   const BlockTypes & inBlocks,
                                   const std::vector<int> & inWidths,
-                                  size_t inOffset)
+                                  size_t inDepth)
     {
 
         CheckArgument(inBlocks.size() == inWidths.size(), "PopulateNodesRecursively got inBlocks.size() != inWidths.size()");
-        if (inOffset >= inBlocks.size())
+        if (inDepth >= inBlocks.size())
         {
             return;
         }
@@ -99,17 +99,17 @@ namespace Tetris
 
 
         // Generate the child nodes
-        GenerateOffspring(inBlocks[inOffset], *inNode, inNode->children());
+        GenerateOffspring(inBlocks[inDepth], *inNode, inNode->children());
 
         // Populate each child node.
         int idx = 0;
-        const int cMaxChilds = inWidths[inOffset];
+        const int cMaxChilds = inWidths[inDepth];
         ChildNodes & children = inNode->children();
         ChildNodes::iterator it = children.begin();
         while (idx < cMaxChilds && it != children.end())
         {
             GameStateNode & childNode = **it;
-            PopulateNodesRecursively(&childNode, inBlocks, inWidths, inOffset + 1);
+            PopulateNodesRecursively(&childNode, inBlocks, inWidths, inDepth + 1);
             ++idx;
             ++it;
         }
@@ -308,55 +308,83 @@ namespace Tetris
 
     size_t TimedNodePopulator::getCurrentDepth() const
     {
-        size_t maxIdx = cMaxDepth - 1;
-        while (maxIdx >= 0)
+        size_t idx = cMaxDepth - 1;
+        while (idx >= 0)
         {
-            ScopedConstAtom<ChildNodes> childNodes(mResults[maxIdx]);
-            if (!childNodes->empty())
+            ScopedConstAtom<Result> result(mResult);
+            if (result->sizeAtDepth(idx) != 0)
             {
                 break;
             }
-            maxIdx--;
+            idx--;
         }
-        return maxIdx;
+        return idx;
     }
 
 
     ChildNodePtr TimedNodePopulator::getBestChild() const
     {
         int currentDepth = getCurrentDepth();
-        ScopedConstAtom<ChildNodes> childNodes(mResults[currentDepth]);
-        return *childNodes->begin();
+        ScopedConstAtom<Result> result(mResult);
+        return *(result->getNodesAtDepth(currentDepth).begin());
     }
 
 
-    void TimedNodePopulator::addToFlattenedNodes(ChildNodePtr inChildNode, size_t inOffset)
+    void TimedNodePopulator::addToFlattenedNodes(const ChildNodes & inChildNodes, size_t inDepth)
     {        
-        if (inOffset >= cMaxDepth)
+        if (inDepth >= cMaxDepth)
         {
-            std::string message(MakeString() << "Tried to exceed max node depth " << inOffset << ". Max entries is " << cMaxDepth << ".");
+            std::string message(MakeString() << "Tried to exceed max node depth " << inDepth << ". Max entries is " << cMaxDepth << ".");
             throw std::out_of_range(message.c_str());
         }
 
-        ScopedAtom<ChildNodes> childNodes(mResults[inOffset]);
-        childNodes->insert(inChildNode);
+        if (!mThreadLocalResult.get())
+        {
+            mThreadLocalResult.reset(new Result);
+        }
+        mThreadLocalResult->mergeAtDepth(inDepth, inChildNodes);
     }
 
 
-    bool TimedNodePopulator::isTimeExpired() const
+    void TimedNodePopulator::commitThreadLocalData()
+    {
+        if (!mThreadLocalResult.get())
+        {
+            return;
+        }
+
+        ScopedAtom<Result> result(mResult);
+        
+        for (size_t idx = 0; idx != cMaxDepth; ++idx)
+        {
+            result->mergeAtDepth(idx, mThreadLocalResult->getNodesAtDepth(idx));
+        }
+
+        mThreadLocalResult.reset();
+    }
+
+
+    bool TimedNodePopulator::isTimeExpired()
     {
         return mIsTimeExpired;
     }
 
+    
+    namespace Counters
+    {
+        static int fCounter = 0;
+        static boost::mutex fCounterMutex;
+    }
 
-    void TimedNodePopulator::populateNodesRecursively(GameStateNode & ioNode, const BlockTypes & inBlockTypes, size_t inOffset)
+
+    void TimedNodePopulator::populateNodesRecursively(GameStateNode & ioNode, const BlockTypes & inBlockTypes, size_t inDepth)
     {
         if (isTimeExpired())
         {
             return;
         }
 
-        if (inOffset >= inBlockTypes.size() || inOffset >= cMaxDepth)
+        if (inDepth >= inBlockTypes.size() || inDepth >= cMaxDepth)
         {
             return;
         }
@@ -368,37 +396,59 @@ namespace Tetris
         }
 
         // Generate the child nodes
-        GenerateOffspring(inBlockTypes[inOffset], ioNode, ioNode.children());        
+        GenerateOffspring(inBlockTypes[inDepth], ioNode, ioNode.children());
         ChildNodes & children = ioNode.children();
 
         // Store the fruit of our labor.
-        for (ChildNodes::iterator it = children.begin(); it != children.end(); ++it)
-        {
-            addToFlattenedNodes(*it, inOffset);
-        }
+        addToFlattenedNodes(children, inDepth);
 
         // Recursion.
         for (ChildNodes::iterator it = children.begin(); it != children.end(); ++it)
         {
             GameStateNode & childNode = **it;
-            populateNodesRecursively(childNode, inBlockTypes, inOffset + 1);
+            populateNodesRecursively(childNode, inBlockTypes, inDepth + 1);
+
+            // This is spielerei: commit "now and then"
+            {
+                bool doIt = false;
+
+                // Critical section
+                {
+                    boost::mutex::scoped_lock lock(Counters::fCounterMutex);
+                    Counters::fCounter++;
+                    if (Counters::fCounter % 1000 == 0)
+                    {
+                        doIt = true;
+                        Counters::fCounter = 0;
+                    }
+                }
+
+                if (doIt)
+                {
+                    commitThreadLocalData();
+                }
+            }
         }
     }
 
 
-    void TimedNodePopulator::populateNodesInBackground(GameStateNode * inNode, BlockTypes * inBlockTypes, size_t inOffset)
+    void TimedNodePopulator::populateNodesInBackground(GameStateNode * inNode, BlockTypes * inBlockTypes, size_t inDepth)
     {
         // Thread entry point
         try
         {
             boost::scoped_ptr<BlockTypes> takeOwnership(inBlockTypes);
-            populateNodesRecursively(*inNode, *inBlockTypes, inOffset);
-        }
+            populateNodesRecursively(*inNode, *inBlockTypes, inDepth);
+            commitThreadLocalData();
+       } 
         catch (const std::exception & inException)
         {
             LogError(MakeString() << "populateNodesInBackground failed: " << inException.what());
         }
     }
+        
+    
+    const int cNumCPU = 8;
 
 
     void TimedNodePopulator::start()
@@ -411,7 +461,8 @@ namespace Tetris
 
         // For each child node:
         ChildNodes::const_iterator it = mNode->children().begin(), end = mNode->children().end();
-        for (; it != end; ++it)
+        size_t count = 0;
+        for (; it != end && count != cNumCPU; ++it)
         {
             GameStateNode & firstGenerationChildNode = **it;
             mThreadPool.create_thread(
@@ -420,6 +471,7 @@ namespace Tetris
                             &firstGenerationChildNode,
                             new BlockTypes(mBlockTypes),
                             1));
+            count++;
         }
 
         mThreadPool.join_all();

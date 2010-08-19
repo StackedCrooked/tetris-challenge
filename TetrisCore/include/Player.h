@@ -60,24 +60,59 @@ namespace Tetris
 
         const GameStateNode * node() const { return mNode.get(); }
 
-        bool isTimeExpired() const;
-
         // Returns best child and its depth.
         ChildNodePtr getBestChild() const;
 
         size_t getCurrentDepth() const;
 
     private:
-        void populateNodesInBackground(GameStateNode * ioNode, BlockTypes * inBlockTypes, size_t inOffset);
-        void populateNodesRecursively(GameStateNode & ioNode, const BlockTypes & inBlockTypes, size_t inOffset);
-        void addToFlattenedNodes(ChildNodePtr inChildNode, size_t inOffset);
+        bool isTimeExpired();
+        void populateNodesInBackground(GameStateNode * ioNode, BlockTypes * inBlockTypes, size_t inDepth);
+        void populateNodesRecursively(GameStateNode & ioNode, const BlockTypes & inBlockTypes, size_t inDepth);
+        void addToFlattenedNodes(const ChildNodes & inChildNode, size_t inDepth);
+        void commitThreadLocalData();
         void onTimer(Poco::Timer &);
 
         boost::scoped_ptr<GameStateNode> mNode;
         BlockTypes mBlockTypes;
         Poco::Int64 mTimeMicroseconds;
 
-        Protected<ChildNodes> mResults[cMaxDepth];
+        struct Result
+        {
+        public:
+            Result() :
+                mChildNodesPerDepth(cMaxDepth)
+            {
+            }
+
+            void mergeAtDepth(int inDepth, const ChildNodes & inChildNodes)
+            {
+                ChildNodes & result = mChildNodesPerDepth[inDepth];
+                for (ChildNodes::const_iterator it = inChildNodes.begin(); it != inChildNodes.end(); ++it)
+                {
+                    result.insert(*it);
+                }
+            }
+
+            size_t sizeAtDepth(size_t inDepth) const
+            {
+                return mChildNodesPerDepth[inDepth].size();
+            }
+
+            const ChildNodes & getNodesAtDepth(size_t inDepth) const
+            {
+                return mChildNodesPerDepth[inDepth];
+            }
+
+        private:
+            std::vector<ChildNodes> mChildNodesPerDepth;
+        };
+
+        Protected<Result> mResult;
+
+
+        typedef boost::thread_specific_ptr<Result> ThreadLocalResult;
+        ThreadLocalResult mThreadLocalResult;
 
         Poco::Timer mTimer;
         volatile bool mIsTimeExpired;
