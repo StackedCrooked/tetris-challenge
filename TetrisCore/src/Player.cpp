@@ -470,7 +470,7 @@ namespace Tetris
                             new BlockTypes(mBlockTypes),
                             1));
 
-            if (count % 4 == 0)
+            if (count % 3 == 0)
             {
                 mThreadPool.join_all();
                 LogInfo(MakeString() << "Completed " << count << " nodes.");

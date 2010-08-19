@@ -32,8 +32,8 @@ namespace Tetris
 {
 
     enum {
-        cAIMaxDepth = 5,        // max depth of the AI
-        cAIThinkingTime = 5000  // number of ms the AI is allowed to think
+        cAIMaxDepth = 6,        // max depth of the AI
+        cAIThinkingTime = 1000  // number of ms the AI is allowed to think
     };
 
     boost::scoped_ptr<Tetris::GameCommandQueue> gCommander;
