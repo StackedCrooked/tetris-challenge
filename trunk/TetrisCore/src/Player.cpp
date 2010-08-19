@@ -289,12 +289,20 @@ namespace Tetris
                                            int inTimeMs) :
         mNode(inNode.release()),
         mBlockTypes(inBlockTypes),
-        mTimeMicroseconds(1000 * inTimeMs)
+        mTimeMicroseconds(1000 * inTimeMs),
+        mTimer(inTimeMs, 0),
+        mIsTimeExpired(false)
     {
         if (mBlockTypes.size() > cMaxDepth)
         {
             LogWarning(MakeString() << "The number of blocks (" << mBlockTypes.size() << ") exceeds the maximum depth (" << cMaxDepth << "). They will be ignored.");
         }
+    }
+        
+        
+    void TimedNodePopulator::onTimer(Poco::Timer &)
+    {
+        mIsTimeExpired = true;
     }
 
 
@@ -337,8 +345,7 @@ namespace Tetris
 
     bool TimedNodePopulator::isTimeExpired() const
     {
-        boost::mutex::scoped_lock lock(mStopwatchMutex);
-        return mStopwatch.elapsed() > mTimeMicroseconds;
+        return mIsTimeExpired;
     }
 
 
@@ -396,7 +403,8 @@ namespace Tetris
 
     void TimedNodePopulator::start()
     {
-        mStopwatch.start();
+        Poco::TimerCallback<TimedNodePopulator> timerCallback(*this, &TimedNodePopulator::onTimer);
+        mTimer.start(timerCallback);
 
         // Generate children of the root node
         GenerateOffspring(mBlockTypes[0], *mNode, mNode->children());

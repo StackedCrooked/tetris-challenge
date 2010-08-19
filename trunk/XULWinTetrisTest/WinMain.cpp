@@ -30,6 +30,12 @@
 
 namespace Tetris
 {
+
+    enum {
+        cAIMaxDepth = 10,       // max depth of the AI
+        cAIThinkingTime = 5000  // number of ms the AI is allowed to think
+    };
+
     boost::scoped_ptr<Tetris::GameCommandQueue> gCommander;
     boost::scoped_ptr<boost::thread> gThread;
 
@@ -212,12 +218,12 @@ namespace Tetris
         // Critical section
         {
             WritableGame game(gCommander->threadSafeGame());
-            game->getFutureBlocks(3, blockTypes);
+            game->getFutureBlocks(cAIMaxDepth, blockTypes);
             clonedGameState = game->currentNode()->clone();
         }
 
         int currentGameDepth = clonedGameState->depth();
-        TimedNodePopulator populator(clonedGameState, blockTypes, 2000);
+        TimedNodePopulator populator(clonedGameState, blockTypes, cAIThinkingTime);
         populator.start();                
         ChildNodePtr bestLastChild = populator.getBestChild();
         GameStateNode * bestFirstChild = bestLastChild.get();
