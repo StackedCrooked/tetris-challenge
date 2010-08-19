@@ -9,29 +9,33 @@
 namespace Tetris
 {
 
-    inline void CheckCondition(bool inCondition, const std::string & inErrorMessage)
-    {
-        if (!inCondition)
-        {
-            throw std::logic_error(inErrorMessage);
-        }
-    }
+    #define CheckCondition(...)
+    #define CheckArgument(...)
+    #define CheckPrecondition(...)
 
-    inline void CheckArgument(bool inCondition, const std::string & inErrorMessage)
-    {
-        if (!inCondition)
-        {
-            throw std::invalid_argument(inErrorMessage);
-        }
-    }
+    //inline void CheckCondition(bool inCondition, const std::string & inErrorMessage)
+    //{
+    //    if (!inCondition)
+    //    {
+    //        throw std::logic_error(inErrorMessage);
+    //    }
+    //}
 
-    inline void CheckPrecondition(bool inCondition, const std::string & inErrorMessage)
-    {
-        if (!inCondition)
-        {
-            throw std::logic_error(inErrorMessage);
-        }
-    }
+    //inline void CheckArgument(bool inCondition, const std::string & inErrorMessage)
+    //{
+    //    if (!inCondition)
+    //    {
+    //        throw std::invalid_argument(inErrorMessage);
+    //    }
+    //}
+
+    //inline void CheckPrecondition(bool inCondition, const std::string & inErrorMessage)
+    //{
+    //    if (!inCondition)
+    //    {
+    //        throw std::logic_error(inErrorMessage);
+    //    }
+    //}
 
 } // namespace Tetris
 
