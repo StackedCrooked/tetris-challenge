@@ -81,13 +81,13 @@ namespace Tetris
             size_t height = mGrid.numRows() - top;
             size_t lastBlockHeight = mGrid.numRows() - mOriginalBlock.row();
 
-            result -= 5 * mQuality.numHoles();
-            result -= 1 * height;
+            result -= 6 * mQuality.numHoles();
+            result -= 2 * height;
             result -= 2 * lastBlockHeight;
 
-            result -= 2 * mStats.numSingles();
-            result -= 1 * mStats.numDoubles();
-            result -= 0 * mStats.numTriples();
+            result += 1 * mStats.numSingles();
+            result += 2 * mStats.numDoubles();
+            result += 4 * mStats.numTriples();
             result += 8 * mStats.numTetrises();
 
             mQuality.setScore(result);

@@ -1,4 +1,5 @@
 #include "TetrisElement.h"
+#include "Threading.h"
 #include "Game.h"
 #include "GameCommandQueue.h"
 #include "Logger.h"
@@ -211,12 +212,12 @@ namespace Tetris
         // Critical section
         {
             WritableGame game(gCommander->threadSafeGame());
-            game->getFutureBlocks(1000, blockTypes);
+            game->getFutureBlocks(3, blockTypes);
             clonedGameState = game->currentNode()->clone();
         }
 
         int currentGameDepth = clonedGameState->depth();
-        TimedNodePopulator populator(clonedGameState, blockTypes, 5000);
+        TimedNodePopulator populator(clonedGameState, blockTypes, 2000);
         populator.start();                
         ChildNodePtr bestLastChild = populator.getBestChild();
         GameStateNode * bestFirstChild = bestLastChild.get();

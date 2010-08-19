@@ -3,6 +3,7 @@
 
 
 #include "Game.h"
+#include "Threading.h"
 #include "ThreadSafeGame.h"
 #include "JobList.h"
 #include "Poco/Stopwatch.h"
@@ -41,11 +42,12 @@ namespace Tetris
     class TimedNodePopulator
     {
     public:
+        static const int cMaxDepth = 10;
         TimedNodePopulator(std::auto_ptr<GameStateNode> inNode,
-                           const BlockTypes & inBlockTypes, // defines maximum depth
+                           const BlockTypes & inBlockTypes,
                            int inTimeMs);
-        
-        
+
+
         // Starts recursively populating the child nodes.
         // Uses a separate thread for each immediate child of the starting node.
         // Given a game grid width of 10 columns, this means that at least 9
@@ -63,6 +65,8 @@ namespace Tetris
         // Returns best child and its depth.
         ChildNodePtr getBestChild() const;
 
+        size_t getCurrentDepth() const;
+
     private:
         void populateNodesInBackground(GameStateNode * ioNode, BlockTypes * inBlockTypes, size_t inOffset);
         void populateNodesRecursively(GameStateNode & ioNode, const BlockTypes & inBlockTypes, size_t inOffset);
@@ -70,9 +74,10 @@ namespace Tetris
 
         boost::scoped_ptr<GameStateNode> mNode;
         BlockTypes mBlockTypes;
-        Poco::Int64 mTimeMicroseconds;        
-        std::vector<ChildNodes> mFlattenedNodes;
-        mutable boost::mutex mFlattenedNodesMutex;        
+        Poco::Int64 mTimeMicroseconds;
+
+        Protected<ChildNodes> mResults[cMaxDepth];
+
         Poco::Stopwatch mStopwatch;
         mutable boost::mutex mStopwatchMutex;
         boost::thread_group mThreadPool;
