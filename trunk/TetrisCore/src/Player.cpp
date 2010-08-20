@@ -52,12 +52,14 @@ namespace Tetris
 
     TimedNodePopulator::TimedNodePopulator(std::auto_ptr<GameStateNode> inNode,
                                            const BlockTypes & inBlockTypes,
-                                           int inTimeMs) :
+                                           int inTimeLimitMs) :
         mNode(inNode.release()),
         mBlockTypes(inBlockTypes),
-        mTimeMicroseconds(1000 * inTimeMs),
-        mTimer(inTimeMs, 0),
-        mStop(false)
+        mTimer(inTimeLimitMs, 0),
+        mTimeLimitMs(inTimeLimitMs),
+        mStopwatch(),
+        mStop(false),
+        mThreadPool()
     {
         if (mBlockTypes.size() > cMaxDepth)
         {
@@ -212,10 +214,17 @@ namespace Tetris
             LogError(MakeString() << "populateNodesInBackground failed: " << inException.what());
         }
     }
+
+
+    int TimedNodePopulator::remainingTimeMs() const
+    {
+        return mTimeLimitMs - static_cast<int>((1000 * mStopwatch.elapsed()) / mStopwatch.resolution());
+    }
         
     
     void TimedNodePopulator::start()
     {
+        mStopwatch.start();
         Poco::TimerCallback<TimedNodePopulator> timerCallback(*this, &TimedNodePopulator::onTimer);
         mTimer.start(timerCallback);
 
@@ -236,6 +245,7 @@ namespace Tetris
         }
 
         mThreadPool.join_all();
+        mStopwatch.reset();
     }
 
 

@@ -12,21 +12,17 @@
   width="640"
   style="background-color:black"
 >
-  <hbox flex="0">
+  <hbox flex="0" align="center">
     <spacer flex="1" />
     <tetris id="tetris-component" flex="0" numfutureblocks="3" keyboardenabled="true" />
     <spacer flex="1" />
   </hbox>
-  <vbox>
-    <hbox>
-      <label id="blocksLabel" value="Blocks:"/>
-      <textbox id="blockCountTextBox" value="0" />
-      <spacer flex="1" />
-    </hbox>
-    <hbox>
-      <label id="timeRemainingLabel" value="Time remaining until evaluation:" />
-      <textbox id="timeRemainingTextBox" value="" />
-    </hbox>
-  </vbox>
+  
+  <hbox align="stretch">
+    <label id="blocksLabel" value="Blocks:" style="text-align:right"/>
+    <textbox id="blockCountTextBox" value="0" readonly="true" width="20" />
+    <spacer flex="1" />
+  </hbox>
+  <progressmeter id="computerAIProgressMeter" value="0" />
   <textbox id="loggingTextbox" multiline="true" flex="1" rows="8" readonly="true" />
 </window>
