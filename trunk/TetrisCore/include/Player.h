@@ -38,6 +38,8 @@ namespace Tetris
         // Blocking! Call this method in a separate thread to avoid blocking the main game.
         void start();
 
+        inline void stop() { mStop = true; }
+
         GameStateNode * node() { return mNode.get(); }
 
         const GameStateNode * node() const { return mNode.get(); }
@@ -103,7 +105,7 @@ namespace Tetris
         ThreadLocalResult mThreadLocalResult;
 
         Poco::Timer mTimer;
-        volatile bool mIsTimeExpired;
+        volatile bool mStop;
         boost::thread_group mThreadPool;
     };
 

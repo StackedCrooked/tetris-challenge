@@ -57,7 +57,7 @@ namespace Tetris
         mBlockTypes(inBlockTypes),
         mTimeMicroseconds(1000 * inTimeMs),
         mTimer(inTimeMs, 0),
-        mIsTimeExpired(false)
+        mStop(false)
     {
         if (mBlockTypes.size() > cMaxDepth)
         {
@@ -68,7 +68,7 @@ namespace Tetris
         
     void TimedNodePopulator::onTimer(Poco::Timer &)
     {
-        mIsTimeExpired = true;
+        mStop = true;
     }
 
 
@@ -132,7 +132,7 @@ namespace Tetris
 
     bool TimedNodePopulator::isTimeExpired()
     {
-        return mIsTimeExpired;
+        return mStop;
     }
 
     
