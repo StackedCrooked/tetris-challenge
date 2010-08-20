@@ -52,7 +52,8 @@ namespace Tetris
             mRefreshTimer(),
             mBlockMover(),
             mAIThread(),
-            mTimedNodePopulator()
+            mTimedNodePopulator(),
+            mQuit(false)
         {
             //
             // Parse the XUL document.
@@ -133,9 +134,10 @@ namespace Tetris
 
             //
             // Activate the stats updater.
+            // The WinAPI::Timer is non-threaded and you can safely access the WinAPI in its callbacks.
             //
             mRefreshTimer.reset(new XULWin::WinAPI::Timer);
-            mRefreshTimer->start(boost::bind(&Controller::updateStats, this), 100);
+            mRefreshTimer->start(boost::bind(&Controller::refresh, this), 500);
 
 
             //
@@ -147,8 +149,18 @@ namespace Tetris
 
         ~Controller()
         {
+            mTimedNodePopulator.reset();
             mTimedGame.reset();
+        }
 
+
+        void Controller::setQuitFlag()
+        {
+            mQuit = true;
+            if (mTimedNodePopulator)
+            {
+                mTimedNodePopulator->stop();
+            }
         }
 
 
@@ -189,8 +201,12 @@ namespace Tetris
         }
 
 
-        void updateStats()
+        void refresh()
         {
+            // Flush the logger.
+            Logger::Instance().flush();
+
+
             if (mBlockCountTextBox)
             {
                 size_t currentBlockIndex = ReadOnlyGame(*mThreadSafeGame)->currentBlockIndex();
@@ -208,7 +224,7 @@ namespace Tetris
                 mBlockMover.reset(new BlockMover(*mThreadSafeGame));
 
                 // Infinite AI
-                while (true)
+                while (!mQuit)
                 {
                     BlockTypes blockTypes;
                     std::auto_ptr<GameStateNode> clonedStartingNode;
@@ -320,6 +336,7 @@ namespace Tetris
         boost::scoped_ptr<BlockMover> mBlockMover;
         boost::scoped_ptr<boost::thread> mAIThread;
         boost::scoped_ptr<TimedNodePopulator> mTimedNodePopulator;
+        volatile bool mQuit;
     };
 
 
@@ -334,6 +351,7 @@ int StartProgram(HINSTANCE hInstance)
 
     // Create the Controller object
     Tetris::Controller controller(hInstance);
+    controller.setQuitFlag();
     controller.joinAllThreads();
     return 0;
 }
