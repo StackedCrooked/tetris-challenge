@@ -169,6 +169,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\include\BlockMover.h"
+				>
+			</File>
+			<File
 				RelativePath=".\include\BlockType.h"
 				>
 			</File>
@@ -242,6 +246,10 @@
 			</File>
 			<File
 				RelativePath=".\src\BlockFactory.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\BlockMover.cpp"
 				>
 			</File>
 			<File

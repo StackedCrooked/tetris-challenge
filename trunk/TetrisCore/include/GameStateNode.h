@@ -37,10 +37,6 @@ namespace Tetris
         // Each node is produced by a unique combination of the current block's column and rotation.
         int identifier() const;
 
-        // Search existing nodes only, does not create any new ones.
-        const GameStateNode * bestChild(int inDepth) const;
-        GameStateNode * bestChild(int inDepth);
-
         // Distance from the root node.
         int depth() const;
 

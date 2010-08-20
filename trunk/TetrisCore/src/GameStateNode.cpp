@@ -82,27 +82,6 @@ namespace Tetris
     }
 
 
-    // Collect all children at the requested depth from all branches,
-    // and return the one with the highest quality score.
-    const GameStateNode * GameStateNode::bestChild(int inDepth) const
-    {
-        ChildNodePtr result;
-        ChildNodes collectAll;
-        CollectAll(this, inDepth, collectAll);
-        if (!collectAll.empty())
-        {
-            result = *collectAll.begin();
-        }
-        return result.get();
-    }
-
-
-    GameStateNode * GameStateNode::bestChild(int inDepth)
-    {
-        return const_cast<GameStateNode*>(static_cast<const GameStateNode*>(this)->bestChild(inDepth));
-    }
-
-
     const GameState & GameStateNode::state() const
     {
         return *mGameState;

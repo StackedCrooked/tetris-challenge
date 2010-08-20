@@ -20,24 +20,6 @@ namespace Tetris
     typedef std::vector<int> Widths;
     void DestroyInferiorChildren(GameStateNode * srcNode, GameStateNode * dstNode);
 
-    class Player
-    {
-    public:
-        Player(const ThreadSafeGame & inThreadSafeGame);
-
-        void move(const std::vector<int> & inWidths);
-
-        void setLogger(std::ostream & inOutStream);
-
-        void playUntilGameOver(const std::vector<int> & inWidths);
-
-    private:
-        void log(const std::string & inMessage);
-
-        ThreadSafeGame mThreadSafeGame;
-        std::ostream * mOutStream;
-    };
-
 
     class TimedNodePopulator
     {
@@ -67,7 +49,13 @@ namespace Tetris
 
     private:
         bool isTimeExpired();
-        void populateNodesInBackground(GameStateNode * ioNode, BlockTypes * inBlockTypes, size_t inDepth);
+
+        // We use a ChildNodePtr (shared_ptr) to prevent destruction of the
+        // object during program exit while this thread is still accessing it.
+        void populateNodesInBackground(ChildNodePtr ioNode,
+                                       BlockTypes * inBlockTypes,
+                                       size_t inDepth);
+
         void populateNodesRecursively(GameStateNode & ioNode, const BlockTypes & inBlockTypes, size_t inDepth);
         void addToFlattenedNodes(const ChildNodes & inChildNode, size_t inDepth);
         void commitThreadLocalData();
