@@ -9,6 +9,7 @@
 #include "TetrisComponent.h"
 #include "Unicode.h"
 #include "XULWin/XULRunner.h"
+#include "XULWin/Components.h"
 #include "XULWin/Decorator.h"
 #include "XULWin/ElementFactory.h"
 #include "XULWin/ErrorReporter.h"
@@ -42,12 +43,112 @@ namespace Tetris
     class Controller
     {
     public:
-        Controller(const ThreadSafeGame & inThreadSafeGame) :
-            mThreadSafeGame(inThreadSafeGame),
+        Controller(HINSTANCE hInstance) :
+            mXULRunner(hInstance),
+            mBlockCountTextBox(0),
+            mLoggingTextBox(0),
+            mThreadSafeGame(),
+            mTimedGame(),
+            mRefreshTimer(),
             mBlockMover(),
             mAIThread(),
             mTimedNodePopulator()
         {
+            //
+            // Parse the XUL document.
+            //
+            XULWin::ElementPtr rootElement = mXULRunner.loadXULFromFile("XULWinTetrisTest.xul");
+            if (!rootElement)
+            {
+                throw std::runtime_error("Failed to load the root element");
+            }
+
+
+            //
+            // Get the Window component.
+            //
+            XULWin::Window * wnd = rootElement->component()->downcast<XULWin::Window>();
+            if (!wnd)
+            {
+                throw std::runtime_error("Root element is not of type winodw.");
+            }
+
+
+            //
+            // Get the Tetris component.
+            //
+            Tetris::TetrisComponent * tetrisComponent(0);
+            std::vector<Tetris::TetrisElement *> tetrisElements;
+            rootElement->getElementsByType<Tetris::TetrisElement>(tetrisElements);
+            if (tetrisElements.empty())
+            {
+                throw std::runtime_error("The window does not contain any 'tetris' elements.");
+            }
+            else
+            {
+                tetrisComponent = tetrisElements[0]->component()->downcast<Tetris::TetrisComponent>();
+            }
+
+            if (tetrisElements.size())
+            {
+                LogWarning("Multiple tetris elements found in the XUL file. Only the first one can be used for AI.");
+            }
+
+
+            //
+            // Get the Game object.
+            //
+            mThreadSafeGame.reset(new ThreadSafeGame(tetrisComponent->getThreadSafeGame()));
+                        
+
+            //
+            // Connect the logger to the logging text box.
+            //
+            if (mLoggingTextBox = rootElement->getElementById("loggingTextbox")->component()->downcast<XULWin::TextBox>())
+            {
+                Tetris::Logger::Instance().setHandler(boost::bind(&Controller::log, this, _1));
+            }
+
+            //
+            // Enable gravity.
+            //
+            mTimedGame.reset(new TimedGame(*mThreadSafeGame));
+            mTimedGame->start();
+
+
+            //
+            // Enable keyboard listener for activating the AI.
+            //
+            tetrisComponent->OnKeyboardPressed.connect(boost::bind(&Controller::processKey, this, _1));
+
+
+            //
+            // Get stats widgets
+            //
+            if (!(mBlockCountTextBox = rootElement->getElementById("blockCountTextBox")->component()->downcast<XULWin::TextBox>()))
+            {
+                LogWarning("The block counter textbox was not found in the XUL document.");
+            }
+
+
+            //
+            // Activate the stats updater.
+            //
+            mRefreshTimer.reset(new XULWin::WinAPI::Timer);
+            mRefreshTimer->start(boost::bind(&Controller::updateStats, this), 100);
+
+
+            //
+            // Show the Window.
+            //
+            wnd->showModal(XULWin::WindowPos_CenterInScreen);
+        }
+
+
+        ~Controller()
+        {
+            mTimedGame.reset();
+
         }
 
 
@@ -62,7 +163,16 @@ namespace Tetris
 
         ThreadSafeGame & threadSafeGame()
         {
-            return mThreadSafeGame;
+            return *mThreadSafeGame;
+        }
+
+
+        void log(const std::string & inMessage)
+        {
+            if (mLoggingTextBox)
+            {
+                mLoggingTextBox->setValue(inMessage + "\r\n" + mLoggingTextBox->getValue());
+            }
         }
 
 
@@ -78,6 +188,16 @@ namespace Tetris
             }
         }
 
+
+        void updateStats()
+        {
+            if (mBlockCountTextBox)
+            {
+                size_t currentBlockIndex = ReadOnlyGame(*mThreadSafeGame)->currentBlockIndex();
+                mBlockCountTextBox->setValue(MakeString() << currentBlockIndex);
+            }
+        }
+
             
         void precalculate()
         {
@@ -85,7 +205,7 @@ namespace Tetris
             try
             {
                 // Start the block mover
-                mBlockMover.reset(new BlockMover(mThreadSafeGame));
+                mBlockMover.reset(new BlockMover(*mThreadSafeGame));
 
                 // Infinite AI
                 while (true)
@@ -98,7 +218,7 @@ namespace Tetris
                     //   - clone the current GameState object
                     //   - fetch future blocks
                     {
-                        WritableGame game(mThreadSafeGame);
+                        WritableGame game(*mThreadSafeGame);
                         GameStateNode * startingNode = game->currentNode();
                         while (!startingNode->children().empty())
                         {
@@ -173,7 +293,7 @@ namespace Tetris
             
             // Critical section: insert the first child in the current node's child list.
             {
-                WritableGame game(mThreadSafeGame);
+                WritableGame game(*mThreadSafeGame);
                 GameStateNode & currentNode = *game->currentNode();
                 if (currentNode.children().empty())
                 {
@@ -191,7 +311,12 @@ namespace Tetris
         }
 
     private:
-        ThreadSafeGame mThreadSafeGame;
+        XULWin::XULRunner mXULRunner;
+        XULWin::TextBox * mBlockCountTextBox;
+        XULWin::TextBox * mLoggingTextBox;
+        boost::scoped_ptr<ThreadSafeGame> mThreadSafeGame;
+        boost::scoped_ptr<Tetris::TimedGame> mTimedGame;
+        boost::scoped_ptr<XULWin::WinAPI::Timer> mRefreshTimer;
         boost::scoped_ptr<BlockMover> mBlockMover;
         boost::scoped_ptr<boost::thread> mAIThread;
         boost::scoped_ptr<TimedNodePopulator> mTimedNodePopulator;
@@ -201,86 +326,14 @@ namespace Tetris
 } // namespace Tetris
 
 
-using namespace Tetris;
-
-
-void AppendLog(XULWin::Element * inTextBoxElement, const std::string & inMessage)
-{
-    inTextBoxElement->setAttribute("value", inTextBoxElement->getAttribute("value") + inMessage + "\r\n");
-}
-
-
-void UpdateStats(Controller * inController, XULWin::Element * inBlocksTextBox)
-{
-    ReadOnlyGame game(inController->threadSafeGame());
-    inBlocksTextBox->setAttribute("value", MakeString() << game->currentBlockIndex());
-}
-
-
 int StartProgram(HINSTANCE hInstance)
 {
     XULWin::Initializer initializer(hInstance);
     XULWin::WinAPI::CommonControlsInitializer ccInit;
     XULWin::ElementFactory::Instance().registerElement<Tetris::TetrisElement>();
 
-    XULWin::ErrorCatcher errorCatcher;
-    errorCatcher.disableLogging(true);
-
-    XULWin::XULRunner runner(hInstance);
-    XULWin::ElementPtr rootElement = runner.loadXULFromFile("XULWinTetrisTest.xul");
-    if (!rootElement)
-    {
-        XULWin::ReportError("Failed to load the root element");
-        return 1;
-    }
-
-    XULWin::Window * wnd = rootElement->component()->downcast<XULWin::Window>();
-    if (!wnd)
-    {
-        XULWin::ReportError("Root element is not of type winodw.");
-        return 1;
-    }
-
-    Tetris::TetrisComponent * tetrisComponent(0);
-    std::vector<Tetris::TetrisElement *> tetrisElements;
-    rootElement->getElementsByType<Tetris::TetrisElement>(tetrisElements);
-    for (size_t idx = 0; idx != tetrisElements.size(); ++idx)
-    {
-        tetrisComponent = tetrisElements[idx]->component()->downcast<Tetris::TetrisComponent>();
-        break;
-    }
-
-    if (!tetrisComponent)
-    {
-        return 0;
-    }
-
-    // Init the logging
-    if (XULWin::Element * loggingElement = rootElement->getElementById("logging-textbox"))
-    {
-        Tetris::Logger::Instance().setHandler(boost::bind(AppendLog, loggingElement, _1));
-    }
-
     // Create the Controller object
-    Controller controller(tetrisComponent->getThreadSafeGame());
-
-
-    // Let the TimedGame and Timer objects die before calling joinAllThreads below.
-    {
-        // Add the gravity (periodic lowering of the current block)
-        Tetris::TimedGame timedGame(controller.threadSafeGame());
-        timedGame.start();
-
-        // Register the keyboard listener
-        tetrisComponent->OnKeyboardPressed.connect(boost::bind(&Controller::processKey, &controller, _1));
-
-        // Periocially update the game stats
-        XULWin::WinAPI::Timer timer;
-        timer.start(boost::bind(UpdateStats, &controller, rootElement->getElementById("blocksTextBox")), 100);
-
-        wnd->showModal(XULWin::WindowPos_CenterInScreen);
-    }
-    
+    Tetris::Controller controller(hInstance);
     controller.joinAllThreads();
     return 0;
 }
