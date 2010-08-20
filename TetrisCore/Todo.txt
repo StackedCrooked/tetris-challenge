@@ -1,3 +1,5 @@
+- AI thinks while block mover is doing his thing
+- Run the console version under valgrind on Mac and see if you can get any more info (KCacheGrind)
 - Delete JobRunner.h and .cpp
 - Non-blocking visual Player
 - Release a version to demo purposes?
