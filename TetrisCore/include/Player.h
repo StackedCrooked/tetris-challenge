@@ -6,6 +6,7 @@
 #include "Threading.h"
 #include "ThreadSafeGame.h"
 #include "JobList.h"
+#include "Poco/Stopwatch.h"
 #include "Poco/Timer.h"
 #include "Poco/Types.h"
 #include <boost/function.hpp>
@@ -27,7 +28,7 @@ namespace Tetris
         static const int cMaxDepth = 10;
         TimedNodePopulator(std::auto_ptr<GameStateNode> inNode,
                            const BlockTypes & inBlockTypes,
-                           int inTimeMs);
+                           int inTimeLimitMs);
 
 
         // Starts recursively populating the child nodes.
@@ -39,6 +40,8 @@ namespace Tetris
         void start();
 
         inline void stop() { mStop = true; }
+
+        int remainingTimeMs() const;
 
         GameStateNode * node() { return mNode.get(); }
 
@@ -65,7 +68,6 @@ namespace Tetris
 
         boost::scoped_ptr<GameStateNode> mNode;
         BlockTypes mBlockTypes;
-        Poco::Int64 mTimeMicroseconds;
 
         struct Result
         {
@@ -105,6 +107,8 @@ namespace Tetris
         ThreadLocalResult mThreadLocalResult;
 
         Poco::Timer mTimer;
+        int mTimeLimitMs;
+        Poco::Stopwatch mStopwatch;
         volatile bool mStop;
         boost::thread_group mThreadPool;
     };

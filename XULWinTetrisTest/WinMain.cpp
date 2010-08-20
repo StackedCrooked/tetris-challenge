@@ -35,8 +35,8 @@ namespace Tetris
 
     enum
     {
-        cAIMaxDepth = 6,        // max depth of the AI
-        cAIThinkingTime = 5000  // number of ms the AI is allowed to think
+        cAIMaxDepth = 4,        // max depth of the AI
+        cAIThinkingTime = 10000  // number of ms the AI is allowed to think
     };
 
     
@@ -46,6 +46,7 @@ namespace Tetris
         Controller(HINSTANCE hInstance) :
             mXULRunner(hInstance),
             mBlockCountTextBox(0),
+            mAIProgressMeter(0),
             mLoggingTextBox(0),
             mThreadSafeGame(),
             mTimedGame(),
@@ -133,11 +134,20 @@ namespace Tetris
 
 
             //
+            // Get the widget that shows the remaing time for the AI to make its decision.
+            //
+            if (!(mAIProgressMeter = rootElement->getElementById("computerAIProgressMeter")->component()->downcast<XULWin::ProgressMeter>()))
+            {
+                LogWarning("The textbox displaying the remaing time until AI decision is missing.");
+            }
+
+
+            //
             // Activate the stats updater.
             // The WinAPI::Timer is non-threaded and you can safely access the WinAPI in its callbacks.
             //
             mRefreshTimer.reset(new XULWin::WinAPI::Timer);
-            mRefreshTimer->start(boost::bind(&Controller::refresh, this), 500);
+            mRefreshTimer->start(boost::bind(&Controller::refresh, this), 50);
 
 
             //
@@ -205,13 +215,33 @@ namespace Tetris
         {
             // Flush the logger.
             Logger::Instance().flush();
-
-
             if (mBlockCountTextBox)
             {
-                size_t currentBlockIndex = ReadOnlyGame(*mThreadSafeGame)->currentBlockIndex();
-                mBlockCountTextBox->setValue(MakeString() << currentBlockIndex);
+                // Only update every 500 ms to reduce the locking.
+                static Poco::Stopwatch fStopwatch;
+                fStopwatch.start();
+                if (1000 * fStopwatch.elapsed() / fStopwatch.resolution() >= 500)
+                {
+                    mBlockCountTextBox->setValue(MakeString() << ReadOnlyGame(*mThreadSafeGame)->currentBlockIndex());
+                    fStopwatch.restart();
+                }
+                
             }
+
+            if (mAIProgressMeter)
+            {
+                if (mTimedNodePopulator)
+                {
+                    mAIProgressMeter->setDisabled(false);
+                    int percentage = 100 *(cAIThinkingTime - mTimedNodePopulator->remainingTimeMs()) / cAIThinkingTime;
+                    mAIProgressMeter->setValue(percentage);
+                }
+                else
+                {
+                    mAIProgressMeter->setDisabled(true);
+                    mAIProgressMeter->setValue(0);
+                }
+            }            
         }
 
             
@@ -329,6 +359,7 @@ namespace Tetris
     private:
         XULWin::XULRunner mXULRunner;
         XULWin::TextBox * mBlockCountTextBox;
+        XULWin::ProgressMeter * mAIProgressMeter;
         XULWin::TextBox * mLoggingTextBox;
         boost::scoped_ptr<ThreadSafeGame> mThreadSafeGame;
         boost::scoped_ptr<Tetris::TimedGame> mTimedGame;
