@@ -148,6 +148,19 @@ namespace Tetris
     }
 
 
+    size_t Game::numPrecalculatedMoves() const
+    {
+        size_t countMovesAhead = 0;
+        const GameStateNode * tmp = mCurrentNode;
+        while (!tmp->children().empty())
+        {
+            tmp = tmp->children().begin()->get();
+            countMovesAhead++;
+        }
+        return countMovesAhead;
+    }
+
+
     GameStateNode * Game::currentNode()
     {
         return mCurrentNode;
