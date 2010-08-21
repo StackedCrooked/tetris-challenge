@@ -65,6 +65,8 @@ namespace Tetris
         typedef XULWin::TextBox * TextBoxPtr;
         TextBoxPtr mLinesTextBoxes[4];
         XULWin::TextBox * mMovesAheadTextBox;
+        XULWin::TextBox * mPercentTextBox;
+        XULWin::TextBox * mMaxTimeTextBox;
         XULWin::ProgressMeter * mAIProgressMeter;
         XULWin::TextBox * mLoggingTextBox;
         boost::scoped_ptr<ThreadSafeGame> mThreadSafeGame;

@@ -85,7 +85,7 @@ namespace Tetris
     size_t Player::getCurrentDepth() const
     {
         size_t idx = mDepthLimit - 1;
-        while (idx >= 0)
+        while (idx > 0)
         {
             ScopedConstAtom<Result> result(mResult);
             if (result->sizeAtDepth(idx) != 0)

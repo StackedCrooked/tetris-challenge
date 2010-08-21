@@ -18,6 +18,8 @@ namespace Tetris
         mFPSTextBox(0),
         mBlockCountTextBox(0),        
         mMovesAheadTextBox(0),
+        mPercentTextBox(0),
+        mMaxTimeTextBox(0),
         mAIProgressMeter(0),
         mLoggingTextBox(0),
         mThreadSafeGame(),
@@ -146,6 +148,25 @@ namespace Tetris
                 LogWarning("The 'moves ahead' textbox was not found in the XUL document.");
             }
         }
+
+
+        if (XULWin::Element * el = rootElement->getElementById("percentTextBox"))
+        {
+            if (!(mPercentTextBox = el->component()->downcast<XULWin::TextBox>()))
+            {
+                LogWarning("The 'percentTextBox' textbox was not found in the XUL document.");
+            }
+        }
+
+
+        if (XULWin::Element * el = rootElement->getElementById("maxTimeTextBox"))
+        {
+            if (!(mMaxTimeTextBox = el->component()->downcast<XULWin::TextBox>()))
+            {
+                LogWarning("The 'curTimeTextBox' textbox was not found in the XUL document.");
+            }
+        }
+        
 
 
         //
@@ -283,24 +304,33 @@ namespace Tetris
             mFPSTextBox->setValue(MakeString() << mTetrisComponent->getFPS());
         }
 
-        if (mAIProgressMeter)
+        if (mComputerPlayer)
         {
-            if (mComputerPlayer)
+            int remainingTime = mComputerPlayer->remainingTimeMs();
+            int maxTime = 0;
+            {
+                boost::mutex::scoped_lock lock(mAIThinkingTimeMutex);
+                maxTime = mAIThinkingTime;
+            }
+            
+            int curTime = maxTime - remainingTime;            
+            int percentage = (100 * curTime) / maxTime;
+            if (mAIProgressMeter)
             {
                 mAIProgressMeter->setDisabled(false);
-                int time = 0;
-                {
-                    boost::mutex::scoped_lock lock(mAIThinkingTimeMutex);
-                    time = mAIThinkingTime;
-                }
-                int percentage = 100 *(time - mComputerPlayer->remainingTimeMs()) / time;
                 mAIProgressMeter->setValue(percentage);
             }
-            else
+
+            if (mPercentTextBox && mMaxTimeTextBox)
             {
-                mAIProgressMeter->setDisabled(true);
-                mAIProgressMeter->setValue(0);
+                mPercentTextBox->setValue(MakeString() << percentage);
+                mMaxTimeTextBox->setValue(MakeString() << maxTime / 1000);
             }
+        }
+        else
+        {
+            mAIProgressMeter->setDisabled(true);
+            mAIProgressMeter->setValue(0);
         }
     }
 
@@ -401,6 +431,7 @@ namespace Tetris
         }
         
         // Critical section: append the first child to the currently last child
+        int numPrecalculated = 0;
         {
             WritableGame game(*mThreadSafeGame);
             GameStateNode * lastChild = game->currentNode();
@@ -409,14 +440,29 @@ namespace Tetris
                 lastChild = lastChild->children().begin()->get();
             }
             lastChild->children().insert(firstChild);
+            numPrecalculated = game->numPrecalculatedMoves();
         }
 
-        // Increment the waiting time until we reach the maximum of 10 seconds.
+        // Increment the waiting time until we reach the maximum of 8 seconds.
         {
             boost::mutex::scoped_lock lock(mAIThinkingTimeMutex);
-            if (mAIThinkingTime < 10)
+            static const int fTimeTable[] =
             {
-                mAIThinkingTime++;
+                500,    // 0
+                500,    // 1
+                1000,   // 2
+                2000,   // 3
+                3000,   // 4
+                4000,   // 5
+                5000,   // 6
+                6000,   // 7
+                7000,   // 8
+                8000    // 9
+            };
+
+            if (numPrecalculated < 10)
+            {
+                mAIThinkingTime = fTimeTable[numPrecalculated];
             }
         }
     }
