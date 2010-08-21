@@ -38,6 +38,12 @@ namespace Tetris
         // Blocking! Call this method in a separate thread to avoid blocking the main game.
         void start();
 
+        // Pauses the precalculation of new moves.
+        // This is useful to too much depth.
+        void setPause(bool inPaused);
+
+        bool isPaused() const;
+
         inline void stop() { mStop = true; }
 
         int remainingTimeMs() const;
@@ -110,6 +116,9 @@ namespace Tetris
         int mDepthLimit;
         Poco::Stopwatch mStopwatch;
         volatile bool mStop;
+        mutable boost::condition_variable mPausedConditionVariable;
+        mutable boost::mutex mPausedMutex;
+        volatile bool mPaused;
         boost::thread_group mThreadPool;
     };
 

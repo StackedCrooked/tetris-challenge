@@ -62,6 +62,7 @@ namespace Tetris
         mDepthLimit(inDepthLimit),
         mStopwatch(),
         mStop(false),
+        mPaused(false),
         mThreadPool()
     {
         if (mDepthLimit < 1)
@@ -170,6 +171,15 @@ namespace Tetris
             return;
         }
 
+        // If we are paused, then we keep waiting here until we get notified of unpause.
+        {
+            boost::mutex::scoped_lock lock(mPausedMutex);
+            while (mPaused)
+            {
+                mPausedConditionVariable.wait(lock);
+            }
+        }
+
         // Generate the child nodes
         GenerateOffspring(inBlockTypes[inDepth], ioNode, ioNode.children());
         ChildNodes & children = ioNode.children();
@@ -226,6 +236,24 @@ namespace Tetris
     int Player::remainingTimeMs() const
     {
         return mTimeLimitMs - static_cast<int>((1000 * mStopwatch.elapsed()) / mStopwatch.resolution());
+    }
+
+
+    void Player::setPause(bool inPaused)
+    {
+        boost::mutex::scoped_lock lock(mPausedMutex);
+        if (inPaused && !mPaused)
+        {
+            mPaused = inPaused;
+            mPausedConditionVariable.notify_one();
+        }
+    }
+
+
+    bool Player::isPaused() const
+    {
+        boost::mutex::scoped_lock lock(mPausedMutex);
+        return mPaused;
     }
         
     
