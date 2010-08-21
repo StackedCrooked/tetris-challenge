@@ -5,6 +5,7 @@
 #include "Block.h"
 #include "Grid.h"
 #include <memory>
+#include <stdexcept>
 
 
 namespace Tetris
@@ -63,6 +64,20 @@ namespace Tetris
 
             inline int numTetrises() const
             { return mNumTetrises; }
+
+            // Use zero based index!
+            inline int numLines(size_t idx) const
+            {
+                switch (idx)
+                {
+                case 0: return mNumSingles;
+                case 1: return mNumDoubles;
+                case 2: return mNumTriples;
+                case 3: return mNumTetrises;
+                default: throw std::invalid_argument("Invalid number of lines scored requested.");
+                }
+                return 0; // compiler happy
+            }
 
         private:
             friend class GameState;

@@ -50,7 +50,9 @@ namespace Tetris
         XULWin::NativeControl(inParent, inAttr, TEXT("STATIC"), 0, 0),
         mThreadSafeGame(new ThreadSafeGame(std::auto_ptr<Game>(new Tetris::Game(20, 10, Tetris::BlockTypes())))),
         mNumFutureBlocks(1),
-        mKeyboardEnabled(true)
+        mKeyboardEnabled(true),
+        mFrameCount(0),
+        mFPS(0)
     {
         if (sTetrisComponentInstances.empty())
         {
@@ -61,7 +63,8 @@ namespace Tetris
         }
         sTetrisComponentInstances.insert(this);
 
-        mWinAPITimer.start(boost::bind(&TetrisComponent::onTimerEvent, this), 10);
+        mWinAPITimer.start(boost::bind(&TetrisComponent::onTimerEvent, this), 40);
+        mFPSStopwatch.start();
     }
 
 
@@ -250,6 +253,15 @@ namespace Tetris
                 int y = cUnitHeight + (idx - 1) * (5 * cUnitHeight);
                 PaintGrid(g, GetGrid(GetBlockIdentifier(futureBlockTypes[idx], 0)), x, y, false);
             }
+        }
+
+        mFrameCount++;
+        const Poco::Timestamp::TimeVal elapsedMs = (1000 * mFPSStopwatch.elapsed()) / mFPSStopwatch.resolution();
+        if (elapsedMs >= 5000)
+        {
+            mFPS = mFrameCount / 5;
+            mFrameCount = 0;
+            mFPSStopwatch.restart();
         }
     }
 
