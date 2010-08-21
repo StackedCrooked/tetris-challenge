@@ -18,6 +18,10 @@ int StartProgram(HINSTANCE hInstance)
 
     // Create the Controller object
     Tetris::Controller controller(hInstance);
+    
+    // Blocking ...
+
+    // The main window has been closed.
     controller.setQuitFlag();
     controller.joinAllThreads();
     return 0;
