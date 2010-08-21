@@ -5,7 +5,6 @@
 #include "Game.h"
 #include "Threading.h"
 #include "ThreadSafeGame.h"
-#include "JobList.h"
 #include "Poco/Stopwatch.h"
 #include "Poco/Timer.h"
 #include "Poco/Types.h"

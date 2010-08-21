@@ -12,6 +12,7 @@
 #include "XULWin/NativeControl.h"
 #include "XULWin/VirtualComponent.h"
 #include "XULWin/WinUtils.h"
+#include "Poco/Stopwatch.h"
 #include <boost/scoped_ptr.hpp>
 #include <boost/signals.hpp>
 
@@ -83,6 +84,8 @@ namespace Tetris
 
         virtual bool init();
 
+        inline int getFPS() const { return mFPS; }
+
         const ThreadSafeGame & getThreadSafeGame() const;
 
         ThreadSafeGame & getThreadSafeGame();
@@ -121,6 +124,9 @@ namespace Tetris
         int mNumFutureBlocks;
         bool mKeyboardEnabled;
         XULWin::WinAPI::Timer mWinAPITimer;
+        int mFrameCount;
+        int mFPS;
+        Poco::Stopwatch mFPSStopwatch;
     };
 
 } // namespace Tetris

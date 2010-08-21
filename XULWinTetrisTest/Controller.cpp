@@ -1,6 +1,5 @@
 #include "Controller.h"
 #include "Logger.h"
-#include "TetrisComponent.h"
 #include "TetrisElement.h"
 #include "BlockMover.h"
 #include "GameStateNode.h"
@@ -15,6 +14,8 @@ namespace Tetris
 
     Controller::Controller(HINSTANCE hInstance) :
         mXULRunner(hInstance),
+        mTetrisComponent(0),
+        mFPSTextBox(0),
         mBlockCountTextBox(0),        
         mMovesAheadTextBox(0),
         mAIProgressMeter(0),
@@ -51,7 +52,6 @@ namespace Tetris
         //
         // Get the Tetris component.
         //
-        Tetris::TetrisComponent * tetrisComponent(0);
         std::vector<Tetris::TetrisElement *> tetrisElements;
         rootElement->getElementsByType<Tetris::TetrisElement>(tetrisElements);
         if (tetrisElements.empty())
@@ -60,7 +60,7 @@ namespace Tetris
         }
         else
         {
-            tetrisComponent = tetrisElements[0]->component()->downcast<Tetris::TetrisComponent>();
+            mTetrisComponent = tetrisElements[0]->component()->downcast<Tetris::TetrisComponent>();
         }
 
         if (tetrisElements.size())
@@ -72,7 +72,7 @@ namespace Tetris
         //
         // Get the Game object.
         //
-        mThreadSafeGame.reset(new ThreadSafeGame(tetrisComponent->getThreadSafeGame()));
+        mThreadSafeGame.reset(new ThreadSafeGame(mTetrisComponent->getThreadSafeGame()));
                     
 
         //
@@ -93,34 +93,67 @@ namespace Tetris
         //
         // Enable keyboard listener for activating the AI.
         //
-        tetrisComponent->OnKeyboardPressed.connect(boost::bind(&Controller::processKey, this, _1));
+        mTetrisComponent->OnKeyboardPressed.connect(boost::bind(&Controller::processKey, this, _1));
 
 
         //
         // Get stats widgets
         //
-        if (!(mBlockCountTextBox = rootElement->getElementById("blockCountTextBox")->component()->downcast<XULWin::TextBox>()))
+        if (XULWin::Element * el = rootElement->getElementById("fpsTextBox"))
+        {
+            mFPSTextBox = el->component()->downcast<XULWin::TextBox>();
+        }
+        else
+        {
+            LogWarning("The fps textbox was not found in the XUL document.");
+        }
+
+
+        if (XULWin::Element * el = rootElement->getElementById("blockCountTextBox"))
+        {
+            mBlockCountTextBox = el->component()->downcast<XULWin::TextBox>();
+        }
+        else
         {
             LogWarning("The block counter textbox was not found in the XUL document.");
+        }
+
+
+        for (size_t idx = 0; idx != 4; ++idx)
+        {
+            if (XULWin::Element * el = rootElement->getElementById(MakeString() << "lines" << (idx + 1) << "TextBox"))
+            {
+                if (!(mLinesTextBoxes[idx] = el->component()->downcast<XULWin::TextBox>()))
+                {
+                    throw std::runtime_error("This is not a textbox!");
+                }
+            }
+            else
+            {
+                LogWarning(MakeString() << "The lines x" << idx << "TextBox element was not found in the XUL document.");
+            }
         }
 
 
         //
         // Get the 'Moves ahead' textbox.
         //
-        if (!(mMovesAheadTextBox = rootElement->getElementById("movesAheadTextBox")->component()->downcast<XULWin::TextBox>()))
+        if (XULWin::Element * el = rootElement->getElementById("movesAheadTextBox"))
         {
-            LogWarning("The 'moves ahead' textbox was not found in the XUL document.");
+            if (!(mMovesAheadTextBox = el->component()->downcast<XULWin::TextBox>()))
+            {
+                LogWarning("The 'moves ahead' textbox was not found in the XUL document.");
+            }
         }
 
 
         //
         // Get the widget that shows the remaing time for the AI to make its decision.
         //
-        if (!(mAIProgressMeter = rootElement->getElementById("computerAIProgressMeter")->component()->downcast<XULWin::ProgressMeter>()))
-        {
-            LogWarning("The textbox displaying the remaing time until AI decision is missing.");
-        }
+        //if (!(mAIProgressMeter = rootElement->getElementById("computerAIProgressMeter")->component()->downcast<XULWin::ProgressMeter>()))
+        //{
+        //    LogWarning("The textbox displaying the remaing time until AI decision is missing.");
+        //}
 
 
         //
@@ -128,7 +161,7 @@ namespace Tetris
         // The WinAPI::Timer is non-threaded and you can safely access the WinAPI in its callbacks.
         //
         mRefreshTimer.reset(new XULWin::WinAPI::Timer);
-        mRefreshTimer->start(boost::bind(&Controller::refresh, this), 50);
+        mRefreshTimer->start(boost::bind(&Controller::onRefresh, this), 500);
 
 
         //
@@ -183,6 +216,10 @@ namespace Tetris
     {
         if (!mAIThread)
         {
+            // Start the block mover
+            mBlockMover.reset(new BlockMover(*mThreadSafeGame));
+
+            // And start the thinking thread
             mAIThread.reset(new boost::thread(boost::bind(&Controller::precalculate, this)));
         }
         else
@@ -192,36 +229,54 @@ namespace Tetris
     }
 
 
+    void Controller::onRefresh()
+    {
+        try
+        {
+            refresh();
+        }
+        catch(const std::exception & inException)
+        {
+            LogError(MakeString() << "Exception thrown during Controller::onRefresh. Details: " << inException.what());
+        }
+    }
+
+
     void Controller::refresh()
     {
         // Flush the logger.
         Logger::Instance().flush();
-        if (mBlockCountTextBox || mMovesAheadTextBox)
+    
+        if (mBlockCountTextBox || mMovesAheadTextBox) // requires locking, brr..
         {
-            // Only update every 500 ms to reduce the locking of the Game object.
-            static Poco::Stopwatch fStopwatch;
-            fStopwatch.start();
-            if (1000 * fStopwatch.elapsed() / fStopwatch.resolution() >= 500)
+            ReadOnlyGame game(*mThreadSafeGame);
+            if (mBlockCountTextBox)
             {
-                ReadOnlyGame game(*mThreadSafeGame);
-                if (mBlockCountTextBox)
-                {
-                    mBlockCountTextBox->setValue(MakeString() << game->currentBlockIndex());
-                }
-
-                if (mMovesAheadTextBox)
-                {
-                    int countMovesAhead = 0;
-                    const GameStateNode * tmp = game->currentNode();
-                    while (!tmp->children().empty())
-                    {
-                        tmp = tmp->children().begin()->get();
-                        countMovesAhead++;
-                    }
-                    mMovesAheadTextBox->setValue(MakeString() << countMovesAhead);
-                }
-                fStopwatch.restart();
+                mBlockCountTextBox->setValue(MakeString() << game->currentBlockIndex());
             }
+
+            if (mMovesAheadTextBox)
+            {
+                int countMovesAhead = 0;
+                const GameStateNode * tmp = game->currentNode();
+                while (!tmp->children().empty())
+                {
+                    tmp = tmp->children().begin()->get();
+                    countMovesAhead++;
+                }
+                mMovesAheadTextBox->setValue(MakeString() << countMovesAhead);
+            }
+
+            for (size_t idx = 0; idx != 4; ++idx)
+            {
+                const GameState::Stats & stats = game->currentNode()->state().stats();
+                mLinesTextBoxes[idx]->setValue(MakeString() << stats.numLines(idx));
+            }
+        }
+
+        if (mFPSTextBox)
+        {
+            mFPSTextBox->setValue(MakeString() << mTetrisComponent->getFPS());
         }
 
         if (mAIProgressMeter)
@@ -237,7 +292,7 @@ namespace Tetris
                 mAIProgressMeter->setDisabled(true);
                 mAIProgressMeter->setValue(0);
             }
-        }            
+        }
     }
 
         
@@ -246,9 +301,6 @@ namespace Tetris
         // Thead entry point
         try
         {
-            // Start the block mover
-            mBlockMover.reset(new BlockMover(*mThreadSafeGame));
-
             // Infinite AI
             while (!mQuit)
             {

@@ -3,6 +3,7 @@
 
 
 #include "Block.h"
+#include "TetrisComponent.h"
 #include "XULWin/Components.h"
 #include "XULWin/WinUtils.h"
 #include "XULWin/XULRunner.h"
@@ -55,9 +56,15 @@ namespace Tetris
 
         void processKey(int inKey);
 
+        void onRefresh();
+
     private:
         XULWin::XULRunner mXULRunner;
+        TetrisComponent * mTetrisComponent;
+        XULWin::TextBox * mFPSTextBox;
         XULWin::TextBox * mBlockCountTextBox;
+        typedef XULWin::TextBox * TextBoxPtr;
+        TextBoxPtr mLinesTextBoxes[4];
         XULWin::TextBox * mMovesAheadTextBox;
         XULWin::ProgressMeter * mAIProgressMeter;
         XULWin::TextBox * mLoggingTextBox;

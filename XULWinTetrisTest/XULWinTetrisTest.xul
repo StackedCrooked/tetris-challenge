@@ -10,27 +10,48 @@
   orient="vertical"
   align="stretch"
 >
-  <hbox>
-    <grid flex="0">
-      <columns>
-        <column flex="0" align="end" />
-        <column flex="1" />
-      </columns>
-      <rows>
-        <row align="center">
-          <label id="blocksLabel" value="Blocks:" style="text-align:right"/>
-          <textbox id="blockCountTextBox" value="0" readonly="true" width="20" />
-        </row>
-        <row align="center">
-          <label value="Moves ahead:" style="text-align:right" />
-          <textbox id="movesAheadTextBox" value="0" readonly="true" width="20" />        
-        </row>
-        <row align="center">
-          <label value="AI progress:" style="text-align:right" />
-          <progressmeter id="computerAIProgressMeter" value="0" orient="vertical" with="20" />
-        </row>
-      </rows>
-    </grid>
+  <hbox align="stretch">
+    <vbox align="stretch">
+      <groupbox>
+        <caption label="Stats" />
+        <grid>
+          <columns>
+            <column flex="0" align="end" />
+            <column flex="1" width="40" />
+          </columns>
+          <rows>
+            <row align="center">
+              <label value="FPS:" style="text-align:right"/>
+              <textbox id="fpsTextBox" value="0" readonly="true" style="text-align:right"/>
+            </row>
+            <row align="center">
+              <label value="Blocks:" style="text-align:right"/>
+              <textbox id="blockCountTextBox" value="0" readonly="true" style="text-align:right"/>
+            </row>
+            <row align="center">
+              <label value="Lines x1:" style="text-align:right"/>
+              <textbox id="lines1TextBox" value="0" readonly="true"  />
+            </row>
+            <row align="center">
+              <label value="Lines x2:" style="text-align:right"/>
+              <textbox id="lines2TextBox" value="0" readonly="true"  />
+            </row>
+            <row align="center">
+              <label value="Lines x3:" style="text-align:right"/>
+              <textbox id="lines3TextBox" value="0" readonly="true"  />
+            </row>
+            <row align="center">
+              <label value="Lines x4:" style="text-align:right"/>
+              <textbox id="lines4TextBox" value="0" readonly="true"  />
+            </row>            
+            <row align="center">
+              <label value="Moves ahead:" style="text-align:right" />
+              <textbox id="movesAheadTextBox" value="0" readonly="true" />
+            </row>
+          </rows>
+        </grid>
+      </groupbox>
+    </vbox>
     <tetris id="tetris-component" flex="0" numfutureblocks="3" keyboardenabled="true" />
   </hbox>
   <textbox id="loggingTextbox" value="Log messages appear here." multiline="true" flex="1" rows="4" readonly="true" style="background-color:white" />
