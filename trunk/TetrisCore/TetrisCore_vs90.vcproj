@@ -233,6 +233,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\include\TypedWrapper.h"
+				>
+			</File>
+			<File
 				RelativePath=".\include\Unicode.h"
 				>
 			</File>

@@ -5,31 +5,22 @@
 #include "BlockType.h"
 #include "Direction.h"
 #include "Grid.h"
+#include "TypedWrapper.h"
 
 
 namespace Tetris
 {
 
-    typedef GenericGrid<BlockType> Grid;
-
-
-#define GENERATE_TYPESAFE_WRAPPER(WrappedType, ClassName) \
-    class ClassName \
-    { \
-    public: \
-        explicit ClassName(WrappedType inValue) : mValue(inValue) {} \
-        WrappedType get() const \
-        { return mValue; } \
-    private: \
-        WrappedType mValue; \
-    };
-
-    // Typesafe wrappers for Rotation, Row and Column.
-    // Now you can't accidentally mix up the order of
-    // arguments in the Block constructor.
+    // Generate the Rotation class
     GENERATE_TYPESAFE_WRAPPER(size_t, Rotation)
+
+    // Generate the Row class
     GENERATE_TYPESAFE_WRAPPER(size_t, Row)
+
+    // Generate the Column class
     GENERATE_TYPESAFE_WRAPPER(size_t, Column)
+
+    // Generate the GameOver class
     GENERATE_TYPESAFE_WRAPPER(bool, GameOver)
 
 

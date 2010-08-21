@@ -24,11 +24,11 @@ namespace Tetris
         // The higher the level the faster the blocks are falling.
         // Levels go from 0 to 20. If the level is set to a
         // bigger value then it is set to 20 instead.
-        void setLevel(int inLevel);
-
-        void onTimerEvent(Poco::Timer & inTimer);
+        void setLevel(int inLevel);        
 
     private:
+        void onTimerEvent(Poco::Timer & inTimer);
+
         ThreadSafeGame mThreadSafeGame;
         int mLevel;
         Poco::Timer mTimer;

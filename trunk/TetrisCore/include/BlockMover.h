@@ -13,8 +13,7 @@ namespace Tetris
      * BlockMover
      *
      * Given a Tetris block that has a current position and a requested position. This class will
-     * peridically move the current block (move one square left, right, down, or rotate) every
-     * time bringing it one step closer to the target position.
+     * peridically move the current block one square closer to the target block.
      *
      * The current position is the position of the Game's active block.
      * The target position is the position of its first child element.
