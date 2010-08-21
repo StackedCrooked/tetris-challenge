@@ -270,7 +270,7 @@ namespace Tetris
         // Start the number crunching. This will take a while to complete (max cAIThinkingTime).
         //
         int currentGameDepth = inClonedGameState->depth();
-        mComputerPlayer.reset(new Player(inClonedGameState, inBlockTypes, cAIThinkingTime));
+        mComputerPlayer.reset(new Player(inClonedGameState, inBlockTypes, cAIThinkingTime, cAIMaxDepth));
         mComputerPlayer->start(); // Wait for results... (limited by cAIThinkingTime)
 
 
