@@ -26,7 +26,7 @@ namespace Tetris
     enum
     {
         cAIMaxDepth = 5,        // max depth of the AI
-        cAIThinkingTime = 3000  // number of ms the AI is allowed to think
+        cAIThinkingTime = 1000  // number of ms the AI is allowed to think
     };
 
     
@@ -58,6 +58,7 @@ namespace Tetris
     private:
         XULWin::XULRunner mXULRunner;
         XULWin::TextBox * mBlockCountTextBox;
+        XULWin::TextBox * mMovesAheadTextBox;
         XULWin::ProgressMeter * mAIProgressMeter;
         XULWin::TextBox * mLoggingTextBox;
         boost::scoped_ptr<ThreadSafeGame> mThreadSafeGame;
