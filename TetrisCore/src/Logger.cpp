@@ -76,12 +76,6 @@ namespace Tetris
             ScopedAtom<Queue> queue(mProtectedQueue);
             queue->push_back(GetMessage(inLogLevel, inMessage));
         }
-
-        // If this is the main thread, then also flush the log messages.
-        if (0 == Poco::Thread::current())
-        {
-            flush();
-        }
     }
 
 
