@@ -26,7 +26,8 @@ namespace Tetris
         mBlockMover(),
         mAIThread(),
         mComputerPlayer(),
-        mQuit(false)
+        mQuit(false),
+        mAIThinkingTime(1000)
     {
 
         //
@@ -150,10 +151,13 @@ namespace Tetris
         //
         // Get the widget that shows the remaing time for the AI to make its decision.
         //
-        //if (!(mAIProgressMeter = rootElement->getElementById("computerAIProgressMeter")->component()->downcast<XULWin::ProgressMeter>()))
-        //{
-        //    LogWarning("The textbox displaying the remaing time until AI decision is missing.");
-        //}
+        if (XULWin::Element * el = rootElement->getElementById("computerAIProgressMeter"))
+        {
+            if (!(mAIProgressMeter = el->component()->downcast<XULWin::ProgressMeter>()))
+            {
+                LogWarning("The textbox displaying the remaing time until AI decision is missing.");
+            }
+        }
 
 
         //
@@ -284,7 +288,12 @@ namespace Tetris
             if (mComputerPlayer)
             {
                 mAIProgressMeter->setDisabled(false);
-                int percentage = 100 *(cAIThinkingTime - mComputerPlayer->remainingTimeMs()) / cAIThinkingTime;
+                int time = 0;
+                {
+                    boost::mutex::scoped_lock lock(mAIThinkingTimeMutex);
+                    time = mAIThinkingTime;
+                }
+                int percentage = 100 *(time - mComputerPlayer->remainingTimeMs()) / time;
                 mAIProgressMeter->setValue(percentage);
             }
             else
@@ -331,6 +340,7 @@ namespace Tetris
                 }
 
                 // Blocking until best path found.
+                assert(clonedStartingNode.get());
                 calculateOptimalPath(clonedStartingNode, blockTypes);
             }
         }
@@ -344,14 +354,19 @@ namespace Tetris
     void Controller::calculateOptimalPath(std::auto_ptr<GameStateNode> inClonedGameState, const BlockTypes & inBlockTypes)
     {
         //
-        // Start the number crunching. This will take a while to complete (max cAIThinkingTime).
+        // Start the number crunching. This will take a while to complete (max mAIThinkingTime).
         //
         int currentGameDepth = inClonedGameState->depth();
-        mComputerPlayer.reset(new Player(inClonedGameState, inBlockTypes, cAIThinkingTime, cAIMaxDepth));
-        mComputerPlayer->start(); // Wait for results... (limited by cAIThinkingTime)
+        int time = 0;
+        {
+            boost::mutex::scoped_lock lock(mAIThinkingTimeMutex);
+            time = mAIThinkingTime;
+        }
+        mComputerPlayer.reset(new Player(inClonedGameState, inBlockTypes, time, cAIMaxDepth));
+        mComputerPlayer->start(); // Wait for results... (limited by mAIThinkingTime)
 
 
-        //
+        // 
         // Eliminate the inferior branches. The tree will be reduced to a path of nodes defining
         // the best game strategy.
         //
@@ -394,6 +409,15 @@ namespace Tetris
                 lastChild = lastChild->children().begin()->get();
             }
             lastChild->children().insert(firstChild);
+        }
+
+        // Increment the waiting time until we reach the maximum of 10 seconds.
+        {
+            boost::mutex::scoped_lock lock(mAIThinkingTimeMutex);
+            if (mAIThinkingTime < 10)
+            {
+                mAIThinkingTime++;
+            }
         }
     }
 
