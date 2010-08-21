@@ -15,7 +15,8 @@ namespace Tetris
 
     Controller::Controller(HINSTANCE hInstance) :
         mXULRunner(hInstance),
-        mBlockCountTextBox(0),
+        mBlockCountTextBox(0),        
+        mMovesAheadTextBox(0),
         mAIProgressMeter(0),
         mLoggingTextBox(0),
         mThreadSafeGame(),
@@ -105,6 +106,15 @@ namespace Tetris
 
 
         //
+        // Get the 'Moves ahead' textbox.
+        //
+        if (!(mMovesAheadTextBox = rootElement->getElementById("movesAheadTextBox")->component()->downcast<XULWin::TextBox>()))
+        {
+            LogWarning("The 'moves ahead' textbox was not found in the XUL document.");
+        }
+
+
+        //
         // Get the widget that shows the remaing time for the AI to make its decision.
         //
         if (!(mAIProgressMeter = rootElement->getElementById("computerAIProgressMeter")->component()->downcast<XULWin::ProgressMeter>()))
@@ -186,17 +196,32 @@ namespace Tetris
     {
         // Flush the logger.
         Logger::Instance().flush();
-        if (mBlockCountTextBox)
+        if (mBlockCountTextBox || mMovesAheadTextBox)
         {
-            // Only update every 500 ms to reduce the locking.
+            // Only update every 500 ms to reduce the locking of the Game object.
             static Poco::Stopwatch fStopwatch;
             fStopwatch.start();
             if (1000 * fStopwatch.elapsed() / fStopwatch.resolution() >= 500)
             {
-                mBlockCountTextBox->setValue(MakeString() << ReadOnlyGame(*mThreadSafeGame)->currentBlockIndex());
+                ReadOnlyGame game(*mThreadSafeGame);
+                if (mBlockCountTextBox)
+                {
+                    mBlockCountTextBox->setValue(MakeString() << game->currentBlockIndex());
+                }
+
+                if (mMovesAheadTextBox)
+                {
+                    int countMovesAhead = 0;
+                    const GameStateNode * tmp = game->currentNode();
+                    while (!tmp->children().empty())
+                    {
+                        tmp = tmp->children().begin()->get();
+                        countMovesAhead++;
+                    }
+                    mMovesAheadTextBox->setValue(MakeString() << countMovesAhead);
+                }
                 fStopwatch.restart();
             }
-            
         }
 
         if (mAIProgressMeter)
