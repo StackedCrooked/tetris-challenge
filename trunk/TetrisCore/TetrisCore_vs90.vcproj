@@ -209,10 +209,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\JobList.h"
-				>
-			</File>
-			<File
 				RelativePath=".\include\Logger.h"
 				>
 			</File>
@@ -274,10 +270,6 @@
 			</File>
 			<File
 				RelativePath=".\src\GameStateNode.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\JobList.cpp"
 				>
 			</File>
 			<File
