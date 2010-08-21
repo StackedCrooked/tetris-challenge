@@ -27,7 +27,6 @@ namespace Tetris
     enum
     {
         cAIMaxDepth = 5,        // max depth of the AI
-        cAIThinkingTime = 1000  // number of ms the AI is allowed to think
     };
 
     
@@ -75,6 +74,9 @@ namespace Tetris
         boost::scoped_ptr<boost::thread> mAIThread;
         boost::scoped_ptr<Player> mComputerPlayer;
         volatile bool mQuit;
+        
+        boost::mutex mAIThinkingTimeMutex;
+        int mAIThinkingTime;
     };
 
 } // namespace Tetris

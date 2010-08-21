@@ -13,7 +13,7 @@
   <hbox align="stretch">
     <vbox align="stretch">
       <groupbox>
-        <caption label="Stats" />
+        <caption label="Score" />
         <grid>
           <columns>
             <column flex="0" align="end" />
@@ -43,16 +43,29 @@
             <row align="center">
               <label value="Lines x4:" style="text-align:right"/>
               <textbox id="lines4TextBox" value="0" readonly="true"  />
-            </row>            
-            <row align="center">
-              <label value="Moves ahead:" style="text-align:right" />
-              <textbox id="movesAheadTextBox" value="0" readonly="true" />
             </row>
           </rows>
         </grid>
       </groupbox>
+      <groupbox>
+        <caption label="AI Metrics" />
+        <hbox align="center">
+          <label value="Num precalculated:" style="text-align:right" />
+          <textbox id="movesAheadTextBox" value="0" readonly="true" flex="1" />
+        </hbox>        
+        <vbox align="stretch">
+          <hbox align="center">
+            <label value="Progress:" />
+            <textbox id="curTimeTextBox" value="0" readonly="true" flex="1" />
+            <label value="/" style="margin:0px" />
+            <textbox id="maxTimeTextBox" value="0" readonly="true" flex="1" />
+            <label value="ms" />
+          </hbox>
+          <progressmeter id="computerAIProgressMeter" />
+        </vbox>
+      </groupbox>
     </vbox>
-    <tetris id="tetris-component" flex="0" numfutureblocks="3" keyboardenabled="true" />
+    <tetris id="tetris-component" flex="0" numfutureblocks="3" keyboardenabled="true" />  
   </hbox>
   <textbox id="loggingTextbox" value="Log messages appear here." multiline="true" flex="1" rows="4" readonly="true" style="background-color:white" />
 </window>
