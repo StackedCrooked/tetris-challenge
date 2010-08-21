@@ -395,6 +395,10 @@ namespace Tetris
         mComputerPlayer.reset(new Player(inClonedGameState, inBlockTypes, time, cAIMaxDepth));
         mComputerPlayer->start(); // Wait for results... (limited by mAIThinkingTime)
 
+        if (mQuit)
+        {
+            return;
+        }
 
         // 
         // Eliminate the inferior branches. The tree will be reduced to a path of nodes defining
@@ -451,13 +455,13 @@ namespace Tetris
                 500,    // 0
                 500,    // 1
                 1000,   // 2
-                2000,   // 3
-                3000,   // 4
-                4000,   // 5
-                5000,   // 6
-                6000,   // 7
-                7000,   // 8
-                8000    // 9
+                1000,   // 3
+                2000,   // 4
+                2000,   // 5
+                3000,   // 6
+                3000,   // 7
+                4000,   // 8
+                4000    // 9
             };
 
             if (numPrecalculated < 10)
