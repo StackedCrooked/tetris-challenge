@@ -22,13 +22,13 @@ namespace Tetris
     void DestroyInferiorChildren(GameStateNode * srcNode, GameStateNode * dstNode);
 
 
-    class TimedNodePopulator
+    class Player
     {
     public:
         static const int cMaxDepth = 10;
-        TimedNodePopulator(std::auto_ptr<GameStateNode> inNode,
-                           const BlockTypes & inBlockTypes,
-                           int inTimeLimitMs);
+        Player(std::auto_ptr<GameStateNode> inNode,
+               const BlockTypes & inBlockTypes,
+               int inTimeLimitMs);
 
 
         // Starts recursively populating the child nodes.

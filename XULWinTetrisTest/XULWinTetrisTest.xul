@@ -22,7 +22,8 @@
     <label id="blocksLabel" value="Blocks:" style="text-align:right"/>
     <textbox id="blockCountTextBox" value="0" readonly="true" width="20" />
     <spacer flex="1" />
+    <progressmeter id="computerAIProgressMeter" value="0" orient="vertical" with="80" />
   </hbox>
-  <progressmeter id="computerAIProgressMeter" value="0" />
+  
   <textbox id="loggingTextbox" multiline="true" flex="1" rows="8" readonly="true" />
 </window>

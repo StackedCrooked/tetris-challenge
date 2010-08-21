@@ -50,9 +50,9 @@ namespace Tetris
     }
 
 
-    TimedNodePopulator::TimedNodePopulator(std::auto_ptr<GameStateNode> inNode,
-                                           const BlockTypes & inBlockTypes,
-                                           int inTimeLimitMs) :
+    Player::Player(std::auto_ptr<GameStateNode> inNode,
+                   const BlockTypes & inBlockTypes,
+                   int inTimeLimitMs) :
         mNode(inNode.release()),
         mBlockTypes(inBlockTypes),
         mTimer(inTimeLimitMs, 0),
@@ -68,13 +68,13 @@ namespace Tetris
     }
         
         
-    void TimedNodePopulator::onTimer(Poco::Timer &)
+    void Player::onTimer(Poco::Timer &)
     {
         mStop = true;
     }
 
 
-    size_t TimedNodePopulator::getCurrentDepth() const
+    size_t Player::getCurrentDepth() const
     {
         size_t idx = cMaxDepth - 1;
         while (idx >= 0)
@@ -90,7 +90,7 @@ namespace Tetris
     }
 
 
-    ChildNodePtr TimedNodePopulator::getBestChild() const
+    ChildNodePtr Player::getBestChild() const
     {
         int currentDepth = getCurrentDepth();
         ScopedConstAtom<Result> result(mResult);
@@ -98,7 +98,7 @@ namespace Tetris
     }
 
 
-    void TimedNodePopulator::addToFlattenedNodes(const ChildNodes & inChildNodes, size_t inDepth)
+    void Player::addToFlattenedNodes(const ChildNodes & inChildNodes, size_t inDepth)
     {        
         if (inDepth >= cMaxDepth)
         {
@@ -114,7 +114,7 @@ namespace Tetris
     }
 
 
-    void TimedNodePopulator::commitThreadLocalData()
+    void Player::commitThreadLocalData()
     {
         if (!mThreadLocalResult.get())
         {
@@ -132,7 +132,7 @@ namespace Tetris
     }
 
 
-    bool TimedNodePopulator::isTimeExpired()
+    bool Player::isTimeExpired()
     {
         return mStop;
     }
@@ -145,7 +145,7 @@ namespace Tetris
     }
 
 
-    void TimedNodePopulator::populateNodesRecursively(GameStateNode & ioNode, const BlockTypes & inBlockTypes, size_t inDepth)
+    void Player::populateNodesRecursively(GameStateNode & ioNode, const BlockTypes & inBlockTypes, size_t inDepth)
     {
         if (isTimeExpired())
         {
@@ -200,7 +200,7 @@ namespace Tetris
     }
 
 
-    void TimedNodePopulator::populateNodesInBackground(ChildNodePtr inNode, BlockTypes * inBlockTypes, size_t inDepth)
+    void Player::populateNodesInBackground(ChildNodePtr inNode, BlockTypes * inBlockTypes, size_t inDepth)
     {
         // Thread entry point
         try
@@ -216,16 +216,16 @@ namespace Tetris
     }
 
 
-    int TimedNodePopulator::remainingTimeMs() const
+    int Player::remainingTimeMs() const
     {
         return mTimeLimitMs - static_cast<int>((1000 * mStopwatch.elapsed()) / mStopwatch.resolution());
     }
         
     
-    void TimedNodePopulator::start()
+    void Player::start()
     {
         mStopwatch.start();
-        Poco::TimerCallback<TimedNodePopulator> timerCallback(*this, &TimedNodePopulator::onTimer);
+        Poco::TimerCallback<Player> timerCallback(*this, &Player::onTimer);
         mTimer.start(timerCallback);
 
         // Generate children of the root node
@@ -237,7 +237,7 @@ namespace Tetris
         {
             ChildNodePtr firstGenerationChildNode = *it;
             mThreadPool.create_thread(
-                boost::bind(&TimedNodePopulator::populateNodesInBackground,
+                boost::bind(&Player::populateNodesInBackground,
                             this,
                             firstGenerationChildNode,
                             new BlockTypes(mBlockTypes),
