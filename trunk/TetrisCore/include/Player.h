@@ -25,10 +25,10 @@ namespace Tetris
     class Player
     {
     public:
-        static const int cMaxDepth = 10;
         Player(std::auto_ptr<GameStateNode> inNode,
                const BlockTypes & inBlockTypes,
-               int inTimeLimitMs);
+               int inTimeLimitMs,
+               int inDepthLimit);
 
 
         // Starts recursively populating the child nodes.
@@ -72,8 +72,8 @@ namespace Tetris
         struct Result
         {
         public:
-            Result() :
-                mChildNodesPerDepth(cMaxDepth)
+            Result(int inDepthLimit) :
+                mChildNodesPerDepth(inDepthLimit)
             {
             }
 
@@ -108,6 +108,7 @@ namespace Tetris
 
         Poco::Timer mTimer;
         int mTimeLimitMs;
+        int mDepthLimit;
         Poco::Stopwatch mStopwatch;
         volatile bool mStop;
         boost::thread_group mThreadPool;

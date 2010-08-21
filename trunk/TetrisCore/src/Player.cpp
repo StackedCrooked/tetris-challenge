@@ -52,18 +52,25 @@ namespace Tetris
 
     Player::Player(std::auto_ptr<GameStateNode> inNode,
                    const BlockTypes & inBlockTypes,
-                   int inTimeLimitMs) :
+                   int inTimeLimitMs,
+                   int inDepthLimit) :
         mNode(inNode.release()),
         mBlockTypes(inBlockTypes),
+        mResult(std::auto_ptr<Result>(new Result(inDepthLimit))),
         mTimer(inTimeLimitMs, 0),
         mTimeLimitMs(inTimeLimitMs),
+        mDepthLimit(inDepthLimit),
         mStopwatch(),
         mStop(false),
         mThreadPool()
     {
-        if (mBlockTypes.size() > cMaxDepth)
+        if (mDepthLimit < 1)
         {
-            LogWarning(MakeString() << "The number of blocks (" << mBlockTypes.size() << ") exceeds the maximum depth (" << cMaxDepth << "). They will be ignored.");
+            throw std::invalid_argument("The depth limit must be at least 1.");
+        }
+        if (mBlockTypes.size() > mDepthLimit)
+        {
+            LogWarning(MakeString() << "The number of blocks (" << mBlockTypes.size() << ") exceeds the maximum depth (" << mDepthLimit << "). They will be ignored.");
         }
     }
         
@@ -76,7 +83,7 @@ namespace Tetris
 
     size_t Player::getCurrentDepth() const
     {
-        size_t idx = cMaxDepth - 1;
+        size_t idx = mDepthLimit - 1;
         while (idx >= 0)
         {
             ScopedConstAtom<Result> result(mResult);
@@ -100,15 +107,15 @@ namespace Tetris
 
     void Player::addToFlattenedNodes(const ChildNodes & inChildNodes, size_t inDepth)
     {        
-        if (inDepth >= cMaxDepth)
+        if (inDepth >= mDepthLimit)
         {
-            std::string message(MakeString() << "Tried to exceed max node depth " << inDepth << ". Max entries is " << cMaxDepth << ".");
+            std::string message(MakeString() << "Tried to exceed max node depth " << inDepth << ". Max entries is " << mDepthLimit << ".");
             throw std::out_of_range(message.c_str());
         }
 
         if (!mThreadLocalResult.get())
         {
-            mThreadLocalResult.reset(new Result);
+            mThreadLocalResult.reset(new Result(mDepthLimit));
         }
         mThreadLocalResult->mergeAtDepth(inDepth, inChildNodes);
     }
@@ -123,7 +130,7 @@ namespace Tetris
 
         ScopedAtom<Result> result(mResult);
         
-        for (size_t idx = 0; idx != cMaxDepth; ++idx)
+        for (size_t idx = 0; idx != mDepthLimit; ++idx)
         {
             result->mergeAtDepth(idx, mThreadLocalResult->getNodesAtDepth(idx));
         }
@@ -152,7 +159,7 @@ namespace Tetris
             return;
         }
 
-        if (inDepth >= inBlockTypes.size() || inDepth >= cMaxDepth)
+        if (inDepth >= inBlockTypes.size() || inDepth >= mDepthLimit)
         {
             return;
         }
