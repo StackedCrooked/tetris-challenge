@@ -49,7 +49,9 @@ namespace Tetris
         for (; it != end; ++it)
         {
             GameStateNode & node(*(*it));
-            result->mChildren.insert(ChildNodePtr(node.clone().release()));
+            ChildNodePtr newChild(node.clone().release());
+            assert(newChild->depth() == mDepth + 1);
+            result->mChildren.insert(newChild);
         }
         return result;
     }
@@ -58,27 +60,6 @@ namespace Tetris
     int GameStateNode::identifier() const
     {
         return mIdentifier;
-    }
-
-
-    void CollectAll(const GameStateNode * inChild, int inDepth, ChildNodes & outChildren)
-    {
-        if (inDepth > 1)
-        {
-            ChildNodes children = inChild->children();
-            for (ChildNodes::iterator it = children.begin(); it != children.end(); ++it)
-            {
-                CollectAll(it->get(), inDepth - 1, outChildren);
-            }
-        }
-        else
-        {
-            ChildNodes children = inChild->children();
-            for (ChildNodes::iterator it = children.begin(); it != children.end(); ++it)
-            {
-                outChildren.insert(*it);
-            }
-        }
     }
 
 
@@ -103,6 +84,13 @@ namespace Tetris
     void GameStateNode::clearChildren()
     {
         mChildren.clear();
+    }
+
+
+    void GameStateNode::addChild(ChildNodePtr inChildNode)
+    {
+        assert(inChildNode->depth() == mDepth + 1);
+        mChildren.insert(inChildNode);
     }
 
 
@@ -160,6 +148,7 @@ namespace Tetris
                                                                              Row(0),
                                                                              Column(initialColumn)),
                                                                              GameOver(true))));
+            assert(childState->depth() == (ioGameStateNode.depth() + 1));
             outChildNodes.insert(childState);
             return;
         }
@@ -179,6 +168,7 @@ namespace Tetris
                 {
                     block.setRow(row - 1);
                     ChildNodePtr childState(new GameStateNode(&ioGameStateNode, gameState.commit(block, GameOver(false))));
+                    assert(childState->depth() == ioGameStateNode.depth() + 1);
                     outChildNodes.insert(childState);
                 }
             }

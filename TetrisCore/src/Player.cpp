@@ -110,8 +110,7 @@ namespace Tetris
     {        
         if (inDepth >= mDepthLimit)
         {
-            std::string message(MakeString() << "Tried to exceed max node depth " << inDepth << ". Max entries is " << mDepthLimit << ".");
-            throw std::out_of_range(message.c_str());
+            throw std::out_of_range(MakeString() << "Tried to exceed max node depth " << inDepth << ". Max entries is " << mDepthLimit << ".");
         }
 
         if (!mThreadLocalResult.get())

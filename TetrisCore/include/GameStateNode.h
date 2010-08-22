@@ -50,8 +50,7 @@ namespace Tetris
 
         void clearChildren();
 
-        inline void addChild(ChildNodePtr inChildNode)
-        { mChildren.insert(inChildNode); }
+        void addChild(ChildNodePtr inChildNode);
 
         const GameState & state() const;
 

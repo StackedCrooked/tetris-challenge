@@ -6,6 +6,7 @@
 #include "Player.h"
 #include "ThreadSafeGame.h"
 #include "TimedGame.h"
+#include "XULWin/ErrorReporter.h"
 #include "XULWin/Window.h"
 
 
@@ -24,6 +25,7 @@ namespace Tetris
 
     Controller::Controller(HINSTANCE hInstance) :
         mXULRunner(hInstance),
+        mWindow(0),
         mTetrisComponent(0),
         mFPSTextBox(0),
         mBlockCountTextBox(0),        
@@ -41,7 +43,6 @@ namespace Tetris
         mQuit(false),
         mAIThinkingTime(1000)
     {
-
         //
         // Parse the XUL document.
         //
@@ -55,10 +56,21 @@ namespace Tetris
         //
         // Get the Window component.
         //
-        XULWin::Window * wnd = rootElement->component()->downcast<XULWin::Window>();
-        if (!wnd)
+        mWindow = rootElement->component()->downcast<XULWin::Window>();
+        if (!mWindow)
         {
             throw std::runtime_error("Root element is not of type winodw.");
+        }
+                    
+
+        //
+        // Connect the logger to the logging text box.
+        //
+        if (mLoggingTextBox = rootElement->getElementById("loggingTextbox")->component()->downcast<XULWin::TextBox>())
+        {
+            boost::function<void(const std::string&)> logFunction = boost::bind(&Controller::log, this, _1);
+            XULWin::ErrorReporter::Instance().setLogger(logFunction);
+            Tetris::Logger::Instance().setHandler(logFunction);
         }
 
 
@@ -72,6 +84,8 @@ namespace Tetris
 
         mTetrisComponent->setController(this);
 
+
+        // Get the future game state component.
         if (!(mFutureTetrisComponent = FindComponentById<Tetris::TetrisComponent>(rootElement.get(), "tetris1")))
         {
             LogWarning("Did not find future tetris component.");
@@ -87,15 +101,7 @@ namespace Tetris
         // Get the Game object.
         //
         mThreadSafeGame.reset(new ThreadSafeGame(std::auto_ptr<Game>(new Game)));
-                    
 
-        //
-        // Connect the logger to the logging text box.
-        //
-        if (mLoggingTextBox = rootElement->getElementById("loggingTextbox")->component()->downcast<XULWin::TextBox>())
-        {
-            Tetris::Logger::Instance().setHandler(boost::bind(&Controller::log, this, _1));
-        }
 
         //
         // Enable gravity.
@@ -198,12 +204,6 @@ namespace Tetris
         //
         mRefreshTimer.reset(new XULWin::WinAPI::Timer);
         mRefreshTimer->start(boost::bind(&Controller::onRefresh, this), 500);
-
-
-        //
-        // Show the Window.
-        //
-        wnd->showModal(XULWin::WindowPos_CenterInScreen);
     }
 
 
@@ -211,6 +211,12 @@ namespace Tetris
     {
         mComputerPlayer.reset();
         mTimedGame.reset();
+    }
+
+
+    void Controller::run()
+    {
+        mWindow->showModal(XULWin::WindowPos_CenterInScreen);
     }
 
             
@@ -404,6 +410,7 @@ namespace Tetris
                     GameStateNode * startingNode = game->currentNode();
                     while (!startingNode->children().empty())
                     {
+                        assert(startingNode->children().empty());
                         GameStateNode & node = **startingNode->children().begin();
                         startingNode = &node;
                     }
@@ -432,10 +439,14 @@ namespace Tetris
 
     void Controller::calculateOptimalPath(std::auto_ptr<GameStateNode> inClonedGameState, const BlockTypes & inBlockTypes)
     {
+        assert(inClonedGameState->children().empty());
+
+
         //
         // Start the number crunching. This will take a while to complete (max mAIThinkingTime).
         //
         int currentGameDepth = inClonedGameState->depth();
+        assert(ReadOnlyGame(*mThreadSafeGame)->currentNode()->depth() == currentGameDepth);
         int time = 0;
         {
             boost::mutex::scoped_lock lock(mAIThinkingTimeMutex);
@@ -487,12 +498,9 @@ namespace Tetris
         int numPrecalculated = 0;
         {
             WritableGame game(*mThreadSafeGame);
-            GameStateNode * lastChild = game->currentNode();
-            while (!lastChild->children().empty())
-            {
-                lastChild = lastChild->children().begin()->get();
-            }
-            lastChild->addChild(firstChild);
+            assert(game->currentNode()->depth() == currentGameDepth);
+            assert(firstChild->depth() == currentGameDepth + 1);
+            game->currentNode()->addChild(firstChild);
             numPrecalculated = game->numPrecalculatedMoves();
         }
 
