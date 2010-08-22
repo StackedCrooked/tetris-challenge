@@ -62,7 +62,7 @@ namespace Tetris
 
         // We use a ChildNodePtr (shared_ptr) to prevent destruction of the
         // object during program exit while this thread is still accessing it.
-        void populateNodesInBackground(ChildNodePtr ioNode,
+        void populateNodesInBackground(GameStateNode & ioNode,
                                        BlockTypes * inBlockTypes,
                                        size_t inDepth);
 
