@@ -51,11 +51,10 @@ namespace Tetris
 
     Player::Player(std::auto_ptr<GameStateNode> inNode,
                    const BlockTypes & inBlockTypes,
-                   int inTimeLimitMs,
-                   int inDepthLimit) :
+                   int inTimeLimitMs) :
         mNode(inNode.release()),
         mBlockTypes(inBlockTypes),
-        mResult(std::auto_ptr<Result>(new Result(inDepthLimit))),
+        mResult(std::auto_ptr<Result>(new Result(inBlockTypes.size()))),
         mTimer(inTimeLimitMs, 0),
         mTimeLimitMs(inTimeLimitMs),
         mStopwatch(),
@@ -92,10 +91,22 @@ namespace Tetris
     ChildNodePtr Player::getBestChild() const
     {
         int currentDepth = getCurrentDepth();
-        ScopedConstAtom<Result> result(mResult);
+        if (currentDepth == 0)
+        {
+            throw std::runtime_error("Searched depth is 0.");
+        }
+
+        ScopedConstAtom<Result> cresult(mResult);
+        const Result & result = *cresult.get();
+        
+        ChildNodes childNodes = result.getNodesAtDepth(currentDepth);
+        if (childNodes.empty())
+        {
+            throw std::runtime_error("No nodes have been generated!?");
+        }
         
         // Backtrack to the beginning.
-        GameStateNode * endNode = (*result->getNodesAtDepth(currentDepth).begin()).get();
+        GameStateNode * endNode = childNodes.begin()->get();
         GameStateNode * startNode = endNode;
         while (startNode != mNode.get())
         {
@@ -144,7 +155,7 @@ namespace Tetris
 
     bool Player::isTimeExpired()
     {
-        return mStop;
+        return mStop && false; // TEMP DISABLED!
     }
 
     
@@ -231,7 +242,7 @@ namespace Tetris
         try
         {
             boost::scoped_ptr<BlockTypes> takeOwnership(inBlockTypes);
-            populateNodesRecursively(inNode, *inBlockTypes, inDepth);
+            populateNodesRecursively(inNode, *inBlockTypes, 0);
             commitThreadLocalData();
        } 
         catch (const std::exception & inException)
@@ -248,7 +259,8 @@ namespace Tetris
         mTimer.start(timerCallback);
 
         GameStateNode & node = *mNode;
-        populateNodesInBackground(node, &mBlockTypes, mBlockTypes.size());
+        BlockTypes * blockTypes = new BlockTypes(mBlockTypes);
+        populateNodesInBackground(node, blockTypes, mBlockTypes.size());
 
         //// Generate children of the root node
         //ChildNodes generatedChildNodes;
@@ -270,10 +282,8 @@ namespace Tetris
         //                    new BlockTypes(mBlockTypes),
         //                    1));
         //}
-
-        mThreadPool.join_all();
+        //mThreadPool.join_all();
         mStopwatch.reset();
-
         return getBestChild();
     }
 

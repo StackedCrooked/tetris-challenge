@@ -35,7 +35,7 @@ int SimpleTest()
         int currentDepth = currentNode->depth();
 
         // Setup the player object
-        Player p(currentNode, futureBlocks, 1000, 2);
+        Player p(currentNode, futureBlocks, 1000);
         ChildNodePtr resultNode = p.start(); // Waiting...
 
         // Just a check

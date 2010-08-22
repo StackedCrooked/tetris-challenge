@@ -26,8 +26,7 @@ namespace Tetris
     public:
         Player(std::auto_ptr<GameStateNode> inNode,
                const BlockTypes & inBlockTypes,
-               int inTimeLimitMs,
-               int inDepthLimit);
+               int inTimeLimitMs);
 
 
         // Starts recursively populating the child nodes.
@@ -64,10 +63,10 @@ namespace Tetris
         // object during program exit while this thread is still accessing it.
         void populateNodesInBackground(GameStateNode & ioNode,
                                        BlockTypes * inBlockTypes,
-                                       size_t inDepth);
+                                       size_t inOffset);
 
-        void populateNodesRecursively(GameStateNode & ioNode, const BlockTypes & inBlockTypes, size_t inDepth);
-        void addToFlattenedNodes(const ChildNodes & inChildNode, size_t inDepth);
+        void populateNodesRecursively(GameStateNode & ioNode, const BlockTypes & inBlockTypes, size_t inOffset);
+        void addToFlattenedNodes(const ChildNodes & inChildNode, size_t inOffset);
         void commitThreadLocalData();
         void onTimer(Poco::Timer &);
 
@@ -82,23 +81,38 @@ namespace Tetris
             {
             }
 
-            void mergeAtDepth(int inDepth, const ChildNodes & inChildNodes)
+            void mergeAtDepth(int inOffset, const ChildNodes & inChildNodes)
             {
-                ChildNodes & result = mChildNodesPerDepth[inDepth];
-                for (ChildNodes::const_iterator it = inChildNodes.begin(); it != inChildNodes.end(); ++it)
+                assert(inOffset < mChildNodesPerDepth.size());
+                if (inOffset < mChildNodesPerDepth.size())
                 {
-                    result.insert(*it);
+                    ChildNodes & result = mChildNodesPerDepth[inOffset];
+                    for (ChildNodes::const_iterator it = inChildNodes.begin(); it != inChildNodes.end(); ++it)
+                    {
+                        result.insert(*it);
+                    }
                 }
             }
 
-            size_t sizeAtDepth(size_t inDepth) const
+            size_t sizeAtDepth(size_t inOffset) const
             {
-                return mChildNodesPerDepth[inDepth].size();
+                assert(inOffset < mChildNodesPerDepth.size());
+                if (inOffset < mChildNodesPerDepth.size())
+                {
+                    return mChildNodesPerDepth[inOffset].size();
+                }
+                return 0;
             }
 
-            const ChildNodes & getNodesAtDepth(size_t inDepth) const
+            const ChildNodes & getNodesAtDepth(size_t inOffset) const
             {
-                return mChildNodesPerDepth[inDepth];
+                assert((inOffset < mChildNodesPerDepth.size()));
+                if (inOffset < mChildNodesPerDepth.size())
+                {
+                    return mChildNodesPerDepth[inOffset];
+                }
+                static ChildNodes fDummy;
+                return fDummy;
             }
 
         private:
