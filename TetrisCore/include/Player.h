@@ -36,7 +36,7 @@ namespace Tetris
         // and at most 32 threads will be running simultaneously.
         //
         // Blocking! Call this method in a separate thread to avoid blocking the main game.
-        void start();
+        ChildNodePtr start();
 
         // Pauses the precalculation of new moves.
         // This is useful to too much depth.
@@ -52,12 +52,12 @@ namespace Tetris
 
         const GameStateNode * node() const { return mNode.get(); }
 
-        // Returns best child and its depth.
-        ChildNodePtr getBestChild() const;
-
         size_t getCurrentDepth() const;
 
     private:
+        // Returns best child and its depth.
+        ChildNodePtr getBestChild() const;
+
         bool isTimeExpired();
 
         // We use a ChildNodePtr (shared_ptr) to prevent destruction of the
@@ -112,8 +112,7 @@ namespace Tetris
         ThreadLocalResult mThreadLocalResult;
 
         Poco::Timer mTimer;
-        int mTimeLimitMs;
-        int mDepthLimit;
+        int mTimeLimitMs;   
         Poco::Stopwatch mStopwatch;
         volatile bool mStop;
         mutable boost::condition_variable mPausedConditionVariable;

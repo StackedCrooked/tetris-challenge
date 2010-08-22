@@ -25,11 +25,11 @@ namespace Tetris
     {
         CheckPrecondition(srcNode != NULL, "Goddamn.");
         CheckPrecondition(dstNode != NULL, "Goddamn.");
-        GameStateNode * dstParent = dstNode->parent();
         GameStateNode * dst = dstNode;
-        while (dst->depth() - srcNode->depth() > 0)
+        assert(dst->depth() > srcNode->depth());
+        while (dst->depth() != srcNode->depth())
         {
-            ChildNodes::const_iterator it = dstParent->children().begin(), end = dstParent->children().end();
+            ChildNodes::const_iterator it = dst->parent()->children().begin(), end = dst->parent()->children().end();
             for (; it != end; ++it)
             {
                 ChildNodePtr dstNode = *it;
@@ -37,15 +37,14 @@ namespace Tetris
                 {
                     // Erase all children. The dstNode object is kept alive
                     // thanks to the refcounting mechanism of boost::shared_ptr.
-                    dstParent->clearChildren();
+                    dst->parent()->clearChildren();
 
                     // Add dstNode to the child nodes again.
-                    dstParent->clearChildren();
+                    dst->parent()->addChild(dstNode);
                     break;
                 }
             }
             dst = dst->parent();
-            dstParent = dst->parent();
         }
     }
 
@@ -59,21 +58,12 @@ namespace Tetris
         mResult(std::auto_ptr<Result>(new Result(inDepthLimit))),
         mTimer(inTimeLimitMs, 0),
         mTimeLimitMs(inTimeLimitMs),
-        mDepthLimit(inDepthLimit),
         mStopwatch(),
         mStop(false),
         mPaused(false),
         mThreadPool()
     {
         assert(mNode->children().empty());
-        if (mDepthLimit < 1)
-        {
-            throw std::invalid_argument("The depth limit must be at least 1.");
-        }
-        if (mBlockTypes.size() > mDepthLimit)
-        {
-            LogWarning(MakeString() << "The number of blocks (" << mBlockTypes.size() << ") exceeds the maximum depth (" << mDepthLimit << "). They will be ignored.");
-        }
     }
         
         
@@ -85,7 +75,7 @@ namespace Tetris
 
     size_t Player::getCurrentDepth() const
     {
-        size_t idx = mDepthLimit - 1;
+        size_t idx = mBlockTypes.size() - 1;
         while (idx > 0)
         {
             ScopedConstAtom<Result> result(mResult);
@@ -103,20 +93,32 @@ namespace Tetris
     {
         int currentDepth = getCurrentDepth();
         ScopedConstAtom<Result> result(mResult);
-        return *(result->getNodesAtDepth(currentDepth).begin());
+        
+        // Backtrack to the beginning.
+        GameStateNode * endNode = (*result->getNodesAtDepth(currentDepth).begin()).get();
+        GameStateNode * startNode = endNode;
+        while (startNode != mNode.get())
+        {
+            startNode = startNode->parent();
+        }
+
+        DestroyInferiorChildren(startNode, endNode);
+
+        assert(startNode->children().size() == 1);
+        return *startNode->children().begin();
     }
 
 
     void Player::addToFlattenedNodes(const ChildNodes & inChildNodes, size_t inDepth)
     {        
-        if (inDepth >= mDepthLimit)
+        if (inDepth >= mBlockTypes.size())
         {
-            throw std::out_of_range(MakeString() << "Tried to exceed max node depth " << inDepth << ". Max entries is " << mDepthLimit << ".");
+            throw std::out_of_range(MakeString() << "Tried to exceed max node depth " << inDepth << ". Max entries is " << mBlockTypes.size() << ".");
         }
 
         if (!mThreadLocalResult.get())
         {
-            mThreadLocalResult.reset(new Result(mDepthLimit));
+            mThreadLocalResult.reset(new Result(mBlockTypes.size()));
         }
         mThreadLocalResult->mergeAtDepth(inDepth, inChildNodes);
     }
@@ -131,7 +133,7 @@ namespace Tetris
 
         ScopedAtom<Result> result(mResult);
         
-        for (size_t idx = 0; idx != mDepthLimit; ++idx)
+        for (size_t idx = 0; idx != mBlockTypes.size(); ++idx)
         {
             result->mergeAtDepth(idx, mThreadLocalResult->getNodesAtDepth(idx));
         }
@@ -160,7 +162,7 @@ namespace Tetris
             return;
         }
 
-        if (inDepth >= inBlockTypes.size() || inDepth >= mDepthLimit)
+        if (inDepth >= inBlockTypes.size() || inDepth >= mBlockTypes.size())
         {
             return;
         }
@@ -239,7 +241,7 @@ namespace Tetris
     }
         
     
-    void Player::start()
+    ChildNodePtr Player::start()
     {
         mStopwatch.start();
         Poco::TimerCallback<Player> timerCallback(*this, &Player::onTimer);
@@ -268,6 +270,8 @@ namespace Tetris
 
         mThreadPool.join_all();
         mStopwatch.reset();
+
+        return getBestChild();
     }
 
 

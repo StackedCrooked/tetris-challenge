@@ -131,6 +131,10 @@ namespace Tetris
             virtual void getGameState(TetrisComponent * tetrisComponent, Grid & grid, Block & activeBlock, BlockTypes & futureBlockTypes) = 0;
 
             virtual bool move(TetrisComponent * tetrisComponent, Direction inDirection) = 0;
+
+            virtual bool rotate(TetrisComponent * tetrisComponent) = 0;
+
+            virtual void drop(TetrisComponent * tetrisComponent) = 0;
         };
 
         TetrisComponent(XULWin::Component * inParent, const XULWin::AttributesMapping & inAttr);
