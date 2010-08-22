@@ -94,15 +94,15 @@ namespace Tetris
     }
 
 
-    ChildNodes & GameStateNode::children()
+    const ChildNodes & GameStateNode::children() const
     {
         return mChildren;
     }
 
 
-    const ChildNodes & GameStateNode::children() const
+    void GameStateNode::clearChildren()
     {
-        return mChildren;
+        mChildren.clear();
     }
 
 
@@ -186,19 +186,20 @@ namespace Tetris
     }
 
 
-    void GenerateOffspring(BlockTypes inBlockTypes, size_t inOffset, GameStateNode & ioGameStateNode, ChildNodes & outChildNodes)
+    void GameStateNode::generateOffspring(BlockTypes inBlockTypes, size_t inOffset)
     {
         CheckPrecondition(inOffset < inBlockTypes.size(), "GenerateOffspring: inOffset must be smaller than inBlockTypes.size().");
-        
-        GenerateOffspring(inBlockTypes[inOffset], ioGameStateNode, outChildNodes);
+
+        assert(mChildren.empty());
+        GenerateOffspring(inBlockTypes[inOffset], *this, mChildren);
 
         if (inOffset + 1 < inBlockTypes.size())
         {
-            ChildNodes::iterator it = outChildNodes.begin(), end = outChildNodes.end();
+            ChildNodes::iterator it = mChildren.begin(), end = mChildren.end();
             for (; it != end; ++it)
             {
-                ChildNodePtr childNode = *it;
-                GenerateOffspring(inBlockTypes, inOffset + 1, *childNode, childNode->children());
+                GameStateNode & childNode = **it;
+                childNode.generateOffspring(inBlockTypes, inOffset + 1);
             }
         }
     }

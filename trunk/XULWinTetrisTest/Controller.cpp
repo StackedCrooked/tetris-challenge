@@ -425,7 +425,7 @@ namespace Tetris
         }
         catch (const std::exception & inException)
         {
-            LogError(inException.what()); // TODO: Make thread safe!!!
+            LogError(inException.what());
         }
     }
 
@@ -467,7 +467,7 @@ namespace Tetris
         // last child. This little loop does the searching.
         //
         ChildNodePtr firstChild;
-        for (ChildNodes::iterator it = mComputerPlayer->node()->children().begin(); it != mComputerPlayer->node()->children().end(); ++it)
+        for (ChildNodes::const_iterator it = mComputerPlayer->node()->children().begin(); it != mComputerPlayer->node()->children().end(); ++it)
         {
             ChildNodePtr child = *it;
             if (child.get() == bestFirstChild)
@@ -492,7 +492,7 @@ namespace Tetris
             {
                 lastChild = lastChild->children().begin()->get();
             }
-            lastChild->children().insert(firstChild);
+            lastChild->addChild(firstChild);
             numPrecalculated = game->numPrecalculatedMoves();
         }
 

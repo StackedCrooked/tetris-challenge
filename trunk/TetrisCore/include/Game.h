@@ -80,7 +80,7 @@ namespace Tetris
     private:
         Game(const Game & inGame);
 
-        void setCurrentNode(GameStateNode * inCurrentNode);
+        void setCurrentNode(const GameStateNode * inCurrentNode);
 
         void supplyBlocks() const;
 

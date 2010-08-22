@@ -173,9 +173,9 @@ namespace Tetris
     }
 
 
-    void Game::setCurrentNode(GameStateNode * inCurrentNode)
+    void Game::setCurrentNode(const GameStateNode * inCurrentNode)
     {
-        mCurrentNode = inCurrentNode;
+        mCurrentNode = const_cast<GameStateNode*>(inCurrentNode);
         mCurrentBlockIndex = mCurrentNode->depth();
         supplyBlocks();
         mActiveBlock.reset(CreateDefaultBlock(mBlocks[mCurrentBlockIndex], mNumColumns).release());
@@ -199,8 +199,10 @@ namespace Tetris
         {
             return false;
         }
-
-        setCurrentNode(mCurrentNode->children().begin()->get());
+        
+        const GameStateNode * nextNode = mCurrentNode->children().begin()->get();
+        assert(nextNode->depth() == mCurrentNode->depth() + 1);
+        setCurrentNode(nextNode);        
         return true;
     }
 
@@ -209,9 +211,9 @@ namespace Tetris
     {
         if (GameStateNode * parent = mCurrentNode->parent())
         {
-            ChildNodes & children = parent->children();
-            ChildNodes::iterator it = children.begin(), end = children.end();
-            ChildNodes::iterator * previous(0);
+            const ChildNodes & children = parent->children();
+            ChildNodes::const_iterator it = children.begin(), end = children.end();
+            ChildNodes::const_iterator * previous(0);
             for (; it != end; ++it)
             {
                 if (it->get() == mCurrentNode)
@@ -234,9 +236,9 @@ namespace Tetris
     {
         if (GameStateNode * parent = mCurrentNode->parent())
         {
-            ChildNodes & children = parent->children();
-            ChildNodes::iterator it = children.begin(), end = children.end();
-            ChildNodes::iterator * previous(0);
+            const ChildNodes & children = parent->children();
+            ChildNodes::const_iterator it = children.begin(), end = children.end();
+            ChildNodes::const_iterator * previous(0);
             for (; it != end; ++it)
             {
                 if (it->get() == mCurrentNode)
@@ -322,7 +324,7 @@ namespace Tetris
 
         // Commit the block
         ChildNodePtr child(new GameStateNode(mCurrentNode, mCurrentNode->state().commit(block, GameOver(block.row() == 0))));
-        mCurrentNode->children().insert(child);
+        mCurrentNode->addChild(child);
         setCurrentNode(child.get());
         supplyBlocks();
         return false;

@@ -29,7 +29,7 @@ namespace Tetris
         GameStateNode * dst = dstNode;
         while (dst->depth() - srcNode->depth() > 0)
         {
-            ChildNodes::iterator it = dstParent->children().begin(), end = dstParent->children().end();
+            ChildNodes::const_iterator it = dstParent->children().begin(), end = dstParent->children().end();
             for (; it != end; ++it)
             {
                 ChildNodePtr dstNode = *it;
@@ -37,10 +37,10 @@ namespace Tetris
                 {
                     // Erase all children. The dstNode object is kept alive
                     // thanks to the refcounting mechanism of boost::shared_ptr.
-                    dstParent->children().clear();
+                    dstParent->clearChildren();
 
                     // Add dstNode to the child nodes again.
-                    dstParent->children().insert(dstNode);
+                    dstParent->clearChildren();
                     break;
                 }
             }
@@ -181,14 +181,20 @@ namespace Tetris
         }
 
         // Generate the child nodes
-        GenerateOffspring(inBlockTypes[inDepth], ioNode, ioNode.children());
-        ChildNodes & children = ioNode.children();
+        ChildNodes generatedChildNodes;
+        GenerateOffspring(inBlockTypes[inDepth], ioNode, generatedChildNodes);
+        
+        ChildNodes::iterator it = generatedChildNodes.begin(), end = generatedChildNodes.end();
+        for (; it != end; ++it)
+        {
+            ioNode.addChild(*it);
+        }
 
         // Store the fruit of our labor.
-        addToFlattenedNodes(children, inDepth);
+        addToFlattenedNodes(generatedChildNodes, inDepth);
 
         // Recursion.
-        for (ChildNodes::iterator it = children.begin(); it != children.end(); ++it)
+        for (ChildNodes::iterator it = generatedChildNodes.begin(); it != generatedChildNodes.end(); ++it)
         {
             GameStateNode & childNode = **it;
             populateNodesRecursively(childNode, inBlockTypes, inDepth + 1);
@@ -264,7 +270,12 @@ namespace Tetris
         mTimer.start(timerCallback);
 
         // Generate children of the root node
-        GenerateOffspring(mBlockTypes[0], *mNode, mNode->children());
+        ChildNodes generatedChildNodes;
+        GenerateOffspring(mBlockTypes[0], *mNode, generatedChildNodes);
+        for (ChildNodes::iterator it = generatedChildNodes.begin(); it != generatedChildNodes.end(); ++it)
+        {
+            mNode->addChild(*it);
+        }
 
         // For each child node:
         ChildNodes::const_iterator it = mNode->children().begin(), end = mNode->children().end();

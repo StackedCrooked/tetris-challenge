@@ -33,9 +33,8 @@ namespace Tetris
                 LogWarning("I can't move the block to where I planned to so I'm cheating now.");
                 if (!game.navigateNodeDown())
                 {
-                    LogError("Application state has become corrupted for an unknown reason. Clearing all AI data.");
                     mTimer.stop();
-                    game.currentNode()->children().clear();
+                    LogError("Application state has become corrupted for an unknown reason.");
                 }
             }
         }
@@ -48,7 +47,7 @@ namespace Tetris
         while (true)
         {
             WritableGame game(mGame);
-            ChildNodes & children = game->currentNode()->children();
+            const ChildNodes & children = game->currentNode()->children();
             if (children.empty())
             {
                 // Do nothing. Perhaps we'll have more luck during the next timer event.
