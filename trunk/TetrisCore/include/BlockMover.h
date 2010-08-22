@@ -26,8 +26,6 @@ namespace Tetris
     public:
         BlockMover(ThreadSafeGame & inGame);
 
-        bool isFinished() const;
-
     private:
         void onTimer(Poco::Timer & ioTimer);
         void move();   

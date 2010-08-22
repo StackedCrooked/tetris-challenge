@@ -225,7 +225,7 @@ namespace Tetris
         int result = cUnitWidth * mNumColumns;
         if (getNumFutureBlocks() > 0)
         {
-            result += 5 * cUnitWidth;
+            result += 4 * cUnitWidth;
         }
         return result;
     }
@@ -235,7 +235,7 @@ namespace Tetris
     {
         int result = 0;
         result += cUnitWidth * mNumRows;
-        int requiredHeightForFutureBlocks = cUnitHeight + (5 * getNumFutureBlocks() * cUnitHeight);
+        int requiredHeightForFutureBlocks = (4 * getNumFutureBlocks() * cUnitHeight);
         if (requiredHeightForFutureBlocks > result)
         {
             result = requiredHeightForFutureBlocks;
@@ -265,7 +265,7 @@ namespace Tetris
         for (size_t idx = 1; idx < futureBlockTypes.size(); ++idx)
         {
             int x = cUnitWidth * mNumColumns + 1;
-            int y = cUnitHeight + (idx - 1) * (5 * cUnitHeight);
+            int y = (idx - 1) * (4 * cUnitHeight);
             PaintGrid(g, GetGrid(GetBlockIdentifier(futureBlockTypes[idx], 0)), x, y, false);
         }
 
@@ -307,7 +307,7 @@ namespace Tetris
         //
         // Erase the background.
         //
-        HBRUSH backgroundBrush = CreateSolidBrush(RGB(0, 0, 0));
+        HBRUSH backgroundBrush = CreateSolidBrush(RGB(211, 211, 211));
         FillRect(compatibleDC, &rc, backgroundBrush);
         DeleteObject(backgroundBrush);
 

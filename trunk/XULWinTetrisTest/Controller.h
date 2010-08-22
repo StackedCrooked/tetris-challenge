@@ -5,6 +5,7 @@
 #include "Block.h"
 #include "TetrisComponent.h"
 #include "XULWin/Components.h"
+#include "XULWin/Window.h"
 #include "XULWin/WinUtils.h"
 #include "XULWin/XULRunner.h"
 #include <boost/noncopyable.hpp>
@@ -38,12 +39,14 @@ namespace Tetris
 
         ~Controller();
 
+        void run();
+
         // TetrisComponent::Controller methods
         void getGameState(TetrisComponent * tetrisComponent, Grid & grid, Block & activeBlock, BlockTypes & futureBlockTypes);
 
         bool move(TetrisComponent * tetrisComponent, Direction inDirection);
 
-        void Controller::setQuitFlag();
+        void setQuitFlag();
 
         void joinAllThreads();
 
@@ -65,6 +68,7 @@ namespace Tetris
 
     private:
         XULWin::XULRunner mXULRunner;
+        XULWin::Window * mWindow;
         TetrisComponent * mTetrisComponent;
         TetrisComponent * mFutureTetrisComponent;
         XULWin::TextBox * mFPSTextBox;

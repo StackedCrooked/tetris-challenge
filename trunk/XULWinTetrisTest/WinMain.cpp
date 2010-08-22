@@ -9,19 +9,20 @@
 #include <windows.h>
 
 
-
 int StartProgram(HINSTANCE hInstance)
 {
     XULWin::Initializer initializer(hInstance);
-    XULWin::WinAPI::CommonControlsInitializer ccInit;
+
+    // Register the XML tag "tetris" in the factory lookup table.
     XULWin::ElementFactory::Instance().registerElement<Tetris::TetrisElement>();
 
-    // Create the Controller object
+    // Create the Controller object. Starts the game.
     Tetris::Controller controller(hInstance);
-    
-    // Blocking ...
 
-    // The main window has been closed.
+    // Run the game
+    controller.run();
+    
+    // Closing
     controller.setQuitFlag();
     controller.joinAllThreads();
     return 0;
