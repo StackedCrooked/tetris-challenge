@@ -12,6 +12,16 @@
 namespace Tetris
 {
 
+    template<class T>
+    T * FindComponentById(XULWin::Element * inElement, const std::string & inId)
+    {
+        if (XULWin::Element * inEl = inElement->getElementById(inId))
+        {
+            return inEl->component()->downcast<T>();
+        }
+        return 0;
+    }
+
     Controller::Controller(HINSTANCE hInstance) :
         mXULRunner(hInstance),
         mTetrisComponent(0),
@@ -55,27 +65,28 @@ namespace Tetris
         //
         // Get the Tetris component.
         //
-        std::vector<Tetris::TetrisElement *> tetrisElements;
-        rootElement->getElementsByType<Tetris::TetrisElement>(tetrisElements);
-        if (tetrisElements.empty())
+        if (!(mTetrisComponent = FindComponentById<Tetris::TetrisComponent>(rootElement.get(), "tetris0")))
         {
-            throw std::runtime_error("The window does not contain any 'tetris' elements.");
-        }
-        else
-        {
-            mTetrisComponent = tetrisElements[0]->component()->downcast<Tetris::TetrisComponent>();
+            throw std::runtime_error("The XUL document must contain a <tetris> element with id \"tetris0\".");
         }
 
-        if (tetrisElements.size())
+        mTetrisComponent->setController(this);
+
+        if (!(mFutureTetrisComponent = FindComponentById<Tetris::TetrisComponent>(rootElement.get(), "tetris1")))
         {
-            LogWarning("Multiple tetris elements found in the XUL file. Only the first one can be used for AI.");
+            LogWarning("Did not find future tetris component.");
+        }
+
+        if (mFutureTetrisComponent)
+        {
+            mFutureTetrisComponent->setController(this);
         }
 
 
         //
         // Get the Game object.
         //
-        mThreadSafeGame.reset(new ThreadSafeGame(mTetrisComponent->getThreadSafeGame()));
+        mThreadSafeGame.reset(new ThreadSafeGame(std::auto_ptr<Game>(new Game)));
                     
 
         //
@@ -202,6 +213,41 @@ namespace Tetris
         mTimedGame.reset();
     }
 
+            
+    void Controller::getGameState(TetrisComponent * tetrisComponent,
+                                  Grid & outGrid,
+                                  Block & outActiveBlock,
+                                  BlockTypes & outFutureBlockTypes)
+    {
+        if (tetrisComponent == mTetrisComponent)
+        {
+            ReadOnlyGame rgame(*mThreadSafeGame);
+            const Game & game = *(rgame.get());
+            outGrid = game.currentNode()->state().grid();
+            outActiveBlock = game.activeBlock();
+            game.getFutureBlocks(mTetrisComponent->getNumFutureBlocks() + 1, outFutureBlockTypes);
+        }
+        else if (tetrisComponent == mFutureTetrisComponent)
+        {
+            ReadOnlyGame rgame(*mThreadSafeGame);
+            const Game & game = *(rgame.get());
+            if (!game.currentNode()->children().empty())
+            {
+                const Game & game = *(rgame.get());
+                const GameStateNode & node = (**game.currentNode()->children().begin());
+                outGrid = node.state().grid();
+            }
+        }
+    }
+
+
+    bool Controller::move(TetrisComponent * tetrisComponent, Direction inDirection)
+    {
+        WritableGame wgame(*mThreadSafeGame);
+        Game & game = *wgame.get();
+        return game.move(inDirection);
+    }
+
 
     void Controller::setQuitFlag()
     {
@@ -272,7 +318,7 @@ namespace Tetris
         // Flush the logger.
         Logger::Instance().flush();
     
-        if (mBlockCountTextBox || mMovesAheadTextBox) // requires locking, brr..
+        if (mBlockCountTextBox || mMovesAheadTextBox || mFutureTetrisComponent) // requires locking, brr..
         {
             ReadOnlyGame game(*mThreadSafeGame);
             if (mBlockCountTextBox)
@@ -295,7 +341,10 @@ namespace Tetris
             for (size_t idx = 0; idx != 4; ++idx)
             {
                 const GameState::Stats & stats = game->currentNode()->state().stats();
-                mLinesTextBoxes[idx]->setValue(MakeString() << stats.numLines(idx));
+                if (mLinesTextBoxes[idx])
+                {
+                    mLinesTextBoxes[idx]->setValue(MakeString() << stats.numLines(idx));
+                }
             }
         }
 

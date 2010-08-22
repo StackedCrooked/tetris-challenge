@@ -30,12 +30,18 @@ namespace Tetris
     };
 
     
-    class Controller : boost::noncopyable
+    class Controller : public TetrisComponent::Controller,
+                       boost::noncopyable
     {
     public:
         Controller(HINSTANCE hInstance);
 
         ~Controller();
+
+        // TetrisComponent::Controller methods
+        void getGameState(TetrisComponent * tetrisComponent, Grid & grid, Block & activeBlock, BlockTypes & futureBlockTypes);
+
+        bool move(TetrisComponent * tetrisComponent, Direction inDirection);
 
         void Controller::setQuitFlag();
 
@@ -60,6 +66,7 @@ namespace Tetris
     private:
         XULWin::XULRunner mXULRunner;
         TetrisComponent * mTetrisComponent;
+        TetrisComponent * mFutureTetrisComponent;
         XULWin::TextBox * mFPSTextBox;
         XULWin::TextBox * mBlockCountTextBox;
         typedef XULWin::TextBox * TextBoxPtr;
