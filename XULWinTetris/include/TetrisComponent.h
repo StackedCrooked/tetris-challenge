@@ -3,7 +3,7 @@
 
 
 #include "Game.h"
-#include "ThreadSafeGame.h"
+#include "Direction.h"
 #include "XULWin/Component.h"
 #include "XULWin/AttributeController.h"
 #include "XULWin/Decorator.h"
@@ -15,6 +15,7 @@
 #include "Poco/Stopwatch.h"
 #include <boost/scoped_ptr.hpp>
 #include <boost/signals.hpp>
+#include <boost/thread.hpp>
 
 
 namespace Tetris
@@ -46,6 +47,52 @@ namespace Tetris
 
 
     /**
+     * Attribute: numcolumns
+     * Type: string (representing an integer)
+     * Purpose: The number of future blocks to show in the Tetris component
+     */
+    class NumColumnsController : public XULWin::AttributeController
+    {
+    public:
+        static const char * AttributeName()
+        {
+            return "numcolumns";
+        }
+
+        virtual void get(std::string & outValue);
+
+        virtual void set(const std::string & inValue);
+
+        virtual int getNumColumns() const = 0;
+
+        virtual void setNumColumns(int inNumColumns) = 0;
+    };
+
+
+    /**
+     * Attribute: numrows
+     * Type: string (representing an integer)
+     * Purpose: The number of future blocks to show in the Tetris component
+     */
+    class NumRowsController : public XULWin::AttributeController
+    {
+    public:
+        static const char * AttributeName()
+        {
+            return "numrows";
+        }
+
+        virtual void get(std::string & outValue);
+
+        virtual void set(const std::string & inValue);
+
+        virtual int getNumRows() const = 0;
+
+        virtual void setNumRows(int inNumRows) = 0;
+    };
+
+
+    /**
      * Attribute: keyboardenabled
      * Type: string (representing an integer)
      * Purpose: The number of future blocks to show in the Tetris component
@@ -70,11 +117,21 @@ namespace Tetris
 
     class TetrisComponent : public XULWin::NativeControl,
                             public NumFutureBlocksController,
+                            public NumRowsController,
+                            public NumColumnsController,
                             public KeyboardEnabledController,
                             public XULWin::GdiplusLoader
     {
     public:
         typedef XULWin::NativeControl Super;
+
+        class Controller
+        {
+        public:
+            virtual void getGameState(TetrisComponent * tetrisComponent, Grid & grid, Block & activeBlock, BlockTypes & futureBlockTypes) = 0;
+
+            virtual bool move(TetrisComponent * tetrisComponent, Direction inDirection) = 0;
+        };
 
         TetrisComponent(XULWin::Component * inParent, const XULWin::AttributesMapping & inAttr);
 
@@ -84,11 +141,9 @@ namespace Tetris
 
         virtual bool init();
 
+        void setController(Controller * inController);
+
         inline int getFPS() const { return mFPS; }
-
-        const ThreadSafeGame & getThreadSafeGame() const;
-
-        ThreadSafeGame & getThreadSafeGame();
 
         virtual bool initAttributeControllers();
 
@@ -102,6 +157,16 @@ namespace Tetris
         virtual int getNumFutureBlocks() const;
 
         virtual void setNumFutureBlocks(int inNumFutureBlocks);
+
+        // NumColumnsController
+        virtual int getNumColumns() const;
+
+        virtual void setNumColumns(int inNumColumns);
+
+        // NumRowsController
+        virtual int getNumRows() const;
+
+        virtual void setNumRows(int inNumRows);
 
         virtual bool getKeyboardEnabled() const;
 
@@ -120,8 +185,10 @@ namespace Tetris
 
         virtual void paint(HDC inHDC);
 
-        boost::scoped_ptr<ThreadSafeGame> mThreadSafeGame;
+        Controller * mController;
         int mNumFutureBlocks;
+        int mNumColumns;
+        int mNumRows;
         bool mKeyboardEnabled;
         XULWin::WinAPI::Timer mWinAPITimer;
         int mFrameCount;

@@ -34,6 +34,30 @@ namespace Tetris
     }
 
     
+    void NumRowsController::get(std::string & outValue)
+    {
+        outValue = XULWin::Int2String(getNumRows());
+    }
+
+    
+    void NumRowsController::set(const std::string & inValue)
+    {
+        setNumRows(XULWin::String2Int(inValue, 1));
+    }
+
+    
+    void NumColumnsController::get(std::string & outValue)
+    {
+        outValue = XULWin::Int2String(getNumColumns());
+    }
+
+    
+    void NumColumnsController::set(const std::string & inValue)
+    {
+        setNumColumns(XULWin::String2Int(inValue, 1));
+    }
+
+    
     void KeyboardEnabledController::get(std::string & outValue)
     {
         outValue = XULWin::Bool2String(getKeyboardEnabled());
@@ -48,8 +72,10 @@ namespace Tetris
 
     TetrisComponent::TetrisComponent(XULWin::Component * inParent, const XULWin::AttributesMapping & inAttr) :
         XULWin::NativeControl(inParent, inAttr, TEXT("STATIC"), 0, 0),
-        mThreadSafeGame(new ThreadSafeGame(std::auto_ptr<Game>(new Tetris::Game(20, 10, Tetris::BlockTypes())))),
+        mController(0),
         mNumFutureBlocks(1),
+        mNumColumns(10),
+        mNumRows(20),
         mKeyboardEnabled(true),
         mFrameCount(0),
         mFPS(0)
@@ -84,6 +110,12 @@ namespace Tetris
     }
 
 
+    void TetrisComponent::setController(Controller * inController)
+    {
+        mController = inController;
+    }
+
+
     void TetrisComponent::onTimerEvent()
     {
         ::InvalidateRect(handle(), 0, FALSE);
@@ -101,6 +133,30 @@ namespace Tetris
         mNumFutureBlocks = inNumFutureBlocks;
     }
 
+    
+    int TetrisComponent::getNumColumns() const
+    {
+        return mNumColumns;
+    }
+
+
+    void TetrisComponent::setNumColumns(int inNumColumns)
+    {
+        mNumColumns = inNumColumns;
+    }
+
+    
+    int TetrisComponent::getNumRows() const
+    {
+        return mNumRows;
+    }
+
+
+    void TetrisComponent::setNumRows(int inNumRows)
+    {
+        mNumRows = inNumRows;
+    }
+
 
     bool TetrisComponent::getKeyboardEnabled() const
     {
@@ -114,46 +170,38 @@ namespace Tetris
         
         
     LRESULT TetrisComponent::onKeyDown(WPARAM wParam, LPARAM lParam)
-    {       
-        // Scoped lock
+    {
+        switch (wParam)
         {
-            switch (wParam)
+            case VK_LEFT:
+            {   
+                mController->move(this, Direction_Left);
+                break;
+            }
+            case VK_RIGHT:
             {
-                case VK_LEFT:
-                {   
-                    WritableGame game(*mThreadSafeGame);
-                    game->move(Direction_Left);
-                    break;
-                }
-                case VK_RIGHT:
-                {
-                    WritableGame game(*mThreadSafeGame);
-                    game->move(Direction_Right);
-                    break;
-                }
-                case VK_UP:
-                {
-                    WritableGame game(*mThreadSafeGame);
-                    game->rotate();
-                    break;
-                }
-                case VK_DOWN:
-                {
-                    WritableGame game(*mThreadSafeGame);
-                    game->move(Direction_Down);
-                    break;
-                }
-                case VK_SPACE:
-                {
-                    WritableGame game(*mThreadSafeGame);
-                    game->drop();
-                    break;
-                }
-                default:
-                {
-                    OnKeyboardPressed(wParam);
-                    break;
-                }
+                mController->move(this, Direction_Right);
+                break;
+            }
+            case VK_UP:
+            {
+                mController->move(this, Direction_Up);
+                break;
+            }
+            case VK_DOWN:
+            {
+                mController->move(this, Direction_Down);
+                break;
+            }
+            case VK_SPACE:
+            {
+                mController->move(this, Direction_Down);
+                break;
+            }
+            default:
+            {
+                OnKeyboardPressed(wParam);
+                break;
             }
         }
 
@@ -162,21 +210,11 @@ namespace Tetris
     }
 
 
-    const ThreadSafeGame & TetrisComponent::getThreadSafeGame() const
-    {
-        return *mThreadSafeGame;
-    }
-
-
-    ThreadSafeGame & TetrisComponent::getThreadSafeGame()
-    {
-        return *mThreadSafeGame;
-    }
-
-
     bool TetrisComponent::initAttributeControllers()
     {
         setAttributeController<NumFutureBlocksController>(this);
+        setAttributeController<NumColumnsController>(this);
+        setAttributeController<NumRowsController>(this);
         setAttributeController<KeyboardEnabledController>(this);
         return Super::initAttributeControllers();
     }
@@ -184,22 +222,11 @@ namespace Tetris
 
     int TetrisComponent::calculateWidth(XULWin::SizeConstraint inSizeConstraint) const
     {
-        int result = 0;
-        if (!mThreadSafeGame)
-        {
-            result += cUnitWidth * 10;
-        }
-        else
-        {
-            ReadOnlyGame game(*mThreadSafeGame);
-            result += cUnitWidth * game->numColumns();
-        }
-
+        int result = cUnitWidth * mNumColumns;
         if (getNumFutureBlocks() > 0)
         {
             result += 5 * cUnitWidth;
         }
-
         return result;
     }
 
@@ -207,16 +234,7 @@ namespace Tetris
     int TetrisComponent::calculateHeight(XULWin::SizeConstraint inSizeConstraint) const
     {
         int result = 0;
-        if (!mThreadSafeGame)
-        {
-            result += cUnitWidth * 20;
-        }
-        else
-        {
-            ReadOnlyGame game(*mThreadSafeGame);
-            result += cUnitHeight * game->numRows();
-        }
-
+        result += cUnitWidth * mNumRows;
         int requiredHeightForFutureBlocks = cUnitHeight + (5 * getNumFutureBlocks() * cUnitHeight);
         if (requiredHeightForFutureBlocks > result)
         {
@@ -228,31 +246,27 @@ namespace Tetris
 
     void TetrisComponent::paint(HDC inHDC)
     {
+        if (!mController)
+        {
+            throw std::runtime_error("You must set a controller object with setController(...)");
+        }
+
         Gdiplus::Graphics g(inHDC);
         g.SetInterpolationMode(Gdiplus::InterpolationModeHighQuality);
         g.SetSmoothingMode(Gdiplus::SmoothingModeHighQuality);
+        
+        Grid grid(mNumRows, mNumColumns);
+        Block activeBlock(BlockType_Begin, Rotation(0), Row(0), Column(0));
+        BlockTypes futureBlockTypes;
+        mController->getGameState(this, grid, activeBlock, futureBlockTypes);
 
-        // Scoped lock
+        PaintGrid(g, grid, 0, 0, true);
+        PaintGrid(g, activeBlock.grid(), activeBlock.column() * cUnitWidth, activeBlock.row() * cUnitHeight, false);
+        for (size_t idx = 1; idx < futureBlockTypes.size(); ++idx)
         {
-            ReadOnlyGame game(*mThreadSafeGame);
-
-            // Paint the current game grid
-            const Grid & grid = game->currentNode()->state().grid();
-            PaintGrid(g, grid, 0, 0, true);
-
-            // Paint the currently active block
-            const Block & block = game->activeBlock();
-            PaintGrid(g, block.grid(), block.column() * cUnitWidth, block.row() * cUnitHeight, false);
-
-            // Paint future blocks
-            BlockTypes futureBlockTypes;
-            game->getFutureBlocks(mNumFutureBlocks + 1, futureBlockTypes);
-            for (size_t idx = 1; idx < futureBlockTypes.size(); ++idx)
-            {
-                int x = cUnitWidth * (game->numColumns() + 1);
-                int y = cUnitHeight + (idx - 1) * (5 * cUnitHeight);
-                PaintGrid(g, GetGrid(GetBlockIdentifier(futureBlockTypes[idx], 0)), x, y, false);
-            }
+            int x = cUnitWidth * mNumColumns + 1;
+            int y = cUnitHeight + (idx - 1) * (5 * cUnitHeight);
+            PaintGrid(g, GetGrid(GetBlockIdentifier(futureBlockTypes[idx], 0)), x, y, false);
         }
 
         mFrameCount++;
