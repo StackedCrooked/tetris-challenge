@@ -37,6 +37,8 @@ namespace Tetris
         // Each node is produced by a unique combination of the current block's column and rotation.
         int identifier() const;
 
+        void generateOffspring(BlockTypes inBlockTypes, size_t inOffset);
+
         // Distance from the root node.
         int depth() const;
 
@@ -46,7 +48,10 @@ namespace Tetris
 
         const ChildNodes & children() const;
 
-        ChildNodes & children();
+        void clearChildren();
+
+        inline void addChild(ChildNodePtr inChildNode)
+        { mChildren.insert(inChildNode); }
 
         const GameState & state() const;
 
