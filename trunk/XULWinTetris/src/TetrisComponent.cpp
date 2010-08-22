@@ -185,7 +185,7 @@ namespace Tetris
             }
             case VK_UP:
             {
-                mController->move(this, Direction_Up);
+                mController->rotate(this);
                 break;
             }
             case VK_DOWN:
@@ -195,7 +195,7 @@ namespace Tetris
             }
             case VK_SPACE:
             {
-                mController->move(this, Direction_Down);
+                mController->drop(this);
                 break;
             }
             default:

@@ -46,6 +46,10 @@ namespace Tetris
 
         bool move(TetrisComponent * tetrisComponent, Direction inDirection);
 
+        bool rotate(TetrisComponent * tetrisComponent);
+
+        void drop(TetrisComponent * tetrisComponent);
+
         void setQuitFlag();
 
         void joinAllThreads();
@@ -57,8 +61,6 @@ namespace Tetris
         void startAI();
 
         void refresh();
-            
-        void precalculate();
 
         void calculateOptimalPath(std::auto_ptr<GameStateNode> inClonedGameState, const BlockTypes & inBlockTypes);
 
@@ -84,7 +86,6 @@ namespace Tetris
         boost::scoped_ptr<Tetris::TimedGame> mTimedGame;
         boost::scoped_ptr<XULWin::WinAPI::Timer> mRefreshTimer;
         boost::scoped_ptr<BlockMover> mBlockMover;
-        boost::scoped_ptr<boost::thread> mAIThread;
         boost::scoped_ptr<Player> mComputerPlayer;
         volatile bool mQuit;
         

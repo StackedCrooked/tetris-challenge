@@ -38,7 +38,6 @@ namespace Tetris
         mTimedGame(),
         mRefreshTimer(),
         mBlockMover(),
-        mAIThread(),
         mComputerPlayer(),
         mQuit(false),
         mAIThinkingTime(1000)
@@ -255,6 +254,22 @@ namespace Tetris
     }
 
 
+    void Controller::drop(TetrisComponent * tetrisComponent)
+    {
+        WritableGame wgame(*mThreadSafeGame);
+        Game & game = *wgame.get();
+        game.drop();
+    }
+
+
+    bool Controller::rotate(TetrisComponent * tetrisComponent)
+    {
+        WritableGame wgame(*mThreadSafeGame);
+        Game & game = *wgame.get();
+        return game.rotate();
+    }
+
+
     void Controller::setQuitFlag()
     {
         mQuit = true;
@@ -267,10 +282,7 @@ namespace Tetris
 
     void Controller::joinAllThreads()
     {
-        if (mAIThread)
-        {
-            mAIThread->join();
-        }
+        // Currently unused because it's blocking.
     }
 
 
@@ -291,17 +303,39 @@ namespace Tetris
 
     void Controller::startAI()
     {
-        if (!mAIThread)
+        // Don't allow AI if there are still blocks in the queue
+        if (ReadOnlyGame(*mThreadSafeGame)->currentNode()->children().empty())
         {
             // Start the block mover
-            mBlockMover.reset(new BlockMover(*mThreadSafeGame));
+            mBlockMover.reset(new BlockMover(*mThreadSafeGame));           
+            
+            std::auto_ptr<GameStateNode> currentNode;
+            BlockTypes futureBlocks;
 
-            // And start the thinking thread
-            mAIThread.reset(new boost::thread(boost::bind(&Controller::precalculate, this)));
-        }
-        else
-        {
-            LogWarning("The AI thread has already started.");
+            // Critical section: fetch a clone of the current node and the list of future blocks
+            {
+                ReadOnlyGame rgame(*mThreadSafeGame);
+                const Game & game = *(rgame.get());
+                game.getFutureBlocks(3, futureBlocks);
+                currentNode = game.currentNode()->clone();
+            }
+            
+            // Prepare just a check
+            int currentDepth = currentNode->depth();
+
+            // Setup the player object
+            Player p(currentNode, futureBlocks, 1000, 3);           
+            ChildNodePtr resultNode = p.start(); // Waiting...
+
+            // Just a check
+            assert(currentDepth + 1 == resultNode->depth());
+
+            // Critical section: apply results
+            {
+                WritableGame wgame(*mThreadSafeGame);
+                Game & game = *(wgame.get());
+                game.currentNode()->addChild(resultNode);
+            }
         }
     }
 
@@ -386,145 +420,6 @@ namespace Tetris
         {
             mAIProgressMeter->setDisabled(true);
             mAIProgressMeter->setValue(0);
-        }
-    }
-
-        
-    void Controller::precalculate()
-    {
-        // Thead entry point
-        try
-        {
-            // Infinite AI
-            while (!mQuit)
-            {
-                BlockTypes blockTypes;
-                std::auto_ptr<GameStateNode> clonedStartingNode;
-                int depthOfStartingNode = 0;
-
-                // Critical section:
-                //   - clone the current GameState object
-                //   - fetch future blocks
-                {
-                    WritableGame game(*mThreadSafeGame);
-                    GameStateNode * startingNode = game->currentNode();
-                    while (!startingNode->children().empty())
-                    {
-                        assert(startingNode->children().empty());
-                        GameStateNode & node = **startingNode->children().begin();
-                        startingNode = &node;
-                    }
-                    clonedStartingNode = startingNode->clone();
-                    depthOfStartingNode = clonedStartingNode->depth() - game->currentNode()->depth();
-
-                    BlockTypes tooManyBlockTypes;
-                    game->getFutureBlocks(depthOfStartingNode + cAIMaxDepth, tooManyBlockTypes);
-                    for (size_t idx = depthOfStartingNode; idx != tooManyBlockTypes.size(); ++idx)
-                    {
-                        blockTypes.push_back(tooManyBlockTypes[idx]);
-                    }
-                }
-
-                // Blocking until best path found.
-                assert(clonedStartingNode.get());
-                calculateOptimalPath(clonedStartingNode, blockTypes);
-            }
-        }
-        catch (const std::exception & inException)
-        {
-            LogError(inException.what());
-        }
-    }
-
-
-    void Controller::calculateOptimalPath(std::auto_ptr<GameStateNode> inClonedGameState, const BlockTypes & inBlockTypes)
-    {
-        assert(inClonedGameState->children().empty());
-
-
-        //
-        // Start the number crunching. This will take a while to complete (max mAIThinkingTime).
-        //
-        int currentGameDepth = inClonedGameState->depth();
-        assert(ReadOnlyGame(*mThreadSafeGame)->currentNode()->depth() == currentGameDepth);
-        int time = 0;
-        {
-            boost::mutex::scoped_lock lock(mAIThinkingTimeMutex);
-            time = mAIThinkingTime;
-        }
-        mComputerPlayer.reset(new Player(inClonedGameState, inBlockTypes, time, cAIMaxDepth));
-        mComputerPlayer->start(); // Wait for results... (limited by mAIThinkingTime)
-
-        if (mQuit)
-        {
-            return;
-        }
-
-        // 
-        // Eliminate the inferior branches. The tree will be reduced to a path of nodes defining
-        // the best game strategy.
-        //
-        ChildNodePtr bestLastChild = mComputerPlayer->getBestChild();
-        GameStateNode * bestFirstChild = bestLastChild.get();
-        while (bestFirstChild->depth() > currentGameDepth + 1)
-        {
-            bestFirstChild = bestFirstChild->parent();
-        }
-        DestroyInferiorChildren(bestFirstChild, bestLastChild.get());
-        
-
-        //
-        // We actually don't know yet which of our first generation children leads to the best
-        // last child. This little loop does the searching.
-        //
-        ChildNodePtr firstChild;
-        for (ChildNodes::const_iterator it = mComputerPlayer->node()->children().begin(); it != mComputerPlayer->node()->children().end(); ++it)
-        {
-            ChildNodePtr child = *it;
-            if (child.get() == bestFirstChild)
-            {
-                firstChild = child;
-                break;
-            }
-        }
-
-        // If we didn't find the first child, then something is wrong with our code. Unforgivable.
-        if (!firstChild)
-        {
-            throw std::logic_error("The AI result-path does not include one of the first generation child nodes.");
-        }
-        
-        // Critical section: append the first child to the currently last child
-        int numPrecalculated = 0;
-        {
-            WritableGame game(*mThreadSafeGame);
-            assert(game->currentNode()->depth() == currentGameDepth);
-            assert(firstChild->depth() == currentGameDepth + 1);
-            game->currentNode()->addChild(firstChild);
-            numPrecalculated = game->numPrecalculatedMoves();
-        }
-
-        // Increment the waiting time until we reach the maximum of 8 seconds.
-        {
-            boost::mutex::scoped_lock lock(mAIThinkingTimeMutex);
-            static const int fTimeTable[] =
-            {
-                500,    // 0
-                500,    // 1
-                1000,   // 2
-                1000,   // 3
-                2000,   // 4
-                2000,   // 5
-                3000,   // 6
-                3000,   // 7
-                4000,   // 8
-                4000    // 9
-            };
-
-            if (numPrecalculated < 10)
-            {
-                mAIThinkingTime = fTimeTable[numPrecalculated];
-            }
         }
     }
 
