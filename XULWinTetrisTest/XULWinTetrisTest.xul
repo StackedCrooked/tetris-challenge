@@ -52,22 +52,11 @@
         <hbox align="center">
           <label value="Precalculated:" style="text-align:right" />
           <textbox id="movesAheadTextBox" value="0" readonly="true" flex="1" />
-        </hbox>        
-        <vbox align="stretch">
-          <hbox align="center">
-            <label value="Progress:" />
-            <textbox id="percentTextBox" value="0" readonly="true" flex="0" />
-            <label value="% of" style="margin:0px" />
-            <textbox id="maxTimeTextBox" value="0" readonly="true" flex="1" width="40" />
-            <label value="s" />
-          </hbox>
-          <progressmeter id="computerAIProgressMeter" />
-        </vbox>
+        </hbox>
       </groupbox>
     </vbox>
     <hbox>
       <tetris id="tetris0" flex="0" numfutureblocks="3" keyboardenabled="true" />
-      <tetris id="tetris1" flex="0" numfutureblocks="3" keyboardenabled="false" />
     </hbox>
   </hbox>
   <textbox id="loggingTextbox" value="Log messages appear here." multiline="true" flex="1" rows="4" readonly="true" style="background-color:white" />
