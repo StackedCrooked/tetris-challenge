@@ -225,13 +225,13 @@ namespace Tetris
     }
 
 
-    void Player::populateNodesInBackground(ChildNodePtr inNode, BlockTypes * inBlockTypes, size_t inDepth)
+    void Player::populateNodesInBackground(GameStateNode & inNode, BlockTypes * inBlockTypes, size_t inDepth)
     {
         // Thread entry point
         try
         {
             boost::scoped_ptr<BlockTypes> takeOwnership(inBlockTypes);
-            populateNodesRecursively(*inNode, *inBlockTypes, inDepth);
+            populateNodesRecursively(inNode, *inBlockTypes, inDepth);
             commitThreadLocalData();
        } 
         catch (const std::exception & inException)
@@ -247,26 +247,29 @@ namespace Tetris
         Poco::TimerCallback<Player> timerCallback(*this, &Player::onTimer);
         mTimer.start(timerCallback);
 
-        // Generate children of the root node
-        ChildNodes generatedChildNodes;
-        GenerateOffspring(mBlockTypes[0], *mNode, generatedChildNodes);
-        for (ChildNodes::iterator it = generatedChildNodes.begin(); it != generatedChildNodes.end(); ++it)
-        {
-            mNode->addChild(*it);
-        }
+        GameStateNode & node = *mNode;
+        populateNodesInBackground(node, &mBlockTypes, mBlockTypes.size());
 
-        // For each child node:
-        ChildNodes::const_iterator it = mNode->children().begin(), end = mNode->children().end();
-        for (; it != end; ++it)
-        {
-            ChildNodePtr firstGenerationChildNode = *it;
-            mThreadPool.create_thread(
-                boost::bind(&Player::populateNodesInBackground,
-                            this,
-                            firstGenerationChildNode,
-                            new BlockTypes(mBlockTypes),
-                            1));
-        }
+        //// Generate children of the root node
+        //ChildNodes generatedChildNodes;
+        //GenerateOffspring(mBlockTypes[0], *mNode, generatedChildNodes);
+        //for (ChildNodes::iterator it = generatedChildNodes.begin(); it != generatedChildNodes.end(); ++it)
+        //{
+        //    mNode->addChild(*it);
+        //}
+
+        //// For each child node:
+        //ChildNodes::const_iterator it = mNode->children().begin(), end = mNode->children().end();
+        //for (; it != end; ++it)
+        //{
+        //    ChildNodePtr firstGenerationChildNode = *it;
+        //    mThreadPool.create_thread(
+        //        boost::bind(&Player::populateNodesInBackground,
+        //                    this,
+        //                    firstGenerationChildNode,
+        //                    new BlockTypes(mBlockTypes),
+        //                    1));
+        //}
 
         mThreadPool.join_all();
         mStopwatch.reset();
