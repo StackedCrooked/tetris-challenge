@@ -162,7 +162,7 @@ namespace Tetris
             return;
         }
 
-        if (inDepth >= inBlockTypes.size() || inDepth >= mBlockTypes.size())
+        if (inDepth >= inBlockTypes.size())
         {
             return;
         }
