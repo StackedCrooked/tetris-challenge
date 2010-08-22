@@ -65,6 +65,7 @@ namespace Tetris
         mPaused(false),
         mThreadPool()
     {
+        assert(mNode->children().empty());
         if (mDepthLimit < 1)
         {
             throw std::invalid_argument("The depth limit must be at least 1.");
@@ -236,30 +237,6 @@ namespace Tetris
             LogError(MakeString() << "populateNodesInBackground failed: " << inException.what());
         }
     }
-
-
-    int Player::remainingTimeMs() const
-    {
-        return mTimeLimitMs - static_cast<int>((1000 * mStopwatch.elapsed()) / mStopwatch.resolution());
-    }
-
-
-    void Player::setPause(bool inPaused)
-    {
-        boost::mutex::scoped_lock lock(mPausedMutex);
-        if (inPaused && !mPaused)
-        {
-            mPaused = inPaused;
-            mPausedConditionVariable.notify_one();
-        }
-    }
-
-
-    bool Player::isPaused() const
-    {
-        boost::mutex::scoped_lock lock(mPausedMutex);
-        return mPaused;
-    }
         
     
     void Player::start()
@@ -291,6 +268,30 @@ namespace Tetris
 
         mThreadPool.join_all();
         mStopwatch.reset();
+    }
+
+
+    int Player::remainingTimeMs() const
+    {
+        return mTimeLimitMs - static_cast<int>((1000 * mStopwatch.elapsed()) / mStopwatch.resolution());
+    }
+
+
+    void Player::setPause(bool inPaused)
+    {
+        boost::mutex::scoped_lock lock(mPausedMutex);
+        if (inPaused && !mPaused)
+        {
+            mPaused = inPaused;
+            mPausedConditionVariable.notify_one();
+        }
+    }
+
+
+    bool Player::isPaused() const
+    {
+        boost::mutex::scoped_lock lock(mPausedMutex);
+        return mPaused;
     }
 
 
