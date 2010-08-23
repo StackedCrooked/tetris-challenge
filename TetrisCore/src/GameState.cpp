@@ -46,6 +46,7 @@ namespace Tetris
             size_t top = mGrid.numRows();
 
             size_t numOccupiedUnderTop = 0;
+            size_t numHinderingTetris = 0;
 
             for (size_t rowIdx = 0; rowIdx != mGrid.numRows(); ++rowIdx)
             {
@@ -64,6 +65,11 @@ namespace Tetris
                         {
                             numOccupiedUnderTop++;
                         }
+                        
+                        if (colIdx == mGrid.numColumns() - 1)
+                        {
+                            numHinderingTetris++;
+                        }
                     }
                     else
                     {
@@ -76,19 +82,29 @@ namespace Tetris
                             }
                         }
                     }
+
                 }
             }
             size_t height = mGrid.numRows() - top;
             size_t lastBlockHeight = mGrid.numRows() - mOriginalBlock.row();
 
-            result -= 6 * mQuality.numHoles();
+            result -= 10 * mQuality.numHoles();
             result -= 2 * height;
             result -= 2 * lastBlockHeight;
 
-            result += 1 * mStats.numSingles();
-            result += 2 * mStats.numDoubles();
-            result += 4 * mStats.numTriples();
-            result += 8 * mStats.numTetrises();
+            //result += 1 * mStats.numSingles();
+            //result += 2 * mStats.numDoubles();
+            //result += 4 * mStats.numTriples();
+            //result += 8 * mStats.numTetrises();
+
+            result -= 4 * mStats.numSingles();
+            if (mOriginalBlock.type() != BlockType_I)
+            {
+                result -= 800 * mStats.numDoubles();
+                result -= 800 * mStats.numTriples();
+            }
+            result += 100 * mStats.numTetrises();
+            result -= 10 * numHinderingTetris;
 
             mQuality.setScore(result);
             mQuality.setInitialized(true);
