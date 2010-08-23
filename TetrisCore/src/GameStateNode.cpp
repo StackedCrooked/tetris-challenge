@@ -94,6 +94,16 @@ namespace Tetris
     }
 
 
+    const GameStateNode * GameStateNode::endNode() const
+    {
+        if (mChildren.empty())
+        {
+            return this;
+        }
+        return (*mChildren.begin())->endNode();
+    }
+
+
     GameStateNode * GameStateNode::parent()
     {
         return mParent;

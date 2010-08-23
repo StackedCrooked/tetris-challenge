@@ -173,6 +173,19 @@ namespace Tetris
     }
 
 
+    const GameStateNode * Game::endNode() const
+    {
+        if (mCurrentNode->children().empty())
+        {
+            return mCurrentNode;
+        }
+        else
+        {
+            return mCurrentNode->endNode();
+        }
+    }
+
+
     void Game::setCurrentNode(const GameStateNode * inCurrentNode)
     {
         mCurrentNode = const_cast<GameStateNode*>(inCurrentNode);

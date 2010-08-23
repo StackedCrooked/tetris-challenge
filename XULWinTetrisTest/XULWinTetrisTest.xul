@@ -53,7 +53,14 @@
         <hbox align="center">
           <label value="Status:" style="text-align:right" />
           <textbox id="statusTextBox" value="Initializing" readonly="true" flex="1" />
-          <textbox id="movesAheadTextBox" value="0" readonly="true" flex="0" />
+        </hbox>
+        <hbox align="center">
+          <label value="Precalculated:" style="text-align:right" />
+          <textbox id="movesAheadTextBox" value="0/8" readonly="true" width="40" flex="1" />
+        </hbox>
+        <hbox align="center">
+          <label value="Search depth:" style="text-align:right" />
+          <textbox id="searchDepthTextBox" value="1" readonly="true" flex="1" />
         </hbox>
       </groupbox>
     </vbox>

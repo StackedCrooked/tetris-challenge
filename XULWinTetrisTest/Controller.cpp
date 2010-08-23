@@ -32,6 +32,7 @@ namespace Tetris
         mComputerEnabledCheckBox(0),
         mStatusTextBox(0),
         mMovesAheadTextBox(0),
+        mSearchDepthTextBox(0),
         mPercentTextBox(0),
         mMaxTimeTextBox(0),
         mLoggingTextBox(0),
@@ -40,6 +41,7 @@ namespace Tetris
         mRefreshTimer(),
         mComputerPlayer(),
         mBlockMover(),
+        mSearchDepth(4),
         mQuit(false)
     {
         //
@@ -172,6 +174,15 @@ namespace Tetris
         }
 
 
+        if (XULWin::Element * el = rootElement->getElementById("searchDepthTextBox"))
+        {
+            if (!(mSearchDepthTextBox = el->component()->downcast<XULWin::TextBox>()))
+            {
+                LogWarning("The 'search depth' textbox was not found in the XUL document.");
+            }
+        }
+
+
         if (XULWin::Element * el = rootElement->getElementById("statusTextBox"))
         {
             if (!(mStatusTextBox = el->component()->downcast<XULWin::TextBox>()))
@@ -204,7 +215,7 @@ namespace Tetris
         // The WinAPI::Timer is non-threaded and you can safely access the WinAPI in its callbacks.
         //
         mRefreshTimer.reset(new XULWin::WinAPI::Timer);
-        mRefreshTimer->start(boost::bind(&Controller::onRefresh, this), 500);
+        mRefreshTimer->start(boost::bind(&Controller::onRefresh, this), 25);
     }
 
 
@@ -316,11 +327,17 @@ namespace Tetris
         assert(!mComputerPlayer);
         if (!mComputerPlayer)
         {
-            std::auto_ptr<GameStateNode> currentNode;
+            std::auto_ptr<GameStateNode> endNode = game.endNode()->clone();
+            size_t blockOffset = endNode->depth() - game.currentNode()->depth();
+            BlockTypes futureBlocks_tooMany;
+            game.getFutureBlocks(inDepth + blockOffset, futureBlocks_tooMany);
+
             BlockTypes futureBlocks;
-            game.getFutureBlocks(inDepth, futureBlocks);
-            currentNode = game.currentNode()->clone();
-            mComputerPlayer.reset(new Player(currentNode, futureBlocks));
+            for (size_t idx = blockOffset; idx != futureBlocks_tooMany.size(); ++idx)
+            {
+                futureBlocks.push_back(futureBlocks_tooMany[idx]);
+            }
+            mComputerPlayer.reset(new Player(endNode, futureBlocks));
             mComputerPlayer->start();
         }
     }
@@ -351,16 +368,28 @@ namespace Tetris
         if (mComputerPlayer && mComputerPlayer->isFinished())
         {
             // Did we manage to think all our moves before the block was dropped?
-            if (mComputerPlayer->result()->depth() == game.currentNode()->depth() + 1)
+            GameStateNode * endNode = game.endNode();
+            if (mComputerPlayer->result()->depth() == endNode->depth() + 1)
             {
-                game.currentNode()->addChild(mComputerPlayer->result());
+                if (mSearchDepth < cMaxSearchDepth)
+                {
+                    mSearchDepth++;
+                }
+                endNode->addChild(mComputerPlayer->result());
                 mComputerPlayer.reset();
             }
-            // We failed! Let's try again with a lowered ambition.
             else
             {
-                mComputerPlayer.reset();
-                startAI(game, 2); // lowered ambition
+                mSearchDepth = cMinSearchDepth;
+            }
+        }
+
+                
+        if (mComputerEnabledCheckBox->isChecked() && !mComputerPlayer)
+        {
+            if (game.endNode()->depth() - game.currentNode()->depth() + mSearchDepth <=  2 * cMaxSearchDepth)
+            {
+                startAI(game, mSearchDepth);
             }
         }
 
@@ -373,31 +402,30 @@ namespace Tetris
                 mBlockMover.reset(new BlockMover(*mThreadSafeGame));
             }
         }
-        // If we have no computer moves lined up, then see if must create some.
         else
         {
             mBlockMover.reset();
-            if (!mComputerPlayer && mComputerEnabledCheckBox->isChecked())
-            {
-                startAI(game, 3);
-            }
         }
         
 
         if (mStatusTextBox)
         {
+            std::string status;
             if (mComputerPlayer)
             {
-                mStatusTextBox->setValue("Thinking...");
+                status = "Thinking";
             }
-            else if (mBlockMover)
+            
+            if (mBlockMover)
             {
-                mStatusTextBox->setValue("Making moves.");
+                if (!status.empty())
+                {
+                    status += " + ";
+                }
+                status += "Moving";
             }
-            else
-            {
-                mStatusTextBox->setValue("Inactive.");
-            }
+            
+            mStatusTextBox->setValue(status.empty() ? "Inactive" : status);
         }
 
 
@@ -409,14 +437,12 @@ namespace Tetris
 
         if (mMovesAheadTextBox)
         {
-            int countMovesAhead = 0;
-            const GameStateNode * tmp = game.currentNode();
-            while (!tmp->children().empty())
-            {
-                tmp = tmp->children().begin()->get();
-                countMovesAhead++;
-            }
-            mMovesAheadTextBox->setValue(MakeString() << countMovesAhead);
+            mMovesAheadTextBox->setValue(MakeString() << (game.endNode()->depth() - game.currentNode()->depth()) << "/" << 2 * cMaxSearchDepth);
+        }
+
+        if (mSearchDepthTextBox)
+        {
+            mSearchDepthTextBox->setValue(MakeString() << mSearchDepth);
         }
 
         for (size_t idx = 0; idx != 4; ++idx)

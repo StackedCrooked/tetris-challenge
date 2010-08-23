@@ -44,6 +44,11 @@ namespace Tetris
 
         GameStateNode * currentNode();
 
+        const GameStateNode * endNode() const;
+
+        inline GameStateNode * endNode()
+        { return const_cast<GameStateNode*>(static_cast<const Game *>(this)->endNode()); }
+
         const GameStateNode * currentNode() const;
 
         bool isGameOver() const;
