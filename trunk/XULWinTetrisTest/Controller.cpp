@@ -32,15 +32,13 @@ namespace Tetris
         mMovesAheadTextBox(0),
         mPercentTextBox(0),
         mMaxTimeTextBox(0),
-        mAIProgressMeter(0),
         mLoggingTextBox(0),
         mThreadSafeGame(),
         mTimedGame(),
         mRefreshTimer(),
-        mBlockMover(),
         mComputerPlayer(),
-        mQuit(false),
-        mAIThinkingTime(1000)
+        mBlockMover(),
+        mQuit(false)
     {
         //
         // Parse the XUL document.
@@ -166,6 +164,15 @@ namespace Tetris
         }
 
 
+        if (XULWin::Element * el = rootElement->getElementById("statusTextBox"))
+        {
+            if (!(mStatusTextBox = el->component()->downcast<XULWin::TextBox>()))
+            {
+                LogWarning("The 'status' textbox was not found in the XUL document.");
+            }
+        }
+
+
         if (XULWin::Element * el = rootElement->getElementById("percentTextBox"))
         {
             if (!(mPercentTextBox = el->component()->downcast<XULWin::TextBox>()))
@@ -180,19 +187,6 @@ namespace Tetris
             if (!(mMaxTimeTextBox = el->component()->downcast<XULWin::TextBox>()))
             {
                 LogWarning("The 'curTimeTextBox' textbox was not found in the XUL document.");
-            }
-        }
-        
-
-
-        //
-        // Get the widget that shows the remaing time for the AI to make its decision.
-        //
-        if (XULWin::Element * el = rootElement->getElementById("computerAIProgressMeter"))
-        {
-            if (!(mAIProgressMeter = el->component()->downcast<XULWin::ProgressMeter>()))
-            {
-                LogWarning("The textbox displaying the remaing time until AI decision is missing.");
             }
         }
 
@@ -248,6 +242,10 @@ namespace Tetris
 
     bool Controller::move(TetrisComponent * tetrisComponent, Direction inDirection)
     {
+        if (mComputerPlayer || mBlockMover)
+        {
+            return false;
+        }
         WritableGame wgame(*mThreadSafeGame);
         Game & game = *wgame.get();
         return game.move(inDirection);
@@ -256,6 +254,10 @@ namespace Tetris
 
     void Controller::drop(TetrisComponent * tetrisComponent)
     {
+        if (mComputerPlayer || mBlockMover)
+        {
+            return;
+        }
         WritableGame wgame(*mThreadSafeGame);
         Game & game = *wgame.get();
         game.drop();
@@ -264,6 +266,10 @@ namespace Tetris
 
     bool Controller::rotate(TetrisComponent * tetrisComponent)
     {
+        if (mComputerPlayer || mBlockMover)
+        {
+            return false;
+        }
         WritableGame wgame(*mThreadSafeGame);
         Game & game = *wgame.get();
         return game.rotate();
@@ -273,10 +279,6 @@ namespace Tetris
     void Controller::setQuitFlag()
     {
         mQuit = true;
-        if (mComputerPlayer)
-        {
-            mComputerPlayer->stop();
-        }
     }
 
 
@@ -303,12 +305,8 @@ namespace Tetris
 
     void Controller::startAI()
     {
-        // Don't allow AI if there are still blocks in the queue
-        if (ReadOnlyGame(*mThreadSafeGame)->currentNode()->children().empty())
+        if (!mComputerPlayer && ReadOnlyGame(*mThreadSafeGame)->currentNode()->children().empty())
         {
-            // Start the block mover
-            mBlockMover.reset(new BlockMover(*mThreadSafeGame));           
-            
             std::auto_ptr<GameStateNode> currentNode;
             BlockTypes futureBlocks;
 
@@ -319,24 +317,22 @@ namespace Tetris
                 game.getFutureBlocks(3, futureBlocks);
                 currentNode = game.currentNode()->clone();
             }
-            
-            // Prepare just a check
-            int currentDepth = currentNode->depth();
 
             // Setup the player object
-            Player p(currentNode, futureBlocks, 1000);           
-            ChildNodePtr resultNode = p.start(); // Waiting...
-
-            // Just a check
-            assert(currentDepth + 1 == resultNode->depth());
-
-            // Critical section: apply results
-            {
-                WritableGame wgame(*mThreadSafeGame);
-                Game & game = *(wgame.get());
-                game.currentNode()->addChild(resultNode);
-            }
+            mComputerPlayer.reset(new Player(currentNode, futureBlocks));
+            mComputerPlayer->start();
         }
+    }
+
+
+    void Controller::retryAI(Game & game)
+    {
+        std::auto_ptr<GameStateNode> currentNode;
+        BlockTypes futureBlocks;
+        game.getFutureBlocks(2, futureBlocks);
+        currentNode = game.currentNode()->clone();
+        mComputerPlayer.reset(new Player(currentNode, futureBlocks));
+        mComputerPlayer->start();
     }
 
 
@@ -357,69 +353,82 @@ namespace Tetris
     {
         // Flush the logger.
         Logger::Instance().flush();
-    
-        if (mBlockCountTextBox || mMovesAheadTextBox || mFutureTetrisComponent) // requires locking, brr..
+
+        WritableGame wgame(*mThreadSafeGame);
+        Game & game = *(wgame.get());
+
+        // Check if the computer player has finished. If yes, then get the results.
+        if (mComputerPlayer && mComputerPlayer->isFinished())
         {
-            ReadOnlyGame game(*mThreadSafeGame);
-            if (mBlockCountTextBox)
+            if (mComputerPlayer->result()->depth() == game.currentNode()->depth() + 1)
             {
-                mBlockCountTextBox->setValue(MakeString() << game->currentBlockIndex());
+                game.currentNode()->addChild(mComputerPlayer->result());
+                mComputerPlayer.reset();
             }
-
-            if (mMovesAheadTextBox)
+            else
             {
-                int countMovesAhead = 0;
-                const GameStateNode * tmp = game->currentNode();
-                while (!tmp->children().empty())
-                {
-                    tmp = tmp->children().begin()->get();
-                    countMovesAhead++;
-                }
-                mMovesAheadTextBox->setValue(MakeString() << countMovesAhead);
+                retryAI(game);
             }
+        }
 
-            for (size_t idx = 0; idx != 4; ++idx)
+        // Check if there are still moves to make.
+        if (mBlockMover && game.currentNode()->children().empty())
+        {
+            mBlockMover.reset();
+        }
+        else if (!mBlockMover && !game.currentNode()->children().empty())
+        {
+            mBlockMover.reset(new BlockMover(*mThreadSafeGame));
+        }
+
+
+        if (mStatusTextBox)
+        {
+            if (mComputerPlayer)
             {
-                const GameState::Stats & stats = game->currentNode()->state().stats();
-                if (mLinesTextBoxes[idx])
-                {
-                    mLinesTextBoxes[idx]->setValue(MakeString() << stats.numLines(idx));
-                }
+                mStatusTextBox->setValue("Thinking...");
+            }
+            else if (mBlockMover)
+            {
+                mStatusTextBox->setValue("Making moves.");
+            }
+            else
+            {
+                mStatusTextBox->setValue("Inactive.");
+            }
+        }
+
+
+        if (mBlockCountTextBox)
+        {
+            mBlockCountTextBox->setValue(MakeString() << game.currentBlockIndex());
+        }
+
+
+        if (mMovesAheadTextBox)
+        {
+            int countMovesAhead = 0;
+            const GameStateNode * tmp = game.currentNode();
+            while (!tmp->children().empty())
+            {
+                tmp = tmp->children().begin()->get();
+                countMovesAhead++;
+            }
+            mMovesAheadTextBox->setValue(MakeString() << countMovesAhead);
+        }
+
+        for (size_t idx = 0; idx != 4; ++idx)
+        {
+            const GameState::Stats & stats = game.currentNode()->state().stats();
+            if (mLinesTextBoxes[idx])
+            {
+                mLinesTextBoxes[idx]->setValue(MakeString() << stats.numLines(idx));
             }
         }
 
         if (mFPSTextBox)
         {
             mFPSTextBox->setValue(MakeString() << mTetrisComponent->getFPS());
-        }
-
-        if (mComputerPlayer)
-        {
-            int remainingTime = mComputerPlayer->remainingTimeMs();
-            int maxTime = 0;
-            {
-                boost::mutex::scoped_lock lock(mAIThinkingTimeMutex);
-                maxTime = mAIThinkingTime;
-            }
-            
-            int curTime = maxTime - remainingTime;            
-            int percentage = (100 * curTime) / maxTime;
-            if (mAIProgressMeter)
-            {
-                mAIProgressMeter->setDisabled(false);
-                mAIProgressMeter->setValue(percentage);
-            }
-
-            if (mPercentTextBox && mMaxTimeTextBox)
-            {
-                mPercentTextBox->setValue(MakeString() << percentage);
-                mMaxTimeTextBox->setValue(MakeString() << maxTime / 1000);
-            }
-        }
-        else
-        {
-            mAIProgressMeter->setDisabled(true);
-            mAIProgressMeter->setValue(0);
         }
     }
 

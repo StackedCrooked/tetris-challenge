@@ -18,37 +18,38 @@
           <columns>
             <column flex="0" align="end" />
             <column flex="1" width="40" />
+            <column flex="0" align="end" />
+            <column flex="1" width="40" />
           </columns>
           <rows>
             <row align="center">
               <label value="FPS:" style="text-align:right"/>
               <textbox id="fpsTextBox" value="0" readonly="true" style="text-align:right"/>
-            </row>
-            <row align="center">
               <label value="Blocks:" style="text-align:right"/>
               <textbox id="blockCountTextBox" value="0" readonly="true" style="text-align:right"/>
             </row>
             <row align="center">
               <label value="Lines x1:" style="text-align:right"/>
               <textbox id="lines1TextBox" value="0" readonly="true"  />
-            </row>
-            <row align="center">
-              <label value="Lines x2:" style="text-align:right"/>
-              <textbox id="lines2TextBox" value="0" readonly="true"  />
-            </row>
-            <row align="center">
               <label value="Lines x3:" style="text-align:right"/>
               <textbox id="lines3TextBox" value="0" readonly="true"  />
             </row>
             <row align="center">
               <label value="Lines x4:" style="text-align:right"/>
               <textbox id="lines4TextBox" value="0" readonly="true" />
+              <label value="Lines x2:" style="text-align:right"/>
+              <textbox id="lines2TextBox" value="0" readonly="true"  />
             </row>
           </rows>
         </grid>
       </groupbox>
+      <spacer flex="1" />
       <groupbox>
-        <caption label="AI Metrics" />
+        <caption label="Computer Player" />
+        <hbox align="center">
+          <label value="Status:" style="text-align:right" />
+          <textbox id="statusTextBox" value="Initializing" readonly="true" flex="1" />
+        </hbox>
         <hbox align="center">
           <label value="Precalculated:" style="text-align:right" />
           <textbox id="movesAheadTextBox" value="0" readonly="true" flex="1" />
