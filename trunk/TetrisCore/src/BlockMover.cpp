@@ -7,7 +7,7 @@ namespace Tetris
 
     BlockMover::BlockMover(ThreadSafeGame & inGame) :
         mGame(inGame),
-        mTimer(0, 50)
+        mTimer(0, 60)
     {
         Poco::TimerCallback<BlockMover> callback(*this, &BlockMover::onTimer);
         mTimer.start(callback);

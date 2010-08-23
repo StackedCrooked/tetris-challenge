@@ -65,7 +65,7 @@
       </groupbox>
     </vbox>
     <hbox>
-      <tetris id="tetris0" flex="0" numfutureblocks="3" keyboardenabled="true" />
+      <tetris id="tetris0" flex="0" numfutureblocks="4" keyboardenabled="true" />
     </hbox>
   </hbox>
   <textbox id="loggingTextbox" value="Log messages appear here." multiline="true" flex="1" rows="4" readonly="true" style="background-color:white" />
