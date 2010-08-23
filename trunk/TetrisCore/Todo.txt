@@ -1,6 +1,4 @@
-- Print debug view: All nodes
-- The AI is really crappy (number of precalc moves often suddenly jumps to 0)
-- Sometimes active block and the next node's original block are not equal.
+- Logger scroll to bottom
 - Implement player vs computer mode.
 - Run the console version under valgrind on Mac and see if you can get any more info (KCacheGrind)
 - Release a version to demo purposes?

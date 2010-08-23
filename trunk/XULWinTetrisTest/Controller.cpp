@@ -41,7 +41,7 @@ namespace Tetris
         mRefreshTimer(),
         mComputerPlayer(),
         mBlockMover(),
-        mSearchDepth(4),
+        mSearchDepth(3),
         mQuit(false)
     {
         //
@@ -376,18 +376,19 @@ namespace Tetris
                     mSearchDepth++;
                 }
                 endNode->addChild(mComputerPlayer->result());
-                mComputerPlayer.reset();
             }
             else
             {
+                LogWarning("Failed to move the blocks in time. Dropping to a lower ambition.");
                 mSearchDepth = cMinSearchDepth;
             }
+            mComputerPlayer.reset();
         }
 
                 
         if (mComputerEnabledCheckBox->isChecked() && !mComputerPlayer)
         {
-            if (game.endNode()->depth() - game.currentNode()->depth() + mSearchDepth <=  2 * cMaxSearchDepth)
+            if (game.endNode()->depth() - game.currentNode()->depth() + mSearchDepth <=  3 * cMaxSearchDepth)
             {
                 startAI(game, mSearchDepth);
             }
@@ -437,7 +438,7 @@ namespace Tetris
 
         if (mMovesAheadTextBox)
         {
-            mMovesAheadTextBox->setValue(MakeString() << (game.endNode()->depth() - game.currentNode()->depth()) << "/" << 2 * cMaxSearchDepth);
+            mMovesAheadTextBox->setValue(MakeString() << (game.endNode()->depth() - game.currentNode()->depth()) << "/" << 3 * cMaxSearchDepth);
         }
 
         if (mSearchDepthTextBox)
