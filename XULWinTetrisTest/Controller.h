@@ -69,6 +69,7 @@ namespace Tetris
         void onRefresh();
 
     private:
+        void retryAI(Game & ioGame);
         XULWin::XULRunner mXULRunner;
         XULWin::Window * mWindow;
         TetrisComponent * mTetrisComponent;
@@ -77,20 +78,17 @@ namespace Tetris
         XULWin::TextBox * mBlockCountTextBox;
         typedef XULWin::TextBox * TextBoxPtr;
         TextBoxPtr mLinesTextBoxes[4];
+        XULWin::TextBox * mStatusTextBox;
         XULWin::TextBox * mMovesAheadTextBox;
         XULWin::TextBox * mPercentTextBox;
         XULWin::TextBox * mMaxTimeTextBox;
-        XULWin::ProgressMeter * mAIProgressMeter;
         XULWin::TextBox * mLoggingTextBox;
         boost::scoped_ptr<ThreadSafeGame> mThreadSafeGame;
         boost::scoped_ptr<Tetris::TimedGame> mTimedGame;
         boost::scoped_ptr<XULWin::WinAPI::Timer> mRefreshTimer;
-        boost::scoped_ptr<BlockMover> mBlockMover;
         boost::scoped_ptr<Player> mComputerPlayer;
+        boost::scoped_ptr<BlockMover> mBlockMover;
         volatile bool mQuit;
-        
-        boost::mutex mAIThinkingTimeMutex;
-        int mAIThinkingTime;
     };
 
 } // namespace Tetris
