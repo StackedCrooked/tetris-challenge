@@ -58,8 +58,6 @@ namespace Tetris
 
         void log(const std::string & inMessage);
 
-        void startAI();
-
         void refresh();
 
         void calculateOptimalPath(std::auto_ptr<GameStateNode> inClonedGameState, const BlockTypes & inBlockTypes);
@@ -69,7 +67,8 @@ namespace Tetris
         void onRefresh();
 
     private:
-        void retryAI(Game & ioGame);
+        void startAI(Game & game, size_t inDepth);
+
         XULWin::XULRunner mXULRunner;
         XULWin::Window * mWindow;
         TetrisComponent * mTetrisComponent;
@@ -78,6 +77,7 @@ namespace Tetris
         XULWin::TextBox * mBlockCountTextBox;
         typedef XULWin::TextBox * TextBoxPtr;
         TextBoxPtr mLinesTextBoxes[4];
+        XULWin::CheckBox * mComputerEnabledCheckBox;
         XULWin::TextBox * mStatusTextBox;
         XULWin::TextBox * mMovesAheadTextBox;
         XULWin::TextBox * mPercentTextBox;

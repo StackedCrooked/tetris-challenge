@@ -17,9 +17,9 @@
         <grid>
           <columns>
             <column flex="0" align="end" />
-            <column flex="1" width="40" />
+            <column flex="1" />
             <column flex="0" align="end" />
-            <column flex="1" width="40" />
+            <column flex="1" />
           </columns>
           <rows>
             <row align="center">
@@ -47,12 +47,13 @@
       <groupbox>
         <caption label="Computer Player" />
         <hbox align="center">
-          <label value="Status:" style="text-align:right" />
-          <textbox id="statusTextBox" value="Initializing" readonly="true" flex="1" />
+          <checkbox id="computerEnabled" label="Let the computer play" style="text-align:right" />
+          <spacer />
         </hbox>
         <hbox align="center">
-          <label value="Precalculated:" style="text-align:right" />
-          <textbox id="movesAheadTextBox" value="0" readonly="true" flex="1" />
+          <label value="Status:" style="text-align:right" />
+          <textbox id="statusTextBox" value="Initializing" readonly="true" flex="1" />
+          <textbox id="movesAheadTextBox" value="0" readonly="true" flex="0" />
         </hbox>
       </groupbox>
     </vbox>

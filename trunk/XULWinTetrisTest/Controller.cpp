@@ -29,6 +29,8 @@ namespace Tetris
         mTetrisComponent(0),
         mFPSTextBox(0),
         mBlockCountTextBox(0),        
+        mComputerEnabledCheckBox(0),
+        mStatusTextBox(0),
         mMovesAheadTextBox(0),
         mPercentTextBox(0),
         mMaxTimeTextBox(0),
@@ -152,9 +154,15 @@ namespace Tetris
         }
 
 
-        //
-        // Get the 'Moves ahead' textbox.
-        //
+        if (XULWin::Element * el = rootElement->getElementById("computerEnabled"))
+        {
+            if (!(mComputerEnabledCheckBox = el->component()->downcast<XULWin::CheckBox>()))
+            {
+                LogWarning("The 'computerEnabled' checkbox was not found in the XUL document.");
+            }
+        }
+
+
         if (XULWin::Element * el = rootElement->getElementById("movesAheadTextBox"))
         {
             if (!(mMovesAheadTextBox = el->component()->downcast<XULWin::TextBox>()))
@@ -303,36 +311,18 @@ namespace Tetris
     }
 
 
-    void Controller::startAI()
+    void Controller::startAI(Game & game, size_t inDepth)
     {
-        if (!mComputerPlayer && ReadOnlyGame(*mThreadSafeGame)->currentNode()->children().empty())
+        assert(!mComputerPlayer);
+        if (!mComputerPlayer)
         {
             std::auto_ptr<GameStateNode> currentNode;
             BlockTypes futureBlocks;
-
-            // Critical section: fetch a clone of the current node and the list of future blocks
-            {
-                ReadOnlyGame rgame(*mThreadSafeGame);
-                const Game & game = *(rgame.get());
-                game.getFutureBlocks(3, futureBlocks);
-                currentNode = game.currentNode()->clone();
-            }
-
-            // Setup the player object
+            game.getFutureBlocks(inDepth, futureBlocks);
+            currentNode = game.currentNode()->clone();
             mComputerPlayer.reset(new Player(currentNode, futureBlocks));
             mComputerPlayer->start();
         }
-    }
-
-
-    void Controller::retryAI(Game & game)
-    {
-        std::auto_ptr<GameStateNode> currentNode;
-        BlockTypes futureBlocks;
-        game.getFutureBlocks(2, futureBlocks);
-        currentNode = game.currentNode()->clone();
-        mComputerPlayer.reset(new Player(currentNode, futureBlocks));
-        mComputerPlayer->start();
     }
 
 
@@ -360,27 +350,39 @@ namespace Tetris
         // Check if the computer player has finished. If yes, then get the results.
         if (mComputerPlayer && mComputerPlayer->isFinished())
         {
+            // Did we manage to think all our moves before the block was dropped?
             if (mComputerPlayer->result()->depth() == game.currentNode()->depth() + 1)
             {
                 game.currentNode()->addChild(mComputerPlayer->result());
                 mComputerPlayer.reset();
             }
+            // We failed! Let's try again with a lowered ambition.
             else
             {
-                retryAI(game);
+                mComputerPlayer.reset();
+                startAI(game, 2); // lowered ambition
             }
         }
 
-        // Check if there are still moves to make.
-        if (mBlockMover && game.currentNode()->children().empty())
+
+        // Do we have computer moves lined up? If yes, then activate the Block mover.
+        if (!game.currentNode()->children().empty())
+        {
+            if (!mBlockMover)
+            {
+                mBlockMover.reset(new BlockMover(*mThreadSafeGame));
+            }
+        }
+        // If we have no computer moves lined up, then see if must create some.
+        else
         {
             mBlockMover.reset();
+            if (!mComputerPlayer && mComputerEnabledCheckBox->isChecked())
+            {
+                startAI(game, 3);
+            }
         }
-        else if (!mBlockMover && !game.currentNode()->children().empty())
-        {
-            mBlockMover.reset(new BlockMover(*mThreadSafeGame));
-        }
-
+        
 
         if (mStatusTextBox)
         {
@@ -435,10 +437,7 @@ namespace Tetris
 
     void Controller::processKey(int inKey)
     {
-        if (inKey == VK_DELETE)
-        {
-            startAI();
-        }
+        // No interest.
     }
 
 
