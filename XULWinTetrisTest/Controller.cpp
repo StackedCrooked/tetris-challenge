@@ -215,7 +215,7 @@ namespace Tetris
         // The WinAPI::Timer is non-threaded and you can safely access the WinAPI in its callbacks.
         //
         mRefreshTimer.reset(new XULWin::WinAPI::Timer);
-        mRefreshTimer->start(boost::bind(&Controller::onRefresh, this), 25);
+        mRefreshTimer->start(boost::bind(&Controller::onRefresh, this), 30);
     }
 
 
