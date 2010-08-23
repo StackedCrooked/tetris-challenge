@@ -27,7 +27,8 @@ namespace Tetris
 
     enum
     {
-        cAIMaxDepth = 5,        // max depth of the AI
+        cMinSearchDepth = 2,
+        cMaxSearchDepth = 4 // more than for results in memory usage of 2+ GB
     };
 
     
@@ -80,6 +81,7 @@ namespace Tetris
         XULWin::CheckBox * mComputerEnabledCheckBox;
         XULWin::TextBox * mStatusTextBox;
         XULWin::TextBox * mMovesAheadTextBox;
+        XULWin::TextBox * mSearchDepthTextBox;
         XULWin::TextBox * mPercentTextBox;
         XULWin::TextBox * mMaxTimeTextBox;
         XULWin::TextBox * mLoggingTextBox;
@@ -88,6 +90,7 @@ namespace Tetris
         boost::scoped_ptr<XULWin::WinAPI::Timer> mRefreshTimer;
         boost::scoped_ptr<Player> mComputerPlayer;
         boost::scoped_ptr<BlockMover> mBlockMover;
+        int mSearchDepth;
         volatile bool mQuit;
     };
 

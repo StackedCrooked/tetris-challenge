@@ -7,7 +7,7 @@ namespace Tetris
 
     BlockMover::BlockMover(ThreadSafeGame & inGame) :
         mGame(inGame),
-        mTimer(0, 80)
+        mTimer(0, 50)
     {
         Poco::TimerCallback<BlockMover> callback(*this, &BlockMover::onTimer);
         mTimer.start(callback);
@@ -56,6 +56,7 @@ namespace Tetris
 
             Block & block = game->activeBlock();
             const Block & targetBlock = (*children.begin())->state().originalBlock();
+            assert(block.type() == targetBlock.type());
             if (block.rotation() != targetBlock.rotation())
             {
                 if (!game->rotate())

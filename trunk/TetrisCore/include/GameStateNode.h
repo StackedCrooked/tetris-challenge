@@ -52,6 +52,11 @@ namespace Tetris
 
         void addChild(ChildNodePtr inChildNode);
 
+        const GameStateNode * endNode() const;
+
+        inline GameStateNode * endNode()
+        { return const_cast<GameStateNode*>(static_cast<const GameStateNode *>(this)->endNode()); }
+
         const GameState & state() const;
 
         GameState & state();
