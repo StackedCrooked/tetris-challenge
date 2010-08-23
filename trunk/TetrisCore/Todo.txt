@@ -1,4 +1,5 @@
 - Logger scroll to bottom
+- People want to see Tetrises!
 - Implement player vs computer mode.
 - Run the console version under valgrind on Mac and see if you can get any more info (KCacheGrind)
 - Release a version to demo purposes?
