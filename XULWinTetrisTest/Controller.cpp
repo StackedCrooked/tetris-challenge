@@ -97,6 +97,7 @@ namespace Tetris
         //
         mTimedGame.reset(new TimedGame(*mThreadSafeGame));
         mTimedGame->start();
+        mTimedGame->setLevel(9);
 
 
         //
@@ -346,7 +347,7 @@ namespace Tetris
             }
             else
             {
-                LogWarning("Failed to move the blocks in time. Dropping to a lower ambition.");
+                LogInfo("Failed to move the blocks in time. Switching to minimal search depth.");
                 mSearchDepth = cMinSearchDepth;
             }
             mComputerPlayer.reset();
@@ -364,10 +365,26 @@ namespace Tetris
         }
 
 
-        // Do we have computer moves lined up? If yes, then activate the Block mover.
+        // Do we have computer moves lined up?
         if (!game.currentNode()->children().empty())
         {
-            if (!mBlockMover)
+            // Is the block mover taking care of them?
+            if (mBlockMover)
+            {
+                // Is yes, check if isn't stuck.
+                if (mBlockMover->status() == BlockMover::Status_Blocked)
+                {
+                    // If it is stuck, then empthy the queue of lined up moves. They are lost :(
+                    game.currentNode()->clearChildren();
+
+                    // Lower the search depth so that we can quickly think of some new moves!
+                    LogInfo("Couldn't move the block to where I wanted. Plan B: quickly think of a some new moves!");
+                    mSearchDepth = cMinSearchDepth;
+                    mBlockMover.reset();
+                }
+            }
+            // If no then start the block mover.
+            else
             {
                 mBlockMover.reset(new BlockMover(*mThreadSafeGame));
             }
