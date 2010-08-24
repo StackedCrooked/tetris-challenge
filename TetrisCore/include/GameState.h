@@ -6,6 +6,7 @@
 #include "GameQualityEvaluator.h"
 #include "Grid.h"
 #include "TypedWrapper.h"
+#include <boost/shared_ptr.hpp>
 #include <memory>
 #include <stdexcept>
 
@@ -143,7 +144,7 @@ namespace Tetris
         };
 
         mutable Quality mQuality;
-        GameQualityEvaluator * mGameQualityEvaluator;
+        boost::shared_ptr<GameQualityEvaluator> mGameQualityEvaluator;
     };
 
 
