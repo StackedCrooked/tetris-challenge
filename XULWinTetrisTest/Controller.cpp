@@ -276,7 +276,9 @@ namespace Tetris
     {
         if (mLoggingTextBox)
         {
-            mLoggingTextBox->setValue(inMessage + "\r\n" + mLoggingTextBox->getValue());
+            mLoggingTextBox->setValue(mLoggingTextBox->getValue() + "\r\n" + inMessage);
+            int lineCount = ::SendMessage(mLoggingTextBox->handle(), EM_GETLINECOUNT, 0, 0);
+            ::SendMessage(mLoggingTextBox->handle(), EM_LINESCROLL, 0, lineCount);
         }
     }
 
