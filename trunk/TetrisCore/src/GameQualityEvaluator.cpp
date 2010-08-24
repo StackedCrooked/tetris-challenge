@@ -75,6 +75,24 @@ namespace Tetris
     }
 
 
+    int MakeTetrises::evaluateImpl(const GameState & inGameState,
+                                                  int inGameHeight,
+                                                  int inLastBlockHeight,
+                                                  int inNumHoles,
+                                                  int inNumOccupiedUnderTop,
+                                                  float inDensity) const
+    {
+        return 0
+               - 4 * inGameHeight
+               - 1 * inLastBlockHeight
+               - 8 * inNumHoles
+               - 4 * inGameState.stats().numSingles()
+               - 4 * inGameState.stats().numDoubles()
+               - 4 * inGameState.stats().numTriples()
+               + 8 * inGameState.stats().numTetrises();
+    }
+
+
             
 
 } // namespace Tetris

@@ -35,6 +35,18 @@ namespace Tetris
     };
 
 
+    class MakeTetrises : public GameQualityEvaluator
+    {
+    protected:
+        virtual int evaluateImpl(const GameState & inGameState,
+                                 int inGameHeight,
+                                 int inLastBlockHeight,
+                                 int inNumHoles,
+                                 int inNumOccupiedUnderTop,
+                                 float inDensity) const;
+    };
+
+
 } // namespace Tetris
 
 
