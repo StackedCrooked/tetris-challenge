@@ -1,9 +1,11 @@
-- Stop cheating
-- Logger scroll to bottom
+- False positives of: "Failed to move the blocks in time"
+- Window icon
 - People want to see Tetrises!
 - Implement player vs computer mode.
 - Run the console version under valgrind on Mac and see if you can get any more info (KCacheGrind)
 - Release a version to demo purposes?
+v Stop cheating
+v Logger scroll to bottom
 v Fix Game Over crash
 v Use official Tetris colors
 v AI thinks while block mover is doing his thing
