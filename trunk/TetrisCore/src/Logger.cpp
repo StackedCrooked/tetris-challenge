@@ -13,15 +13,15 @@ namespace Tetris
         {
             case LogLevel_Info:
             {
-                return "Info";
+                return "INFO";
             }
             case LogLevel_Warning:
             {
-                return "Warning";
+                return "WARNING";
             }
             case LogLevel_Error:
             {
-                return "Error";
+                return "ERROR";
             }
             default:
             {

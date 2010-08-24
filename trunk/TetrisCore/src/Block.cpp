@@ -14,7 +14,7 @@ namespace Tetris
         mColumn(inColumn.get()),
         mGrid(&GetGrid(GetBlockIdentifier(inType, inRotation.get())))
     {
-        Assert(mRotation >= 0 && mRotation <= 3, "Invalid rotation value.");
+        Assert(mRotation >= 0 && mRotation <= 3);
     }
 
 
