@@ -1,3 +1,5 @@
+- Show menu with "New game", "About", etc..
+- Implement various selectable "Strategies" for AI
 - False positives of: "Failed to move the blocks in time"
 - Window icon
 - People want to see Tetrises!
