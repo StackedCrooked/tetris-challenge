@@ -8,10 +8,17 @@ namespace Tetris
 
     BlockMover::BlockMover(ThreadSafeGame & inGame) :
         mGame(inGame),
-        mTimer(0, 50)
+        mTimer(0, 50),
+        mStatus(Status_Ok)
     {
         Poco::TimerCallback<BlockMover> callback(*this, &BlockMover::onTimer);
         mTimer.start(callback);
+    }
+
+
+    BlockMover::Status BlockMover::status() const
+    {
+        return mStatus;
     }
 
 
@@ -23,78 +30,61 @@ namespace Tetris
         }
         catch (const std::exception & inException)
         {
+            mStatus = Status_Error;
             LogError(inException.what());
-
-            // Critical section
-            {
-                WritableGame wg(mGame);
-                Game & game = *wg.get();
-                
-                // Try to cheat our way out of it
-                LogWarning("I can't move the block to where I planned to so I'm cheating now.");
-                if (!game.navigateNodeDown())
-                {
-                    mTimer.stop();
-                    LogError("Application state has become corrupted for an unknown reason.");
-                }
-            }
         }
     }
 
 
     void BlockMover::move()
     {
-        // Critical section
-        while (true)
+        if (mStatus == Status_Blocked)
         {
-            WritableGame game(mGame);
-            const ChildNodes & children = game->currentNode()->children();
-            if (children.empty())
-            {
-                // Do nothing. Perhaps we'll have more luck during the next timer event.
-                return;
-            }
+            return;
+        }
 
-            Block & block = game->activeBlock();
-            const Block & targetBlock = (*children.begin())->state().originalBlock();
-            Assert(block.type() == targetBlock.type());
-            if (block.rotation() != targetBlock.rotation())
+        WritableGame game(mGame);
+        const ChildNodes & children = game->currentNode()->children();
+        if (children.empty())
+        {
+            return;
+        }
+
+        Block & block = game->activeBlock();
+        const Block & targetBlock = (*children.begin())->state().originalBlock();
+        Assert(block.type() == targetBlock.type());
+        if (block.rotation() != targetBlock.rotation())
+        {
+            if (!game->rotate())
             {
-                if (!game->rotate())
-                {
-                    LogInfo("Cheating now");
-                    game->navigateNodeDown();
-                }
+                mStatus = Status_Blocked;
             }
-            else if (block.column() < targetBlock.column())
+        }
+        else if (block.column() < targetBlock.column())
+        {
+            if (!game->move(Direction_Right))
             {
-                if (!game->move(Direction_Right))
-                {
-                    LogInfo("Cheating now");
-                    game->navigateNodeDown();
-                }
+                mStatus = Status_Blocked;
             }
-            else if (block.column() > targetBlock.column())
+        }
+        else if (block.column() > targetBlock.column())
+        {
+            if (!game->move(Direction_Left))
             {
-                if (!game->move(Direction_Left))
-                {
-                    LogInfo("Cheating now");
-                    game->navigateNodeDown();
-                }
+                mStatus = Status_Blocked;
             }
-            else
+        }
+        else
+        {
+            GameState & gameState = game->currentNode()->state();
+            if (gameState.checkPositionValid(block, block.row() + 1, block.column()))
             {
-                GameState & gameState = game->currentNode()->state();
-                if (gameState.checkPositionValid(block, block.row() + 1, block.column()))
-                {
-                    game->move(Direction_Down);
-                }
-                else if (!game->navigateNodeDown())
-                {
-                    throw std::runtime_error("Failed to navigate the game state one node down.");
-                }
+                game->move(Direction_Down);
             }
-            break;
+            else if (!game->navigateNodeDown())
+            {
+                throw std::runtime_error("Failed to navigate the game state one node down.");
+            }
         }
     }
 

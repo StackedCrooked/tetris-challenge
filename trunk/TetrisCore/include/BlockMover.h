@@ -26,13 +26,22 @@ namespace Tetris
     public:
         BlockMover(ThreadSafeGame & inGame);
 
+        enum Status
+        {
+            Status_Ok,
+            Status_Blocked,
+            Status_Error,
+        };
+
+        Status status() const;
+
     private:
         void onTimer(Poco::Timer & ioTimer);
         void move();   
         
         ThreadSafeGame & mGame;
         Poco::Timer mTimer;
-        volatile bool mIsWaiting;
+        volatile Status mStatus;
     };
 
 } // namespace Tetris
