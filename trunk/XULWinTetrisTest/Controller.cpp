@@ -35,8 +35,6 @@ namespace Tetris
         mStatusTextBox(0),
         mMovesAheadTextBox(0),
         mSearchDepthTextBox(0),
-        mPercentTextBox(0),
-        mMaxTimeTextBox(0),
         mLoggingTextBox(0),
         mThreadSafeGame(),
         mTimedGame(),
@@ -88,22 +86,10 @@ namespace Tetris
         mTetrisComponent->setController(this);
 
 
-        // Get the future game state component.
-        if (!(mFutureTetrisComponent = FindComponentById<Tetris::TetrisComponent>(rootElement.get(), "tetris1")))
-        {
-            LogWarning("Did not find future tetris component.");
-        }
-
-        if (mFutureTetrisComponent)
-        {
-            mFutureTetrisComponent->setController(this);
-        }
-
-
         //
         // Get the Game object.
         //
-        mThreadSafeGame.reset(new ThreadSafeGame(std::auto_ptr<Game>(new Game(5, 10))));
+        mThreadSafeGame.reset(new ThreadSafeGame(std::auto_ptr<Game>(new Game(mTetrisComponent->getNumRows(), mTetrisComponent->getNumColumns()))));
 
 
         //
@@ -194,24 +180,6 @@ namespace Tetris
         }
 
 
-        if (XULWin::Element * el = rootElement->getElementById("percentTextBox"))
-        {
-            if (!(mPercentTextBox = el->component()->downcast<XULWin::TextBox>()))
-            {
-                LogWarning("The 'percentTextBox' textbox was not found in the XUL document.");
-            }
-        }
-
-
-        if (XULWin::Element * el = rootElement->getElementById("maxTimeTextBox"))
-        {
-            if (!(mMaxTimeTextBox = el->component()->downcast<XULWin::TextBox>()))
-            {
-                LogWarning("The 'curTimeTextBox' textbox was not found in the XUL document.");
-            }
-        }
-
-
         //
         // Activate the stats updater.
         // The WinAPI::Timer is non-threaded and you can safely access the WinAPI in its callbacks.
@@ -246,17 +214,6 @@ namespace Tetris
             outGrid = game.currentNode()->state().grid();
             outActiveBlock = game.activeBlock();
             game.getFutureBlocks(mTetrisComponent->getNumFutureBlocks() + 1, outFutureBlockTypes);
-        }
-        else if (tetrisComponent == mFutureTetrisComponent)
-        {
-            ReadOnlyGame rgame(*mThreadSafeGame);
-            const Game & game = *(rgame.get());
-            if (!game.currentNode()->children().empty())
-            {
-                const Game & game = *(rgame.get());
-                const GameStateNode & node = (**game.currentNode()->children().begin());
-                outGrid = node.state().grid();
-            }
         }
     }
 
