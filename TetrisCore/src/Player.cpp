@@ -72,7 +72,7 @@ namespace Tetris
     {
         if (mStop)
         {
-            throw std::runtime_error("Interrupted!");
+            return;
         }
 
 

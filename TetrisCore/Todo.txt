@@ -1,9 +1,10 @@
-- Fix Game Over crash
+- Stop cheating
 - Logger scroll to bottom
 - People want to see Tetrises!
 - Implement player vs computer mode.
 - Run the console version under valgrind on Mac and see if you can get any more info (KCacheGrind)
 - Release a version to demo purposes?
+v Fix Game Over crash
 v Use official Tetris colors
 v AI thinks while block mover is doing his thing
 v Delete JobRunner.h and .cpp

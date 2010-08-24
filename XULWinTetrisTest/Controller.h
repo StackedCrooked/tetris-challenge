@@ -77,7 +77,6 @@ namespace Tetris
         XULWin::XULRunner mXULRunner;
         XULWin::Window * mWindow;
         TetrisComponent * mTetrisComponent;
-        TetrisComponent * mFutureTetrisComponent;
         XULWin::TextBox * mFPSTextBox;
         XULWin::TextBox * mBlockCountTextBox;
         typedef XULWin::TextBox * TextBoxPtr;
@@ -86,8 +85,6 @@ namespace Tetris
         XULWin::TextBox * mStatusTextBox;
         XULWin::TextBox * mMovesAheadTextBox;
         XULWin::TextBox * mSearchDepthTextBox;
-        XULWin::TextBox * mPercentTextBox;
-        XULWin::TextBox * mMaxTimeTextBox;
         XULWin::TextBox * mLoggingTextBox;
         boost::scoped_ptr<ThreadSafeGame> mThreadSafeGame;
         boost::scoped_ptr<Tetris::TimedGame> mTimedGame;
