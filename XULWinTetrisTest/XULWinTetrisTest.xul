@@ -47,7 +47,7 @@
       <groupbox>
         <caption label="Computer Player" />
         <hbox align="center">
-          <checkbox id="computerEnabled" label="Let the computer play" style="text-align:right" />
+          <checkbox id="computerEnabled" label="Let the computer play" checked="true" style="text-align:right" />
           <spacer />
         </hbox>
         <hbox align="center">

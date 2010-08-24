@@ -9,6 +9,8 @@
 #include "TimedGame.h"
 #include "XULWin/ErrorReporter.h"
 #include "XULWin/Window.h"
+#include "Poco/DateTime.h"
+#include "Poco/DateTimeFormatter.h"
 
 
 
@@ -97,7 +99,7 @@ namespace Tetris
         //
         mTimedGame.reset(new TimedGame(*mThreadSafeGame));
         mTimedGame->start();
-        mTimedGame->setLevel(9);
+        mTimedGame->setLevel(0);
 
 
         //
@@ -277,7 +279,8 @@ namespace Tetris
     {
         if (mLoggingTextBox)
         {
-            mLoggingTextBox->setValue(mLoggingTextBox->getValue() + "\r\n" + inMessage);
+            std::string timestamp = Poco::DateTimeFormatter::format(Poco::DateTime(), "%H:%M:%S ");
+            mLoggingTextBox->setValue(MakeString() << mLoggingTextBox->getValue() << "\r\n" << timestamp << inMessage);
             int lineCount = ::SendMessage(mLoggingTextBox->handle(), EM_GETLINECOUNT, 0, 0);
             ::SendMessage(mLoggingTextBox->handle(), EM_LINESCROLL, 0, lineCount);
         }

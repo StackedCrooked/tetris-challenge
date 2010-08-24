@@ -143,7 +143,7 @@ namespace Tetris
 
     void GenerateOffspring(BlockType inBlockType, GameStateNode & ioGameStateNode, ChildNodes & outChildNodes)
     {        
-        Assert(outChildNodes.empty(), "outChildNodes should most likely be empty!");
+        Assert(outChildNodes.empty());
         const GameState & gameState = ioGameStateNode.state();
         const Grid & gameGrid = gameState.grid();
 
@@ -188,7 +188,7 @@ namespace Tetris
 
     void GameStateNode::generateOffspring(BlockTypes inBlockTypes, size_t inOffset)
     {
-        Assert(inOffset < inBlockTypes.size(), "GenerateOffspring: inOffset must be smaller than inBlockTypes.size().");
+        Assert(inOffset < inBlockTypes.size());
 
         Assert(mChildren.empty());
         GenerateOffspring(inBlockTypes[inOffset], *this, mChildren);
@@ -207,9 +207,8 @@ namespace Tetris
 
     bool ChildPtrCompare::operator()(ChildNodePtr lhs, ChildNodePtr rhs)
     {
-        Assert(lhs && rhs, "Comparison fails because ChildNodePtr objects are null!");
-        Assert(lhs.get() != rhs.get(), "Comparison game state against itself. This is wrong!");
-
+        Assert(lhs && rhs);
+        Assert(lhs.get() != rhs.get());
         return lhs->state().quality() > rhs->state().quality();
     }
 
