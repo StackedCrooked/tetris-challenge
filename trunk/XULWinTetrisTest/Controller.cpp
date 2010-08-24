@@ -281,8 +281,8 @@ namespace Tetris
         {
             std::string timestamp = Poco::DateTimeFormatter::format(Poco::DateTime(), "%H:%M:%S ");
             mLoggingTextBox->setValue(MakeString() << mLoggingTextBox->getValue() << "\r\n" << timestamp << inMessage);
-            int lineCount = ::SendMessage(mLoggingTextBox->handle(), EM_GETLINECOUNT, 0, 0);
-            ::SendMessage(mLoggingTextBox->handle(), EM_LINESCROLL, 0, lineCount);
+            //int lineCount = ::SendMessage(mLoggingTextBox->handle(), EM_GETLINECOUNT, 0, 0);
+            //::SendMessage(mLoggingTextBox->handle(), EM_LINESCROLL, 0, lineCount);
         }
     }
 
@@ -350,7 +350,7 @@ namespace Tetris
             }
             else
             {
-                LogInfo("Failed to move the blocks in time. Switching to minimal search depth.");
+                LogInfo(MakeString() << "Failed to move the blocks in time. Switching to minimal search depth. Game end node: " << endNode->depth() << ", result begin node: " << resultNode->depth() << ".");
                 mSearchDepth = cMinSearchDepth;
             }
             mComputerPlayer.reset();
