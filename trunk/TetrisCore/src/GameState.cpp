@@ -66,7 +66,7 @@ namespace Tetris
                             numOccupiedUnderTop++;
                         }
                         
-                        if (colIdx == mGrid.numColumns() - 1)
+                        if (mOriginalBlock.type() != BlockType_I && colIdx == mGrid.numColumns() - 1)
                         {
                             numHinderingTetris++;
                         }

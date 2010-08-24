@@ -1,4 +1,5 @@
 #include "Controller.h"
+#include "ErrorHandling.h"
 #include "Logger.h"
 #include "TetrisElement.h"
 #include "BlockMover.h"
@@ -8,6 +9,7 @@
 #include "TimedGame.h"
 #include "XULWin/ErrorReporter.h"
 #include "XULWin/Window.h"
+
 
 
 namespace Tetris
@@ -41,7 +43,7 @@ namespace Tetris
         mRefreshTimer(),
         mComputerPlayer(),
         mBlockMover(),
-        mSearchDepth(3),
+        mSearchDepth(cMinSearchDepth),
         mQuit(false)
     {
         //
@@ -101,7 +103,7 @@ namespace Tetris
         //
         // Get the Game object.
         //
-        mThreadSafeGame.reset(new ThreadSafeGame(std::auto_ptr<Game>(new Game)));
+        mThreadSafeGame.reset(new ThreadSafeGame(std::auto_ptr<Game>(new Game(5, 10))));
 
 
         //
@@ -215,7 +217,7 @@ namespace Tetris
         // The WinAPI::Timer is non-threaded and you can safely access the WinAPI in its callbacks.
         //
         mRefreshTimer.reset(new XULWin::WinAPI::Timer);
-        mRefreshTimer->start(boost::bind(&Controller::onRefresh, this), 30);
+        mRefreshTimer->start(boost::bind(&Controller::onRefresh, this), 10);
     }
 
 
@@ -324,7 +326,7 @@ namespace Tetris
 
     void Controller::startAI(Game & game, size_t inDepth)
     {
-        assert(!mComputerPlayer);
+        Assert(!mComputerPlayer);
         if (!mComputerPlayer)
         {
             std::auto_ptr<GameStateNode> endNode = game.endNode()->clone();
@@ -363,19 +365,25 @@ namespace Tetris
 
         WritableGame wgame(*mThreadSafeGame);
         Game & game = *(wgame.get());
+        if (game.isGameOver())
+        {
+            mStatusTextBox->setValue("Game Over!");
+            return;
+        }
 
         // Check if the computer player has finished. If yes, then get the results.
         if (mComputerPlayer && mComputerPlayer->isFinished())
         {
             // Did we manage to think all our moves before the block was dropped?
             GameStateNode * endNode = game.endNode();
-            if (mComputerPlayer->result()->depth() == endNode->depth() + 1)
+            ChildNodePtr resultNode = mComputerPlayer->result();
+            if (resultNode->depth() == endNode->depth() + 1)
             {
                 if (mSearchDepth < cMaxSearchDepth)
                 {
                     mSearchDepth++;
                 }
-                endNode->addChild(mComputerPlayer->result());
+                endNode->addChild(resultNode);
             }
             else
             {
@@ -388,7 +396,9 @@ namespace Tetris
                 
         if (mComputerEnabledCheckBox->isChecked() && !mComputerPlayer)
         {
-            if (game.endNode()->depth() - game.currentNode()->depth() + mSearchDepth <=  3 * cMaxSearchDepth)
+            GameStateNode * endNode = game.endNode();
+            if (!endNode->state().isGameOver() &&
+                endNode->depth() - game.currentNode()->depth() + mSearchDepth <=  3 * cMaxSearchDepth)
             {
                 startAI(game, mSearchDepth);
             }

@@ -12,6 +12,7 @@
 #include <boost/thread.hpp>
 #include <ostream>
 #include <vector>
+#include <boost/noncopyable.hpp>
 
 
 namespace Tetris
@@ -21,16 +22,20 @@ namespace Tetris
     void DestroyInferiorChildren(GameStateNode * srcNode, GameStateNode * dstNode);
 
 
-    class Player
+    class Player : boost::noncopyable
     {
     public:
         Player(std::auto_ptr<GameStateNode> inNode,
                const BlockTypes & inBlockTypes);
 
+        ~Player();
 
+        // You can check if the Player has finished using this call:
         void start();
 
         bool isFinished() const;
+
+		bool isGameOver() const;
 
         ChildNodePtr result();
 
@@ -45,6 +50,7 @@ namespace Tetris
         ChildNodePtr mEndNode;
         BlockTypes mBlockTypes;
         volatile bool mIsFinished;
+        volatile bool mStop;
         boost::scoped_ptr<boost::thread> mThread;
     };
 

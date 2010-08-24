@@ -214,7 +214,7 @@ namespace Tetris
         }
         
         const GameStateNode * nextNode = mCurrentNode->children().begin()->get();
-        assert(nextNode->depth() == mCurrentNode->depth() + 1);
+        Assert(nextNode->depth() == mCurrentNode->depth() + 1);
         setCurrentNode(nextNode);        
         return true;
     }
