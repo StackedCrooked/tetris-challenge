@@ -1,4 +1,5 @@
 #include "GameStateNode.h"
+#include "GameQualityEvaluator.h"
 #include "Block.h"
 #include "ErrorHandling.h"
 #include "GameState.h"
@@ -9,7 +10,10 @@ namespace Tetris
 
     std::auto_ptr<GameStateNode> GameStateNode::CreateRootNode(size_t inNumRows, size_t inNumColumns)
     {
-        return std::auto_ptr<GameStateNode>(new GameStateNode(std::auto_ptr<GameState>(new GameState(inNumRows, inNumColumns))));
+        return std::auto_ptr<GameStateNode>(
+            new GameStateNode(
+                std::auto_ptr<GameState>(
+                    new GameState(new DefaultGameQualityEvaluator, inNumRows, inNumColumns))));
     }
 
 
