@@ -3,7 +3,9 @@
 
 
 #include "Block.h"
+#include "GameQualityEvaluator.h"
 #include "Grid.h"
+#include "TypedWrapper.h"
 #include <memory>
 #include <stdexcept>
 
@@ -15,7 +17,7 @@ namespace Tetris
     {
     public:
         // Creates a new GameState
-        GameState(int inNumRows, int inNumColumns);
+        GameState(GameQualityEvaluator * inGameQualityEvaluator, size_t inNumRows, size_t inNumColumns);
 
         const Grid & grid() const;
 
@@ -141,6 +143,7 @@ namespace Tetris
         };
 
         mutable Quality mQuality;
+        GameQualityEvaluator * mGameQualityEvaluator;
     };
 
 

@@ -193,6 +193,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\include\GameQualityEvaluator.h"
+				>
+			</File>
+			<File
 				RelativePath=".\include\GameState.h"
 				>
 			</File>
@@ -262,6 +266,10 @@
 			</File>
 			<File
 				RelativePath=".\src\GameCommandQueue.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\GameQualityEvaluator.cpp"
 				>
 			</File>
 			<File

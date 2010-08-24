@@ -1,18 +1,21 @@
 #include "GameState.h"
 #include "BlockType.h"
+#include "ErrorHandling.h"
 #include <algorithm>
 
 
 namespace Tetris
 {
 
-    GameState::GameState(int inNumRows, int inNumColumns) :
+    GameState::GameState(GameQualityEvaluator * inGameQualityEvaluator, size_t inNumRows, size_t inNumColumns) :
         mGrid(inNumRows, inNumColumns, BlockType_Nil),
         mStats(),
         mIsGameOver(false),
         mOriginalBlock(BlockType_L, Rotation(0), Row(0), Column(0)),
-        mQuality()
+        mQuality(),
+        mGameQualityEvaluator(inGameQualityEvaluator)
     {
+        Assert(mGameQualityEvaluator);
     }
 
 
@@ -39,74 +42,7 @@ namespace Tetris
         if (!mQuality.isInitialized())
         {
             mQuality.reset();
-
-            int result = 0;
-
-            bool foundTop = false;
-            size_t top = mGrid.numRows();
-
-            size_t numOccupiedUnderTop = 0;
-            size_t numHinderingTetris = 0;
-
-            for (size_t rowIdx = 0; rowIdx != mGrid.numRows(); ++rowIdx)
-            {
-                for (size_t colIdx = 0; colIdx != mGrid.numColumns(); ++colIdx)
-                {
-                    const int & value = mGrid.get(rowIdx, colIdx);
-                    if (value != BlockType_Nil)
-                    {
-                        if (!foundTop)
-                        {
-                            top = rowIdx;
-                            foundTop = true;
-                        }
-
-                        if (foundTop)
-                        {
-                            numOccupiedUnderTop++;
-                        }
-                        
-                        if (mOriginalBlock.type() != BlockType_I && colIdx == mGrid.numColumns() - 1)
-                        {
-                            numHinderingTetris++;
-                        }
-                    }
-                    else
-                    {
-                        // check for holes
-                        if (foundTop && rowIdx > 0)
-                        {
-                            if (mGrid.get(rowIdx - 1, colIdx) != BlockType_Nil)
-                            {
-                                mQuality.setNumHoles(mQuality.numHoles() + 1);
-                            }
-                        }
-                    }
-
-                }
-            }
-            size_t height = mGrid.numRows() - top;
-            size_t lastBlockHeight = mGrid.numRows() - mOriginalBlock.row();
-
-            result -= 10 * mQuality.numHoles();
-            result -= 2 * height;
-            result -= 2 * lastBlockHeight;
-
-            //result += 1 * mStats.numSingles();
-            //result += 2 * mStats.numDoubles();
-            //result += 4 * mStats.numTriples();
-            //result += 8 * mStats.numTetrises();
-
-            result -= 4 * mStats.numSingles();
-            if (mOriginalBlock.type() != BlockType_I)
-            {
-                result -= 800 * mStats.numDoubles();
-                result -= 800 * mStats.numTriples();
-            }
-            result += 100 * mStats.numTetrises();
-            result -= 10 * numHinderingTetris;
-
-            mQuality.setScore(result);
+            mQuality.setScore(mGameQualityEvaluator->evaluate(*this));
             mQuality.setInitialized(true);
         }
         return mQuality.score();
