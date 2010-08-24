@@ -2,6 +2,7 @@
 #define ERROR_HANDLING_INCLUDED
 
 
+#include "Poco/Debugger.h"
 #include <stdexcept>
 #include <string>
 
@@ -9,33 +10,7 @@
 namespace Tetris
 {
 
-    #define CheckCondition(...)
-    #define CheckArgument(...)
-    #define CheckPrecondition(...)
-
-    //inline void CheckCondition(bool inCondition, const std::string & inErrorMessage)
-    //{
-    //    if (!inCondition)
-    //    {
-    //        throw std::logic_error(inErrorMessage);
-    //    }
-    //}
-
-    //inline void CheckArgument(bool inCondition, const std::string & inErrorMessage)
-    //{
-    //    if (!inCondition)
-    //    {
-    //        throw std::invalid_argument(inErrorMessage);
-    //    }
-    //}
-
-    //inline void CheckPrecondition(bool inCondition, const std::string & inErrorMessage)
-    //{
-    //    if (!inCondition)
-    //    {
-    //        throw std::logic_error(inErrorMessage);
-    //    }
-    //}
+    #define Assert(condition) if (!(condition)) { Poco::Debugger::enter(__FILE__, __LINE__); }
 
 } // namespace Tetris
 

@@ -1,4 +1,5 @@
 #include "BlockMover.h"
+#include "ErrorHandling.h"
 #include "Logger.h"
 
 
@@ -7,7 +8,7 @@ namespace Tetris
 
     BlockMover::BlockMover(ThreadSafeGame & inGame) :
         mGame(inGame),
-        mTimer(0, 60)
+        mTimer(0, 50)
     {
         Poco::TimerCallback<BlockMover> callback(*this, &BlockMover::onTimer);
         mTimer.start(callback);
@@ -56,29 +57,29 @@ namespace Tetris
 
             Block & block = game->activeBlock();
             const Block & targetBlock = (*children.begin())->state().originalBlock();
-            assert(block.type() == targetBlock.type());
+            Assert(block.type() == targetBlock.type());
             if (block.rotation() != targetBlock.rotation())
             {
                 if (!game->rotate())
                 {
-                    throw std::runtime_error(MakeString() << "Rotation failed.");
+                    LogInfo("Cheating now");
+                    game->navigateNodeDown();
                 }
             }
             else if (block.column() < targetBlock.column())
             {
                 if (!game->move(Direction_Right))
                 {
-                    throw std::runtime_error(MakeString() << "Move to right failed. Current column: " << block.column()
-                                                          << ", target column: " << targetBlock.column() << ".");
+                    LogInfo("Cheating now");
+                    game->navigateNodeDown();
                 }
             }
             else if (block.column() > targetBlock.column())
             {
                 if (!game->move(Direction_Left))
                 {
-                    throw std::runtime_error(MakeString() << "Move to left failed. "
-                                                          << "Current column: " << block.column() << ", "
-                                                          << "target column: " << targetBlock.column() << ".");
+                    LogInfo("Cheating now");
+                    game->navigateNodeDown();
                 }
             }
             else

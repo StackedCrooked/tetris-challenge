@@ -50,7 +50,7 @@ namespace Tetris
         {
             GameStateNode & node(*(*it));
             ChildNodePtr newChild(node.clone().release());
-            assert(newChild->depth() == mDepth + 1);
+            Assert(newChild->depth() == mDepth + 1);
             result->mChildren.insert(newChild);
         }
         return result;
@@ -89,7 +89,7 @@ namespace Tetris
 
     void GameStateNode::addChild(ChildNodePtr inChildNode)
     {
-        assert(inChildNode->depth() == mDepth + 1);
+        Assert(inChildNode->depth() == mDepth + 1);
         mChildren.insert(inChildNode);
     }
 
@@ -143,7 +143,7 @@ namespace Tetris
 
     void GenerateOffspring(BlockType inBlockType, GameStateNode & ioGameStateNode, ChildNodes & outChildNodes)
     {        
-        CheckPrecondition(outChildNodes.empty(), "outChildNodes should most likely be empty!");
+        Assert(outChildNodes.empty(), "outChildNodes should most likely be empty!");
         const GameState & gameState = ioGameStateNode.state();
         const Grid & gameGrid = gameState.grid();
 
@@ -158,7 +158,7 @@ namespace Tetris
                                                                              Row(0),
                                                                              Column(initialColumn)),
                                                                              GameOver(true))));
-            assert(childState->depth() == (ioGameStateNode.depth() + 1));
+            Assert(childState->depth() == (ioGameStateNode.depth() + 1));
             outChildNodes.insert(childState);
             return;
         }
@@ -178,7 +178,7 @@ namespace Tetris
                 {
                     block.setRow(row - 1);
                     ChildNodePtr childState(new GameStateNode(&ioGameStateNode, gameState.commit(block, GameOver(false))));
-                    assert(childState->depth() == ioGameStateNode.depth() + 1);
+                    Assert(childState->depth() == ioGameStateNode.depth() + 1);
                     outChildNodes.insert(childState);
                 }
             }
@@ -188,9 +188,9 @@ namespace Tetris
 
     void GameStateNode::generateOffspring(BlockTypes inBlockTypes, size_t inOffset)
     {
-        CheckPrecondition(inOffset < inBlockTypes.size(), "GenerateOffspring: inOffset must be smaller than inBlockTypes.size().");
+        Assert(inOffset < inBlockTypes.size(), "GenerateOffspring: inOffset must be smaller than inBlockTypes.size().");
 
-        assert(mChildren.empty());
+        Assert(mChildren.empty());
         GenerateOffspring(inBlockTypes[inOffset], *this, mChildren);
 
         if (inOffset + 1 < inBlockTypes.size())
@@ -207,8 +207,8 @@ namespace Tetris
 
     bool ChildPtrCompare::operator()(ChildNodePtr lhs, ChildNodePtr rhs)
     {
-        CheckArgument(lhs && rhs, "Comparison fails because ChildNodePtr objects are null!");
-        CheckArgument(lhs.get() != rhs.get(), "Comparison game state against itself. This is wrong!");
+        Assert(lhs && rhs, "Comparison fails because ChildNodePtr objects are null!");
+        Assert(lhs.get() != rhs.get(), "Comparison game state against itself. This is wrong!");
 
         return lhs->state().quality() > rhs->state().quality();
     }

@@ -24,7 +24,7 @@ namespace Tetris
     void DestroyInferiorChildren(GameStateNode & startNode, GameStateNode & endNode)
     {
         GameStateNode * dst = &endNode;
-        assert(dst->depth() > startNode.depth());
+        Assert(dst->depth() > startNode.depth());
         while (dst->depth() != startNode.depth())
         {
             ChildNodes::const_iterator it = dst->parent()->children().begin(), end = dst->parent()->children().end();
@@ -53,14 +53,29 @@ namespace Tetris
         mEndNode(),
         mBlockTypes(inBlockTypes),
         mIsFinished(false),
+        mStop(false),
         mThread()
     {
-        assert(mNode->children().empty());
+        Assert(!mNode->state().isGameOver());
+        Assert(mNode->children().empty());
+    }
+
+
+    Player::~Player()
+    {
+        mStop = true;
+        mThread->join();
     }
 
 
     void Player::populateNodesRecursively(GameStateNode & ioNode, const BlockTypes & inBlockTypes, size_t inDepth)
     {
+        if (mStop)
+        {
+            throw std::runtime_error("Interrupted!");
+        }
+
+
         if (inDepth >= inBlockTypes.size())
         {
             return;
@@ -107,16 +122,26 @@ namespace Tetris
     }
 
 
+    bool Player::isGameOver() const
+    {
+        if (!mNode->children().empty())
+        {
+            return (*mNode->children().begin())->state().isGameOver();
+        }
+        return false;
+    }
+
+
     ChildNodePtr Player::result()
     {
-        assert(!mNode->children().empty());
+        Assert(!mNode->children().empty());
         return *mNode->children().begin();
     }
 
 
     void Player::start()
     {
-        assert(!mThread);
+        Assert(!mThread);
         if (!mThread)
         {
             mThread.reset(new boost::thread(boost::bind(&Player::startImpl, this)));

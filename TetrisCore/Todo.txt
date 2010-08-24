@@ -1,3 +1,4 @@
+- Fix Game Over crash
 - Logger scroll to bottom
 - People want to see Tetrises!
 - Implement player vs computer mode.
