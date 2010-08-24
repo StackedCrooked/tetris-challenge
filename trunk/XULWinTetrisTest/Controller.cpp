@@ -293,7 +293,12 @@ namespace Tetris
         if (!mComputerPlayer)
         {
             std::auto_ptr<GameStateNode> endNode = game.endNode()->clone();
-            size_t blockOffset = endNode->depth() - game.currentNode()->depth();
+            size_t blockOffset = 0;
+            Assert(endNode->depth() >= game.currentNode()->depth());
+            if (endNode->depth() > game.currentNode()->depth())
+            {
+                blockOffset = endNode->depth() - game.currentNode()->depth();
+            }
             BlockTypes futureBlocks_tooMany;
             game.getFutureBlocks(inDepth + blockOffset, futureBlocks_tooMany);
 
@@ -302,6 +307,7 @@ namespace Tetris
             {
                 futureBlocks.push_back(futureBlocks_tooMany[idx]);
             }
+            Assert(endNode->depth() == game.endNode()->depth());
             mComputerPlayer.reset(new Player(endNode, futureBlocks));
             mComputerPlayer->start();
         }
