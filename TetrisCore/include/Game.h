@@ -4,6 +4,7 @@
 
 #include "Block.h"
 #include "BlockFactory.h"
+#include "BlockType.h"
 #include "Direction.h"
 #include "GameStateNode.h"
 #include <boost/scoped_ptr.hpp>
@@ -94,11 +95,7 @@ namespace Tetris
         boost::scoped_ptr<GameStateNode> mRootNode;
         GameStateNode * mCurrentNode;
         boost::scoped_ptr<Block> mActiveBlock;
-
-        BlockFactory mBlockFactory;
-        
-        // All blocks, previous, current and future.
-        // This list grows during the game.
+        boost::scoped_ptr<BlockFactory> mBlockFactory;
         mutable BlockTypes mBlocks;
         size_t mCurrentBlockIndex;
     };

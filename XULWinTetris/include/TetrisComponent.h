@@ -2,8 +2,9 @@
 #define TETRISCOMPONENT_H_INCLUDED
 
 
-#include "Game.h"
+#include "BlockType.h"
 #include "Direction.h"
+#include "Grid.h"
 #include "XULWin/Component.h"
 #include "XULWin/AttributeController.h"
 #include "XULWin/Decorator.h"
@@ -20,7 +21,8 @@
 
 namespace Tetris
 {
-    class Game;
+    class Block;
+    class Game;    
 
 
     /**

@@ -2,21 +2,18 @@
 #define PLAYER_H_INCLUDED
 
 
-#include "Game.h"
-#include "Threading.h"
-#include "ThreadSafeGame.h"
-#include "Poco/Stopwatch.h"
-#include "Poco/Timer.h"
-#include "Poco/Types.h"
-#include <boost/function.hpp>
-#include <boost/thread.hpp>
-#include <ostream>
+#include "GameStateNode.h"
+#include "BlockType.h"
+#include <memory>
 #include <vector>
 #include <boost/noncopyable.hpp>
+#include <boost/scoped_ptr.hpp>
+#include <boost/thread.hpp>
 
 
 namespace Tetris
 {
+
     
     typedef std::vector<int> Widths;
     void DestroyInferiorChildren(GameStateNode * srcNode, GameStateNode * dstNode);
