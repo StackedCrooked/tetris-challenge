@@ -280,8 +280,11 @@ namespace Tetris
         {
             std::string timestamp = Poco::DateTimeFormatter::format(Poco::DateTime(), "%H:%M:%S ");
             mLoggingTextBox->setValue(MakeString() << mLoggingTextBox->getValue() << "\r\n" << timestamp << inMessage);
-            //int lineCount = ::SendMessage(mLoggingTextBox->handle(), EM_GETLINECOUNT, 0, 0);
-            //::SendMessage(mLoggingTextBox->handle(), EM_LINESCROLL, 0, lineCount);
+
+            // Scroll to bottom
+            int endPos = mLoggingTextBox->getValue().size();
+            ::SendMessage(mLoggingTextBox->handle(), EM_SETSEL, (WPARAM)endPos, (LPARAM)endPos);
+            ::SendMessage(mLoggingTextBox->handle(), EM_SCROLLCARET, 0, 0);
         }
     }
 
