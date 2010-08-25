@@ -2,7 +2,6 @@
 - Implement various selectable "Strategies" for AI
 - False positives of: "Failed to move the blocks in time"
 - Window icon
-- People want to see Tetrises!
 - Implement player vs computer mode.
 - Run the console version under valgrind on Mac and see if you can get any more info (KCacheGrind)
 - Release a version to demo purposes?
