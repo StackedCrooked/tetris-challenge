@@ -1,7 +1,7 @@
-#include "Player.h"
-#include "GameState.h"
-#include "ErrorHandling.h"
-#include "Logger.h"
+#include "Tetris/Player.h"
+#include "Tetris/GameState.h"
+#include "Tetris/ErrorHandling.h"
+#include "Tetris/Logger.h"
 #include "Poco/Stopwatch.h"
 #include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>

@@ -2,10 +2,10 @@
 #define BLOCK_H_INCLUDED
 
 
-#include "BlockType.h"
-#include "Direction.h"
-#include "Grid.h"
-#include "TypedWrapper.h"
+#include "Tetris/BlockType.h"
+#include "Tetris/Direction.h"
+#include "Tetris/Grid.h"
+#include "Tetris/TypedWrapper.h"
 
 
 namespace Tetris

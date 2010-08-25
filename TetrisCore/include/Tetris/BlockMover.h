@@ -2,7 +2,7 @@
 #define BLOCKMOVER_H_INCLUDED
 
 
-#include "Threading.h"
+#include "Tetris/Threading.h"
 #include "Poco/Timer.h"
 
 

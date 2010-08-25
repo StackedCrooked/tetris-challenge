@@ -1,6 +1,6 @@
-#include "BlockFactory.h"
-#include "Block.h"
-#include "ErrorHandling.h"
+#include "Tetris/BlockFactory.h"
+#include "Tetris/Block.h"
+#include "Tetris/ErrorHandling.h"
 #include <algorithm>
 #include <cstdlib>
 #include <ctime>

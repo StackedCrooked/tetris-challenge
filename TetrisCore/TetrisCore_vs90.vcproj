@@ -161,75 +161,75 @@
 			Name="Header Files"
 			>
 			<File
-				RelativePath=".\include\Block.h"
+				RelativePath=".\include\Tetris\Block.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\BlockFactory.h"
+				RelativePath=".\include\Tetris\BlockFactory.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\BlockMover.h"
+				RelativePath=".\include\Tetris\BlockMover.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\BlockType.h"
+				RelativePath=".\include\Tetris\BlockType.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\Direction.h"
+				RelativePath=".\include\Tetris\Direction.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\ErrorHandling.h"
+				RelativePath=".\include\Tetris\ErrorHandling.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\Game.h"
+				RelativePath=".\include\Tetris\Game.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\GameQualityEvaluator.h"
+				RelativePath=".\include\Tetris\GameQualityEvaluator.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\GameState.h"
+				RelativePath=".\include\Tetris\GameState.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\GameStateNode.h"
+				RelativePath=".\include\Tetris\GameStateNode.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\GenericGrid.h"
+				RelativePath=".\include\Tetris\GenericGrid.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\Grid.h"
+				RelativePath=".\include\Tetris\Grid.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\Logger.h"
+				RelativePath=".\include\Tetris\Logger.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\Player.h"
+				RelativePath=".\include\Tetris\Player.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\Threading.h"
+				RelativePath=".\include\Tetris\Threading.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\TimedGame.h"
+				RelativePath=".\include\Tetris\TimedGame.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\TypedWrapper.h"
+				RelativePath=".\include\Tetris\TypedWrapper.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\Unicode.h"
+				RelativePath=".\include\Tetris\Unicode.h"
 				>
 			</File>
 		</Filter>

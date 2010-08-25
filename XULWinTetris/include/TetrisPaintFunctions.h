@@ -2,8 +2,8 @@
 #define TETRISPAINTFUNCTIONS_H_INCLUDED
 
 
-#include "GameState.h"
-#include "BlockType.h"
+#include "Tetris/GameState.h"
+#include "Tetris/BlockType.h"
 #include "XULWin/Rect.h"
 #include <string>
 

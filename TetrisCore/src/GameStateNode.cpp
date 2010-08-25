@@ -1,8 +1,8 @@
-#include "GameStateNode.h"
-#include "GameQualityEvaluator.h"
-#include "Block.h"
-#include "ErrorHandling.h"
-#include "GameState.h"
+#include "Tetris/GameStateNode.h"
+#include "Tetris/GameQualityEvaluator.h"
+#include "Tetris/Block.h"
+#include "Tetris/ErrorHandling.h"
+#include "Tetris/GameState.h"
 
 namespace Tetris
 {

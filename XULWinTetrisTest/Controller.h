@@ -2,10 +2,10 @@
 #define CONTROLLER_H_INCLUDED
 
 
-#include "Block.h"
-#include "Game.h"
+#include "Tetris/Block.h"
+#include "Tetris/Game.h"
 #include "TetrisComponent.h"
-#include "Threading.h"
+#include "Tetris/Threading.h"
 #include "XULWin/Components.h"
 #include "XULWin/Window.h"
 #include "XULWin/WinUtils.h"

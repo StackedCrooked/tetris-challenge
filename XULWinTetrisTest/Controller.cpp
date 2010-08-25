@@ -1,17 +1,16 @@
 #include "Controller.h"
-#include "ErrorHandling.h"
-#include "Game.h"
-#include "Logger.h"
+#include "Tetris/ErrorHandling.h"
+#include "Tetris/Game.h"
+#include "Tetris/Logger.h"
 #include "TetrisElement.h"
-#include "BlockMover.h"
-#include "GameStateNode.h"
-#include "Player.h"
-#include "TimedGame.h"
+#include "Tetris/BlockMover.h"
+#include "Tetris/GameStateNode.h"
+#include "Tetris/Player.h"
+#include "Tetris/TimedGame.h"
 #include "XULWin/ErrorReporter.h"
 #include "XULWin/Window.h"
 #include "Poco/DateTime.h"
 #include "Poco/DateTimeFormatter.h"
-
 
 
 namespace Tetris

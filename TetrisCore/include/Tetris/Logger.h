@@ -2,7 +2,7 @@
 #define LOGGER_H_INCLUDED
 
 
-#include "Threading.h"
+#include "Tetris/Threading.h"
 #include <boost/function.hpp>
 #include <boost/thread.hpp>
 #include <sstream>
