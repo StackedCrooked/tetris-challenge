@@ -8,6 +8,7 @@
 #include "Tetris/Player.h"
 #include "Tetris/TimedGame.h"
 #include "XULWin/ErrorReporter.h"
+#include "XULWin/Menu.h"
 #include "XULWin/Window.h"
 #include "Poco/DateTime.h"
 #include "Poco/DateTimeFormatter.h"
@@ -37,7 +38,7 @@ namespace Tetris
         mMovesAheadTextBox(0),
         mSearchDepthTextBox(0),
         mLoggingTextBox(0),
-        mThreadSafeGame(),
+        mProtectedGame(),
         mTimedGame(),
         mRefreshTimer(),
         mComputerPlayer(),
@@ -90,15 +91,13 @@ namespace Tetris
         //
         // Get the Game object.
         //
-        mThreadSafeGame.reset(new Protected<Game>(std::auto_ptr<Game>(new Game(mTetrisComponent->getNumRows(), mTetrisComponent->getNumColumns()))));
+        mProtectedGame.reset(new Protected<Game>(std::auto_ptr<Game>(new Game(mTetrisComponent->getNumRows(), mTetrisComponent->getNumColumns()))));
 
 
         //
         // Enable gravity.
         //
-        mTimedGame.reset(new TimedGame(*mThreadSafeGame));
-        mTimedGame->start();
-        mTimedGame->setLevel(0);
+        mTimedGame.reset(new TimedGame(*mProtectedGame));
 
 
         //
@@ -181,6 +180,21 @@ namespace Tetris
             }
         }
 
+        if (XULWin::MenuItem * newMenuItem = FindComponentById<XULWin::MenuItem>(rootElement.get(), "newMenuItem"))
+        {
+            mScopedEventListener.connect(newMenuItem->el(), boost::bind(&Controller::onNew, this, _1, _2));
+        }
+
+        if (XULWin::MenuItem * quitMenuItem = FindComponentById<XULWin::MenuItem>(rootElement.get(), "quitMenuItem"))
+        {
+            mScopedEventListener.connect(quitMenuItem->el(), boost::bind(&Controller::onQuit, this, _1, _2));
+        }
+
+        if (XULWin::MenuItem * aboutMenuItem = FindComponentById<XULWin::MenuItem>(rootElement.get(), "aboutMenuItem"))
+        {
+            mScopedEventListener.connect(aboutMenuItem->el(), boost::bind(&Controller::onAboutMenuItem, this, _1, _2));
+        }
+
 
         //
         // Activate the stats updater.
@@ -198,6 +212,31 @@ namespace Tetris
     }
 
 
+    LRESULT Controller::onNew(WPARAM wParam, LPARAM lParam)
+    {
+        mComputerPlayer.reset();
+        mTimedGame.reset();
+        mBlockMover.reset();
+        mProtectedGame.reset(new Protected<Game>(std::auto_ptr<Game>(new Game(mTetrisComponent->getNumRows(), mTetrisComponent->getNumColumns()))));
+        mTimedGame.reset(new TimedGame(*mProtectedGame));
+        return XULWin::cHandled;
+    }
+
+
+    LRESULT Controller::onQuit(WPARAM wParam, LPARAM lParam)
+    {
+        ::PostQuitMessage(0);
+        return XULWin::cHandled;
+    }
+
+
+    LRESULT Controller::onAboutMenuItem(WPARAM wParam, LPARAM lParam)
+    {
+        ::MessageBox(0, L"Check out http://code.google.com/p/tetris-challenge.\nFrancis Rammeloo", L"Tetris Challenge", MB_OK);
+        return XULWin::cHandled;
+    }
+
+
     void Controller::run()
     {
         mWindow->showModal(XULWin::WindowPos_CenterInScreen);
@@ -211,7 +250,7 @@ namespace Tetris
     {
         if (tetrisComponent == mTetrisComponent)
         {
-            ScopedConstAtom<Game> rgame(*mThreadSafeGame);
+            ScopedConstAtom<Game> rgame(*mProtectedGame);
             const Game & game = *(rgame.get());
             outGrid = game.currentNode()->state().grid();
             outActiveBlock = game.activeBlock();
@@ -226,7 +265,7 @@ namespace Tetris
         {
             return false;
         }
-        ScopedAtom<Game> wgame(*mThreadSafeGame);
+        ScopedAtom<Game> wgame(*mProtectedGame);
         Game & game = *wgame.get();
         return game.move(inDirection);
     }
@@ -238,7 +277,7 @@ namespace Tetris
         {
             return;
         }
-        ScopedAtom<Game> wgame(*mThreadSafeGame);
+        ScopedAtom<Game> wgame(*mProtectedGame);
         Game & game = *wgame.get();
         game.drop();
     }
@@ -250,7 +289,7 @@ namespace Tetris
         {
             return false;
         }
-        ScopedAtom<Game> wgame(*mThreadSafeGame);
+        ScopedAtom<Game> wgame(*mProtectedGame);
         Game & game = *wgame.get();
         return game.rotate();
     }
@@ -270,7 +309,7 @@ namespace Tetris
 
     Protected<Game> & Controller::threadSafeGame()
     {
-        return *mThreadSafeGame;
+        return *mProtectedGame;
     }
 
 
@@ -334,7 +373,7 @@ namespace Tetris
         // Flush the logger.
         Logger::Instance().flush();
 
-        ScopedAtom<Game> wgame(*mThreadSafeGame);
+        ScopedAtom<Game> wgame(*mProtectedGame);
         Game & game = *(wgame.get());
         if (game.isGameOver())
         {
@@ -397,7 +436,7 @@ namespace Tetris
             // If no then start the block mover.
             else
             {
-                mBlockMover.reset(new BlockMover(*mThreadSafeGame));
+                mBlockMover.reset(new BlockMover(*mProtectedGame));
             }
         }
         else
