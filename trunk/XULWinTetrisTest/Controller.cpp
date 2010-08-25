@@ -209,6 +209,7 @@ namespace Tetris
     {
         mComputerPlayer.reset();
         mTimedGame.reset();
+        mBlockMover.reset();
     }
 
 
