@@ -1,4 +1,4 @@
-- Show menu with "New game", "About", etc..
+- About dialog with real hyperlink
 - Implement various selectable "Strategies" for AI
 - False positives of: "Failed to move the blocks in time"
 - Window icon
@@ -6,6 +6,7 @@
 - Implement player vs computer mode.
 - Run the console version under valgrind on Mac and see if you can get any more info (KCacheGrind)
 - Release a version to demo purposes?
+v Show menu with "New game", "About", etc..
 v Use Tetris/Game.h include structure.
 v Replace Protected<Game> with Protected<Game>.
 v Stop cheating

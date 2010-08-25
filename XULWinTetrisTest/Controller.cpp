@@ -232,7 +232,7 @@ namespace Tetris
 
     LRESULT Controller::onAboutMenuItem(WPARAM wParam, LPARAM lParam)
     {
-        ::MessageBox(0, L"Check out http://code.google.com/p/tetris-challenge.\nFrancis Rammeloo", L"Tetris Challenge", MB_OK);
+        ::MessageBox(0, L"Check out http://code.google.com/p/tetris-challenge.", L"Tetris Challenge", MB_OK);
         return XULWin::cHandled;
     }
 
