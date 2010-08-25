@@ -1,5 +1,3 @@
-
-- Use Tetris/Game.h include structure.
 - Show menu with "New game", "About", etc..
 - Implement various selectable "Strategies" for AI
 - False positives of: "Failed to move the blocks in time"
@@ -8,6 +6,7 @@
 - Implement player vs computer mode.
 - Run the console version under valgrind on Mac and see if you can get any more info (KCacheGrind)
 - Release a version to demo purposes?
+v Use Tetris/Game.h include structure.
 v Replace Protected<Game> with Protected<Game>.
 v Stop cheating
 v Logger scroll to bottom

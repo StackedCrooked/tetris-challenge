@@ -18,8 +18,6 @@ namespace Tetris
     public:
         TimedGame(const Protected<Game> & inGame);
 
-        void start();
-
         int level() const;
 
         // The higher the level the faster the blocks are falling.

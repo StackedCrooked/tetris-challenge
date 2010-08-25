@@ -19,12 +19,7 @@ namespace Tetris
         mThreadSafeGame(inThreadSafeGame),
         mLevel(0)
     {
-    }
-
-
-    void TimedGame::start()
-    {
-        mTimer.start(Poco::TimerCallback<TimedGame>(*this, &TimedGame::onTimerEvent));        
+        mTimer.start(Poco::TimerCallback<TimedGame>(*this, &TimedGame::onTimerEvent));     
     }
 
 

@@ -7,6 +7,7 @@
 #include "TetrisComponent.h"
 #include "Tetris/Threading.h"
 #include "XULWin/Components.h"
+#include "XULWin/EventListener.h"
 #include "XULWin/Window.h"
 #include "XULWin/WinUtils.h"
 #include "XULWin/XULRunner.h"
@@ -74,6 +75,10 @@ namespace Tetris
 
     private:
         void startAI(Game & game, size_t inDepth);
+        
+        LRESULT onNew(WPARAM wParam, LPARAM lParam);
+        LRESULT onQuit(WPARAM wParam, LPARAM lParam);
+        LRESULT onAboutMenuItem(WPARAM wParam, LPARAM lParam);
 
         XULWin::XULRunner mXULRunner;
         XULWin::Window * mWindow;
@@ -87,7 +92,8 @@ namespace Tetris
         XULWin::TextBox * mMovesAheadTextBox;
         XULWin::TextBox * mSearchDepthTextBox;
         XULWin::TextBox * mLoggingTextBox;
-        boost::scoped_ptr<Protected<Game>> mThreadSafeGame;
+        XULWin::ScopedEventListener mScopedEventListener;
+        boost::scoped_ptr<Protected<Game> > mProtectedGame;
         boost::scoped_ptr<Tetris::TimedGame> mTimedGame;
         boost::scoped_ptr<XULWin::WinAPI::Timer> mRefreshTimer;
         boost::scoped_ptr<Player> mComputerPlayer;
