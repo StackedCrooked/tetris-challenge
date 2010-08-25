@@ -2,12 +2,14 @@
 #define BLOCKMOVER_H_INCLUDED
 
 
-#include "ThreadSafeGame.h"
+#include "Threading.h"
 #include "Poco/Timer.h"
 
 
 namespace Tetris
 {
+
+    class Game;
 
     /**
      * BlockMover
@@ -24,7 +26,7 @@ namespace Tetris
     class BlockMover
     {
     public:
-        BlockMover(ThreadSafeGame & inGame);
+        BlockMover(Protected<Game> & inGame);
 
         enum Status
         {
@@ -39,7 +41,7 @@ namespace Tetris
         void onTimer(Poco::Timer & ioTimer);
         void move();   
         
-        ThreadSafeGame & mGame;
+        Protected<Game> & mGame;
         Poco::Timer mTimer;
         volatile Status mStatus;
     };

@@ -1,11 +1,11 @@
 #include "Controller.h"
 #include "ErrorHandling.h"
+#include "Game.h"
 #include "Logger.h"
 #include "TetrisElement.h"
 #include "BlockMover.h"
 #include "GameStateNode.h"
 #include "Player.h"
-#include "ThreadSafeGame.h"
 #include "TimedGame.h"
 #include "XULWin/ErrorReporter.h"
 #include "XULWin/Window.h"
@@ -91,7 +91,7 @@ namespace Tetris
         //
         // Get the Game object.
         //
-        mThreadSafeGame.reset(new ThreadSafeGame(std::auto_ptr<Game>(new Game(mTetrisComponent->getNumRows(), mTetrisComponent->getNumColumns()))));
+        mThreadSafeGame.reset(new Protected<Game>(std::auto_ptr<Game>(new Game(mTetrisComponent->getNumRows(), mTetrisComponent->getNumColumns()))));
 
 
         //
@@ -212,7 +212,7 @@ namespace Tetris
     {
         if (tetrisComponent == mTetrisComponent)
         {
-            ReadOnlyGame rgame(*mThreadSafeGame);
+            ScopedConstAtom<Game> rgame(*mThreadSafeGame);
             const Game & game = *(rgame.get());
             outGrid = game.currentNode()->state().grid();
             outActiveBlock = game.activeBlock();
@@ -227,7 +227,7 @@ namespace Tetris
         {
             return false;
         }
-        WritableGame wgame(*mThreadSafeGame);
+        ScopedAtom<Game> wgame(*mThreadSafeGame);
         Game & game = *wgame.get();
         return game.move(inDirection);
     }
@@ -239,7 +239,7 @@ namespace Tetris
         {
             return;
         }
-        WritableGame wgame(*mThreadSafeGame);
+        ScopedAtom<Game> wgame(*mThreadSafeGame);
         Game & game = *wgame.get();
         game.drop();
     }
@@ -251,7 +251,7 @@ namespace Tetris
         {
             return false;
         }
-        WritableGame wgame(*mThreadSafeGame);
+        ScopedAtom<Game> wgame(*mThreadSafeGame);
         Game & game = *wgame.get();
         return game.rotate();
     }
@@ -269,7 +269,7 @@ namespace Tetris
     }
 
 
-    ThreadSafeGame & Controller::threadSafeGame()
+    Protected<Game> & Controller::threadSafeGame()
     {
         return *mThreadSafeGame;
     }
@@ -332,7 +332,7 @@ namespace Tetris
         // Flush the logger.
         Logger::Instance().flush();
 
-        WritableGame wgame(*mThreadSafeGame);
+        ScopedAtom<Game> wgame(*mThreadSafeGame);
         Game & game = *(wgame.get());
         if (game.isGameOver())
         {

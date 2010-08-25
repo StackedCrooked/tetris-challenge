@@ -92,7 +92,4 @@ namespace Tetris
                + 8 * inGameState.stats().numTetrises();
     }
 
-
-            
-
 } // namespace Tetris

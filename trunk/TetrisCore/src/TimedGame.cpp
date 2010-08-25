@@ -1,4 +1,5 @@
 #include "TimedGame.h"
+#include "Game.h"
 
 
 namespace Tetris
@@ -14,7 +15,7 @@ namespace Tetris
 
     static const int sIntervalCount = sizeof(sIntervals)/sizeof(int);
 
-    TimedGame::TimedGame(const ThreadSafeGame & inThreadSafeGame) :
+    TimedGame::TimedGame(const Protected<Game> & inThreadSafeGame) :
         mThreadSafeGame(inThreadSafeGame),
         mLevel(0)
     {
@@ -31,7 +32,7 @@ namespace Tetris
     {
         // Scoped lock
         {
-            WritableGame game(mThreadSafeGame);
+            ScopedAtom<Game> game(mThreadSafeGame);
             if (!game->isGameOver())
             {
                 game->move(Direction_Down);

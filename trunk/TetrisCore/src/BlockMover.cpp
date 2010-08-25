@@ -1,4 +1,6 @@
 #include "BlockMover.h"
+#include "Game.h"
+#include "GameStateNode.h"
 #include "ErrorHandling.h"
 #include "Logger.h"
 
@@ -6,7 +8,7 @@
 namespace Tetris
 {
 
-    BlockMover::BlockMover(ThreadSafeGame & inGame) :
+    BlockMover::BlockMover(Protected<Game> & inGame) :
         mGame(inGame),
         mTimer(0, 50),
         mStatus(Status_Ok)
@@ -43,7 +45,7 @@ namespace Tetris
             return;
         }
 
-        WritableGame game(mGame);
+        ScopedAtom<Game> game(mGame);
         const ChildNodes & children = game->currentNode()->children();
         if (children.empty())
         {

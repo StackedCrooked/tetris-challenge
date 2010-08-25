@@ -1,7 +1,5 @@
 #include "Game.h"
-#include "Block.h"
 #include "ErrorHandling.h"
-#include "GameState.h"
 
 
 namespace Tetris
@@ -21,13 +19,13 @@ namespace Tetris
         mNumColumns(inNumColumns),
         mRootNode(GameStateNode::CreateRootNode(inNumRows, inNumColumns).release()),        
         mActiveBlock(),
-        mBlockFactory(),
+        mBlockFactory(new BlockFactory),
         mBlocks(),
         mCurrentBlockIndex(0)
     {
         if (mBlocks.empty())
         {
-            mBlocks.push_back(mBlockFactory.getNext());        
+            mBlocks.push_back(mBlockFactory->getNext());        
         }
         mActiveBlock.reset(CreateDefaultBlock(mBlocks.front(), inNumColumns).release());
         mCurrentNode = mRootNode.get();
@@ -62,7 +60,7 @@ namespace Tetris
         mRootNode(inGame.mRootNode->clone().release()),
         mCurrentNode(0),
         mActiveBlock(new Block(*(inGame.mActiveBlock))),
-        mBlockFactory(inGame.mBlockFactory),
+        mBlockFactory(new BlockFactory(*inGame.mBlockFactory)),
         mBlocks(inGame.mBlocks),
         mCurrentBlockIndex(inGame.mCurrentBlockIndex)
     {
@@ -92,7 +90,7 @@ namespace Tetris
     {
         while (mBlocks.size() < inCount)
         {
-            mBlocks.push_back(mBlockFactory.getNext());
+            mBlocks.push_back(mBlockFactory->getNext());
         }
     }
 
@@ -107,7 +105,7 @@ namespace Tetris
     {
         while (mCurrentBlockIndex >= mBlocks.size())
         {
-            mBlocks.push_back(mBlockFactory.getNext());
+            mBlocks.push_back(mBlockFactory->getNext());
         }
     }
 
@@ -132,7 +130,7 @@ namespace Tetris
         // Make sure we have all blocks we need.
         while (mBlocks.size() - mCurrentBlockIndex < inCount)
         {
-            mBlocks.push_back(mBlockFactory.getNext());
+            mBlocks.push_back(mBlockFactory->getNext());
         }
 
         

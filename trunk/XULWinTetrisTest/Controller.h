@@ -3,7 +3,9 @@
 
 
 #include "Block.h"
+#include "Game.h"
 #include "TetrisComponent.h"
+#include "Threading.h"
 #include "XULWin/Components.h"
 #include "XULWin/Window.h"
 #include "XULWin/WinUtils.h"
@@ -22,7 +24,6 @@ namespace Tetris
     class BlockMover;
     class GameStateNode;
     class Player;
-    class ThreadSafeGame;
     class TimedGame;
 
     enum
@@ -59,7 +60,7 @@ namespace Tetris
 
         void joinAllThreads();
 
-        ThreadSafeGame & threadSafeGame();
+        Protected<Game> & threadSafeGame();
 
         void log(const std::string & inMessage);
 
@@ -86,7 +87,7 @@ namespace Tetris
         XULWin::TextBox * mMovesAheadTextBox;
         XULWin::TextBox * mSearchDepthTextBox;
         XULWin::TextBox * mLoggingTextBox;
-        boost::scoped_ptr<ThreadSafeGame> mThreadSafeGame;
+        boost::scoped_ptr<Protected<Game>> mThreadSafeGame;
         boost::scoped_ptr<Tetris::TimedGame> mTimedGame;
         boost::scoped_ptr<XULWin::WinAPI::Timer> mRefreshTimer;
         boost::scoped_ptr<Player> mComputerPlayer;

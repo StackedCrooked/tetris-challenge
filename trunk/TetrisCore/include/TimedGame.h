@@ -2,12 +2,13 @@
 #define TIMEDGAME_H_INCLUDED
 
 
-#include "ThreadSafeGame.h"
+#include "Threading.h"
 #include "Poco/Timer.h"
 
 
 namespace Tetris
 {
+    class Game;
 
     /**
      * TimedGame adds the timed lowering of the active block.
@@ -15,7 +16,7 @@ namespace Tetris
     class TimedGame
     {
     public:
-        TimedGame(const ThreadSafeGame & inGame);
+        TimedGame(const Protected<Game> & inGame);
 
         void start();
 
@@ -29,7 +30,7 @@ namespace Tetris
     private:
         void onTimerEvent(Poco::Timer & inTimer);
 
-        ThreadSafeGame mThreadSafeGame;
+        Protected<Game> mThreadSafeGame;
         int mLevel;
         Poco::Timer mTimer;
     };
