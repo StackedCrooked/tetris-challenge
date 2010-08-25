@@ -1,5 +1,5 @@
-#include "Block.h"
-#include "ErrorHandling.h"
+#include "Tetris/Block.h"
+#include "Tetris/ErrorHandling.h"
 #include <stdexcept>
 
 

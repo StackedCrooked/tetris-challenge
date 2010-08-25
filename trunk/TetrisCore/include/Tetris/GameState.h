@@ -2,10 +2,10 @@
 #define GAMESTATE_H_INCLUDED
 
 
-#include "Block.h"
-#include "GameQualityEvaluator.h"
-#include "Grid.h"
-#include "TypedWrapper.h"
+#include "Tetris/Block.h"
+#include "Tetris/GameQualityEvaluator.h"
+#include "Tetris/Grid.h"
+#include "Tetris/TypedWrapper.h"
 #include <boost/shared_ptr.hpp>
 #include <memory>
 #include <stdexcept>

@@ -1,5 +1,5 @@
-#include "GameQualityEvaluator.h"
-#include "GameState.h"
+#include "Tetris/GameQualityEvaluator.h"
+#include "Tetris/GameState.h"
 
 
 namespace Tetris

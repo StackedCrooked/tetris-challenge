@@ -2,11 +2,11 @@
 #define GAME_H_INCLUDED
 
 
-#include "Block.h"
-#include "BlockFactory.h"
-#include "BlockType.h"
-#include "Direction.h"
-#include "GameStateNode.h"
+#include "Tetris/Block.h"
+#include "Tetris/BlockFactory.h"
+#include "Tetris/BlockType.h"
+#include "Tetris/Direction.h"
+#include "Tetris/GameStateNode.h"
 #include <boost/scoped_ptr.hpp>
 #include <memory>
 #include <vector>

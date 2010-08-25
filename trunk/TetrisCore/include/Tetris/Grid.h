@@ -2,8 +2,8 @@
 #define GRID_H_INCLUDED
 
 
-#include "BlockType.h"
-#include "GenericGrid.h"
+#include "Tetris/BlockType.h"
+#include "Tetris/GenericGrid.h"
 
 
 namespace Tetris

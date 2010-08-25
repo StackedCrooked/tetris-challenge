@@ -1,5 +1,5 @@
-#include "Game.h"
-#include "ErrorHandling.h"
+#include "Tetris/Game.h"
+#include "Tetris/ErrorHandling.h"
 
 
 namespace Tetris

@@ -2,8 +2,8 @@
 #define GAMESTATENODE_H_INCLUDED
 
 
-#include "BlockType.h"
-#include "GameState.h"
+#include "Tetris/BlockType.h"
+#include "Tetris/GameState.h"
 #include <boost/shared_ptr.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <set>

@@ -1,6 +1,6 @@
-#include "GameState.h"
-#include "BlockType.h"
-#include "ErrorHandling.h"
+#include "Tetris/GameState.h"
+#include "Tetris/BlockType.h"
+#include "Tetris/ErrorHandling.h"
 #include <algorithm>
 
 

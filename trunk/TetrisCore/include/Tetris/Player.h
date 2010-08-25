@@ -2,8 +2,8 @@
 #define PLAYER_H_INCLUDED
 
 
-#include "GameStateNode.h"
-#include "BlockType.h"
+#include "Tetris/GameStateNode.h"
+#include "Tetris/BlockType.h"
 #include <memory>
 #include <vector>
 #include <boost/noncopyable.hpp>

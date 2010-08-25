@@ -1,8 +1,8 @@
-#include "BlockMover.h"
-#include "Game.h"
-#include "GameStateNode.h"
-#include "ErrorHandling.h"
-#include "Logger.h"
+#include "Tetris/BlockMover.h"
+#include "Tetris/Game.h"
+#include "Tetris/GameStateNode.h"
+#include "Tetris/ErrorHandling.h"
+#include "Tetris/Logger.h"
 
 
 namespace Tetris

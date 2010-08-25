@@ -2,9 +2,9 @@
 #define TETRISCOMPONENT_H_INCLUDED
 
 
-#include "BlockType.h"
-#include "Direction.h"
-#include "Grid.h"
+#include "Tetris/BlockType.h"
+#include "Tetris/Direction.h"
+#include "Tetris/Grid.h"
 #include "XULWin/Component.h"
 #include "XULWin/AttributeController.h"
 #include "XULWin/Decorator.h"

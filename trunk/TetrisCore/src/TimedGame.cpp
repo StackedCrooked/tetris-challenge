@@ -1,5 +1,5 @@
-#include "TimedGame.h"
-#include "Game.h"
+#include "Tetris/TimedGame.h"
+#include "Tetris/Game.h"
 
 
 namespace Tetris
