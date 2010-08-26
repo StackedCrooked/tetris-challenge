@@ -1,10 +1,9 @@
-- About dialog with real hyperlink
+- Hyperlink in about dialog
 - Implement various selectable "Strategies" for AI
 - False positives of: "Failed to move the blocks in time"
-- Window icon
-- Implement player vs computer mode.
-- Run the console version under valgrind on Mac and see if you can get any more info (KCacheGrind)
-- Release a version to demo purposes?
+- Add the tetris icon to the credits section (about dialog)
+v About dialog
+v Window icon
 v Show menu with "New game", "About", etc..
 v Use Tetris/Game.h include structure.
 v Replace Protected<Game> with Protected<Game>.
