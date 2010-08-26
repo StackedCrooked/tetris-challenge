@@ -51,7 +51,7 @@ namespace Tetris
         //
         // Parse the XUL document.
         //
-        mRootElement = mXULRunner.loadXULFromFile("XULWinTetrisTest.xul");
+        mRootElement = mXULRunner.loadApplication("application.ini");
         if (!mRootElement)
         {
             throw std::runtime_error("Failed to load the root element");
@@ -235,7 +235,7 @@ namespace Tetris
 
     LRESULT Controller::onAboutMenuItem(WPARAM wParam, LPARAM lParam)
     {
-        if (!(mAboutDialogRootElement = mXULRunner.loadXULFromFile("AboutDialog.xul")))
+        if (!(mAboutDialogRootElement = mXULRunner.loadXULFromFile("chrome/content/AboutDialog.xul")))
         {
             throw std::runtime_error("Did not find the AboutDialog.xul file.");
         }
