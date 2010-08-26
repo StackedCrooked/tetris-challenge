@@ -195,16 +195,14 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="XUL"
-			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
+			Name="Tetris.xul"
 			>
 			<File
-				RelativePath=".\AboutDialog.xul"
+				RelativePath=".\Tetris.xul\chrome\content\AboutDialog.xul"
 				>
 			</File>
 			<File
-				RelativePath=".\XULWinTetrisTest.xul"
+				RelativePath=".\Tetris.xul\chrome\content\Tetris.xul"
 				>
 			</File>
 		</Filter>
