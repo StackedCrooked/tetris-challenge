@@ -3,7 +3,7 @@
 <!-- Stylesheet ignored by XULWin, inluded for compatibility with Mozilla XUL -->
 <?xul-overlay href="chrome://global/content/globalOverlay.xul"?>
 
-<window id="XULWinTetrisTestWindow"
+<window id="TetrisWindow"
   xmlns:html="http://www.w3.org/1999/xhtml"
   xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
   title="XULWin Tetris Tester"
