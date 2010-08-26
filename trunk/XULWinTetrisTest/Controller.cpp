@@ -29,7 +29,9 @@ namespace Tetris
 
     Controller::Controller(HINSTANCE hInstance) :
         mXULRunner(hInstance),
+        mRootElement(),
         mWindow(0),
+        mAboutDialogRootElement(),
         mTetrisComponent(0),
         mFPSTextBox(0),
         mBlockCountTextBox(0),        
@@ -49,8 +51,8 @@ namespace Tetris
         //
         // Parse the XUL document.
         //
-        XULWin::ElementPtr rootElement = mXULRunner.loadXULFromFile("XULWinTetrisTest.xul");
-        if (!rootElement)
+        mRootElement = mXULRunner.loadXULFromFile("XULWinTetrisTest.xul");
+        if (!mRootElement)
         {
             throw std::runtime_error("Failed to load the root element");
         }
@@ -59,7 +61,7 @@ namespace Tetris
         //
         // Get the Window component.
         //
-        mWindow = rootElement->component()->downcast<XULWin::Window>();
+        mWindow = mRootElement->component()->downcast<XULWin::Window>();
         if (!mWindow)
         {
             throw std::runtime_error("Root element is not of type winodw.");
@@ -69,7 +71,7 @@ namespace Tetris
         //
         // Connect the logger to the logging text box.
         //
-        if (mLoggingTextBox = rootElement->getElementById("loggingTextbox")->component()->downcast<XULWin::TextBox>())
+        if (mLoggingTextBox = mRootElement->getElementById("loggingTextbox")->component()->downcast<XULWin::TextBox>())
         {
             boost::function<void(const std::string&)> logFunction = boost::bind(&Controller::log, this, _1);
             XULWin::ErrorReporter::Instance().setLogger(logFunction);
@@ -80,7 +82,7 @@ namespace Tetris
         //
         // Get the Tetris component.
         //
-        if (!(mTetrisComponent = FindComponentById<Tetris::TetrisComponent>(rootElement.get(), "tetris0")))
+        if (!(mTetrisComponent = FindComponentById<Tetris::TetrisComponent>(mRootElement.get(), "tetris0")))
         {
             throw std::runtime_error("The XUL document must contain a <tetris> element with id \"tetris0\".");
         }
@@ -109,7 +111,7 @@ namespace Tetris
         //
         // Get stats widgets
         //
-        if (XULWin::Element * el = rootElement->getElementById("fpsTextBox"))
+        if (XULWin::Element * el = mRootElement->getElementById("fpsTextBox"))
         {
             mFPSTextBox = el->component()->downcast<XULWin::TextBox>();
         }
@@ -119,7 +121,7 @@ namespace Tetris
         }
 
 
-        if (XULWin::Element * el = rootElement->getElementById("blockCountTextBox"))
+        if (XULWin::Element * el = mRootElement->getElementById("blockCountTextBox"))
         {
             mBlockCountTextBox = el->component()->downcast<XULWin::TextBox>();
         }
@@ -131,7 +133,7 @@ namespace Tetris
 
         for (size_t idx = 0; idx != 4; ++idx)
         {
-            if (XULWin::Element * el = rootElement->getElementById(MakeString() << "lines" << (idx + 1) << "TextBox"))
+            if (XULWin::Element * el = mRootElement->getElementById(MakeString() << "lines" << (idx + 1) << "TextBox"))
             {
                 if (!(mLinesTextBoxes[idx] = el->component()->downcast<XULWin::TextBox>()))
                 {
@@ -145,7 +147,7 @@ namespace Tetris
         }
 
 
-        if (XULWin::Element * el = rootElement->getElementById("computerEnabled"))
+        if (XULWin::Element * el = mRootElement->getElementById("computerEnabled"))
         {
             if (!(mComputerEnabledCheckBox = el->component()->downcast<XULWin::CheckBox>()))
             {
@@ -154,7 +156,7 @@ namespace Tetris
         }
 
 
-        if (XULWin::Element * el = rootElement->getElementById("movesAheadTextBox"))
+        if (XULWin::Element * el = mRootElement->getElementById("movesAheadTextBox"))
         {
             if (!(mMovesAheadTextBox = el->component()->downcast<XULWin::TextBox>()))
             {
@@ -163,7 +165,7 @@ namespace Tetris
         }
 
 
-        if (XULWin::Element * el = rootElement->getElementById("searchDepthTextBox"))
+        if (XULWin::Element * el = mRootElement->getElementById("searchDepthTextBox"))
         {
             if (!(mSearchDepthTextBox = el->component()->downcast<XULWin::TextBox>()))
             {
@@ -172,7 +174,7 @@ namespace Tetris
         }
 
 
-        if (XULWin::Element * el = rootElement->getElementById("statusTextBox"))
+        if (XULWin::Element * el = mRootElement->getElementById("statusTextBox"))
         {
             if (!(mStatusTextBox = el->component()->downcast<XULWin::TextBox>()))
             {
@@ -180,17 +182,17 @@ namespace Tetris
             }
         }
 
-        if (XULWin::MenuItem * newMenuItem = FindComponentById<XULWin::MenuItem>(rootElement.get(), "newMenuItem"))
+        if (XULWin::MenuItem * newMenuItem = FindComponentById<XULWin::MenuItem>(mRootElement.get(), "newMenuItem"))
         {
             mScopedEventListener.connect(newMenuItem->el(), boost::bind(&Controller::onNew, this, _1, _2));
         }
 
-        if (XULWin::MenuItem * quitMenuItem = FindComponentById<XULWin::MenuItem>(rootElement.get(), "quitMenuItem"))
+        if (XULWin::MenuItem * quitMenuItem = FindComponentById<XULWin::MenuItem>(mRootElement.get(), "quitMenuItem"))
         {
             mScopedEventListener.connect(quitMenuItem->el(), boost::bind(&Controller::onQuit, this, _1, _2));
         }
 
-        if (XULWin::MenuItem * aboutMenuItem = FindComponentById<XULWin::MenuItem>(rootElement.get(), "aboutMenuItem"))
+        if (XULWin::MenuItem * aboutMenuItem = FindComponentById<XULWin::MenuItem>(mRootElement.get(), "aboutMenuItem"))
         {
             mScopedEventListener.connect(aboutMenuItem->el(), boost::bind(&Controller::onAboutMenuItem, this, _1, _2));
         }
@@ -233,7 +235,21 @@ namespace Tetris
 
     LRESULT Controller::onAboutMenuItem(WPARAM wParam, LPARAM lParam)
     {
-        ::MessageBox(0, L"Check out http://code.google.com/p/tetris-challenge.", L"Tetris Challenge", MB_OK);
+        if (!(mAboutDialogRootElement = mXULRunner.loadXULFromFile("AboutDialog.xul")))
+        {
+            throw std::runtime_error("Did not find the AboutDialog.xul file.");
+        }
+
+        if (XULWin::Dialog * dialog = mAboutDialogRootElement->component()->downcast<XULWin::Dialog>())
+        {
+            if (XULWin::Element * okButton = mAboutDialogRootElement->getElementById("okButton"))
+            {
+                XULWin::ScopedEventListener dialogEventListener;
+                dialogEventListener.connect(okButton,
+                                            boost::bind(&XULWin::Dialog::endModal, dialog, XULWin::DialogResult_Ok));
+                dialog->showModal(mWindow);
+            }
+        }
         return XULWin::cHandled;
     }
 

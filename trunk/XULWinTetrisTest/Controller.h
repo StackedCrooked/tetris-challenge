@@ -7,6 +7,7 @@
 #include "TetrisComponent.h"
 #include "Tetris/Threading.h"
 #include "XULWin/Components.h"
+#include "XULWin/Dialog.h"
 #include "XULWin/EventListener.h"
 #include "XULWin/Window.h"
 #include "XULWin/WinUtils.h"
@@ -81,7 +82,9 @@ namespace Tetris
         LRESULT onAboutMenuItem(WPARAM wParam, LPARAM lParam);
 
         XULWin::XULRunner mXULRunner;
+        XULWin::ElementPtr mRootElement;;
         XULWin::Window * mWindow;
+        XULWin::ElementPtr mAboutDialogRootElement;
         TetrisComponent * mTetrisComponent;
         XULWin::TextBox * mFPSTextBox;
         XULWin::TextBox * mBlockCountTextBox;
