@@ -7,14 +7,17 @@
 #include "XULWin/Unicode.h"
 #include <stdexcept>
 #include <windows.h>
+#include <boost/scoped_ptr.hpp>
 
 
 int StartProgram(HINSTANCE hInstance)
 {
-#ifndef NDEBUG // only required when launching from Visual Studio
-	// Change the current directory to the XUL Directory
-    XULWin::WinAPI::CurrentDirectoryChanger cd("Tetris.xul");
-#endif
+    boost::scoped_ptr<XULWin::WinAPI::CurrentDirectoryChanger> cd;
+    if (XULWin::WinAPI::getCurrentDirectory().find("Tetris.xul") == std::string::npos)
+    {
+	    // Change the current directory to the XUL Directory
+        cd.reset(new XULWin::WinAPI::CurrentDirectoryChanger("Tetris.xul"));
+    }
 
     XULWin::Initializer initializer(hInstance);
 

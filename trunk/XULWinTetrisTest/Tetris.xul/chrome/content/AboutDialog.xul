@@ -7,10 +7,15 @@
         align="stretch"
         title="About"
 >
-  <hbox align="center">
-    <label style="text-align:center" value="Checkout:" />
-    <html:a href="http://code.google.com/p/tetris-challenge" style="text-align:center">http://code.google.com/p/tetris-challenge</html:a>
-  </hbox>
+  
+  <vbox align="center">
+    <label style="text-align:center" value="Sources" />
+    <html:a id="link1" href="http://code.google.com/p/tetris-challenge" style="text-align:center">http://code.google.com/p/tetris-challenge</html:a>
+  </vbox>  
+  <vbox align="center">
+    <label value="Tetris Icon"/>
+    <html:a id="link2" href="http://www.everaldo.com/">Everaldo Coelho</html:a>
+  </vbox>  
   <spacer flex="1" />
   <hbox>
     <spacer flex="1" />
