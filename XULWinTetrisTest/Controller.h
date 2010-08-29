@@ -9,6 +9,7 @@
 #include "XULWin/Components.h"
 #include "XULWin/Dialog.h"
 #include "XULWin/EventListener.h"
+#include "XULWin/Menu.h"
 #include "XULWin/Window.h"
 #include "XULWin/WinUtils.h"
 #include "XULWin/XULRunner.h"
@@ -93,7 +94,7 @@ namespace Tetris
         XULWin::CheckBox * mComputerEnabledCheckBox;
         XULWin::TextBox * mStatusTextBox;
         XULWin::TextBox * mMovesAheadTextBox;
-        XULWin::TextBox * mSearchDepthTextBox;
+        XULWin::MenuList * mStrategiesMenuList;
         XULWin::TextBox * mLoggingTextBox;
         XULWin::ScopedEventListener mScopedEventListener;
         boost::scoped_ptr<Protected<Game> > mProtectedGame;
