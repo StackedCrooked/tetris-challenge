@@ -18,7 +18,7 @@ namespace Tetris
     {
     public:
         // Creates a new GameState
-        GameState(GameQualityEvaluator * inGameQualityEvaluator, size_t inNumRows, size_t inNumColumns);
+        GameState(size_t inNumRows, size_t inNumColumns);
 
         const Grid & grid() const;
 
@@ -31,7 +31,7 @@ namespace Tetris
 
         // Calculates the quality of the playing field.
         // Caches the value.
-        int quality() const;
+        int quality(const Evaluator & inEvaluator) const;
 
         // Checks if a activeBlock can be placed at a given location without
         // overlapping with previously placed blocks.
@@ -144,7 +144,6 @@ namespace Tetris
         };
 
         mutable Quality mQuality;
-        boost::shared_ptr<GameQualityEvaluator> mGameQualityEvaluator;
     };
 
 

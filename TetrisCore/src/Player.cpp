@@ -48,10 +48,12 @@ namespace Tetris
 
 
     Player::Player(std::auto_ptr<GameStateNode> inNode,
-                   const BlockTypes & inBlockTypes) :
+                   const BlockTypes & inBlockTypes,
+                   std::auto_ptr<Evaluator> inEvaluator) :
         mNode(inNode.release()),
         mEndNode(),
         mBlockTypes(inBlockTypes),
+        mEvaluator(inEvaluator),
         mIsFinished(false),
         mStop(false),
         mThread()
@@ -88,8 +90,8 @@ namespace Tetris
         }
 
         // Generate the child nodes
-        ChildNodes generatedChildNodes;
-        GenerateOffspring(inBlockTypes[inDepth], ioNode, generatedChildNodes);        
+        ChildNodes generatedChildNodes(GameStateComparisonFunctor(mEvaluator->clone()));
+        GenerateOffspring(inBlockTypes[inDepth], ioNode, *mEvaluator, generatedChildNodes);
         ChildNodes::iterator it = generatedChildNodes.begin(), end = generatedChildNodes.end();
         for (; it != end; ++it)
         {
@@ -101,7 +103,7 @@ namespace Tetris
                 {
                     mEndNode = child;
                 }
-                else if (child->state().quality() > mEndNode->state().quality())
+                else if (child->state().quality(child->qualityEvaluator()) > mEndNode->state().quality(child->qualityEvaluator()))
                 {
                     mEndNode = child;
                 }

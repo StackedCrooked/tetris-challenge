@@ -3,6 +3,7 @@
 #include "Tetris/Block.h"
 #include "Tetris/ErrorHandling.h"
 #include "Tetris/GameState.h"
+#include "Tetris/Utilities.h"
 
 namespace Tetris
 {
@@ -10,12 +11,12 @@ namespace Tetris
 
     std::auto_ptr<GameStateNode> GameStateNode::CreateRootNode(size_t inNumRows, size_t inNumColumns)
     {
-        return std::auto_ptr<GameStateNode>(
-            new GameStateNode(
-                std::auto_ptr<GameState>(
-                    new GameState(new DefaultGameQualityEvaluator, inNumRows, inNumColumns))));
+        return std::auto_ptr<GameStateNode>(new GameStateNode(Create<GameState>(inNumRows, inNumColumns),
+                                                              CreatePoly<Evaluator, DefaultEvaluator>()));
     }
 
+    
+    ChildNodes nodes(DefaultEvaluator);
 
     static int GetIdentifier(const GameState & inGameState)
     {
@@ -24,29 +25,36 @@ namespace Tetris
     }
 
 
-    GameStateNode::GameStateNode(std::auto_ptr<GameState> inGameState) :
+    GameStateNode::GameStateNode(std::auto_ptr<GameState> inGameState, std::auto_ptr<Evaluator> inEvaluator) :
         mParent(0),
         mIdentifier(GetIdentifier(*inGameState)),
         mDepth(0),
-        mGameState(inGameState)
+        mGameState(inGameState),
+        mEvaluator(inEvaluator.release()),
+        mChildren(GameStateComparisonFunctor(mEvaluator->clone()))
     {
 
     }
 
 
-    GameStateNode::GameStateNode(GameStateNode * inParent, std::auto_ptr<GameState> inGameState) :
+    GameStateNode::GameStateNode(GameStateNode * inParent, std::auto_ptr<GameState> inGameState, std::auto_ptr<Evaluator> inEvaluator) :
         mParent(inParent),
         mIdentifier(GetIdentifier(*inGameState)),
         mDepth(inParent->depth() + 1),
-        mGameState(inGameState)
+        mGameState(inGameState),
+        mEvaluator(inEvaluator.release()),
+        mChildren(GameStateComparisonFunctor(mEvaluator->clone()))
     {
     }
 
 
     std::auto_ptr<GameStateNode> GameStateNode::clone() const
     {
-        std::auto_ptr<GameStateNode> result(mParent ? new GameStateNode(mParent, std::auto_ptr<GameState>(new GameState(*mGameState)))
-                                                    : new GameStateNode(std::auto_ptr<GameState>(new GameState(*mGameState))));
+        std::auto_ptr<GameStateNode> result(mParent ? new GameStateNode(mParent,
+                                                                        std::auto_ptr<GameState>(new GameState(*mGameState)),
+                                                                        mEvaluator->clone())
+                                                    : new GameStateNode(std::auto_ptr<GameState>(new GameState(*mGameState)),
+                                                                        mEvaluator->clone()));
         result->mDepth = mDepth;
 
         ChildNodes::const_iterator it = mChildren.begin(), end = mChildren.end();
@@ -64,6 +72,12 @@ namespace Tetris
     int GameStateNode::identifier() const
     {
         return mIdentifier;
+    }
+
+
+    const Evaluator & GameStateNode::qualityEvaluator() const
+    {
+        return *mEvaluator;
     }
 
 
@@ -145,7 +159,10 @@ namespace Tetris
     }
 
 
-    void GenerateOffspring(BlockType inBlockType, GameStateNode & ioGameStateNode, ChildNodes & outChildNodes)
+    void GenerateOffspring(BlockType inBlockType,
+                           GameStateNode & ioGameStateNode,
+                           const Evaluator & inEvaluator,
+                           ChildNodes & outChildNodes)
     {        
         Assert(outChildNodes.empty());
         const GameState & gameState = ioGameStateNode.state();
@@ -161,7 +178,8 @@ namespace Tetris
                                                                              Rotation(0),
                                                                              Row(0),
                                                                              Column(initialColumn)),
-                                                                             GameOver(true))));
+                                                                             GameOver(true)),
+                                                      inEvaluator.clone()));
             Assert(childState->depth() == (ioGameStateNode.depth() + 1));
             outChildNodes.insert(childState);
             return;
@@ -181,7 +199,9 @@ namespace Tetris
                 if (row > 0)
                 {
                     block.setRow(row - 1);
-                    ChildNodePtr childState(new GameStateNode(&ioGameStateNode, gameState.commit(block, GameOver(false))));
+                    ChildNodePtr childState(new GameStateNode(&ioGameStateNode,
+                                                              gameState.commit(block, GameOver(false)),
+                                                              inEvaluator.clone()));
                     Assert(childState->depth() == ioGameStateNode.depth() + 1);
                     outChildNodes.insert(childState);
                 }
@@ -190,12 +210,12 @@ namespace Tetris
     }
 
 
-    void GameStateNode::generateOffspring(BlockTypes inBlockTypes, size_t inOffset)
+    void GameStateNode::generateOffspring(BlockTypes inBlockTypes, size_t inOffset, const Evaluator & inEvaluator)
     {
         Assert(inOffset < inBlockTypes.size());
 
         Assert(mChildren.empty());
-        GenerateOffspring(inBlockTypes[inOffset], *this, mChildren);
+        GenerateOffspring(inBlockTypes[inOffset], *this, inEvaluator, mChildren);
 
         if (inOffset + 1 < inBlockTypes.size())
         {
@@ -203,17 +223,24 @@ namespace Tetris
             for (; it != end; ++it)
             {
                 GameStateNode & childNode = **it;
-                childNode.generateOffspring(inBlockTypes, inOffset + 1);
+                childNode.generateOffspring(inBlockTypes, inOffset + 1, inEvaluator);
             }
         }
     }
 
+    
+    GameStateComparisonFunctor::GameStateComparisonFunctor(std::auto_ptr<Evaluator> inEvaluator) :
+        mEvaluator(inEvaluator.release())
+    {
+    }
 
-    bool ChildPtrCompare::operator()(ChildNodePtr lhs, ChildNodePtr rhs)
+    
+    bool GameStateComparisonFunctor::operator()(ChildNodePtr lhs, ChildNodePtr rhs)
     {
         Assert(lhs && rhs);
         Assert(lhs.get() != rhs.get());
-        return lhs->state().quality() > rhs->state().quality();
+        
+        return lhs->state().quality(*mEvaluator) > rhs->state().quality(*mEvaluator);
     }
 
 } // namespace Tetris

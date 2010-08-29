@@ -1,6 +1,7 @@
 #include "Controller.h"
 #include "Tetris/ErrorHandling.h"
 #include "Tetris/Game.h"
+#include "Tetris/GameQualityEvaluator.h"
 #include "Tetris/Logger.h"
 #include "TetrisElement.h"
 #include "Tetris/BlockMover.h"
@@ -45,6 +46,7 @@ namespace Tetris
         mRefreshTimer(),
         mComputerPlayer(),
         mBlockMover(),
+        mEvaluator(new DefaultEvaluator),
         mSearchDepth(cMinSearchDepth),
         mQuit(false)
     {
@@ -366,7 +368,7 @@ namespace Tetris
                 futureBlocks.push_back(futureBlocks_tooMany[idx]);
             }
             Assert(endNode->depth() == game.endNode()->depth());
-            mComputerPlayer.reset(new Player(endNode, futureBlocks));
+            mComputerPlayer.reset(new Player(endNode, futureBlocks, mEvaluator->clone()));
             mComputerPlayer->start();
         }
     }

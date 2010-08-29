@@ -232,6 +232,10 @@
 				RelativePath=".\include\Tetris\Unicode.h"
 				>
 			</File>
+			<File
+				RelativePath=".\include\Tetris\Utilities.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Source Files"

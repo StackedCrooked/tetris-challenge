@@ -7,15 +7,13 @@
 namespace Tetris
 {
 
-    GameState::GameState(GameQualityEvaluator * inGameQualityEvaluator, size_t inNumRows, size_t inNumColumns) :
+    GameState::GameState(size_t inNumRows, size_t inNumColumns) :
         mGrid(inNumRows, inNumColumns, BlockType_Nil),
         mStats(),
         mIsGameOver(false),
         mOriginalBlock(BlockType_L, Rotation(0), Row(0), Column(0)),
-        mQuality(),
-        mGameQualityEvaluator(inGameQualityEvaluator)
+        mQuality()
     {
-        Assert(mGameQualityEvaluator);
     }
 
 
@@ -37,12 +35,12 @@ namespace Tetris
     }
 
 
-    int GameState::quality() const
+    int GameState::quality(const Evaluator & inEvaluator) const
     {
         if (!mQuality.isInitialized())
         {
             mQuality.reset();
-            mQuality.setScore(mGameQualityEvaluator->evaluate(*this));
+            mQuality.setScore(inEvaluator.evaluate(*this));
             mQuality.setInitialized(true);
         }
         return mQuality.score();

@@ -2,16 +2,21 @@
 #define GAMEQUALITYEVALUATOR_H_INCLUDED
 
 
+#include "Utilities.h"
+
+
 namespace Tetris
 {
     class GameState;
 
-    class GameQualityEvaluator
+    class Evaluator
     {
     public:
-        GameQualityEvaluator();
+        Evaluator();
 
-        int evaluate(const GameState & inGameState);
+        int evaluate(const GameState & inGameState) const;
+
+        virtual std::auto_ptr<Evaluator> clone() const = 0 {}
 
     protected:
         virtual int evaluateImpl(const GameState & inGameState,
@@ -23,9 +28,14 @@ namespace Tetris
     };
 
 
-    class DefaultGameQualityEvaluator : public GameQualityEvaluator
+    class DefaultEvaluator : public Evaluator
     {
+    public:
+        virtual std::auto_ptr<Evaluator> clone() const
+        { return CreatePoly<Evaluator, DefaultEvaluator>(*this); }
+
     protected:
+
         virtual int evaluateImpl(const GameState & inGameState,
                                  int inGameHeight,
                                  int inLastBlockHeight,
@@ -35,8 +45,12 @@ namespace Tetris
     };
 
 
-    class MakeTetrises : public GameQualityEvaluator
+    class MakeTetrises : public Evaluator
     {
+    public:
+        virtual std::auto_ptr<Evaluator> clone() const
+        { return CreatePoly<Evaluator, MakeTetrises>(*this); }
+
     protected:
         virtual int evaluateImpl(const GameState & inGameState,
                                  int inGameHeight,
