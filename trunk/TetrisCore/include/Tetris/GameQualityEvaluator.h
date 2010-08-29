@@ -28,11 +28,11 @@ namespace Tetris
     };
 
 
-    class DefaultEvaluator : public Evaluator
+    class Balanced : public Evaluator
     {
     public:
         virtual std::auto_ptr<Evaluator> clone() const
-        { return CreatePoly<Evaluator, DefaultEvaluator>(*this); }
+        { return CreatePoly<Evaluator, Balanced>(*this); }
 
     protected:
 
@@ -45,11 +45,27 @@ namespace Tetris
     };
 
 
-    class MakeTetrises : public Evaluator
+    class Perfectionistic : public Evaluator
     {
     public:
         virtual std::auto_ptr<Evaluator> clone() const
-        { return CreatePoly<Evaluator, MakeTetrises>(*this); }
+        { return CreatePoly<Evaluator, Perfectionistic>(*this); }
+
+    protected:
+        virtual int evaluateImpl(const GameState & inGameState,
+                                 int inGameHeight,
+                                 int inLastBlockHeight,
+                                 int inNumHoles,
+                                 int inNumOccupiedUnderTop,
+                                 float inDensity) const;
+    };
+
+
+    class EvaluateScoreOnly : public Evaluator
+    {
+    public:
+        virtual std::auto_ptr<Evaluator> clone() const
+        { return CreatePoly<Evaluator, EvaluateScoreOnly>(*this); }
 
     protected:
         virtual int evaluateImpl(const GameState & inGameState,

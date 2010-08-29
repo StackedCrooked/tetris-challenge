@@ -57,12 +57,12 @@ namespace Tetris
     }
 
 
-    int DefaultEvaluator::evaluateImpl(const GameState & inGameState,
-                                                  int inGameHeight,
-                                                  int inLastBlockHeight,
-                                                  int inNumHoles,
-                                                  int inNumOccupiedUnderTop,
-                                                  float inDensity) const
+    int Balanced::evaluateImpl(const GameState & inGameState,
+                                       int inGameHeight,
+                                       int inLastBlockHeight,
+                                       int inNumHoles,
+                                       int inNumOccupiedUnderTop,
+                                       float inDensity) const
     {
         return 0
                - 2 * inGameHeight
@@ -75,12 +75,12 @@ namespace Tetris
     }
 
 
-    int MakeTetrises::evaluateImpl(const GameState & inGameState,
-                                                  int inGameHeight,
-                                                  int inLastBlockHeight,
-                                                  int inNumHoles,
-                                                  int inNumOccupiedUnderTop,
-                                                  float inDensity) const
+    int Perfectionistic::evaluateImpl(const GameState & inGameState,
+                                   int inGameHeight,
+                                   int inLastBlockHeight,
+                                   int inNumHoles,
+                                   int inNumOccupiedUnderTop,
+                                   float inDensity) const
     {
         return 0
                - 4 * inGameHeight
@@ -90,6 +90,22 @@ namespace Tetris
                - 8 * inGameState.stats().numDoubles()
                - 8 * inGameState.stats().numTriples()
                + 8 * inGameState.stats().numTetrises();
+    }
+
+
+    int EvaluateScoreOnly::evaluateImpl(const GameState & inGameState,
+                                        int inGameHeight,
+                                        int inLastBlockHeight,
+                                        int inNumHoles,
+                                        int inNumOccupiedUnderTop,
+                                        float inDensity) const
+    {
+        // Scoring a single lines gets 40 points. Therefore we use the number 40 as a unit for evaluation.
+        const int cUnit = 40;
+        return inGameState.stats().score()
+               - 1 * cUnit * inGameHeight
+               - 1 * cUnit * inLastBlockHeight
+               - 1 * cUnit * inNumHoles;
     }
 
 } // namespace Tetris

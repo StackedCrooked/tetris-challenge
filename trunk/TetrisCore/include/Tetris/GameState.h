@@ -53,6 +53,8 @@ namespace Tetris
             {
             }
 
+            int score() const;
+
             inline int numLines() const
             { return mNumLines; }
 

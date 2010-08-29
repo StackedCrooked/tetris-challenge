@@ -37,24 +37,28 @@
           <rows>
             <row align="center">
               <label value="FPS:" style="text-align:right"/>
-              <textbox id="fpsTextBox" value="0" readonly="true" style="text-align:right" />
+              <textbox id="fpsTextBox" value="0" readonly="true" style="text-align:right" flex="1" />
               <label value="Blocks:" style="text-align:right"/>
-              <textbox id="blockCountTextBox" value="0" readonly="true" style="text-align:right" />
+              <textbox id="blockCountTextBox" value="0" readonly="true" style="text-align:right" flex="1" />
             </row>
             <row align="center">
               <label value="Lines x1:" style="text-align:right"/>
-              <textbox id="lines1TextBox" value="0" readonly="true" style="text-align:right" />
+              <textbox id="lines1TextBox" value="0" readonly="true" style="text-align:right" flex="1" />
               <label value="Lines x2:" style="text-align:right"/>
-              <textbox id="lines2TextBox" value="0" readonly="true" style="text-align:right" />
+              <textbox id="lines2TextBox" value="0" readonly="true" style="text-align:right" flex="1" />
             </row>
             <row align="center">
               <label value="Lines x3:" style="text-align:right"/>
-              <textbox id="lines3TextBox" value="0" readonly="true"  style="text-align:right" />
+              <textbox id="lines3TextBox" value="0" readonly="true"  style="text-align:right" flex="1" />
               <label value="Lines x4:" style="text-align:right"/>
-              <textbox id="lines4TextBox" value="0" readonly="true"  style="text-align:right" />
-            </row>
+              <textbox id="lines4TextBox" value="0" readonly="true"  style="text-align:right" flex="1" />
+            </row>            
           </rows>
         </grid>
+        <hbox style="text-align:center">
+          <label value="Score:"/>
+          <textbox id="scoreTextBox" value="0" readonly="true" style="text-align:right" flex="1" />
+        </hbox>
       </groupbox>
       <groupbox>
         <caption label="Computer Player" />
@@ -84,5 +88,5 @@
       <tetris id="tetris0" flex="0" numfutureblocks="4" keyboardenabled="true" numrows="20" numcolumns="10" />
     </hbox>
   </hbox>
-  <textbox id="loggingTextbox" value="Log messages appear here." multiline="true" flex="1" rows="4" readonly="true" style="background-color:white" />
+  <!--<textbox id="loggingTextbox" value="Log messages appear here." multiline="true" flex="1" rows="4" readonly="true" style="background-color:white" />-->
 </window>

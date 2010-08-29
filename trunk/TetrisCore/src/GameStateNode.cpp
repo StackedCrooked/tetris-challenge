@@ -12,11 +12,11 @@ namespace Tetris
     std::auto_ptr<GameStateNode> GameStateNode::CreateRootNode(size_t inNumRows, size_t inNumColumns)
     {
         return std::auto_ptr<GameStateNode>(new GameStateNode(Create<GameState>(inNumRows, inNumColumns),
-                                                              CreatePoly<Evaluator, DefaultEvaluator>()));
+                                                              CreatePoly<Evaluator, Balanced>()));
     }
 
     
-    ChildNodes nodes(DefaultEvaluator);
+    ChildNodes nodes(Balanced);
 
     static int GetIdentifier(const GameState & inGameState)
     {

@@ -36,6 +36,7 @@ namespace Tetris
         mTetrisComponent(0),
         mFPSTextBox(0),
         mBlockCountTextBox(0),        
+        mScoreTextBox(0),
         mComputerEnabledCheckBox(0),
         mStatusTextBox(0),
         mMovesAheadTextBox(0),
@@ -46,7 +47,7 @@ namespace Tetris
         mRefreshTimer(),
         mComputerPlayer(),
         mBlockMover(),
-        mEvaluator(new DefaultEvaluator),
+        mEvaluator(new Balanced),
         mSearchDepth(cMinSearchDepth),
         mQuit(false)
     {
@@ -73,11 +74,14 @@ namespace Tetris
         //
         // Connect the logger to the logging text box.
         //
-        if (mLoggingTextBox = mRootElement->getElementById("loggingTextbox")->component()->downcast<XULWin::TextBox>())
+        if (XULWin::Element * el = mRootElement->getElementById("loggingTextbox"))
         {
-            boost::function<void(const std::string&)> logFunction = boost::bind(&Controller::log, this, _1);
-            XULWin::ErrorReporter::Instance().setLogger(logFunction);
-            Tetris::Logger::Instance().setHandler(logFunction);
+            if (mLoggingTextBox = el->component()->downcast<XULWin::TextBox>())
+            {
+                boost::function<void(const std::string&)> logFunction = boost::bind(&Controller::log, this, _1);
+                XULWin::ErrorReporter::Instance().setLogger(logFunction);
+                Tetris::Logger::Instance().setHandler(logFunction);
+            }
         }
 
 
@@ -147,13 +151,22 @@ namespace Tetris
                 LogWarning(MakeString() << "The lines x" << idx << "TextBox element was not found in the XUL document.");
             }
         }
+        
+
+        if (XULWin::Element * el = mRootElement->getElementById("scoreTextBox"))
+        {
+            if (!(mScoreTextBox = el->component()->downcast<XULWin::TextBox>()))
+            {
+                LogWarning("The element with id 'scoreTextBox' was found but it was not of type 'textbox'.");
+            }
+        }
 
 
         if (XULWin::Element * el = mRootElement->getElementById("computerEnabled"))
         {
             if (!(mComputerEnabledCheckBox = el->component()->downcast<XULWin::CheckBox>()))
             {
-                LogWarning("The 'computerEnabled' checkbox was not found in the XUL document.");
+                LogWarning("The element with id 'computerEnabled' was found but it was not of type 'checkbox'.");
             }            
         }
 
@@ -179,12 +192,16 @@ namespace Tetris
                 {
                     // Populate it
                     XULWin::AttributesMapping attr;
-                    attr["label"] = "Default";
-                    attr["id"] = "defaultStrategy";
+                    attr["label"] = "Balanced";
+                    attr["id"] = "balancedStrategy";
                     XULWin::ElementPtr menuItem = XULWin::XMLMenuItem::Create(xmlpopup, attr);
 
-                    attr["id"] = "makeTetrisesStrategy";
-                    attr["label"] = "Make tetrises";
+                    attr["id"] = "perfectionisticStrategy";
+                    attr["label"] = "Perfectionistic";
+                    XULWin::XMLMenuItem::Create(xmlpopup, attr);
+
+                    attr["id"] = "scoreOnlyStrategy";
+                    attr["label"] = "Score";
                     XULWin::XMLMenuItem::Create(xmlpopup, attr);
                 }
             }
@@ -437,6 +454,12 @@ namespace Tetris
             mComputerPlayer.reset();
         }
 
+
+        if (mScoreTextBox)
+        {
+            mScoreTextBox->setValue(MakeString() << game.currentNode()->state().stats().score());
+        }
+
                 
         if (mComputerEnabledCheckBox->isChecked() && !mComputerPlayer)
         {
@@ -533,20 +556,28 @@ namespace Tetris
                         XULWin::Component * comp = popup->getChild(selectedIndex);
                         if (XULWin::MenuItem * menuItem = comp->downcast<XULWin::MenuItem>())
                         {
-                            if (menuItem->getLabel() == "Default")
+                            if (menuItem->getLabel() == "Balanced")
                             {
-                                if (!dynamic_cast<DefaultEvaluator*>(mEvaluator.get()))
+                                if (!dynamic_cast<Balanced*>(mEvaluator.get()))
                                 {
-                                    mEvaluator.reset(new DefaultEvaluator);
+                                    mEvaluator.reset(new Balanced);
                                     LogInfo("AI is now using the default strategy.");
                                 }
                             }
-                            else if (menuItem->getLabel() == "Make tetrises")
+                            else if (menuItem->getLabel() == "Perfectionistic")
                             {
-                                if (!dynamic_cast<MakeTetrises*>(mEvaluator.get()))
+                                if (!dynamic_cast<Perfectionistic*>(mEvaluator.get()))
                                 {
-                                    mEvaluator.reset(new MakeTetrises);
+                                    mEvaluator.reset(new Perfectionistic);
                                     LogInfo("AI will now try to make tetrises.");
+                                }
+                            }
+                            else if (menuItem->getLabel() == "Score")
+                            {
+                                if (!dynamic_cast<EvaluateScoreOnly*>(mEvaluator.get()))
+                                {
+                                    mEvaluator.reset(new EvaluateScoreOnly);
+                                    LogInfo("AI will only take the score into account.");
                                 }
                             }
                         }
