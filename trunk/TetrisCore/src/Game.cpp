@@ -1,5 +1,7 @@
 #include "Tetris/Game.h"
+#include "Tetris/GameQualityEvaluator.h"
 #include "Tetris/ErrorHandling.h"
+#include "Tetris/Utilities.h"
 
 
 namespace Tetris
@@ -334,7 +336,9 @@ namespace Tetris
         }
 
         // Commit the block
-        ChildNodePtr child(new GameStateNode(mCurrentNode, mCurrentNode->state().commit(block, GameOver(block.row() == 0))));
+        ChildNodePtr child(new GameStateNode(mCurrentNode,
+                                             mCurrentNode->state().commit(block, GameOver(block.row() == 0)),
+                                             CreatePoly<Evaluator, DefaultEvaluator>()));
         mCurrentNode->addChild(child);
         setCurrentNode(child.get());
         supplyBlocks();

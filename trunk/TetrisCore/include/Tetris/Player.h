@@ -23,7 +23,8 @@ namespace Tetris
     {
     public:
         Player(std::auto_ptr<GameStateNode> inNode,
-               const BlockTypes & inBlockTypes);
+               const BlockTypes & inBlockTypes,
+               std::auto_ptr<Evaluator> inEvaluator);
 
         ~Player();
 
@@ -46,6 +47,7 @@ namespace Tetris
         ChildNodePtr mNode;
         ChildNodePtr mEndNode;
         BlockTypes mBlockTypes;
+        boost::scoped_ptr<Evaluator> mEvaluator;
         volatile bool mIsFinished;
         volatile bool mStop;
         boost::scoped_ptr<boost::thread> mThread;

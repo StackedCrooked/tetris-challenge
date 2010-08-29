@@ -5,12 +5,12 @@
 namespace Tetris
 {
 
-    GameQualityEvaluator::GameQualityEvaluator()
+    Evaluator::Evaluator()
     {
     }
 
 
-    int GameQualityEvaluator::evaluate(const GameState & inGameState)
+    int Evaluator::evaluate(const GameState & inGameState) const
     {
         const Grid & grid = inGameState.grid(); 
         size_t top = grid.numRows();    
@@ -57,7 +57,7 @@ namespace Tetris
     }
 
 
-    int DefaultGameQualityEvaluator::evaluateImpl(const GameState & inGameState,
+    int DefaultEvaluator::evaluateImpl(const GameState & inGameState,
                                                   int inGameHeight,
                                                   int inLastBlockHeight,
                                                   int inNumHoles,

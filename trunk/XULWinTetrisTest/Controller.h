@@ -101,6 +101,7 @@ namespace Tetris
         boost::scoped_ptr<XULWin::WinAPI::Timer> mRefreshTimer;
         boost::scoped_ptr<Player> mComputerPlayer;
         boost::scoped_ptr<BlockMover> mBlockMover;
+        boost::scoped_ptr<Evaluator> mEvaluator;
         int mSearchDepth;
         volatile bool mQuit;
     };
