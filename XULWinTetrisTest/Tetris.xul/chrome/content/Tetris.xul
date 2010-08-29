@@ -52,13 +52,15 @@
               <textbox id="lines3TextBox" value="0" readonly="true"  style="text-align:right" flex="1" />
               <label value="Lines x4:" style="text-align:right"/>
               <textbox id="lines4TextBox" value="0" readonly="true"  style="text-align:right" flex="1" />
-            </row>            
+            </row>
+            <row align="center">
+              <label value="Level:" style="text-align:right"/>
+              <textbox id="levelTextBox" value="0" readonly="true"  style="text-align:right" flex="1" />
+              <label value="Score:" style="text-align:right" />
+              <textbox id="scoreTextBox" value="0" readonly="true" style="text-align:right" flex="1" />
+            </row>
           </rows>
         </grid>
-        <hbox style="text-align:center">
-          <label value="Score:"/>
-          <textbox id="scoreTextBox" value="0" readonly="true" style="text-align:right" flex="1" />
-        </hbox>
       </groupbox>
       <groupbox>
         <caption label="Computer Player" />

@@ -36,6 +36,7 @@ namespace Tetris
         mTetrisComponent(0),
         mFPSTextBox(0),
         mBlockCountTextBox(0),        
+        mLevelTextBox(0),
         mScoreTextBox(0),
         mComputerEnabledCheckBox(0),
         mStatusTextBox(0),
@@ -152,6 +153,15 @@ namespace Tetris
             }
         }
         
+
+        if (XULWin::Element * el = mRootElement->getElementById("levelTextBox"))
+        {
+            if (!(mLevelTextBox = el->component()->downcast<XULWin::TextBox>()))
+            {
+                LogWarning("The element with id 'levelTextBox' was found but it was not of type 'textbox'.");
+            }
+        }
+
 
         if (XULWin::Element * el = mRootElement->getElementById("scoreTextBox"))
         {
@@ -455,6 +465,12 @@ namespace Tetris
         }
 
 
+        if (mLevelTextBox && mTimedGame)
+        {
+            mLevelTextBox->setValue(MakeString() << mTimedGame->level());
+        }
+
+
         if (mScoreTextBox)
         {
             mScoreTextBox->setValue(MakeString() << game.currentNode()->state().stats().score());
@@ -590,11 +606,6 @@ namespace Tetris
         if (mFPSTextBox)
         {
             mFPSTextBox->setValue(MakeString() << mTetrisComponent->getFPS());
-        }
-
-        if (mComputerEnabledCheckBox && !mComputerEnabledCheckBox->isChecked())
-        {
-            ::SetFocus(mTetrisComponent->handle());
         }
     }
 
