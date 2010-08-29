@@ -7,17 +7,14 @@
 #include "XULWin/Unicode.h"
 #include <stdexcept>
 #include <windows.h>
-#include <boost/scoped_ptr.hpp>
 
 
 int StartProgram(HINSTANCE hInstance)
 {
-    boost::scoped_ptr<XULWin::WinAPI::CurrentDirectoryChanger> cd;
-    if (XULWin::WinAPI::getCurrentDirectory().find("Tetris.xul") == std::string::npos)
-    {
-	    // Change the current directory to the XUL Directory
-        cd.reset(new XULWin::WinAPI::CurrentDirectoryChanger("Tetris.xul"));
-    }
+#ifndef NDEBUG // only required when launching from Visual Studio
+	// Change the current directory to the XUL Directory
+    XULWin::WinAPI::CurrentDirectoryChanger cd("Tetris.xul");
+#endif
 
     XULWin::Initializer initializer(hInstance);
 
@@ -45,11 +42,11 @@ INT_PTR WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmd
     }
     catch (const std::exception & inError)
     {
-        ::MessageBox(0, XULWin::ToUTF16(inError.what()).c_str(), TEXT("XULWin Tetris Component"), MB_OK);
+        ::MessageBox(0, XULWin::ToUTF16(inError.what()).c_str(), TEXT("Tetris AI"), MB_OK);
     }
     catch (...)
     {
-        ::MessageBox(0, TEXT("Program is terminated due to unhandled and unknown exception."), L"XULWin Tetris Component", MB_OK);
+        ::MessageBox(0, TEXT("Program is terminated due to unhandled and unknown exception."), L"Tetris AI", MB_OK);
     }
     return 0;
 }

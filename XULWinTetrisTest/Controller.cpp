@@ -152,7 +152,7 @@ namespace Tetris
             if (!(mComputerEnabledCheckBox = el->component()->downcast<XULWin::CheckBox>()))
             {
                 LogWarning("The 'computerEnabled' checkbox was not found in the XUL document.");
-            }
+            }            
         }
 
 
@@ -512,12 +512,16 @@ namespace Tetris
         {
             mFPSTextBox->setValue(MakeString() << mTetrisComponent->getFPS());
         }
+
+        if (mComputerEnabledCheckBox && !mComputerEnabledCheckBox->isChecked())
+        {
+            ::SetFocus(mTetrisComponent->handle());
+        }
     }
 
 
     void Controller::processKey(int inKey)
     {
-        // No interest.
     }
 
 
