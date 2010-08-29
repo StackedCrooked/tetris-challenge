@@ -7,16 +7,27 @@
         align="stretch"
         title="About"
 >
-  
-  <vbox align="center">
-    <label style="text-align:center" value="Sources" />
-    <html:a id="link1" href="http://code.google.com/p/tetris-challenge" style="text-align:center">http://code.google.com/p/tetris-challenge</html:a>
-  </vbox>  
-  <vbox align="center">
-    <label value="Tetris Icon"/>
-    <html:a id="link2" href="http://www.everaldo.com/">Everaldo Coelho</html:a>
-  </vbox>  
-  <spacer flex="1" />
+  <grid>
+    <columns>
+      <column flex="0" />
+      <column flex="1" />
+    </columns>
+    <rows>
+      <row align="center">
+        <label value="Author:" style="text-align:right" />
+        <html:a href="http://code.google.com/u/francis.rammeloo/" style="text-align:center">Francis Rammeloo</html:a>
+      </row>
+      <row align="center">
+        <label value="Sources:" style="text-align:right" />
+        <html:a href="http://code.google.com/p/tetris-challenge" style="text-align:center">http://code.google.com/p/tetris-challenge</html:a>
+      </row>
+      <row align="center">
+        <label value="Tetris Icon (LGPL):" style="text:align:right" />
+        <html:a href="http://www.everaldo.com/">Everaldo Coelho</html:a>
+      </row>
+    </rows>
+  </grid>
+  <spacer height="23" />
   <hbox>
     <spacer flex="1" />
     <button label="OK" id="okButton" />
