@@ -111,6 +111,12 @@ namespace Tetris
     }
 
 
+    int GameState::Stats::score() const
+    {
+        return 40 * mNumSingles + 100 * mNumDoubles + 300 * mNumTriples + 1200 * mNumTetrises;
+    }
+
+
     void GameState::solidifyBlock(const Block & inBlock)
     {
         const Grid & grid = inBlock.grid();
