@@ -39,7 +39,7 @@ namespace Tetris
         mComputerEnabledCheckBox(0),
         mStatusTextBox(0),
         mMovesAheadTextBox(0),
-        mSearchDepthTextBox(0),
+        mStrategiesMenuList(0),
         mLoggingTextBox(0),
         mProtectedGame(),
         mTimedGame(),
@@ -167,14 +167,29 @@ namespace Tetris
         }
 
 
-        if (XULWin::Element * el = mRootElement->getElementById("searchDepthTextBox"))
+        if (XULWin::Element * el = mRootElement->getElementById("strategiesMenuList"))
         {
-            if (!(mSearchDepthTextBox = el->component()->downcast<XULWin::TextBox>()))
+            if (!(mStrategiesMenuList = el->component()->downcast<XULWin::MenuList>()))
             {
-                LogWarning("The 'search depth' textbox was not found in the XUL document.");
+                LogWarning("The 'strategies' menulist was not found in the XUL document.");
+            }
+            else
+            {
+                if (XULWin::Element * xmlpopup = mRootElement->getElementById("strategiesPopup"))
+                {
+                    // Populate it
+                    XULWin::AttributesMapping attr;
+                    attr["label"] = "Default";
+                    attr["id"] = "defaultStrategy";
+                    XULWin::ElementPtr menuItem = XULWin::XMLMenuItem::Create(xmlpopup, attr);
+
+                    attr["id"] = "makeTetrisesStrategy";
+                    attr["label"] = "Make tetrises";
+                    XULWin::XMLMenuItem::Create(xmlpopup, attr);
+                }
             }
         }
-
+        
 
         if (XULWin::Element * el = mRootElement->getElementById("statusTextBox"))
         {
@@ -496,11 +511,6 @@ namespace Tetris
             mMovesAheadTextBox->setValue(MakeString() << (game.endNode()->depth() - game.currentNode()->depth()) << "/" << 3 * cMaxSearchDepth);
         }
 
-        if (mSearchDepthTextBox)
-        {
-            mSearchDepthTextBox->setValue(MakeString() << mSearchDepth);
-        }
-
         for (size_t idx = 0; idx != 4; ++idx)
         {
             const GameState::Stats & stats = game.currentNode()->state().stats();
@@ -509,6 +519,42 @@ namespace Tetris
                 mLinesTextBoxes[idx]->setValue(MakeString() << stats.numLines(idx));
             }
         }
+        
+
+        if (mStrategiesMenuList)
+        {
+            int selectedIndex = mStrategiesMenuList->getSelectedIndex();
+            if (selectedIndex != CB_ERR)
+            {
+                if (XULWin::MenuPopup * popup = mStrategiesMenuList->findChildOfType<XULWin::MenuPopup>())
+                {
+                    if (selectedIndex < popup->getChildCount())
+                    {
+                        XULWin::Component * comp = popup->getChild(selectedIndex);
+                        if (XULWin::MenuItem * menuItem = comp->downcast<XULWin::MenuItem>())
+                        {
+                            if (menuItem->getLabel() == "Default")
+                            {
+                                if (!dynamic_cast<DefaultEvaluator*>(mEvaluator.get()))
+                                {
+                                    mEvaluator.reset(new DefaultEvaluator);
+                                    LogInfo("AI is now using the default strategy.");
+                                }
+                            }
+                            else if (menuItem->getLabel() == "Make tetrises")
+                            {
+                                if (!dynamic_cast<MakeTetrises*>(mEvaluator.get()))
+                                {
+                                    mEvaluator.reset(new MakeTetrises);
+                                    LogInfo("AI will now try to make tetrises.");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
 
         if (mFPSTextBox)
         {

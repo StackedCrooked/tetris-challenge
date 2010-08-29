@@ -71,8 +71,12 @@
           <textbox id="movesAheadTextBox" value="0/8" readonly="true" width="40" flex="1" />
         </hbox>
         <hbox align="center">
-          <label value="Search depth:" style="text-align:right" />
-          <textbox id="searchDepthTextBox" value="1" readonly="true" flex="1" />
+          <label value="Strategy" />
+          <menulist id="strategiesMenuList">
+            <menupopup id="strategiesPopup">
+                <!-- Populated at run-time -->
+            </menupopup>
+          </menulist>
         </hbox>
       </groupbox>
     </vbox>

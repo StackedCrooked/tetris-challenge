@@ -1,3 +1,5 @@
+- Strategy selector: implement a DECENT event handler for the menu handler AND the menupopup
+- Strategy selector: add a 'custom' strategy where the user can decide on the parameters
 - Use Tetris icon on the exe file.
 - Implement various selectable "Strategies" for AI
 - False positives of: "Failed to move the blocks in time"
