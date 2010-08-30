@@ -81,6 +81,8 @@ namespace Tetris
         LRESULT onNew(WPARAM wParam, LPARAM lParam);
         LRESULT onQuit(WPARAM wParam, LPARAM lParam);
         LRESULT onAboutMenuItem(WPARAM wParam, LPARAM lParam);
+        LRESULT onStrategySelected(WPARAM wParam, LPARAM lParam);
+        
 
         XULWin::XULRunner mXULRunner;
         XULWin::ElementPtr mRootElement;;
