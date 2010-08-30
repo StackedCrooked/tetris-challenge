@@ -30,7 +30,8 @@ namespace Tetris
                   NumTriplesFactor inNumTriplesFactor,
                   NumTetrisesFactor inNumTetrisesFactor);
 
-        virtual std::auto_ptr<Evaluator> clone() const = 0 {}
+        virtual std::auto_ptr<Evaluator> clone() const
+        { return Create<Evaluator>(*this); }
 
         virtual int evaluate(const GameState & inGameState) const;
 

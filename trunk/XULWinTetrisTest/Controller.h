@@ -77,6 +77,7 @@ namespace Tetris
 
     private:
         void startAI(Game & game, size_t inDepth);
+        int getFactor(const std::string & inFactor);
         
         LRESULT onNew(WPARAM wParam, LPARAM lParam);
         LRESULT onQuit(WPARAM wParam, LPARAM lParam);

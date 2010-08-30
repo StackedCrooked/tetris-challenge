@@ -13,6 +13,7 @@
 #include "XULWin/Window.h"
 #include "Poco/DateTime.h"
 #include "Poco/DateTimeFormatter.h"
+#include <boost/lexical_cast.hpp>
 
 
 namespace Tetris
@@ -578,6 +579,7 @@ namespace Tetris
             mMovesAheadTextBox->setValue(MakeString() << (game.endNode()->depth() - game.currentNode()->depth()) << "/" << 3 * cMaxSearchDepth);
         }
 
+
         for (size_t idx = 0; idx != 4; ++idx)
         {
             const GameState::Stats & stats = game.currentNode()->state().stats();
@@ -590,31 +592,14 @@ namespace Tetris
 
         if (mStrategiesMenuList)
         {
-            //std::string strategyName = mStrategiesMenuList->getLabel();
-            //if (strategyName == "Balanced")
-            //{
-            //    if (!dynamic_cast<Balanced*>(mEvaluator.get()))
-            //    {
-            //        mEvaluator.reset(new Balanced);
-            //        LogInfo("AI is now using the default strategy.");
-            //    }
-            //}
-            //else if (strategyName == "Perfectionistic")
-            //{
-            //    if (!dynamic_cast<Perfectionistic*>(mEvaluator.get()))
-            //    {
-            //        mEvaluator.reset(new Perfectionistic);
-            //        LogInfo("AI will now try to make tetrises.");
-            //    }
-            //}
-            //else if (strategyName == "Score")
-            //{
-            //    if (!dynamic_cast<EvaluateScoreOnly*>(mEvaluator.get()))
-            //    {
-            //        mEvaluator.reset(new EvaluateScoreOnly);
-            //        LogInfo("AI will only take the score into account.");
-            //    }
-            //}
+            mEvaluator.reset(new Evaluator(
+                GameHeightFactor(getFactor("gameHeightFactor")),
+                LastBlockHeightFactor(getFactor("lastBlockHeightFactor")),
+                NumHolesFactor(getFactor("numHolesFactor")),
+                NumSinglesFactor(getFactor("numSinglesFactor")),
+                NumDoublesFactor(getFactor("numDoublesFactor")),
+                NumTriplesFactor(getFactor("numTriplesFactor")),
+                NumTetrisesFactor(getFactor("numTetrisesFactor"))));
         }
 
 
@@ -622,6 +607,26 @@ namespace Tetris
         {
             mFPSTextBox->setValue(MakeString() << mTetrisComponent->getFPS());
         }
+    }
+
+
+    int Controller::getFactor(const std::string & inFactor)
+    {
+        try
+        {
+            if (XULWin::Element * el = mRootElement->getElementById(inFactor))
+            {
+                if (XULWin::TextBox * textBox = el->component()->downcast<XULWin::TextBox>())
+                {
+                    return boost::lexical_cast<int>(textBox->getValue());
+                }
+            }
+        }
+        catch (const std::bad_cast & inExc)
+        {
+            LogError(MakeString() << "Bad cast exception thrown. " << inExc.what());
+        }
+        return 0;
     }
 
 

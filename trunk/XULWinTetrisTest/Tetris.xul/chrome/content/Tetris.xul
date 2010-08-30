@@ -93,20 +93,36 @@
             </columns>
             <rows>
               <row align="center">
-                <label value="Search depth:" style="text-align:right" />
-                <textbox value="3" flex="0" />
+                <label value="Game height:" style="text-align:right" />
+                <textbox id="gameHeightFactor" value="-2" />
               </row>
               <row align="center">
-                <label value="Holes penalty:" style="text-align:right" />
-                <textbox value="4" flex="0" />
+                <label value="Last block height:" style="text-align:right" />
+                <textbox id="lastBlockHeightFactor" value="-1" />
               </row>
               <row align="center">
-                <label value="Field height penalty:" style="text-align:right" />
-                <textbox value="4" flex="0" />
+                <label value="Number of holes:" style="text-align:right" />
+                <textbox id="numHolesFactor" value="-4" />
               </row>
               <row align="center">
-                <label value="Last block height penalty:" style="text-align:right" />
-                <textbox value="4" flex="0" />
+                <label value="Number of lines:" style="text-align:right" />
+                <textbox id="numLinesFactor" value="0" />
+              </row>
+              <row align="center">
+                <label value="Number of single:" style="text-align:right" />
+                <textbox id="numSinglesFactor" value="1" />
+              </row>
+              <row align="center">
+                <label value="Number of double lines:" style="text-align:right" />
+                <textbox id="numDoublesFactor" value="2" />
+              </row>
+              <row align="center">
+                <label value="Number of triple lines:" style="text-align:right" />
+                <textbox id="numTriplesFactor" value="4" />
+              </row>
+              <row align="center">
+                <label value="Number of tetrises:" style="text-align:right" />
+                <textbox id="numTetrisesFactor" value="8" />
               </row>
             </rows>
           </grid>
@@ -117,5 +133,5 @@
       <tetris id="tetris0" flex="0" numfutureblocks="4" keyboardenabled="true" numrows="20" numcolumns="10" />
     </hbox>
   </hbox>
-  <textbox id="loggingTextbox" value="Log messages appear here." multiline="true" flex="1" rows="4" readonly="true" style="background-color:white" />
+  <!--<textbox id="loggingTextbox" value="Log messages appear here." multiline="true" flex="1" rows="4" readonly="true" style="background-color:white" />-->
 </window>
