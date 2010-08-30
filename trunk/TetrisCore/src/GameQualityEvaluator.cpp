@@ -5,7 +5,20 @@
 namespace Tetris
 {
 
-    Evaluator::Evaluator()
+    Evaluator::Evaluator(GameHeightFactor inGameHeightFactor,
+                         LastBlockHeightFactor inLastBlockHeightFactor, 
+                         NumHolesFactor inNumHolesFactor,
+                         NumSinglesFactor inNumSinglesFactor,
+                         NumDoublesFactor inNumDoublesFactor,
+                         NumTriplesFactor inNumTriplesFactor,
+                         NumTetrisesFactor inNumTetrisesFactor) :
+        mGameHeightFactor(inGameHeightFactor.get()),
+        mLastBlockHeightFactor(inLastBlockHeightFactor.get()),
+        mNumHolesFactor(inNumHolesFactor.get()),
+        mNumSinglesFactor(inNumSinglesFactor.get()),
+        mNumDoublesFactor(inNumDoublesFactor.get()),
+        mNumTriplesFactor(inNumTriplesFactor.get()),
+        mNumTetrisesFactor(inNumTetrisesFactor.get())
     {
     }
 
@@ -52,60 +65,40 @@ namespace Tetris
         }
         int gameHeight = grid.numRows() - top;
         int lastBlockHeight = grid.numRows() - inGameState.originalBlock().row();
-        float density = static_cast<float>(numOccupiedUnderTop)/static_cast<float>(gameHeight * grid.numColumns());
-        return evaluateImpl(inGameState, gameHeight, lastBlockHeight, numHoles, numOccupiedUnderTop, density);
+
+
+        return gameHeight * mGameHeightFactor + 
+               lastBlockHeight * mLastBlockHeightFactor +
+               numHoles * mNumHolesFactor +
+               inGameState.stats().numSingles() * mNumSinglesFactor +
+               inGameState.stats().numDoubles() * mNumDoublesFactor +
+               inGameState.stats().numTriples() * mNumTriplesFactor +
+               inGameState.stats().numTetrises() * mNumTetrisesFactor;
     }
 
 
-    int Balanced::evaluateImpl(const GameState & inGameState,
-                                       int inGameHeight,
-                                       int inLastBlockHeight,
-                                       int inNumHoles,
-                                       int inNumOccupiedUnderTop,
-                                       float inDensity) const
+    Balanced::Balanced() :
+        Evaluator(GameHeightFactor(-2),
+                  LastBlockHeightFactor(-1),
+                  NumHolesFactor(-4),
+                  NumSinglesFactor(1),
+                  NumDoublesFactor(2),
+                  NumTriplesFactor(4),
+                  NumTetrisesFactor(8))
     {
-        return 0
-               - 2 * inGameHeight
-               - 1 * inLastBlockHeight
-               - 4 * inNumHoles
-               + 1 * inGameState.stats().numSingles()
-               + 2 * inGameState.stats().numDoubles()
-               + 4 * inGameState.stats().numTriples()
-               + 8 * inGameState.stats().numTetrises();
     }
 
 
-    int Perfectionistic::evaluateImpl(const GameState & inGameState,
-                                   int inGameHeight,
-                                   int inLastBlockHeight,
-                                   int inNumHoles,
-                                   int inNumOccupiedUnderTop,
-                                   float inDensity) const
+    Perfectionistic::Perfectionistic() :
+        Evaluator(GameHeightFactor(-4),
+                  LastBlockHeightFactor(-1),
+                  NumHolesFactor(-16),
+                  NumSinglesFactor(-4),
+                  NumDoublesFactor(-4),
+                  NumTriplesFactor(-4),
+                  NumTetrisesFactor(8))
     {
-        return 0
-               - 4 * inGameHeight
-               - 1 * inLastBlockHeight
-               - 16 * inNumHoles
-               - 8 * inGameState.stats().numSingles()
-               - 8 * inGameState.stats().numDoubles()
-               - 8 * inGameState.stats().numTriples()
-               + 8 * inGameState.stats().numTetrises();
     }
 
-
-    int EvaluateScoreOnly::evaluateImpl(const GameState & inGameState,
-                                        int inGameHeight,
-                                        int inLastBlockHeight,
-                                        int inNumHoles,
-                                        int inNumOccupiedUnderTop,
-                                        float inDensity) const
-    {
-        // Scoring a single lines gets 40 points. Therefore we use the number 40 as a unit for evaluation.
-        const int cUnit = 40;
-        return inGameState.stats().score()
-               - 1 * cUnit * inGameHeight
-               - 1 * cUnit * inLastBlockHeight
-               - 1 * cUnit * inNumHoles;
-    }
 
 } // namespace Tetris

@@ -320,14 +320,6 @@ namespace Tetris
                     LogInfo("AI will now try to make tetrises.");
                 }
             }
-            else if (strategyName == "Score")
-            {
-                if (!dynamic_cast<EvaluateScoreOnly*>(mEvaluator.get()))
-                {
-                    mEvaluator.reset(new EvaluateScoreOnly);
-                    LogInfo("AI will only take the score into account.");
-                }
-            }
         }
         // Must return unhandled otherwise the popup menu stays.
         return XULWin::cUnhandled;
