@@ -1,9 +1,9 @@
 - Strategy selector: add a 'custom' strategy where the user can decide on the parameters
 - Implement level increment (doesn't work currently)
 - Use Tetris icon on the exe file.
-- Implement various selectable "Strategies" for AI
 - False positives of: "Failed to move the blocks in time"
-- Add the tetris icon to the credits section (about dialog)
+v Implement various selectable "Strategies" for AI
+v Add the tetris icon to the credits section (about dialog)
 v Strategy selector: implement a DECENT event handler for the menu handler AND the menupopup
 v Hyperlink in about dialog
 v About dialog
