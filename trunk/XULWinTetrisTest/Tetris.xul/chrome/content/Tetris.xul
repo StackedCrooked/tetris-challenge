@@ -84,6 +84,33 @@
             </menupopup>
           </menulist>
         </hbox>
+        <groupbox>
+          <caption label="Parameters" />
+          <grid>
+            <columns>
+              <column flex="1" />
+              <column flex="0" style="text-align:right" width="36" />
+            </columns>
+            <rows>
+              <row align="center">
+                <label value="Search depth:" style="text-align:right" />
+                <textbox value="3" flex="0" />
+              </row>
+              <row align="center">
+                <label value="Holes penalty:" style="text-align:right" />
+                <textbox value="4" flex="0" />
+              </row>
+              <row align="center">
+                <label value="Field height penalty:" style="text-align:right" />
+                <textbox value="4" flex="0" />
+              </row>
+              <row align="center">
+                <label value="Last block height penalty:" style="text-align:right" />
+                <textbox value="4" flex="0" />
+              </row>
+            </rows>
+          </grid>
+        </groupbox>
       </groupbox>
     </vbox>
     <hbox>
