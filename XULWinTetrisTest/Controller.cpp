@@ -198,6 +198,7 @@ namespace Tetris
             }
             else
             {
+                mScopedEventListener.connect(el, boost::bind(&Controller::onStrategySelected, this, _1, _2));
                 if (XULWin::Element * xmlpopup = mRootElement->getElementById("strategiesPopup"))
                 {
                     // Populate it
@@ -295,6 +296,41 @@ namespace Tetris
             }
         }
         return XULWin::cHandled;
+    }
+
+
+    LRESULT Controller::onStrategySelected(WPARAM wParam, LPARAM lParam)
+    {
+        if (HIWORD(wParam) == CBN_SELCHANGE)
+        {
+            std::string strategyName = mStrategiesMenuList->getLabel();
+            if (strategyName == "Balanced")
+            {
+                if (!dynamic_cast<Balanced*>(mEvaluator.get()))
+                {
+                    mEvaluator.reset(new Balanced);
+                    LogInfo("AI is now using the default strategy.");
+                }
+            }
+            else if (strategyName == "Perfectionistic")
+            {
+                if (!dynamic_cast<Perfectionistic*>(mEvaluator.get()))
+                {
+                    mEvaluator.reset(new Perfectionistic);
+                    LogInfo("AI will now try to make tetrises.");
+                }
+            }
+            else if (strategyName == "Score")
+            {
+                if (!dynamic_cast<EvaluateScoreOnly*>(mEvaluator.get()))
+                {
+                    mEvaluator.reset(new EvaluateScoreOnly);
+                    LogInfo("AI will only take the score into account.");
+                }
+            }
+        }
+        // Must return unhandled otherwise the popup menu stays.
+        return XULWin::cUnhandled;
     }
 
 
@@ -562,44 +598,31 @@ namespace Tetris
 
         if (mStrategiesMenuList)
         {
-            int selectedIndex = mStrategiesMenuList->getSelectedIndex();
-            if (selectedIndex != CB_ERR)
-            {
-                if (XULWin::MenuPopup * popup = mStrategiesMenuList->findChildOfType<XULWin::MenuPopup>())
-                {
-                    if (selectedIndex < popup->getChildCount())
-                    {
-                        XULWin::Component * comp = popup->getChild(selectedIndex);
-                        if (XULWin::MenuItem * menuItem = comp->downcast<XULWin::MenuItem>())
-                        {
-                            if (menuItem->getLabel() == "Balanced")
-                            {
-                                if (!dynamic_cast<Balanced*>(mEvaluator.get()))
-                                {
-                                    mEvaluator.reset(new Balanced);
-                                    LogInfo("AI is now using the default strategy.");
-                                }
-                            }
-                            else if (menuItem->getLabel() == "Perfectionistic")
-                            {
-                                if (!dynamic_cast<Perfectionistic*>(mEvaluator.get()))
-                                {
-                                    mEvaluator.reset(new Perfectionistic);
-                                    LogInfo("AI will now try to make tetrises.");
-                                }
-                            }
-                            else if (menuItem->getLabel() == "Score")
-                            {
-                                if (!dynamic_cast<EvaluateScoreOnly*>(mEvaluator.get()))
-                                {
-                                    mEvaluator.reset(new EvaluateScoreOnly);
-                                    LogInfo("AI will only take the score into account.");
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            //std::string strategyName = mStrategiesMenuList->getLabel();
+            //if (strategyName == "Balanced")
+            //{
+            //    if (!dynamic_cast<Balanced*>(mEvaluator.get()))
+            //    {
+            //        mEvaluator.reset(new Balanced);
+            //        LogInfo("AI is now using the default strategy.");
+            //    }
+            //}
+            //else if (strategyName == "Perfectionistic")
+            //{
+            //    if (!dynamic_cast<Perfectionistic*>(mEvaluator.get()))
+            //    {
+            //        mEvaluator.reset(new Perfectionistic);
+            //        LogInfo("AI will now try to make tetrises.");
+            //    }
+            //}
+            //else if (strategyName == "Score")
+            //{
+            //    if (!dynamic_cast<EvaluateScoreOnly*>(mEvaluator.get()))
+            //    {
+            //        mEvaluator.reset(new EvaluateScoreOnly);
+            //        LogInfo("AI will only take the score into account.");
+            //    }
+            //}
         }
 
 

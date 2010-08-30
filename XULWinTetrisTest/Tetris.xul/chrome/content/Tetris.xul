@@ -90,5 +90,5 @@
       <tetris id="tetris0" flex="0" numfutureblocks="4" keyboardenabled="true" numrows="20" numcolumns="10" />
     </hbox>
   </hbox>
-  <!--<textbox id="loggingTextbox" value="Log messages appear here." multiline="true" flex="1" rows="4" readonly="true" style="background-color:white" />-->
+  <textbox id="loggingTextbox" value="Log messages appear here." multiline="true" flex="1" rows="4" readonly="true" style="background-color:white" />
 </window>

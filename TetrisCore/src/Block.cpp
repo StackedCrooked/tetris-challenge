@@ -81,10 +81,7 @@ namespace Tetris
 
     size_t GetBlockIdentifier(BlockType inType, size_t inRotation)
     {
-        if (inType < BlockType_Begin || inType >= BlockType_End)
-        {
-            throw std::logic_error("Invalid block type.");
-        }
+        Assert(inType >= BlockType_Begin || inType < BlockType_End);
         // Max 4 rotations.
         return 4 * static_cast<int>(inType - 1) + inRotation;
     }
@@ -92,10 +89,7 @@ namespace Tetris
 
     size_t GetBlockRotationCount(BlockType inType)
     {
-        if (inType < BlockType_Begin || inType >= BlockType_End)
-        {
-            throw std::logic_error("Invalid block type.");
-        }        
+        Assert(inType >= BlockType_Begin || inType < BlockType_End);
         static const int fRotationCounts[] =
         {
             2, // BlockType_I
