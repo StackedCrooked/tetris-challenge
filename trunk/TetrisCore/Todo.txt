@@ -1,4 +1,4 @@
-- Strategy selector: add a 'custom' strategy where the user can decide on the parameters
+- Use up/down control for modifying AI parameters.
 - Implement level increment (doesn't work currently)
 - Use Tetris icon on the exe file.
 - False positives of: "Failed to move the blocks in time"
