@@ -3,14 +3,22 @@
 #include "Tetris/GameStateNode.h"
 #include "Tetris/ErrorHandling.h"
 #include "Tetris/Logger.h"
+#include <stdexcept>
 
 
 namespace Tetris
 {
+    
+    static int GetIntervalMs(int inNumMovesPerSecond)
+    {
+        Assert(inNumMovesPerSecond != 0);
+        return static_cast<int>(0.5 + 1000.0 / static_cast<float>(inNumMovesPerSecond != 0 ? inNumMovesPerSecond : 1));
+    }
 
-    BlockMover::BlockMover(Protected<Game> & inGame) :
+
+    BlockMover::BlockMover(Protected<Game> & inGame, int inNumMovesPerSecond) :
         mGame(inGame),
-        mTimer(0, 50),
+        mTimer(GetIntervalMs(inNumMovesPerSecond), GetIntervalMs(inNumMovesPerSecond)),
         mStatus(Status_Ok)
     {
         Poco::TimerCallback<BlockMover> callback(*this, &BlockMover::onTimer);
@@ -21,6 +29,13 @@ namespace Tetris
     BlockMover::Status BlockMover::status() const
     {
         return mStatus;
+    }
+
+
+    void BlockMover::setSpeed(int inNumMovesPerSecond)
+    {
+        Assert(inNumMovesPerSecond != 0);
+        mTimer.setPeriodicInterval(GetIntervalMs(inNumMovesPerSecond));
     }
 
 

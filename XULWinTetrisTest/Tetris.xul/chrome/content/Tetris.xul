@@ -64,68 +64,74 @@
       </groupbox>
       <groupbox>
         <caption label="Computer Player" />
-        <hbox align="center">
-          <checkbox id="computerEnabled" label="Let the computer play" checked="true" style="text-align:right" />
-          <spacer />
-        </hbox>
-        <hbox align="center">
-          <label value="Status:" style="text-align:right" />
-          <textbox id="statusTextBox" value="Initializing" readonly="true" flex="1" />
-        </hbox>
-        <hbox align="center">
-          <label value="Precalculated:" style="text-align:right" />
-          <textbox id="movesAheadTextBox" value="0/8" readonly="true" width="40" flex="1" />
-        </hbox>
-        <!--<hbox align="center">
-          <label value="Strategy" />
-          <menulist id="strategiesMenuList">
-            <menupopup id="strategiesPopup">
-                --><!-- Populated at run-time --><!--
-            </menupopup>
-          </menulist>
-        </hbox>-->
-        <groupbox>
-          <caption label="AI Parameters" />
-          <description>Use these parameters to manipulate the AI.</description>
-          <grid>
-            <columns>
-              <column flex="1" />
-              <column flex="0" />
-              <column flex="1" />
-              <column flex="0" />
-            </columns>
-            <rows>
-              <row align="center">
-                <textbox id="gameHeightFactor" type="number" readonly="true" style="text-align:right" value="-2" />
-                <label value="x game height" style="text-align:left" />
-                <textbox id="lastBlockHeightFactor" type="number" readonly="true" style="text-align:right" value="-1" />
-                <label value="x last block height" style="text-align:left" />
-              </row>
-              <row align="center">
-                <textbox id="numHolesFactor" type="number" readonly="true" style="text-align:right" value="-4" />
-                <label value="x number of holes" style="text-align:left" />
-                <textbox id="numLinesFactor" type="number" readonly="true" style="text-align:right" value="0" />
-                <label value="x total number of lines" style="text-align:left" />
-              </row>
-              <row align="center">
-                <textbox id="numSinglesFactor" type="number" readonly="true" style="text-align:right" value="1" />
-                <label value="x number of single lines" style="text-align:left" />
-                <textbox id="numDoublesFactor" type="number" readonly="true" style="text-align:right" value="2" />
-                <label value="x number of double lines" style="text-align:left" />
-              </row>
-              <row align="center">
-                <textbox id="numTriplesFactor" type="number" readonly="true" style="text-align:right" value="4" />
-                <label value="x number of triple lines" style="text-align:left" />
-                <textbox id="numTetrisesFactor" type="number" readonly="true" style="text-align:right" value="8" />
-                <label value="x number of tetrises" style="text-align:left" />
-              </row>
-            </rows>
-          </grid>
-          <hbox align="center">
-            <label value="Game quality according to above parameters:"/>
-            <textbox id="gameStateScore" readonly="true" value="0" flex="1" />
-          </hbox>
-        </groupbox>
+        <grid>
+          <columns>
+            <column flex="0" />
+            <column flex="1" />
+          </columns>
+          <rows>
+            <row align="center">
+              <label value="Computer player:" style="text-align:right" />
+              <checkbox id="computerEnabled" label="Enable AI" checked="true" style="text-align:right" flex="1" />
+            </row>
+            <row align="center">
+              <label value="Move speed:" style="text-align:right" />
+              <hbox align="center">
+                <textbox id="movementSpeed" type="number" readonly="true" style="text-align:right" value="20" />
+                <label value="moves/s" />
+              </hbox>
+            </row>
+            <row align="center">
+              <label value="Status:" style="text-align:right" />
+              <textbox id="statusTextBox" value="Initializing" readonly="true" flex="1" />
+            </row>
+            <row align="center">
+              <label value="Precalculated:" style="text-align:right" />
+              <textbox id="movesAheadTextBox" value="0/8" readonly="true" width="40" flex="1" />
+            </row>
+            <row align="center">
+              <label value="Game quality:" style="text-align:right" />
+              <textbox id="gameStateScore" readonly="true" value="0" flex="1" />
+            </row>
+          </rows>
+        </grid>
+      </groupbox>
+      <groupbox>
+        <caption label="Game Quality Parameters" />
+        <grid>
+          <columns>
+            <column flex="1" />
+            <column flex="0" />
+            <column flex="1" />
+            <column flex="0" />
+          </columns>
+          <rows>
+            <row align="center">
+              <textbox id="numHolesFactor" type="number" readonly="true" style="text-align:right" value="-1" />
+              <label value="number of holes" style="text-align:left" />
+              <textbox id="numSinglesFactor" type="number" readonly="true" style="text-align:right" value="0" />
+              <label value="number of single lines" style="text-align:left" />
+            </row>
+            <row align="center">
+              <textbox id="gameHeightFactor" type="number" readonly="true" style="text-align:right" value="-1" />
+              <label value="game height" style="text-align:left" />
+              <textbox id="numDoublesFactor" type="number" readonly="true" style="text-align:right" value="0" />
+              <label value="number of double lines" style="text-align:left" />
+            </row>
+            <row align="center">
+              <textbox id="lastBlockHeightFactor" type="number" readonly="true" style="text-align:right" value="-1" />
+              <label value="last block height" style="text-align:left" />
+              <textbox id="numTriplesFactor" type="number" readonly="true" style="text-align:right" value="0" />
+              <label value="number of triple lines" style="text-align:left" />
+            </row>
+            <row align="center">
+              <textbox id="numLinesFactor" type="number" readonly="true" style="text-align:right" value="0" />
+              <label value="total number of lines" style="text-align:left" />
+              <textbox id="numTetrisesFactor" type="number" readonly="true" style="text-align:right" value="0" />
+              <label value="number of tetrises" style="text-align:left" />
+            </row>
+          </rows>
+        </grid>
       </groupbox>
     </vbox>
     <hbox>

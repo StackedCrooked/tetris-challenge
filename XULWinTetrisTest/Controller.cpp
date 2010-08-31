@@ -53,6 +53,7 @@ namespace Tetris
         mLevelTextBox(0),
         mScoreTextBox(0),
         mComputerEnabledCheckBox(0),
+        mMovementSpeed(0),
         mStatusTextBox(0),
         mMovesAheadTextBox(0),
         mStrategiesMenuList(0),
@@ -206,6 +207,9 @@ namespace Tetris
                 LogWarning("The element with id 'computerEnabled' was found but it was not of type 'checkbox'.");
             }            
         }
+
+
+        mMovementSpeed = FindComponentById<XULWin::SpinButton>(mRootElement.get(), "movementSpeed");
 
 
         if (XULWin::Element * el = mRootElement->getElementById("movesAheadTextBox"))
@@ -552,6 +556,12 @@ namespace Tetris
         }
 
 
+        if (mMovementSpeed && mBlockMover)
+        {
+            mBlockMover->setSpeed(XULWin::String2Int(mMovementSpeed->getValue(), 1));
+        }
+
+
         // Do we have computer moves lined up?
         if (!game.currentNode()->children().empty())
         {
@@ -573,7 +583,7 @@ namespace Tetris
             // If no then start the block mover.
             else
             {
-                mBlockMover.reset(new BlockMover(*mProtectedGame));
+                mBlockMover.reset(new BlockMover(*mProtectedGame, XULWin::String2Int(mMovementSpeed->getValue(), 20)));
             }
         }
         else
