@@ -1,4 +1,5 @@
 - Add AI movement speed parameter.
+- SpinButton -> implement range (block mover speed!)
 - Add checkbox to have the AI drop it's blocks instead of moving down.
 - Implement level increment (doesn't work currently)
 - Use Tetris icon on the exe file.

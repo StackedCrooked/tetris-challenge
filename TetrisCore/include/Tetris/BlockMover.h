@@ -4,6 +4,7 @@
 
 #include "Tetris/Threading.h"
 #include "Poco/Timer.h"
+#include <boost/noncopyable.hpp>
 
 
 namespace Tetris
@@ -23,10 +24,12 @@ namespace Tetris
      * This class does not create child nodes. Once no more child nodes are available it goes into
      * waiting mode until more child nodes are added.
      */
-    class BlockMover
+    class BlockMover : boost::noncopyable
     {
     public:
         BlockMover(Protected<Game> & inGame, int inNumMovesPerSecond);
+
+        ~BlockMover();
 
         enum Status
         {
@@ -44,7 +47,7 @@ namespace Tetris
         void move();   
         
         Protected<Game> & mGame;
-        Poco::Timer mTimer;
+        boost::scoped_ptr<Poco::Timer> mTimer;
         int mNumMovesPerSecond;
         volatile Status mStatus;
     };
