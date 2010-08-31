@@ -77,7 +77,6 @@ namespace Tetris
 
     private:
         void startAI(Game & game, size_t inDepth);
-        int getFactor(const std::string & inFactor);
         
         LRESULT onNew(WPARAM wParam, LPARAM lParam);
         LRESULT onQuit(WPARAM wParam, LPARAM lParam);
@@ -100,6 +99,18 @@ namespace Tetris
         XULWin::TextBox * mStatusTextBox;
         XULWin::TextBox * mMovesAheadTextBox;
         XULWin::MenuList * mStrategiesMenuList;
+
+        XULWin::SpinButton * mGameHeightFactor;
+        XULWin::SpinButton * mLastBlockHeightFactor;
+        XULWin::SpinButton * mNumHolesFactor;
+        XULWin::SpinButton * mNumLinesFactor;
+        XULWin::SpinButton * mNumSinglesFactor;
+        XULWin::SpinButton * mNumDoublesFactor;
+        XULWin::SpinButton * mNumTriplesFactor;
+        XULWin::SpinButton * mNumTetrisesFactor;
+
+        XULWin::TextBox * mGameStateScore;
+
         XULWin::TextBox * mLoggingTextBox;
         XULWin::ScopedEventListener mScopedEventListener;
         boost::scoped_ptr<Protected<Game> > mProtectedGame;

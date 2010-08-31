@@ -8,6 +8,7 @@
 #include "Tetris/GameStateNode.h"
 #include "Tetris/Player.h"
 #include "Tetris/TimedGame.h"
+#include "XULWin/Conversions.h"
 #include "XULWin/ErrorReporter.h"
 #include "XULWin/Menu.h"
 #include "XULWin/Window.h"
@@ -24,7 +25,19 @@ namespace Tetris
     {
         if (XULWin::Element * inEl = inElement->getElementById(inId))
         {
-            return inEl->component()->downcast<T>();
+            if (T * comp = inEl->component()->downcast<T>())
+            {
+                return comp;
+            }
+            else
+            {
+                LogError("Element with id '" + inId + "' was found but it was not of the requested type.");
+                return 0;
+            }
+        }
+        else
+        {
+            LogWarning("Element with id '" + inId + "' not found.");
         }
         return 0;
     }
@@ -43,6 +56,15 @@ namespace Tetris
         mStatusTextBox(0),
         mMovesAheadTextBox(0),
         mStrategiesMenuList(0),
+        mGameHeightFactor(0),
+        mLastBlockHeightFactor(0),
+        mNumHolesFactor(0),
+        mNumLinesFactor(0),
+        mNumSinglesFactor(0),
+        mNumDoublesFactor(0),
+        mNumTriplesFactor(0),
+        mNumTetrisesFactor(0),
+        mGameStateScore(0),
         mLoggingTextBox(0),
         mProtectedGame(),
         mTimedGame(),
@@ -218,7 +240,16 @@ namespace Tetris
                 }
             }
         }
-        
+
+        mGameHeightFactor = FindComponentById<XULWin::SpinButton>(mRootElement.get(), "gameHeightFactor");
+        mLastBlockHeightFactor = FindComponentById<XULWin::SpinButton>(mRootElement.get(), "lastBlockHeightFactor");
+        mNumHolesFactor = FindComponentById<XULWin::SpinButton>(mRootElement.get(), "numHolesFactor");
+        mNumLinesFactor = FindComponentById<XULWin::SpinButton>(mRootElement.get(), "numLinesFactor");
+        mNumSinglesFactor = FindComponentById<XULWin::SpinButton>(mRootElement.get(), "numSinglesFactor");
+        mNumDoublesFactor = FindComponentById<XULWin::SpinButton>(mRootElement.get(), "numDoublesFactor");
+        mNumTriplesFactor = FindComponentById<XULWin::SpinButton>(mRootElement.get(), "numTriplesFactor");
+        mNumTetrisesFactor = FindComponentById<XULWin::SpinButton>(mRootElement.get(), "numTetrisesFactor");
+        mGameStateScore = FindComponentById<XULWin::TextBox>(mRootElement.get(), "gameStateScore");
 
         if (XULWin::Element * el = mRootElement->getElementById("statusTextBox"))
         {
@@ -589,17 +620,29 @@ namespace Tetris
             }
         }
         
-
-        if (mStrategiesMenuList)
+        if (mGameHeightFactor &&
+            mLastBlockHeightFactor &&
+            mNumHolesFactor &&
+            mNumLinesFactor &&
+            mNumSinglesFactor &&
+            mNumDoublesFactor &&
+            mNumTriplesFactor &&
+            mNumTetrisesFactor)
         {
-            mEvaluator.reset(new Evaluator(
-                GameHeightFactor(getFactor("gameHeightFactor")),
-                LastBlockHeightFactor(getFactor("lastBlockHeightFactor")),
-                NumHolesFactor(getFactor("numHolesFactor")),
-                NumSinglesFactor(getFactor("numSinglesFactor")),
-                NumDoublesFactor(getFactor("numDoublesFactor")),
-                NumTriplesFactor(getFactor("numTriplesFactor")),
-                NumTetrisesFactor(getFactor("numTetrisesFactor"))));
+            mEvaluator.reset(new Evaluator(                
+                GameHeightFactor(XULWin::String2Int(mGameHeightFactor->getValue(), 0)),
+                LastBlockHeightFactor(XULWin::String2Int(mLastBlockHeightFactor->getValue(), 0)),
+                NumHolesFactor(XULWin::String2Int(mNumHolesFactor->getValue(), 0)),
+                NumSinglesFactor(XULWin::String2Int(mNumSinglesFactor->getValue(), 0)),
+                NumDoublesFactor(XULWin::String2Int(mNumDoublesFactor->getValue(), 0)),
+                NumTriplesFactor(XULWin::String2Int(mNumTriplesFactor->getValue(), 0)),
+                NumTetrisesFactor(XULWin::String2Int(mNumTetrisesFactor->getValue(), 0))));
+
+
+            if (mGameStateScore)
+            {
+                mGameStateScore->setValue(XULWin::Int2String(mEvaluator->evaluate(game.currentNode()->state())));
+            }
         }
 
 
@@ -607,26 +650,6 @@ namespace Tetris
         {
             mFPSTextBox->setValue(MakeString() << mTetrisComponent->getFPS());
         }
-    }
-
-
-    int Controller::getFactor(const std::string & inFactor)
-    {
-        try
-        {
-            if (XULWin::Element * el = mRootElement->getElementById(inFactor))
-            {
-                if (XULWin::TextBox * textBox = el->component()->downcast<XULWin::TextBox>())
-                {
-                    return boost::lexical_cast<int>(textBox->getValue());
-                }
-            }
-        }
-        catch (const std::bad_cast & inExc)
-        {
-            LogError(MakeString() << "Bad cast exception thrown. " << inExc.what());
-        }
-        return 0;
     }
 
 
