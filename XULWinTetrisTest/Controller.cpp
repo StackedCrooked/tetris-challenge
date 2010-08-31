@@ -12,6 +12,7 @@
 #include "XULWin/ErrorReporter.h"
 #include "XULWin/Menu.h"
 #include "XULWin/Window.h"
+#include "XULWin/WinUtils.h"
 #include "Poco/DateTime.h"
 #include "Poco/DateTimeFormatter.h"
 #include <boost/lexical_cast.hpp>
@@ -53,6 +54,7 @@ namespace Tetris
         mLevelTextBox(0),
         mScoreTextBox(0),
         mComputerEnabledCheckBox(0),
+        mSearchDepth(0),
         mMovementSpeed(0),
         mStatusTextBox(0),
         mMovesAheadTextBox(0),
@@ -73,7 +75,6 @@ namespace Tetris
         mComputerPlayer(),
         mBlockMover(),
         mEvaluator(new Balanced),
-        mSearchDepth(cMinSearchDepth),
         mQuit(false)
     {
         //
@@ -208,7 +209,10 @@ namespace Tetris
             }            
         }
 
-
+        if (mSearchDepth = FindComponentById<XULWin::SpinButton>(mRootElement.get(), "searchDepth"))
+        {
+            XULWin::WinAPI::SpinButton_SetRange(mSearchDepth->handle(), 1, 4);
+        }
         mMovementSpeed = FindComponentById<XULWin::SpinButton>(mRootElement.get(), "movementSpeed");
 
 
@@ -518,16 +522,7 @@ namespace Tetris
             ChildNodePtr resultNode = mComputerPlayer->result();
             if (resultNode->depth() == endNode->depth() + 1)
             {
-                if (mSearchDepth < cMaxSearchDepth)
-                {
-                    mSearchDepth++;
-                }
                 endNode->addChild(resultNode);
-            }
-            else
-            {
-                LogInfo(MakeString() << "Failed to move the blocks in time. Switching to minimal search depth. Game end node: " << endNode->depth() << ", result begin node: " << resultNode->depth() << ".");
-                mSearchDepth = cMinSearchDepth;
             }
             mComputerPlayer.reset();
         }
@@ -547,17 +542,19 @@ namespace Tetris
                 
         if (mComputerEnabledCheckBox->isChecked() && !mComputerPlayer)
         {
+            int searchDepth = XULWin::String2Int(mSearchDepth->getValue(), 2);
             GameStateNode * endNode = game.endNode();
             if (!endNode->state().isGameOver() &&
-                endNode->depth() - game.currentNode()->depth() + mSearchDepth <=  3 * cMaxSearchDepth)
+                endNode->depth() - game.currentNode()->depth() + searchDepth <=  3 * cMaxSearchDepth)
             {
-                startAI(game, mSearchDepth);
+                startAI(game, searchDepth);
             }
         }
 
 
         if (mMovementSpeed && mBlockMover)
         {
+            XULWin::WinAPI::SpinButton_SetRange(mMovementSpeed->handle(), 1, 100);
             mBlockMover->setSpeed(XULWin::String2Int(mMovementSpeed->getValue(), 1));
         }
 
@@ -576,7 +573,6 @@ namespace Tetris
 
                     // Lower the search depth so that we can quickly think of some new moves!
                     LogInfo("Couldn't move the block to where I wanted. Plan B: quickly think of a some new moves!");
-                    mSearchDepth = cMinSearchDepth;
                     mBlockMover.reset();
                 }
             }

@@ -19,7 +19,8 @@ namespace Tetris
         mThreadSafeGame(inThreadSafeGame),
         mLevel(0)
     {
-        mTimer.start(Poco::TimerCallback<TimedGame>(*this, &TimedGame::onTimerEvent));     
+        mTimer.start(Poco::TimerCallback<TimedGame>(*this, &TimedGame::onTimerEvent));
+        mTimer.setPeriodicInterval(sIntervals[mLevel]);
     }
 
 

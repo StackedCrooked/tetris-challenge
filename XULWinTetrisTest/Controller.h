@@ -96,6 +96,7 @@ namespace Tetris
         XULWin::TextBox * mScoreTextBox;
         XULWin::TextBox * mLevelTextBox;
         XULWin::CheckBox * mComputerEnabledCheckBox;
+        XULWin::SpinButton * mSearchDepth;
         XULWin::SpinButton * mMovementSpeed;
         XULWin::TextBox * mStatusTextBox;
         XULWin::TextBox * mMovesAheadTextBox;
@@ -120,7 +121,6 @@ namespace Tetris
         boost::scoped_ptr<Player> mComputerPlayer;
         boost::scoped_ptr<BlockMover> mBlockMover;
         boost::scoped_ptr<Evaluator> mEvaluator;
-        int mSearchDepth;
         volatile bool mQuit;
     };
 
