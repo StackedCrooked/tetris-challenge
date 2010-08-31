@@ -26,7 +26,7 @@ namespace Tetris
     class BlockMover
     {
     public:
-        BlockMover(Protected<Game> & inGame);
+        BlockMover(Protected<Game> & inGame, int inNumMovesPerSecond);
 
         enum Status
         {
@@ -37,12 +37,15 @@ namespace Tetris
 
         Status status() const;
 
+        void setSpeed(int inNumMovesPerSecond);
+
     private:
         void onTimer(Poco::Timer & ioTimer);
         void move();   
         
         Protected<Game> & mGame;
         Poco::Timer mTimer;
+        int mNumMovesPerSecond;
         volatile Status mStatus;
     };
 
