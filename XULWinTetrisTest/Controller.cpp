@@ -95,6 +95,10 @@ namespace Tetris
         }
                     
 
+		// Disabled XULWin logging during constructor. We have our own logger.
+        XULWin::ErrorCatcher catcher;
+        catcher.disableLogging(true);
+
         //
         // Connect the logger to the logging text box.
         //

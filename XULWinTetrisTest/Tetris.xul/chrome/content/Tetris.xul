@@ -91,45 +91,39 @@
             <columns>
               <column flex="1" />
               <column flex="0" />
+              <column flex="1" />
+              <column flex="0" />
             </columns>
             <rows>
               <row align="center">
                 <textbox id="gameHeightFactor" type="number" readonly="true" style="text-align:right" value="-2" />
                 <label value="x game height" style="text-align:left" />
-              </row>
-              <row align="center">
                 <textbox id="lastBlockHeightFactor" type="number" readonly="true" style="text-align:right" value="-1" />
                 <label value="x last block height" style="text-align:left" />
               </row>
               <row align="center">
                 <textbox id="numHolesFactor" type="number" readonly="true" style="text-align:right" value="-4" />
                 <label value="x number of holes" style="text-align:left" />
+                <textbox id="numLinesFactor" type="number" readonly="true" style="text-align:right" value="0" />
+                <label value="x total number of lines" style="text-align:left" />
               </row>
               <row align="center">
                 <textbox id="numSinglesFactor" type="number" readonly="true" style="text-align:right" value="1" />
                 <label value="x number of single lines" style="text-align:left" />
-              </row>
-              <row align="center">
                 <textbox id="numDoublesFactor" type="number" readonly="true" style="text-align:right" value="2" />
                 <label value="x number of double lines" style="text-align:left" />
               </row>
               <row align="center">
                 <textbox id="numTriplesFactor" type="number" readonly="true" style="text-align:right" value="4" />
                 <label value="x number of triple lines" style="text-align:left" />
-              </row>
-              <row align="center">
                 <textbox id="numTetrisesFactor" type="number" readonly="true" style="text-align:right" value="8" />
                 <label value="x number of tetrises" style="text-align:left" />
-              </row>
-              <row align="center">
-                <textbox id="numLinesFactor" type="number" readonly="true" style="text-align:right" value="0" />
-                <label value="x total number of lines" style="text-align:left" />
               </row>
             </rows>
           </grid>
           <hbox align="center">
-            <label value="Current game state score:"/>
-            <textbox id="gameStateScore" readonly="true" value="0" width="40" />
+            <label value="Game quality according to above parameters:"/>
+            <textbox id="gameStateScore" readonly="true" value="0" flex="1" />
           </hbox>
         </groupbox>
       </groupbox>
@@ -138,5 +132,5 @@
       <tetris id="tetris0" flex="0" numfutureblocks="4" keyboardenabled="true" numrows="20" numcolumns="10" />
     </hbox>
   </hbox>
-  <textbox id="loggingTextbox" value="Log messages appear here." multiline="true" flex="1" rows="4" readonly="true" style="background-color:white" />
+  <!--<textbox id="loggingTextbox" value="Log messages appear here." multiline="true" flex="1" rows="4" readonly="true" style="background-color:white" />-->
 </window>
