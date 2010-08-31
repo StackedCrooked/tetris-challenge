@@ -38,26 +38,26 @@
             <row align="center">
               <label value="FPS:" style="text-align:right"/>
               <textbox id="fpsTextBox" value="0" readonly="true" style="text-align:right" flex="1" />
-              <label value="Blocks:" style="text-align:right"/>
-              <textbox id="blockCountTextBox" value="0" readonly="true" style="text-align:right" flex="1" />
-            </row>
-            <row align="center">
               <label value="Lines x1:" style="text-align:right"/>
               <textbox id="lines1TextBox" value="0" readonly="true" style="text-align:right" flex="1" />
+            </row>
+            <row align="center">
+              <label value="Blocks:" style="text-align:right"/>
+              <textbox id="blockCountTextBox" value="0" readonly="true" style="text-align:right" flex="1" />
               <label value="Lines x2:" style="text-align:right"/>
               <textbox id="lines2TextBox" value="0" readonly="true" style="text-align:right" flex="1" />
             </row>
             <row align="center">
-              <label value="Lines x3:" style="text-align:right"/>
-              <textbox id="lines3TextBox" value="0" readonly="true"  style="text-align:right" flex="1" />
-              <label value="Lines x4:" style="text-align:right"/>
-              <textbox id="lines4TextBox" value="0" readonly="true"  style="text-align:right" flex="1" />
-            </row>
-            <row align="center">
               <label value="Level:" style="text-align:right"/>
               <textbox id="levelTextBox" value="0" readonly="true"  style="text-align:right" flex="1" />
+              <label value="Lines x3:" style="text-align:right"/>
+              <textbox id="lines3TextBox" value="0" readonly="true"  style="text-align:right" flex="1" />
+            </row>
+            <row align="center">
               <label value="Score:" style="text-align:right" />
               <textbox id="scoreTextBox" value="0" readonly="true" style="text-align:right" flex="1" />
+              <label value="Lines x4:" style="text-align:right"/>
+              <textbox id="lines4TextBox" value="0" readonly="true"  style="text-align:right" flex="1" />
             </row>
           </rows>
         </grid>
