@@ -76,56 +76,61 @@
           <label value="Precalculated:" style="text-align:right" />
           <textbox id="movesAheadTextBox" value="0/8" readonly="true" width="40" flex="1" />
         </hbox>
-        <hbox align="center">
+        <!--<hbox align="center">
           <label value="Strategy" />
           <menulist id="strategiesMenuList">
             <menupopup id="strategiesPopup">
-                <!-- Populated at run-time -->
+                --><!-- Populated at run-time --><!--
             </menupopup>
           </menulist>
-        </hbox>
+        </hbox>-->
         <groupbox>
-          <caption label="Parameters" />
+          <caption label="AI Parameters" />
+          <description>Use these parameters to manipulate the AI.</description>
           <grid>
             <columns>
               <column flex="1" />
-              <column flex="0" style="text-align:right" width="36" />
+              <column flex="0" />
             </columns>
             <rows>
               <row align="center">
-                <label value="Game height:" style="text-align:right" />
-                <textbox id="gameHeightFactor" value="-2" />
+                <textbox id="gameHeightFactor" type="number" readonly="true" style="text-align:right" value="-2" />
+                <label value="x game height" style="text-align:left" />
               </row>
               <row align="center">
-                <label value="Last block height:" style="text-align:right" />
-                <textbox id="lastBlockHeightFactor" value="-1" />
+                <textbox id="lastBlockHeightFactor" type="number" readonly="true" style="text-align:right" value="-1" />
+                <label value="x last block height" style="text-align:left" />
               </row>
               <row align="center">
-                <label value="Number of holes:" style="text-align:right" />
-                <textbox id="numHolesFactor" value="-4" />
+                <textbox id="numHolesFactor" type="number" readonly="true" style="text-align:right" value="-4" />
+                <label value="x number of holes" style="text-align:left" />
               </row>
               <row align="center">
-                <label value="Number of lines:" style="text-align:right" />
-                <textbox id="numLinesFactor" value="0" />
+                <textbox id="numSinglesFactor" type="number" readonly="true" style="text-align:right" value="1" />
+                <label value="x number of single lines" style="text-align:left" />
               </row>
               <row align="center">
-                <label value="Number of single:" style="text-align:right" />
-                <textbox id="numSinglesFactor" value="1" />
+                <textbox id="numDoublesFactor" type="number" readonly="true" style="text-align:right" value="2" />
+                <label value="x number of double lines" style="text-align:left" />
               </row>
               <row align="center">
-                <label value="Number of double lines:" style="text-align:right" />
-                <textbox id="numDoublesFactor" value="2" />
+                <textbox id="numTriplesFactor" type="number" readonly="true" style="text-align:right" value="4" />
+                <label value="x number of triple lines" style="text-align:left" />
               </row>
               <row align="center">
-                <label value="Number of triple lines:" style="text-align:right" />
-                <textbox id="numTriplesFactor" value="4" />
+                <textbox id="numTetrisesFactor" type="number" readonly="true" style="text-align:right" value="8" />
+                <label value="x number of tetrises" style="text-align:left" />
               </row>
               <row align="center">
-                <label value="Number of tetrises:" style="text-align:right" />
-                <textbox id="numTetrisesFactor" value="8" />
+                <textbox id="numLinesFactor" type="number" readonly="true" style="text-align:right" value="0" />
+                <label value="x total number of lines" style="text-align:left" />
               </row>
             </rows>
           </grid>
+          <hbox align="center">
+            <label value="Current game state score:"/>
+            <textbox id="gameStateScore" readonly="true" value="0" width="40" />
+          </hbox>
         </groupbox>
       </groupbox>
     </vbox>
@@ -133,5 +138,5 @@
       <tetris id="tetris0" flex="0" numfutureblocks="4" keyboardenabled="true" numrows="20" numcolumns="10" />
     </hbox>
   </hbox>
-  <!--<textbox id="loggingTextbox" value="Log messages appear here." multiline="true" flex="1" rows="4" readonly="true" style="background-color:white" />-->
+  <textbox id="loggingTextbox" value="Log messages appear here." multiline="true" flex="1" rows="4" readonly="true" style="background-color:white" />
 </window>
