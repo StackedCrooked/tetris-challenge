@@ -11,18 +11,29 @@ namespace Tetris
     
     static int GetIntervalMs(int inNumMovesPerSecond)
     {
-        Assert(inNumMovesPerSecond != 0);
+        if (inNumMovesPerSecond <= 0)
+        {
+            return 1;
+        }
         return static_cast<int>(0.5 + 1000.0 / static_cast<float>(inNumMovesPerSecond != 0 ? inNumMovesPerSecond : 1));
     }
 
 
     BlockMover::BlockMover(Protected<Game> & inGame, int inNumMovesPerSecond) :
         mGame(inGame),
-        mTimer(GetIntervalMs(inNumMovesPerSecond), GetIntervalMs(inNumMovesPerSecond)),
+        mTimer(),
         mStatus(Status_Ok)
     {
+        mTimer.reset(new Poco::Timer(GetIntervalMs(inNumMovesPerSecond), GetIntervalMs(inNumMovesPerSecond)));
         Poco::TimerCallback<BlockMover> callback(*this, &BlockMover::onTimer);
-        mTimer.start(callback);
+        mTimer->start(callback);
+    }
+
+
+    BlockMover::~BlockMover()
+    {
+        mTimer->stop();
+        mTimer.reset();
     }
 
 
@@ -34,8 +45,10 @@ namespace Tetris
 
     void BlockMover::setSpeed(int inNumMovesPerSecond)
     {
-        Assert(inNumMovesPerSecond != 0);
-        mTimer.setPeriodicInterval(GetIntervalMs(inNumMovesPerSecond));
+        if (inNumMovesPerSecond > 0)
+        {
+            mTimer->setPeriodicInterval(GetIntervalMs(inNumMovesPerSecond));
+        }
     }
 
 
