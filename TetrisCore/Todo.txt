@@ -1,9 +1,9 @@
-- Add AI movement speed parameter.
+
 - SpinButton -> implement range (block mover speed!)
-- Add checkbox to have the AI drop it's blocks instead of moving down.
 - Implement level increment (doesn't work currently)
 - Use Tetris icon on the exe file.
 - False positives of: "Failed to move the blocks in time"
+v Add AI movement speed parameter.
 v Use up/down control for modifying AI parameters.
 v Implement various selectable "Strategies" for AI
 v Add the tetris icon to the credits section (about dialog)

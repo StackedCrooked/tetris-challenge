@@ -25,6 +25,7 @@ namespace Tetris
 
     void TimedGame::onTimerEvent(Poco::Timer & inTimer)
     {
+        int level = 0;
         // Scoped lock
         {
             ScopedAtom<Game> game(mThreadSafeGame);
@@ -32,8 +33,14 @@ namespace Tetris
             {
                 game->move(Direction_Down);
             }
+            level = game->currentNode()->state().stats().numLines() / 10;
         }
-        mTimer.setPeriodicInterval(sIntervals[mLevel]);
+
+        if (level > mLevel)
+        {
+            mLevel = level;
+            mTimer.setPeriodicInterval(sIntervals[mLevel]);
+        }
     }
 
 
