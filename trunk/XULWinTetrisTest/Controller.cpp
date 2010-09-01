@@ -471,10 +471,11 @@ namespace Tetris
             int remainingTime = game.numRows();
             if (blockOffset == 0)
             {
-                remainingTime = calculateRemainingTimeMs(game) / 2;
+                remainingTime = calculateRemainingTimeMs(game) - 1500;
                 if (remainingTime <= 0)
                 {
-                    game.drop();
+                    // We have very little time to make our move.
+                    // Let's cross our fingers.
                     remainingTime = calculateRemainingTimeMs(game) / 2;
                     Assert(remainingTime > 0 || game.isGameOver());
                 }

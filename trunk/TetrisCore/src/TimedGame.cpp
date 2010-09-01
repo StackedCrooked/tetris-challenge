@@ -60,6 +60,7 @@ namespace Tetris
     void TimedGame::setLevel(int inLevel)
     {
         mLevel = std::min<int>(inLevel, sIntervalCount - 1);
+        mTimer.setPeriodicInterval(sIntervals[mLevel]);
     }
 
 
