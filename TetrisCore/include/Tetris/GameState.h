@@ -49,7 +49,8 @@ namespace Tetris
                 mNumSingles(0),
                 mNumDoubles(0),
                 mNumTriples(0),
-                mNumTetrises(0)
+                mNumTetrises(0),
+                mFirstOccupiedRow(0)
             {
             }
 
@@ -69,6 +70,9 @@ namespace Tetris
 
             inline int numTetrises() const
             { return mNumTetrises; }
+
+            inline int firstOccupiedRow() const
+            { return mFirstOccupiedRow; }
 
             // Use zero based index!
             inline int numLines(size_t idx) const
@@ -91,6 +95,7 @@ namespace Tetris
             int mNumDoubles;
             int mNumTriples;
             int mNumTetrises;
+            int mFirstOccupiedRow;
         };
 
         const Stats & stats() const;

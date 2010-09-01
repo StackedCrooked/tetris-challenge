@@ -5,7 +5,10 @@
 #ifdef _DEBUG
 #include "Poco/Debugger.h"
 #else
+#ifndef NDEBUG
 #include <sstream>
+#include <stdexcept>
+#endif
 #endif
 
 
@@ -13,10 +16,17 @@
 #include <string>
 
 
-#ifndef NDEBUG
+#ifdef _DEBUG
 #define Assert(condition) if (!(condition)) { Poco::Debugger::enter(__FILE__, __LINE__); }
-#else
+#elif NDEBUG
 #define Assert(...)
+#else
+#define Assert(condition) \
+    if (!(condition) \
+    { \
+        std::stringstream ss; \
+        throw std::logic_error(ss << __FILE__ << ":" << __LINE__); \
+    }
 #endif
 
 

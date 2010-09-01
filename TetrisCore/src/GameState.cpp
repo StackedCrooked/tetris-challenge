@@ -14,6 +14,7 @@ namespace Tetris
         mOriginalBlock(BlockType_L, Rotation(0), Row(0), Column(0)),
         mQuality()
     {
+        mStats.mFirstOccupiedRow = inNumRows;
     }
 
 
@@ -126,7 +127,13 @@ namespace Tetris
             {
                 if (grid.get(r, c) != BlockType_Nil)
                 {
-                    mGrid.set(inBlock.row() + r, inBlock.column() + c, inBlock.type());
+                    int gridRow = inBlock.row() + r;
+                    int gridCol = inBlock.column() + c;
+                    mGrid.set(gridRow, gridCol, inBlock.type());
+                    if (gridRow < mStats.mFirstOccupiedRow)
+                    {
+                        mStats.mFirstOccupiedRow = gridRow;
+                    }
                 }
             }
         }
@@ -167,6 +174,8 @@ namespace Tetris
             return;
         }
 
+        Assert(mStats.mFirstOccupiedRow + numLines <= mGrid.numRows());
+        mStats.mFirstOccupiedRow += numLines;
         
         BlockTypes newData(mGrid.data().size(), BlockType_Nil);
         

@@ -76,7 +76,31 @@ namespace Tetris
         void onRefresh();
 
     private:
+        template<class T>
+        T * findComponentById(const std::string & inId)
+        {
+            if (XULWin::Element * element = mRootElement->getElementById(inId))
+            {
+                if (T * comp = element->component()->downcast<T>())
+                {
+                    return comp;
+                }
+                else
+                {
+                    LogError("Element with id '" + inId + "' was found but it was not of the requested type.");
+                    return 0;
+                }
+            }
+            else
+            {
+                LogWarning("Element with id '" + inId + "' not found.");
+            }
+            return 0;
+        }
+
+        int calculateRemainingTimeMs(Game & game) const;
         void startAI(Game & game, size_t inDepth);
+        
         
         LRESULT onNew(WPARAM wParam, LPARAM lParam);
         LRESULT onQuit(WPARAM wParam, LPARAM lParam);

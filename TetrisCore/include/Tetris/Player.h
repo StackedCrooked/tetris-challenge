@@ -4,6 +4,7 @@
 
 #include "Tetris/GameStateNode.h"
 #include "Tetris/BlockType.h"
+#include "Poco/Stopwatch.h"
 #include <memory>
 #include <vector>
 #include <boost/noncopyable.hpp>
@@ -24,18 +25,33 @@ namespace Tetris
     public:
         Player(std::auto_ptr<GameStateNode> inNode,
                const BlockTypes & inBlockTypes,
-               std::auto_ptr<Evaluator> inEvaluator);
+               std::auto_ptr<Evaluator> inEvaluator,
+               int inTimeLimitMs);
 
         ~Player();
 
-        // You can check if the Player has finished using this call:
         void start();
+
+        int timeRemaining() const;
 
         bool isFinished() const;
 
 		bool isGameOver() const;
 
-        ChildNodePtr result();
+        bool result(ChildNodePtr & outChild);
+
+        enum Status 
+        {
+            Status_Null,
+            Status_Calculating,
+            Status_Finished,
+            Status_TimeExpired,
+            Status_Destructing
+        };
+
+        Status getStatus() const;
+
+        void setStatus(Status inStatus);
 
     private:
         void startImpl();
@@ -48,8 +64,11 @@ namespace Tetris
         ChildNodePtr mEndNode;
         BlockTypes mBlockTypes;
         boost::scoped_ptr<Evaluator> mEvaluator;
-        volatile bool mIsFinished;
-        volatile bool mStop;
+        int mTimeLimitMs;
+        Status mStatus;
+        mutable boost::mutex mStatusMutex;
+        boost::scoped_ptr<Poco::Stopwatch> mStopwatch;
+        mutable boost::mutex mStopwatchMutex;
         boost::scoped_ptr<boost::thread> mThread;
     };
 

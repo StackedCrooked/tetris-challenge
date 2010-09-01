@@ -45,6 +45,12 @@ namespace Tetris
     }
 
 
+    float TimedGame::currentSpeed() const
+    {
+        return 1000.0 / static_cast<float>(sIntervals[mLevel]);
+    }
+
+
     int TimedGame::level() const
     {
         return mLevel;

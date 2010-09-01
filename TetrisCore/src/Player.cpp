@@ -49,31 +49,57 @@ namespace Tetris
 
     Player::Player(std::auto_ptr<GameStateNode> inNode,
                    const BlockTypes & inBlockTypes,
-                   std::auto_ptr<Evaluator> inEvaluator) :
+                   std::auto_ptr<Evaluator> inEvaluator,
+                   int inTimeLimitMs) :
         mNode(inNode.release()),
         mEndNode(),
         mBlockTypes(inBlockTypes),
         mEvaluator(inEvaluator),
-        mIsFinished(false),
-        mStop(false),
+        mTimeLimitMs(inTimeLimitMs),
+        mStatus(Status_Null),
         mThread()
     {
         Assert(!mNode->state().isGameOver());
         Assert(mNode->children().empty());
+        mStopwatch.reset(new Poco::Stopwatch);
+        mStopwatch->start();
     }
 
 
     Player::~Player()
     {
-        mStop = true;
+        setStatus(Status_Destructing);
         mThread->join();
+    }
+
+
+    Player::Status Player::getStatus() const
+    {
+        boost::mutex::scoped_lock lock(mStatusMutex);
+        return mStatus;
+    }
+
+
+    void Player::setStatus(Status inStatus)
+    {
+        boost::mutex::scoped_lock lock(mStatusMutex);
+        mStatus = inStatus;
     }
 
 
     void Player::populateNodesRecursively(GameStateNode & ioNode, const BlockTypes & inBlockTypes, size_t inDepth)
     {
-        if (mStop)
+        Status status = getStatus();
+        if (status == Status_Destructing)
         {
+            return;
+        }
+
+        
+        int remainingTime = timeRemaining();
+        if (remainingTime <= 1000)
+        {
+            setStatus(Status_TimeExpired);
             return;
         }
 
@@ -120,7 +146,7 @@ namespace Tetris
         
     bool Player::isFinished() const
     {
-        return mIsFinished;
+        return getStatus() == Status_Finished;;
     }
 
 
@@ -134,10 +160,23 @@ namespace Tetris
     }
 
 
-    ChildNodePtr Player::result()
+    bool Player::result(ChildNodePtr & outChild)
     {
-        Assert(!mNode->children().empty());
-        return *mNode->children().begin();
+        if (!mNode->children().empty())
+        {
+            outChild = *mNode->children().begin();
+            return true;
+        }
+        return false;
+    }
+    
+    
+    int Player::timeRemaining() const
+    {
+        boost::mutex::scoped_lock lock(mStopwatchMutex);
+        int elapsedMs = static_cast<int>((mStopwatch->elapsed() / static_cast<Poco::Timestamp::TimeDiff>(1000)));
+        int timeRemaining = mTimeLimitMs - elapsedMs;
+        return timeRemaining;
     }
 
 
@@ -161,7 +200,7 @@ namespace Tetris
             {
                 DestroyInferiorChildren(*mNode, *mEndNode);
             }
-            mIsFinished = true;
+            setStatus(Status_Finished);
         } 
         catch (const std::exception & inException)
         {
