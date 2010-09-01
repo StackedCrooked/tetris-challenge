@@ -97,7 +97,7 @@ namespace Tetris
 
         
         int remainingTime = timeRemaining();
-        if (remainingTime <= 1000)
+        if (remainingTime <= 0)
         {
             setStatus(Status_TimeExpired);
             return;
