@@ -1,3 +1,5 @@
+- Add time limit to AI
+- Improve speed of search depth 4
 - SpinButton -> implement range (block mover speed!)
 - Use Tetris icon on the exe file.
 - False positives of: "Failed to move the blocks in time"
