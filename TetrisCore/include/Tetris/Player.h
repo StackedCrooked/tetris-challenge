@@ -34,6 +34,9 @@ namespace Tetris
 
         int timeRemaining() const;
 
+        // Force a timeout.
+        void setTimeExpired();
+
         bool isFinished() const;
 
 		bool isGameOver() const;
