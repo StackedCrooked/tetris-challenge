@@ -439,7 +439,7 @@ namespace Tetris
 
     int Controller::calculateRemainingTimeMs(Game & game) const
     {
-        float numRemainingRows = static_cast<float>(game.currentNode()->state().stats().firstOccupiedRow() - game.activeBlock().row());
+        float numRemainingRows = static_cast<float>(game.currentNode()->state().stats().firstOccupiedRow() - (game.activeBlock().row() + 4));
         float numRowsPerSecond = mTimedGame->currentSpeed();
         float remainingTime = 1000 * numRemainingRows / numRowsPerSecond;
         return static_cast<int>(0.5 + remainingTime);
@@ -458,6 +458,55 @@ namespace Tetris
             {
                 blockOffset = endNode->depth() - game.currentNode()->depth();
             }
+
+            // If we still have blocks queued, then give the computer 1 second per precalculated block.
+            // Note that this may be a misestimation. However, in that case we can still be saved if
+            // the refresh() method forces a time-out in time using the Player::setTimeExpired() method.
+            int timeLimit = 1000 * blockOffset;
+            if (blockOffset > 0)
+            {
+                BlockTypes futureBlocks_tooMany;
+                game.getFutureBlocks(inDepth + blockOffset, futureBlocks_tooMany);
+
+                BlockTypes futureBlocks;
+                for (size_t idx = blockOffset; idx != futureBlocks_tooMany.size(); ++idx)
+                {
+                    futureBlocks.push_back(futureBlocks_tooMany[idx]);
+                }
+                mComputerPlayer.reset(new Player(endNode, futureBlocks, mEvaluator->clone(), timeLimit));
+                mComputerPlayer->start();
+                return;
+            }
+
+
+            //
+            // We don't have any blocks queued so we have to be very time aware.
+            //
+            int remainingTimeMs = calculateRemainingTimeMs(game);
+            if (remainingTimeMs < 1000)
+            {
+                if (remainingTimeMs > 500)
+                {
+                    inDepth = 2;
+                }
+                else
+                {
+                    inDepth = 1;
+                }
+            }
+
+            // We need to start moving before we run out of time!
+            timeLimit = remainingTimeMs - 500;
+
+            // We don't even have 500 ms to make our move.
+            // This will probably end bad, but we can't always win.
+            // Just give it 1 ms. We'll see what it gives.
+            if (timeLimit < 0)
+            {
+                // Just use a dummy value.
+                timeLimit = 1;
+            }
+            
             BlockTypes futureBlocks_tooMany;
             game.getFutureBlocks(inDepth + blockOffset, futureBlocks_tooMany);
 
@@ -466,25 +515,9 @@ namespace Tetris
             {
                 futureBlocks.push_back(futureBlocks_tooMany[idx]);
             }
-            Assert(endNode->depth() == game.endNode()->depth());
 
-            int remainingTime = game.numRows();
-            if (blockOffset == 0)
-            {
-                remainingTime = calculateRemainingTimeMs(game) - 1500;
-                if (remainingTime <= 0)
-                {
-                    // We have very little time to make our move.
-                    // Let's cross our fingers.
-                    remainingTime = calculateRemainingTimeMs(game) / 2;
-                    Assert(remainingTime > 0 || game.isGameOver());
-                }
-            }
-            if (remainingTime > 0)
-            {
-                mComputerPlayer.reset(new Player(endNode, futureBlocks, mEvaluator->clone(), remainingTime));
-                mComputerPlayer->start();
-            }
+            mComputerPlayer.reset(new Player(endNode, futureBlocks, mEvaluator->clone(), timeLimit));
+            mComputerPlayer->start();
         }
     }
 
@@ -515,24 +548,35 @@ namespace Tetris
             return;
         }
 
-        // Check if the computer player has finished. If yes, then get the results.
-        if (mComputerPlayer && mComputerPlayer->isFinished())
+        
+        if (mComputerPlayer)
         {
-            // Did we manage to think all our moves before the block was dropped?
-            GameStateNode * endNode = game.endNode();
-            ChildNodePtr resultNode;
-            if (mComputerPlayer->result(resultNode))
+            // Check if the computer player has finished. If yes, then get the results.
+            if (mComputerPlayer->isFinished())
             {
-                if (resultNode->depth() == endNode->depth() + 1)
+                // Did we manage to think all our moves before the block was dropped?
+                GameStateNode * endNode = game.endNode();
+                ChildNodePtr resultNode;
+                if (mComputerPlayer->result(resultNode))
                 {
-                    endNode->addChild(resultNode);
+                    if (resultNode->depth() == endNode->depth() + 1)
+                    {
+                        endNode->addChild(resultNode);
+                    }
                 }
+                mComputerPlayer.reset();
             }
+            // Else check if there is any danger of crashing the current block.
             else
             {
-                LogInfo("Failed");
+                int remainingTimeMs = calculateRemainingTimeMs(game);
+
+                // Panic! Stop the computer player now or we won't make it!
+                if (remainingTimeMs < 1000)
+                {
+                    mComputerPlayer->setTimeExpired();
+                }
             }
-            mComputerPlayer.reset();
         }
 
 
@@ -548,7 +592,7 @@ namespace Tetris
         }
 
                 
-        if (mComputerEnabledCheckBox->isChecked() && !mComputerPlayer)
+        if (!mComputerPlayer && mComputerEnabledCheckBox->isChecked())
         {
             int searchDepth = XULWin::String2Int(mSearchDepth->getValue(), 2);
             GameStateNode * endNode = game.endNode();

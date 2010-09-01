@@ -90,7 +90,7 @@ namespace Tetris
     void Player::populateNodesRecursively(GameStateNode & ioNode, const BlockTypes & inBlockTypes, size_t inDepth)
     {
         Status status = getStatus();
-        if (status == Status_Destructing)
+        if (status == Status_Destructing || status == Status_TimeExpired)
         {
             return;
         }
@@ -206,6 +206,12 @@ namespace Tetris
     }
 
 
+    void Player::setTimeExpired()
+    {
+        setStatus(Status_TimeExpired);
+    }
+
+
     void Player::start()
     {
         Assert(!mThread);
@@ -221,6 +227,7 @@ namespace Tetris
         // Thread entry point has try/catch block
         try
         {
+            setStatus(Status_Calculating);
             populateNodesRecursively(*mNode, mBlockTypes, 0);
             if (mEndNode)
             {
