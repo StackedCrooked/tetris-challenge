@@ -21,28 +21,6 @@
 namespace Tetris
 {
 
-    template<class T>
-    T * FindComponentById(XULWin::Element * inElement, const std::string & inId)
-    {
-        if (XULWin::Element * inEl = inElement->getElementById(inId))
-        {
-            if (T * comp = inEl->component()->downcast<T>())
-            {
-                return comp;
-            }
-            else
-            {
-                LogError("Element with id '" + inId + "' was found but it was not of the requested type.");
-                return 0;
-            }
-        }
-        else
-        {
-            LogWarning("Element with id '" + inId + "' not found.");
-        }
-        return 0;
-    }
-
     Controller::Controller(HINSTANCE hInstance) :
         mXULRunner(hInstance),
         mRootElement(),
@@ -118,7 +96,7 @@ namespace Tetris
         //
         // Get the Tetris component.
         //
-        if (!(mTetrisComponent = FindComponentById<Tetris::TetrisComponent>(mRootElement.get(), "tetris0")))
+        if (!(mTetrisComponent = findComponentById<Tetris::TetrisComponent>("tetris0")))
         {
             throw std::runtime_error("The XUL document must contain a <tetris> element with id \"tetris0\".");
         }
@@ -209,13 +187,13 @@ namespace Tetris
             }            
         }
 
-        if (mSearchDepth = FindComponentById<XULWin::SpinButton>(mRootElement.get(), "searchDepth"))
+        if (mSearchDepth = findComponentById<XULWin::SpinButton>("searchDepth"))
         {
             XULWin::WinAPI::SpinButton_SetRange(mSearchDepth->handle(), 1, 4);
         }
         
         
-        if (mMovementSpeed = FindComponentById<XULWin::SpinButton>(mRootElement.get(), "movementSpeed"))
+        if (mMovementSpeed = findComponentById<XULWin::SpinButton>("movementSpeed"))
         {            
             XULWin::WinAPI::SpinButton_SetRange(mMovementSpeed->handle(), 1, 100);
         }
@@ -258,35 +236,28 @@ namespace Tetris
             }
         }
 
-        mGameHeightFactor = FindComponentById<XULWin::SpinButton>(mRootElement.get(), "gameHeightFactor");
-        mLastBlockHeightFactor = FindComponentById<XULWin::SpinButton>(mRootElement.get(), "lastBlockHeightFactor");
-        mNumHolesFactor = FindComponentById<XULWin::SpinButton>(mRootElement.get(), "numHolesFactor");
-        mNumLinesFactor = FindComponentById<XULWin::SpinButton>(mRootElement.get(), "numLinesFactor");
-        mNumSinglesFactor = FindComponentById<XULWin::SpinButton>(mRootElement.get(), "numSinglesFactor");
-        mNumDoublesFactor = FindComponentById<XULWin::SpinButton>(mRootElement.get(), "numDoublesFactor");
-        mNumTriplesFactor = FindComponentById<XULWin::SpinButton>(mRootElement.get(), "numTriplesFactor");
-        mNumTetrisesFactor = FindComponentById<XULWin::SpinButton>(mRootElement.get(), "numTetrisesFactor");
-        mGameStateScore = FindComponentById<XULWin::TextBox>(mRootElement.get(), "gameStateScore");
+        mGameHeightFactor = findComponentById<XULWin::SpinButton>("gameHeightFactor");
+        mLastBlockHeightFactor = findComponentById<XULWin::SpinButton>("lastBlockHeightFactor");
+        mNumHolesFactor = findComponentById<XULWin::SpinButton>("numHolesFactor");
+        mNumLinesFactor = findComponentById<XULWin::SpinButton>("numLinesFactor");
+        mNumSinglesFactor = findComponentById<XULWin::SpinButton>("numSinglesFactor");
+        mNumDoublesFactor = findComponentById<XULWin::SpinButton>("numDoublesFactor");
+        mNumTriplesFactor = findComponentById<XULWin::SpinButton>("numTriplesFactor");
+        mNumTetrisesFactor = findComponentById<XULWin::SpinButton>("numTetrisesFactor");
+        mGameStateScore = findComponentById<XULWin::TextBox>("gameStateScore");
+        mStatusTextBox = findComponentById<XULWin::TextBox>("statusTextBox");
 
-        if (XULWin::Element * el = mRootElement->getElementById("statusTextBox"))
-        {
-            if (!(mStatusTextBox = el->component()->downcast<XULWin::TextBox>()))
-            {
-                LogWarning("The 'status' textbox was not found in the XUL document.");
-            }
-        }
-
-        if (XULWin::MenuItem * newMenuItem = FindComponentById<XULWin::MenuItem>(mRootElement.get(), "newMenuItem"))
+        if (XULWin::MenuItem * newMenuItem = findComponentById<XULWin::MenuItem>("newMenuItem"))
         {
             mScopedEventListener.connect(newMenuItem->el(), boost::bind(&Controller::onNew, this, _1, _2));
         }
 
-        if (XULWin::MenuItem * quitMenuItem = FindComponentById<XULWin::MenuItem>(mRootElement.get(), "quitMenuItem"))
+        if (XULWin::MenuItem * quitMenuItem = findComponentById<XULWin::MenuItem>("quitMenuItem"))
         {
             mScopedEventListener.connect(quitMenuItem->el(), boost::bind(&Controller::onQuit, this, _1, _2));
         }
 
-        if (XULWin::MenuItem * aboutMenuItem = FindComponentById<XULWin::MenuItem>(mRootElement.get(), "aboutMenuItem"))
+        if (XULWin::MenuItem * aboutMenuItem = findComponentById<XULWin::MenuItem>("aboutMenuItem"))
         {
             mScopedEventListener.connect(aboutMenuItem->el(), boost::bind(&Controller::onAboutMenuItem, this, _1, _2));
         }
@@ -466,6 +437,15 @@ namespace Tetris
     }
 
 
+    int Controller::calculateRemainingTimeMs(Game & game) const
+    {
+        float numRemainingRows = static_cast<float>(game.currentNode()->state().stats().firstOccupiedRow() - game.activeBlock().row());
+        float numRowsPerSecond = mTimedGame->currentSpeed();
+        float remainingTime = 1000 * numRemainingRows / numRowsPerSecond;
+        return static_cast<int>(0.5 + remainingTime);
+    }
+
+
     void Controller::startAI(Game & game, size_t inDepth)
     {
         Assert(!mComputerPlayer);
@@ -487,8 +467,23 @@ namespace Tetris
                 futureBlocks.push_back(futureBlocks_tooMany[idx]);
             }
             Assert(endNode->depth() == game.endNode()->depth());
-            mComputerPlayer.reset(new Player(endNode, futureBlocks, mEvaluator->clone()));
-            mComputerPlayer->start();
+
+            int remainingTime = game.numRows();
+            if (blockOffset == 0)
+            {
+                remainingTime = calculateRemainingTimeMs(game) / 2;
+                if (remainingTime <= 0)
+                {
+                    game.drop();
+                    remainingTime = calculateRemainingTimeMs(game) / 2;
+                    Assert(remainingTime > 0 || game.isGameOver());
+                }
+            }
+            if (remainingTime > 0)
+            {
+                mComputerPlayer.reset(new Player(endNode, futureBlocks, mEvaluator->clone(), remainingTime));
+                mComputerPlayer->start();
+            }
         }
     }
 
@@ -524,10 +519,17 @@ namespace Tetris
         {
             // Did we manage to think all our moves before the block was dropped?
             GameStateNode * endNode = game.endNode();
-            ChildNodePtr resultNode = mComputerPlayer->result();
-            if (resultNode->depth() == endNode->depth() + 1)
+            ChildNodePtr resultNode;
+            if (mComputerPlayer->result(resultNode))
             {
-                endNode->addChild(resultNode);
+                if (resultNode->depth() == endNode->depth() + 1)
+                {
+                    endNode->addChild(resultNode);
+                }
+            }
+            else
+            {
+                LogInfo("Failed");
             }
             mComputerPlayer.reset();
         }
@@ -596,19 +598,25 @@ namespace Tetris
         {
             std::string status;
             if (mComputerPlayer)
-            {
-                status = "Thinking";
-            }
-            
-            if (mBlockMover)
-            {
-                if (!status.empty())
+            {            
+                if (!mBlockMover)
                 {
-                    status += " + ";
+                    status = "Moving in maximum ";
+                    int remainingSeconds = static_cast<int>(0.5 + (static_cast<float>(mComputerPlayer->timeRemaining()) / 1000.0));
+                    if (remainingSeconds >= 0 && !status.empty())
+                    {
+                        status += boost::lexical_cast<std::string>(remainingSeconds) + " seconds.";
+                    }
                 }
-                status += "Moving";
-            }
-            
+                else
+                {
+                    if (!status.empty())
+                    {
+                        status += " + ";
+                    }
+                    status += "Moving.";
+                }
+            }            
             mStatusTextBox->setValue(status.empty() ? "Inactive" : status);
         }
 
