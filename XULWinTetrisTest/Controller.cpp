@@ -213,7 +213,12 @@ namespace Tetris
         {
             XULWin::WinAPI::SpinButton_SetRange(mSearchDepth->handle(), 1, 4);
         }
-        mMovementSpeed = FindComponentById<XULWin::SpinButton>(mRootElement.get(), "movementSpeed");
+        
+        
+        if (mMovementSpeed = FindComponentById<XULWin::SpinButton>(mRootElement.get(), "movementSpeed"))
+        {            
+            XULWin::WinAPI::SpinButton_SetRange(mMovementSpeed->handle(), 1, 100);
+        }
 
 
         if (XULWin::Element * el = mRootElement->getElementById("movesAheadTextBox"))
@@ -554,7 +559,6 @@ namespace Tetris
 
         if (mMovementSpeed && mBlockMover)
         {
-            XULWin::WinAPI::SpinButton_SetRange(mMovementSpeed->handle(), 1, 100);
             mBlockMover->setSpeed(XULWin::String2Int(mMovementSpeed->getValue(), 1));
         }
 
