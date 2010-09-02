@@ -2,6 +2,7 @@
 #define THREADING_H_INCLUDED
 
 
+#include "Tetris/ErrorHandling.h"
 #include <memory>
 #include <boost/thread.hpp>
 
@@ -18,7 +19,7 @@ namespace Tetris
         }
 
         boost::scoped_ptr<Variable> mVariable;
-        mutable boost::mutex mMutex;
+        mutable boost::timed_mutex mMutex;
     };
 
     // Forward declaration.
@@ -45,6 +46,9 @@ namespace Tetris
         {
         }
 
+        boost::timed_mutex & getMutex() const
+        { return mVariableWithMutex->mMutex; }
+
     private:
         friend class ScopedAtom<Variable>;
         friend class ScopedConstAtom<Variable>;
@@ -60,6 +64,17 @@ namespace Tetris
             mLock(inProtectedVariable.mVariableWithMutex->mMutex),
             mVariable(inProtectedVariable.mVariableWithMutex->mVariable.get())
         {
+
+        }
+
+        ScopedAtom(Protected<Variable> & inProtectedVariable, int inTimeoutMs) :
+            mLock(inProtectedVariable.mVariableWithMutex->mMutex, boost::defer_lock),
+            mVariable(inProtectedVariable.mVariableWithMutex->mVariable.get())
+        {
+            if (!mLock.timed_lock(boost::posix_time::milliseconds(inTimeoutMs)))
+            {
+                throw std::runtime_error("Lock timeout.");
+            }
         }
 
         Variable * get()
@@ -68,7 +83,7 @@ namespace Tetris
         Variable * operator->()
         { return mVariable; }
     private:
-        boost::mutex::scoped_lock mLock;
+        boost::timed_mutex::scoped_lock mLock;
         Variable * mVariable;
     };
 
@@ -83,13 +98,23 @@ namespace Tetris
         {
         }
 
+        ScopedConstAtom(Protected<Variable> & inProtectedVariable, int inTimeoutMs) :
+            mLock(inProtectedVariable.mVariableWithMutex->mMutex, boost::defer_lock),
+            mVariable(inProtectedVariable.mVariableWithMutex->mVariable.get())
+        {
+            if (!mLock.timed_lock(boost::posix_time::milliseconds(inTimeoutMs)))
+            {
+                throw std::runtime_error("Lock timeout.");
+            }
+        }
+
         const Variable * get() const
         { return mVariable; }
 
         const Variable * operator->() const
         { return mVariable; }
     private:
-        boost::mutex::scoped_lock mLock;
+        boost::timed_mutex::scoped_lock mLock;
         const Variable * mVariable;
     };
 

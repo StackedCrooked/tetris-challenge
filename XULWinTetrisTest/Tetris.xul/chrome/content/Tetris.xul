@@ -77,14 +77,14 @@
             <row align="center">
               <label value="Search depth:" style="text-align:right" />
               <hbox align="center">
-                <textbox id="searchDepth" type="number" readonly="true" style="text-align:right" value="4" />
+                <textbox id="searchDepth" type="number" readonly="true" style="text-align:right" value="3" />
                 <spacer flex="1" />
               </hbox>
             </row>
             <row align="center">
               <label value="Move speed:" style="text-align:right" />
               <hbox align="center">
-                <textbox id="movementSpeed" type="number" readonly="true" style="text-align:right" value="20" />
+                <textbox id="movementSpeed" type="number" readonly="true" style="text-align:right" value="100" />
                 <label value="moves/s" />
               </hbox>
             </row>
@@ -145,5 +145,5 @@
       <tetris id="tetris0" flex="0" numfutureblocks="4" keyboardenabled="true" numrows="20" numcolumns="10" />
     </hbox>
   </hbox>
-  <!--<textbox id="loggingTextbox" value="Log messages appear here." multiline="true" flex="1" rows="4" readonly="true" style="background-color:white" />-->
+  <textbox id="loggingTextbox" value="Log messages appear here." multiline="true" flex="1" rows="4" readonly="true" style="background-color:white" />
 </window>

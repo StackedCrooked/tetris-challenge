@@ -3,7 +3,7 @@
     // 2 ~BlockMover calls Timer::stop. The timer waits for BlockMover::move() to finish
     // 3 BlockMover::move() waits for Controller::refresh() to finish.
 
-
+- Fix stack overflow when deleting a node that goes very deep.
 - Specifying a time limit should be non-intrusive.
 - Improve speed of search depth 4
 - SpinButton -> implement range (block mover speed!)
