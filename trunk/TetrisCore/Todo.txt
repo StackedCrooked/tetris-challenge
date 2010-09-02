@@ -1,14 +1,11 @@
-- Fix deadlock issue in BlockMover:
-    // 1 Controller::refresh calls ~BlockMover
-    // 2 ~BlockMover calls Timer::stop. The timer waits for BlockMover::move() to finish
-    // 3 BlockMover::move() waits for Controller::refresh() to finish.
-
+- Use shared_lock for threads that don't modify the game state (Controller::refresh for example)
 - Fix stack overflow when deleting a node that goes very deep.
-- Specifying a time limit should be non-intrusive.
+- Player class: specifying a time limit should be non-intrusive. Use a Concept (or Decorator).
 - Improve speed of search depth 4
 - SpinButton -> implement range (block mover speed!)
 - Use Tetris icon on the exe file.
 - False positives of: "Failed to move the blocks in time"
+v Fix deadlock issue in BlockMover:
 v Implement level increment (doesn't work currently)
 v Add AI movement speed parameter.
 v Use up/down control for modifying AI parameters.
