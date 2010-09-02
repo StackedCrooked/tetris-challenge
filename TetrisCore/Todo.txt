@@ -1,4 +1,5 @@
-- Add time limit to AI
+- Fix timer issues in BlockMover
+- Specifying a time limit should be non-intrusive.
 - Improve speed of search depth 4
 - SpinButton -> implement range (block mover speed!)
 - Use Tetris icon on the exe file.
