@@ -189,7 +189,7 @@ namespace Tetris
 
         if (mSearchDepth = findComponentById<XULWin::SpinButton>("searchDepth"))
         {
-            XULWin::WinAPI::SpinButton_SetRange(mSearchDepth->handle(), 1, 4);
+            XULWin::WinAPI::SpinButton_SetRange(mSearchDepth->handle(), 1, cMaxSearchDepth);
         }
         
         
@@ -582,7 +582,7 @@ namespace Tetris
 
         if (mLevelTextBox && mTimedGame)
         {
-            mLevelTextBox->setValue(MakeString() << mTimedGame->level());
+            mLevelTextBox->setValue(MakeString() << mTimedGame->getLevel());
         }
 
 

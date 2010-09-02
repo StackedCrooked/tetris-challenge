@@ -114,7 +114,7 @@
           </columns>
           <rows>
             <row align="center">
-              <textbox id="numHolesFactor" type="number" readonly="true" style="text-align:right" value="-1" />
+              <textbox id="numHolesFactor" type="number" readonly="true" style="text-align:right" value="-2" />
               <label value="number of holes" style="text-align:left" />
               <textbox id="numSinglesFactor" type="number" readonly="true" style="text-align:right" value="0" />
               <label value="number of single lines" style="text-align:left" />

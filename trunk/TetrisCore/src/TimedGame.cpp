@@ -1,4 +1,5 @@
 #include "Tetris/TimedGame.h"
+#include "Tetris/Logger.h"
 #include "Tetris/Game.h"
 
 
@@ -13,53 +14,62 @@ namespace Tetris
         100, 84, 84, 67, 67, 50
     };
 
-    static const int sIntervalCount = sizeof(sIntervals)/sizeof(int);
+    static const int cMaxLevel = sizeof(sIntervals)/sizeof(int) - 1;
 
     TimedGame::TimedGame(const Protected<Game> & inThreadSafeGame) :
         mThreadSafeGame(inThreadSafeGame),
         mLevel(0)
     {
         mTimer.start(Poco::TimerCallback<TimedGame>(*this, &TimedGame::onTimerEvent));
-        mTimer.setPeriodicInterval(sIntervals[mLevel]);
+        mTimer.setPeriodicInterval(sIntervals[getLevel()]);
     }
 
 
     void TimedGame::onTimerEvent(Poco::Timer & inTimer)
     {
-        int level = 0;
-        // Scoped lock
+        try
         {
-            ScopedAtom<Game> game(mThreadSafeGame);
-            if (!game->isGameOver())
+            int level = 0;
+            // Scoped lock
             {
-                game->move(Direction_Down);
+                ScopedAtom<Game> game(mThreadSafeGame, 10);
+                if (!game->isGameOver())
+                {
+                    game->move(Direction_Down);
+                }
+                level = game->currentNode()->state().stats().numLines() / 10;
             }
-            level = game->currentNode()->state().stats().numLines() / 10;
-        }
 
-        if (level > mLevel)
+            if (level > getLevel() && level <= cMaxLevel)
+            {
+                setLevel(level);
+                mTimer.setPeriodicInterval(sIntervals[level]);
+            }
+        }
+        catch (const std::exception & inException)
         {
-            mLevel = level;
-            mTimer.setPeriodicInterval(sIntervals[mLevel]);
+            LogError(inException.what());
         }
     }
 
 
     float TimedGame::currentSpeed() const
     {
-        return static_cast<float>(1000.0 / static_cast<float>(sIntervals[mLevel]));
+        return static_cast<float>(1000.0 / static_cast<float>(sIntervals[getLevel()]));
     }
 
 
-    int TimedGame::level() const
+    int TimedGame::getLevel() const
     {
+        boost::mutex::scoped_lock lock(mLevelMutex);
         return mLevel;
     }
 
 
     void TimedGame::setLevel(int inLevel)
     {
-        mLevel = std::min<int>(inLevel, sIntervalCount - 1);
+        boost::mutex::scoped_lock lock(mLevelMutex);
+        mLevel = std::min<int>(inLevel, cMaxLevel);
         mTimer.setPeriodicInterval(sIntervals[mLevel]);
     }
 

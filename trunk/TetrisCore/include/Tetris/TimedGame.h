@@ -4,6 +4,7 @@
 
 #include "Tetris/Threading.h"
 #include "Poco/Timer.h"
+#include <boost/thread.hpp>
 
 
 namespace Tetris
@@ -18,7 +19,7 @@ namespace Tetris
     public:
         TimedGame(const Protected<Game> & inGame);
 
-        int level() const;
+        int getLevel() const;
 
         // Number of rows per second
         float currentSpeed() const;
@@ -33,6 +34,7 @@ namespace Tetris
 
         Protected<Game> mThreadSafeGame;
         int mLevel;
+        mutable boost::mutex mLevelMutex;
         Poco::Timer mTimer;
     };
 
