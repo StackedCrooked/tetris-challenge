@@ -89,6 +89,9 @@ namespace Tetris
 
     void Player::populateNodesRecursively(GameStateNode & ioNode, const BlockTypes & inBlockTypes, size_t inDepth)
     {
+        //
+        // Check status
+        //
         Status status = getStatus();
         if (status == Status_Destructing || status == Status_TimeExpired)
         {
@@ -96,6 +99,9 @@ namespace Tetris
         }
 
         
+        //
+        // Check remaining time
+        //
         int remainingTime = timeRemaining();
         if (remainingTime <= 0)
         {
@@ -104,6 +110,9 @@ namespace Tetris
         }
 
 
+        //
+        // Check stop condition
+        //
         if (inDepth >= inBlockTypes.size())
         {
             return;
@@ -115,38 +124,21 @@ namespace Tetris
             return;
         }
 
+
+        //
         // Generate the child nodes
+        //
         ChildNodes generatedChildNodes(GameStateComparisonFunctor(mEvaluator->clone()));
         GenerateOffspring(inBlockTypes[inDepth], ioNode, *mEvaluator, generatedChildNodes);
+
+
+        //
+        // Populate ioNode and overwrite mEndNode.
+        //
         ChildNodes::iterator it = generatedChildNodes.begin(), end = generatedChildNodes.end();
-
-
-        // OPTIMIZATION
-        // ------------
-        // We introduce a 'count' variable that heuristically limits the searched branches to the best four child nodes.
-        // Once this is done we continue populating the rest of the children.
-        // This technique will cause the tree to be populated with higher quality nodes first. And this will in turn
-		// improve the quality of time-restrained searches.
-        for (int count = 0; it != end && count != 4; ++it, ++count)
-        {
-            ChildNodePtr child = *it;
-            ioNode.addChild(child);
-            if (inDepth == inBlockTypes.size() - 1)
-            {
-                if (!mEndNode)
-                {
-                    mEndNode = child;
-                }
-                else if (child->state().quality(child->qualityEvaluator()) > mEndNode->state().quality(child->qualityEvaluator()))
-                {
-                    mEndNode = child;
-                }
-            }
-        }
-        // END OPTIMIZATION
-
         for (; it != end; ++it)
         {
+            // Populate io
             ChildNodePtr child = *it;
             ioNode.addChild(child);
             if (inDepth == inBlockTypes.size() - 1)
@@ -162,7 +154,9 @@ namespace Tetris
             }
         }
 
-        // Recursion.
+        //
+        // Recursive call on each child node.
+        //
         for (ChildNodes::iterator it = generatedChildNodes.begin(); it != generatedChildNodes.end(); ++it)
         {
             populateNodesRecursively(**it, inBlockTypes, inDepth + 1);
