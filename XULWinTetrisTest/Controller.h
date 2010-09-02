@@ -35,7 +35,7 @@ namespace Tetris
 #ifndef NDEBUG
         cMaxSearchDepth = 3
 #else
-        cMaxSearchDepth = 4 // more than for results in memory usage of 2+ GB
+        cMaxSearchDepth = 10 // more than for results in memory usage of 2+ GB
 #endif
     };
 
