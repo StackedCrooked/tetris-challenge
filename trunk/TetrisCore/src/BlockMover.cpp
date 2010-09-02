@@ -73,7 +73,7 @@ namespace Tetris
             return;
         }
 
-        ScopedAtom<Game> game(mGame);
+        ScopedAtom<Game> game(mGame, 1000);
         const ChildNodes & children = game->currentNode()->children();
         if (children.empty())
         {
