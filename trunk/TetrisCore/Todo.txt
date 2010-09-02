@@ -2,6 +2,7 @@
 - Fix stack overflow when deleting a node that goes very deep.
 - Player class: specifying a time limit should be non-intrusive. Use a Concept (or Decorator).
 - Improve speed of search depth 4
+- SpinButton -> implement a refresh when keeping the mouse button down
 - SpinButton -> implement range (block mover speed!)
 - Use Tetris icon on the exe file.
 - False positives of: "Failed to move the blocks in time"
