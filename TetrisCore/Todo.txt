@@ -1,3 +1,4 @@
+- BlockMover should only be created once. It should not be destroyed and recreated every time.
 - Consider introducing a memory limit instead of a depth limit.
 - Player class: specifying a time limit should be non-intrusive. Use a Concept (or Decorator).
 - Improve speed of search depth 4
