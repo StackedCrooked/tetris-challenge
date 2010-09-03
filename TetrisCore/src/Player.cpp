@@ -51,7 +51,7 @@ namespace Tetris
                    const BlockTypes & inBlockTypes,
                    std::auto_ptr<Evaluator> inEvaluator,
                    int inTimeLimitMs) :
-        mTreeRows(inBlockTypes.size()),
+        mTreeRows(),
         mNode(inNode.release()),
         mBlockTypes(inBlockTypes),
         mEvaluator(inEvaluator),
@@ -70,96 +70,6 @@ namespace Tetris
     {
         setStatus(Status_Destructing);
         mThread->join();
-    }
-
-
-    Player::Status Player::getStatus() const
-    {
-        boost::mutex::scoped_lock lock(mStatusMutex);
-        return mStatus;
-    }
-
-
-    void Player::setStatus(Status inStatus)
-    {
-        boost::mutex::scoped_lock lock(mStatusMutex);
-        mStatus = inStatus;
-    }
-
-
-    void Player::populateNodesRecursively(GameStateNode & ioNode, const BlockTypes & inBlockTypes, size_t inDepth)
-    {
-        //
-        // Check status
-        //
-        Status status = getStatus();
-        if (status == Status_Destructing || status == Status_TimeExpired)
-        {
-            return;
-        }
-
-        
-        //
-        // Check remaining time
-        //
-        int remainingTime = timeRemaining();
-        if (remainingTime <= 0)
-        {
-            setStatus(Status_TimeExpired);
-            return;
-        }
-
-
-        //
-        // Check stop condition
-        //
-        if (inDepth >= inBlockTypes.size())
-        {
-            return;
-        }
-        
-        if (ioNode.state().isGameOver())
-        {
-            // Game over state has no children.
-            return;
-        }
-
-
-        //
-        // Generate the child nodes
-        //
-        ChildNodes generatedChildNodes(GameStateComparisonFunctor(mEvaluator->clone()));
-        GenerateOffspring(inBlockTypes[inDepth], ioNode, *mEvaluator, generatedChildNodes);
-
-
-        //
-        // Populate ioNode and overwrite results.
-        //
-        {
-            ScopedAtom<TreeRowInfo> scopedTreeRowInfo = mTreeRows[inDepth];
-            TreeRowInfo & rowInfo = *scopedTreeRowInfo.get();
-            ChildNodes::iterator it = generatedChildNodes.begin(), end = generatedChildNodes.end();
-            for (; it != end; ++it)
-            {
-                // Populate io
-                ChildNodePtr child = *it;
-                ioNode.addChild(child);
-                if (!rowInfo.mBestChild || 
-                    child->state().quality(child->qualityEvaluator()) > rowInfo.mBestChild->state().quality(child->qualityEvaluator()))
-                {
-                    rowInfo.mBestChild = child;
-                }
-                rowInfo.mNumItems++;
-            }
-        }
-
-        //
-        // Recursive call on each child node.
-        //
-        for (ChildNodes::iterator it = generatedChildNodes.begin(); it != generatedChildNodes.end(); ++it)
-        {
-            populateNodesRecursively(**it, inBlockTypes, inDepth + 1);
-        }
     }
     
         
@@ -181,7 +91,7 @@ namespace Tetris
 
     bool Player::result(ChildNodePtr & outChild)
     {
-        if (!mNode->children().empty())
+        if (mNode->children().size() == 1)
         {
             outChild = *mNode->children().begin();
             return true;
@@ -205,12 +115,167 @@ namespace Tetris
     }
 
 
-    void Player::start()
+    Player::Status Player::getStatus() const
     {
-        Assert(!mThread);
-        if (!mThread)
+        boost::mutex::scoped_lock lock(mStatusMutex);
+        return mStatus;
+    }
+
+
+    void Player::setStatus(Status inStatus)
+    {
+        boost::mutex::scoped_lock lock(mStatusMutex);
+        mStatus = inStatus;
+    }
+
+
+    void Player::populateNodesRecursively(GameStateNode & ioNode,
+                                          const BlockTypes & inBlockTypes,
+                                          size_t inIndex,
+                                          size_t inMaxIndex)
+    {
+        //
+        // Check stop conditions
+        //
+        if (inIndex > inMaxIndex || inIndex >= inBlockTypes.size())
         {
-            mThread.reset(new boost::thread(boost::bind(&Player::startImpl, this)));
+            return;
+        }
+
+
+        //
+        // Check status
+        //
+        Status status = getStatus();
+        if (status == Status_Destructing || status == Status_TimeExpired)
+        {
+            return;
+        }
+
+
+        //
+        // Check remaining time
+        //
+        int remainingTime = timeRemaining();
+        if (remainingTime <= 0)
+        {
+            setStatus(Status_TimeExpired);
+            return;
+        }
+
+
+        if (ioNode.state().isGameOver())
+        {
+            // Game over state has no children.
+            return;
+        }
+
+
+        //
+        // Generate the child nodes.
+        //
+        // It is possible that the nodes were already generated at this depth.
+        // If that is the case then we immediately jump to the recursive call below.
+        //
+        ChildNodes generatedChildNodes = ioNode.children();
+        if (generatedChildNodes.empty())
+        {
+            generatedChildNodes = ChildNodes(GameStateComparisonFunctor(mEvaluator->clone()));
+            GenerateOffspring(inBlockTypes[inIndex], ioNode, *mEvaluator, generatedChildNodes);
+
+            // Populate ioNode and overwrite results.
+            {
+                Assert(inIndex <= mTreeRows.size());
+                if (inIndex == mTreeRows.size())
+                {
+                    Protected<TreeRowInfo> newTreeInfo;
+                    mTreeRows.push_back(newTreeInfo);
+                }
+                Assert(inIndex < mTreeRows.size());
+                ScopedAtom<TreeRowInfo> scopedTreeRowInfo = mTreeRows[inIndex];
+                TreeRowInfo & rowInfo = *scopedTreeRowInfo.get();
+                ChildNodes::iterator it = generatedChildNodes.begin(), end = generatedChildNodes.end();
+                for (; it != end; ++it)
+                {
+                    // Populate io
+                    ChildNodePtr child = *it;
+                    ioNode.addChild(child);
+                    if (!rowInfo.mBestChild || 
+                        child->state().quality(child->qualityEvaluator()) > rowInfo.mBestChild->state().quality(child->qualityEvaluator()))
+                    {
+                        rowInfo.mBestChild = child;
+                    }
+                    rowInfo.mNumItems++;
+                }
+            }
+        }
+
+
+        //
+        // Recursive call on each child node.
+        //
+        if (inIndex < inMaxIndex)
+        {
+            for (ChildNodes::iterator it = generatedChildNodes.begin(); it != generatedChildNodes.end(); ++it)
+            {
+                populateNodesRecursively(**it, inBlockTypes, inIndex + 1, inMaxIndex);
+            }
+        }
+    }
+
+
+    void Player::markTreeRowAsFinished(size_t inIndex)
+    {
+        size_t numTreeRows = mTreeRows.size();
+        Assert(inIndex < numTreeRows);
+        if (inIndex < numTreeRows)
+        {
+            ScopedAtom<TreeRowInfo> scopedTreeRowInfo = mTreeRows[inIndex];
+            TreeRowInfo & rowInfo = *scopedTreeRowInfo.get();
+            rowInfo.mFinished = true;
+        }
+    }
+
+
+    void Player::populateBreadthFirst()
+    {
+        size_t maxIndex = 0;
+        size_t numBlockTypes = mBlockTypes.size();
+        while (maxIndex < numBlockTypes)
+        {
+            populateNodesRecursively(*mNode, mBlockTypes, 0, maxIndex);
+            size_t numTreeRows = mTreeRows.size();
+            if (maxIndex + 1 == numTreeRows)
+            {
+                markTreeRowAsFinished(maxIndex);
+            }
+            else
+            {
+                break;
+            }
+            maxIndex++;
+        }
+    }
+
+
+    void Player::destroyInferiorChildren()
+    {
+        if (!mTreeRows.empty())
+        {
+            TreeRowInfo * rowInfo(0);
+            for (size_t idx = 0; idx != mTreeRows.size(); ++idx)
+            {
+                ScopedAtom<TreeRowInfo> scopedTreeRowInfo = mTreeRows[idx];
+                if (!scopedTreeRowInfo->mFinished)
+                {
+                    break;
+                }
+                rowInfo = scopedTreeRowInfo.get();
+            }
+            if (rowInfo)
+            {
+                DestroyInferiorChildren(*mNode, *rowInfo->mBestChild);
+            }
         }
     }
 
@@ -221,19 +286,23 @@ namespace Tetris
         try
         {
             setStatus(Status_Calculating);
-            populateNodesRecursively(*mNode, mBlockTypes, 0);
-
-            if (!mTreeRows.empty())
-            {                
-                ScopedAtom<TreeRowInfo> scopedTreeRowInfo = mTreeRows.back();
-                TreeRowInfo & rowInfo = *scopedTreeRowInfo.get();
-                DestroyInferiorChildren(*mNode, *rowInfo.mBestChild);
-            }
+            populateBreadthFirst();
+            destroyInferiorChildren();
             setStatus(Status_Finished);
         } 
         catch (const std::exception & inException)
         {
             LogError(MakeString() << inException.what());
+        }
+    }
+
+
+    void Player::start()
+    {
+        Assert(!mThread);
+        if (!mThread)
+        {
+            mThread.reset(new boost::thread(boost::bind(&Player::startImpl, this)));
         }
     }
 

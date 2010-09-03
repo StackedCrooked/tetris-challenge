@@ -60,17 +60,23 @@ namespace Tetris
     private:
         void startImpl();
 
+        
+        void markTreeRowAsFinished(size_t inIndex);
+        void populateBreadthFirst();
+        void destroyInferiorChildren();
+
         void populateNodesRecursively(GameStateNode & ioNode,
                                       const BlockTypes & inBlockTypes,
-                                      size_t inDepth);
+                                      size_t inIndex,
+                                      size_t inMaxIndex);
 
         // A 'tree row' is the union of all nodes at a certain depth.
         struct TreeRowInfo
         {
-            TreeRowInfo() : mNumItems(0), mMaxItems(0) {}
+            TreeRowInfo() : mNumItems(0), mFinished(false) {}
             ChildNodePtr mBestChild;
             int mNumItems;
-            int mMaxItems;
+            bool mFinished;
         };
 
         // Stores tree row info for each depth.

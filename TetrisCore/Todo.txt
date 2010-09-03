@@ -1,4 +1,3 @@
-- Use shared_lock for threads that don't modify the game state (Controller::refresh for example)
 - Consider introducing a memory limit instead of a depth limit.
 - Player class: specifying a time limit should be non-intrusive. Use a Concept (or Decorator).
 - Improve speed of search depth 4

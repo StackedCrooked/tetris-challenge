@@ -563,6 +563,14 @@ namespace Tetris
                     {
                         endNode->addChild(resultNode);
                     }
+                    else
+                    {
+                        LogError("The computer generated move does not have the correct depth.");
+                    }
+                }
+                else
+                {
+                    LogWarning("Suspicious: the computer failed to generate any moves.");
                 }
                 mComputerPlayer.reset();
             }
