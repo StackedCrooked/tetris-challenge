@@ -548,7 +548,14 @@ namespace Tetris
             return;
         }
 
-        
+
+        // Create only once
+        if (!mBlockMover)
+        {
+            mBlockMover.reset(new BlockMover(*mProtectedGame, XULWin::String2Int(mMovementSpeed->getValue(), 20)));
+        }
+
+
         if (mComputerPlayer)
         {
             // Check if the computer player has finished. If yes, then get the results.
@@ -616,35 +623,6 @@ namespace Tetris
         {
             mBlockMover->setSpeed(XULWin::String2Int(mMovementSpeed->getValue(), 1));
         }
-
-
-        // Do we have computer moves lined up?
-        if (!game.currentNode()->children().empty())
-        {
-            // Is the block mover taking care of them?
-            if (mBlockMover)
-            {
-                // Is yes, check if isn't stuck.
-                if (mBlockMover->status() == BlockMover::Status_Blocked)
-                {
-                    // If it is stuck, then empthy the queue of lined up moves. They are lost :(
-                    game.currentNode()->clearChildren();
-
-                    // Lower the search depth so that we can quickly think of some new moves!
-                    LogInfo("Couldn't move the block to where I wanted. Plan B: quickly think of a some new moves!");
-                    mBlockMover.reset();
-                }
-            }
-            // If no then start the block mover.
-            else
-            {
-                mBlockMover.reset(new BlockMover(*mProtectedGame, XULWin::String2Int(mMovementSpeed->getValue(), 20)));
-            }
-        }
-        else
-        {
-            mBlockMover.reset();
-        }
         
 
         if (mStatusTextBox)
@@ -652,7 +630,7 @@ namespace Tetris
             std::string status;
             if (mComputerPlayer)
             {            
-                if (!mBlockMover)
+                if (game.currentNode()->children().empty())
                 {
                     status = "Moving in maximum ";
                     int remainingSeconds = static_cast<int>(0.5 + (static_cast<float>(mComputerPlayer->timeRemaining()) / 1000.0));
