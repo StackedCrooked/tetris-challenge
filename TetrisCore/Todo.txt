@@ -1,5 +1,4 @@
 - Use shared_lock for threads that don't modify the game state (Controller::refresh for example)
-- Fix stack overflow when deleting a node that goes very deep.
 - Consider introducing a memory limit instead of a depth limit.
 - Player class: specifying a time limit should be non-intrusive. Use a Concept (or Decorator).
 - Improve speed of search depth 4
@@ -8,6 +7,7 @@
 - Resizing the window during gameplay causes it to grow super-large in size horizontally.
 - Use Tetris icon on the exe file.
 - False positives of: "Failed to move the blocks in time"
+v Fix stack overflow when deleting a node that goes very deep.
 v Fix deadlock issue in BlockMover:
 v Implement level increment (doesn't work currently)
 v Add AI movement speed parameter.

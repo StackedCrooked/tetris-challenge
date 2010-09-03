@@ -28,6 +28,8 @@ namespace Tetris
     public:
         Game(size_t inNumRows, size_t inNumColumns);
 
+        ~Game();
+
         std::auto_ptr<Game> clone() const;
 
         int numRows() const;
@@ -43,6 +45,8 @@ namespace Tetris
         // Includes the currently active block
         void getFutureBlocks(size_t inCount, BlockTypes & outBlocks) const;
 
+        bool isGameOver() const;
+
         GameStateNode * currentNode();
 
         const GameStateNode * endNode() const;
@@ -52,7 +56,10 @@ namespace Tetris
 
         const GameStateNode * currentNode() const;
 
-        bool isGameOver() const;
+        // Removes all nodes that came before the current node.
+        // This function is mainly used to prevent a stack overflow
+        // when destructing a Game object that has a very deep node tree.
+        void eraseHistory();
 
         //
         // Statistics
@@ -84,7 +91,11 @@ namespace Tetris
         bool navigateNodeRight();
 
     private:
-        Game(const Game & inGame);
+        // Implemented
+        explicit Game(const Game & inGame);
+
+        // Not implemented
+        Game & operator&();
 
         void setCurrentNode(const GameStateNode * inCurrentNode);
 
