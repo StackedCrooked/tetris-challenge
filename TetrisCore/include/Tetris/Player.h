@@ -26,17 +26,11 @@ namespace Tetris
     public:
         Player(std::auto_ptr<GameStateNode> inNode,
                const BlockTypes & inBlockTypes,
-               std::auto_ptr<Evaluator> inEvaluator,
-               int inTimeLimitMs);
+               std::auto_ptr<Evaluator> inEvaluator);
 
         ~Player();
 
         void start();
-
-        int timeRemaining() const;
-
-        // Force a timeout.
-        void setTimeExpired();
 
         bool isFinished() const;
 
@@ -49,7 +43,7 @@ namespace Tetris
             Status_Null,
             Status_Calculating,
             Status_Finished,
-            Status_TimeExpired,
+            Status_Interrupted,
             Status_Destructing
         };
 
@@ -85,7 +79,6 @@ namespace Tetris
         ChildNodePtr mNode;
         BlockTypes mBlockTypes;
         boost::scoped_ptr<Evaluator> mEvaluator;
-        int mTimeLimitMs;
         Status mStatus;
         mutable boost::mutex mStatusMutex;
         boost::scoped_ptr<Poco::Stopwatch> mStopwatch;
