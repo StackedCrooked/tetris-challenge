@@ -435,7 +435,8 @@ namespace Tetris
         float numRemainingRows = static_cast<float>(game.currentNode()->state().stats().firstOccupiedRow() - (game.activeBlock().row() + 4));
         float numRowsPerSecond = mTimedGame->currentSpeed();
         float remainingTime = 1000 * numRemainingRows / numRowsPerSecond;
-        return static_cast<int>(0.5 + remainingTime);
+        float timeRequiredForMove = static_cast<float>(game.activeBlock().numRotations() + game.numColumns()) / static_cast<float>(mBlockMover->speed());
+        return static_cast<int>(0.5 + remainingTime - timeRequiredForMove);
     }
 
 
@@ -444,71 +445,29 @@ namespace Tetris
         Assert(!mComputerPlayer);
         if (!mComputerPlayer)
         {
+            //
+            // Clone the starting node
+            //
             std::auto_ptr<GameStateNode> endNode = game.endNode()->clone();
-            size_t blockOffset = 0;
             Assert(endNode->depth() >= game.currentNode()->depth());
-            if (endNode->depth() > game.currentNode()->depth())
-            {
-                blockOffset = endNode->depth() - game.currentNode()->depth();
-            }
-
-            // If we still have blocks queued, then give the computer 1 second per precalculated block.
-            // Note that this may be a misestimation. However, in that case we can still be saved if
-            // the refresh() method forces a time-out in time using the Player::setTimeExpired() method.
-            int timeLimit = 1000 * blockOffset;
-            if (blockOffset > 0)
-            {
-                BlockTypes futureBlocks_tooMany;
-                game.getFutureBlocks(inDepth + blockOffset, futureBlocks_tooMany);
-
-                BlockTypes futureBlocks;
-                for (size_t idx = blockOffset; idx != futureBlocks_tooMany.size(); ++idx)
-                {
-                    futureBlocks.push_back(futureBlocks_tooMany[idx]);
-                }
-                mComputerPlayer.reset(new Player(endNode, futureBlocks, mEvaluator->clone()));
-                mComputerPlayer->start();
-                return;
-            }
 
 
             //
-            // We don't have any blocks queued so we have to be very time aware.
-            //
-            int remainingTimeMs = calculateRemainingTimeMs(game);
-            if (remainingTimeMs < 1000)
-            {
-                if (remainingTimeMs > 500)
-                {
-                    inDepth = 2;
-                }
-                else
-                {
-                    inDepth = 1;
-                }
-            }
-
-            // We need to start moving before we run out of time!
-            timeLimit = remainingTimeMs - 500;
-
-            // We don't even have 500 ms to make our move.
-            // This will probably end bad, but we can't always win.
-            // Just give it 1 ms. We'll see what it gives.
-            if (timeLimit < 0)
-            {
-                // Just use a dummy value.
-                timeLimit = 1;
-            }
-
+            // Create the list of future blocks
+            //            
+            size_t blockOffset = endNode->depth() - game.currentNode()->depth();
             BlockTypes futureBlocks_tooMany;
             game.getFutureBlocks(inDepth + blockOffset, futureBlocks_tooMany);
-
             BlockTypes futureBlocks;
             for (size_t idx = blockOffset; idx != futureBlocks_tooMany.size(); ++idx)
             {
                 futureBlocks.push_back(futureBlocks_tooMany[idx]);
             }
 
+
+            //
+            // Create and start the Player.
+            //
             mComputerPlayer.reset(new Player(endNode, futureBlocks, mEvaluator->clone()));
             mComputerPlayer->start();
         }
@@ -576,10 +535,13 @@ namespace Tetris
                 mComputerPlayer.reset();
             }
             // Else check if there is any danger of crashing the current block.
-            else if (calculateRemainingTimeMs(game) < 1000)
+            else if (mComputerPlayer->getStatus() != Player::Status_Interrupted)
             {
-                mComputerPlayer->setStatus(Player::Status_Interrupted);
-                LogInfo("Panic!");
+                int remainingTimeMs = calculateRemainingTimeMs(game);
+                if (remainingTimeMs < 1500)
+                {
+                    mComputerPlayer->setStatus(Player::Status_Interrupted);                    
+                }
             }
         }
 
