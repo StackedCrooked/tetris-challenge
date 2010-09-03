@@ -2,8 +2,9 @@
 #define PLAYER_H_INCLUDED
 
 
-#include "Tetris/GameStateNode.h"
 #include "Tetris/BlockType.h"
+#include "Tetris/GameStateNode.h"
+#include "Tetris/Threading.h"
 #include "Poco/Stopwatch.h"
 #include <memory>
 #include <vector>
@@ -63,8 +64,19 @@ namespace Tetris
                                       const BlockTypes & inBlockTypes,
                                       size_t inDepth);
 
+        // A 'tree row' is the union of all nodes at a certain depth.
+        struct TreeRowInfo
+        {
+            TreeRowInfo() : mNumItems(0), mMaxItems(0) {}
+            ChildNodePtr mBestChild;
+            int mNumItems;
+            int mMaxItems;
+        };
+
+        // Stores tree row info for each depth.
+        std::vector<Protected<TreeRowInfo> > mTreeRows;
+
         ChildNodePtr mNode;
-        ChildNodePtr mEndNode;
         BlockTypes mBlockTypes;
         boost::scoped_ptr<Evaluator> mEvaluator;
         int mTimeLimitMs;
