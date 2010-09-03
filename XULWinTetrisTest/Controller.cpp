@@ -161,11 +161,11 @@ namespace Tetris
         }
         
 
-        if (XULWin::Element * el = mRootElement->getElementById("levelTextBox"))
+        if (mLevelTextBox = findComponentById<XULWin::TextBox>("levelTextBox"))
         {
-            if (!(mLevelTextBox = el->component()->downcast<XULWin::TextBox>()))
+            if (mTimedGame)
             {
-                LogWarning("The element with id 'levelTextBox' was found but it was not of type 'textbox'.");
+                mTimedGame->setLevel(XULWin::String2Int(mLevelTextBox->getValue(), mTimedGame->getLevel()));
             }
         }
 
@@ -582,15 +582,10 @@ namespace Tetris
                 mComputerPlayer.reset();
             }
             // Else check if there is any danger of crashing the current block.
-            else
+            else if (mComputerPlayer->getStatus() != Player::Status_TimeExpired && calculateRemainingTimeMs(game) < 1000)
             {
-                int remainingTimeMs = calculateRemainingTimeMs(game);
-
-                // Panic! Stop the computer player now or we won't make it!
-                if (remainingTimeMs < 1000)
-                {
-                    mComputerPlayer->setTimeExpired();
-                }
+                mComputerPlayer->setTimeExpired();
+                LogInfo("Panic!");
             }
         }
 
