@@ -33,6 +33,8 @@ namespace Tetris
 
         void setSpeed(int inNumMovesPerSecond);
 
+        int speed() const;
+
     private:
         void onTimer(Poco::Timer & ioTimer);
         void move();   
