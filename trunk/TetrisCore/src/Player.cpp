@@ -49,13 +49,11 @@ namespace Tetris
 
     Player::Player(std::auto_ptr<GameStateNode> inNode,
                    const BlockTypes & inBlockTypes,
-                   std::auto_ptr<Evaluator> inEvaluator,
-                   int inTimeLimitMs) :
+                   std::auto_ptr<Evaluator> inEvaluator) :
         mTreeRows(),
         mNode(inNode.release()),
         mBlockTypes(inBlockTypes),
         mEvaluator(inEvaluator),
-        mTimeLimitMs(inTimeLimitMs),
         mStatus(Status_Null),
         mThread()
     {
@@ -98,21 +96,6 @@ namespace Tetris
         }
         return false;
     }
-    
-    
-    int Player::timeRemaining() const
-    {
-        boost::mutex::scoped_lock lock(mStopwatchMutex);
-        int elapsedMs = static_cast<int>((mStopwatch->elapsed() / static_cast<Poco::Timestamp::TimeDiff>(1000)));
-        int timeRemaining = mTimeLimitMs - elapsedMs;
-        return timeRemaining;
-    }
-
-
-    void Player::setTimeExpired()
-    {
-        setStatus(Status_TimeExpired);
-    }
 
 
     Player::Status Player::getStatus() const
@@ -147,19 +130,8 @@ namespace Tetris
         // Check status
         //
         Status status = getStatus();
-        if (status == Status_Destructing || status == Status_TimeExpired)
+        if (status == Status_Destructing || status == Status_Interrupted)
         {
-            return;
-        }
-
-
-        //
-        // Check remaining time
-        //
-        int remainingTime = timeRemaining();
-        if (remainingTime <= 0)
-        {
-            setStatus(Status_TimeExpired);
             return;
         }
 

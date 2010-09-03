@@ -483,7 +483,7 @@ namespace Tetris
                 {
                     futureBlocks.push_back(futureBlocks_tooMany[idx]);
                 }
-                mComputerPlayer.reset(new Player(endNode, futureBlocks, mEvaluator->clone(), timeLimit));
+                mComputerPlayer.reset(new Player(endNode, futureBlocks, mEvaluator->clone()));
                 mComputerPlayer->start();
                 return;
             }
@@ -526,7 +526,7 @@ namespace Tetris
                 futureBlocks.push_back(futureBlocks_tooMany[idx]);
             }
 
-            mComputerPlayer.reset(new Player(endNode, futureBlocks, mEvaluator->clone(), timeLimit));
+            mComputerPlayer.reset(new Player(endNode, futureBlocks, mEvaluator->clone()));
             mComputerPlayer->start();
         }
     }
@@ -592,9 +592,9 @@ namespace Tetris
                 mComputerPlayer.reset();
             }
             // Else check if there is any danger of crashing the current block.
-            else if (mComputerPlayer->getStatus() != Player::Status_TimeExpired && calculateRemainingTimeMs(game) < 1000)
+            else if (calculateRemainingTimeMs(game) < 1000)
             {
-                mComputerPlayer->setTimeExpired();
+                mComputerPlayer->setStatus(Player::Status_Interrupted);
                 LogInfo("Panic!");
             }
         }
@@ -632,28 +632,7 @@ namespace Tetris
 
         if (mStatusTextBox)
         {
-            std::string status;
-            if (mComputerPlayer)
-            {            
-                if (game.currentNode()->children().empty())
-                {
-                    status = "Moving in maximum ";
-                    int remainingSeconds = static_cast<int>(0.5 + (static_cast<float>(mComputerPlayer->timeRemaining()) / 1000.0));
-                    if (remainingSeconds >= 0 && !status.empty())
-                    {
-                        status += boost::lexical_cast<std::string>(remainingSeconds) + " seconds.";
-                    }
-                }
-                else
-                {
-                    if (!status.empty())
-                    {
-                        status += " + ";
-                    }
-                    status += "Moving.";
-                }
-            }            
-            mStatusTextBox->setValue(status.empty() ? "Inactive" : status);
+            mStatusTextBox->setValue(game.currentNode()->children().empty() ? "Thinking" : "Moving");
         }
 
 
