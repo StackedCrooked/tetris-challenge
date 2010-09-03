@@ -21,8 +21,7 @@ namespace Tetris
 
     BlockMover::BlockMover(Protected<Game> & inGame, int inNumMovesPerSecond) :
         mGame(inGame),
-        mTimer(),
-        mStatus(Status_Ok)
+        mTimer()
     {
         mTimer.reset(new Poco::Timer(GetIntervalMs(inNumMovesPerSecond), GetIntervalMs(inNumMovesPerSecond)));
         Poco::TimerCallback<BlockMover> callback(*this, &BlockMover::onTimer);
@@ -34,12 +33,6 @@ namespace Tetris
     {
         mTimer->stop();
         mTimer.reset();
-    }
-
-
-    BlockMover::Status BlockMover::status() const
-    {
-        return mStatus;
     }
 
 
@@ -60,7 +53,6 @@ namespace Tetris
         }
         catch (const std::exception & inException)
         {
-            mStatus = Status_Error;
             LogError(inException.what());
         }
     }
@@ -68,10 +60,6 @@ namespace Tetris
 
     void BlockMover::move()
     {
-        if (mStatus == Status_Blocked)
-        {
-            return;
-        }
 
         ScopedAtom<Game> game(mGame, 100);
         const ChildNodes & children = game->currentNode()->children();
@@ -87,21 +75,27 @@ namespace Tetris
         {
             if (!game->rotate())
             {
-                mStatus = Status_Blocked;
+                // Damn we can't rotate.
+                // Give up on this block.
+                game->drop();
             }
         }
         else if (block.column() < targetBlock.column())
         {
             if (!game->move(Direction_Right))
             {
-                mStatus = Status_Blocked;
+                // Damn we can't move this block anymore.
+                // Give up on this block.
+                game->drop();
             }
         }
         else if (block.column() > targetBlock.column())
         {
             if (!game->move(Direction_Left))
             {
-                mStatus = Status_Blocked;
+                // Damn we can't move this block anymore.
+                // Give up on this block.
+                game->drop();
             }
         }
         else
@@ -111,9 +105,9 @@ namespace Tetris
             {
                 game->move(Direction_Down);
             }
-            else if (!game->navigateNodeDown())
+            if (!game->navigateNodeDown())
             {
-                throw std::runtime_error("Failed to navigate the game state one node down.");
+                throw std::runtime_error("Unable to navigate one node down in the the gamestate tree.");
             }
         }
     }

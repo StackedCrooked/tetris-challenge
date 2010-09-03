@@ -31,15 +31,6 @@ namespace Tetris
 
         ~BlockMover();
 
-        enum Status
-        {
-            Status_Ok,
-            Status_Blocked,
-            Status_Error,
-        };
-
-        Status status() const;
-
         void setSpeed(int inNumMovesPerSecond);
 
     private:
@@ -49,7 +40,6 @@ namespace Tetris
         Protected<Game> & mGame;
         boost::scoped_ptr<Poco::Timer> mTimer;
         int mNumMovesPerSecond;
-        volatile Status mStatus;
     };
 
 } // namespace Tetris
