@@ -51,8 +51,8 @@ namespace Tetris
                    const BlockTypes & inBlockTypes,
                    std::auto_ptr<Evaluator> inEvaluator,
                    int inTimeLimitMs) :
+        mTreeRows(inBlockTypes.size()),
         mNode(inNode.release()),
-        mEndNode(),
         mBlockTypes(inBlockTypes),
         mEvaluator(inEvaluator),
         mTimeLimitMs(inTimeLimitMs),
@@ -133,24 +133,23 @@ namespace Tetris
 
 
         //
-        // Populate ioNode and overwrite mEndNode.
+        // Populate ioNode and overwrite results.
         //
-        ChildNodes::iterator it = generatedChildNodes.begin(), end = generatedChildNodes.end();
-        for (; it != end; ++it)
         {
-            // Populate io
-            ChildNodePtr child = *it;
-            ioNode.addChild(child);
-            if (inDepth == inBlockTypes.size() - 1)
+            ScopedAtom<TreeRowInfo> scopedTreeRowInfo = mTreeRows[inDepth];
+            TreeRowInfo & rowInfo = *scopedTreeRowInfo.get();
+            ChildNodes::iterator it = generatedChildNodes.begin(), end = generatedChildNodes.end();
+            for (; it != end; ++it)
             {
-                if (!mEndNode)
+                // Populate io
+                ChildNodePtr child = *it;
+                ioNode.addChild(child);
+                if (!rowInfo.mBestChild || 
+                    child->state().quality(child->qualityEvaluator()) > rowInfo.mBestChild->state().quality(child->qualityEvaluator()))
                 {
-                    mEndNode = child;
+                    rowInfo.mBestChild = child;
                 }
-                else if (child->state().quality(child->qualityEvaluator()) > mEndNode->state().quality(child->qualityEvaluator()))
-                {
-                    mEndNode = child;
-                }
+                rowInfo.mNumItems++;
             }
         }
 
@@ -223,9 +222,12 @@ namespace Tetris
         {
             setStatus(Status_Calculating);
             populateNodesRecursively(*mNode, mBlockTypes, 0);
-            if (mEndNode)
-            {
-                DestroyInferiorChildren(*mNode, *mEndNode);
+
+            if (!mTreeRows.empty())
+            {                
+                ScopedAtom<TreeRowInfo> scopedTreeRowInfo = mTreeRows.back();
+                TreeRowInfo & rowInfo = *scopedTreeRowInfo.get();
+                DestroyInferiorChildren(*mNode, *rowInfo.mBestChild);
             }
             setStatus(Status_Finished);
         } 
