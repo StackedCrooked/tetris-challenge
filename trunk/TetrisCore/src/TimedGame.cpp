@@ -25,6 +25,12 @@ namespace Tetris
     }
 
 
+    TimedGame::~TimedGame()
+    {
+        mTimer.stop();
+    }
+
+
     void TimedGame::onTimerEvent(Poco::Timer & inTimer)
     {
         try

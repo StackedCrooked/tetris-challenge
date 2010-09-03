@@ -4,6 +4,7 @@
 
 #include "Tetris/Threading.h"
 #include "Poco/Timer.h"
+#include <boost/noncopyable.hpp>
 #include <boost/thread.hpp>
 
 
@@ -14,10 +15,12 @@ namespace Tetris
     /**
      * TimedGame adds the timed lowering of the active block.
      */
-    class TimedGame
+    class TimedGame : boost::noncopyable
     {
     public:
         TimedGame(const Protected<Game> & inGame);
+
+        ~TimedGame();
 
         int getLevel() const;
 

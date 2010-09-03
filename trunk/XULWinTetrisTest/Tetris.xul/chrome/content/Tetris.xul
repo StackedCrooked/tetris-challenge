@@ -49,7 +49,7 @@
             </row>
             <row align="center">
               <label value="Level:" style="text-align:right"/>
-              <textbox id="levelTextBox" value="0" readonly="true"  style="text-align:right" flex="1" />
+              <textbox id="levelTextBox" value="10" readonly="true"  style="text-align:right" flex="1" />
               <label value="Lines x3:" style="text-align:right"/>
               <textbox id="lines3TextBox" value="0" readonly="true"  style="text-align:right" flex="1" />
             </row>
