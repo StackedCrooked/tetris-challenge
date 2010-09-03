@@ -49,7 +49,7 @@
             </row>
             <row align="center">
               <label value="Level:" style="text-align:right"/>
-              <textbox id="levelTextBox" value="0" readonly="true"  style="text-align:right" flex="1" />
+              <textbox id="levelTextBox" value="7" readonly="true"  style="text-align:right" flex="1" />
               <label value="Lines x3:" style="text-align:right"/>
               <textbox id="lines3TextBox" value="0" readonly="true"  style="text-align:right" flex="1" />
             </row>
@@ -84,7 +84,7 @@
             <row align="center">
               <label value="Move speed:" style="text-align:right" />
               <hbox align="center">
-                <textbox id="movementSpeed" type="number" readonly="true" style="text-align:right" value="10" />
+                <textbox id="movementSpeed" type="number" readonly="true" style="text-align:right" value="15" />
                 <label value="moves/s" />
               </hbox>
             </row>
@@ -114,27 +114,27 @@
           </columns>
           <rows>
             <row align="center">
-              <textbox id="numHolesFactor" type="number" readonly="true" style="text-align:right" value="-2" />
+              <textbox id="numHolesFactor" type="number" readonly="true" style="text-align:right" value="-4" />
               <label value="number of holes" style="text-align:left" />
-              <textbox id="numSinglesFactor" type="number" readonly="true" style="text-align:right" value="0" />
+              <textbox id="numSinglesFactor" type="number" readonly="true" style="text-align:right" value="-4" />
               <label value="number of single lines" style="text-align:left" />
             </row>
             <row align="center">
-              <textbox id="gameHeightFactor" type="number" readonly="true" style="text-align:right" value="-1" />
+              <textbox id="gameHeightFactor" type="number" readonly="true" style="text-align:right" value="-2" />
               <label value="game height" style="text-align:left" />
-              <textbox id="numDoublesFactor" type="number" readonly="true" style="text-align:right" value="0" />
+              <textbox id="numDoublesFactor" type="number" readonly="true" style="text-align:right" value="-3" />
               <label value="number of double lines" style="text-align:left" />
             </row>
             <row align="center">
               <textbox id="lastBlockHeightFactor" type="number" readonly="true" style="text-align:right" value="-1" />
               <label value="last block height" style="text-align:left" />
-              <textbox id="numTriplesFactor" type="number" readonly="true" style="text-align:right" value="0" />
+              <textbox id="numTriplesFactor" type="number" readonly="true" style="text-align:right" value="-2" />
               <label value="number of triple lines" style="text-align:left" />
             </row>
             <row align="center">
               <textbox id="numLinesFactor" type="number" readonly="true" style="text-align:right" value="0" />
               <label value="total number of lines" style="text-align:left" />
-              <textbox id="numTetrisesFactor" type="number" readonly="true" style="text-align:right" value="0" />
+              <textbox id="numTetrisesFactor" type="number" readonly="true" style="text-align:right" value="8" />
               <label value="number of tetrises" style="text-align:left" />
             </row>
           </rows>
@@ -145,5 +145,4 @@
       <tetris id="tetris0" flex="0" numfutureblocks="4" keyboardenabled="true" numrows="20" numcolumns="10" />
     </hbox>
   </hbox>
-  <!--<textbox id="loggingTextbox" value="Log messages appear here." multiline="true" flex="1" rows="4" readonly="true" style="background-color:white" />-->
 </window>

@@ -16,6 +16,7 @@
 #include "Poco/DateTime.h"
 #include "Poco/DateTimeFormatter.h"
 #include <boost/lexical_cast.hpp>
+#include <iostream>
 
 
 namespace Tetris
@@ -28,7 +29,7 @@ namespace Tetris
         mAboutDialogRootElement(),
         mTetrisComponent(0),
         mFPSTextBox(0),
-        mBlockCountTextBox(0),        
+        mBlockCountTextBox(0),
         mLevelTextBox(0),
         mScoreTextBox(0),
         mComputerEnabledCheckBox(0),
@@ -73,9 +74,9 @@ namespace Tetris
         {
             throw std::runtime_error("Root element is not of type winodw.");
         }
-                    
 
-		// Disabled XULWin logging during constructor. We have our own logger.
+
+        // Disabled XULWin logging during constructor. We have our own logger.
         XULWin::ErrorCatcher catcher;
         catcher.disableLogging(true);
 
@@ -86,11 +87,12 @@ namespace Tetris
         {
             if (mLoggingTextBox = el->component()->downcast<XULWin::TextBox>())
             {
-                boost::function<void(const std::string&)> logFunction = boost::bind(&Controller::log, this, _1);
-                XULWin::ErrorReporter::Instance().setLogger(logFunction);
-                Tetris::Logger::Instance().setHandler(logFunction);
+
             }
         }
+        boost::function<void(const std::string &)> logFunction = boost::bind(&Controller::log, this, _1);
+        XULWin::ErrorReporter::Instance().setLogger(logFunction);
+        Tetris::Logger::Instance().setHandler(logFunction);
 
 
         //
@@ -159,7 +161,7 @@ namespace Tetris
                 LogWarning(MakeString() << "The lines x" << idx << "TextBox element was not found in the XUL document.");
             }
         }
-        
+
 
         if (mLevelTextBox = findComponentById<XULWin::TextBox>("levelTextBox"))
         {
@@ -184,17 +186,17 @@ namespace Tetris
             if (!(mComputerEnabledCheckBox = el->component()->downcast<XULWin::CheckBox>()))
             {
                 LogWarning("The element with id 'computerEnabled' was found but it was not of type 'checkbox'.");
-            }            
+            }
         }
 
         if (mSearchDepth = findComponentById<XULWin::SpinButton>("searchDepth"))
         {
             XULWin::WinAPI::SpinButton_SetRange(mSearchDepth->handle(), 1, cMaxSearchDepth);
         }
-        
-        
+
+
         if (mMovementSpeed = findComponentById<XULWin::SpinButton>("movementSpeed"))
-        {            
+        {
             XULWin::WinAPI::SpinButton_SetRange(mMovementSpeed->handle(), 1, 100);
         }
 
@@ -326,7 +328,7 @@ namespace Tetris
             std::string strategyName = mStrategiesMenuList->getLabel();
             if (strategyName == "Balanced")
             {
-                if (!dynamic_cast<Balanced*>(mEvaluator.get()))
+                if (!dynamic_cast<Balanced *>(mEvaluator.get()))
                 {
                     mEvaluator.reset(new Balanced);
                     LogInfo("AI is now using the default strategy.");
@@ -334,7 +336,7 @@ namespace Tetris
             }
             else if (strategyName == "Perfectionistic")
             {
-                if (!dynamic_cast<Perfectionistic*>(mEvaluator.get()))
+                if (!dynamic_cast<Perfectionistic *>(mEvaluator.get()))
                 {
                     mEvaluator.reset(new Perfectionistic);
                     LogInfo("AI will now try to make tetrises.");
@@ -351,7 +353,7 @@ namespace Tetris
         mWindow->showModal(XULWin::WindowPos_CenterInScreen);
     }
 
-            
+
     void Controller::getGameState(TetrisComponent * tetrisComponent,
                                   Grid & outGrid,
                                   Block & outActiveBlock,
@@ -424,26 +426,7 @@ namespace Tetris
 
     void Controller::log(const std::string & inMessage)
     {
-        if (mLoggingTextBox)
-        {
-            std::string timestamp = Poco::DateTimeFormatter::format(Poco::DateTime(), "%H:%M:%S ");
-            std::string currentMessage = mLoggingTextBox->getValue();
-            if (currentMessage.size() > 100)            
-            {
-                std::string::size_type offset = currentMessage.find("\r\n");
-                if (offset != std::string::npos)
-                {
-                    offset += 2;
-                }
-                currentMessage = currentMessage.substr(offset);
-            }
-            mLoggingTextBox->setValue(MakeString() << currentMessage << "\r\n" << timestamp << inMessage);
-
-            // Scroll to bottom
-            int endPos = mLoggingTextBox->getValue().size();
-            ::SendMessage(mLoggingTextBox->handle(), EM_SETSEL, (WPARAM)endPos, (LPARAM)endPos);
-            ::SendMessage(mLoggingTextBox->handle(), EM_SCROLLCARET, 0, 0);
-        }
+        std::cout << inMessage << "\n";
     }
 
 
@@ -516,7 +499,7 @@ namespace Tetris
                 // Just use a dummy value.
                 timeLimit = 1;
             }
-            
+
             BlockTypes futureBlocks_tooMany;
             game.getFutureBlocks(inDepth + blockOffset, futureBlocks_tooMany);
 
@@ -538,7 +521,7 @@ namespace Tetris
         {
             refresh();
         }
-        catch(const std::exception & inException)
+        catch (const std::exception & inException)
         {
             LogError(MakeString() << "Exception thrown during Controller::onRefresh. Details: " << inException.what());
         }
@@ -547,6 +530,7 @@ namespace Tetris
 
     void Controller::refresh()
     {
+
         // Flush the logger.
         Logger::Instance().flush();
 
@@ -611,13 +595,13 @@ namespace Tetris
             mScoreTextBox->setValue(MakeString() << game.currentNode()->state().stats().score());
         }
 
-                
+
         if (!mComputerPlayer && mComputerEnabledCheckBox->isChecked())
         {
             int searchDepth = XULWin::String2Int(mSearchDepth->getValue(), 2);
             GameStateNode * endNode = game.endNode();
             if (!endNode->state().isGameOver() &&
-                endNode->depth() - game.currentNode()->depth() + searchDepth <=  3 * cMaxSearchDepth)
+                 endNode->depth() - game.currentNode()->depth() + searchDepth <=  3 * cMaxSearchDepth)
             {
                 startAI(game, searchDepth);
             }
@@ -628,7 +612,7 @@ namespace Tetris
         {
             mBlockMover->setSpeed(XULWin::String2Int(mMovementSpeed->getValue(), 1));
         }
-        
+
 
         if (mStatusTextBox)
         {
@@ -656,24 +640,24 @@ namespace Tetris
                 mLinesTextBoxes[idx]->setValue(MakeString() << stats.numLines(idx));
             }
         }
-        
+
         if (mGameHeightFactor &&
-            mLastBlockHeightFactor &&
-            mNumHolesFactor &&
-            mNumLinesFactor &&
-            mNumSinglesFactor &&
-            mNumDoublesFactor &&
-            mNumTriplesFactor &&
-            mNumTetrisesFactor)
+                mLastBlockHeightFactor &&
+                mNumHolesFactor &&
+                mNumLinesFactor &&
+                mNumSinglesFactor &&
+                mNumDoublesFactor &&
+                mNumTriplesFactor &&
+                mNumTetrisesFactor)
         {
-            mEvaluator.reset(new Evaluator(                
-                GameHeightFactor(XULWin::String2Int(mGameHeightFactor->getValue(), 0)),
-                LastBlockHeightFactor(XULWin::String2Int(mLastBlockHeightFactor->getValue(), 0)),
-                NumHolesFactor(XULWin::String2Int(mNumHolesFactor->getValue(), 0)),
-                NumSinglesFactor(XULWin::String2Int(mNumSinglesFactor->getValue(), 0)),
-                NumDoublesFactor(XULWin::String2Int(mNumDoublesFactor->getValue(), 0)),
-                NumTriplesFactor(XULWin::String2Int(mNumTriplesFactor->getValue(), 0)),
-                NumTetrisesFactor(XULWin::String2Int(mNumTetrisesFactor->getValue(), 0))));
+            mEvaluator.reset(new Evaluator(
+                                 GameHeightFactor(XULWin::String2Int(mGameHeightFactor->getValue(), 0)),
+                                 LastBlockHeightFactor(XULWin::String2Int(mLastBlockHeightFactor->getValue(), 0)),
+                                 NumHolesFactor(XULWin::String2Int(mNumHolesFactor->getValue(), 0)),
+                                 NumSinglesFactor(XULWin::String2Int(mNumSinglesFactor->getValue(), 0)),
+                                 NumDoublesFactor(XULWin::String2Int(mNumDoublesFactor->getValue(), 0)),
+                                 NumTriplesFactor(XULWin::String2Int(mNumTriplesFactor->getValue(), 0)),
+                                 NumTetrisesFactor(XULWin::String2Int(mNumTetrisesFactor->getValue(), 0))));
 
 
             if (mGameStateScore)
