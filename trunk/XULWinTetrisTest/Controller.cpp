@@ -449,6 +449,7 @@ namespace Tetris
             // Clone the starting node
             //
             std::auto_ptr<GameStateNode> endNode = game.endNode()->clone();
+            Assert(endNode->children().empty());
             Assert(endNode->depth() >= game.currentNode()->depth());
 
 

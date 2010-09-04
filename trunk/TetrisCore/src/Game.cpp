@@ -54,20 +54,6 @@ namespace Tetris
             throw std::logic_error("Failed to find the current node. Childnodes require cleanup first.");
         }
     }
-        
-        
-    Game::Game(const Game & inGame) :
-        mNumRows(inGame.mNumRows),
-        mNumColumns(inGame.mNumColumns),
-        mRootNode(inGame.mRootNode->clone().release()),
-        mCurrentNode(0),
-        mActiveBlock(new Block(*(inGame.mActiveBlock))),
-        mBlockFactory(new BlockFactory(*inGame.mBlockFactory)),
-        mBlocks(inGame.mBlocks),
-        mCurrentBlockIndex(inGame.mCurrentBlockIndex)
-    {
-        mCurrentNode = FindCurrentNode(mRootNode.get(), inGame.mCurrentNode->depth());
-    }
 
 
     Game::~Game()
@@ -84,12 +70,6 @@ namespace Tetris
             end->clearChildren();
             end = end->parent();
         }
-    }
-
-
-    std::auto_ptr<Game> Game::clone() const
-    {
-        return std::auto_ptr<Game>(new Game(*this));
     }
 
     

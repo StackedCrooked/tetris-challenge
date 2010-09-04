@@ -44,11 +44,11 @@ INT_PTR WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmd
     }
     catch (const std::exception & inError)
     {
-        ::MessageBox(0, XULWin::ToUTF16(inError.what()).c_str(), TEXT("Tetris AI"), MB_OK);
+        ::MessageBox(0, XULWin::ToUTF16(inError.what()).c_str(), TEXT("Tetris"), MB_OK);
     }
     catch (...)
     {
-        ::MessageBox(0, TEXT("Program is terminated due to unhandled and unknown exception."), L"Tetris AI", MB_OK);
+        ::MessageBox(0, TEXT("Program is terminated due to unhandled and unknown exception."), L"Tetris", MB_OK);
     }
     return 0;
 }
