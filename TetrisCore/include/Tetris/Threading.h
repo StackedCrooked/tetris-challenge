@@ -56,6 +56,20 @@ namespace Tetris
     };
 
 
+    
+
+    class LockTimeout : public std::runtime_error
+    {
+    public:
+        explicit LockTimeout(const std::string & inMessage) :
+            std::runtime_error(inMessage)
+        {
+        }
+    
+        virtual ~LockTimeout() throw() { }    
+    };
+
+
     template<class Variable>
     class ScopedAtom
     {
@@ -73,7 +87,7 @@ namespace Tetris
         {
             if (!mLock.timed_lock(boost::posix_time::milliseconds(inTimeoutMs)))
             {
-                throw std::runtime_error("Lock timeout.");
+                throw LockTimeout("Lock timout occured during ScopedAtom constructor.");
             }
         }
 
