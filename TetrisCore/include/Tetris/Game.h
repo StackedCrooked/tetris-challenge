@@ -7,6 +7,7 @@
 #include "Tetris/BlockType.h"
 #include "Tetris/Direction.h"
 #include "Tetris/GameStateNode.h"
+#include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <memory>
 #include <vector>
@@ -23,14 +24,12 @@ namespace Tetris
      *
      * It is the class that needs to be exposed to the client.
      */
-    class Game
+    class Game : boost::noncopyable
     {
     public:
         Game(size_t inNumRows, size_t inNumColumns);
 
         ~Game();
-
-        std::auto_ptr<Game> clone() const;
 
         int numRows() const;
 
@@ -91,12 +90,6 @@ namespace Tetris
         bool navigateNodeRight();
 
     private:
-        // Implemented
-        explicit Game(const Game & inGame);
-
-        // Not implemented
-        Game & operator&();
-
         void setCurrentNode(const GameStateNode * inCurrentNode);
 
         void supplyBlocks() const;

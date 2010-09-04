@@ -15,32 +15,25 @@ namespace Tetris
     {
         // Pick a new seed.
         srand(static_cast<unsigned int>(time(NULL)));
-
-        mBag.reserve(cBlockTypeCount * mBagSize);
-        reset();
-    }
-
-
-    void BlockFactory::reset()
-    {
-        mBag.clear();
+   
         size_t totalSize = mBagSize * cBlockTypeCount;
+        mBag.reserve(totalSize);
         for (size_t idx = 0; idx != totalSize; ++idx)
         {
             BlockType blockType = static_cast<BlockType>(1 + (idx % cBlockTypeCount));
             mBag.push_back(blockType);
-        }        
-        mCurrentIndex = 0;
+        }
         std::random_shuffle(mBag.begin(), mBag.end());
     }
 
     
     BlockType BlockFactory::getNext() const
     {
-        if (mCurrentIndex >= mBagSize * cBlockTypeCount)
+        if (mCurrentIndex >= mBag.size())
         {
-            // Reshuffle the bag.
-            const_cast<BlockFactory*>(this)->reset();
+            // Reshuffle the bag.            
+            std::random_shuffle(mBag.begin(), mBag.end());
+            mCurrentIndex = 0;
         }
         return mBag[mCurrentIndex++];
     }

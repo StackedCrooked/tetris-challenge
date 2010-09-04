@@ -21,8 +21,6 @@ namespace Tetris
         BlockType getNext() const;
 
     private:
-        void reset();
-
         size_t mBagSize;
         mutable size_t mCurrentIndex;
         mutable BlockTypes mBag;
