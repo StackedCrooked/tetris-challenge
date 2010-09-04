@@ -55,11 +55,6 @@ namespace Tetris
 
         const GameStateNode * currentNode() const;
 
-        // Removes all nodes that came before the current node.
-        // This function is mainly used to prevent a stack overflow
-        // when destructing a Game object that has a very deep node tree.
-        void eraseHistory();
-
         //
         // Statistics
         //
