@@ -183,23 +183,12 @@ namespace Tetris
     }
 
 
-    void Game::setCurrentNode(const GameStateNode * inCurrentNode)
+    void Game::setCurrentNode(GameStateNode * inCurrentNode)
     {
-        mCurrentNode = const_cast<GameStateNode*>(inCurrentNode);
+        mCurrentNode = inCurrentNode;
         mCurrentBlockIndex = mCurrentNode->depth();
         supplyBlocks();
         mActiveBlock.reset(CreateDefaultBlock(mBlocks[mCurrentBlockIndex], mNumColumns).release());
-    }
-
-
-    bool Game::navigateNodeUp()
-    {
-        if (mCurrentNode->parent())
-        {
-            setCurrentNode(mCurrentNode->parent());
-            return true;
-        }
-        return false;
     }
 
 
@@ -210,60 +199,21 @@ namespace Tetris
             return false;
         }
         
-        const GameStateNode * nextNode = mCurrentNode->children().begin()->get();
+        GameStateNode * nextNode = mCurrentNode->children().begin()->get();
         Assert(nextNode->depth() == mCurrentNode->depth() + 1);
-        setCurrentNode(nextNode);        
+        setCurrentNode(nextNode);
         return true;
     }
 
-
-    bool Game::navigateNodeLeft()
+    
+    void Game::cleanupHistory()
     {
-        if (GameStateNode * parent = mCurrentNode->parent())
+        // Cleanup history
+        while (mRootNode.get() != mCurrentNode)
         {
-            const ChildNodes & children = parent->children();
-            ChildNodes::const_iterator it = children.begin(), end = children.end();
-            ChildNodes::const_iterator * previous(0);
-            for (; it != end; ++it)
-            {
-                if (it->get() == mCurrentNode)
-                {
-                    if (!previous)
-                    {
-                        return false;
-                    }
-                    setCurrentNode((*previous)->get());
-                    return true;
-                }
-                previous = &it;
-            }
+            ChildNodePtr child = *mRootNode->children().begin();
+            mRootNode = child;
         }
-        return false;
-    }
-
-
-    bool Game::navigateNodeRight()
-    {
-        if (GameStateNode * parent = mCurrentNode->parent())
-        {
-            const ChildNodes & children = parent->children();
-            ChildNodes::const_iterator it = children.begin(), end = children.end();
-            ChildNodes::const_iterator * previous(0);
-            for (; it != end; ++it)
-            {
-                if (it->get() == mCurrentNode)
-                {
-                    ++it;
-                    if (it != end)
-                    {
-                        setCurrentNode(it->get());
-                        return true;
-                    }
-                    return false;
-                }
-            }
-        }
-        return false;
     }
 
 
@@ -369,4 +319,3 @@ namespace Tetris
 
 
 } // namespace Tetris
-

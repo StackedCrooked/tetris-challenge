@@ -501,7 +501,10 @@ namespace Tetris
             mStatusTextBox->setValue("Game Over!");
             return;
         }
-
+        
+        // Cleanup the previous game states.
+        // This prevents a stack overflow when deleting a very deep tree.
+        game.cleanupHistory();
 
         // Create only once
         if (!mBlockMover)

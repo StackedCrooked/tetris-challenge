@@ -59,9 +59,13 @@ namespace Tetris
         {
             move();
         }
+        catch (const LockTimeout & inException)
+        {
+            LogWarning(MakeString() << "BlockMover failed to lock the Game due to timeout. Details: " << inException.what());
+        }
         catch (const std::exception & inException)
         {
-            LogError(inException.what());
+            LogError(MakeString() << "Unanticipated exception thrown in BlockMover::move(). Details: " << inException.what());
         }
     }
 

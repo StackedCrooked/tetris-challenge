@@ -77,26 +77,19 @@ namespace Tetris
 
         void drop();
 
-        //
-        // Navigate the game history and alternative histories.
-        // Experimental.
-        //
-        bool navigateNodeUp();
-
+        // Make the next queued game state the current game state.
         bool navigateNodeDown();
 
-        bool navigateNodeLeft();
-
-        bool navigateNodeRight();
+        void cleanupHistory();
 
     private:
-        void setCurrentNode(const GameStateNode * inCurrentNode);
+        void setCurrentNode(GameStateNode * inCurrentNode);
 
         void supplyBlocks() const;
 
         size_t mNumRows;
         size_t mNumColumns;
-        boost::scoped_ptr<GameStateNode> mRootNode;
+        ChildNodePtr mRootNode;
         GameStateNode * mCurrentNode;
         boost::scoped_ptr<Block> mActiveBlock;
         boost::scoped_ptr<BlockFactory> mBlockFactory;
@@ -105,5 +98,6 @@ namespace Tetris
     };
 
 } // namespace Tetris
+
 
 #endif // GAME_H_INCLUDED
