@@ -50,7 +50,7 @@ namespace Tetris
     Player::Player(std::auto_ptr<GameStateNode> inNode,
                    const BlockTypes & inBlockTypes,
                    std::auto_ptr<Evaluator> inEvaluator) :
-        mTreeRows(),
+        mLayers(),
         mNode(inNode.release()),
         mBlockTypes(inBlockTypes),
         mEvaluator(inEvaluator),
@@ -157,27 +157,27 @@ namespace Tetris
 
             // Populate ioNode and overwrite results.
             {
-                Assert(inIndex <= mTreeRows.size());
-                if (inIndex == mTreeRows.size())
+                Assert(inIndex <= mLayers.size());
+                if (inIndex == mLayers.size())
                 {
-                    Protected<TreeRowInfo> newTreeInfo;
-                    mTreeRows.push_back(newTreeInfo);
+                    Protected<LayerData> newTreeInfo;
+                    mLayers.push_back(newTreeInfo);
                 }
-                Assert(inIndex < mTreeRows.size());
-                ScopedAtom<TreeRowInfo> scopedTreeRowInfo = mTreeRows[inIndex];
-                TreeRowInfo & rowInfo = *scopedTreeRowInfo.get();
+                Assert(inIndex < mLayers.size());
+                ScopedAtom<LayerData> scopedLayerData = mLayers[inIndex];
+                LayerData & layer = *scopedLayerData.get();
                 ChildNodes::iterator it = generatedChildNodes.begin(), end = generatedChildNodes.end();
                 for (; it != end; ++it)
                 {
                     // Populate io
                     ChildNodePtr child = *it;
                     ioNode.addChild(child);
-                    if (!rowInfo.mBestChild || 
-                        child->state().quality(child->qualityEvaluator()) > rowInfo.mBestChild->state().quality(child->qualityEvaluator()))
+                    if (!layer.mBestChild || 
+                        child->state().quality(child->qualityEvaluator()) > layer.mBestChild->state().quality(child->qualityEvaluator()))
                     {
-                        rowInfo.mBestChild = child;
+                        layer.mBestChild = child;
                     }
-                    rowInfo.mNumItems++;
+                    layer.mNumItems++;
                 }
             }
         }
@@ -198,55 +198,55 @@ namespace Tetris
 
     void Player::markTreeRowAsFinished(size_t inIndex)
     {
-        size_t numTreeRows = mTreeRows.size();
-        Assert(inIndex < numTreeRows);
-        if (inIndex < numTreeRows)
+        size_t numLevels = mLayers.size();
+        Assert(inIndex < numLevels);
+        if (inIndex < numLevels)
         {
-            ScopedAtom<TreeRowInfo> scopedTreeRowInfo = mTreeRows[inIndex];
-            TreeRowInfo & rowInfo = *scopedTreeRowInfo.get();
-            rowInfo.mFinished = true;
+            ScopedAtom<LayerData> scopedLayerData = mLayers[inIndex];
+            LayerData & layer = *scopedLayerData.get();
+            layer.mFinished = true;
         }
     }
 
 
     void Player::populateBreadthFirst()
     {
-        size_t maxIndex = 0;
-        size_t numBlockTypes = mBlockTypes.size();
-        while (maxIndex < numBlockTypes)
+        size_t currentDepth = 0;
+        size_t targetDepth = mBlockTypes.size();
+        while (currentDepth < targetDepth)
         {
-            populateNodesRecursively(*mNode, mBlockTypes, 0, maxIndex);
-            size_t numTreeRows = mTreeRows.size();
-            if (maxIndex + 1 == numTreeRows)
+            populateNodesRecursively(*mNode, mBlockTypes, 0, currentDepth);
+            size_t numLevels = mLayers.size();
+            if (currentDepth + 1 == numLevels)
             {
-                markTreeRowAsFinished(maxIndex);
+                markTreeRowAsFinished(currentDepth);
             }
             else
             {
                 break;
             }
-            maxIndex++;
+            currentDepth++;
         }
     }
 
 
     void Player::destroyInferiorChildren()
     {
-        if (!mTreeRows.empty())
+        if (!mLayers.empty())
         {
-            TreeRowInfo * rowInfo(0);
-            for (size_t idx = 0; idx != mTreeRows.size(); ++idx)
+            LayerData * layer(0);
+            for (size_t idx = 0; idx != mLayers.size(); ++idx)
             {
-                ScopedAtom<TreeRowInfo> scopedTreeRowInfo = mTreeRows[idx];
-                if (!scopedTreeRowInfo->mFinished)
+                ScopedAtom<LayerData> scopedLayerData = mLayers[idx];
+                if (!scopedLayerData->mFinished)
                 {
                     break;
                 }
-                rowInfo = scopedTreeRowInfo.get();
+                layer = scopedLayerData.get();
             }
-            if (rowInfo)
+            if (layer)
             {
-                DestroyInferiorChildren(*mNode, *rowInfo->mBestChild);
+                DestroyInferiorChildren(*mNode, *layer->mBestChild);
             }
         }
     }

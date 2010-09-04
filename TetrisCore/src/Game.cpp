@@ -58,18 +58,6 @@ namespace Tetris
 
     Game::~Game()
     {
-        eraseHistory();
-    }
-
-
-    void Game::eraseHistory()
-    {
-        GameStateNode * end = endNode();
-        while (end && end->depth() > 1)
-        {
-            end->clearChildren();
-            end = end->parent();
-        }
     }
 
     

@@ -64,17 +64,17 @@ namespace Tetris
                                       size_t inIndex,
                                       size_t inMaxIndex);
 
-        // A 'tree row' is the union of all nodes at a certain depth.
-        struct TreeRowInfo
+        // LayerData contains the accumulated data for all branches at a same depth.
+        struct LayerData
         {
-            TreeRowInfo() : mNumItems(0), mFinished(false) {}
+            LayerData() : mNumItems(0), mFinished(false) {}
             ChildNodePtr mBestChild;
             int mNumItems;
             bool mFinished;
         };
 
-        // Stores tree row info for each depth.
-        std::vector<Protected<TreeRowInfo> > mTreeRows;
+        // Stores layer info per layer index.
+        std::vector<Protected<LayerData> > mLayers;
 
         ChildNodePtr mNode;
         BlockTypes mBlockTypes;
