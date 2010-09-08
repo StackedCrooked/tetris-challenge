@@ -1,4 +1,23 @@
-- Consider introducing a memory limit instead of a depth limit.
+- [high] Memory limit
+	- set from the GUI
+	- boost pool library
+	- allow depth > 5 now
+- [med] GUI shows memory used and current search depth
+	- black background
+	- green text
+	- graphics
+- [med] Pruning
+	- set from GUI
+	- [2, 34]
+- [low] Concurrent node calculation
+	- Create first generation	
+	- Per child node
+		- iterative deepening
+		- threaded
+		- limit number of threads (set with GUI)
+- [low] Reduce size of nodes
+	- For example: store base grid + modifications
+	- Actual grid is only required when calculating actual quality
 - SpinButton -> implement a refresh when keeping the mouse button down
 - Use Tetris icon on the exe file.
 v Player class: specifying a time limit should be non-intrusive. Use a Concept (or Decorator).
