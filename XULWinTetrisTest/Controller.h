@@ -32,11 +32,7 @@ namespace Tetris
     enum
     {
         cMinSearchDepth = 2,
-#ifndef NDEBUG
         cMaxSearchDepth = 4
-#else
-        cMaxSearchDepth = 5 // more than for results in memory usage of 2+ GB
-#endif
     };
 
     
