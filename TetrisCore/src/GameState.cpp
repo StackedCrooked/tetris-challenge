@@ -177,25 +177,24 @@ namespace Tetris
         Assert(mStats.mFirstOccupiedRow + numLines <= mGrid.numRows());
         mStats.mFirstOccupiedRow += numLines;
         
-        BlockTypes newData(mGrid.data().size(), BlockType_Nil);
-        
-        // Get newData
+                
+        // Get newGrid
+        Grid newGrid(mGrid.numRows(), mGrid.numColumns(), BlockType_Nil);
+        int newRowIdx = numLines;
+        for (size_t r = 0; r != mGrid.numRows(); ++r)
         {
-            int newRowIdx = numLines;
-            for (size_t r = 0; r != mGrid.numRows(); ++r)
-            {
-				if (!lines[r])
+			if (!lines[r])
+			{
+				for (size_t c = 0; c != mGrid.numColumns(); ++c)
 				{
-					for (size_t c = 0; c != mGrid.numColumns(); ++c)
-					{
-						newData[newRowIdx * mGrid.numColumns() + c] = mGrid.get(r, c);
-					}					
-                    newRowIdx++;
+                    newGrid.set(newRowIdx, c, mGrid.get(r, c));
 				}
-            }
+                newRowIdx++;
+			}
         }
         
-        mGrid.data().swap(newData);
+        mGrid = newGrid;
+
         mStats.mNumLines += numLines;
         
         switch (numLines)
