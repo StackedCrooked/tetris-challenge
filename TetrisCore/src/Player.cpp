@@ -77,16 +77,6 @@ namespace Tetris
     }
 
 
-    bool Player::isGameOver() const
-    {
-        if (!mNode->children().empty())
-        {
-            return (*mNode->children().begin())->state().isGameOver();
-        }
-        return false;
-    }
-
-
     bool Player::result(ChildNodePtr & outChild)
     {
         if (mNode->children().size() == 1)
