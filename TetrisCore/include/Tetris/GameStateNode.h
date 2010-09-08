@@ -61,6 +61,9 @@ namespace Tetris
 
         GameStateNode * parent();
 
+        void detach()
+        { mParent = 0; }
+
         const ChildNodes & children() const;
 
         void clearChildren();

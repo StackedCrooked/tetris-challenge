@@ -20,7 +20,7 @@ namespace Tetris
     Game::Game(size_t inNumRows, size_t inNumColumns) :
         mNumRows(inNumRows),
         mNumColumns(inNumColumns),
-        mRootNode(GameStateNode::CreateRootNode(inNumRows, inNumColumns).release()),        
+        mCurrentNode(GameStateNode::CreateRootNode(inNumRows, inNumColumns).release()),
         mActiveBlock(),
         mBlockFactory(new BlockFactory),
         mBlocks(),
@@ -31,7 +31,6 @@ namespace Tetris
             mBlocks.push_back(mBlockFactory->getNext());        
         }
         mActiveBlock.reset(CreateDefaultBlock(mBlocks.front(), inNumColumns).release());
-        mCurrentNode = mRootNode.get();
     }
 
 
@@ -137,7 +136,7 @@ namespace Tetris
     size_t Game::numPrecalculatedMoves() const
     {
         size_t countMovesAhead = 0;
-        const GameStateNode * tmp = mCurrentNode;
+        const GameStateNode * tmp = mCurrentNode.get();
         while (!tmp->children().empty())
         {
             tmp = tmp->children().begin()->get();
@@ -149,13 +148,13 @@ namespace Tetris
 
     GameStateNode * Game::currentNode()
     {
-        return mCurrentNode;
+        return mCurrentNode.get();
     }
 
 
     const GameStateNode * Game::currentNode() const
     {
-        return mCurrentNode;
+        return mCurrentNode.get();
     }
 
 
@@ -163,7 +162,7 @@ namespace Tetris
     {
         if (mCurrentNode->children().empty())
         {
-            return mCurrentNode;
+            return mCurrentNode.get();
         }
         else
         {
@@ -172,7 +171,7 @@ namespace Tetris
     }
 
 
-    void Game::setCurrentNode(GameStateNode * inCurrentNode)
+    void Game::setCurrentNode(boost::shared_ptr<GameStateNode> inCurrentNode)
     {
         mCurrentNode = inCurrentNode;
         mCurrentBlockIndex = mCurrentNode->depth();
@@ -188,21 +187,10 @@ namespace Tetris
             return false;
         }
         
-        GameStateNode * nextNode = mCurrentNode->children().begin()->get();
+        boost::shared_ptr<GameStateNode> nextNode = *mCurrentNode->children().begin();
         Assert(nextNode->depth() == mCurrentNode->depth() + 1);
         setCurrentNode(nextNode);
         return true;
-    }
-
-    
-    void Game::cleanupHistory()
-    {
-        // Cleanup history
-        while (!mRootNode->children().empty() && mRootNode.get() != mCurrentNode)
-        {
-            ChildNodePtr child = *mRootNode->children().begin();
-            mRootNode = child;
-        }
     }
 
 
@@ -272,11 +260,11 @@ namespace Tetris
         }
 
         // Commit the block
-        ChildNodePtr child(new GameStateNode(mCurrentNode,
+        ChildNodePtr child(new GameStateNode(mCurrentNode.get(),
                                              mCurrentNode->state().commit(block, GameOver(block.row() == 0)),
                                              CreatePoly<Evaluator, Balanced>()));
         mCurrentNode->addChild(child);
-        setCurrentNode(child.get());
+        setCurrentNode(child);
         supplyBlocks();
         return false;
     }
