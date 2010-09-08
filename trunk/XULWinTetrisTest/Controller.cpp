@@ -443,7 +443,8 @@ namespace Tetris
     void Controller::startAI(Game & game, size_t inDepth)
     {
         Assert(!mComputerPlayer);
-        if (!mComputerPlayer)
+        Assert(!game.isGameOver());
+        if (!mComputerPlayer && !game.isGameOver())
         {
             //
             // Clone the starting node
@@ -517,24 +518,26 @@ namespace Tetris
         {
             // Check if the computer player has finished. If yes, then get the results.
             if (mComputerPlayer->isFinished())
-            {
-                // Did we manage to think all our moves before the block was dropped?
-                GameStateNode * endNode = game.endNode();
+            {                
                 ChildNodePtr resultNode;
                 if (mComputerPlayer->result(resultNode))
                 {
-                    if (resultNode->depth() == endNode->depth() + 1)
+                    if (!resultNode->state().isGameOver())
                     {
-                        endNode->addChild(resultNode);
-                    }
-                    else
-                    {
-                        LogError("The computer generated move does not have the correct depth.");
+                        GameStateNode * endNode = game.endNode();
+                        if (resultNode->depth() == endNode->depth() + 1)
+                        {
+                            endNode->addChild(resultNode);
+                        }
+                        else
+                        {
+                            LogError("The computer generated move does not have the correct depth.");
+                        }
                     }
                 }
                 else
                 {
-                    LogWarning("Suspicious: the computer failed to generate any moves.");
+                    LogInfo("Game Over");
                 }
                 mComputerPlayer.reset();
             }
@@ -562,7 +565,7 @@ namespace Tetris
         }
 
 
-        if (!mComputerPlayer && mComputerEnabledCheckBox->isChecked())
+        if (!game.isGameOver() && !mComputerPlayer && mComputerEnabledCheckBox->isChecked())
         {
             int searchDepth = XULWin::String2Int(mSearchDepth->getValue(), 2);
             GameStateNode * endNode = game.endNode();

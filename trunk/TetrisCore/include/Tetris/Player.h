@@ -34,8 +34,6 @@ namespace Tetris
 
         bool isFinished() const;
 
-		bool isGameOver() const;
-
         bool result(ChildNodePtr & outChild);
 
         enum Status 

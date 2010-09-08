@@ -1,6 +1,7 @@
 #include "Tetris/Game.h"
-#include "Tetris/GameQualityEvaluator.h"
 #include "Tetris/ErrorHandling.h"
+#include "Tetris/GameQualityEvaluator.h"
+#include "Tetris/Logger.h"
 #include "Tetris/Utilities.h"
 
 
@@ -197,7 +198,7 @@ namespace Tetris
     void Game::cleanupHistory()
     {
         // Cleanup history
-        while (mRootNode.get() != mCurrentNode)
+        while (!mRootNode->children().empty() && mRootNode.get() != mCurrentNode)
         {
             ChildNodePtr child = *mRootNode->children().begin();
             mRootNode = child;
