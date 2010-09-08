@@ -117,7 +117,7 @@ namespace Tetris
             {
                 game->move(Direction_Down);
             }
-            if (!game->navigateNodeDown())
+            else if (!game->navigateNodeDown())
             {
                 throw std::runtime_error("Unable to navigate one node down in the the gamestate tree.");
             }
