@@ -199,8 +199,16 @@ namespace Tetris
     }
 
 
-    void Player::populateBreadthFirst()
+    //void create()
+    //{
+    //    char *buf  = new char[1000];   //pre-allocated buffer
+    //    string *p = new (buf) string("hi");  //placement new
+    //}
+
+
+    void Player::populate()
     {
+        // Use iterative-deepening
         size_t currentDepth = 0;
         size_t targetDepth = mBlockTypes.size();
         while (currentDepth < targetDepth)
@@ -248,7 +256,7 @@ namespace Tetris
         try
         {
             setStatus(Status_Calculating);
-            populateBreadthFirst();
+            populate();
             destroyInferiorChildren();
             setStatus(Status_Finished);
         } 

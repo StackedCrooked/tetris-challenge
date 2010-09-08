@@ -54,7 +54,7 @@ namespace Tetris
 
         
         void markTreeRowAsFinished(size_t inIndex);
-        void populateBreadthFirst();
+        void populate();
         void destroyInferiorChildren();
 
         void populateNodesRecursively(GameStateNode & ioNode,
