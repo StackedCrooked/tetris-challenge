@@ -75,17 +75,14 @@ namespace Tetris
         // Make the next queued game state the current game state.
         bool navigateNodeDown();
 
-        void cleanupHistory();
-
     private:
-        void setCurrentNode(GameStateNode * inCurrentNode);
+        void setCurrentNode(boost::shared_ptr<GameStateNode> inCurrentNode);
 
         void supplyBlocks() const;
 
         size_t mNumRows;
         size_t mNumColumns;
-        ChildNodePtr mRootNode;
-        GameStateNode * mCurrentNode;
+        boost::shared_ptr<GameStateNode> mCurrentNode;
         boost::scoped_ptr<Block> mActiveBlock;
         boost::scoped_ptr<BlockFactory> mBlockFactory;
         mutable BlockTypes mBlocks;
