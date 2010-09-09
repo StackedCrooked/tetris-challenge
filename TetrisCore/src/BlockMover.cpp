@@ -73,51 +73,55 @@ namespace Tetris
     void BlockMover::move()
     {
 
-        ScopedAtom<Game> game(mGame, 100);
-        const ChildNodes & children = game->currentNode()->children();
+        ScopedAtom<Game> wgame(mGame, 100);
+        Game & game = *wgame.get();
+
+        const ChildNodes & children = game.currentNode()->children();
         if (children.empty())
         {
             return;
         }
 
-        Block & block = game->activeBlock();
-        const Block & targetBlock = (*children.begin())->state().originalBlock();
+        GameStateNode & firstChild = **children.begin();
+
+        Block & block = game.activeBlock();
+        const Block & targetBlock = firstChild.state().originalBlock();
         Assert(block.type() == targetBlock.type());
         if (block.rotation() != targetBlock.rotation())
         {
-            if (!game->rotate())
+            if (!game.rotate())
             {
                 // Damn we can't rotate.
                 // Give up on this block.
-                game->drop();
+                game.drop();
             }
         }
         else if (block.column() < targetBlock.column())
         {
-            if (!game->move(Direction_Right))
+            if (!game.move(Direction_Right))
             {
                 // Damn we can't move this block anymore.
                 // Give up on this block.
-                game->drop();
+                game.drop();
             }
         }
         else if (block.column() > targetBlock.column())
         {
-            if (!game->move(Direction_Left))
+            if (!game.move(Direction_Left))
             {
                 // Damn we can't move this block anymore.
                 // Give up on this block.
-                game->drop();
+                game.drop();
             }
         }
         else
         {
-            GameState & gameState = game->currentNode()->state();
+            GameState & gameState = game.currentNode()->state();
             if (gameState.checkPositionValid(block, block.row() + 1, block.column()))
             {
-                game->move(Direction_Down);
+                game.move(Direction_Down);
             }
-            else if (!game->navigateNodeDown())
+            else if (!game.navigateNodeDown())
             {
                 throw std::runtime_error("Unable to navigate one node down in the the gamestate tree.");
             }

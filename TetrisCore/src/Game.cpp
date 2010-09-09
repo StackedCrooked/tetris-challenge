@@ -115,11 +115,10 @@ namespace Tetris
     {
 
         // Make sure we have all blocks we need.
-        while (mBlocks.size() - mCurrentBlockIndex < inCount)
+        while (mBlocks.size() < mCurrentBlockIndex + inCount)
         {
             mBlocks.push_back(mBlockFactory->getNext());
         }
-
         
         outBlocks.push_back(mBlocks[mCurrentBlockIndex]);
 
@@ -177,6 +176,7 @@ namespace Tetris
         mCurrentBlockIndex = mCurrentNode->depth();
         supplyBlocks();
         mActiveBlock.reset(CreateDefaultBlock(mBlocks[mCurrentBlockIndex], mNumColumns).release());
+        Assert(mActiveBlock->type() == (*mCurrentNode->children().begin())->state().originalBlock().type());
     }
 
 
