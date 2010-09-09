@@ -61,7 +61,7 @@ namespace Tetris
 
         GameStateNode * parent();
 
-        void detach()
+        void makeRoot()
         { mParent = 0; }
 
         const ChildNodes & children() const;

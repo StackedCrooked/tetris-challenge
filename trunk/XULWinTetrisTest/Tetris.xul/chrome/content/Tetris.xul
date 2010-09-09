@@ -84,7 +84,7 @@
             <row align="center">
               <label value="Move speed:" style="text-align:right" />
               <hbox align="center">
-                <textbox id="movementSpeed" type="number" readonly="true" style="text-align:right" value="15" />
+                <textbox id="movementSpeed" type="number" readonly="true" style="text-align:right" value="100" />
                 <label value="moves/s" />
               </hbox>
             </row>

@@ -461,16 +461,18 @@ namespace Tetris
             BlockTypes futureBlocks_tooMany;
             game.getFutureBlocks(inDepth + blockOffset, futureBlocks_tooMany);
             BlockTypes futureBlocks;
+            std::vector<size_t> widths;
             for (size_t idx = blockOffset; idx != futureBlocks_tooMany.size(); ++idx)
             {
                 futureBlocks.push_back(futureBlocks_tooMany[idx]);
+                widths.push_back(4);
             }
 
 
             //
             // Create and start the Player.
             //
-            mComputerPlayer.reset(new Player(endNode, futureBlocks, mEvaluator->clone()));
+            mComputerPlayer.reset(new Player(endNode, futureBlocks, widths, mEvaluator->clone()));
             mComputerPlayer->start();
         }
     }
