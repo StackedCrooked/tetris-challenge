@@ -76,13 +76,13 @@ namespace Tetris
         bool navigateNodeDown();
 
     private:
-        void setCurrentNode(boost::shared_ptr<GameStateNode> inCurrentNode);
+        void setCurrentNode(NodePtr inCurrentNode);
 
         void supplyBlocks() const;
 
         size_t mNumRows;
         size_t mNumColumns;
-        boost::shared_ptr<GameStateNode> mCurrentNode;
+        NodePtr mCurrentNode;
         boost::scoped_ptr<Block> mActiveBlock;
         boost::scoped_ptr<BlockFactory> mBlockFactory;
         mutable BlockTypes mBlocks;
