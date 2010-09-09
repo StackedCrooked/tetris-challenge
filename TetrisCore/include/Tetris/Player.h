@@ -35,6 +35,8 @@ namespace Tetris
 
         bool isFinished() const;
 
+        int getCurrentSearchDepth() const;
+
         bool result(NodePtr & outChild);
 
         enum Status 
@@ -75,6 +77,7 @@ namespace Tetris
 
         // Stores layer info per layer index.
         std::vector<Protected<LayerData> > mLayers;
+        Protected<int> mCompletedSearchDepth;
 
         NodePtr mNode;
         BlockTypes mBlockTypes;

@@ -52,6 +52,7 @@ namespace Tetris
                    const std::vector<size_t> & inWidths,
                    std::auto_ptr<Evaluator> inEvaluator) :
         mLayers(),
+        mCompletedSearchDepth(Create<int>(0)),
         mNode(inNode.release()),
         mBlockTypes(inBlockTypes),
         mWidths(inWidths),
@@ -77,6 +78,13 @@ namespace Tetris
     bool Player::isFinished() const
     {
         return getStatus() == Status_Finished;;
+    }
+
+
+    int Player::getCurrentSearchDepth() const
+    {
+        ScopedConstAtom<int> value(mCompletedSearchDepth);
+        return *value.get();
     }
 
 
@@ -192,6 +200,8 @@ namespace Tetris
 
     void Player::markTreeRowAsFinished(size_t inIndex)
     {
+        ScopedAtom<int> wdepth(mCompletedSearchDepth);
+        *wdepth.get() = inIndex;
         size_t numLevels = mLayers.size();
         Assert(inIndex < numLevels);
         if (inIndex < numLevels)
@@ -201,13 +211,6 @@ namespace Tetris
             layer.mFinished = true;
         }
     }
-
-
-    //void create()
-    //{
-    //    char *buf  = new char[1000];   //pre-allocated buffer
-    //    string *p = new (buf) string("hi");  //placement new
-    //}
 
 
     void Player::populate()

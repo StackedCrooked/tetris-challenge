@@ -117,6 +117,7 @@ namespace Tetris
         XULWin::TextBox * mLevelTextBox;
         XULWin::CheckBox * mComputerEnabledCheckBox;
         XULWin::SpinButton * mSearchDepth;
+        XULWin::TextBox * mCurrentSearchDepth;
         XULWin::SpinButton * mMovementSpeed;
         XULWin::TextBox * mStatusTextBox;
         XULWin::TextBox * mMovesAheadTextBox;
