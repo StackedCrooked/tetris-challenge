@@ -26,6 +26,7 @@ namespace Tetris
     public:
         Player(std::auto_ptr<GameStateNode> inNode,
                const BlockTypes & inBlockTypes,
+               const std::vector<size_t> & inWidths,
                std::auto_ptr<Evaluator> inEvaluator);
 
         ~Player();
@@ -59,6 +60,7 @@ namespace Tetris
 
         void populateNodesRecursively(GameStateNode & ioNode,
                                       const BlockTypes & inBlockTypes,
+                                      const std::vector<size_t> & inWidths,
                                       size_t inIndex,
                                       size_t inMaxIndex);
 
@@ -76,6 +78,7 @@ namespace Tetris
 
         ChildNodePtr mNode;
         BlockTypes mBlockTypes;
+        std::vector<size_t> mWidths;
         boost::scoped_ptr<Evaluator> mEvaluator;
         Status mStatus;
         mutable boost::mutex mStatusMutex;

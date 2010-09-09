@@ -49,16 +49,19 @@ namespace Tetris
 
     Player::Player(std::auto_ptr<GameStateNode> inNode,
                    const BlockTypes & inBlockTypes,
+                   const std::vector<size_t> & inWidths,
                    std::auto_ptr<Evaluator> inEvaluator) :
         mLayers(),
         mNode(inNode.release()),
         mBlockTypes(inBlockTypes),
+        mWidths(inWidths),
         mEvaluator(inEvaluator),
         mStatus(Status_Null),
         mThread()
     {
         Assert(!mNode->state().isGameOver());
         Assert(mNode->children().empty());
+        mNode->makeRoot(); // forget out parent node
         mStopwatch.reset(new Poco::Stopwatch);
         mStopwatch->start();
     }
@@ -104,6 +107,7 @@ namespace Tetris
 
     void Player::populateNodesRecursively(GameStateNode & ioNode,
                                           const BlockTypes & inBlockTypes,
+                                          const std::vector<size_t> & inWidths,
                                           size_t inIndex,
                                           size_t inMaxIndex)
     {
@@ -157,7 +161,7 @@ namespace Tetris
                 ScopedAtom<LayerData> scopedLayerData = mLayers[inIndex];
                 LayerData & layer = *scopedLayerData.get();
                 ChildNodes::iterator it = generatedChildNodes.begin(), end = generatedChildNodes.end();
-                for (; it != end; ++it)
+                for (size_t count = 0; count < inWidths[inIndex] && it != end; ++count, ++it)
                 {
                     // Populate io
                     ChildNodePtr child = *it;
@@ -180,7 +184,7 @@ namespace Tetris
         {
             for (ChildNodes::iterator it = generatedChildNodes.begin(); it != generatedChildNodes.end(); ++it)
             {
-                populateNodesRecursively(**it, inBlockTypes, inIndex + 1, inMaxIndex);
+                populateNodesRecursively(**it, inBlockTypes, inWidths, inIndex + 1, inMaxIndex);
             }
         }
     }
@@ -213,7 +217,7 @@ namespace Tetris
         size_t targetDepth = mBlockTypes.size();
         while (currentDepth < targetDepth)
         {
-            populateNodesRecursively(*mNode, mBlockTypes, 0, currentDepth);
+            populateNodesRecursively(*mNode, mBlockTypes, mWidths, 0, currentDepth);
             size_t numLevels = mLayers.size();
             if (currentDepth + 1 == numLevels)
             {
