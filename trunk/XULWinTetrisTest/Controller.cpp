@@ -34,6 +34,7 @@ namespace Tetris
         mScoreTextBox(0),
         mComputerEnabledCheckBox(0),
         mSearchDepth(0),
+        mCurrentSearchDepth(0),
         mMovementSpeed(0),
         mStatusTextBox(0),
         mMovesAheadTextBox(0),
@@ -193,6 +194,9 @@ namespace Tetris
         {
             XULWin::WinAPI::SpinButton_SetRange(mSearchDepth->handle(), 1, cMaxSearchDepth);
         }
+
+
+        mCurrentSearchDepth = findComponentById<XULWin::TextBox>("currentSearchDepth");       
 
 
         if (mMovementSpeed = findComponentById<XULWin::SpinButton>("movementSpeed"))
@@ -465,7 +469,7 @@ namespace Tetris
             for (size_t idx = blockOffset; idx != futureBlocks_tooMany.size(); ++idx)
             {
                 futureBlocks.push_back(futureBlocks_tooMany[idx]);
-                widths.push_back(4);
+                widths.push_back(40); // no pruning
             }
 
 
@@ -565,13 +569,19 @@ namespace Tetris
 
         if (!game.isGameOver() && !mComputerPlayer && mComputerEnabledCheckBox->isChecked())
         {
-            int searchDepth = XULWin::String2Int(mSearchDepth->getValue(), 2);
+            int searchDepth = mSearchDepth ? XULWin::String2Int(mSearchDepth->getValue(), 2) : 2;
             GameStateNode * endNode = game.endNode();
             if (!endNode->state().isGameOver() &&
                  endNode->depth() - game.currentNode()->depth() + searchDepth <=  3 * cMaxSearchDepth)
             {
                 startAI(game, searchDepth);
             }
+        }
+
+
+        if (mCurrentSearchDepth && mComputerPlayer)
+        {
+            mCurrentSearchDepth->setValue(XULWin::Int2String(mComputerPlayer->getCurrentSearchDepth()));
         }
 
 
