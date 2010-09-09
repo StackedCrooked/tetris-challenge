@@ -517,7 +517,7 @@ namespace Tetris
             // Check if the computer player has finished. If yes, then get the results.
             if (mComputerPlayer->isFinished())
             {                
-                ChildNodePtr resultNode;
+                NodePtr resultNode;
                 if (mComputerPlayer->result(resultNode))
                 {
                     if (!resultNode->state().isGameOver())

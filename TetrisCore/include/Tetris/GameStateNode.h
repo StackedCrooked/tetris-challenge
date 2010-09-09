@@ -7,6 +7,7 @@
 #include "Tetris/GameQualityEvaluator.h"
 #include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/weak_ptr.hpp>
 #include <set>
 
 
@@ -16,7 +17,7 @@ namespace Tetris
     class Block;
     class GameState;
     class GameStateNode;
-    typedef boost::shared_ptr<GameStateNode> ChildNodePtr;
+    typedef boost::shared_ptr<GameStateNode> NodePtr;
 
 
     struct GameStateComparisonFunctor
@@ -28,21 +29,21 @@ namespace Tetris
 
         GameStateComparisonFunctor(std::auto_ptr<Evaluator> inChildPtrCompare);
     
-        bool operator()(ChildNodePtr lhs, ChildNodePtr rhs);
+        bool operator()(NodePtr lhs, NodePtr rhs);
 
     private:
         boost::shared_ptr<Evaluator> mEvaluator;
     };
 
 
-    typedef std::multiset<ChildNodePtr, GameStateComparisonFunctor> ChildNodes;
+    typedef std::multiset<NodePtr, GameStateComparisonFunctor> ChildNodes;
 
     class GameStateNode
     {
     public:
         static std::auto_ptr<GameStateNode> CreateRootNode(size_t inNumRows, size_t inNumColumns);
 
-        GameStateNode(GameStateNode * inParent, std::auto_ptr<GameState> inGameState, std::auto_ptr<Evaluator> inEvaluator);
+        GameStateNode(NodePtr inParent, std::auto_ptr<GameState> inGameState, std::auto_ptr<Evaluator> inEvaluator);
 
         // Creates a deep copy of this node and all child nodes.
         std::auto_ptr<GameStateNode> clone() const;
@@ -52,23 +53,24 @@ namespace Tetris
 
         const Evaluator & qualityEvaluator() const;
 
-        void generateOffspring(BlockTypes inBlockTypes, size_t inOffset, const Evaluator & inEvaluator);
-
         // Distance from the root node.
         int depth() const;
 
-        const GameStateNode * parent() const;
+        const NodePtr parent() const;
 
-        GameStateNode * parent();
+        NodePtr parent();
 
         void makeRoot()
-        { mParent = 0; }
+        { mParent.reset(); }
 
         const ChildNodes & children() const;
 
+        // yeah
+        ChildNodes & children() { return mChildren; }
+
         void clearChildren();
 
-        void addChild(ChildNodePtr inChildNode);
+        void addChild(NodePtr inChildNode);
 
         const GameStateNode * endNode() const;
 
@@ -83,7 +85,7 @@ namespace Tetris
         // Creates a root node
         GameStateNode(std::auto_ptr<GameState> inGameState, std::auto_ptr<Evaluator> inEvaluator);
 
-        GameStateNode * mParent;
+        boost::weak_ptr<GameStateNode> mParent;
         int mIdentifier;
         int mDepth;
         boost::scoped_ptr<GameState> mGameState;
@@ -92,22 +94,12 @@ namespace Tetris
         ChildNodes mChildren;                    // } => Order matters!
     };
 
+    bool IsGameOver(const GameState & inGameState, BlockType inBlockType, int inRotation);
 
-    //
-    // Helper functions
-    //
-
-    // Populate the node with all possible child nodes that can be
-    // created by combining the game state and the given block.
-    void GenerateOffspring(BlockType inBlockType,
-                           GameStateNode & ioGameStateNode,
+    void GenerateOffspring(NodePtr ioGameStateNode,
+                           BlockType inBlockType,
                            const Evaluator & inEvaluator,
                            ChildNodes & outChildNodes);
-
-    // Same as GenerateOffspring, but multiple levels deep.
-    void GenerateOffspring(size_t inDepth, const Block & inBlock, GameStateNode & ioGameStateNode, ChildNodes & outChildNodes);
-
-    bool IsGameOver(const GameState & inGameState, BlockType inBlockType, int inRotation);
 
 
 } // namespace Tetris

@@ -35,7 +35,7 @@ namespace Tetris
 
         bool isFinished() const;
 
-        bool result(ChildNodePtr & outChild);
+        bool result(NodePtr & outChild);
 
         enum Status 
         {
@@ -58,7 +58,7 @@ namespace Tetris
         void populate();
         void destroyInferiorChildren();
 
-        void populateNodesRecursively(GameStateNode & ioNode,
+        void populateNodesRecursively(NodePtr ioNode,
                                       const BlockTypes & inBlockTypes,
                                       const std::vector<size_t> & inWidths,
                                       size_t inIndex,
@@ -68,7 +68,7 @@ namespace Tetris
         struct LayerData
         {
             LayerData() : mNumItems(0), mFinished(false) {}
-            ChildNodePtr mBestChild;
+            NodePtr mBestChild;
             int mNumItems;
             bool mFinished;
         };
@@ -76,7 +76,7 @@ namespace Tetris
         // Stores layer info per layer index.
         std::vector<Protected<LayerData> > mLayers;
 
-        ChildNodePtr mNode;
+        NodePtr mNode;
         BlockTypes mBlockTypes;
         std::vector<size_t> mWidths;
         boost::scoped_ptr<Evaluator> mEvaluator;

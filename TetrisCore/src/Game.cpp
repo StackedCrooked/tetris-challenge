@@ -171,7 +171,7 @@ namespace Tetris
     }
 
 
-    void Game::setCurrentNode(boost::shared_ptr<GameStateNode> inCurrentNode)
+    void Game::setCurrentNode(NodePtr inCurrentNode)
     {
         mCurrentNode = inCurrentNode;
         mCurrentBlockIndex = mCurrentNode->depth();
@@ -187,7 +187,7 @@ namespace Tetris
             return false;
         }
         
-        boost::shared_ptr<GameStateNode> nextNode = *mCurrentNode->children().begin();
+        NodePtr nextNode = *mCurrentNode->children().begin();
         Assert(nextNode->depth() == mCurrentNode->depth() + 1);
         setCurrentNode(nextNode);
         return true;
@@ -260,7 +260,7 @@ namespace Tetris
         }
 
         // Commit the block
-        ChildNodePtr child(new GameStateNode(mCurrentNode.get(),
+        NodePtr child(new GameStateNode(mCurrentNode,
                                              mCurrentNode->state().commit(block, GameOver(block.row() == 0)),
                                              CreatePoly<Evaluator, Balanced>()));
         mCurrentNode->addChild(child);

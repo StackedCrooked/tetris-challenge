@@ -21,17 +21,17 @@ namespace Tetris
     //
     // The purpose of this function is mainly to free up memory.
     //
-    void DestroyInferiorChildren(GameStateNode & startNode, GameStateNode & endNode)
+    void DestroyInferiorChildren(NodePtr startNode, NodePtr endNode)
     {
-        GameStateNode * dst = &endNode;
-        Assert(dst->depth() > startNode.depth());
-        while (dst->depth() != startNode.depth())
+        NodePtr dst = endNode;
+        Assert(dst->depth() > startNode->depth());
+        while (dst->depth() != startNode->depth())
         {
             ChildNodes::const_iterator it = dst->parent()->children().begin(), end = dst->parent()->children().end();
             for (; it != end; ++it)
             {
-                ChildNodePtr endNode = *it;
-                if (endNode.get() == dst) // is endNode part of the path between startNode and endNode?
+                NodePtr endNode = *it;
+                if (endNode == dst) // is endNode part of the path between startNode and endNode?
                 {
                     // Erase all children. The endNode object is kept alive
                     // thanks to the refcounting mechanism of boost::shared_ptr.
@@ -80,7 +80,7 @@ namespace Tetris
     }
 
 
-    bool Player::result(ChildNodePtr & outChild)
+    bool Player::result(NodePtr & outChild)
     {
         if (mNode->children().size() == 1)
         {
@@ -105,7 +105,7 @@ namespace Tetris
     }
 
 
-    void Player::populateNodesRecursively(GameStateNode & ioNode,
+    void Player::populateNodesRecursively(NodePtr ioNode,
                                           const BlockTypes & inBlockTypes,
                                           const std::vector<size_t> & inWidths,
                                           size_t inIndex,
@@ -130,7 +130,7 @@ namespace Tetris
         }
 
 
-        if (ioNode.state().isGameOver())
+        if (ioNode->state().isGameOver())
         {
             // Game over state has no children.
             return;
@@ -143,11 +143,11 @@ namespace Tetris
         // It is possible that the nodes were already generated at this depth.
         // If that is the case then we immediately jump to the recursive call below.
         //
-        ChildNodes generatedChildNodes = ioNode.children();
+        ChildNodes generatedChildNodes = ioNode->children();
         if (generatedChildNodes.empty())
         {
             generatedChildNodes = ChildNodes(GameStateComparisonFunctor(mEvaluator->clone()));
-            GenerateOffspring(inBlockTypes[inIndex], ioNode, *mEvaluator, generatedChildNodes);
+            GenerateOffspring(ioNode, inBlockTypes[inIndex], *mEvaluator, generatedChildNodes);
 
             // Populate ioNode and overwrite results.
             {
@@ -164,8 +164,8 @@ namespace Tetris
                 for (size_t count = 0; count < inWidths[inIndex] && it != end; ++count, ++it)
                 {
                     // Populate io
-                    ChildNodePtr child = *it;
-                    ioNode.addChild(child);
+                    NodePtr child = *it;
+                    ioNode->addChild(child);
                     if (!layer.mBestChild || 
                         child->state().quality(child->qualityEvaluator()) > layer.mBestChild->state().quality(child->qualityEvaluator()))
                     {
@@ -184,7 +184,7 @@ namespace Tetris
         {
             for (ChildNodes::iterator it = generatedChildNodes.begin(); it != generatedChildNodes.end(); ++it)
             {
-                populateNodesRecursively(**it, inBlockTypes, inWidths, inIndex + 1, inMaxIndex);
+                populateNodesRecursively(*it, inBlockTypes, inWidths, inIndex + 1, inMaxIndex);
             }
         }
     }
@@ -217,7 +217,7 @@ namespace Tetris
         size_t targetDepth = mBlockTypes.size();
         while (currentDepth < targetDepth)
         {
-            populateNodesRecursively(*mNode, mBlockTypes, mWidths, 0, currentDepth);
+            populateNodesRecursively(mNode, mBlockTypes, mWidths, 0, currentDepth);
             size_t numLevels = mLayers.size();
             if (currentDepth + 1 == numLevels)
             {
@@ -248,7 +248,7 @@ namespace Tetris
             }
             if (layer)
             {
-                DestroyInferiorChildren(*mNode, *layer->mBestChild);
+                DestroyInferiorChildren(mNode, layer->mBestChild);
             }
         }
     }
