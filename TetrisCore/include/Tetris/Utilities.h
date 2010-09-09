@@ -8,6 +8,7 @@
 namespace Tetris
 {    
 
+
     // Rounded division by 2.
     // To be used for integral values (int, size_t, ...).
     template<class T>

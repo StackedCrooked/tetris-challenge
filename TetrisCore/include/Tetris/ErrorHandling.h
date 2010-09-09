@@ -3,7 +3,7 @@
 
 
 #ifdef _DEBUG
-#include "Poco/Debugger.h"
+#include <windows.h> // required for the ::DebugBreak function
 #else
 #ifndef NDEBUG
 #include <sstream>
@@ -17,7 +17,7 @@
 
 
 #ifdef _DEBUG
-#define Assert(condition) if (!(condition)) { Poco::Debugger::enter(__FILE__, __LINE__); }
+#define Assert(condition) if (!(condition)) { ::DebugBreak(); }
 #elif NDEBUG
 #define Assert(...)
 #else

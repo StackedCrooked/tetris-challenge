@@ -21,6 +21,22 @@ namespace Tetris
 
     std::string ToString(LogLevel inLogLevel);
 
+    // Requires that the ToString function is defined for values of type T.
+    template<class T>
+    std::string ToString(const std::vector<T> & inVector)
+    {
+        std::stringstream result;
+        for (size_t idx = 0; idx != inVector.size(); ++idx)
+        {
+            if (idx != 0)
+            {
+                result << ", ";
+            }
+            result << ToString(inVector[idx]);            
+        }
+        return result.str();
+    }
+
     class Logger
     {
     public:
