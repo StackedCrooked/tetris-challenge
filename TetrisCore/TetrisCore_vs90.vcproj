@@ -253,6 +253,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\BlockType.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\src\ErrorHandling.cpp"
 				>
 			</File>
