@@ -461,7 +461,7 @@ namespace Tetris
             //
             // Create the list of future blocks
             //            
-            size_t blockOffset = endNode->depth() - game.currentNode()->depth();
+            size_t blockOffset = endNode->depth();
             BlockTypes futureBlocks_tooMany;
             game.getFutureBlocks(inDepth + blockOffset, futureBlocks_tooMany);
             BlockTypes futureBlocks;
@@ -527,6 +527,7 @@ namespace Tetris
                     if (!resultNode->state().isGameOver())
                     {
                         GameStateNode * endNode = game.endNode();
+                        Assert(resultNode->depth() == endNode->depth() + 1);
                         if (resultNode->depth() == endNode->depth() + 1)
                         {
                             endNode->addChild(resultNode);

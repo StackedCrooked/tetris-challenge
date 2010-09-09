@@ -62,6 +62,7 @@ namespace Tetris
     {
         Assert(!mNode->state().isGameOver());
         Assert(mNode->children().empty());
+        LogInfo(MakeString() << "New player. " << "Starting node depth: " << mNode->depth() << ". Block types: " << ToString(inBlockTypes));
         mNode->makeRoot(); // forget out parent node
         mStopwatch.reset(new Poco::Stopwatch);
         mStopwatch->start();
