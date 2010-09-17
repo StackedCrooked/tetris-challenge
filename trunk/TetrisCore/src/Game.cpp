@@ -242,12 +242,10 @@ namespace Tetris
             return false;
         }
 
-        const GameState & gameState = mCurrentNode->state();
-        
         Block & block = activeBlock();
         size_t newRow = block.row() + GetRowDelta(inDirection);
         size_t newCol = block.column() + GetColumnDelta(inDirection);
-        if (gameState.checkPositionValid(block, newRow, newCol))
+        if (mCurrentNode->state().checkPositionValid(block, newRow, newCol))
         {
             block.setRow(newRow);
             block.setColumn(newCol);
@@ -262,8 +260,8 @@ namespace Tetris
 
         // Commit the block
         NodePtr child(new GameStateNode(mCurrentNode,
-                                             mCurrentNode->state().commit(block, GameOver(block.row() == 0)),
-                                             CreatePoly<Evaluator, Balanced>()));
+                                        mCurrentNode->state().commit(block, GameOver(block.row() == 0)),
+                                        CreatePoly<Evaluator, Balanced>()));
         mCurrentNode->addChild(child);
         setCurrentNode(child);
         supplyBlocks();
