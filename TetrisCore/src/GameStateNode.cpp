@@ -160,13 +160,13 @@ namespace Tetris
     }
 
 
-    void GenerateOffspring(NodePtr ioGameStateNode,
+    void GenerateOffspring(NodePtr inNode,
                            BlockType inBlockType,
                            const Evaluator & inEvaluator,
                            ChildNodes & outChildNodes)
     {        
         Assert(outChildNodes.empty());
-        const GameState & gameState = ioGameStateNode->state();
+        const GameState & gameState = inNode->state();
         const Grid & gameGrid = gameState.grid();
 
         // Is this a "game over" situation?
@@ -174,14 +174,14 @@ namespace Tetris
         if (IsGameOver(gameState, inBlockType, 0))
         {
             size_t initialColumn = DivideByTwo(gameGrid.numColumns() - GetGrid(GetBlockIdentifier(inBlockType, 0)).numColumns());
-            NodePtr childState(new GameStateNode(ioGameStateNode,
-                                                      gameState.commit(Block(inBlockType,
-                                                                             Rotation(0),
-                                                                             Row(0),
-                                                                             Column(initialColumn)),
-                                                                             GameOver(true)),
-                                                      inEvaluator.clone()));
-            Assert(childState->depth() == (ioGameStateNode->depth() + 1));
+            NodePtr childState(new GameStateNode(inNode,
+                                                 gameState.commit(Block(inBlockType,
+                                                                        Rotation(0),
+                                                                        Row(0),
+                                                                        Column(initialColumn)),
+                                                                        GameOver(true)),
+                                                 inEvaluator.clone()));
+            Assert(childState->depth() == (inNode->depth() + 1));
             outChildNodes.insert(childState);
             return;
         }
@@ -200,10 +200,10 @@ namespace Tetris
                 if (row > 0)
                 {
                     block.setRow(row - 1);
-                    NodePtr childState(new GameStateNode(ioGameStateNode,
-                                                              gameState.commit(block, GameOver(false)),
-                                                              inEvaluator.clone()));
-                    Assert(childState->depth() == ioGameStateNode->depth() + 1);
+                    NodePtr childState(new GameStateNode(inNode,
+                                                         gameState.commit(block, GameOver(false)),
+                                                         inEvaluator.clone()));
+                    Assert(childState->depth() == inNode->depth() + 1);
                     outChildNodes.insert(childState);
                 }
             }
@@ -226,11 +226,15 @@ namespace Tetris
 
         if (inOffset + 1 < inBlockTypes.size())
         {
-            ChildNodes::iterator it = ioGameStateNode->children().begin(), end = ioGameStateNode->children().end();
-            for (; it != end; ++it)
+            for (ChildNodes::iterator it = ioGameStateNode->children().begin();
+                 it != ioGameStateNode->children().end();
+                 ++it)
             {
                 NodePtr childNode = *it;
-                GenerateOffspring(childNode, inBlockTypes, inOffset + 1, inEvaluator);
+                GenerateOffspring(childNode,
+                                  inBlockTypes,
+                                  inOffset + 1,
+                                  inEvaluator);
             }
         }
     }
@@ -247,6 +251,7 @@ namespace Tetris
         Assert(lhs && rhs);
         Assert(lhs.get() != rhs.get());
         
+        // Order by descending quality.
         return lhs->state().quality(*mEvaluator) > rhs->state().quality(*mEvaluator);
     }
 
