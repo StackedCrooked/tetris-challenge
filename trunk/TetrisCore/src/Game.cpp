@@ -172,6 +172,7 @@ namespace Tetris
 
     void Game::setCurrentNode(NodePtr inCurrentNode)
     {
+        Assert(inCurrentNode->depth() == mCurrentNode->depth() + 1);
         mCurrentNode = inCurrentNode;
         mCurrentBlockIndex = mCurrentNode->depth();
         supplyBlocks();
