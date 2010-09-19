@@ -119,15 +119,10 @@ namespace Tetris
         {
             mBlocks.push_back(mBlockFactory->getNext());
         }
-        
-        outBlocks.push_back(mBlocks[mCurrentBlockIndex]);
 
-        if (inCount > 0)
+        for (size_t idx = 0; idx < inCount; ++idx)
         {
-            for (size_t idx = 0; idx < inCount - 1; ++idx)
-            {
-                outBlocks.push_back(mBlocks[mCurrentBlockIndex + 1 + idx]);
-            }
+            outBlocks.push_back(mBlocks[mCurrentBlockIndex + idx]);
         }
     }
 
@@ -174,10 +169,15 @@ namespace Tetris
     {
         Assert(inCurrentNode->depth() == mCurrentNode->depth() + 1);
         mCurrentNode = inCurrentNode;
+        size_t oldBlockIndex = mCurrentBlockIndex;
         mCurrentBlockIndex = mCurrentNode->depth();
         supplyBlocks();
         mActiveBlock.reset(CreateDefaultBlock(mBlocks[mCurrentBlockIndex], mNumColumns).release());
-        Assert(mActiveBlock->type() == (*mCurrentNode->children().begin())->state().originalBlock().type());
+        if (!mCurrentNode->children().empty())
+        {
+            GameState & state = (*mCurrentNode->children().begin())->state();
+            Assert(mActiveBlock->type() == state.originalBlock().type());
+        }
     }
 
 

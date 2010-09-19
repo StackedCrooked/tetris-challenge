@@ -186,6 +186,7 @@ namespace Tetris
             return;
         }
 
+        // Generate game state for each column/rotation combination.
         for (size_t col = 0; col != gameGrid.numColumns(); ++col)
         {
             Block block(inBlockType, Rotation(0), Row(0), Column(col));

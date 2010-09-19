@@ -460,13 +460,12 @@ namespace Tetris
 
             //
             // Create the list of future blocks
-            //            
-            size_t blockOffset = endNode->depth();
+            //
             BlockTypes futureBlocks_tooMany;
-            game.getFutureBlocks(inDepth + blockOffset, futureBlocks_tooMany);
+            game.getFutureBlocks(endNode->depth() + inDepth, futureBlocks_tooMany);
             BlockTypes futureBlocks;
             std::vector<size_t> widths;
-            for (size_t idx = blockOffset; idx != futureBlocks_tooMany.size(); ++idx)
+            for (size_t idx = endNode->depth(); idx != futureBlocks_tooMany.size(); ++idx)
             {
                 futureBlocks.push_back(futureBlocks_tooMany[idx]);
                 widths.push_back(40); // no pruning
