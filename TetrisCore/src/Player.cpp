@@ -71,7 +71,7 @@ namespace Tetris
 
     Player::~Player()
     {
-        setStatus(Status_Destructing);
+        setStatus(Status_Interrupted);
         mThread->join();
     }
     
@@ -133,7 +133,7 @@ namespace Tetris
         // Check status
         //
         Status status = getStatus();
-        if (status == Status_Destructing || status == Status_Interrupted)
+        if (status == Status_Interrupted)
         {
             return;
         }
@@ -189,7 +189,7 @@ namespace Tetris
         //
         // Recursive call on each child node.
         //
-        if (inIndex < inMaxIndex)
+        if (inIndex <= inMaxIndex)
         {
             for (ChildNodes::iterator it = generatedChildNodes.begin(); it != generatedChildNodes.end(); ++it)
             {

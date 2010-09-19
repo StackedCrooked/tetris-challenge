@@ -44,8 +44,7 @@ namespace Tetris
             Status_Null,
             Status_Calculating,
             Status_Finished,
-            Status_Interrupted,
-            Status_Destructing
+            Status_Interrupted
         };
 
         Status getStatus() const;
