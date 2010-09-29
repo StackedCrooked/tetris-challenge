@@ -127,6 +127,21 @@ namespace Tetris
     }
 
 
+    void Game::getFutureBlocksWithOffset(size_t inOffset, size_t inCount, BlockTypes & outBlocks) const
+    {
+        // Make sure we have all blocks we need.
+        while (mBlocks.size() < inOffset + inCount)
+        {
+            mBlocks.push_back(mBlockFactory->getNext());
+        }
+
+        for (size_t idx = 0; idx < inCount; ++idx)
+        {
+            outBlocks.push_back(mBlocks[inOffset + idx]);
+        }
+    }
+
+
     size_t Game::numPrecalculatedMoves() const
     {
         size_t countMovesAhead = 0;

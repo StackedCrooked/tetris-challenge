@@ -44,6 +44,8 @@ namespace Tetris
         // Includes the currently active block
         void getFutureBlocks(size_t inCount, BlockTypes & outBlocks) const;
 
+        void getFutureBlocksWithOffset(size_t inOffset, size_t inCount, BlockTypes & outBlocks) const;
+
         bool isGameOver() const;
 
         GameStateNode * currentNode();
