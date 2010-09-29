@@ -169,14 +169,7 @@ namespace Tetris
 
     const GameStateNode * Game::endNode() const
     {
-        if (mCurrentNode->children().empty())
-        {
-            return mCurrentNode.get();
-        }
-        else
-        {
-            return mCurrentNode->endNode();
-        }
+        return mCurrentNode->endNode();
     }
 
 

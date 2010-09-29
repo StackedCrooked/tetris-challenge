@@ -192,7 +192,12 @@ namespace Tetris
 
         if (mSearchDepth = findComponentById<XULWin::SpinButton>("searchDepth"))
         {
-            XULWin::WinAPI::SpinButton_SetRange(mSearchDepth->handle(), 1, cMaxSearchDepth);
+            XULWin::WinAPI::SpinButton_SetRange(mSearchDepth->handle(), cMinSearchDepth, cMaxSearchDepth);
+        }
+
+        if (mSearchWidth = findComponentById<XULWin::SpinButton>("searchWidth"))
+        {
+            XULWin::WinAPI::SpinButton_SetRange(mSearchWidth->handle(), cMinSearchWidth, cMaxSearchWidth);
         }
 
 
@@ -444,7 +449,7 @@ namespace Tetris
     }
 
 
-    void Controller::startAI(Game & game, size_t inDepth)
+    void Controller::startAI(Game & game, size_t inDepth, size_t inWidth)
     {
         Assert(!mComputerPlayer);
         Assert(!game.isGameOver());
@@ -466,7 +471,7 @@ namespace Tetris
             std::vector<size_t> widths;
             for (size_t idx = 0; idx != futureBlocks.size(); ++idx)
             {
-                widths.push_back(40); // no pruning
+                widths.push_back(inWidth); // no pruning
             }
 
 
@@ -524,8 +529,9 @@ namespace Tetris
                     if (!resultNode->state().isGameOver())
                     {
                         GameStateNode * endNode = game.endNode();
-                        Assert(resultNode->depth() == endNode->depth() + 1);
-                        if (resultNode->depth() == endNode->depth() + 1)
+                        int resultNodeDepth = resultNode->depth(), endNodeDepth = endNode->depth();
+                        Assert(resultNodeDepth == endNodeDepth + 1);
+                        if (resultNodeDepth == endNodeDepth + 1)
                         {
                             endNode->addChild(resultNode);
                         }
@@ -567,12 +573,13 @@ namespace Tetris
 
         if (!game.isGameOver() && !mComputerPlayer && mComputerEnabledCheckBox->isChecked())
         {
-            int searchDepth = mSearchDepth ? XULWin::String2Int(mSearchDepth->getValue(), 2) : 2;
+            int searchDepth = mSearchDepth ? XULWin::String2Int(mSearchDepth->getValue(), cDefaultSearchDepth) : cDefaultSearchDepth;
             GameStateNode * endNode = game.endNode();
             if (!endNode->state().isGameOver() &&
                  endNode->depth() - game.currentNode()->depth() + searchDepth <=  3 * cMaxSearchDepth)
             {
-                startAI(game, searchDepth);
+                int searchWidth = mSearchWidth ? XULWin::String2Int(mSearchWidth->getValue(), cDefaultSearchWidth) : cDefaultSearchWidth;
+                startAI(game, searchDepth, searchWidth);
             }
         }
 
