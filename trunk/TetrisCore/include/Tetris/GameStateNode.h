@@ -38,6 +38,10 @@ namespace Tetris
 
     typedef std::multiset<NodePtr, GameStateComparisonFunctor> ChildNodes;
 
+    /**
+     * GameStateNode is a tree of game states.
+     * Each node object contains one GameState object and a collection of child nodes.
+     */
     class GameStateNode
     {
     public:
