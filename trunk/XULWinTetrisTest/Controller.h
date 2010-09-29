@@ -31,8 +31,13 @@ namespace Tetris
 
     enum
     {
-        cMinSearchDepth = 2,
-        cMaxSearchDepth = 10
+        cMinSearchDepth = 1,
+        cDefaultSearchDepth = 3,
+        cMaxSearchDepth = 10,
+        
+        cMinSearchWidth = 1,
+        cDefaultSearchWidth = 8,
+        cMaxSearchWidth = 40
     };
 
     
@@ -95,7 +100,7 @@ namespace Tetris
         }
 
         int calculateRemainingTimeMs(Game & game) const;
-        void startAI(Game & game, size_t inDepth);
+        void startAI(Game & game, size_t inDepth, size_t inWidth);
         
         
         LRESULT onNew(WPARAM wParam, LPARAM lParam);
@@ -117,6 +122,7 @@ namespace Tetris
         XULWin::TextBox * mLevelTextBox;
         XULWin::CheckBox * mComputerEnabledCheckBox;
         XULWin::SpinButton * mSearchDepth;
+        XULWin::SpinButton * mSearchWidth;
         XULWin::TextBox * mCurrentSearchDepth;
         XULWin::SpinButton * mMovementSpeed;
         XULWin::TextBox * mStatusTextBox;
