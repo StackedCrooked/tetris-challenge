@@ -167,7 +167,7 @@ namespace Tetris
     }
 
 
-    const GameStateNode * Game::endNode() const
+    const GameStateNode * Game::lastPrecalculatedNode() const
     {
         return mCurrentNode->endNode();
     }

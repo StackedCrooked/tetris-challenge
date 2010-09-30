@@ -458,7 +458,7 @@ namespace Tetris
             //
             // Clone the starting node
             //
-            std::auto_ptr<GameStateNode> endNode = game.endNode()->clone();
+            std::auto_ptr<GameStateNode> endNode = game.lastPrecalculatedNode()->clone();
             Assert(endNode->children().empty());
             Assert(endNode->depth() >= game.currentNode()->depth());
 
@@ -528,7 +528,9 @@ namespace Tetris
                 {
                     if (!resultNode->state().isGameOver())
                     {
-                        GameStateNode * endNode = game.endNode();
+                        GameStateNode * endNode = game.lastPrecalculatedNode();
+
+                        // The created node should follow the last precalculated one.
                         int resultNodeDepth = resultNode->depth(), endNodeDepth = endNode->depth();
                         Assert(resultNodeDepth == endNodeDepth + 1);
                         if (resultNodeDepth == endNodeDepth + 1)
@@ -574,7 +576,7 @@ namespace Tetris
         if (!game.isGameOver() && !mComputerPlayer && mComputerEnabledCheckBox->isChecked())
         {
             int searchDepth = mSearchDepth ? XULWin::String2Int(mSearchDepth->getValue(), cDefaultSearchDepth) : cDefaultSearchDepth;
-            GameStateNode * endNode = game.endNode();
+            GameStateNode * endNode = game.lastPrecalculatedNode();
             if (!endNode->state().isGameOver() &&
                  endNode->depth() - game.currentNode()->depth() + searchDepth <=  3 * cMaxSearchDepth)
             {
@@ -610,7 +612,7 @@ namespace Tetris
 
         if (mMovesAheadTextBox)
         {
-            mMovesAheadTextBox->setValue(MakeString() << (game.endNode()->depth() - game.currentNode()->depth()) << "/" << 3 * cMaxSearchDepth);
+            mMovesAheadTextBox->setValue(MakeString() << (game.lastPrecalculatedNode()->depth() - game.currentNode()->depth()) << "/" << 3 * cMaxSearchDepth);
         }
 
 
