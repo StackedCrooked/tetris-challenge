@@ -33,6 +33,8 @@ namespace Tetris
 
         void start();
 
+        void interrupt();
+
         bool isFinished() const;
 
         int getCurrentSearchDepth() const;
@@ -49,12 +51,12 @@ namespace Tetris
             Status_Interrupted
         };
 
-        Status getStatus() const;
-
-        void setStatus(Status inStatus);
+        Status status() const;
 
     private:
         void startImpl();
+
+        void setStatus(Status inStatus);
 
         
         void markTreeRowAsFinished(size_t inIndex);

@@ -52,8 +52,7 @@ namespace Tetris
 
         const GameStateNode * lastPrecalculatedNode() const;
 
-        inline GameStateNode * lastPrecalculatedNode()
-        { return const_cast<GameStateNode*>(static_cast<const Game *>(this)->lastPrecalculatedNode()); }
+        GameStateNode * lastPrecalculatedNode();
 
         const GameStateNode * currentNode() const;
 

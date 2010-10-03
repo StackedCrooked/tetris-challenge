@@ -36,6 +36,7 @@ namespace Tetris
 
     Player::~Player()
     {
+        mThread->interrupt();
         setStatus(Status_Interrupted);
         mThread->join();
     }
@@ -43,7 +44,7 @@ namespace Tetris
         
     bool Player::isFinished() const
     {
-        return getStatus() == Status_Finished;;
+        return status() == Status_Finished;
     }
 
 
@@ -71,7 +72,7 @@ namespace Tetris
     }
 
 
-    Player::Status Player::getStatus() const
+    Player::Status Player::status() const
     {
         boost::mutex::scoped_lock lock(mStatusMutex);
         return mStatus;
@@ -91,6 +92,9 @@ namespace Tetris
                                           size_t inIndex,
                                           size_t inMaxIndex)
     {
+        // Throws boost::thread_interrupted if boost::thread::interrupt() has been called.
+        boost::this_thread::interruption_point();
+
         //
         // Check stop conditions
         //
@@ -103,10 +107,10 @@ namespace Tetris
         //
         // Check status
         //
-        Status status = getStatus();
-        if (status == Status_Interrupted)
+        if (status() == Status_Interrupted)
         {
-            return;
+            LogInfo("Ignoring Status_Interrupted");
+            //return;
         }
 
 
@@ -187,23 +191,30 @@ namespace Tetris
 
     void Player::populate()
     {
-        // The nodes are populated using a simple "Iterative deepening" algorithm.
-        // See: http://en.wikipedia.org/wiki/Iterative_deepening_depth-first_search for more information.
         size_t currentDepth = 0;
         size_t targetDepth = mBlockTypes.size();
-        while (currentDepth < targetDepth)
+        try
         {
-            populateNodesRecursively(mNode, mBlockTypes, mWidths, 0, currentDepth);
-            size_t numLevels = mLayers.size();
-            if (currentDepth + 1 == numLevels)
+            // The nodes are populated using a simple "Iterative deepening" algorithm.
+            // See: http://en.wikipedia.org/wiki/Iterative_deepening_depth-first_search for more information.
+            while (currentDepth < targetDepth)
             {
-                markTreeRowAsFinished(currentDepth);
+                populateNodesRecursively(mNode, mBlockTypes, mWidths, 0, currentDepth);
+                size_t numLevels = mLayers.size();
+                if (currentDepth + 1 == numLevels)
+                {
+                    markTreeRowAsFinished(currentDepth);
+                }
+                else
+                {
+                    break;
+                }
+                currentDepth++;
             }
-            else
-            {
-                break;
-            }
-            currentDepth++;
+        }
+        catch (const boost::thread_interrupted & )
+        {
+            LogInfo(MakeString() << "Thread was interrupted. Reached search depth: " << currentDepth << "/" << targetDepth << ".");
         }
     }
 
@@ -227,6 +238,13 @@ namespace Tetris
                 CarveBestPath(mNode, layer->mBestChild);
             }
         }
+    }
+
+
+    void Player::interrupt()
+    {
+        setStatus(Status_Interrupted);
+        mThread->interrupt();
     }
 
 

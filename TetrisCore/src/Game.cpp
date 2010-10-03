@@ -173,9 +173,21 @@ namespace Tetris
     }
 
 
+    GameStateNode * Game::lastPrecalculatedNode()
+    {
+        return mCurrentNode->endNode();
+    }
+
+
     void Game::setCurrentNode(NodePtr inCurrentNode)
     {
         Assert(inCurrentNode->depth() == mCurrentNode->depth() + 1);
+
+        const int oldDepth = mCurrentNode->endNode()->depth();
+        const int newDepth = inCurrentNode->endNode()->depth();
+        LogInfo(MakeString() << "Game::setCurrentNode: oldDepth: " << oldDepth << ", newDepth: " << newDepth << ".");
+        Assert(newDepth >= oldDepth);
+
         mCurrentNode = inCurrentNode;
         size_t oldBlockIndex = mCurrentBlockIndex;
         mCurrentBlockIndex = mCurrentNode->depth();
@@ -266,13 +278,38 @@ namespace Tetris
             return false;
         }
 
-        // Commit the block
+
+        //
+        // We can't move the block down any further => we hit the bottom => commit the block
+        //
+
+        // First check if we already have a matching precalculated block.
+        if (!mCurrentNode->children().empty())
+        {
+            const GameStateNode & precalculatedChild = **mCurrentNode->children().begin();
+            const Block & nextBlock = precalculatedChild.state().originalBlock();
+            Assert(nextBlock.type() == block.type());
+            if (block.column() == nextBlock.column() &&
+                block.rotation() == nextBlock.rotation())
+            {
+                return navigateNodeDown();
+            }
+        }
+
+        // We don't have a matching precalculating block.
+        // => Erase any existing children (should not happen)
+        if (!mCurrentNode->children().empty())
+        {
+            LogWarning("Existing children when commiting a block. They will be deleted.");
+            mCurrentNode->children().clear();
+        }
+
+        // Actually commit the block
         NodePtr child(new GameStateNode(mCurrentNode,
                                         mCurrentNode->state().commit(block, GameOver(block.row() == 0)),
                                         CreatePoly<Evaluator, Balanced>()));
         mCurrentNode->addChild(child);
         setCurrentNode(child);
-        supplyBlocks();
         return false;
     }
 
