@@ -209,6 +209,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\include\Tetris\Gravity.h"
+				>
+			</File>
+			<File
 				RelativePath=".\include\Tetris\Grid.h"
 				>
 			</File>
@@ -222,10 +226,6 @@
 			</File>
 			<File
 				RelativePath=".\include\Tetris\Threading.h"
-				>
-			</File>
-			<File
-				RelativePath=".\include\Tetris\TimedGame.h"
 				>
 			</File>
 			<File
@@ -285,15 +285,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\Gravity.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\src\Logger.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\src\Player.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\TimedGame.cpp"
 				>
 			</File>
 			<File

@@ -1,4 +1,4 @@
-#include "Tetris/TimedGame.h"
+#include "Tetris/Gravity.h"
 #include "Tetris/Logger.h"
 #include "Tetris/Game.h"
 
@@ -16,22 +16,22 @@ namespace Tetris
 
     static const int cMaxLevel = sizeof(sIntervals)/sizeof(int) - 1;
 
-    TimedGame::TimedGame(const Protected<Game> & inThreadSafeGame) :
+    Gravity::Gravity(const Protected<Game> & inThreadSafeGame) :
         mThreadSafeGame(inThreadSafeGame),
         mLevel(0)
     {
-        mTimer.start(Poco::TimerCallback<TimedGame>(*this, &TimedGame::onTimerEvent));
+        mTimer.start(Poco::TimerCallback<Gravity>(*this, &Gravity::onTimerEvent));
         mTimer.setPeriodicInterval(sIntervals[getLevel()]);
     }
 
 
-    TimedGame::~TimedGame()
+    Gravity::~Gravity()
     {
         mTimer.stop();
     }
 
 
-    void TimedGame::onTimerEvent(Poco::Timer & inTimer)
+    void Gravity::onTimerEvent(Poco::Timer & inTimer)
     {
         try
         {
@@ -59,20 +59,20 @@ namespace Tetris
     }
 
 
-    float TimedGame::currentSpeed() const
+    float Gravity::currentSpeed() const
     {
         return static_cast<float>(1000.0 / static_cast<float>(sIntervals[getLevel()]));
     }
 
 
-    int TimedGame::getLevel() const
+    int Gravity::getLevel() const
     {
         boost::mutex::scoped_lock lock(mLevelMutex);
         return mLevel;
     }
 
 
-    void TimedGame::setLevel(int inLevel)
+    void Gravity::setLevel(int inLevel)
     {
         boost::mutex::scoped_lock lock(mLevelMutex);
         mLevel = std::min<int>(inLevel, cMaxLevel);
