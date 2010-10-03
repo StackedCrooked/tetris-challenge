@@ -99,6 +99,8 @@ namespace Tetris
             return 0;
         }
 
+        void setText(XULWin::StringValueController * inComponent, const std::string & inText);
+
         int calculateRemainingTimeMs(Game & game) const;
         void startAI(Game & game, size_t inDepth, size_t inWidth);
         

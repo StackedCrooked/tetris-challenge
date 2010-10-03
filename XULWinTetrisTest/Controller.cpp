@@ -484,6 +484,15 @@ namespace Tetris
     }
 
 
+    void Controller::setText(XULWin::StringValueController * inComponent, const std::string & inText)
+    {
+        if (inComponent->getValue() != inText)
+        {
+            inComponent->setValue(inText);
+        }
+    }
+
+
     void Controller::onRefresh()
     {
         try
@@ -507,7 +516,7 @@ namespace Tetris
         Game & game = *(wgame.get());
         if (game.isGameOver())
         {
-            mStatusTextBox->setValue("Game Over!");
+            setText(mStatusTextBox, "Game Over!");
             return;
         }
 
@@ -563,13 +572,13 @@ namespace Tetris
 
         if (mLevelTextBox && mTimedGame)
         {
-            mLevelTextBox->setValue(MakeString() << mTimedGame->getLevel());
+            setText(mLevelTextBox, MakeString() << mTimedGame->getLevel());
         }
 
 
         if (mScoreTextBox)
         {
-            mScoreTextBox->setValue(MakeString() << game.currentNode()->state().stats().score());
+            setText(mScoreTextBox, MakeString() << game.currentNode()->state().stats().score());
         }
 
 
@@ -588,7 +597,7 @@ namespace Tetris
 
         if (mCurrentSearchDepth && mComputerPlayer)
         {
-            mCurrentSearchDepth->setValue(XULWin::Int2String(mComputerPlayer->getCurrentSearchDepth()));
+            setText(mCurrentSearchDepth, XULWin::Int2String(mComputerPlayer->getCurrentSearchDepth()));
         }
 
 
@@ -600,19 +609,19 @@ namespace Tetris
 
         if (mStatusTextBox)
         {
-            mStatusTextBox->setValue(game.currentNode()->children().empty() ? "Thinking" : "Moving");
+            setText(mStatusTextBox, game.currentNode()->children().empty() ? "Thinking" : "Moving");
         }
 
 
         if (mBlockCountTextBox)
         {
-            mBlockCountTextBox->setValue(MakeString() << game.currentBlockIndex());
+            setText(mBlockCountTextBox, MakeString() << game.currentBlockIndex());
         }
 
 
         if (mMovesAheadTextBox)
         {
-            mMovesAheadTextBox->setValue(MakeString() << (game.lastPrecalculatedNode()->depth() - game.currentNode()->depth()) << "/" << 3 * cMaxSearchDepth);
+            setText(mMovesAheadTextBox, MakeString() << (game.lastPrecalculatedNode()->depth() - game.currentNode()->depth()) << "/" << 3 * cMaxSearchDepth);
         }
 
 
@@ -621,7 +630,7 @@ namespace Tetris
             const GameState::Stats & stats = game.currentNode()->state().stats();
             if (mLinesTextBoxes[idx])
             {
-                mLinesTextBoxes[idx]->setValue(MakeString() << stats.numLines(idx));
+                setText(mLinesTextBoxes[idx], MakeString() << stats.numLines(idx));
             }
         }
 
@@ -646,14 +655,14 @@ namespace Tetris
 
             if (mGameStateScore)
             {
-                mGameStateScore->setValue(XULWin::Int2String(mEvaluator->evaluate(game.currentNode()->state())));
+                setText(mGameStateScore, XULWin::Int2String(mEvaluator->evaluate(game.currentNode()->state())));
             }
         }
 
 
         if (mFPSTextBox)
         {
-            mFPSTextBox->setValue(MakeString() << mTetrisComponent->getFPS());
+            setText(mFPSTextBox, MakeString() << mTetrisComponent->getFPS());
         }
     }
 
