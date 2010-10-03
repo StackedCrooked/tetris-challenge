@@ -161,6 +161,10 @@
 			Name="Header Files"
 			>
 			<File
+				RelativePath=".\include\Tetris\AISupport.h"
+				>
+			</File>
+			<File
 				RelativePath=".\include\Tetris\Block.h"
 				>
 			</File>
@@ -240,6 +244,10 @@
 		<Filter
 			Name="Source Files"
 			>
+			<File
+				RelativePath=".\src\AISupport.cpp"
+				>
+			</File>
 			<File
 				RelativePath=".\src\Block.cpp"
 				>

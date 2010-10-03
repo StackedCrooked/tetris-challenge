@@ -2,6 +2,7 @@
 #define PLAYER_H_INCLUDED
 
 
+#include "Tetris/AISupport.h"
 #include "Tetris/BlockType.h"
 #include "Tetris/GameStateNode.h"
 #include "Tetris/Threading.h"
@@ -18,7 +19,6 @@ namespace Tetris
 
     
     typedef std::vector<int> Widths;
-    void DestroyInferiorChildren(GameStateNode * srcNode, GameStateNode * dstNode);
 
 
     class Player : boost::noncopyable
