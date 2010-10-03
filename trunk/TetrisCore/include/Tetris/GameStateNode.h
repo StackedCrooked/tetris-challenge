@@ -98,14 +98,6 @@ namespace Tetris
         ChildNodes mChildren;                    // } => Order matters!
     };
 
-    bool IsGameOver(const GameState & inGameState, BlockType inBlockType, int inRotation);
-
-    void GenerateOffspring(NodePtr ioGameStateNode,
-                           BlockType inBlockType,
-                           const Evaluator & inEvaluator,
-                           ChildNodes & outChildNodes);
-
-
 } // namespace Tetris
 
 
