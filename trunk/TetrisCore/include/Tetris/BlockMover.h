@@ -15,14 +15,10 @@ namespace Tetris
     /**
      * BlockMover
      *
-     * Given a Tetris block that has a current position and a requested position. This class will
-     * peridically move the current block one square closer to the target block.
+     * A BlockMove object will peridically move the current tetris block
+     * one square closer to the next precalculated block (from the AI).
      *
-     * The current position is the position of the Game's active block.
-     * The target position is the position of its first child element.
-     *
-     * This class does not create child nodes. Once no more child nodes are available it goes into
-     * waiting mode until more child nodes are added.
+     * If no precalculated blocks are available then it will enter a waiting state.
      */
     class BlockMover : boost::noncopyable
     {
@@ -31,9 +27,20 @@ namespace Tetris
 
         ~BlockMover();
 
+        // Set the move speed.
         void setSpeed(int inNumMovesPerSecond);
 
         int speed() const;
+
+        enum MoveDownBehavior
+        {
+            MoveDownBehavior_Move,      // also move the block down at the same speed at left/right/rotate
+            MoveDownBehavior_DontMove,  // don't move the block down, let the gravity do the job (extra time allows for more AI precalculation)
+            MoveDownBehavior_Drop       // drop the block
+        };
+
+        // Define if and how the BlockMover should move the current block down.
+        void setMoveDownBehavior(MoveDownBehavior inMoveDown);
 
     private:
         void onTimer(Poco::Timer & ioTimer);
@@ -42,6 +49,7 @@ namespace Tetris
         Protected<Game> & mGame;
         boost::scoped_ptr<Poco::Timer> mTimer;
         int mNumMovesPerSecond;
+        MoveDownBehavior mMoveDownBehavior;
     };
 
 } // namespace Tetris

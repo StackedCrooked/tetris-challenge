@@ -22,7 +22,8 @@ namespace Tetris
     BlockMover::BlockMover(Protected<Game> & inGame, int inNumMovesPerSecond) :
         mGame(inGame),
         mTimer(),
-        mNumMovesPerSecond(inNumMovesPerSecond)
+        mNumMovesPerSecond(inNumMovesPerSecond),
+        mMoveDownBehavior(MoveDownBehavior_Move)
     {
         mTimer.reset(new Poco::Timer(GetIntervalMs(inNumMovesPerSecond), GetIntervalMs(inNumMovesPerSecond)));
         Poco::TimerCallback<BlockMover> callback(*this, &BlockMover::onTimer);
@@ -34,6 +35,12 @@ namespace Tetris
     {
         mTimer->stop();
         mTimer.reset();
+    }
+
+
+    void BlockMover::setMoveDownBehavior(MoveDownBehavior inMoveDown)
+    {
+        mMoveDownBehavior = inMoveDown;
     }
 
 
@@ -116,7 +123,28 @@ namespace Tetris
         }
         else
         {
-            game.move(Direction_Down);
+            switch (mMoveDownBehavior)
+            {
+                case MoveDownBehavior_Move:
+                {
+                    game.move(Direction_Down);
+                    break;
+                }
+                case MoveDownBehavior_Drop:
+                {
+                    game.drop();
+                    break;
+                }
+                case MoveDownBehavior_DontMove:
+                {
+                    // Do nothing.
+                    break;
+                }
+                default:
+                {
+                    throw std::logic_error("Invalid enum value.");
+                }
+            }
         }
     }
 
