@@ -1,9 +1,9 @@
--> Fix bug where the precalculated node does not line up with the current game state.
 - Implement Player vs Computer modus.
 - GUI shows current search depth
 - Concurrent node calculation (create first generation of childnodes and then use a thread per child)
 - SpinButton -> implement a refresh when keeping the mouse button down
 - Use Tetris icon on the exe file.
+v Fix bug where the precalculated node does not line up with the current game state.
 v Pruning
 v Player class: specifying a time limit should be non-intrusive. Use a Concept (or Decorator).
 v BlockMover should only be created once. It should not be destroyed and recreated every time.
