@@ -537,19 +537,20 @@ namespace Tetris
                 {
                     if (!resultNode->state().isGameOver())
                     {
-                        GameStateNode * endNode = game.lastPrecalculatedNode();
-
                         // The created node should follow the last precalculated one.
-                        int resultNodeDepth = resultNode->depth(), endNodeDepth = endNode->depth();
+                        const int resultNodeDepth = resultNode->depth();
+                        const int endNodeDepth = game.lastPrecalculatedNode()->depth();
+                        LogInfo(MakeString() << "resultNodeDepth: " << resultNodeDepth << ", endNodeDepth: " << endNodeDepth);
                         Assert(resultNodeDepth == endNodeDepth + 1);
                         if (resultNodeDepth == endNodeDepth + 1)
                         {
-                            endNode->addChild(resultNode);
+                            game.lastPrecalculatedNode()->addChild(resultNode);
                         }
                         else
                         {
                             LogError("The computer generated move does not have the correct depth.");
                         }
+                        LogInfo(MakeString() << "New endNodeDepth: " << game.lastPrecalculatedNode()->depth());
                     }
                 }
                 else
@@ -558,14 +559,10 @@ namespace Tetris
                 }
                 mComputerPlayer.reset();
             }
-            // Else check if there is any danger of crashing the current block.
-            else if (mComputerPlayer->getStatus() != Player::Status_Interrupted)
+            // Check if there is the danger of crashing the current block.
+            else if (game.numPrecalculatedMoves() == 0 && calculateRemainingTimeMs(game) < 1500)
             {
-                int remainingTimeMs = calculateRemainingTimeMs(game);
-                if (remainingTimeMs < 1500)
-                {
-                    mComputerPlayer->setStatus(Player::Status_Interrupted);                    
-                }
+                mComputerPlayer->interrupt();
             }
         }
 

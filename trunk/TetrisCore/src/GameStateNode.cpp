@@ -123,6 +123,16 @@ namespace Tetris
     }
 
 
+    GameStateNode * GameStateNode::endNode()
+    {
+        if (mChildren.empty())
+        {
+            return this;
+        }
+        return (*mChildren.begin())->endNode();
+    }
+
+
     NodePtr GameStateNode::parent()
     {
         return mParent.lock();

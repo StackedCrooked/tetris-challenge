@@ -78,8 +78,7 @@ namespace Tetris
 
         const GameStateNode * endNode() const;
 
-        inline GameStateNode * endNode()
-        { return const_cast<GameStateNode*>(static_cast<const GameStateNode *>(this)->endNode()); }
+        GameStateNode * endNode();
 
         const GameState & state() const;
 
