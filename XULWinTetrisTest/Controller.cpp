@@ -540,7 +540,6 @@ namespace Tetris
                         // The created node should follow the last precalculated one.
                         const int resultNodeDepth = resultNode->depth();
                         const int endNodeDepth = game.lastPrecalculatedNode()->depth();
-                        LogInfo(MakeString() << "resultNodeDepth: " << resultNodeDepth << ", endNodeDepth: " << endNodeDepth);
                         Assert(resultNodeDepth == endNodeDepth + 1);
                         if (resultNodeDepth == endNodeDepth + 1)
                         {
@@ -550,7 +549,6 @@ namespace Tetris
                         {
                             LogError("The computer generated move does not have the correct depth.");
                         }
-                        LogInfo(MakeString() << "New endNodeDepth: " << game.lastPrecalculatedNode()->depth());
                     }
                 }
                 else

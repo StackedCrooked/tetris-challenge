@@ -183,11 +183,6 @@ namespace Tetris
     {
         Assert(inCurrentNode->depth() == mCurrentNode->depth() + 1);
 
-        const int oldDepth = mCurrentNode->endNode()->depth();
-        const int newDepth = inCurrentNode->endNode()->depth();
-        LogInfo(MakeString() << "Game::setCurrentNode: oldDepth: " << oldDepth << ", newDepth: " << newDepth << ".");
-        Assert(newDepth >= oldDepth);
-
         mCurrentNode = inCurrentNode;
         size_t oldBlockIndex = mCurrentBlockIndex;
         mCurrentBlockIndex = mCurrentNode->depth();
