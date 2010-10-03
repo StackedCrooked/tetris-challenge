@@ -225,6 +225,14 @@
 				RelativePath=".\XULWinTetrisTest.exe.manifest"
 				>
 			</File>
+			<File
+				RelativePath=".\XULWinTetrisTestRC.h"
+				>
+			</File>
+			<File
+				RelativePath=".\XULWinTetrisTestRC.rc"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>
