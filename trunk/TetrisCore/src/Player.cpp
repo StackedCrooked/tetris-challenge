@@ -218,7 +218,7 @@ namespace Tetris
             }
             if (layer)
             {
-                DestroyInferiorChildren(mNode, layer->mBestChild);
+                CarveBestPath(mNode, layer->mBestChild);
             }
         }
     }

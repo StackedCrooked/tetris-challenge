@@ -4,7 +4,7 @@
 namespace Tetris
 {
 
-    void DestroyInferiorChildren(NodePtr startNode, NodePtr endNode)
+    void CarveBestPath(NodePtr startNode, NodePtr endNode)
     {
         NodePtr dst = endNode;
         Assert(dst->depth() > startNode->depth());
@@ -16,8 +16,7 @@ namespace Tetris
                 NodePtr endNode = *it;
                 if (endNode == dst) // is endNode part of the path between startNode and endNode?
                 {
-                    // Erase all children. The endNode object is kept alive
-                    // thanks to the refcounting mechanism of boost::shared_ptr.
+                    // Erase all children. The endNode object is kept alive by endNode object.
                     dst->parent()->clearChildren();
 
                     // Add endNode to the child nodes again.
@@ -130,4 +129,3 @@ namespace Tetris
     }
 
 } // namespace Tetris
-
