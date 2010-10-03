@@ -310,7 +310,7 @@ namespace Tetris
                                         CreatePoly<Evaluator, Balanced>()));
         mCurrentNode->addChild(child);
         setCurrentNode(child);
-        return false;
+        return true;
     }
 
 
