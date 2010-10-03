@@ -104,16 +104,6 @@ namespace Tetris
         }
 
 
-        //
-        // Check status
-        //
-        if (status() == Status_Interrupted)
-        {
-            LogInfo("Ignoring Status_Interrupted");
-            //return;
-        }
-
-
         if (ioNode->state().isGameOver())
         {
             // Game over state has no children.
