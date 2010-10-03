@@ -37,6 +37,8 @@ namespace Tetris
 
         int getCurrentSearchDepth() const;
 
+        int getMaxSearchDepth() const;
+
         bool result(NodePtr & outChild);
 
         enum Status 

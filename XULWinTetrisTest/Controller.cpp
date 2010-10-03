@@ -594,10 +594,10 @@ namespace Tetris
             }
         }
 
-
         if (mCurrentSearchDepth && mComputerPlayer)
         {
-            setText(mCurrentSearchDepth, XULWin::Int2String(mComputerPlayer->getCurrentSearchDepth()));
+            std::string text = MakeString() << mComputerPlayer->getCurrentSearchDepth() << "/" << mComputerPlayer->getMaxSearchDepth();
+            setText(mCurrentSearchDepth, text);
         }
 
 

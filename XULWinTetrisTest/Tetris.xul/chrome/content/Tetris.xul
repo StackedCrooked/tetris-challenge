@@ -73,46 +73,38 @@
             <row align="center">
               <label value="Computer player:" style="text-align:right" />
               <checkbox id="computerEnabled" label="Enable AI" checked="true" style="text-align:right" flex="1" />
+              <spacer flex="1" />
             </row>
             <row align="center">
               <label value="Search depth:" style="text-align:right" />
-              <hbox align="center">
-                <textbox id="searchDepth" type="number" readonly="true" style="text-align:right" value="4" />
-                <spacer flex="1" />
-              </hbox>
+              <textbox id="searchDepth" type="number" readonly="true" style="text-align:right" value="4" flex="1" />
             </row>
             <row align="center">
               <label value="Search width (pruning):" style="text-align:right" />
-              <hbox align="center">
-                <textbox id="searchWidth" type="number" readonly="true" style="text-align:right" value="4" />
-                <spacer flex="1" />
-              </hbox>
+              <textbox id="searchWidth" type="number" readonly="true" style="text-align:right" value="4" flex="1" />
             </row>
             <row align="center">
               <label value="Current search depth:" style="text-align:right" />
-              <hbox align="center">
-                <textbox id="currentSearchDepth" readonly="true" style="text-align:right" value="0" />
-                <spacer flex="1" />
-              </hbox>
+              <textbox id="currentSearchDepth" readonly="true" style="text-align:right" value="__/__" flex="1" />
             </row>
             <row align="center">
               <label value="Move speed:" style="text-align:right" />
               <hbox align="center">
-                <textbox id="movementSpeed" type="number" readonly="true" style="text-align:right" value="1" />
+                <textbox id="movementSpeed" type="number" readonly="true" style="text-align:right" value="1" flex="1" />
                 <label value="moves/s" />
               </hbox>
             </row>
             <row align="center">
               <label value="Status:" style="text-align:right" />
-              <textbox id="statusTextBox" value="Initializing" readonly="true" flex="1" />
+              <textbox id="statusTextBox" value="Initializing" readonly="true" style="text-align:right" flex="1" />
             </row>
             <row align="center">
               <label value="Precalculated:" style="text-align:right" />
-              <textbox id="movesAheadTextBox" value="0" readonly="true" width="40" flex="1" />
+              <textbox id="movesAheadTextBox" value="0" readonly="true" width="40" style="text-align:right" flex="1" />
             </row>
             <row align="center">
               <label value="Game quality:" style="text-align:right" />
-              <textbox id="gameStateScore" readonly="true" value="0" flex="1" />
+              <textbox id="gameStateScore" readonly="true" value="0" style="text-align:right" flex="1" />
             </row>
           </rows>
         </grid>
@@ -129,27 +121,27 @@
           <rows>
             <row align="center">
               <textbox id="numHolesFactor" type="number" readonly="true" style="text-align:right" value="-4" />
-              <label value="number of holes" style="text-align:left" />
+              <label value="holes" style="text-align:left" />
               <textbox id="numSinglesFactor" type="number" readonly="true" style="text-align:right" value="-5" />
-              <label value="number of single lines" style="text-align:left" />
+              <label value="single lines" style="text-align:left" />
             </row>
             <row align="center">
               <textbox id="gameHeightFactor" type="number" readonly="true" style="text-align:right" value="-2" />
               <label value="game height" style="text-align:left" />
               <textbox id="numDoublesFactor" type="number" readonly="true" style="text-align:right" value="-8" />
-              <label value="number of double lines" style="text-align:left" />
+              <label value="double lines" style="text-align:left" />
             </row>
             <row align="center">
               <textbox id="lastBlockHeightFactor" type="number" readonly="true" style="text-align:right" value="-1" />
               <label value="last block height" style="text-align:left" />
               <textbox id="numTriplesFactor" type="number" readonly="true" style="text-align:right" value="-9" />
-              <label value="number of triple lines" style="text-align:left" />
+              <label value="triple lines" style="text-align:left" />
             </row>
             <row align="center">
               <textbox id="numLinesFactor" type="number" readonly="true" style="text-align:right" value="0" />
-              <label value="total number of lines" style="text-align:left" />
+              <label value="total lines" style="text-align:left" />
               <textbox id="numTetrisesFactor" type="number" readonly="true" style="text-align:right" value="16" />
-              <label value="number of tetrises" style="text-align:left" />
+              <label value="tetrises" style="text-align:left" />
             </row>
           </rows>
         </grid>

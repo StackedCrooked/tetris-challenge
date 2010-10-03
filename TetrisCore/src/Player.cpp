@@ -54,6 +54,12 @@ namespace Tetris
     }
 
 
+    int Player::getMaxSearchDepth() const
+    {
+        return mWidths.size();
+    }
+
+
     bool Player::result(NodePtr & outChild)
     {
         if (mNode->children().size() == 1)
