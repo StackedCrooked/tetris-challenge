@@ -1,7 +1,7 @@
--> SpinButton -> implement a refresh when keeping the mouse button down
 -> Use Tetris icon on the exe file.
 - Implement Player vs Computer modus.
 - Concurrent node calculation (create first generation of childnodes and then use a thread per child)
+v SpinButton -> implement a refresh when keeping the mouse button down
 v GUI shows current search depth
 v Fix bug where the precalculated node does not line up with the current game state.
 v Pruning
