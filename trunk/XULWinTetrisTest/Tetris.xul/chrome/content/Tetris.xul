@@ -68,27 +68,27 @@
           <columns>
             <column flex="0" />
             <column flex="1" />
+            <column flex="0" />
+            <column flex="1" />
           </columns>
           <rows>
             <row align="center">
-              <label value="Current search depth:" style="text-align:right" />
-              <textbox id="currentSearchDepth" readonly="true" style="text-align:right" value="__/__" flex="1" />
-            </row>
-            <row align="center">
               <label value="Status:" style="text-align:right" />
               <textbox id="statusTextBox" value="Initializing" readonly="true" style="text-align:right" flex="1" />
+              <label value="Move speed:" style="text-align:right" />
+              <textbox id="movementSpeed" type="number" readonly="true" style="text-align:right" value="1" flex="1" />
             </row>
             <row align="center">
+              <label value="Search depth:" style="text-align:right" />
+              <textbox id="currentSearchDepth" readonly="true" style="text-align:right" value="__/__" flex="1" />
               <label value="Precalculated:" style="text-align:right" />
               <textbox id="movesAheadTextBox" value="0" readonly="true" width="40" style="text-align:right" flex="1" />
             </row>
             <row align="center">
+              <spacer />
+              <spacer />
               <label value="Game quality:" style="text-align:right" />
               <textbox id="gameStateScore" readonly="true" value="0" style="text-align:right" flex="1" />
-            </row>
-            <row>
-              <label value="Move speed:" style="text-align:right" />
-              <textbox id="movementSpeed" type="number" readonly="true" style="text-align:right" value="1" flex="1" />
             </row>
           </rows>
         </grid>
