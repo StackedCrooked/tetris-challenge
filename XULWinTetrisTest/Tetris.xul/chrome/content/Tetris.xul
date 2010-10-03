@@ -71,28 +71,8 @@
           </columns>
           <rows>
             <row align="center">
-              <label value="Computer player:" style="text-align:right" />
-              <checkbox id="computerEnabled" label="Enable AI" checked="true" style="text-align:right" flex="1" />
-              <spacer flex="1" />
-            </row>
-            <row align="center">
-              <label value="Search depth:" style="text-align:right" />
-              <textbox id="searchDepth" type="number" readonly="true" style="text-align:right" value="4" flex="1" />
-            </row>
-            <row align="center">
-              <label value="Search width (pruning):" style="text-align:right" />
-              <textbox id="searchWidth" type="number" readonly="true" style="text-align:right" value="4" flex="1" />
-            </row>
-            <row align="center">
               <label value="Current search depth:" style="text-align:right" />
               <textbox id="currentSearchDepth" readonly="true" style="text-align:right" value="__/__" flex="1" />
-            </row>
-            <row align="center">
-              <label value="Move speed:" style="text-align:right" />
-              <hbox align="center">
-                <textbox id="movementSpeed" type="number" readonly="true" style="text-align:right" value="1" flex="1" />
-                <label value="moves/s" />
-              </hbox>
             </row>
             <row align="center">
               <label value="Status:" style="text-align:right" />
@@ -106,42 +86,54 @@
               <label value="Game quality:" style="text-align:right" />
               <textbox id="gameStateScore" readonly="true" value="0" style="text-align:right" flex="1" />
             </row>
+            <row>
+              <label value="Move speed:" style="text-align:right" />
+              <textbox id="movementSpeed" type="number" readonly="true" style="text-align:right" value="1" flex="1" />
+            </row>
           </rows>
         </grid>
       </groupbox>
       <groupbox>
-        <caption label="Game Quality Parameters" />
+        <caption label="AI Parameters" />
+        <description>Change the AI decision making factors.</description>
+        <spacer height="5" />
         <grid>
           <columns>
-            <column flex="1" />
             <column flex="0" />
             <column flex="1" />
             <column flex="0" />
+            <column flex="1" />
           </columns>
           <rows>
             <row align="center">
-              <textbox id="numHolesFactor" type="number" readonly="true" style="text-align:right" value="-4" />
-              <label value="holes" style="text-align:left" />
-              <textbox id="numSinglesFactor" type="number" readonly="true" style="text-align:right" value="-5" />
-              <label value="single lines" style="text-align:left" />
+              <label value="Search depth:" style="text-align:right" />
+              <textbox id="searchDepth" type="number" readonly="true" style="text-align:right" value="4" flex="1" />
+              <label value="Search width:" style="text-align:right" />
+              <textbox id="searchWidth" type="number" readonly="true" style="text-align:right" value="4" flex="1" />
             </row>
             <row align="center">
-              <textbox id="gameHeightFactor" type="number" readonly="true" style="text-align:right" value="-2" />
-              <label value="game height" style="text-align:left" />
-              <textbox id="numDoublesFactor" type="number" readonly="true" style="text-align:right" value="-8" />
-              <label value="double lines" style="text-align:left" />
+              <label value="Holes:" style="text-align:right" />
+              <textbox id="numHolesFactor" type="number" readonly="true" style="text-align:right" value="-4" flex="1" />
+              <label value="Single lines:" style="text-align:right" />
+              <textbox id="numSinglesFactor" type="number" readonly="true" style="text-align:right" value="-5" flex="1" />
             </row>
             <row align="center">
-              <textbox id="lastBlockHeightFactor" type="number" readonly="true" style="text-align:right" value="-1" />
-              <label value="last block height" style="text-align:left" />
-              <textbox id="numTriplesFactor" type="number" readonly="true" style="text-align:right" value="-9" />
-              <label value="triple lines" style="text-align:left" />
+              <label value="Game height:" style="text-align:right" />
+              <textbox id="gameHeightFactor" type="number" readonly="true" style="text-align:right" value="-2" flex="1" />
+              <label value="Double lines:" style="text-align:right" />
+              <textbox id="numDoublesFactor" type="number" readonly="true" style="text-align:right" value="-8" flex="1" />
             </row>
             <row align="center">
-              <textbox id="numLinesFactor" type="number" readonly="true" style="text-align:right" value="0" />
-              <label value="total lines" style="text-align:left" />
-              <textbox id="numTetrisesFactor" type="number" readonly="true" style="text-align:right" value="16" />
-              <label value="tetrises" style="text-align:left" />
+              <label value="Drop depth:" style="text-align:right" />
+              <textbox id="lastBlockHeightFactor" type="number" readonly="true" style="text-align:right" value="-1" flex="1" />
+              <label value="Triple lines:" style="text-align:right" />
+              <textbox id="numTriplesFactor" type="number" readonly="true" style="text-align:right" value="-9" flex="1" />
+            </row>
+            <row align="center">
+              <label value="Total lines:" style="text-align:right" />
+              <textbox id="numLinesFactor" type="number" readonly="true" style="text-align:right" value="0" flex="1" />
+              <label value="Tetrises:" style="text-align:right" />
+              <textbox id="numTetrisesFactor" type="number" readonly="true" style="text-align:right" value="16" flex="1" />
             </row>
           </rows>
         </grid>

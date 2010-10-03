@@ -582,7 +582,7 @@ namespace Tetris
         }
 
 
-        if (!game.isGameOver() && !mComputerPlayer && mComputerEnabledCheckBox->isChecked())
+        if (!game.isGameOver() && !mComputerPlayer && (!mComputerEnabledCheckBox || mComputerEnabledCheckBox->isChecked()))
         {
             int searchDepth = mSearchDepth ? XULWin::String2Int(mSearchDepth->getValue(), cDefaultSearchDepth) : cDefaultSearchDepth;
             GameStateNode * endNode = game.lastPrecalculatedNode();
