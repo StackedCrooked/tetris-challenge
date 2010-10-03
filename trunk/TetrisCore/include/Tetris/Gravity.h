@@ -1,5 +1,5 @@
-#ifndef TIMEDGAME_H_INCLUDED
-#define TIMEDGAME_H_INCLUDED
+#ifndef GRAVITY_H_INCLUDED
+#define GRAVITY_H_INCLUDED
 
 
 #include "Tetris/Threading.h"
@@ -13,14 +13,17 @@ namespace Tetris
     class Game;
 
     /**
-     * TimedGame adds the timed lowering of the active block.
+     * Gravity
+     *
+     * Gravity implements the the gravity aspect to the game.
+     * It moves the active block one unit down at regular intervals.
      */
-    class TimedGame : boost::noncopyable
+    class Gravity : boost::noncopyable
     {
     public:
-        TimedGame(const Protected<Game> & inGame);
+        Gravity(const Protected<Game> & inGame);
 
-        ~TimedGame();
+        ~Gravity();
 
         int getLevel() const;
 
@@ -44,4 +47,4 @@ namespace Tetris
 } // namespace Tetris
 
 
-#endif // TIMEDGAME_H_INCLUDED
+#endif // GRAVITY_H_INCLUDED

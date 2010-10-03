@@ -7,7 +7,7 @@
 #include "Tetris/BlockMover.h"
 #include "Tetris/GameStateNode.h"
 #include "Tetris/Player.h"
-#include "Tetris/TimedGame.h"
+#include "Tetris/Gravity.h"
 #include "XULWin/Conversions.h"
 #include "XULWin/ErrorReporter.h"
 #include "XULWin/Menu.h"
@@ -50,7 +50,7 @@ namespace Tetris
         mGameStateScore(0),
         mLoggingTextBox(0),
         mProtectedGame(),
-        mTimedGame(),
+        mGravity(),
         mRefreshTimer(),
         mComputerPlayer(),
         mBlockMover(),
@@ -116,7 +116,7 @@ namespace Tetris
         //
         // Enable gravity.
         //
-        mTimedGame.reset(new TimedGame(*mProtectedGame));
+        mGravity.reset(new Gravity(*mProtectedGame));
 
 
         //
@@ -166,9 +166,9 @@ namespace Tetris
 
         if (mLevelTextBox = findComponentById<XULWin::TextBox>("levelTextBox"))
         {
-            if (mTimedGame)
+            if (mGravity)
             {
-                mTimedGame->setLevel(XULWin::String2Int(mLevelTextBox->getValue(), mTimedGame->getLevel()));
+                mGravity->setLevel(XULWin::String2Int(mLevelTextBox->getValue(), mGravity->getLevel()));
             }
         }
 
@@ -286,7 +286,7 @@ namespace Tetris
     Controller::~Controller()
     {
         mComputerPlayer.reset();
-        mTimedGame.reset();
+        mGravity.reset();
         mBlockMover.reset();
     }
 
@@ -294,10 +294,10 @@ namespace Tetris
     LRESULT Controller::onNew(WPARAM wParam, LPARAM lParam)
     {
         mComputerPlayer.reset();
-        mTimedGame.reset();
+        mGravity.reset();
         mBlockMover.reset();
         mProtectedGame.reset(new Protected<Game>(std::auto_ptr<Game>(new Game(mTetrisComponent->getNumRows(), mTetrisComponent->getNumColumns()))));
-        mTimedGame.reset(new TimedGame(*mProtectedGame));
+        mGravity.reset(new Gravity(*mProtectedGame));
         return XULWin::cHandled;
     }
 
@@ -442,7 +442,7 @@ namespace Tetris
     int Controller::calculateRemainingTimeMs(Game & game) const
     {
         float numRemainingRows = static_cast<float>(game.currentNode()->state().stats().firstOccupiedRow() - (game.activeBlock().row() + 4));
-        float numRowsPerSecond = mTimedGame->currentSpeed();
+        float numRowsPerSecond = mGravity->currentSpeed();
         float remainingTime = 1000 * numRemainingRows / numRowsPerSecond;
         float timeRequiredForMove = static_cast<float>(game.activeBlock().numRotations() + game.numColumns()) / static_cast<float>(mBlockMover->speed());
         return static_cast<int>(0.5 + remainingTime - timeRequiredForMove);
@@ -570,9 +570,9 @@ namespace Tetris
         }
 
 
-        if (mLevelTextBox && mTimedGame)
+        if (mLevelTextBox && mGravity)
         {
-            setText(mLevelTextBox, MakeString() << mTimedGame->getLevel());
+            setText(mLevelTextBox, MakeString() << mGravity->getLevel());
         }
 
 

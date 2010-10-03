@@ -27,7 +27,7 @@ namespace Tetris
     class BlockMover;
     class GameStateNode;
     class Player;
-    class TimedGame;
+    class Gravity;
 
     enum
     {
@@ -145,7 +145,7 @@ namespace Tetris
         XULWin::TextBox * mLoggingTextBox;
         XULWin::ScopedEventListener mScopedEventListener;
         boost::scoped_ptr<Protected<Game> > mProtectedGame;
-        boost::scoped_ptr<Tetris::TimedGame> mTimedGame;
+        boost::scoped_ptr<Tetris::Gravity> mGravity;
         boost::scoped_ptr<XULWin::WinAPI::Timer> mRefreshTimer;
         boost::scoped_ptr<Player> mComputerPlayer;
         boost::scoped_ptr<BlockMover> mBlockMover;
