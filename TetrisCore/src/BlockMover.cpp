@@ -116,15 +116,7 @@ namespace Tetris
         }
         else
         {
-            GameState & gameState = game.currentNode()->state();
-            if (gameState.checkPositionValid(block, block.row() + 1, block.column()))
-            {
-                game.move(Direction_Down);
-            }
-            else if (!game.navigateNodeDown())
-            {
-                throw std::runtime_error("Unable to navigate one node down in the the gamestate tree.");
-            }
+            game.move(Direction_Down);
         }
     }
 
