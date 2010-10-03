@@ -9,14 +9,15 @@
 namespace Tetris
 {
 
-    // Remove all the children from srcNode except the one on the path that leads to dstNode.
-    // The children of the 'good one' are also exterminated, except the one that brings us a 
-    // step closer to dstNode. This algorithm is recursively repeated until only the path between
-    // srcNode and dstNode remains.
-    //
-    // The purpose of this function is mainly to free up memory.
-    //
-    void DestroyInferiorChildren(NodePtr startNode, NodePtr endNode);
+    /**
+     * CarveBestPath
+     *
+     * Removes all tree-nodes that are not in the best path.
+     * 
+     * The best path is defined as the path that is formed by backtracking the
+     * ancestry (parent nodes) of endNode's first child up until the start node.
+     */
+    void CarveBestPath(NodePtr startNode, NodePtr endNode);
 
     bool IsGameOver(const GameState & inGameState, BlockType inBlockType, int inRotation);
     
