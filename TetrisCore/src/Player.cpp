@@ -15,9 +15,9 @@ namespace Tetris
 
     Player::Player(std::auto_ptr<GameStateNode> inNode,
                    const BlockTypes & inBlockTypes,
-                   const std::vector<size_t> & inWidths,
+                   const Widths & inWidths,
                    std::auto_ptr<Evaluator> inEvaluator) :
-        mLayers(),
+        mLayers(inBlockTypes.size()),
         mCompletedSearchDepth(Create<int>(0)),
         mNode(inNode.release()),
         mBlockTypes(inBlockTypes),
@@ -86,9 +86,21 @@ namespace Tetris
     }
 
 
+    void Player::updateLayerData(size_t inIndex, NodePtr inNodePtr, size_t inCount)
+    {        
+        ScopedAtom<LayerData> wLayerData = mLayers[inIndex];
+        LayerData & layerData = *wLayerData.get();
+        layerData.mNumItems += inCount;        
+        if (!layerData.mBestChild || inNodePtr->state().quality(inNodePtr->qualityEvaluator()) > layerData.mBestChild->state().quality(inNodePtr->qualityEvaluator()))
+        {
+            layerData.mBestChild = inNodePtr;
+        }
+    }
+
+
     void Player::populateNodesRecursively(NodePtr ioNode,
                                           const BlockTypes & inBlockTypes,
-                                          const std::vector<size_t> & inWidths,
+                                          const Widths & inWidths,
                                           size_t inIndex,
                                           size_t inMaxIndex)
     {
@@ -123,31 +135,17 @@ namespace Tetris
             generatedChildNodes = ChildNodes(GameStateComparisonFunctor(mEvaluator->clone()));
             GenerateOffspring(ioNode, inBlockTypes[inIndex], *mEvaluator, generatedChildNodes);
 
-            // Populate ioNode and overwrite results.
+         
+            size_t count = 0;
+            ChildNodes::iterator it = generatedChildNodes.begin(), end = generatedChildNodes.end();
+            while (count < inWidths[inIndex] && it != end)
             {
-                Assert(inIndex <= mLayers.size());
-                if (inIndex == mLayers.size())
-                {
-                    Protected<LayerData> newTreeInfo;
-                    mLayers.push_back(newTreeInfo);
-                }
-                Assert(inIndex < mLayers.size());
-                ScopedAtom<LayerData> scopedLayerData = mLayers[inIndex];
-                LayerData & layer = *scopedLayerData.get();
-                ChildNodes::iterator it = generatedChildNodes.begin(), end = generatedChildNodes.end();
-                for (size_t count = 0; count < inWidths[inIndex] && it != end; ++count, ++it)
-                {
-                    // Populate io
-                    NodePtr child = *it;
-                    ioNode->addChild(child);
-                    if (!layer.mBestChild || 
-                        child->state().quality(child->qualityEvaluator()) > layer.mBestChild->state().quality(child->qualityEvaluator()))
-                    {
-                        layer.mBestChild = child;
-                    }
-                    layer.mNumItems++;
-                }
+                ioNode->addChild(*it);
+                ++count;
+                ++it;
             }
+
+            updateLayerData(inIndex, *ioNode->children().begin(), count);
         }
 
 
@@ -166,45 +164,34 @@ namespace Tetris
 
     void Player::markTreeRowAsFinished(size_t inIndex)
     {
-        ScopedAtom<int> wdepth(mCompletedSearchDepth);
-        *wdepth.get() = inIndex;
-        size_t numLevels = mLayers.size();
-        Assert(inIndex < numLevels);
-        if (inIndex < numLevels)
         {
-            ScopedAtom<LayerData> scopedLayerData = mLayers[inIndex];
-            LayerData & layer = *scopedLayerData.get();
-            layer.mFinished = true;
+            ScopedAtom<int> wdepth(mCompletedSearchDepth);
+            int & depth = *wdepth.get();
+            if (inIndex > depth)
+            {
+                depth = inIndex;
+            }
+        }
+
+        Assert(inIndex < mLayers.size());
+        if (inIndex < mLayers.size())
+        {
+            ScopedAtom<LayerData> layerData(mLayers[inIndex]);
+            layerData->mFinished = true;
         }
     }
 
 
-    void Player::populate()
+    void Player::populate(NodePtr ioNode, std::auto_ptr<BlockTypes> inBlockTypes, std::auto_ptr<Widths> inWidths, int inOffset)
     {
-        size_t currentDepth = 0;
-        size_t targetDepth = mBlockTypes.size();
-        try
+        // The nodes are populated using a simple "Iterative deepening" algorithm.
+        // See: http://en.wikipedia.org/wiki/Iterative_deepening_depth-first_search for more information.
+        size_t targetDepth = 1;
+        while (targetDepth < inBlockTypes->size())
         {
-            // The nodes are populated using a simple "Iterative deepening" algorithm.
-            // See: http://en.wikipedia.org/wiki/Iterative_deepening_depth-first_search for more information.
-            while (currentDepth < targetDepth)
-            {
-                populateNodesRecursively(mNode, mBlockTypes, mWidths, 0, currentDepth);
-                size_t numLevels = mLayers.size();
-                if (currentDepth + 1 == numLevels)
-                {
-                    markTreeRowAsFinished(currentDepth);
-                }
-                else
-                {
-                    break;
-                }
-                currentDepth++;
-            }
-        }
-        catch (const boost::thread_interrupted & )
-        {
-            LogInfo(MakeString() << "Thread was interrupted. Reached search depth: " << currentDepth << "/" << targetDepth << ".");
+            populateNodesRecursively(ioNode, *inBlockTypes, *inWidths, inOffset, inOffset + targetDepth);
+            markTreeRowAsFinished(targetDepth);
+            targetDepth++;
         }
     }
 
@@ -243,8 +230,42 @@ namespace Tetris
         // Thread entry point has try/catch block
         try
         {
-            setStatus(Status_Calculating);
-            populate();
+            try
+            {
+                setStatus(Status_Calculating);
+                
+                // Get the first generation of child nodes
+                ChildNodes childNodes = ChildNodes(GameStateComparisonFunctor(mEvaluator->clone()));
+                GenerateOffspring(mNode, mBlockTypes[0], *mEvaluator, childNodes);
+
+
+                // Apply pruning on the first generation of children.
+                size_t count = 0;
+                for (ChildNodes::iterator it = childNodes.begin(), end = childNodes.end(); it != end; ++it)
+                {
+                    if (count >= mWidths[0])
+                    {
+                        break;
+                    }
+                    mNode->addChild(*it);
+                    count++;
+                }
+
+                // Apply the layer data on the first generation of children.
+                updateLayerData(0, *mNode->children().begin(), count);
+
+                // For each first generation child, generate more offspring.
+                // TODO: Perform each iteration in a separate thread (use a boost::thread_group to join_all afterwards).
+                ChildNodes::iterator it = mNode->children().begin(), end = mNode->children().end();
+                for (; it != end; ++it)
+                {
+                    populate(*it, Create<BlockTypes>(mBlockTypes), Create<Widths>(mWidths), 1);
+                }
+            }
+            catch (const boost::thread_interrupted & )
+            {
+                LogInfo("Thread interrupted.");
+            }
             destroyInferiorChildren();
             setStatus(Status_Finished);
         } 

@@ -26,7 +26,7 @@ namespace Tetris
     public:
         Player(std::auto_ptr<GameStateNode> inNode,
                const BlockTypes & inBlockTypes,
-               const std::vector<size_t> & inWidths,
+               const Widths & inWidths,
                std::auto_ptr<Evaluator> inEvaluator);
 
         ~Player();
@@ -57,15 +57,14 @@ namespace Tetris
         void startImpl();
 
         void setStatus(Status inStatus);
-
-        
+        void updateLayerData(size_t inIndex, NodePtr inNodePtr, size_t inCount);        
         void markTreeRowAsFinished(size_t inIndex);
-        void populate();
+        void populate(NodePtr ioNode, std::auto_ptr<BlockTypes> inBlockTypes, std::auto_ptr<Widths> inWidths, int inOffset);
         void destroyInferiorChildren();
 
         void populateNodesRecursively(NodePtr ioNode,
                                       const BlockTypes & inBlockTypes,
-                                      const std::vector<size_t> & inWidths,
+                                      const Widths & inWidths,
                                       size_t inIndex,
                                       size_t inMaxIndex);
 
@@ -80,17 +79,19 @@ namespace Tetris
 
         // Stores layer info per layer index.
         std::vector<Protected<LayerData> > mLayers;
+
         Protected<int> mCompletedSearchDepth;
 
         NodePtr mNode;
         BlockTypes mBlockTypes;
-        std::vector<size_t> mWidths;
+        Widths mWidths;
         boost::scoped_ptr<Evaluator> mEvaluator;
         Status mStatus;
         mutable boost::mutex mStatusMutex;
         boost::scoped_ptr<Poco::Stopwatch> mStopwatch;
         mutable boost::mutex mStopwatchMutex;
         boost::scoped_ptr<boost::thread> mThread;
+        boost::scoped_ptr<boost::thread_group> mThreadGroup;
     };
 
 } // namespace Tetris
