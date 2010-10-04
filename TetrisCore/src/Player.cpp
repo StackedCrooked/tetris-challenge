@@ -36,9 +36,18 @@ namespace Tetris
 
     Player::~Player()
     {
-        mThread->interrupt();
+        if (mThreadGroup)
+        {
+            mThreadGroup->interrupt_all();
+        }
+
+        if (mThread)
+        {
+            mThread->join();
+            mThread.reset();
+        }
+
         setStatus(Status_Interrupted);
-        mThread->join();
     }
     
         
@@ -63,6 +72,7 @@ namespace Tetris
 
     bool Player::result(NodePtr & outChild)
     {
+        Assert(!mThreadGroup);
         if (mNode->children().size() == 1)
         {
             outChild = *mNode->children().begin();
@@ -140,6 +150,7 @@ namespace Tetris
             ChildNodes::iterator it = generatedChildNodes.begin(), end = generatedChildNodes.end();
             while (count < inWidths[inIndex] && it != end)
             {
+                boost::this_thread::interruption_point();
                 ioNode->addChild(*it);
                 ++count;
                 ++it;
@@ -182,16 +193,27 @@ namespace Tetris
     }
 
 
-    void Player::populate(NodePtr ioNode, std::auto_ptr<BlockTypes> inBlockTypes, std::auto_ptr<Widths> inWidths, int inOffset)
+    void Player::populate(NodePtr ioNode, BlockTypes inBlockTypes, Widths inWidths, int inOffset)
     {
-        // The nodes are populated using a simple "Iterative deepening" algorithm.
-        // See: http://en.wikipedia.org/wiki/Iterative_deepening_depth-first_search for more information.
-        size_t targetDepth = 1;
-        while (targetDepth < inBlockTypes->size())
+        try
         {
-            populateNodesRecursively(ioNode, *inBlockTypes, *inWidths, inOffset, inOffset + targetDepth);
-            markTreeRowAsFinished(targetDepth);
-            targetDepth++;
+            // The nodes are populated using a simple "Iterative deepening" algorithm.
+            // See: http://en.wikipedia.org/wiki/Iterative_deepening_depth-first_search for more information.
+            size_t targetDepth = inOffset + 1;
+            while (targetDepth < inBlockTypes.size())
+            {
+                populateNodesRecursively(ioNode, inBlockTypes, inWidths, inOffset, targetDepth);
+                markTreeRowAsFinished(targetDepth);
+                targetDepth++;
+            }
+        }
+        catch (const boost::thread_interrupted &)
+        {
+            LogInfo("Player::populate: thread interrupted");
+        }
+        catch (const std::exception & inException)
+        {
+            LogError(MakeString() << "Player::populate: " << inException.what());
         }
     }
 
@@ -220,8 +242,18 @@ namespace Tetris
 
     void Player::interrupt()
     {
-        setStatus(Status_Interrupted);
-        mThread->interrupt();
+        setStatus(Status_Interrupted);        
+
+        if (mThreadGroup)
+        {
+            mThreadGroup->interrupt_all();
+        }
+        
+        if (mThread)
+        {
+            mThread->join();
+            mThread.reset();
+        }
     }
 
 
@@ -255,12 +287,18 @@ namespace Tetris
                 updateLayerData(0, *mNode->children().begin(), count);
 
                 // For each first generation child, generate more offspring.
-                // TODO: Perform each iteration in a separate thread (use a boost::thread_group to join_all afterwards).
+                mThreadGroup.reset(new boost::thread_group);
                 ChildNodes::iterator it = mNode->children().begin(), end = mNode->children().end();
                 for (; it != end; ++it)
                 {
-                    populate(*it, Create<BlockTypes>(mBlockTypes), Create<Widths>(mWidths), 1);
+                    NodePtr nodePtr = *it;
+                    boost::function<void()> action = boost::bind(&Player::populate, this, nodePtr, mBlockTypes, mWidths, 1);
+                    mThreadGroup->create_thread(action);
                 }
+				LogInfo("Start joining all threads.");
+                mThreadGroup->join_all();
+                LogInfo("Finished joining all threads.");
+                mThreadGroup.reset();
             }
             catch (const boost::thread_interrupted & )
             {

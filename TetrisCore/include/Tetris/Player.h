@@ -59,7 +59,7 @@ namespace Tetris
         void setStatus(Status inStatus);
         void updateLayerData(size_t inIndex, NodePtr inNodePtr, size_t inCount);        
         void markTreeRowAsFinished(size_t inIndex);
-        void populate(NodePtr ioNode, std::auto_ptr<BlockTypes> inBlockTypes, std::auto_ptr<Widths> inWidths, int inOffset);
+        void populate(NodePtr ioNode, BlockTypes inBlockTypes, Widths inWidths, int inOffset);
         void destroyInferiorChildren();
 
         void populateNodesRecursively(NodePtr ioNode,
