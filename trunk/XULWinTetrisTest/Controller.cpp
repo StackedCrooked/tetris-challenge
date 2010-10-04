@@ -468,10 +468,10 @@ namespace Tetris
             //
             BlockTypes futureBlocks;
             game.getFutureBlocksWithOffset(endNode->depth(), inDepth, futureBlocks);
-            std::vector<size_t> widths;
+            Widths widths;
             for (size_t idx = 0; idx != futureBlocks.size(); ++idx)
             {
-                widths.push_back(inWidth); // no pruning
+                widths.push_back(inWidth);
             }
 
 
