@@ -1,3 +1,4 @@
+- Rename Player to ComputerPlayer.
 - Implement Player vs Computer modus.
 x Concurrent node calculation (create first generation of childnodes and then use a thread per child)
 v Use Tetris icon on the exe file.

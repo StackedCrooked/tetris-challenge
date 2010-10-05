@@ -58,7 +58,6 @@ namespace Tetris
         mBlockMover(),
         mEvaluator(new Balanced),
         mConsoleVisible(false),
-        mQuit(false),
         mWorkerThread(new WorkerThread)
     {
         //
@@ -432,18 +431,6 @@ namespace Tetris
         ScopedAtom<Game> wgame(*mProtectedGame);
         Game & game = *wgame.get();
         return game.rotate();
-    }
-
-
-    void Controller::setQuitFlag()
-    {
-        mQuit = true;
-    }
-
-
-    void Controller::joinAllThreads()
-    {
-        // Currently unused because it's blocking.
     }
 
 

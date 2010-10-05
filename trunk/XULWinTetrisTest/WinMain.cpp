@@ -26,10 +26,6 @@ int StartProgram(HINSTANCE hInstance)
 
     // Run the game
     controller.run();
-    
-    // Closing
-    controller.setQuitFlag();
-    controller.joinAllThreads();
     return 0;
 }
 
