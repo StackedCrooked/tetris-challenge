@@ -13,7 +13,7 @@ namespace Tetris
 
     /**
      * WorkerThread is a thread that runs in a loop taking "work" from a queue.
-     * When the queue is empty it waits.
+     * When the queue is empty the thread waits.
      */
     class WorkerThread : boost::noncopyable
     {
@@ -28,8 +28,9 @@ namespace Tetris
 
         typedef boost::function<void()> Task;
 
-        // The task should be interruptable. This can be achieved by peridically
-        // calling the 'boost::this_thread::interruption_point()' function.
+        // Adds a task to the queue.
+        // The task should be interruptable. This can be achieved by periodically
+        // calling the boost::this_thread::interruption_point() function.
         void schedule(const Task & inTask);
 
         // Sends an interrupt message to the current task and waits for it to return.
@@ -45,15 +46,14 @@ namespace Tetris
         void run();
         Task nextTask();
         void processTask();
-
-        boost::scoped_ptr<boost::thread> mThread;
+        
         std::list<Task> mQueue;
         boost::mutex mQueueMutex;
         boost::condition_variable mQueueCondition;
-
         boost::mutex mTaskProcessedMutex;
         boost::condition_variable mTaskProcessedCondition;
         mutable boost::mutex mQuitFlagMutex;
+        boost::scoped_ptr<boost::thread> mThread;
         bool mQuitFlag;
     };
 
