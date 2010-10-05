@@ -18,17 +18,18 @@ namespace Tetris
     class WorkerThread : boost::noncopyable
     {
     public:
+        // Creates a new thread and starts waiting for tasks.
         WorkerThread();
 
-        // If a task is running while destructing an interrupt
-        // is sent to the current task and then we wait for it
-        // to return.
+        // If a task is running during destruction then we send
+        // it an interrupt signal and wait for it to return.
+        // Any remaining tasks are erased and the thread is destroyed.
         ~WorkerThread();
 
         typedef boost::function<void()> Task;
 
-        // In order to be interruptible the task function should 
-        // periodically call boost::this_thread::interruption_point().
+        // The task should be interruptable. This can be achieved by peridically
+        // calling the 'boost::this_thread::interruption_point()' function.
         void schedule(const Task & inTask);
 
         // Sends an interrupt message to the current task and waits for it to return.

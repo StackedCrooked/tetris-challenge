@@ -16,9 +16,17 @@ namespace Tetris
     WorkerThread::~WorkerThread()
     {
         setQuitFlag();
+
+        // Interrupt the current task.
         mThread->interrupt();
-        mQueueCondition.notify_all();
+
+        // Escape from the 'wait()' call.
+        mQueueCondition.notify_all(); 
+
+        // Wait for our thread to finish.
         mThread->join();
+
+        // Destroy our thread.
         mThread.reset();
     }
     
@@ -72,7 +80,7 @@ namespace Tetris
         {
             mQueueCondition.wait(lock);
 
-            // Interrupt here happens during destruction.
+            // This interrupt is "armed" by the 'interrupt()' call in our destructor.
             boost::this_thread::interruption_point();
         }
         Task task = mQueue.front();
