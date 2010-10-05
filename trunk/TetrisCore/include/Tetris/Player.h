@@ -58,8 +58,9 @@ namespace Tetris
 
         void setStatus(Status inStatus);
         void updateLayerData(size_t inIndex, NodePtr inNodePtr, size_t inCount);        
+        
         void markTreeRowAsFinished(size_t inIndex);
-        void populate(NodePtr ioNode, BlockTypes inBlockTypes, Widths inWidths, int inOffset);
+        void populate();
         void destroyInferiorChildren();
 
         void populateNodesRecursively(NodePtr ioNode,
@@ -79,7 +80,6 @@ namespace Tetris
 
         // Stores layer info per layer index.
         std::vector<Protected<LayerData> > mLayers;
-
         Protected<int> mCompletedSearchDepth;
 
         NodePtr mNode;
@@ -91,7 +91,6 @@ namespace Tetris
         boost::scoped_ptr<Poco::Stopwatch> mStopwatch;
         mutable boost::mutex mStopwatchMutex;
         boost::scoped_ptr<boost::thread> mThread;
-        boost::scoped_ptr<boost::thread_group> mThreadGroup;
     };
 
 } // namespace Tetris

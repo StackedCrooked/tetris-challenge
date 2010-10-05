@@ -36,18 +36,9 @@ namespace Tetris
 
     Player::~Player()
     {
-        if (mThreadGroup)
-        {
-            mThreadGroup->interrupt_all();
-        }
-
-        if (mThread)
-        {
-            mThread->join();
-            mThread.reset();
-        }
-
+        mThread->interrupt();
         setStatus(Status_Interrupted);
+        mThread->join();
     }
     
         
@@ -72,7 +63,6 @@ namespace Tetris
 
     bool Player::result(NodePtr & outChild)
     {
-        Assert(!mThreadGroup);
         if (mNode->children().size() == 1)
         {
             outChild = *mNode->children().begin();
@@ -184,25 +174,21 @@ namespace Tetris
             }
         }
 
-        Assert(inIndex < mLayers.size());
-        if (inIndex < mLayers.size())
-        {
-            ScopedAtom<LayerData> layerData(mLayers[inIndex]);
-            layerData->mFinished = true;
-        }
+        ScopedAtom<LayerData> layerData(mLayers[inIndex]);
+        layerData->mFinished = true;
     }
 
 
-    void Player::populate(NodePtr ioNode, BlockTypes inBlockTypes, Widths inWidths, int inOffset)
+    void Player::populate()
     {
         try
         {
             // The nodes are populated using a simple "Iterative deepening" algorithm.
             // See: http://en.wikipedia.org/wiki/Iterative_deepening_depth-first_search for more information.
-            size_t targetDepth = inOffset + 1;
-            while (targetDepth < inBlockTypes.size())
+            size_t targetDepth = 1;
+            while (targetDepth < mBlockTypes.size())
             {
-                populateNodesRecursively(ioNode, inBlockTypes, inWidths, inOffset, targetDepth);
+                populateNodesRecursively(mNode, mBlockTypes, mWidths, 0, targetDepth);
                 markTreeRowAsFinished(targetDepth);
                 targetDepth++;
             }
@@ -242,18 +228,8 @@ namespace Tetris
 
     void Player::interrupt()
     {
-        setStatus(Status_Interrupted);        
-
-        if (mThreadGroup)
-        {
-            mThreadGroup->interrupt_all();
-        }
-        
-        if (mThread)
-        {
-            mThread->join();
-            mThread.reset();
-        }
+        setStatus(Status_Interrupted);
+        mThread->interrupt();
     }
 
 
@@ -262,48 +238,8 @@ namespace Tetris
         // Thread entry point has try/catch block
         try
         {
-            try
-            {
-                setStatus(Status_Calculating);
-                
-                // Get the first generation of child nodes
-                ChildNodes childNodes = ChildNodes(GameStateComparisonFunctor(mEvaluator->clone()));
-                GenerateOffspring(mNode, mBlockTypes[0], *mEvaluator, childNodes);
-
-
-                // Apply pruning on the first generation of children.
-                size_t count = 0;
-                for (ChildNodes::iterator it = childNodes.begin(), end = childNodes.end(); it != end; ++it)
-                {
-                    if (count >= mWidths[0])
-                    {
-                        break;
-                    }
-                    mNode->addChild(*it);
-                    count++;
-                }
-
-                // Apply the layer data on the first generation of children.
-                updateLayerData(0, *mNode->children().begin(), count);
-
-                // For each first generation child, generate more offspring.
-                mThreadGroup.reset(new boost::thread_group);
-                ChildNodes::iterator it = mNode->children().begin(), end = mNode->children().end();
-                for (; it != end; ++it)
-                {
-                    NodePtr nodePtr = *it;
-                    boost::function<void()> action = boost::bind(&Player::populate, this, nodePtr, mBlockTypes, mWidths, 1);
-                    mThreadGroup->create_thread(action);
-                }
-				LogInfo("Start joining all threads.");
-                mThreadGroup->join_all();
-                LogInfo("Finished joining all threads.");
-                mThreadGroup.reset();
-            }
-            catch (const boost::thread_interrupted & )
-            {
-                LogInfo("Thread interrupted.");
-            }
+            setStatus(Status_Calculating);
+            populate();
             destroyInferiorChildren();
             setStatus(Status_Finished);
         } 
