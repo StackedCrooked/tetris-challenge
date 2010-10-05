@@ -20,30 +20,40 @@ namespace Tetris
     public:
         WorkerThread();
 
+        // If a task is running while destructing an interrupt
+        // is sent to the current task and then we wait for it
+        // to return.
         ~WorkerThread();
 
         typedef boost::function<void()> Task;
 
+        // In order to be interruptible the task function should 
+        // periodically call boost::this_thread::interruption_point().
         void schedule(const Task & inTask);
 
-        // Clears the task queue.
-        void clear();
-
-        // Sends an interrupt message to the current thread and then joins the thread.
-        // This call effectively destroys the current thread.
+        // Sends an interrupt message to the current task and waits for it to return.
         void interrupt();
 
-        // After an interrupt this method can be called to recreate
-        // the thread and resume the processing of the task list.
-        void resume();
+        // Erases all pending tasks. Does not affect the currently active task.
+        void clear();
 
     private:
-        void runImpl();
+        void setQuitFlag();
+        bool getQuitFlag() const;
 
+        void run();
+        Task nextTask();
+        void processTask();
+
+        boost::scoped_ptr<boost::thread> mThread;
         std::list<Task> mQueue;
         boost::mutex mQueueMutex;
         boost::condition_variable mQueueCondition;
-        boost::scoped_ptr<boost::thread> mThread;
+
+        boost::mutex mInterruptMutex;
+        boost::condition_variable mInterruptCondition;
+        mutable boost::mutex mQuitFlagMutex;
+        bool mQuitFlag;
     };
 
 } // namespace Tetris
