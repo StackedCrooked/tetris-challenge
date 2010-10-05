@@ -84,8 +84,6 @@ namespace Tetris
         while (mQueue.empty())
         {
             mQueueCondition.wait(lock);
-
-            // This interrupt is "armed" by the interrupt() call in our destructor.
             boost::this_thread::interruption_point();
         }
         Task task = mQueue.front();
