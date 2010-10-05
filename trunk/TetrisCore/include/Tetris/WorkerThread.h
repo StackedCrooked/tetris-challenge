@@ -50,8 +50,8 @@ namespace Tetris
         boost::mutex mQueueMutex;
         boost::condition_variable mQueueCondition;
 
-        boost::mutex mInterruptMutex;
-        boost::condition_variable mInterruptCondition;
+        boost::mutex mTaskProcessedMutex;
+        boost::condition_variable mTaskProcessedCondition;
         mutable boost::mutex mQuitFlagMutex;
         bool mQuitFlag;
     };

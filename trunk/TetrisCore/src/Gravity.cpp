@@ -38,7 +38,7 @@ namespace Tetris
             int level = 0;
             // Scoped lock
             {
-                ScopedAtom<Game> game(mThreadSafeGame, 10);
+                ScopedAtom<Game> game(mThreadSafeGame, 1000);
                 if (!game->isGameOver())
                 {
                     game->move(Direction_Down);

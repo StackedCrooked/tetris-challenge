@@ -2,9 +2,9 @@
 #define CONTROLLER_H_INCLUDED
 
 
+#include "TetrisComponent.h"
 #include "Tetris/Block.h"
 #include "Tetris/Game.h"
-#include "TetrisComponent.h"
 #include "Tetris/Threading.h"
 #include "XULWin/Components.h"
 #include "XULWin/Dialog.h"
@@ -28,6 +28,7 @@ namespace Tetris
     class GameStateNode;
     class Player;
     class Gravity;
+    class WorkerThread;
 
     enum
     {
@@ -151,6 +152,7 @@ namespace Tetris
         boost::scoped_ptr<BlockMover> mBlockMover;
         boost::scoped_ptr<Evaluator> mEvaluator;
         volatile bool mQuit;
+        boost::shared_ptr<WorkerThread> mWorkerThread;
     };
 
 } // namespace Tetris

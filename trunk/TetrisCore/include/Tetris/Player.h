@@ -6,6 +6,7 @@
 #include "Tetris/BlockType.h"
 #include "Tetris/GameStateNode.h"
 #include "Tetris/Threading.h"
+#include "Tetris/WorkerThread.h"
 #include "Poco/Stopwatch.h"
 #include <memory>
 #include <vector>
@@ -17,14 +18,13 @@
 namespace Tetris
 {
 
-    
     typedef std::vector<int> Widths;
-
 
     class Player : boost::noncopyable
     {
     public:
-        Player(std::auto_ptr<GameStateNode> inNode,
+        Player(boost::shared_ptr<WorkerThread> inWorkerThread,
+               std::auto_ptr<GameStateNode> inNode,
                const BlockTypes & inBlockTypes,
                const Widths & inWidths,
                std::auto_ptr<Evaluator> inEvaluator);
@@ -45,8 +45,8 @@ namespace Tetris
 
         enum Status 
         {
-            Status_Null,
-            Status_Calculating,
+            Status_Nil,
+            Status_Started,
             Status_Finished,
             Status_Interrupted
         };
@@ -90,7 +90,9 @@ namespace Tetris
         mutable boost::mutex mStatusMutex;
         boost::scoped_ptr<Poco::Stopwatch> mStopwatch;
         mutable boost::mutex mStopwatchMutex;
-        boost::scoped_ptr<boost::thread> mThread;
+
+        // Use static variable so that we can reuse the same thread.
+        boost::shared_ptr<WorkerThread> mWorkerThread;
     };
 
 } // namespace Tetris

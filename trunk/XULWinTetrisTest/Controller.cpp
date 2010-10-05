@@ -8,6 +8,7 @@
 #include "Tetris/GameStateNode.h"
 #include "Tetris/Player.h"
 #include "Tetris/Gravity.h"
+#include "Tetris/WorkerThread.h"
 #include "XULWin/Conversions.h"
 #include "XULWin/ErrorReporter.h"
 #include "XULWin/Menu.h"
@@ -55,7 +56,8 @@ namespace Tetris
         mComputerPlayer(),
         mBlockMover(),
         mEvaluator(new Balanced),
-        mQuit(false)
+        mQuit(false),
+        mWorkerThread(new WorkerThread)
     {
         //
         // Parse the XUL document.
@@ -478,7 +480,7 @@ namespace Tetris
             //
             // Create and start the Player.
             //
-            mComputerPlayer.reset(new Player(endNode, futureBlocks, widths, mEvaluator->clone()));
+            mComputerPlayer.reset(new Player(mWorkerThread, endNode, futureBlocks, widths, mEvaluator->clone()));
             mComputerPlayer->start();
         }
     }

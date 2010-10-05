@@ -13,18 +13,19 @@
 namespace Tetris
 {
 
-    Player::Player(std::auto_ptr<GameStateNode> inNode,
+    Player::Player(boost::shared_ptr<WorkerThread> inWorkerThread,
+                   std::auto_ptr<GameStateNode> inNode,
                    const BlockTypes & inBlockTypes,
                    const Widths & inWidths,
                    std::auto_ptr<Evaluator> inEvaluator) :
+        mWorkerThread(inWorkerThread),
         mLayers(inBlockTypes.size()),
         mCompletedSearchDepth(Create<int>(0)),
         mNode(inNode.release()),
         mBlockTypes(inBlockTypes),
         mWidths(inWidths),
         mEvaluator(inEvaluator),
-        mStatus(Status_Null),
-        mThread()
+        mStatus(Status_Nil)
     {
         Assert(!mNode->state().isGameOver());
         Assert(mNode->children().empty());
@@ -36,9 +37,8 @@ namespace Tetris
 
     Player::~Player()
     {
-        mThread->interrupt();
+        mWorkerThread->interrupt();
         setStatus(Status_Interrupted);
-        mThread->join();
     }
     
         
@@ -229,7 +229,7 @@ namespace Tetris
     void Player::interrupt()
     {
         setStatus(Status_Interrupted);
-        mThread->interrupt();
+        mWorkerThread->interrupt();
     }
 
 
@@ -238,7 +238,7 @@ namespace Tetris
         // Thread entry point has try/catch block
         try
         {
-            setStatus(Status_Calculating);
+            setStatus(Status_Started);
             populate();
             destroyInferiorChildren();
             setStatus(Status_Finished);
@@ -252,12 +252,8 @@ namespace Tetris
 
     void Player::start()
     {
-        Assert(!mThread);
-        if (!mThread)
-        {
-            mThread.reset(new boost::thread(boost::bind(&Player::startImpl, this)));
-        }
+        Assert(status() == Status_Nil);
+        mWorkerThread->schedule(boost::bind(&Player::startImpl, this));
     }
-
 
 } // namespace Tetris
