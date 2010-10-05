@@ -7,7 +7,7 @@
 #include "TetrisElement.h"
 #include "Tetris/BlockMover.h"
 #include "Tetris/GameStateNode.h"
-#include "Tetris/Player.h"
+#include "Tetris/ComputerPlayer.h"
 #include "Tetris/Gravity.h"
 #include "Tetris/WorkerThread.h"
 #include "XULWin/Conversions.h"
@@ -483,9 +483,9 @@ namespace Tetris
 
 
             //
-            // Create and start the Player.
+            // Create and start the ComputerPlayer.
             //
-            mComputerPlayer.reset(new Player(mWorkerThread, endNode, futureBlocks, widths, mEvaluator->clone()));
+            mComputerPlayer.reset(new ComputerPlayer(mWorkerThread, endNode, futureBlocks, widths, mEvaluator->clone()));
             mComputerPlayer->start();
         }
     }

@@ -1,4 +1,4 @@
-#include "Tetris/Player.h"
+#include "Tetris/ComputerPlayer.h"
 #include "Tetris/GameState.h"
 #include "Tetris/ErrorHandling.h"
 #include "Tetris/Logger.h"
@@ -13,7 +13,7 @@
 namespace Tetris
 {
 
-    Player::Player(boost::shared_ptr<WorkerThread> inWorkerThread,
+    ComputerPlayer::ComputerPlayer(boost::shared_ptr<WorkerThread> inWorkerThread,
                    std::auto_ptr<GameStateNode> inNode,
                    const BlockTypes & inBlockTypes,
                    const Widths & inWidths,
@@ -35,33 +35,33 @@ namespace Tetris
     }
 
 
-    Player::~Player()
+    ComputerPlayer::~ComputerPlayer()
     {
         mWorkerThread->interrupt();
         setStatus(Status_Interrupted);
     }
     
         
-    bool Player::isFinished() const
+    bool ComputerPlayer::isFinished() const
     {
         return status() == Status_Finished;
     }
 
 
-    int Player::getCurrentSearchDepth() const
+    int ComputerPlayer::getCurrentSearchDepth() const
     {
         ScopedConstAtom<int> value(mCompletedSearchDepth);
         return *value.get();
     }
 
 
-    int Player::getMaxSearchDepth() const
+    int ComputerPlayer::getMaxSearchDepth() const
     {
         return mWidths.size();
     }
 
 
-    bool Player::result(NodePtr & outChild)
+    bool ComputerPlayer::result(NodePtr & outChild)
     {
         if (mNode->children().size() == 1)
         {
@@ -72,21 +72,21 @@ namespace Tetris
     }
 
 
-    Player::Status Player::status() const
+    ComputerPlayer::Status ComputerPlayer::status() const
     {
         boost::mutex::scoped_lock lock(mStatusMutex);
         return mStatus;
     }
 
 
-    void Player::setStatus(Status inStatus)
+    void ComputerPlayer::setStatus(Status inStatus)
     {
         boost::mutex::scoped_lock lock(mStatusMutex);
         mStatus = inStatus;
     }
 
 
-    void Player::updateLayerData(size_t inIndex, NodePtr inNodePtr, size_t inCount)
+    void ComputerPlayer::updateLayerData(size_t inIndex, NodePtr inNodePtr, size_t inCount)
     {        
         ScopedAtom<LayerData> wLayerData = mLayers[inIndex];
         LayerData & layerData = *wLayerData.get();
@@ -98,7 +98,7 @@ namespace Tetris
     }
 
 
-    void Player::populateNodesRecursively(NodePtr ioNode,
+    void ComputerPlayer::populateNodesRecursively(NodePtr ioNode,
                                           const BlockTypes & inBlockTypes,
                                           const Widths & inWidths,
                                           size_t inIndex,
@@ -167,7 +167,7 @@ namespace Tetris
     }
 
 
-    void Player::markTreeRowAsFinished(size_t inIndex)
+    void ComputerPlayer::markTreeRowAsFinished(size_t inIndex)
     {
         {
             ScopedAtom<int> wdepth(mCompletedSearchDepth);
@@ -183,7 +183,7 @@ namespace Tetris
     }
 
 
-    void Player::populate()
+    void ComputerPlayer::populate()
     {
         try
         {
@@ -199,16 +199,16 @@ namespace Tetris
         }
         catch (const boost::thread_interrupted &)
         {
-            LogInfo("Player::populate: thread interrupted");
+            LogInfo("ComputerPlayer::populate: thread interrupted");
         }
         catch (const std::exception & inException)
         {
-            LogError(MakeString() << "Player::populate: " << inException.what());
+            LogError(MakeString() << "ComputerPlayer::populate: " << inException.what());
         }
     }
 
 
-    void Player::destroyInferiorChildren()
+    void ComputerPlayer::destroyInferiorChildren()
     {
         if (!mLayers.empty())
         {
@@ -230,14 +230,14 @@ namespace Tetris
     }
 
 
-    void Player::interrupt()
+    void ComputerPlayer::interrupt()
     {
         setStatus(Status_Interrupted);
         mWorkerThread->interrupt();
     }
 
 
-    void Player::startImpl()
+    void ComputerPlayer::startImpl()
     {
         // Thread entry point has try/catch block
         try
@@ -254,10 +254,10 @@ namespace Tetris
     }
 
 
-    void Player::start()
+    void ComputerPlayer::start()
     {
         Assert(status() == Status_Nil);
-        mWorkerThread->schedule(boost::bind(&Player::startImpl, this));
+        mWorkerThread->schedule(boost::bind(&ComputerPlayer::startImpl, this));
     }
 
 } // namespace Tetris

@@ -181,6 +181,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\include\Tetris\ComputerPlayer.h"
+				>
+			</File>
+			<File
 				RelativePath=".\include\Tetris\Direction.h"
 				>
 			</File>
@@ -218,10 +222,6 @@
 			</File>
 			<File
 				RelativePath=".\include\Tetris\Logger.h"
-				>
-			</File>
-			<File
-				RelativePath=".\include\Tetris\Player.h"
 				>
 			</File>
 			<File
@@ -269,6 +269,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\ComputerPlayer.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\src\ErrorHandling.cpp"
 				>
 			</File>
@@ -294,10 +298,6 @@
 			</File>
 			<File
 				RelativePath=".\src\Logger.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\Player.cpp"
 				>
 			</File>
 			<File
