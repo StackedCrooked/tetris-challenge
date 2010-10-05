@@ -6,7 +6,6 @@ namespace Tetris
 {
 
     WorkerThread::WorkerThread() :
-        mThread(),
         mQuitFlag(false)
     {
         mThread.reset(new boost::thread(boost::bind(&WorkerThread::run, this)));
@@ -20,7 +19,7 @@ namespace Tetris
         // Interrupt the current task.
         mThread->interrupt();
 
-        // Escape from the 'wait()' call.
+        // Escape from the wait() call.
         mQueueCondition.notify_all(); 
 
         // Wait for our thread to finish.
@@ -64,11 +63,17 @@ namespace Tetris
 
     void WorkerThread::interrupt()
     {
+        // Interrupt the current task.
         mThread->interrupt();
+        
+        // If no task is currently being processed then
+        // we'll need to break out of the wait() call.
         mQueueCondition.notify_all();
 
-        // This mutex seems to be only need for the wait() call below.
+        // This mutex is only used for the wait() method below.
         boost::mutex::scoped_lock lock(mTaskProcessedMutex);
+
+        // This blocks the thread until the notify_all() call in processTask().
         mTaskProcessedCondition.wait(lock);
     }
 
@@ -80,7 +85,7 @@ namespace Tetris
         {
             mQueueCondition.wait(lock);
 
-            // This interrupt is "armed" by the 'interrupt()' call in our destructor.
+            // This interrupt is "armed" by the interrupt() call in our destructor.
             boost::this_thread::interruption_point();
         }
         Task task = mQueue.front();
