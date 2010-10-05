@@ -107,7 +107,7 @@
           <rows>
             <row align="center">
               <label value="Search depth:" style="text-align:right" />
-              <textbox id="searchDepth" type="number" readonly="true" style="text-align:right" value="10" flex="1" />
+              <textbox id="searchDepth" type="number" readonly="true" style="text-align:right" value="8" flex="1" />
               <label value="Search width:" style="text-align:right" />
               <textbox id="searchWidth" type="number" readonly="true" style="text-align:right" value="4" flex="1" />
             </row>
@@ -115,19 +115,19 @@
               <label value="Holes:" style="text-align:right" />
               <textbox id="numHolesFactor" type="number" readonly="true" style="text-align:right" value="-4" flex="1" />
               <label value="Single lines:" style="text-align:right" />
-              <textbox id="numSinglesFactor" type="number" readonly="true" style="text-align:right" value="-5" flex="1" />
+              <textbox id="numSinglesFactor" type="number" readonly="true" style="text-align:right" value="1" flex="1" />
             </row>
             <row align="center">
               <label value="Game height:" style="text-align:right" />
               <textbox id="gameHeightFactor" type="number" readonly="true" style="text-align:right" value="-2" flex="1" />
               <label value="Double lines:" style="text-align:right" />
-              <textbox id="numDoublesFactor" type="number" readonly="true" style="text-align:right" value="-8" flex="1" />
+              <textbox id="numDoublesFactor" type="number" readonly="true" style="text-align:right" value="2" flex="1" />
             </row>
             <row align="center">
               <label value="Drop depth:" style="text-align:right" />
               <textbox id="lastBlockHeightFactor" type="number" readonly="true" style="text-align:right" value="-1" flex="1" />
               <label value="Triple lines:" style="text-align:right" />
-              <textbox id="numTriplesFactor" type="number" readonly="true" style="text-align:right" value="-9" flex="1" />
+              <textbox id="numTriplesFactor" type="number" readonly="true" style="text-align:right" value="4" flex="1" />
             </row>
             <row align="center">
               <label value="Total lines:" style="text-align:right" />

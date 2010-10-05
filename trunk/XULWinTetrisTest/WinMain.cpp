@@ -39,7 +39,9 @@ INT_PTR WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmd
 {
     try
     {
+#ifndef NDEBUG
         AttachToConsole();
+#endif
         return StartProgram(hInstance);
     }
     catch (const std::exception & inError)
