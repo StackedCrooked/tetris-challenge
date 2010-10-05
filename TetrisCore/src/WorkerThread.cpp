@@ -5,20 +5,35 @@
 namespace Tetris
 {
 
-    WorkerThread::WorkerThread()
+    WorkerThread::WorkerThread() :
+        mThread(),
+        mQuitFlag(false)
     {
-        mThread.reset(new boost::thread(boost::bind(&WorkerThread::runImpl, this)));
+        mThread.reset(new boost::thread(boost::bind(&WorkerThread::run, this)));
     }
 
 
     WorkerThread::~WorkerThread()
     {
-        if (mThread)
-        {
-            mThread->interrupt();
-            mQueueCondition.notify_one();
-            mThread->join();
-        }
+        setQuitFlag();
+        mThread->interrupt();
+        mQueueCondition.notify_one();
+        mThread->join();
+        mThread.reset();
+    }
+    
+    
+    void WorkerThread::setQuitFlag()
+    {
+        boost::mutex::scoped_lock lock(mQuitFlagMutex);
+        mQuitFlag = true;
+    }
+    
+    
+    bool WorkerThread::getQuitFlag() const
+    {
+        boost::mutex::scoped_lock lock(mQuitFlagMutex);
+        return mQuitFlag;
     }
 
     
@@ -41,53 +56,67 @@ namespace Tetris
 
     void WorkerThread::interrupt()
     {
-        if (mThread)
-        {
-            mThread->interrupt();
-            mThread->join();
-            mThread.reset();
-        }
+        boost::mutex::scoped_lock lock(mInterruptMutex);
+        mThread->interrupt();
+        mQueueCondition.notify_one();
+        mInterruptCondition.wait(lock);
     }
 
 
-    void WorkerThread::resume()
+    WorkerThread::Task WorkerThread::nextTask()
     {
-        if (!mThread)
+        boost::mutex::scoped_lock lock(mQueueMutex);
+        while (mQueue.empty())
         {
-            mThread.reset(new boost::thread(boost::bind(&WorkerThread::runImpl, this)));
+            mQueueCondition.wait(lock);
+
+            // Interrupt here happens during destruction.
+            boost::this_thread::interruption_point();
         }
+        Task task = mQueue.front();
+        mQueue.erase(mQueue.begin());
+        return task;
     }
     
     
-    void WorkerThread::runImpl()
+    void WorkerThread::processTask()
     {
         try
         {
-            Task task;
-            {
-                boost::mutex::scoped_lock lock(mQueueMutex);
-                while (mQueue.empty())
-                {
-                    mQueueCondition.wait(lock);
-                    boost::this_thread::interruption_point();
-                }
-                task = mQueue.front();
-                mQueue.erase(mQueue.begin());
-            }            
+            // Get the next task.
+            Task task = nextTask();
+
+            // Run the task.
             task();
+
+            // Check if the user requested an interrupt.
             boost::this_thread::interruption_point();
         }
         catch (const boost::thread_interrupted &)
         {
+            mInterruptCondition.notify_one();
             LogInfo("Worker thread was interrupted.");
+        }
+    }
+    
+    
+    void WorkerThread::run()
+    {
+        // Wrap entire thread in try/catch block.
+        try
+        {
+            while (!getQuitFlag())
+            {
+                processTask();
+            }
         }
         catch (const std::exception & inExc)
         {
-            LogError(MakeString() << "Unhandled exception caught in WorkerThread::runImpl. Detail: " << inExc.what());
+            LogError(MakeString() << "Exception caught in WorkerThread::run. Detail: " << inExc.what());
         }
         catch (...)
         {
-            LogError("Unknown exception caught in WorkerThread::runImpl.");
+            LogError("Unknown exception caught in WorkerThread::run.");
         }
     }
 
