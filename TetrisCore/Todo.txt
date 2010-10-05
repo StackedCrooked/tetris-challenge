@@ -1,5 +1,5 @@
 - Implement Player vs Computer modus.
-- Concurrent node calculation (create first generation of childnodes and then use a thread per child)
+x Concurrent node calculation (create first generation of childnodes and then use a thread per child)
 v Use Tetris icon on the exe file.
 v SpinButton -> implement a refresh when keeping the mouse button down
 v GUI shows current search depth

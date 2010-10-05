@@ -134,19 +134,21 @@ namespace Tetris
         {
             generatedChildNodes = ChildNodes(GameStateComparisonFunctor(mEvaluator->clone()));
             GenerateOffspring(ioNode, inBlockTypes[inIndex], *mEvaluator, generatedChildNodes);
+            boost::this_thread::interruption_point();
 
          
             size_t count = 0;
             ChildNodes::iterator it = generatedChildNodes.begin(), end = generatedChildNodes.end();
             while (count < inWidths[inIndex] && it != end)
             {
-                boost::this_thread::interruption_point();
                 ioNode->addChild(*it);
                 ++count;
                 ++it;
+                boost::this_thread::interruption_point();
             }
 
             updateLayerData(inIndex, *ioNode->children().begin(), count);
+            boost::this_thread::interruption_point();
         }
 
 
@@ -157,7 +159,9 @@ namespace Tetris
         {
             for (ChildNodes::iterator it = generatedChildNodes.begin(); it != generatedChildNodes.end(); ++it)
             {
-                populateNodesRecursively(*it, inBlockTypes, inWidths, inIndex + 1, inMaxIndex);
+                NodePtr child = *it;
+                populateNodesRecursively(child, inBlockTypes, inWidths, inIndex + 1, inMaxIndex);
+                boost::this_thread::interruption_point();
             }
         }
     }
