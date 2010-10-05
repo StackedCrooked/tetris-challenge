@@ -61,10 +61,6 @@ namespace Tetris
 
         void drop(TetrisComponent * tetrisComponent);
 
-        void setQuitFlag();
-
-        void joinAllThreads();
-
         Protected<Game> & threadSafeGame();
 
         void log(const std::string & inMessage);
@@ -153,7 +149,6 @@ namespace Tetris
         boost::scoped_ptr<BlockMover> mBlockMover;
         boost::scoped_ptr<Evaluator> mEvaluator;
         bool mConsoleVisible;
-        volatile bool mQuit;
         boost::shared_ptr<WorkerThread> mWorkerThread;
     };
 
