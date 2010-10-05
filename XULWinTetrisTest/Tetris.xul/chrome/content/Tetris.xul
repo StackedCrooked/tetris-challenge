@@ -14,6 +14,7 @@
     <menu label="Tetris">
       <menupopup>
         <menuitem id="newMenuItem" label="New"/>
+        <menuitem id="showConsoleMenuItem" label="Show console"/>
         <menuitem id="quitMenuItem" label="Quit" disabled="true" />
       </menupopup>
     </menu>

@@ -1,5 +1,4 @@
 #include "Controller.h"
-#include "Console.h"
 #include "TetrisComponent.h"
 #include "TetrisElement.h"
 #include "XULWin/ElementFactory.h"
@@ -39,9 +38,6 @@ INT_PTR WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmd
 {
     try
     {
-#ifndef NDEBUG
-        AttachToConsole();
-#endif
         return StartProgram(hInstance);
     }
     catch (const std::exception & inError)

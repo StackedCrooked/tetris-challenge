@@ -1,4 +1,5 @@
 #include "Controller.h"
+#include "Console.h"
 #include "Tetris/ErrorHandling.h"
 #include "Tetris/Game.h"
 #include "Tetris/GameQualityEvaluator.h"
@@ -56,6 +57,7 @@ namespace Tetris
         mComputerPlayer(),
         mBlockMover(),
         mEvaluator(new Balanced),
+        mConsoleVisible(false),
         mQuit(false),
         mWorkerThread(new WorkerThread)
     {
@@ -265,6 +267,11 @@ namespace Tetris
             mScopedEventListener.connect(newMenuItem->el(), boost::bind(&Controller::onNew, this, _1, _2));
         }
 
+        if (XULWin::MenuItem * showConsoleMenuItem = findComponentById<XULWin::MenuItem>("showConsoleMenuItem"))
+        {
+            mScopedEventListener.connect(showConsoleMenuItem->el(), boost::bind(&Controller::onShowConsole, this, _1, _2));
+        }
+
         if (XULWin::MenuItem * quitMenuItem = findComponentById<XULWin::MenuItem>("quitMenuItem"))
         {
             mScopedEventListener.connect(quitMenuItem->el(), boost::bind(&Controller::onQuit, this, _1, _2));
@@ -300,6 +307,17 @@ namespace Tetris
         mBlockMover.reset();
         mProtectedGame.reset(new Protected<Game>(std::auto_ptr<Game>(new Game(mTetrisComponent->getNumRows(), mTetrisComponent->getNumColumns()))));
         mGravity.reset(new Gravity(*mProtectedGame));
+        return XULWin::cHandled;
+    }
+
+
+    LRESULT Controller::onShowConsole(WPARAM wParam, LPARAM lParam)
+    {
+        if (!mConsoleVisible)
+        {
+            AttachToConsole();
+            mConsoleVisible = true;
+        }
         return XULWin::cHandled;
     }
 

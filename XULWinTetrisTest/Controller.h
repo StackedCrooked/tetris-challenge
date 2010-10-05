@@ -107,6 +107,7 @@ namespace Tetris
         
         
         LRESULT onNew(WPARAM wParam, LPARAM lParam);
+        LRESULT onShowConsole(WPARAM wParam, LPARAM lParam);
         LRESULT onQuit(WPARAM wParam, LPARAM lParam);
         LRESULT onAboutMenuItem(WPARAM wParam, LPARAM lParam);
         LRESULT onStrategySelected(WPARAM wParam, LPARAM lParam);
@@ -151,6 +152,7 @@ namespace Tetris
         boost::scoped_ptr<Player> mComputerPlayer;
         boost::scoped_ptr<BlockMover> mBlockMover;
         boost::scoped_ptr<Evaluator> mEvaluator;
+        bool mConsoleVisible;
         volatile bool mQuit;
         boost::shared_ptr<WorkerThread> mWorkerThread;
     };
