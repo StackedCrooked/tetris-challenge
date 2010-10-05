@@ -26,7 +26,7 @@ namespace Tetris
 
     class BlockMover;
     class GameStateNode;
-    class Player;
+    class ComputerPlayer;
     class Gravity;
     class WorkerThread;
 
@@ -145,7 +145,7 @@ namespace Tetris
         boost::scoped_ptr<Protected<Game> > mProtectedGame;
         boost::scoped_ptr<Tetris::Gravity> mGravity;
         boost::scoped_ptr<XULWin::WinAPI::Timer> mRefreshTimer;
-        boost::scoped_ptr<Player> mComputerPlayer;
+        boost::scoped_ptr<ComputerPlayer> mComputerPlayer;
         boost::scoped_ptr<BlockMover> mBlockMover;
         boost::scoped_ptr<Evaluator> mEvaluator;
         bool mConsoleVisible;

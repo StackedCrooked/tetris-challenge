@@ -20,16 +20,16 @@ namespace Tetris
 
     typedef std::vector<int> Widths;
 
-    class Player : boost::noncopyable
+    class ComputerPlayer : boost::noncopyable
     {
     public:
-        Player(boost::shared_ptr<WorkerThread> inWorkerThread,
+        ComputerPlayer(boost::shared_ptr<WorkerThread> inWorkerThread,
                std::auto_ptr<GameStateNode> inNode,
                const BlockTypes & inBlockTypes,
                const Widths & inWidths,
                std::auto_ptr<Evaluator> inEvaluator);
 
-        ~Player();
+        ~ComputerPlayer();
 
         void start();
 

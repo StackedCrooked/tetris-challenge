@@ -64,7 +64,7 @@
         </grid>
       </groupbox>
       <groupbox>
-        <caption label="Computer Player" />
+        <caption label="Computer ComputerPlayer" />
         <grid>
           <columns>
             <column flex="0" />
