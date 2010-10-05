@@ -37,6 +37,8 @@ namespace Tetris
 
     ComputerPlayer::~ComputerPlayer()
     {
+        // Remove any obsolete tasks.
+        mWorkerThread->clear();
         mWorkerThread->interrupt();
         setStatus(Status_Interrupted);
     }
