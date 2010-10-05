@@ -17,7 +17,7 @@ namespace Tetris
     {
         setQuitFlag();
         mThread->interrupt();
-        mQueueCondition.notify_one();
+        mQueueCondition.notify_all();
         mThread->join();
         mThread.reset();
     }
@@ -56,10 +56,12 @@ namespace Tetris
 
     void WorkerThread::interrupt()
     {
-        boost::mutex::scoped_lock lock(mInterruptMutex);
         mThread->interrupt();
-        mQueueCondition.notify_one();
-        mInterruptCondition.wait(lock);
+        mQueueCondition.notify_all();
+
+        // This mutex seems to be only need for the wait() call below.
+        boost::mutex::scoped_lock lock(mTaskProcessedMutex);
+        mTaskProcessedCondition.wait(lock);
     }
 
 
@@ -88,15 +90,12 @@ namespace Tetris
 
             // Run the task.
             task();
-
-            // Check if the user requested an interrupt.
-            boost::this_thread::interruption_point();
         }
         catch (const boost::thread_interrupted &)
         {
-            mInterruptCondition.notify_one();
-            LogInfo("Worker thread was interrupted.");
+            LogInfo("WorkerThread: Task was interrupted.");
         }
+        mTaskProcessedCondition.notify_all();
     }
     
     
