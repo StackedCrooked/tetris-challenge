@@ -240,6 +240,10 @@
 				RelativePath=".\include\Tetris\Utilities.h"
 				>
 			</File>
+			<File
+				RelativePath=".\include\Tetris\WorkerThread.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Source Files"
@@ -298,6 +302,10 @@
 			</File>
 			<File
 				RelativePath=".\src\Unicode.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\WorkerThread.cpp"
 				>
 			</File>
 		</Filter>
