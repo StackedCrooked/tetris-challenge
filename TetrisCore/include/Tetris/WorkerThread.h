@@ -33,6 +33,7 @@ namespace Tetris
             Status_Working
         };
 
+        // Get the current status.
         Status status() const;
 
         // Returns the number of pending tasks.
