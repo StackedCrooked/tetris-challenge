@@ -15,17 +15,8 @@ namespace Tetris
     WorkerThread::~WorkerThread()
     {
         setQuitFlag();
-
-        // Interrupt the current task.
-        mThread->interrupt();
-
-        // Escape from the wait() call.
-        mQueueCondition.notify_all(); 
-
-        // Wait for our thread to finish.
+        interrupt();
         mThread->join();
-
-        // Destroy our thread.
         mThread.reset();
     }
     
