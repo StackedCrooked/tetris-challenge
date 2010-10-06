@@ -316,6 +316,10 @@ namespace Tetris
         mBlockMover.reset();
         mProtectedGame.reset(new Protected<Game>(std::auto_ptr<Game>(new Game(mTetrisComponent->getNumRows(), mTetrisComponent->getNumColumns()))));
         mGravity.reset(new Gravity(*mProtectedGame));
+        if (mLevelTextBox)
+        {
+            mGravity->setLevel(XULWin::String2Int(mLevelTextBox->getValue(), mGravity->getLevel()));
+        }
         return XULWin::cHandled;
     }
 
