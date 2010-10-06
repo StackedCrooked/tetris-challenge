@@ -24,16 +24,16 @@ namespace Tetris
     {
     public:
         ComputerPlayer(boost::shared_ptr<WorkerThread> inWorkerThread,
-               std::auto_ptr<GameStateNode> inNode,
-               const BlockTypes & inBlockTypes,
-               const Widths & inWidths,
-               std::auto_ptr<Evaluator> inEvaluator);
+                       std::auto_ptr<GameStateNode> inNode,
+                       const BlockTypes & inBlockTypes,
+                       const Widths & inWidths,
+                       std::auto_ptr<Evaluator> inEvaluator);
 
         ~ComputerPlayer();
 
         void start();
 
-        void interrupt();
+        void stop();
 
         bool isFinished() const;
 
@@ -41,14 +41,13 @@ namespace Tetris
 
         int getMaxSearchDepth() const;
 
-        bool result(NodePtr & outChild);
+        NodePtr result() const;
 
         enum Status 
         {
             Status_Nil,
             Status_Started,
-            Status_Finished,
-            Status_Interrupted
+            Status_Finished
         };
 
         Status status() const;
@@ -57,6 +56,9 @@ namespace Tetris
         void startImpl();
 
         void setStatus(Status inStatus);
+        
+        void setCurrentSearchDepth(int inDepth);
+
         void updateLayerData(size_t inIndex, NodePtr inNodePtr, size_t inCount);        
         
         void markTreeRowAsFinished(size_t inIndex);
@@ -72,26 +74,36 @@ namespace Tetris
         // LayerData contains the accumulated data for all branches at a same depth.
         struct LayerData
         {
-            LayerData() : mNumItems(0), mFinished(false) {}
+            LayerData() :
+                mBestChild(),
+                mNumItems(0),
+                mFinished(false)
+            {
+            }
+
             NodePtr mBestChild;
             int mNumItems;
             bool mFinished;
         };
 
-        // Stores layer info per layer index.
-        std::vector<Protected<LayerData> > mLayers;
-        Protected<int> mCompletedSearchDepth;
-
         NodePtr mNode;
+        mutable boost::mutex mNodeMutex;
+
+        // Store info per horizontal level of nodes.
+        std::vector<LayerData> mLayers;
+        mutable boost::mutex mLayersMutex;
+
+        int mCompletedSearchDepth;
+        mutable boost::mutex mCompletedSearchDepthMutex;
+
+
         BlockTypes mBlockTypes;
         Widths mWidths;
         boost::scoped_ptr<Evaluator> mEvaluator;
+        
         Status mStatus;
         mutable boost::mutex mStatusMutex;
-        boost::scoped_ptr<Poco::Stopwatch> mStopwatch;
-        mutable boost::mutex mStopwatchMutex;
 
-        // Use static variable so that we can reuse the same thread.
         boost::shared_ptr<WorkerThread> mWorkerThread;
     };
 
