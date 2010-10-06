@@ -26,6 +26,16 @@ namespace Tetris
         // Any remaining tasks are erased and the thread is destroyed.
         ~WorkerThread();
 
+        typedef boost::function<void()> Task;
+
+        // Adds a task to the queue.
+        // The task should be interruptable. This can be achieved by letting it
+        // periodically call the boost::this_thread::interruption_point() function.
+        void schedule(const Task & inTask);
+
+        // Returns the number of pending tasks.
+        size_t queueSize() const;
+
         enum Status
         {
             Status_Nil,
@@ -36,28 +46,18 @@ namespace Tetris
         // Get the current status.
         Status status() const;
 
-        // Returns the number of pending tasks.
-        size_t queueSize() const;
-
         // Erases all pending tasks. Does not affect the currently active task.
         void clear();
-
-        // Erases all pending tasks also interrupts any running task.
-        // Blocks until task is finished.
-        void clearAndInterrupt();
-
-        typedef boost::function<void()> Task;
-
-        // Adds a task to the queue.
-        // The task should be interruptable. This can be achieved by periodically
-        // calling the boost::this_thread::interruption_point() function.
-        void schedule(const Task & inTask);
 
         // Sends an interrupt message to the current task.
         // This call is blocking until the task has completed.
         // After that the WorkerThread will start working on
         // the next task or enter waiting mode.
         void interrupt();
+
+        // Combines the clear() interrupt() calls.
+        // Blocks until task returns.
+        void clearAndInterrupt();
 
     private:
         void setQuitFlag();
