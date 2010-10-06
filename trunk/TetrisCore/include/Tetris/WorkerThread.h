@@ -39,7 +39,11 @@ namespace Tetris
         size_t queueSize() const;
 
         // Erases all pending tasks. Does not affect the currently active task.
-        void clearQueue();
+        void clear();
+
+        // Erases all pending tasks also interrupts any running task.
+        // Blocks until task is finished.
+        void clearAndInterrupt();
 
         typedef boost::function<void()> Task;
 
@@ -71,7 +75,6 @@ namespace Tetris
         mutable boost::mutex mQueueMutex;
         boost::condition_variable mQueueCondition;
 
-        mutable boost::mutex mTaskProcessedMutex;
         boost::condition_variable mTaskProcessedCondition;
 
         mutable boost::mutex mQuitFlagMutex;
