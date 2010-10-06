@@ -6,7 +6,9 @@ namespace Tetris
 {
 
     WorkerThread::WorkerThread() :
+        mStatus(Status_Nil),
         mQuitFlag(false)
+        
     {
         mThread.reset(new boost::thread(boost::bind(&WorkerThread::run, this)));
     }
@@ -33,22 +35,41 @@ namespace Tetris
         boost::mutex::scoped_lock lock(mQuitFlagMutex);
         return mQuitFlag;
     }
+    
+    
+    WorkerThread::Status WorkerThread::status() const
+    {
+        boost::mutex::scoped_lock lock(mStatusMutex);
+        return mStatus;
+    }
+    
+    
+    void WorkerThread::setStatus(Status inStatus)
+    {
+        boost::mutex::scoped_lock lock(mStatusMutex);
+        mStatus = inStatus;
+    }
+    
+    
+    size_t WorkerThread::queueSize() const
+    {
+        boost::mutex::scoped_lock lock(mQueueMutex);
+        return mQueue.size();
+    }
+
+
+    void WorkerThread::clearQueue()
+    {
+        boost::mutex::scoped_lock lock(mQueueMutex);
+        mQueue.clear();
+    }
 
     
     void WorkerThread::schedule(const WorkerThread::Task & inTask)
     {
-        {
-            boost::mutex::scoped_lock lock(mQueueMutex);
-            mQueue.push_back(inTask);
-        }
-        mQueueCondition.notify_one();
-    }
-
-
-    void WorkerThread::clear()
-    {
         boost::mutex::scoped_lock lock(mQueueMutex);
-        mQueue.clear();
+        mQueue.push_back(inTask);
+        mQueueCondition.notify_one();
     }
 
 
