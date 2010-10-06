@@ -50,7 +50,7 @@
             </row>
             <row align="center">
               <label value="Level:" style="text-align:right"/>
-              <textbox id="levelTextBox" value="0" readonly="true"  style="text-align:right" flex="1" />
+              <textbox id="levelTextBox" value="6" readonly="true"  style="text-align:right" flex="1" />
               <label value="Lines x3:" style="text-align:right"/>
               <textbox id="lines3TextBox" value="0" readonly="true"  style="text-align:right" flex="1" />
             </row>
@@ -70,7 +70,7 @@
         </grid>
       </groupbox>
       <groupbox>
-        <caption label="Computer ComputerPlayer" />
+        <caption label="Computer Player" />
         <grid>
           <columns>
             <column flex="0" />
@@ -114,7 +114,7 @@
           <rows>
             <row align="center">
               <label value="Search depth:" style="text-align:right" />
-              <textbox id="searchDepth" type="number" readonly="true" style="text-align:right" value="1" flex="1" />
+              <textbox id="searchDepth" type="number" readonly="true" style="text-align:right" value="8" flex="1" />
               <label value="Search width:" style="text-align:right" />
               <textbox id="searchWidth" type="number" readonly="true" style="text-align:right" value="4" flex="1" />
             </row>

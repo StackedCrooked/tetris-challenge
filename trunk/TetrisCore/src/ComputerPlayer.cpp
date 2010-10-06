@@ -183,7 +183,7 @@ namespace Tetris
 
     void ComputerPlayer::markTreeRowAsFinished(size_t inIndex)
     {
-        setCurrentSearchDepth(inIndex);
+        setCurrentSearchDepth(inIndex + 1);
         boost::mutex::scoped_lock lock(mLayersMutex);
         mLayers[inIndex].mFinished = true;
     }
@@ -207,7 +207,7 @@ namespace Tetris
         catch (const boost::thread_interrupted &)
         {
             // Task was interrupted. Ok.
-            LogInfo(MakeString() << "ComputerPlayer was interrupted. Resulting search depth: " << getCurrentSearchDepth() << "/" << mBlockTypes.size());
+            LogInfo(MakeString() << "ComputerPlayer was interrupted at search depth: " << getCurrentSearchDepth() << "/" << mBlockTypes.size());
         }
         catch (const std::exception & inException)
         {
@@ -219,15 +219,15 @@ namespace Tetris
     void ComputerPlayer::destroyInferiorChildren()
     {
         int reachedDepth = getCurrentSearchDepth();
-        Assert(reachedDepth >= 0);
+        Assert(reachedDepth >= 1);
         
         // We use the 'best child' from this search depth.
         // The path between the start node and this best
         // child will be the list of precalculated nodes.
         boost::mutex::scoped_lock layersLock(mLayersMutex);
         boost::mutex::scoped_lock nodeLock(mNodeMutex);
-        Assert(reachedDepth < mLayers.size());
-        CarveBestPath(mNode, mLayers[reachedDepth].mBestChild);
+        Assert((reachedDepth - 1) < mLayers.size());
+        CarveBestPath(mNode, mLayers[reachedDepth - 1].mBestChild);
     }
 
 
