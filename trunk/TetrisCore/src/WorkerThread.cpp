@@ -63,6 +63,8 @@ namespace Tetris
 
     void WorkerThread::interrupt()
     {
+        boost::mutex::scoped_lock lock(mQueueMutex);
+
         // Interrupt the current task.
         mThread->interrupt();
         
@@ -71,7 +73,7 @@ namespace Tetris
         mQueueCondition.notify_all();
 
         // This mutex is only used for the wait() method below.
-        boost::mutex::scoped_lock lock(mTaskProcessedMutex);
+        boost::mutex::scoped_lock lock2(mTaskProcessedMutex);
 
         // This blocks the thread until the notify_all() call in processTask().
         mTaskProcessedCondition.wait(lock);
