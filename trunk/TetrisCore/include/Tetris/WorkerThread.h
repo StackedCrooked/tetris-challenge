@@ -26,6 +26,21 @@ namespace Tetris
         // Any remaining tasks are erased and the thread is destroyed.
         ~WorkerThread();
 
+        enum Status
+        {
+            Status_Nil,
+            Status_Waiting,
+            Status_Working
+        };
+
+        Status status() const;
+
+        // Returns the number of pending tasks.
+        size_t queueSize() const;
+
+        // Erases all pending tasks. Does not affect the currently active task.
+        void clearQueue();
+
         typedef boost::function<void()> Task;
 
         // Adds a task to the queue.
@@ -33,28 +48,36 @@ namespace Tetris
         // calling the boost::this_thread::interruption_point() function.
         void schedule(const Task & inTask);
 
-        // Sends an interrupt message to the current task and waits for it to return.
+        // Sends an interrupt message to the current task.
+        // This call is blocking until the task has completed.
+        // After that the WorkerThread will start working on
+        // the next task or enter waiting mode.
         void interrupt();
-
-        // Erases all pending tasks. Does not affect the currently active task.
-        void clear();
 
     private:
         void setQuitFlag();
         bool getQuitFlag() const;
 
+        void setStatus(Status inStatus);
+
         void run();
         Task nextTask();
         void processTask();
         
+        Status mStatus;
+        mutable boost::mutex mStatusMutex;
+
         std::list<Task> mQueue;
-        boost::mutex mQueueMutex;
+        mutable boost::mutex mQueueMutex;
         boost::condition_variable mQueueCondition;
-        boost::mutex mTaskProcessedMutex;
+
+        mutable boost::mutex mTaskProcessedMutex;
         boost::condition_variable mTaskProcessedCondition;
+
         mutable boost::mutex mQuitFlagMutex;
-        boost::scoped_ptr<boost::thread> mThread;
         bool mQuitFlag;
+
+        boost::scoped_ptr<boost::thread> mThread;
     };
 
 } // namespace Tetris
