@@ -539,35 +539,28 @@ namespace Tetris
             // Check if the computer player has finished. If yes, then get the results.
             if (mComputerPlayer->isFinished())
             {                
-                NodePtr resultNode;
-                if (mComputerPlayer->result(resultNode))
+                NodePtr resultNode = mComputerPlayer->result();
+                if (!resultNode->state().isGameOver())
                 {
-                    if (!resultNode->state().isGameOver())
+                    // The created node should follow the last precalculated one.
+                    const int resultNodeDepth = resultNode->depth();
+                    const int endNodeDepth = game.lastPrecalculatedNode()->depth();
+                    Assert(resultNodeDepth == endNodeDepth + 1);
+                    if (resultNodeDepth == endNodeDepth + 1)
                     {
-                        // The created node should follow the last precalculated one.
-                        const int resultNodeDepth = resultNode->depth();
-                        const int endNodeDepth = game.lastPrecalculatedNode()->depth();
-                        Assert(resultNodeDepth == endNodeDepth + 1);
-                        if (resultNodeDepth == endNodeDepth + 1)
-                        {
-                            game.lastPrecalculatedNode()->addChild(resultNode);
-                        }
-                        else
-                        {
-                            LogError("The computer generated move does not have the correct depth.");
-                        }
+                        game.lastPrecalculatedNode()->addChild(resultNode);
                     }
-                }
-                else
-                {
-                    LogInfo("Game Over");
+                    else
+                    {
+                        LogError("The computer generated move does not have the correct depth.");
+                    }
                 }
                 mComputerPlayer.reset();
             }
             // Check if there is the danger of crashing the current block.
             else if (game.numPrecalculatedMoves() == 0 && calculateRemainingTimeMs(game) < 1500)
             {
-                mComputerPlayer->interrupt();
+                mComputerPlayer->stop();
             }
         }
 

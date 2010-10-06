@@ -14,13 +14,13 @@ namespace Tetris
 {
 
     ComputerPlayer::ComputerPlayer(boost::shared_ptr<WorkerThread> inWorkerThread,
-                   std::auto_ptr<GameStateNode> inNode,
-                   const BlockTypes & inBlockTypes,
-                   const Widths & inWidths,
-                   std::auto_ptr<Evaluator> inEvaluator) :
+                                   std::auto_ptr<GameStateNode> inNode,
+                                   const BlockTypes & inBlockTypes,
+                                   const Widths & inWidths,
+                                   std::auto_ptr<Evaluator> inEvaluator) :
         mWorkerThread(inWorkerThread),
         mLayers(inBlockTypes.size()),
-        mCompletedSearchDepth(Create<int>(0)),
+        mCompletedSearchDepth(0),
         mNode(inNode.release()),
         mBlockTypes(inBlockTypes),
         mWidths(inWidths),
@@ -30,17 +30,12 @@ namespace Tetris
         Assert(!mNode->state().isGameOver());
         Assert(mNode->children().empty());
         mNode->makeRoot(); // forget out parent node
-        mStopwatch.reset(new Poco::Stopwatch);
-        mStopwatch->start();
     }
 
 
     ComputerPlayer::~ComputerPlayer()
     {
-        // Remove any obsolete tasks.
-        mWorkerThread->clear();
         mWorkerThread->interrupt();
-        setStatus(Status_Interrupted);
     }
     
         
@@ -52,8 +47,18 @@ namespace Tetris
 
     int ComputerPlayer::getCurrentSearchDepth() const
     {
-        ScopedConstAtom<int> value(mCompletedSearchDepth);
-        return *value.get();
+        boost::mutex::scoped_lock lock(mCompletedSearchDepthMutex);
+        return mCompletedSearchDepth;
+    }
+    
+    
+    void ComputerPlayer::setCurrentSearchDepth(int inDepth)
+    {
+        boost::mutex::scoped_lock lock(mCompletedSearchDepthMutex);
+        if (inDepth > mCompletedSearchDepth)
+        {
+            mCompletedSearchDepth = inDepth;
+        }
     }
 
 
@@ -63,14 +68,16 @@ namespace Tetris
     }
 
 
-    bool ComputerPlayer::result(NodePtr & outChild)
+    NodePtr ComputerPlayer::result() const
     {
-        if (mNode->children().size() == 1)
+        if (status() != Status_Finished)
         {
-            outChild = *mNode->children().begin();
-            return true;
+            throw std::logic_error("ComputerPlayer::result() was called while not yet finished.");
         }
-        return false;
+
+        boost::mutex::scoped_lock lock(mNodeMutex);
+        Assert(mNode->children().size() == 1); // CarveBestPath() must have been called.
+        return *mNode->children().begin();
     }
 
 
@@ -89,9 +96,9 @@ namespace Tetris
 
 
     void ComputerPlayer::updateLayerData(size_t inIndex, NodePtr inNodePtr, size_t inCount)
-    {        
-        ScopedAtom<LayerData> wLayerData = mLayers[inIndex];
-        LayerData & layerData = *wLayerData.get();
+    {
+        boost::mutex::scoped_lock lock(mLayersMutex);
+        LayerData & layerData = mLayers[inIndex];
         layerData.mNumItems += inCount;        
         if (!layerData.mBestChild || inNodePtr->state().quality(inNodePtr->qualityEvaluator()) > layerData.mBestChild->state().quality(inNodePtr->qualityEvaluator()))
         {
@@ -101,10 +108,10 @@ namespace Tetris
 
 
     void ComputerPlayer::populateNodesRecursively(NodePtr ioNode,
-                                          const BlockTypes & inBlockTypes,
-                                          const Widths & inWidths,
-                                          size_t inIndex,
-                                          size_t inMaxIndex)
+                                                  const BlockTypes & inBlockTypes,
+                                                  const Widths & inWidths,
+                                                  size_t inIndex,
+                                                  size_t inMaxIndex)
     {
         // Throws boost::thread_interrupted if boost::thread::interrupt() has been called.
         boost::this_thread::interruption_point();
@@ -171,17 +178,9 @@ namespace Tetris
 
     void ComputerPlayer::markTreeRowAsFinished(size_t inIndex)
     {
-        {
-            ScopedAtom<int> wdepth(mCompletedSearchDepth);
-            int & depth = *wdepth.get();
-            if (inIndex > depth)
-            {
-                depth = inIndex;
-            }
-        }
-
-        ScopedAtom<LayerData> layerData(mLayers[inIndex]);
-        layerData->mFinished = true;
+        setCurrentSearchDepth(inIndex);
+        boost::mutex::scoped_lock lock(mLayersMutex);
+        mLayers[inIndex].mFinished = true;
     }
 
 
@@ -194,6 +193,7 @@ namespace Tetris
             size_t targetDepth = 1;
             while (targetDepth < mBlockTypes.size())
             {
+                boost::mutex::scoped_lock lock(mNodeMutex);
                 populateNodesRecursively(mNode, mBlockTypes, mWidths, 0, targetDepth);
                 markTreeRowAsFinished(targetDepth);
                 targetDepth++;
@@ -212,29 +212,21 @@ namespace Tetris
 
     void ComputerPlayer::destroyInferiorChildren()
     {
-        if (!mLayers.empty())
-        {
-            LayerData * layer(0);
-            for (size_t idx = 0; idx != mLayers.size(); ++idx)
-            {
-                ScopedAtom<LayerData> scopedLayerData = mLayers[idx];
-                if (!scopedLayerData->mFinished)
-                {
-                    break;
-                }
-                layer = scopedLayerData.get();
-            }
-            if (layer)
-            {
-                CarveBestPath(mNode, layer->mBestChild);
-            }
-        }
+        int reachedDepth = getCurrentSearchDepth() - 1;
+        Assert(reachedDepth >= 1);
+
+        // We use the 'best child' from this search depth.
+        // The path between the start node and this best
+        // child will be the list of precalculated nodes.
+        boost::mutex::scoped_lock layersLock(mLayersMutex);
+        boost::mutex::scoped_lock nodeLock(mNodeMutex);
+        Assert(reachedDepth < mLayers.size());
+        CarveBestPath(mNode, mLayers[reachedDepth].mBestChild);
     }
 
 
-    void ComputerPlayer::interrupt()
+    void ComputerPlayer::stop()
     {
-        setStatus(Status_Interrupted);
         mWorkerThread->interrupt();
     }
 
@@ -244,11 +236,10 @@ namespace Tetris
         // Thread entry point has try/catch block
         try
         {
-            setStatus(Status_Started);
             populate();
             destroyInferiorChildren();
             setStatus(Status_Finished);
-        } 
+        }
         catch (const std::exception & inException)
         {
             LogError(MakeString() << inException.what());
@@ -258,8 +249,10 @@ namespace Tetris
 
     void ComputerPlayer::start()
     {
-        Assert(status() == Status_Nil);
+        boost::mutex::scoped_lock lock(mStatusMutex);
+        Assert(mStatus == Status_Nil);
         mWorkerThread->schedule(boost::bind(&ComputerPlayer::startImpl, this));
+        mStatus = Status_Started;
     }
 
 } // namespace Tetris
