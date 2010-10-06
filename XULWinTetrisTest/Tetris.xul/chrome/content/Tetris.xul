@@ -60,6 +60,12 @@
               <label value="Lines x4:" style="text-align:right"/>
               <textbox id="lines4TextBox" value="0" readonly="true"  style="text-align:right" flex="1" />
             </row>
+            <row align="center">
+              <spacer />
+              <spacer />
+              <label value="Total lines:" style="text-align:right"/>
+              <textbox id="totalLinesTextBox" value="0" readonly="true"  style="text-align:right" flex="1" />
+            </row>
           </rows>
         </grid>
       </groupbox>
@@ -108,7 +114,7 @@
           <rows>
             <row align="center">
               <label value="Search depth:" style="text-align:right" />
-              <textbox id="searchDepth" type="number" readonly="true" style="text-align:right" value="8" flex="1" />
+              <textbox id="searchDepth" type="number" readonly="true" style="text-align:right" value="1" flex="1" />
               <label value="Search width:" style="text-align:right" />
               <textbox id="searchWidth" type="number" readonly="true" style="text-align:right" value="4" flex="1" />
             </row>

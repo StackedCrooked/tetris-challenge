@@ -34,6 +34,7 @@ namespace Tetris
         mBlockCountTextBox(0),
         mLevelTextBox(0),
         mScoreTextBox(0),
+        mTotalLinesTextBox(0),
         mComputerEnabledCheckBox(0),
         mSearchDepth(0),
         mCurrentSearchDepth(0),
@@ -181,6 +182,15 @@ namespace Tetris
             if (!(mScoreTextBox = el->component()->downcast<XULWin::TextBox>()))
             {
                 LogWarning("The element with id 'scoreTextBox' was found but it was not of type 'textbox'.");
+            }
+        }
+
+
+        if (XULWin::Element * el = mRootElement->getElementById("totalLinesTextBox"))
+        {
+            if (!(mTotalLinesTextBox = el->component()->downcast<XULWin::TextBox>()))
+            {
+                LogWarning("The element with id 'totalLinesTextBox' was found but it was not of type 'textbox'.");
             }
         }
 
@@ -575,6 +585,12 @@ namespace Tetris
         if (mScoreTextBox)
         {
             setText(mScoreTextBox, MakeString() << game.currentNode()->state().stats().score());
+        }
+
+
+        if (mTotalLinesTextBox)
+        {
+            setText(mTotalLinesTextBox, MakeString() << game.currentNode()->state().stats().numLines());
         }
 
 

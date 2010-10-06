@@ -76,7 +76,14 @@ namespace Tetris
         }
 
         boost::mutex::scoped_lock lock(mNodeMutex);
-        Assert(mNode->children().size() == 1); // CarveBestPath() must have been called.
+        if (mNode->children().empty())
+        {
+            throw std::runtime_error("The computer player failed to generate any results.");
+        }
+
+        size_t numChildren = mNode->children().size();
+        Assert(numChildren == 1);
+
         return *mNode->children().begin();
     }
 
@@ -113,8 +120,12 @@ namespace Tetris
                                                   size_t inIndex,
                                                   size_t inMaxIndex)
     {
-        // Throws boost::thread_interrupted if boost::thread::interrupt() has been called.
-        boost::this_thread::interruption_point();
+
+        // We want to at least perform a depth-1 search.
+        if (inIndex > 0)
+        {        
+            boost::this_thread::interruption_point();
+        }
 
         //
         // Check stop conditions
@@ -143,8 +154,6 @@ namespace Tetris
         {
             generatedChildNodes = ChildNodes(GameStateComparisonFunctor(mEvaluator->clone()));
             GenerateOffspring(ioNode, inBlockTypes[inIndex], *mEvaluator, generatedChildNodes);
-            boost::this_thread::interruption_point();
-
          
             size_t count = 0;
             ChildNodes::iterator it = generatedChildNodes.begin(), end = generatedChildNodes.end();
@@ -153,24 +162,20 @@ namespace Tetris
                 ioNode->addChild(*it);
                 ++count;
                 ++it;
-                boost::this_thread::interruption_point();
             }
-
             updateLayerData(inIndex, *ioNode->children().begin(), count);
-            boost::this_thread::interruption_point();
         }
 
 
         //
         // Recursive call on each child node.
         //
-        if (inIndex <= inMaxIndex)
+        if (inIndex < inMaxIndex)
         {
             for (ChildNodes::iterator it = generatedChildNodes.begin(); it != generatedChildNodes.end(); ++it)
             {
                 NodePtr child = *it;
                 populateNodesRecursively(child, inBlockTypes, inWidths, inIndex + 1, inMaxIndex);
-                boost::this_thread::interruption_point();
             }
         }
     }
@@ -188,9 +193,9 @@ namespace Tetris
     {
         try
         {
-            // The nodes are populated using a simple "Iterative deepening" algorithm.
+            // The nodes are populated using a "Iterative deepening" algorithm.
             // See: http://en.wikipedia.org/wiki/Iterative_deepening_depth-first_search for more information.
-            size_t targetDepth = 1;
+            size_t targetDepth = 0;
             while (targetDepth < mBlockTypes.size())
             {
                 boost::mutex::scoped_lock lock(mNodeMutex);
@@ -201,20 +206,21 @@ namespace Tetris
         }
         catch (const boost::thread_interrupted &)
         {
-            LogInfo("ComputerPlayer::populate: thread interrupted");
+            // Task was interrupted. Ok.
+            LogInfo(MakeString() << "ComputerPlayer was interrupted. Resulting search depth: " << getCurrentSearchDepth() << "/" << mBlockTypes.size());
         }
         catch (const std::exception & inException)
         {
-            LogError(MakeString() << "ComputerPlayer::populate: " << inException.what());
+            LogError(MakeString() << "Exception caught in ComputerPlayer::populate(). Detail: " << inException.what());
         }
     }
 
 
     void ComputerPlayer::destroyInferiorChildren()
     {
-        int reachedDepth = getCurrentSearchDepth() - 1;
-        Assert(reachedDepth >= 1);
-
+        int reachedDepth = getCurrentSearchDepth();
+        Assert(reachedDepth >= 0);
+        
         // We use the 'best child' from this search depth.
         // The path between the start node and this best
         // child will be the list of precalculated nodes.

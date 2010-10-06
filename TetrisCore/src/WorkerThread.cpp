@@ -136,7 +136,7 @@ namespace Tetris
         }
         catch (const boost::thread_interrupted &)
         {
-            LogInfo("WorkerThread: Task was interrupted.");
+            // Task was interrupted. Ok.
         }
         mTaskProcessedCondition.notify_all();
     }

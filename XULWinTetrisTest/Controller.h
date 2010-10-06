@@ -118,6 +118,7 @@ namespace Tetris
         XULWin::TextBox * mBlockCountTextBox;
         typedef XULWin::TextBox * TextBoxPtr;
         TextBoxPtr mLinesTextBoxes[4];
+        XULWin::TextBox * mTotalLinesTextBox;
         XULWin::TextBox * mScoreTextBox;
         XULWin::TextBox * mLevelTextBox;
         XULWin::CheckBox * mComputerEnabledCheckBox;
