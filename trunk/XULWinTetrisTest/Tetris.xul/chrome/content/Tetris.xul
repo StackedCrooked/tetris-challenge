@@ -112,7 +112,7 @@
               <menuitem id="customMenuItem" label="Custom" />
             </menupopup>
           </menulist>
-          <spacer flex="1" />
+          <!--<button id="clearPrecalculatedButton" label="Clear precalculated" />-->
         </hbox>
         <spacer height="5" />
         <grid>

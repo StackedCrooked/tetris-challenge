@@ -64,6 +64,8 @@ namespace Tetris
 
         size_t numPrecalculatedMoves() const;
 
+        void clearPrecalculatedNodes();
+
         //
         // Game commands
         //

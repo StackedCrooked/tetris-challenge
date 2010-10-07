@@ -156,6 +156,12 @@ namespace Tetris
     }
 
 
+    void Game::clearPrecalculatedNodes()
+    {
+        mCurrentNode->children().clear();
+    }
+
+
     GameStateNode * Game::currentNode()
     {
         return mCurrentNode.get();
