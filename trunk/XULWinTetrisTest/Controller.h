@@ -42,8 +42,9 @@ namespace Tetris
     };
 
 
-    class Controller : public TetrisComponent::Controller,
-                       boost::noncopyable
+    class Controller :
+        public TetrisComponent::Controller,
+        boost::noncopyable
     {
     public:
         Controller(HINSTANCE hInstance);
