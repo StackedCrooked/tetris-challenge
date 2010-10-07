@@ -107,6 +107,7 @@ namespace Tetris
         LRESULT onQuit(WPARAM wParam, LPARAM lParam);
         LRESULT onAboutMenuItem(WPARAM wParam, LPARAM lParam);
         LRESULT onStrategySelected(WPARAM wParam, LPARAM lParam);
+        LRESULT onClearPrecalculated(WPARAM wParam, LPARAM lParam);
 
         void updateStrategy();
 
@@ -129,6 +130,7 @@ namespace Tetris
         XULWin::TextBox * mStatusTextBox;
         XULWin::TextBox * mMovesAheadTextBox;
         XULWin::MenuList * mStrategiesMenuList;
+        XULWin::Button * mClearPrecalculatedButton;
 
         XULWin::SpinButton * mSearchDepth;
         XULWin::SpinButton * mSearchWidth;

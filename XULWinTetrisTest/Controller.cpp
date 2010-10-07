@@ -44,6 +44,7 @@ namespace Tetris
         mStatusTextBox(0),
         mMovesAheadTextBox(0),
         mStrategiesMenuList(0),
+        mClearPrecalculatedButton(0),
         mGameHeightFactor(0),
         mLastBlockHeightFactor(0),
         mNumHolesFactor(0),
@@ -239,6 +240,11 @@ namespace Tetris
             mScopedEventListener.connect(mStrategiesMenuList->el(), boost::bind(&Controller::onStrategySelected, this, _1, _2));
         }
 
+        if (mClearPrecalculatedButton = findComponentById<XULWin::Button>("clearPrecalculatedButton"))
+        {
+            mScopedEventListener.connect(mClearPrecalculatedButton->el(), boost::bind(&Controller::onClearPrecalculated, this, _1, _2));
+        }
+
         mGameHeightFactor = findComponentById<XULWin::SpinButton>("gameHeightFactor");
         mLastBlockHeightFactor = findComponentById<XULWin::SpinButton>("lastBlockHeightFactor");
         mNumHolesFactor = findComponentById<XULWin::SpinButton>("numHolesFactor");
@@ -354,6 +360,14 @@ namespace Tetris
         }
         // Must return unhandled otherwise the popup menu stays.
         return XULWin::cUnhandled;
+    }
+
+
+    LRESULT Controller::onClearPrecalculated(WPARAM wParam, LPARAM lParam)
+    {
+        ScopedAtom<Game> game(*mProtectedGame);
+        game->clearPrecalculatedNodes();
+        return XULWin::cHandled;
     }
 
 
@@ -568,7 +582,6 @@ namespace Tetris
                     // The created node should follow the last precalculated one.
                     const int resultNodeDepth = resultNode->depth();
                     const int endNodeDepth = game.lastPrecalculatedNode()->depth();
-                    Assert(resultNodeDepth == endNodeDepth + 1);
                     if (resultNodeDepth == endNodeDepth + 1)
                     {
                         game.lastPrecalculatedNode()->addChild(resultNode);

@@ -179,8 +179,8 @@ namespace Tetris
                   NumDoublesFactor(2),
                   NumTriplesFactor(4),
                   NumTetrisesFactor(8),
-                  SearchDepth(6),
-                  SearchWidth(6))
+                  SearchDepth(4),
+                  SearchWidth(4))
     {
     }
 
@@ -193,17 +193,17 @@ namespace Tetris
                   NumDoublesFactor(-8),
                   NumTriplesFactor(-8),
                   NumTetrisesFactor(8),
-                  SearchDepth(6),
-                  SearchWidth(6))
+                  SearchDepth(8),
+                  SearchWidth(5))
     {
     }
 
 
     Acrobatic::Acrobatic() :
         Evaluator(GameHeightFactor(-2),
-                  LastBlockHeightFactor(1),
+                  LastBlockHeightFactor(0),
                   NumHolesFactor(-4),
-                  NumSinglesFactor(-2),
+                  NumSinglesFactor(1),
                   NumDoublesFactor(2),
                   NumTriplesFactor(4),
                   NumTetrisesFactor(8),
