@@ -3,6 +3,7 @@
 #include "Tetris/GameState.h"
 #include "Tetris/Logger.h"
 #include "Tetris/MakeString.h"
+#include "Tetris/WorkerThread.h"
 #include <boost/bind.hpp>
 
 
@@ -152,7 +153,7 @@ namespace Tetris
             generatedChildNodes = ChildNodes(GameStateComparisonFunctor(mEvaluator->clone()));
             GenerateOffspring(ioNode, inBlockTypes[inIndex], *mEvaluator, generatedChildNodes);
 
-            size_t count = 0;
+            int count = 0;
             ChildNodes::iterator it = generatedChildNodes.begin(), end = generatedChildNodes.end();
             while (count < inWidths[inIndex] && it != end)
             {
@@ -215,7 +216,7 @@ namespace Tetris
 
     void ComputerPlayer::destroyInferiorChildren()
     {
-        int reachedDepth = getCurrentSearchDepth();
+        size_t reachedDepth = getCurrentSearchDepth();
         Assert(reachedDepth >= 1);
 
         // We use the 'best child' from this search depth.

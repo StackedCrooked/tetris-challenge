@@ -4,10 +4,7 @@
 
 #include "Tetris/AISupport.h"
 #include "Tetris/BlockType.h"
-#include "Tetris/GameStateNode.h"
 #include "Tetris/Threading.h"
-#include "Tetris/WorkerThread.h"
-#include "Poco/Stopwatch.h"
 #include <memory>
 #include <vector>
 #include <boost/noncopyable.hpp>
@@ -18,7 +15,11 @@
 namespace Tetris
 {
 
+
+    class GameStateNode;
+    class WorkerThread;
     typedef std::vector<int> Widths;
+
 
     class ComputerPlayer : boost::noncopyable
     {

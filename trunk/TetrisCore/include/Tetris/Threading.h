@@ -2,7 +2,6 @@
 #define THREADING_H_INCLUDED
 
 
-#include "Tetris/ErrorHandling.h"
 #include <memory>
 #include <boost/thread.hpp>
 

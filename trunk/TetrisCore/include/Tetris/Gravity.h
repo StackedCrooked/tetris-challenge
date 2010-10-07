@@ -5,7 +5,6 @@
 #include "Tetris/Threading.h"
 #include "Poco/Timer.h"
 #include <boost/noncopyable.hpp>
-#include <boost/thread.hpp>
 
 
 namespace Tetris
