@@ -91,8 +91,8 @@ namespace Tetris
         if (IsGameOver(gameState, inBlockType, 0))
         {
             size_t initialColumn = DivideByTwo(gameGrid.numColumns() - GetGrid(GetBlockIdentifier(inBlockType, 0)).numColumns());
-            std::auto_ptr<GameState> nextGameState = gameState.commit(Block(inBlockType, Rotation(0), Row(0), Column(initialColumn));
-			NodePtr childState(new GameStateNode(inNode, nextGameState, GameOver(true)), inEvaluator.clone()));
+            std::auto_ptr<GameState> nextGameState = gameState.commit(Block(inBlockType, Rotation(0), Row(0), Column(initialColumn)));
+            NodePtr childState(new GameStateNode(inNode, nextGameState, GameOver(true)), inEvaluator.clone()));
             Assert(childState->depth() == (inNode->depth() + 1));
             outChildNodes.insert(childState);
             return;
