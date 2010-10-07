@@ -114,11 +114,12 @@ namespace Tetris
     }
 
 
-    void ComputerPlayer::populateNodesRecursively(NodePtr ioNode,
-                                                  const BlockTypes & inBlockTypes,
-                                                  const Widths & inWidths,
-                                                  size_t inIndex,
-                                                  size_t inMaxIndex)
+    void ComputerPlayer::populateNodesRecursively(
+        NodePtr ioNode,
+        const BlockTypes & inBlockTypes,
+        const Widths & inWidths,
+        size_t inIndex,
+        size_t inMaxIndex)
     {
 
         // We want to at least perform a depth-1 search.
