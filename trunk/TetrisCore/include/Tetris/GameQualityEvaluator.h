@@ -122,13 +122,13 @@ namespace Tetris
     };
 
 
-    class Acrobatic : public Evaluator
+    class Depressed : public Evaluator
     {
     public:
-        Acrobatic();
+        Depressed();
 
         virtual std::auto_ptr<Evaluator> clone() const
-        { return CreatePoly<Evaluator, Acrobatic>(*this); }
+        { return CreatePoly<Evaluator, Depressed>(*this); }
     };
 
 
