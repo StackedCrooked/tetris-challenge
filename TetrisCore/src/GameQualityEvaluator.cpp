@@ -200,7 +200,7 @@ namespace Tetris
 
 
     Depressed::Depressed() :
-        Evaluator(GameHeightFactor(1),
+        Evaluator(GameHeightFactor(0),
                   LastBlockHeightFactor(0),
                   NumHolesFactor(0),
                   NumSinglesFactor(0),
@@ -209,6 +209,20 @@ namespace Tetris
                   NumTetrisesFactor(0),
                   SearchDepth(1),
                   SearchWidth(1))
+    {
+    }
+
+
+    Shabby::Shabby() :
+        Evaluator(GameHeightFactor(-1),
+                  LastBlockHeightFactor(-1),
+                  NumHolesFactor(0),
+                  NumSinglesFactor(0),
+                  NumDoublesFactor(0),
+                  NumTriplesFactor(0),
+                  NumTetrisesFactor(0),
+                  SearchDepth(4),
+                  SearchWidth(4))
     {
     }
 

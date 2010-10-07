@@ -393,6 +393,15 @@ namespace Tetris
                 game->clearPrecalculatedNodes();
             }
         }
+        else if (id == "Shabby")
+        {
+            if (!dynamic_cast<Survival *>(mEvaluator.get()))
+            {
+                mEvaluator.reset(new Shabby);
+                ScopedAtom<Game> game(*mProtectedGame);
+                game->clearPrecalculatedNodes();
+            }
+        }
         else if (id == "Depressed")
         {
             if (!dynamic_cast<Depressed *>(mEvaluator.get()))
