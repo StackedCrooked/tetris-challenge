@@ -102,7 +102,18 @@
       </groupbox>
       <groupbox>
         <caption label="AI Parameters" />
-        <description>Change the AI decision making factors.</description>
+        <hbox align="center">
+          <label style="text-align:right" value="Preset: " />
+          <menulist id="strategiesMenuList">
+            <menupopup id="strategiesPopup">
+              <menuitem id="makeTetrisesMenuItem" label="Make Tetrises" />
+              <menuitem id="surviveMenuItem" label="Survive" />
+              <menuitem id="acrobaticMenuItem" label="Acrobatic" />
+              <menuitem id="customMenuItem" label="Custom" />
+            </menupopup>
+          </menulist>
+          <spacer flex="1" />
+        </hbox>
         <spacer height="5" />
         <grid>
           <columns>
@@ -114,33 +125,33 @@
           <rows>
             <row align="center">
               <label value="Search depth:" style="text-align:right" />
-              <textbox id="searchDepth" type="number" readonly="true" style="text-align:right" value="8" flex="1" />
+              <textbox id="searchDepth" type="number" readonly="true" style="text-align:right" value="8" disabled="true" flex="1" />
               <label value="Search width:" style="text-align:right" />
-              <textbox id="searchWidth" type="number" readonly="true" style="text-align:right" value="4" flex="1" />
+              <textbox id="searchWidth" type="number" readonly="true" style="text-align:right" value="4" disabled="true" flex="1" />
             </row>
             <row align="center">
               <label value="Holes:" style="text-align:right" />
-              <textbox id="numHolesFactor" type="number" readonly="true" style="text-align:right" value="-4" flex="1" />
+              <textbox id="numHolesFactor" type="number" readonly="true" style="text-align:right" value="-4" disabled="true" flex="1" />
               <label value="Single lines:" style="text-align:right" />
-              <textbox id="numSinglesFactor" type="number" readonly="true" style="text-align:right" value="1" flex="1" />
+              <textbox id="numSinglesFactor" type="number" readonly="true" style="text-align:right" value="1" disabled="true" flex="1" />
             </row>
             <row align="center">
               <label value="Game height:" style="text-align:right" />
-              <textbox id="gameHeightFactor" type="number" readonly="true" style="text-align:right" value="-2" flex="1" />
+              <textbox id="gameHeightFactor" type="number" readonly="true" style="text-align:right" value="-2" disabled="true" flex="1" />
               <label value="Double lines:" style="text-align:right" />
-              <textbox id="numDoublesFactor" type="number" readonly="true" style="text-align:right" value="2" flex="1" />
+              <textbox id="numDoublesFactor" type="number" readonly="true" style="text-align:right" value="2" disabled="true" flex="1" />
             </row>
             <row align="center">
               <label value="Drop depth:" style="text-align:right" />
-              <textbox id="lastBlockHeightFactor" type="number" readonly="true" style="text-align:right" value="-1" flex="1" />
+              <textbox id="lastBlockHeightFactor" type="number" readonly="true" style="text-align:right" value="-1" disabled="true" flex="1" />
               <label value="Triple lines:" style="text-align:right" />
-              <textbox id="numTriplesFactor" type="number" readonly="true" style="text-align:right" value="4" flex="1" />
+              <textbox id="numTriplesFactor" type="number" readonly="true" style="text-align:right" value="4" disabled="true" flex="1" />
             </row>
             <row align="center">
               <label value="Total lines:" style="text-align:right" />
-              <textbox id="numLinesFactor" type="number" readonly="true" style="text-align:right" value="0" flex="1" />
+              <textbox id="numLinesFactor" type="number" readonly="true" style="text-align:right" value="0" disabled="true" flex="1" />
               <label value="Tetrises:" style="text-align:right" />
-              <textbox id="numTetrisesFactor" type="number" readonly="true" style="text-align:right" value="16" flex="1" />
+              <textbox id="numTetrisesFactor" type="number" readonly="true" style="text-align:right" value="16" disabled="true" flex="1" />
             </row>
           </rows>
         </grid>

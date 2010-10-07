@@ -108,6 +108,8 @@ namespace Tetris
         LRESULT onAboutMenuItem(WPARAM wParam, LPARAM lParam);
         LRESULT onStrategySelected(WPARAM wParam, LPARAM lParam);
 
+        void updateStrategy();
+
 
         XULWin::XULRunner mXULRunner;
         XULWin::ElementPtr mRootElement;;
@@ -122,14 +124,14 @@ namespace Tetris
         XULWin::TextBox * mScoreTextBox;
         XULWin::TextBox * mLevelTextBox;
         XULWin::CheckBox * mComputerEnabledCheckBox;
-        XULWin::SpinButton * mSearchDepth;
-        XULWin::SpinButton * mSearchWidth;
         XULWin::TextBox * mCurrentSearchDepth;
         XULWin::SpinButton * mMovementSpeed;
         XULWin::TextBox * mStatusTextBox;
         XULWin::TextBox * mMovesAheadTextBox;
         XULWin::MenuList * mStrategiesMenuList;
 
+        XULWin::SpinButton * mSearchDepth;
+        XULWin::SpinButton * mSearchWidth;
         XULWin::SpinButton * mGameHeightFactor;
         XULWin::SpinButton * mLastBlockHeightFactor;
         XULWin::SpinButton * mNumHolesFactor;

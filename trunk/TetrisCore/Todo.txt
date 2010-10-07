@@ -1,3 +1,5 @@
+-> Add menulist for AI preset
+- Add checkbox: 'switch to Survive when height reaches xx%'
 - Implement ComputerPlayer vs Computer modus.
 v Rename ComputerPlayer to ComputerPlayer.
 x Concurrent node calculation (create first generation of childnodes and then use a thread per child)
