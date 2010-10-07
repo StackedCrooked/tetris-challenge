@@ -1,6 +1,5 @@
 #include "Tetris/ErrorHandling.h"
 
-
 namespace Tetris
 {
 
