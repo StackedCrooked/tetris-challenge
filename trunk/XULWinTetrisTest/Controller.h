@@ -35,13 +35,13 @@ namespace Tetris
         cMinSearchDepth = 1,
         cDefaultSearchDepth = 3,
         cMaxSearchDepth = 10,
-        
+
         cMinSearchWidth = 1,
         cDefaultSearchWidth = 8,
         cMaxSearchWidth = 40
     };
 
-    
+
     class Controller : public TetrisComponent::Controller,
                        boost::noncopyable
     {
@@ -100,14 +100,13 @@ namespace Tetris
 
         int calculateRemainingTimeMs(Game & game) const;
         void startAI(Game & game, size_t inDepth, size_t inWidth);
-        
-        
+
         LRESULT onNew(WPARAM wParam, LPARAM lParam);
         LRESULT onShowConsole(WPARAM wParam, LPARAM lParam);
         LRESULT onQuit(WPARAM wParam, LPARAM lParam);
         LRESULT onAboutMenuItem(WPARAM wParam, LPARAM lParam);
         LRESULT onStrategySelected(WPARAM wParam, LPARAM lParam);
-        
+
 
         XULWin::XULRunner mXULRunner;
         XULWin::ElementPtr mRootElement;;

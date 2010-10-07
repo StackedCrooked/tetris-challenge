@@ -12,7 +12,7 @@
 int StartProgram(HINSTANCE hInstance)
 {
 #ifndef NDEBUG // only required when launching from Visual Studio
-	// Change the current directory to the XUL Directory
+    // Change the current directory to the XUL Directory
     XULWin::WinAPI::CurrentDirectoryChanger cd("Tetris.xul");
 #endif
 

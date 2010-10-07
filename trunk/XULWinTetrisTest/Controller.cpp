@@ -214,7 +214,7 @@ namespace Tetris
         }
 
 
-        mCurrentSearchDepth = findComponentById<XULWin::TextBox>("currentSearchDepth");       
+        mCurrentSearchDepth = findComponentById<XULWin::TextBox>("currentSearchDepth");
 
 
         if (mMovementSpeed = findComponentById<XULWin::SpinButton>("movementSpeed"))
@@ -553,7 +553,7 @@ namespace Tetris
         {
             // Check if the computer player has finished. If yes, then get the results.
             if (mComputerPlayer->isFinished())
-            {                
+            {
                 NodePtr resultNode = mComputerPlayer->result();
                 if (!resultNode->state().isGameOver())
                 {
@@ -603,7 +603,7 @@ namespace Tetris
             int searchDepth = mSearchDepth ? XULWin::String2Int(mSearchDepth->getValue(), cDefaultSearchDepth) : cDefaultSearchDepth;
             GameStateNode * endNode = game.lastPrecalculatedNode();
             if (!endNode->state().isGameOver() &&
-                 endNode->depth() - game.currentNode()->depth() + searchDepth <=  3 * cMaxSearchDepth)
+                    endNode->depth() - game.currentNode()->depth() + searchDepth <=  3 * cMaxSearchDepth)
             {
                 int searchWidth = mSearchWidth ? XULWin::String2Int(mSearchWidth->getValue(), cDefaultSearchWidth) : cDefaultSearchWidth;
                 startAI(game, searchDepth, searchWidth);
