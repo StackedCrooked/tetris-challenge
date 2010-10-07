@@ -16,7 +16,7 @@ void AttachToConsole()
         }
         AllocConsole();
     }
-    
+
     int raw_out = _open_osfhandle(reinterpret_cast<intptr_t>(GetStdHandle(STD_OUTPUT_HANDLE)), _O_TEXT);
     *stdout = *_fdopen(raw_out, "w");
     setvbuf(stdout, NULL, _IONBF, 0);
