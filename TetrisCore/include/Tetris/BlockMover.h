@@ -3,8 +3,14 @@
 
 
 #include "Tetris/Threading.h"
-#include "Poco/Timer.h"
+#include <boost/scoped_ptr.hpp>
 #include <boost/noncopyable.hpp>
+
+
+namespace Poco
+{
+    class Timer;
+}
 
 
 namespace Tetris

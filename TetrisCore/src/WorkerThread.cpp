@@ -1,5 +1,6 @@
 #include "Tetris/WorkerThread.h"
 #include "Tetris/Logger.h"
+#include "Tetris/MakeString.h"
 
 
 namespace Tetris

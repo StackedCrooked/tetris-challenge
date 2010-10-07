@@ -1,5 +1,6 @@
 #include "Tetris/Game.h"
 #include "Tetris/ErrorHandling.h"
+#include "Tetris/GameState.h"
 #include "Tetris/GameQualityEvaluator.h"
 #include "Tetris/Logger.h"
 #include "Tetris/Utilities.h"

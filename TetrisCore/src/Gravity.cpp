@@ -1,4 +1,5 @@
 #include "Tetris/Gravity.h"
+#include "Tetris/GameState.h"
 #include "Tetris/Logger.h"
 #include "Tetris/Game.h"
 

@@ -3,7 +3,6 @@
 
 
 #include "Tetris/BlockType.h"
-#include "Tetris/GameState.h"
 #include "Tetris/GameQualityEvaluator.h"
 #include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
