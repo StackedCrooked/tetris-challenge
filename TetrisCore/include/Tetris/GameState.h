@@ -79,11 +79,11 @@ namespace Tetris
             {
                 switch (idx)
                 {
-                case 0: return mNumSingles;
-                case 1: return mNumDoubles;
-                case 2: return mNumTriples;
-                case 3: return mNumTetrises;
-                default: throw std::invalid_argument("Invalid number of lines scored requested.");
+                    case 0: return mNumSingles;
+                    case 1: return mNumDoubles;
+                    case 2: return mNumTriples;
+                    case 3: return mNumTetrises;
+                    default: throw std::invalid_argument("Invalid number of lines scored requested.");
                 }
                 return 0; // compiler happy
             }

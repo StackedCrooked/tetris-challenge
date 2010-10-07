@@ -7,7 +7,8 @@ namespace Tetris
 {
 
     // Number of milliseconds between two drops.
-    static const int sIntervals[] = {
+    static const int sIntervals[] =
+    {
         887, 820, 753, 686, 619,
         552, 469, 368, 285, 184,
         167, 151, 134, 117, 100,

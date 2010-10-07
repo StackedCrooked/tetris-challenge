@@ -57,15 +57,15 @@ namespace Tetris
         Assert(ioGameStateNode->children().empty());
 
         GenerateOffspring(ioGameStateNode,
-                          inBlockTypes[inOffset],                          
+                          inBlockTypes[inOffset],
                           inEvaluator,
                           ioGameStateNode->children());
 
         if (inOffset + 1 < inBlockTypes.size())
         {
             for (ChildNodes::iterator it = ioGameStateNode->children().begin();
-                 it != ioGameStateNode->children().end();
-                 ++it)
+                    it != ioGameStateNode->children().end();
+                    ++it)
             {
                 NodePtr childNode = *it;
                 GenerateOffspring(childNode,
@@ -81,7 +81,7 @@ namespace Tetris
                            BlockType inBlockType,
                            const Evaluator & inEvaluator,
                            ChildNodes & outChildNodes)
-    {        
+    {
         Assert(outChildNodes.empty());
         const GameState & gameState = inNode->state();
         const Grid & gameGrid = gameState.grid();
@@ -96,7 +96,7 @@ namespace Tetris
                                                                         Rotation(0),
                                                                         Row(0),
                                                                         Column(initialColumn)),
-                                                                        GameOver(true)),
+                                                                  GameOver(true)),
                                                  inEvaluator.clone()));
             Assert(childState->depth() == (inNode->depth() + 1));
             outChildNodes.insert(childState);

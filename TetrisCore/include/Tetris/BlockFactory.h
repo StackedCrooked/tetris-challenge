@@ -8,7 +8,7 @@
 
 namespace Tetris
 {
-    
+
     class Block;
 
     class BlockFactory

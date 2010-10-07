@@ -43,7 +43,7 @@ namespace Tetris
 
         NodePtr result() const;
 
-        enum Status 
+        enum Status
         {
             Status_Nil,
             Status_Started,
@@ -56,11 +56,11 @@ namespace Tetris
         void startImpl();
 
         void setStatus(Status inStatus);
-        
+
         void setCurrentSearchDepth(int inDepth);
 
-        void updateLayerData(size_t inIndex, NodePtr inNodePtr, size_t inCount);        
-        
+        void updateLayerData(size_t inIndex, NodePtr inNodePtr, size_t inCount);
+
         void markTreeRowAsFinished(size_t inIndex);
         void populate();
         void destroyInferiorChildren();
@@ -100,7 +100,7 @@ namespace Tetris
         BlockTypes mBlockTypes;
         Widths mWidths;
         boost::scoped_ptr<Evaluator> mEvaluator;
-        
+
         Status mStatus;
         mutable boost::mutex mStatusMutex;
 

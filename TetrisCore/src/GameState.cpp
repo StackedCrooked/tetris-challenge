@@ -139,19 +139,19 @@ namespace Tetris
         }
     }
 
-    
+
     void GameState::clearLines()
     {
         size_t numLines = 0;
         std::vector<bool> lines(mGrid.numRows(), false);
-        
+
         // Get numLines and lines
         {
             for (size_t rowIndex = mOriginalBlock.row();
-                 rowIndex < std::min<size_t>(mGrid.numRows(),
-                                             mOriginalBlock.row() + mOriginalBlock.grid().numRows());
-                 ++rowIndex)
-            {  
+                    rowIndex < std::min<size_t>(mGrid.numRows(),
+                                                mOriginalBlock.row() + mOriginalBlock.grid().numRows());
+                    ++rowIndex)
+            {
                 lines[rowIndex] = true;
                 for (size_t ci = 0; ci != mGrid.numColumns(); ++ci)
                 {
@@ -176,27 +176,26 @@ namespace Tetris
 
         Assert(mStats.mFirstOccupiedRow + numLines <= mGrid.numRows());
         mStats.mFirstOccupiedRow += numLines;
-        
-                
+
         // Get newGrid
         Grid newGrid(mGrid.numRows(), mGrid.numColumns(), BlockType_Nil);
         int newRowIdx = numLines;
         for (size_t r = 0; r != mGrid.numRows(); ++r)
         {
-			if (!lines[r])
-			{
-				for (size_t c = 0; c != mGrid.numColumns(); ++c)
-				{
+            if (!lines[r])
+            {
+                for (size_t c = 0; c != mGrid.numColumns(); ++c)
+                {
                     newGrid.set(newRowIdx, c, mGrid.get(r, c));
-				}
+                }
                 newRowIdx++;
-			}
+            }
         }
-        
+
         mGrid = newGrid;
 
         mStats.mNumLines += numLines;
-        
+
         switch (numLines)
         {
             case 0:

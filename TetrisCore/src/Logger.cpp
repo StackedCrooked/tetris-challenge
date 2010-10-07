@@ -41,13 +41,13 @@ namespace Tetris
         static Logger fInstance;
         return fInstance;
     }
-    
-    
+
+
     void Logger::setHandler(const Handler & inHandler)
     {
         mHandler = inHandler;
-    }   
-            
+    }
+
 
     void Logger::flush()
     {
@@ -57,7 +57,7 @@ namespace Tetris
             logImpl((*queue.get())[idx]);
         }
         queue->clear();
-    }    
+    }
 
 
     void Logger::logImpl(const std::string & inMessage)
@@ -72,7 +72,7 @@ namespace Tetris
     void Logger::log(LogLevel inLogLevel, const std::string & inMessage)
     {
         // Critical section: add the log message to the buffer
-        {        
+        {
             ScopedAtom<Queue> queue(mProtectedQueue);
             queue->push_back(GetMessage(inLogLevel, inMessage));
         }

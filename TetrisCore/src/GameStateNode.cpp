@@ -12,10 +12,10 @@ namespace Tetris
     std::auto_ptr<GameStateNode> GameStateNode::CreateRootNode(size_t inNumRows, size_t inNumColumns)
     {
         return std::auto_ptr<GameStateNode>(new GameStateNode(Create<GameState>(inNumRows, inNumColumns),
-                                                              CreatePoly<Evaluator, Balanced>()));
+                                            CreatePoly<Evaluator, Balanced>()));
     }
 
-    
+
     ChildNodes nodes(Balanced);
 
     static int GetIdentifier(const GameState & inGameState)
@@ -49,13 +49,11 @@ namespace Tetris
 
 
     std::auto_ptr<GameStateNode> GameStateNode::clone() const
-    {        
+    {
         NodePtr parent = mParent.lock();
-        std::auto_ptr<GameStateNode> result(parent ? new GameStateNode(parent,
-                                                                       std::auto_ptr<GameState>(new GameState(*mGameState)),
-                                                                       mEvaluator->clone())
-                                                    : new GameStateNode(std::auto_ptr<GameState>(new GameState(*mGameState)),
-                                                                        mEvaluator->clone()));
+        std::auto_ptr<GameStateNode> result(
+			parent ? new GameStateNode(parent, std::auto_ptr<GameState>(new GameState(*mGameState)), mEvaluator->clone())
+                   : new GameStateNode(std::auto_ptr<GameState>(new GameState(*mGameState)), mEvaluator->clone()));
         result->mDepth = mDepth;
 
         ChildNodes::const_iterator it = mChildren.begin(), end = mChildren.end();
@@ -150,18 +148,18 @@ namespace Tetris
         return mParent.lock();
     }
 
-    
+
     GameStateComparisonFunctor::GameStateComparisonFunctor(std::auto_ptr<Evaluator> inEvaluator) :
         mEvaluator(inEvaluator.release())
     {
     }
 
-    
+
     bool GameStateComparisonFunctor::operator()(NodePtr lhs, NodePtr rhs)
     {
         Assert(lhs && rhs);
         Assert(lhs.get() != rhs.get());
-        
+
         // Order by descending quality.
         return lhs->state().quality(*mEvaluator) > rhs->state().quality(*mEvaluator);
     }

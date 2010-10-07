@@ -37,8 +37,8 @@ namespace Tetris
     {
         mWorkerThread->interrupt();
     }
-    
-        
+
+
     bool ComputerPlayer::isFinished() const
     {
         return status() == Status_Finished;
@@ -50,8 +50,8 @@ namespace Tetris
         boost::mutex::scoped_lock lock(mCompletedSearchDepthMutex);
         return mCompletedSearchDepth;
     }
-    
-    
+
+
     void ComputerPlayer::setCurrentSearchDepth(int inDepth)
     {
         boost::mutex::scoped_lock lock(mCompletedSearchDepthMutex);
@@ -106,7 +106,7 @@ namespace Tetris
     {
         boost::mutex::scoped_lock lock(mLayersMutex);
         LayerData & layerData = mLayers[inIndex];
-        layerData.mNumItems += inCount;        
+        layerData.mNumItems += inCount;
         if (!layerData.mBestChild || inNodePtr->state().quality(inNodePtr->qualityEvaluator()) > layerData.mBestChild->state().quality(inNodePtr->qualityEvaluator()))
         {
             layerData.mBestChild = inNodePtr;
@@ -123,7 +123,7 @@ namespace Tetris
 
         // We want to at least perform a depth-1 search.
         if (inIndex > 0)
-        {        
+        {
             boost::this_thread::interruption_point();
         }
 
@@ -154,7 +154,7 @@ namespace Tetris
         {
             generatedChildNodes = ChildNodes(GameStateComparisonFunctor(mEvaluator->clone()));
             GenerateOffspring(ioNode, inBlockTypes[inIndex], *mEvaluator, generatedChildNodes);
-         
+
             size_t count = 0;
             ChildNodes::iterator it = generatedChildNodes.begin(), end = generatedChildNodes.end();
             while (count < inWidths[inIndex] && it != end)
@@ -220,7 +220,7 @@ namespace Tetris
     {
         int reachedDepth = getCurrentSearchDepth();
         Assert(reachedDepth >= 1);
-        
+
         // We use the 'best child' from this search depth.
         // The path between the start node and this best
         // child will be the list of precalculated nodes.

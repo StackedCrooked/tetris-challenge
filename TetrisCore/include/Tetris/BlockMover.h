@@ -44,8 +44,8 @@ namespace Tetris
 
     private:
         void onTimer(Poco::Timer & ioTimer);
-        void move();   
-        
+        void move();
+
         Protected<Game> & mGame;
         boost::scoped_ptr<Poco::Timer> mTimer;
         int mNumMovesPerSecond;
