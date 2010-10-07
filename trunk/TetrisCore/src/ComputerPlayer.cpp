@@ -1,13 +1,9 @@
 #include "Tetris/ComputerPlayer.h"
-#include "Tetris/GameState.h"
 #include "Tetris/ErrorHandling.h"
+#include "Tetris/GameState.h"
 #include "Tetris/Logger.h"
-#include "Poco/Stopwatch.h"
+#include "Tetris/MakeString.h"
 #include <boost/bind.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/bind.hpp>
-#include <boost/shared_ptr.hpp>
-#include <ostream>
 
 
 namespace Tetris

@@ -21,22 +21,6 @@ namespace Tetris
 
     std::string ToString(LogLevel inLogLevel);
 
-    // Requires that the ToString function is defined for values of type T.
-    template<class T>
-    std::string ToString(const std::vector<T> & inVector)
-    {
-        std::stringstream result;
-        for (size_t idx = 0; idx != inVector.size(); ++idx)
-        {
-            if (idx != 0)
-            {
-                result << ", ";
-            }
-            result << ToString(inVector[idx]);
-        }
-        return result.str();
-    }
-
     class Logger
     {
     public:
@@ -70,31 +54,6 @@ namespace Tetris
     void LogWarning(const std::string & inMessage);
 
     void LogError(const std::string & inMessage);
-
-    /**
-     * MakeString
-     *
-     * Enables logging like this:
-     *
-     *   LogError(MakeString() << "The index " << i << " exceeds the max length of " << max << ".");
-     *
-     */
-    class MakeString
-    {
-    public:
-        template <typename T>
-        MakeString & operator<<(const T & datum)
-        {
-            mBuffer << datum;
-            return *this;
-        }
-        operator std::string() const
-        {
-            return mBuffer.str();
-        }
-    private:
-        std::ostringstream mBuffer;
-    };
 
 } // namespace Tetris
 

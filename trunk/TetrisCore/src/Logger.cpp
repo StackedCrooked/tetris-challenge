@@ -6,7 +6,6 @@
 namespace Tetris
 {
 
-
     std::string ToString(LogLevel inLogLevel)
     {
         switch (inLogLevel)

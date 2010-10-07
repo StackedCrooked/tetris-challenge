@@ -2,7 +2,6 @@
 #define BLOCKTYPE_H_INCLUDED
 
 
-#include "Logger.h"
 #include <vector>
 
 

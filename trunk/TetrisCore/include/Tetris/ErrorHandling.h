@@ -3,30 +3,10 @@
 
 
 #ifdef _DEBUG
-#include <windows.h> // required for the ::DebugBreak function
+    #include <windows.h>
+    #define Assert(condition) if (!(condition)) { ::DebugBreak(); }
 #else
-#ifndef NDEBUG
-#include <sstream>
-#include <stdexcept>
-#endif
-#endif
-
-
-#include <stdexcept>
-#include <string>
-
-
-#ifdef _DEBUG
-#define Assert(condition) if (!(condition)) { ::DebugBreak(); }
-#elif NDEBUG
-#define Assert(...)
-#else
-#define Assert(condition) \
-    if (!(condition) \
-    { \
-    std::stringstream ss; \
-    throw std::logic_error(ss << __FILE__ << ":" << __LINE__); \
-    }
+    #define Assert(...)
 #endif
 
 

@@ -1,4 +1,5 @@
 #include "Tetris/BlockType.h"
+#include "Tetris/MakeString.h"
 
 
 namespace Tetris
@@ -46,6 +47,5 @@ namespace Tetris
             }
         }
     }
-
 
 } // namespace Tetris

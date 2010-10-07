@@ -1,4 +1,8 @@
 #include "Tetris/AISupport.h"
+#include "Tetris/ErrorHandling.h"
+#include "Tetris/Block.h"
+#include "Tetris/Grid.h"
+#include "Tetris/GameState.h"
 
 
 namespace Tetris
