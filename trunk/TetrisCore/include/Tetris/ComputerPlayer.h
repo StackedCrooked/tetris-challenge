@@ -1,5 +1,5 @@
-#ifndef PLAYER_H_INCLUDED
-#define PLAYER_H_INCLUDED
+#ifndef TETRIS_PLAYER_H_INCLUDED
+#define TETRIS_PLAYER_H_INCLUDED
 
 
 #include "Tetris/AISupport.h"

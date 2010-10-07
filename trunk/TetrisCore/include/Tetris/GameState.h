@@ -1,5 +1,5 @@
-#ifndef GAMESTATE_H_INCLUDED
-#define GAMESTATE_H_INCLUDED
+#ifndef TETRIS_GAMESTATE_H_INCLUDED
+#define TETRIS_GAMESTATE_H_INCLUDED
 
 
 #include "Tetris/Block.h"
