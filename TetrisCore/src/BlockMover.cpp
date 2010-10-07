@@ -1,5 +1,5 @@
 #include "Tetris/BlockMover.h"
-#include "Tetris/ErrorHandling.h"
+#include "Tetris/Assert.h"
 #include "Tetris/Game.h"
 #include "Tetris/GameState.h"
 #include "Tetris/GameStateNode.h"

@@ -165,6 +165,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\include\Tetris\Assert.h"
+				>
+			</File>
+			<File
 				RelativePath=".\include\Tetris\Block.h"
 				>
 			</File>
@@ -186,10 +190,6 @@
 			</File>
 			<File
 				RelativePath=".\include\Tetris\Direction.h"
-				>
-			</File>
-			<File
-				RelativePath=".\include\Tetris\ErrorHandling.h"
 				>
 			</File>
 			<File
@@ -274,10 +274,6 @@
 			</File>
 			<File
 				RelativePath=".\src\ComputerPlayer.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\ErrorHandling.cpp"
 				>
 			</File>
 			<File
