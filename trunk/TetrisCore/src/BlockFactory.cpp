@@ -9,13 +9,13 @@
 namespace Tetris
 {
 
-    BlockFactory::BlockFactory(int inBagSize) :        
+    BlockFactory::BlockFactory(int inBagSize) :
         mBagSize(inBagSize),
         mCurrentIndex(0)
     {
         // Pick a new seed.
         srand(static_cast<unsigned int>(time(NULL)));
-   
+
         size_t totalSize = mBagSize * cBlockTypeCount;
         mBag.reserve(totalSize);
         for (size_t idx = 0; idx != totalSize; ++idx)
@@ -26,12 +26,12 @@ namespace Tetris
         std::random_shuffle(mBag.begin(), mBag.end());
     }
 
-    
+
     BlockType BlockFactory::getNext() const
     {
         if (mCurrentIndex >= mBag.size())
         {
-            // Reshuffle the bag.            
+            // Reshuffle the bag.
             std::random_shuffle(mBag.begin(), mBag.end());
             mCurrentIndex = 0;
         }

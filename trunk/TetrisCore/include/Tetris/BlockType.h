@@ -14,7 +14,7 @@ namespace Tetris
      * BlockType
      *
      * Represents a tetris shape or block type.
-     * 
+     *
      * I = long shape
      * J = J shaped block
      * O = square block

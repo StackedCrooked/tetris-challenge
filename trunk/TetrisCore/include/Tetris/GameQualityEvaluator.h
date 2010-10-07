@@ -23,7 +23,7 @@ namespace Tetris
     {
     public:
         Evaluator(GameHeightFactor inGameHeightFactor,
-                  LastBlockHeightFactor inLastBlockHeightFactor, 
+                  LastBlockHeightFactor inLastBlockHeightFactor,
                   NumHolesFactor inNumHolesFactor,
                   NumSinglesFactor inNumSinglesFactor,
                   NumDoublesFactor inNumDoublesFactor,

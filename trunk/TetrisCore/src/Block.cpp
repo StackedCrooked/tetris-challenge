@@ -40,20 +40,20 @@ namespace Tetris
     {
         return *mGrid;
     }
- 
-        
+
+
     size_t Block::row() const
     {
         return mRow;
     }
- 
-        
+
+
     size_t Block::column() const
     {
         return mColumn;
     }
- 
-        
+
+
     void Block::setRow(size_t inRow)
     {
         mRow = inRow;

@@ -13,14 +13,14 @@ namespace Tetris
      * CarveBestPath
      *
      * Removes all tree-nodes that are not in the best path.
-     * 
+     *
      * The best path is defined as the path that is formed by backtracking the
      * ancestry (parent nodes) of endNode's first child up until the start node.
      */
     void CarveBestPath(NodePtr startNode, NodePtr endNode);
 
     bool IsGameOver(const GameState & inGameState, BlockType inBlockType, int inRotation);
-    
+
     void GenerateOffspring(NodePtr ioGameStateNode,
                            BlockTypes inBlockTypes,
                            size_t inOffset,

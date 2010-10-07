@@ -6,7 +6,7 @@ namespace Tetris
 {
 
     Evaluator::Evaluator(GameHeightFactor inGameHeightFactor,
-                         LastBlockHeightFactor inLastBlockHeightFactor, 
+                         LastBlockHeightFactor inLastBlockHeightFactor,
                          NumHolesFactor inNumHolesFactor,
                          NumSinglesFactor inNumSinglesFactor,
                          NumDoublesFactor inNumDoublesFactor,
@@ -25,9 +25,9 @@ namespace Tetris
 
     int Evaluator::evaluate(const GameState & inGameState) const
     {
-        const Grid & grid = inGameState.grid(); 
-        size_t top = grid.numRows();    
-        bool foundTop = false;   
+        const Grid & grid = inGameState.grid();
+        size_t top = grid.numRows();
+        bool foundTop = false;
         int numHoles = 0;
         int numOccupiedUnderTop = 0;
 
@@ -67,7 +67,7 @@ namespace Tetris
         int lastBlockHeight = grid.numRows() - inGameState.originalBlock().row();
 
 
-        return gameHeight * mGameHeightFactor + 
+        return gameHeight * mGameHeightFactor +
                lastBlockHeight * mLastBlockHeightFactor +
                numHoles * mNumHolesFactor +
                inGameState.stats().numSingles() * mNumSinglesFactor +

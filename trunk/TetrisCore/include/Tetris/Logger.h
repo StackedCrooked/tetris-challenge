@@ -32,7 +32,7 @@ namespace Tetris
             {
                 result << ", ";
             }
-            result << ToString(inVector[idx]);            
+            result << ToString(inVector[idx]);
         }
         return result.str();
     }
@@ -82,18 +82,18 @@ namespace Tetris
     class MakeString
     {
     public:
-       template <typename T>
-       MakeString& operator<<(const T & datum)
-       {
-          mBuffer << datum;
-          return *this;
-       }
-       operator std::string () const
-       {
-          return mBuffer.str();
-       }
+        template <typename T>
+        MakeString & operator<<(const T & datum)
+        {
+            mBuffer << datum;
+            return *this;
+        }
+        operator std::string() const
+        {
+            return mBuffer.str();
+        }
     private:
-       std::ostringstream mBuffer;
+        std::ostringstream mBuffer;
     };
 
 } // namespace Tetris

@@ -61,19 +61,19 @@ namespace Tetris
         const Grid * mGrid;
     };
 
-   
-    
+
+
     size_t GetBlockRotationCount(BlockType inType);
 
     // Returns the number possible combinations of rotations and position to
     // place a certain block in a grid that has a given a number of columns.
     size_t GetBlockPositionCount(BlockType inType, size_t inNumColumns);
-    
+
     size_t GetBlockIdentifier(BlockType inType, size_t inRotation);
-    
+
     // Gets the Grid object that is associated with a block identifier
     const Grid & GetGrid(int inBlockIdentifier);
-    
+
     Grid GetIGrid(int rotation);
     Grid GetJGrid(int rotation);
     Grid GetLGrid(int rotation);

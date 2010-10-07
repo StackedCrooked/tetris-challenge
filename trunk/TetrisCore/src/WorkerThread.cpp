@@ -8,7 +8,7 @@ namespace Tetris
     WorkerThread::WorkerThread() :
         mStatus(Status_Nil),
         mQuitFlag(false)
-        
+
     {
         mThread.reset(new boost::thread(boost::bind(&WorkerThread::run, this)));
     }
@@ -21,36 +21,36 @@ namespace Tetris
         mThread->join();
         mThread.reset();
     }
-    
-    
+
+
     void WorkerThread::setQuitFlag()
     {
         boost::mutex::scoped_lock lock(mQuitFlagMutex);
         mQuitFlag = true;
     }
-    
-    
+
+
     bool WorkerThread::getQuitFlag() const
     {
         boost::mutex::scoped_lock lock(mQuitFlagMutex);
         return mQuitFlag;
     }
-    
-    
+
+
     WorkerThread::Status WorkerThread::status() const
     {
         boost::mutex::scoped_lock lock(mStatusMutex);
         return mStatus;
     }
-    
-    
+
+
     void WorkerThread::setStatus(Status inStatus)
     {
         boost::mutex::scoped_lock lock(mStatusMutex);
         mStatus = inStatus;
     }
-    
-    
+
+
     size_t WorkerThread::queueSize() const
     {
         boost::mutex::scoped_lock lock(mQueueMutex);
@@ -71,7 +71,7 @@ namespace Tetris
 
         // Interrupt the current task.
         mThread->interrupt();
-        
+
         // If no task is currently being processed then
         // we'll need to break out of the wait() call.
         mQueueCondition.notify_all();
@@ -90,7 +90,7 @@ namespace Tetris
 
         // Interrupt the current task.
         mThread->interrupt();
-        
+
         // If no task is currently being processed then
         // we'll need to break out of the wait() call.
         mQueueCondition.notify_all();
@@ -99,7 +99,7 @@ namespace Tetris
         mTaskProcessedCondition.wait(queueLock);
     }
 
-    
+
     void WorkerThread::schedule(const WorkerThread::Task & inTask)
     {
         boost::mutex::scoped_lock lock(mQueueMutex);
@@ -121,8 +121,8 @@ namespace Tetris
         mQueue.erase(mQueue.begin());
         return task;
     }
-    
-    
+
+
     void WorkerThread::processTask()
     {
         try
@@ -130,7 +130,7 @@ namespace Tetris
             // Get the next task.
             Task task = nextTask();
 
-            // Run the task.            
+            // Run the task.
             setStatus(Status_Working);
             task();
         }
@@ -140,8 +140,8 @@ namespace Tetris
         }
         mTaskProcessedCondition.notify_all();
     }
-    
-    
+
+
     void WorkerThread::run()
     {
         // Wrap entire thread in try/catch block.

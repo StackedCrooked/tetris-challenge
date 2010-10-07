@@ -56,7 +56,7 @@ namespace Tetris
     };
 
 
-    
+
 
     class LockTimeout : public std::runtime_error
     {
@@ -65,8 +65,8 @@ namespace Tetris
             std::runtime_error(inMessage)
         {
         }
-    
-        virtual ~LockTimeout() throw() { }    
+
+        virtual ~LockTimeout() throw() { }
     };
 
 

@@ -68,7 +68,7 @@ namespace Tetris
         void run();
         Task nextTask();
         void processTask();
-        
+
         Status mStatus;
         mutable boost::mutex mStatusMutex;
 

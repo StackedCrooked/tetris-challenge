@@ -28,7 +28,7 @@ namespace Tetris
         }
 
         GameStateComparisonFunctor(std::auto_ptr<Evaluator> inChildPtrCompare);
-    
+
         bool operator()(NodePtr lhs, NodePtr rhs);
 
     private:
@@ -93,7 +93,7 @@ namespace Tetris
         int mDepth;
         boost::scoped_ptr<GameState> mGameState;
 
-        boost::scoped_ptr<Evaluator> mEvaluator; // } 
+        boost::scoped_ptr<Evaluator> mEvaluator; // }
         ChildNodes mChildren;                    // } => Order matters!
     };
 

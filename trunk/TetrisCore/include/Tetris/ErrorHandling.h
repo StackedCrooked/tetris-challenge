@@ -24,8 +24,8 @@
 #define Assert(condition) \
     if (!(condition) \
     { \
-        std::stringstream ss; \
-        throw std::logic_error(ss << __FILE__ << ":" << __LINE__); \
+    std::stringstream ss; \
+    throw std::logic_error(ss << __FILE__ << ":" << __LINE__); \
     }
 #endif
 

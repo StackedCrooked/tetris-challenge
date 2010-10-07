@@ -11,7 +11,7 @@ namespace Tetris
     std::auto_ptr<Block> CreateDefaultBlock(BlockType inBlockType, size_t inNumColumns)
     {
         return std::auto_ptr<Block>(new Block(inBlockType,
-                                              Rotation(0), 
+                                              Rotation(0),
                                               Row(0),
                                               Column(DivideByTwo(inNumColumns - GetGrid(GetBlockIdentifier(inBlockType, 0)).numColumns()))));
     }
@@ -28,7 +28,7 @@ namespace Tetris
     {
         if (mBlocks.empty())
         {
-            mBlocks.push_back(mBlockFactory->getNext());        
+            mBlocks.push_back(mBlockFactory->getNext());
         }
         mActiveBlock.reset(CreateDefaultBlock(mBlocks.front(), inNumColumns).release());
     }
@@ -39,8 +39,8 @@ namespace Tetris
         if (inDepth == 0)
         {
             return inRootNode;
-        }       
-        
+        }
+
         if (inRootNode->children().size() == 1)
         {
             return FindCurrentNode(inRootNode->children().begin()->get(), inDepth - 1);
@@ -60,7 +60,7 @@ namespace Tetris
     {
     }
 
-    
+
     int Game::numRows() const
     {
         return mNumRows;
@@ -202,7 +202,7 @@ namespace Tetris
         {
             return false;
         }
-        
+
         NodePtr nextNode = *mCurrentNode->children().begin();
         Assert(nextNode->depth() == mCurrentNode->depth() + 1);
         setCurrentNode(nextNode);
@@ -266,7 +266,7 @@ namespace Tetris
             block.setColumn(newCol);
             return true;
         }
-        
+
         if (inDirection != Direction_Down)
         {
             // Do nothing
@@ -285,7 +285,7 @@ namespace Tetris
             const Block & nextBlock = precalculatedChild.state().originalBlock();
             Assert(nextBlock.type() == block.type());
             if (block.column() == nextBlock.column() &&
-                block.rotation() == nextBlock.rotation())
+                    block.rotation() == nextBlock.rotation())
             {
                 return navigateNodeDown();
             }
@@ -315,7 +315,7 @@ namespace Tetris
         {
             return false;
         }
-        
+
         Block & block = activeBlock();
         size_t oldRotation = block.rotation();
         block.rotate();

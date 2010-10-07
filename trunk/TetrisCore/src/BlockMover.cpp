@@ -8,7 +8,7 @@
 
 namespace Tetris
 {
-    
+
     static int GetIntervalMs(int inNumMovesPerSecond)
     {
         if (inNumMovesPerSecond <= 0)

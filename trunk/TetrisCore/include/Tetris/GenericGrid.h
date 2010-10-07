@@ -95,14 +95,14 @@ namespace Tetris
         return mNumColumns;
     }
 
-    
+
     template<class T>
     const std::vector<T> & GenericGrid<T>::data() const
     {
         return mData;
     }
 
-    
+
     template<class T>
     std::vector<T> & GenericGrid<T>::data()
     {
