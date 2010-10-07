@@ -1,7 +1,7 @@
 #include "Tetris/GameStateNode.h"
+#include "Tetris/Assert.h"
 #include "Tetris/GameQualityEvaluator.h"
 #include "Tetris/Block.h"
-#include "Tetris/ErrorHandling.h"
 #include "Tetris/GameState.h"
 #include "Tetris/Utilities.h"
 

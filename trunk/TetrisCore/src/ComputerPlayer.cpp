@@ -1,5 +1,5 @@
 #include "Tetris/ComputerPlayer.h"
-#include "Tetris/ErrorHandling.h"
+#include "Tetris/Assert.h"
 #include "Tetris/GameState.h"
 #include "Tetris/Logger.h"
 #include "Tetris/MakeString.h"
