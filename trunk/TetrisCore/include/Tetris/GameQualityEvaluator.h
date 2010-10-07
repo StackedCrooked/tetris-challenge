@@ -132,6 +132,16 @@ namespace Tetris
     };
 
 
+    class Shabby : public Evaluator
+    {
+    public:
+        Shabby();
+
+        virtual std::auto_ptr<Evaluator> clone() const
+        { return CreatePoly<Evaluator, Shabby>(*this); }
+    };
+
+
 } // namespace Tetris
 
 
