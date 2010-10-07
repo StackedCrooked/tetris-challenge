@@ -1,5 +1,5 @@
-#ifndef AISUPPORT_H_INCLUDED
-#define AISUPPORT_H_INCLUDED
+#ifndef TETRIS_AISUPPORT_H_INCLUDED
+#define TETRIS_AISUPPORT_H_INCLUDED
 
 
 #include "Tetris/BlockType.h"

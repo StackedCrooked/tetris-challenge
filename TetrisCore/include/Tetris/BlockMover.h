@@ -1,5 +1,5 @@
-#ifndef BLOCKMOVER_H_INCLUDED
-#define BLOCKMOVER_H_INCLUDED
+#ifndef TETRIS_BLOCKMOVER_H_INCLUDED
+#define TETRIS_BLOCKMOVER_H_INCLUDED
 
 
 #include "Tetris/Threading.h"

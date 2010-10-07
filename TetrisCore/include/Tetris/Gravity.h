@@ -1,5 +1,5 @@
-#ifndef GRAVITY_H_INCLUDED
-#define GRAVITY_H_INCLUDED
+#ifndef TETRIS_GRAVITY_H_INCLUDED
+#define TETRIS_GRAVITY_H_INCLUDED
 
 
 #include "Tetris/Threading.h"

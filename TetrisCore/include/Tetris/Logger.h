@@ -1,5 +1,5 @@
-#ifndef LOGGER_H_INCLUDED
-#define LOGGER_H_INCLUDED
+#ifndef TETRIS_LOGGER_H_INCLUDED
+#define TETRIS_LOGGER_H_INCLUDED
 
 
 #include "Tetris/Threading.h"

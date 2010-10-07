@@ -1,5 +1,5 @@
-#ifndef BLOCKFACTORY_H
-#define BLOCKFACTORY_H
+#ifndef TETRIS_BLOCKFACTORY_H_INCLUDED
+#define TETRIS_BLOCKFACTORY_H_INCLUDED
 
 
 #include "Tetris/Block.h"
@@ -29,4 +29,4 @@ namespace Tetris
 } // namespace Tetris
 
 
-#endif // BLOCKFACTORY_H
+#endif // BLOCKFACTORY_H_INCLUDED

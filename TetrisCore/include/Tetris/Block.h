@@ -1,5 +1,5 @@
-#ifndef BLOCK_H_INCLUDED
-#define BLOCK_H_INCLUDED
+#ifndef TETRIS_BLOCK_H_INCLUDED
+#define TETRIS_BLOCK_H_INCLUDED
 
 
 #include "Tetris/BlockType.h"
