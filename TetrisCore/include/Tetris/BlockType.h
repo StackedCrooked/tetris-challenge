@@ -52,9 +52,7 @@ namespace Tetris
      */
     std::string ToString(const BlockType & inBlockType);
 
-
 } // namespace Tetris
-
 
 
 #endif // BLOCKTYPE_H_INCLUDED
