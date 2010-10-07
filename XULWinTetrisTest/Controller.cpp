@@ -357,6 +357,7 @@ namespace Tetris
         if (HIWORD(wParam) == CBN_SELCHANGE)
         {
             updateStrategy();
+            ScopedAtom<Game> game(*mProtectedGame);
         }
         // Must return unhandled otherwise the popup menu stays.
         return XULWin::cUnhandled;
@@ -379,6 +380,8 @@ namespace Tetris
             if (!dynamic_cast<MakeTetrises *>(mEvaluator.get()))
             {
                 mEvaluator.reset(new MakeTetrises);
+                ScopedAtom<Game> game(*mProtectedGame);
+                game->clearPrecalculatedNodes();
             }
         }
         else if (id == "Survive")
@@ -386,13 +389,17 @@ namespace Tetris
             if (!dynamic_cast<Survival *>(mEvaluator.get()))
             {
                 mEvaluator.reset(new Survival);
+                ScopedAtom<Game> game(*mProtectedGame);
+                game->clearPrecalculatedNodes();
             }
         }
-        else if (id == "Acrobatic")
+        else if (id == "Depressed")
         {
-            if (!dynamic_cast<Acrobatic *>(mEvaluator.get()))
+            if (!dynamic_cast<Depressed *>(mEvaluator.get()))
             {
-                mEvaluator.reset(new Acrobatic);
+                mEvaluator.reset(new Depressed);
+                ScopedAtom<Game> game(*mProtectedGame);
+                game->clearPrecalculatedNodes();
             }
         }
         else if (id == "Custom")
@@ -624,7 +631,7 @@ namespace Tetris
             int searchDepth = mSearchDepth ? XULWin::String2Int(mSearchDepth->getValue(), cDefaultSearchDepth) : cDefaultSearchDepth;
             GameStateNode * endNode = game.lastPrecalculatedNode();
             if (!endNode->state().isGameOver() &&
-                endNode->depth() - game.currentNode()->depth() + searchDepth <= 3 * cMaxSearchDepth)
+                endNode->depth() - game.currentNode()->depth() + searchDepth <= cMaxSearchDepth)
             {
                 int searchWidth = mSearchWidth ? XULWin::String2Int(mSearchWidth->getValue(), cDefaultSearchWidth) : cDefaultSearchWidth;
                 startAI(game, searchDepth, searchWidth);

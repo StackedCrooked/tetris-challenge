@@ -199,16 +199,16 @@ namespace Tetris
     }
 
 
-    Acrobatic::Acrobatic() :
-        Evaluator(GameHeightFactor(-2),
+    Depressed::Depressed() :
+        Evaluator(GameHeightFactor(1),
                   LastBlockHeightFactor(0),
-                  NumHolesFactor(-4),
-                  NumSinglesFactor(1),
-                  NumDoublesFactor(2),
-                  NumTriplesFactor(4),
-                  NumTetrisesFactor(8),
-                  SearchDepth(6),
-                  SearchWidth(6))
+                  NumHolesFactor(0),
+                  NumSinglesFactor(0),
+                  NumDoublesFactor(0),
+                  NumTriplesFactor(0),
+                  NumTetrisesFactor(0),
+                  SearchDepth(1),
+                  SearchWidth(1))
     {
     }
 

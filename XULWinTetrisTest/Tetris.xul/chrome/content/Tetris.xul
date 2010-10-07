@@ -108,7 +108,7 @@
             <menupopup id="strategiesPopup">
               <menuitem id="makeTetrisesMenuItem" label="Make Tetrises" />
               <menuitem id="surviveMenuItem" label="Survive" />
-              <menuitem id="acrobaticMenuItem" label="Acrobatic" />
+              <menuitem id="depressedMenuItem" label="Depressed" />
               <menuitem id="customMenuItem" label="Custom" />
             </menupopup>
           </menulist>
