@@ -4,8 +4,6 @@
 
 #include "Tetris/Threading.h"
 #include <boost/function.hpp>
-#include <boost/thread.hpp>
-#include <sstream>
 #include <string>
 
 

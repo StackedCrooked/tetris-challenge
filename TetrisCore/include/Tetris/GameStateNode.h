@@ -3,7 +3,6 @@
 
 
 #include "Tetris/BlockType.h"
-#include "Tetris/GameQualityEvaluator.h"
 #include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
@@ -14,6 +13,7 @@ namespace Tetris
 {
 
     class Block;
+    class Evaluator;
     class GameState;
     class GameStateNode;
     typedef boost::shared_ptr<GameStateNode> NodePtr;
