@@ -8,8 +8,11 @@
 
 namespace Tetris
 {
+
     class GameState;
 
+
+    // Type-safe int wrappers to prevent mix-ups in arg lists.
     GENERATE_TYPESAFE_WRAPPER(int, GameHeightFactor)
     GENERATE_TYPESAFE_WRAPPER(int, LastBlockHeightFactor)
     GENERATE_TYPESAFE_WRAPPER(int, NumHolesFactor)
@@ -18,6 +21,9 @@ namespace Tetris
     GENERATE_TYPESAFE_WRAPPER(int, NumDoublesFactor)
     GENERATE_TYPESAFE_WRAPPER(int, NumTriplesFactor)
     GENERATE_TYPESAFE_WRAPPER(int, NumTetrisesFactor)
+    GENERATE_TYPESAFE_WRAPPER(int, SearchDepth)
+    GENERATE_TYPESAFE_WRAPPER(int, SearchWidth)
+
 
     class Evaluator
     {
@@ -28,12 +34,32 @@ namespace Tetris
                   NumSinglesFactor inNumSinglesFactor,
                   NumDoublesFactor inNumDoublesFactor,
                   NumTriplesFactor inNumTriplesFactor,
-                  NumTetrisesFactor inNumTetrisesFactor);
+                  NumTetrisesFactor inNumTetrisesFactor,
+                  SearchDepth inRecommendedSearchDepth,
+                  SearchWidth inRecommendedSearchWidth);
 
         virtual std::auto_ptr<Evaluator> clone() const
         { return Create<Evaluator>(*this); }
 
         virtual int evaluate(const GameState & inGameState) const;
+
+        int gameHeightFactor() const;
+
+        int lastBlockHeightFactor() const;
+
+        int numHolesFactor() const;
+
+        int numSinglesFactor() const;
+
+        int numDoublesFactor() const;
+
+        int numTriplesFactor() const;
+
+        int numTetrisesFactor() const;
+
+        int recommendedSearchDepth() const;
+
+        int recommendedSearchWidth() const;
 
     private:
         int mGameHeightFactor;
@@ -43,6 +69,26 @@ namespace Tetris
         int mNumDoublesFactor;
         int mNumTriplesFactor;
         int mNumTetrisesFactor;
+        int mRecommendedSearchDepth;
+        int mRecommendedSearchWidth;
+    };
+
+
+    class CustomEvaluator : public Evaluator
+    {
+    public:
+        CustomEvaluator(GameHeightFactor inGameHeightFactor,
+                        LastBlockHeightFactor inLastBlockHeightFactor,
+                        NumHolesFactor inNumHolesFactor,
+                        NumSinglesFactor inNumSinglesFactor,
+                        NumDoublesFactor inNumDoublesFactor,
+                        NumTriplesFactor inNumTriplesFactor,
+                        NumTetrisesFactor inNumTetrisesFactor,
+                        SearchDepth inRecommendedSearchDepth,
+                        SearchWidth inRecommendedSearchWidth);
+
+        virtual std::auto_ptr<Evaluator> clone() const
+        { return CreatePoly<Evaluator, CustomEvaluator>(*this); }
     };
 
 
@@ -56,13 +102,33 @@ namespace Tetris
     };
 
 
-    class Perfectionistic : public Evaluator
+    class Survival : public Evaluator
     {
     public:
-        Perfectionistic();
+        Survival();
 
         virtual std::auto_ptr<Evaluator> clone() const
-        { return CreatePoly<Evaluator, Perfectionistic>(*this); }
+        { return CreatePoly<Evaluator, Survival>(*this); }
+    };
+
+
+    class MakeTetrises : public Evaluator
+    {
+    public:
+        MakeTetrises();
+
+        virtual std::auto_ptr<Evaluator> clone() const
+        { return CreatePoly<Evaluator, MakeTetrises>(*this); }
+    };
+
+
+    class Acrobatic : public Evaluator
+    {
+    public:
+        Acrobatic();
+
+        virtual std::auto_ptr<Evaluator> clone() const
+        { return CreatePoly<Evaluator, Acrobatic>(*this); }
     };
 
 

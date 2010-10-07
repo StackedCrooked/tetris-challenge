@@ -11,15 +11,73 @@ namespace Tetris
                          NumSinglesFactor inNumSinglesFactor,
                          NumDoublesFactor inNumDoublesFactor,
                          NumTriplesFactor inNumTriplesFactor,
-                         NumTetrisesFactor inNumTetrisesFactor) :
+                         NumTetrisesFactor inNumTetrisesFactor,
+                         SearchDepth inRecommendedSearchDepth,
+                         SearchWidth inRecommendedSearchWidth) :
         mGameHeightFactor(inGameHeightFactor.get()),
         mLastBlockHeightFactor(inLastBlockHeightFactor.get()),
         mNumHolesFactor(inNumHolesFactor.get()),
         mNumSinglesFactor(inNumSinglesFactor.get()),
         mNumDoublesFactor(inNumDoublesFactor.get()),
         mNumTriplesFactor(inNumTriplesFactor.get()),
-        mNumTetrisesFactor(inNumTetrisesFactor.get())
+        mNumTetrisesFactor(inNumTetrisesFactor.get()),
+        mRecommendedSearchDepth(inRecommendedSearchDepth.get()),
+        mRecommendedSearchWidth(inRecommendedSearchWidth.get())
     {
+    }
+
+
+    int Evaluator::gameHeightFactor() const
+    {
+        return mGameHeightFactor;
+    }
+
+
+    int Evaluator::lastBlockHeightFactor() const
+    {
+        return mLastBlockHeightFactor;
+    }
+
+
+    int Evaluator::numHolesFactor() const
+    {
+        return mNumHolesFactor;
+    }
+
+
+    int Evaluator::numSinglesFactor() const
+    {
+        return mNumSinglesFactor;
+    }
+
+
+    int Evaluator::numDoublesFactor() const
+    {
+        return mNumDoublesFactor;
+    }
+
+
+    int Evaluator::numTriplesFactor() const
+    {
+        return mNumTriplesFactor;
+    }
+
+
+    int Evaluator::numTetrisesFactor() const
+    {
+        return mNumTetrisesFactor;
+    }
+
+
+    int Evaluator::recommendedSearchDepth() const
+    {
+        return mRecommendedSearchDepth;
+    }
+
+
+    int Evaluator::recommendedSearchWidth() const
+    {
+        return mRecommendedSearchWidth;
     }
 
 
@@ -77,6 +135,28 @@ namespace Tetris
     }
 
 
+    CustomEvaluator::CustomEvaluator(GameHeightFactor inGameHeightFactor,
+                                     LastBlockHeightFactor inLastBlockHeightFactor,
+                                     NumHolesFactor inNumHolesFactor,
+                                     NumSinglesFactor inNumSinglesFactor,
+                                     NumDoublesFactor inNumDoublesFactor,
+                                     NumTriplesFactor inNumTriplesFactor,
+                                     NumTetrisesFactor inNumTetrisesFactor,
+                                     SearchDepth inRecommendedSearchDepth,
+                                     SearchWidth inRecommendedSearchWidth) :
+        Evaluator(inGameHeightFactor,
+                  inLastBlockHeightFactor,
+                  inNumHolesFactor,
+                  inNumSinglesFactor,
+                  inNumDoublesFactor,
+                  inNumTriplesFactor,
+                  inNumTetrisesFactor,
+                  inRecommendedSearchDepth,
+                  inRecommendedSearchWidth)
+    {
+    }
+
+
     Balanced::Balanced() :
         Evaluator(GameHeightFactor(-2),
                   LastBlockHeightFactor(-1),
@@ -84,19 +164,51 @@ namespace Tetris
                   NumSinglesFactor(1),
                   NumDoublesFactor(2),
                   NumTriplesFactor(4),
-                  NumTetrisesFactor(8))
+                  NumTetrisesFactor(8),
+                  SearchDepth(8),
+                  SearchWidth(4))
     {
     }
 
 
-    Perfectionistic::Perfectionistic() :
-        Evaluator(GameHeightFactor(-4),
+    Survival::Survival() :
+        Evaluator(GameHeightFactor(-2),
                   LastBlockHeightFactor(-1),
-                  NumHolesFactor(-16),
+                  NumHolesFactor(-2),
+                  NumSinglesFactor(1),
+                  NumDoublesFactor(2),
+                  NumTriplesFactor(4),
+                  NumTetrisesFactor(8),
+                  SearchDepth(6),
+                  SearchWidth(6))
+    {
+    }
+
+
+    MakeTetrises::MakeTetrises() :
+        Evaluator(GameHeightFactor(-2),
+                  LastBlockHeightFactor(-1),
+                  NumHolesFactor(-4),
                   NumSinglesFactor(-4),
-                  NumDoublesFactor(-4),
-                  NumTriplesFactor(-4),
-                  NumTetrisesFactor(8))
+                  NumDoublesFactor(-8),
+                  NumTriplesFactor(-8),
+                  NumTetrisesFactor(8),
+                  SearchDepth(6),
+                  SearchWidth(6))
+    {
+    }
+
+
+    Acrobatic::Acrobatic() :
+        Evaluator(GameHeightFactor(-2),
+                  LastBlockHeightFactor(1),
+                  NumHolesFactor(-4),
+                  NumSinglesFactor(-2),
+                  NumDoublesFactor(2),
+                  NumTriplesFactor(4),
+                  NumTetrisesFactor(8),
+                  SearchDepth(6),
+                  SearchWidth(6))
     {
     }
 
