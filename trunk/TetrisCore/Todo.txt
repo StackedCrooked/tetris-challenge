@@ -1,6 +1,8 @@
--> Add menulist for AI preset
+- GameState::quality() should not require an Evaluator argument.
+- Add multicore search and add spin button to GUI to specify number of threads.
 - Add checkbox: 'switch to Survive when height reaches xx%'
 - Implement ComputerPlayer vs Computer modus.
+v Add menulist for AI preset
 v Rename ComputerPlayer to ComputerPlayer.
 x Concurrent node calculation (create first generation of childnodes and then use a thread per child)
 v Use Tetris icon on the exe file.
