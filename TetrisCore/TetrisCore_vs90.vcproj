@@ -245,7 +245,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\Tetris\WorkerThread.h"
+				RelativePath=".\include\Tetris\Worker.h"
 				>
 			</File>
 		</Filter>
@@ -305,7 +305,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\WorkerThread.cpp"
+				RelativePath=".\src\Worker.cpp"
 				>
 			</File>
 		</Filter>
