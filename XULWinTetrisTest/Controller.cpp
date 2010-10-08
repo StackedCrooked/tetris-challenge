@@ -537,7 +537,7 @@ namespace Tetris
             //
             // Create and start the ComputerPlayer.
             //
-            mWorkerThread->clearAndInterrupt();
+            mWorkerThread->interrupt();
             mComputerPlayer.reset(new ComputerPlayer(mWorkerThread, endNode, futureBlocks, widths, mEvaluator->clone()));
             mComputerPlayer->start();
         }
