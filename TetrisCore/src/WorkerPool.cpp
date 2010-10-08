@@ -49,10 +49,7 @@ namespace Tetris
         // Interrupt all workers but without waiting for the task to complete.
         for (size_t idx = 0; idx != mWorkers.size(); ++idx)
         {
-            if (mWorkers[idx]->status() == Worker::Status_Working)
-            {
-                mWorkers[idx]->interruptImpl();
-            }
+            mWorkers[idx]->interruptImpl();
         }
 
         // Now wait for each of the workers for their task to complete.
