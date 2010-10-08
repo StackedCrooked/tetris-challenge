@@ -16,14 +16,15 @@ namespace Tetris
                                    const BlockTypes & inBlockTypes,
                                    const Widths & inWidths,
                                    std::auto_ptr<Evaluator> inEvaluator) :
-        mWorkerPool(inWorkerPool),
         mLayers(inBlockTypes.size()),
         mCompletedSearchDepth(0),
         mNode(inNode.release()),
         mBlockTypes(inBlockTypes),
         mWidths(inWidths),
         mEvaluator(inEvaluator),
-        mStatus(Status_Nil)
+        mStatus(Status_Nil),
+        mWorkerPool(inWorkerPool),        
+        mBoss(inWorkerPool->getWorker(0))
     {
         Assert(!mNode->state().isGameOver());
         Assert(mNode->children().empty());
@@ -256,7 +257,7 @@ namespace Tetris
     {
         boost::mutex::scoped_lock lock(mStatusMutex);
         Assert(mStatus == Status_Nil);
-        mWorkerPool->getWorker()->schedule(boost::bind(&ComputerPlayer::startImpl, this));
+        mBoss->schedule(boost::bind(&ComputerPlayer::startImpl, this));
         mStatus = Status_Started;
     }
 
