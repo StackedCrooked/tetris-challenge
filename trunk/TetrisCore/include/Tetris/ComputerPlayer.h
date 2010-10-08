@@ -17,6 +17,7 @@ namespace Tetris
 
 
     class GameStateNode;
+    class Worker;
     class WorkerPool;
     typedef std::vector<int> Widths;
 
@@ -106,8 +107,9 @@ namespace Tetris
         mutable boost::mutex mStatusMutex;
 
         WorkerPool * mWorkerPool;
-        boost::scoped_ptr<boost::thread> mThread;
 
+        // We pick a "boss" from one of the workers in the pool.
+        Worker * mBoss;
     };
 
 } // namespace Tetris
