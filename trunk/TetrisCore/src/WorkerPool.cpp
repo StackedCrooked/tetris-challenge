@@ -20,6 +20,19 @@ namespace Tetris
     {
         return mWorkers.size();
     }
+
+
+    void WorkerPool::setSize(size_t inSize)
+    {
+        if (inSize > mWorkers.size())
+        {
+            mWorkers.resize(inSize, WorkerPtr(new Worker));
+        }
+        else if (inSize < mWorkers.size()) // Deletes a few workers
+        {
+            mWorkers.resize(inSize);
+        }
+    }
     
     
     void WorkerPool::interruptAll()
