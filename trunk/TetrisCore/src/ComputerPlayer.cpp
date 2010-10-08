@@ -3,14 +3,14 @@
 #include "Tetris/GameState.h"
 #include "Tetris/Logger.h"
 #include "Tetris/MakeString.h"
-#include "Tetris/WorkerThread.h"
+#include "Tetris/Worker.h"
 #include <boost/bind.hpp>
 
 
 namespace Tetris
 {
 
-    ComputerPlayer::ComputerPlayer(boost::shared_ptr<WorkerThread> inWorkerThread,
+    ComputerPlayer::ComputerPlayer(boost::shared_ptr<Worker> inWorkerThread,
                                    std::auto_ptr<GameStateNode> inNode,
                                    const BlockTypes & inBlockTypes,
                                    const Widths & inWidths,

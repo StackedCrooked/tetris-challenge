@@ -12,19 +12,19 @@ namespace Tetris
 {
 
     /**
-     * WorkerThread is a thread that runs in a loop taking "work" from a queue.
-     * When the queue is empty the thread waits.
+     * Worker starts a background thread that runs in a loop processing tasks from a queue.
+     * When the queue is empty the Worker goes into waiting mode.
      */
-    class WorkerThread : boost::noncopyable
+    class Worker : boost::noncopyable
     {
     public:
         // Creates a new thread and starts waiting for tasks.
-        WorkerThread();
+        Worker();
 
         // If a task is running during destruction then we send
         // it an interrupt signal and wait for it to return.
         // Any remaining tasks are erased and the thread is destroyed.
-        ~WorkerThread();
+        ~Worker();
 
         typedef boost::function<void()> Task;
 
@@ -51,7 +51,7 @@ namespace Tetris
 
         // Sends an interrupt message to the current task.
         // This call is blocking until the task has completed.
-        // After that the WorkerThread will start working on
+        // After that the Worker will start working on
         // the next task or enter waiting mode.
         void interrupt();
 

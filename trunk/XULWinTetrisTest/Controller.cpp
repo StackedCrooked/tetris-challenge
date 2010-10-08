@@ -10,7 +10,7 @@
 #include "Tetris/Gravity.h"
 #include "Tetris/Logger.h"
 #include "Tetris/MakeString.h"
-#include "Tetris/WorkerThread.h"
+#include "Tetris/Worker.h"
 #include "TetrisElement.h"
 #include "XULWin/Conversions.h"
 #include "XULWin/ErrorReporter.h"
@@ -62,7 +62,7 @@ namespace Tetris
         mBlockMover(),
         mEvaluator(new Balanced),
         mConsoleVisible(false),
-        mWorkerThread(new WorkerThread)
+        mWorkerThread(new Worker)
     {
         //
         // Parse the XUL document.
