@@ -10,6 +10,8 @@
 
 namespace Tetris
 {
+    class WorkerPool;
+    
 
     /**
      * Worker starts a background thread that runs in a loop processing tasks from a queue.
@@ -34,20 +36,20 @@ namespace Tetris
         void schedule(const Task & inTask);
 
         // Returns the number of pending tasks.
-        size_t queueSize() const;
+        size_t size() const;
 
         enum Status
         {
             Status_Nil,
             Status_Waiting,
-            Status_Working
+            Status_Working,
+            Status_Interrupted
         };
 
         // Get the current status.
         Status status() const;
 
-        // Erases all pending tasks. Does not affect the currently active task.
-        void clear();
+        void waitForStatus(Status inStatus);
 
         // Sends an interrupt message to the current task.
         // This call is blocking until the task has completed.
@@ -55,13 +57,12 @@ namespace Tetris
         // the next task or enter waiting mode.
         void interrupt();
 
-        // Combines the clear() interrupt() calls.
-        // Blocks until task returns.
-        void clearAndInterrupt();
-
     private:
+        friend class WorkerPool;
         void setQuitFlag();
         bool getQuitFlag() const;
+
+        void interruptImpl();
 
         void setStatus(Status inStatus);
 
@@ -71,6 +72,7 @@ namespace Tetris
 
         Status mStatus;
         mutable boost::mutex mStatusMutex;
+        mutable boost::condition_variable mStatusCondition;
 
         std::list<Task> mQueue;
         mutable boost::mutex mQueueMutex;

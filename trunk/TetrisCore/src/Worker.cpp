@@ -38,53 +38,49 @@ namespace Tetris
     }
 
 
+    void Worker::setStatus(Status inStatus)
+    {
+        boost::mutex::scoped_lock lock(mStatusMutex);
+        mStatus = inStatus;
+        mStatusCondition.notify_all();
+    }
+
+
     Worker::Status Worker::status() const
     {
         boost::mutex::scoped_lock lock(mStatusMutex);
         return mStatus;
     }
-
-
-    void Worker::setStatus(Status inStatus)
+    
+    
+    void Worker::waitForStatus(Status inStatus)
     {
         boost::mutex::scoped_lock lock(mStatusMutex);
-        mStatus = inStatus;
+        while (mStatus != inStatus)
+        {
+            mStatusCondition.wait(lock);
+        }
     }
 
 
-    size_t Worker::queueSize() const
+    size_t Worker::size() const
     {
         boost::mutex::scoped_lock lock(mQueueMutex);
         return mQueue.size();
     }
 
 
-    void Worker::clear()
-    {
-        boost::mutex::scoped_lock lock(mQueueMutex);
-        mQueue.clear();
-    }
-
-
     void Worker::interrupt()
     {
         boost::mutex::scoped_lock queueLock(mQueueMutex);
-
-        // Interrupt the current task.
-        mThread->interrupt();
-
-        // If no task is currently being processed then
-        // we'll need to break out of the wait() call.
-        mQueueCondition.notify_all();
-
-        // This blocks the thread until the notify_all() call in processTask().
+        interruptImpl();        
         mTaskProcessedCondition.wait(queueLock);
     }
 
 
-    void Worker::clearAndInterrupt()
+    void Worker::interruptImpl()
     {
-        boost::mutex::scoped_lock queueLock(mQueueMutex);
+        setStatus(Status_Interrupted);
 
         // Clear the queue
         mQueue.clear();
@@ -95,9 +91,6 @@ namespace Tetris
         // If no task is currently being processed then
         // we'll need to break out of the wait() call.
         mQueueCondition.notify_all();
-
-        // This blocks the thread until the notify_all() call in processTask().
-        mTaskProcessedCondition.wait(queueLock);
     }
 
 
