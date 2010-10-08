@@ -5,9 +5,13 @@ namespace Tetris
 {
 
     WorkerPool::WorkerPool(size_t inSize) :
-        mWorkers(inSize, WorkerPtr(new Worker)),
+        mWorkers(),
         mRotation(0)
     {
+        for (size_t idx = 0; idx != inSize; ++idx)
+        {
+            mWorkers.push_back(WorkerPtr(new Worker));            
+        }
     }
     
     
@@ -46,16 +50,26 @@ namespace Tetris
     
     void WorkerPool::interruptAll()
     {
-        // Interrupt all workers but without waiting for the task to complete.
+        // Some typedefs to reduce the typing
+        typedef boost::mutex::scoped_lock ScopedLock;
+        typedef boost::shared_ptr<ScopedLock> ScopedLockPtr;
+        typedef std::vector<ScopedLockPtr> ScopedLocks;
+
+        ScopedLocks locks;
+        
+        // Send all workers the interrupt all without waiting for the tasks.
         for (size_t idx = 0; idx != mWorkers.size(); ++idx)
         {
-            mWorkers[idx]->interruptImpl();
+            Worker & worker = *mWorkers[idx];
+            locks.push_back(ScopedLockPtr(new ScopedLock(worker.mQueueMutex)));
+            worker.interruptImpl();
         }
 
-        // Now wait for each of the workers for their task to complete.
+	    // Wait for the tasks to finish.
         for (size_t idx = 0; idx != mWorkers.size(); ++idx)
         {
-            mWorkers[idx]->waitForStatus(Worker::Status_Waiting);
+            Worker & worker = *mWorkers[idx];
+            worker.mTaskProcessedCondition.wait(*locks[idx]);
         }
     }
 

@@ -73,7 +73,7 @@ namespace Tetris
     void Worker::interrupt()
     {
         boost::mutex::scoped_lock queueLock(mQueueMutex);
-        interruptImpl();        
+        interruptImpl();
         mTaskProcessedCondition.wait(queueLock);
     }
 
@@ -98,7 +98,7 @@ namespace Tetris
     {
         boost::mutex::scoped_lock lock(mQueueMutex);
         mQueue.push_back(inTask);
-        mQueueCondition.notify_one();
+        mQueueCondition.notify_all();
     }
 
 
