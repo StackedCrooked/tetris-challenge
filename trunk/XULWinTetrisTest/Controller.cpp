@@ -539,7 +539,7 @@ namespace Tetris
             // Create and start the ComputerPlayer.
             //
             mWorkerPool->interruptAll();
-            mComputerPlayer.reset(new ComputerPlayer(mWorkerPool.get(), endNode, futureBlocks, widths, mEvaluator->clone()));
+            mComputerPlayer.reset(new ComputerPlayer(mWorkerPool->getWorker(), endNode, futureBlocks, widths, mEvaluator->clone()));
             mComputerPlayer->start();
         }
     }

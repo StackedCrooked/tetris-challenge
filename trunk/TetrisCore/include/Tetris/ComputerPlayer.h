@@ -18,14 +18,14 @@ namespace Tetris
 
     class GameStateNode;
     class Worker;
-    class WorkerPool;
+    class Worker;
     typedef std::vector<int> Widths;
 
 
     class ComputerPlayer : boost::noncopyable
     {
     public:
-        ComputerPlayer(WorkerPool * inWorkerPool,
+        ComputerPlayer(Worker * inWorker,
                        std::auto_ptr<GameStateNode> inNode,
                        const BlockTypes & inBlockTypes,
                        const Widths & inWidths,
@@ -106,10 +106,7 @@ namespace Tetris
         Status mStatus;
         mutable boost::mutex mStatusMutex;
 
-        WorkerPool * mWorkerPool;
-
-        // We pick a "boss" from one of the workers in the pool.
-        Worker * mBoss;
+        Worker * mWorker;
     };
 
 } // namespace Tetris
