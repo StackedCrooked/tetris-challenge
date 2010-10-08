@@ -5,7 +5,8 @@ namespace Tetris
 {
 
     WorkerPool::WorkerPool(size_t inSize) :
-        mWorkers(inSize, WorkerPtr(new Worker))
+        mWorkers(inSize, WorkerPtr(new Worker)),
+        mRotation(0)
     {
     }
     
@@ -13,6 +14,14 @@ namespace Tetris
     Worker * WorkerPool::getWorker(size_t inIndex)
     {
         return mWorkers[inIndex].get();
+    }
+    
+    
+    Worker * WorkerPool::getWorker()
+    {        
+        Worker * result = mWorkers[mRotation].get();
+        mRotation = (mRotation + 1) % mWorkers.size();
+        return result;
     }
     
     
@@ -40,7 +49,10 @@ namespace Tetris
         // Interrupt all workers but without waiting for the task to complete.
         for (size_t idx = 0; idx != mWorkers.size(); ++idx)
         {
-            mWorkers[idx]->interruptImpl();
+            if (mWorkers[idx]->status() == Worker::Status_Working)
+            {
+                mWorkers[idx]->interruptImpl();
+            }
         }
 
         // Now wait for each of the workers for their task to complete.

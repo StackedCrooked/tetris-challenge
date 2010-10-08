@@ -28,7 +28,7 @@ namespace Tetris
     class GameStateNode;
     class ComputerPlayer;
     class Gravity;
-    class Worker;
+    class WorkerPool;
 
     enum
     {
@@ -154,7 +154,7 @@ namespace Tetris
         boost::scoped_ptr<BlockMover> mBlockMover;
         boost::scoped_ptr<Evaluator> mEvaluator;
         bool mConsoleVisible;
-        boost::shared_ptr<Worker> mWorkerThread;
+        boost::scoped_ptr<WorkerPool> mWorkerPool;
     };
 
 } // namespace Tetris

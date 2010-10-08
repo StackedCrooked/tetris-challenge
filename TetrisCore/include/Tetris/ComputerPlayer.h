@@ -17,14 +17,14 @@ namespace Tetris
 
 
     class GameStateNode;
-    class Worker;
+    class WorkerPool;
     typedef std::vector<int> Widths;
 
 
     class ComputerPlayer : boost::noncopyable
     {
     public:
-        ComputerPlayer(boost::shared_ptr<Worker> inWorkerThread,
+        ComputerPlayer(WorkerPool * inWorkerPool,
                        std::auto_ptr<GameStateNode> inNode,
                        const BlockTypes & inBlockTypes,
                        const Widths & inWidths,
@@ -105,7 +105,9 @@ namespace Tetris
         Status mStatus;
         mutable boost::mutex mStatusMutex;
 
-        boost::shared_ptr<Worker> mWorkerThread;
+        WorkerPool * mWorkerPool;
+        boost::scoped_ptr<boost::thread> mThread;
+
     };
 
 } // namespace Tetris

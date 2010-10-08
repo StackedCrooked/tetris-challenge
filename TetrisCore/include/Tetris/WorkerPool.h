@@ -18,6 +18,10 @@ namespace Tetris
     public:
         WorkerPool(size_t inSize);
 
+        // Returns a different worker on each call.
+        // This enables you to evenly spread tasks.
+        Worker * getWorker();
+
         Worker * getWorker(size_t inIndex);
 
         // Returns the number of workers.
@@ -33,6 +37,7 @@ namespace Tetris
     private:
         typedef boost::shared_ptr<Worker> WorkerPtr;
         typedef std::vector<WorkerPtr> Workers;
+        mutable size_t mRotation;
         Workers mWorkers;
     };
 
