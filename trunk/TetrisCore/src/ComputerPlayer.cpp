@@ -4,18 +4,19 @@
 #include "Tetris/Logger.h"
 #include "Tetris/MakeString.h"
 #include "Tetris/Worker.h"
+#include "Tetris/WorkerPool.h"
 #include <boost/bind.hpp>
 
 
 namespace Tetris
 {
 
-    ComputerPlayer::ComputerPlayer(boost::shared_ptr<Worker> inWorkerThread,
+    ComputerPlayer::ComputerPlayer(WorkerPool * inWorkerPool,
                                    std::auto_ptr<GameStateNode> inNode,
                                    const BlockTypes & inBlockTypes,
                                    const Widths & inWidths,
                                    std::auto_ptr<Evaluator> inEvaluator) :
-        mWorkerThread(inWorkerThread),
+        mWorkerPool(inWorkerPool),
         mLayers(inBlockTypes.size()),
         mCompletedSearchDepth(0),
         mNode(inNode.release()),
@@ -32,7 +33,7 @@ namespace Tetris
 
     ComputerPlayer::~ComputerPlayer()
     {
-        mWorkerThread->interrupt();
+        mWorkerPool->interruptAll();
     }
 
 
@@ -231,7 +232,7 @@ namespace Tetris
 
     void ComputerPlayer::stop()
     {
-        mWorkerThread->interrupt();
+        mWorkerPool->interruptAll();
     }
 
 
@@ -255,7 +256,7 @@ namespace Tetris
     {
         boost::mutex::scoped_lock lock(mStatusMutex);
         Assert(mStatus == Status_Nil);
-        mWorkerThread->schedule(boost::bind(&ComputerPlayer::startImpl, this));
+        mWorkerPool->getWorker()->schedule(boost::bind(&ComputerPlayer::startImpl, this));
         mStatus = Status_Started;
     }
 
