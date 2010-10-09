@@ -2,7 +2,7 @@
 #include "Console.h"
 #include "Tetris/Assert.h"
 #include "Tetris/BlockMover.h"
-#include "Tetris/ComputerPlayer.h"
+#include "Tetris/ComputerPlayerMt.h"
 #include "Tetris/Game.h"
 #include "Tetris/GameQualityEvaluator.h"
 #include "Tetris/GameState.h"
@@ -63,7 +63,7 @@ namespace Tetris
         mBlockMover(),
         mEvaluator(new Balanced),
         mConsoleVisible(false),
-        mWorkerPool(new WorkerPool(4))
+        mWorkerPool()
     {
         //
         // Parse the XUL document.
@@ -90,19 +90,15 @@ namespace Tetris
         catcher.disableLogging(true);
 
         //
-        // Connect the logger to the logging text box.
+        // Initialize the log handler
         //
-        if (XULWin::Element * el = mRootElement->getElementById("loggingTextbox"))
-        {
-            if (mLoggingTextBox = el->component()->downcast<XULWin::TextBox>())
-            {
-
-            }
-        }
         boost::function<void(const std::string &)> logFunction = boost::bind(&Controller::log, this, _1);
         XULWin::ErrorReporter::Instance().setLogger(logFunction);
         Tetris::Logger::Instance().setHandler(logFunction);
-
+        
+        
+        // Initialize worker pool after the logger.
+        mWorkerPool.reset(new WorkerPool("Tetris Workers", 4));
 
         //
         // Get the Tetris component.
@@ -539,7 +535,7 @@ namespace Tetris
             // Create and start the ComputerPlayer.
             //
             mWorkerPool->interruptAll();
-            mComputerPlayer.reset(new ComputerPlayer(mWorkerPool->getWorker(), endNode, futureBlocks, widths, mEvaluator->clone()));
+            mComputerPlayer.reset(new ComputerPlayerMt(mWorkerPool.get(), endNode, futureBlocks, widths, mEvaluator->clone()));
             mComputerPlayer->start();
         }
     }

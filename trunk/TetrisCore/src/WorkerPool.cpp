@@ -1,16 +1,20 @@
 #include "Tetris/WorkerPool.h"
+#include "Tetris/Logger.h"
+#include "Tetris/MakeString.h"
 
 
 namespace Tetris
 {
 
-    WorkerPool::WorkerPool(size_t inSize) :
+    WorkerPool::WorkerPool(const std::string & inName, size_t inSize) :
+        mName(inName),
         mWorkers(),
         mRotation(0)
     {
         for (size_t idx = 0; idx != inSize; ++idx)
         {
-            mWorkers.push_back(WorkerPtr(new Worker));            
+            mWorkers.push_back(WorkerPtr(new Worker(MakeString() << inName << mWorkers.size())));
+            LogInfo(MakeString() << "WorkerPool: Created worker " << idx << ".");
         }
     }
     
@@ -39,7 +43,7 @@ namespace Tetris
     {
         if (inSize > mWorkers.size())
         {
-            mWorkers.resize(inSize, WorkerPtr(new Worker));
+            mWorkers.resize(inSize, WorkerPtr(new Worker(MakeString() << mName << mWorkers.size())));
         }
         else if (inSize < mWorkers.size()) // Deletes a few workers
         {
