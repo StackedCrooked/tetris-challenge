@@ -21,12 +21,14 @@ namespace Tetris
     {
     public:
         // Creates a new thread and starts waiting for tasks.
-        Worker();
+        Worker(const std::string & inName);
 
         // If a task is running during destruction then we send
         // it an interrupt signal and wait for it to return.
         // Any remaining tasks are erased and the thread is destroyed.
         ~Worker();
+
+        inline const std::string & name() const { return mName; }
 
         typedef boost::function<void()> Task;
 
@@ -70,6 +72,7 @@ namespace Tetris
         Task nextTask();
         void processTask();
 
+        std::string mName;
         Status mStatus;
         mutable boost::mutex mStatusMutex;
         mutable boost::condition_variable mStatusCondition;

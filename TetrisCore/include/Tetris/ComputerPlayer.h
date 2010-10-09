@@ -54,6 +54,23 @@ namespace Tetris
 
         Status status() const;
 
+        // LayerData contains the accumulated data for all branches at a same depth.
+        struct LayerData
+        {
+            LayerData() :
+                mBestChild(),
+                mNumItems(0),
+                mFinished(false)
+            {
+            }
+
+            NodePtr mBestChild;
+            int mNumItems;
+            bool mFinished;
+        };
+
+        void getLayerData(int inIndex, LayerData & outLayerData);
+
     private:
         void startImpl();
 
@@ -72,21 +89,6 @@ namespace Tetris
                                       const Widths & inWidths,
                                       size_t inIndex,
                                       size_t inMaxIndex);
-
-        // LayerData contains the accumulated data for all branches at a same depth.
-        struct LayerData
-        {
-            LayerData() :
-                mBestChild(),
-                mNumItems(0),
-                mFinished(false)
-            {
-            }
-
-            NodePtr mBestChild;
-            int mNumItems;
-            bool mFinished;
-        };
 
         NodePtr mNode;
         mutable boost::mutex mNodeMutex;

@@ -21,7 +21,7 @@ namespace Tetris
         mNode(inNode.release()),
         mBlockTypes(inBlockTypes),
         mWidths(inWidths),
-        mEvaluator(inEvaluator),
+        mEvaluator(inEvaluator.release()),
         mStatus(Status_Nil),
         mWorker(inWorker)
     {
@@ -34,6 +34,13 @@ namespace Tetris
     ComputerPlayer::~ComputerPlayer()
     {
         mWorker->interrupt();
+    }
+
+
+    void ComputerPlayer::getLayerData(int inIndex, LayerData & outLayerData)
+    {
+        boost::mutex::scoped_lock lock(mLayersMutex);
+        outLayerData = mLayers[inIndex];
     }
 
 

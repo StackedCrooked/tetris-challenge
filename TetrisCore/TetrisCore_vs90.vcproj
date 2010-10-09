@@ -189,6 +189,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\include\Tetris\ComputerPlayerMt.h"
+				>
+			</File>
+			<File
 				RelativePath=".\include\Tetris\Direction.h"
 				>
 			</File>
@@ -278,6 +282,10 @@
 			</File>
 			<File
 				RelativePath=".\src\ComputerPlayer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\ComputerPlayerMt.cpp"
 				>
 			</File>
 			<File

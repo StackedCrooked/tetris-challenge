@@ -1,4 +1,5 @@
 #include "Controller.h"
+#include "Console.h"
 #include "TetrisComponent.h"
 #include "TetrisElement.h"
 #include "XULWin/ElementFactory.h"
@@ -14,6 +15,10 @@ int StartProgram(HINSTANCE hInstance)
 #ifndef NDEBUG // only required when launching from Visual Studio
     // Change the current directory to the XUL Directory
     XULWin::WinAPI::CurrentDirectoryChanger cd("Tetris.xul");
+#endif
+
+#ifdef _DEBUG
+    AttachToConsole();
 #endif
 
     XULWin::Initializer initializer(hInstance);

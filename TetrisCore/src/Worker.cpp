@@ -6,7 +6,8 @@
 namespace Tetris
 {
 
-    Worker::Worker() :
+    Worker::Worker(const std::string & inName) :
+        mName(inName),
         mStatus(Status_Nil),
         mQuitFlag(false)
 

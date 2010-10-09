@@ -33,6 +33,9 @@ namespace Tetris
         // Caches the value.
         int quality(const Evaluator & inEvaluator) const;
 
+        // Requires that quality has been called once before with an Evaluator argument.
+        int quality() const;
+
         // Checks if a activeBlock can be placed at a given location without
         // overlapping with previously placed blocks.
         bool checkPositionValid(const Block & inBlock, size_t inRowIdx, size_t inColIdx) const;

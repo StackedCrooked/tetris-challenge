@@ -16,7 +16,9 @@ namespace Tetris
     class WorkerPool : boost::noncopyable
     {
     public:
-        WorkerPool(size_t inSize);
+        WorkerPool(const std::string & inName, size_t inSize);
+
+        inline const std::string & name() const { return mName; }
 
         // Returns a different worker on each call.
         // This enables you to evenly spread tasks.
@@ -35,6 +37,7 @@ namespace Tetris
         void interruptAll();
 
     private:
+        std::string mName;
         typedef boost::shared_ptr<Worker> WorkerPtr;
         typedef std::vector<WorkerPtr> Workers;
         mutable size_t mRotation;
