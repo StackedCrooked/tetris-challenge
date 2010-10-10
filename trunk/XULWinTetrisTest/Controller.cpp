@@ -98,7 +98,7 @@ namespace Tetris
         
         
         // Initialize worker pool after the logger.
-        mWorkerPool.reset(new WorkerPool("Tetris Workers", 4));
+        mWorkerPool.reset(new WorkerPool("Tetris Workers", 6));
 
         //
         // Get the Tetris component.
@@ -534,8 +534,8 @@ namespace Tetris
             //
             // Create and start the ComputerPlayer.
             //
-            mWorkerPool->interruptAll();
-            mComputerPlayer.reset(new ComputerPlayerMt(mWorkerPool.get(), endNode, futureBlocks, widths, mEvaluator->clone()));
+            //mWorkerPool->interruptAll();
+            mComputerPlayer.reset(new ComputerPlayerMt(mWorkerPool, endNode, futureBlocks, widths, mEvaluator->clone()));
             mComputerPlayer->start();
         }
     }
@@ -595,6 +595,7 @@ namespace Tetris
                     // The created node should follow the last precalculated one.
                     const int resultNodeDepth = resultNode->depth();
                     const int endNodeDepth = game.lastPrecalculatedNode()->depth();
+                    Assert(resultNodeDepth == endNodeDepth + 1);
                     if (resultNodeDepth == endNodeDepth + 1)
                     {
                         game.lastPrecalculatedNode()->addChild(resultNode);
@@ -637,7 +638,7 @@ namespace Tetris
             int searchDepth = mSearchDepth ? XULWin::String2Int(mSearchDepth->getValue(), cDefaultSearchDepth) : cDefaultSearchDepth;
             GameStateNode * endNode = game.lastPrecalculatedNode();
             if (!endNode->state().isGameOver() &&
-                endNode->depth() - game.currentNode()->depth() + searchDepth <= cMaxSearchDepth)
+                endNode->depth() - game.currentNode()->depth() + searchDepth <= 3 * cMaxSearchDepth)
             {
                 int searchWidth = mSearchWidth ? XULWin::String2Int(mSearchWidth->getValue(), cDefaultSearchWidth) : cDefaultSearchWidth;
                 startAI(game, searchDepth, searchWidth);

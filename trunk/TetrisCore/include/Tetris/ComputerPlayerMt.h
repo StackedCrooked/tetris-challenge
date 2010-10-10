@@ -18,7 +18,7 @@ namespace Tetris
     class ComputerPlayerMt
     {
     public:
-        ComputerPlayerMt(WorkerPool * inWorkerPool,
+        ComputerPlayerMt(boost::shared_ptr<WorkerPool> inWorkerPool,
                          std::auto_ptr<GameStateNode> inNode,
                          const BlockTypes & inBlockTypes,
                          const std::vector<int> & inWidths,
@@ -42,11 +42,23 @@ namespace Tetris
         ChildNodes getLayer1Nodes(BlockType inBlockType, size_t inWidth) const;
 
         int mMaxSearchDepth;
-        boost::shared_ptr<GameStateNode> mRootNode;
+        NodePtr mRootNode;
         typedef boost::shared_ptr<ComputerPlayer> ComputerPlayerPtr;
-        std::vector<ComputerPlayerPtr> mComputerPlayers;
+        struct ComputerPlayerInfo
+        {
+            ComputerPlayerInfo(NodePtr inChildNode, ComputerPlayerPtr inComputerPlayerPtr) :
+                mChildNode(inChildNode),
+                mComputerPlayer(inComputerPlayerPtr)
+            {
+            }
+            NodePtr mChildNode;
+            ComputerPlayerPtr mComputerPlayer;
+        };
+
+        std::vector<ComputerPlayerInfo> mComputerPlayers;
         boost::shared_ptr<WorkerPool> mWorkerPool;
         boost::scoped_ptr<Evaluator> mEvaluator;
+        mutable bool mFinished;
     };
 
 } // namespace Tetris

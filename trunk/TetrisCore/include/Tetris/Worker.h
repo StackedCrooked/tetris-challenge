@@ -10,6 +10,9 @@
 
 namespace Tetris
 {
+
+    class Worker;
+    typedef boost::shared_ptr<Worker> WorkerPtr;
     class WorkerPool;
     
 
@@ -44,6 +47,7 @@ namespace Tetris
         {
             Status_Nil,
             Status_Waiting,
+            Status_Scheduled,
             Status_Working,
             Status_Interrupted
         };
@@ -57,14 +61,17 @@ namespace Tetris
         // This call is blocking until the task has completed.
         // After that the Worker will start working on
         // the next task or enter waiting mode.
-        void interrupt();
+        enum Interrupt
+        {
+            Interrupt_Wait,
+            Interrupt_NoWait
+        };
+        void interrupt(Interrupt inInterrupt);
 
     private:
         friend class WorkerPool;
         void setQuitFlag();
         bool getQuitFlag() const;
-
-        void interruptImpl();
 
         void setStatus(Status inStatus);
 

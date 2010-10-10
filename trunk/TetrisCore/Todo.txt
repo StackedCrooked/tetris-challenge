@@ -1,3 +1,15 @@
+TODO: ComputerPlayerMt multicore
+--------------------------------
+- Number of workers should not depend on search depth
+- Clean up asserts
+- Unit tests for TetrisCore (esp Worker and WorkerPool)
+- Write console tests to measure ComputerPlayer vs ComputerPlayerMt performance
+
+
+
+
+GENERAL TODO
+------------
 - GameState::quality() should not require an Evaluator argument.
 - Add multicore search and add spin button to GUI to specify number of threads.
 - Add checkbox: 'switch to Survive when height reaches xx%'

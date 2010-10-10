@@ -22,9 +22,9 @@ namespace Tetris
 
         // Returns a different worker on each call.
         // This enables you to evenly spread tasks.
-        Worker * getWorker();
+        WorkerPtr getWorker();
 
-        Worker * getWorker(size_t inIndex);
+        WorkerPtr getWorker(size_t inIndex);
 
         // Returns the number of workers.
         size_t size() const;
@@ -38,10 +38,11 @@ namespace Tetris
 
     private:
         std::string mName;
-        typedef boost::shared_ptr<Worker> WorkerPtr;
         typedef std::vector<WorkerPtr> Workers;
         mutable size_t mRotation;
+
         Workers mWorkers;
+        mutable boost::mutex mWorkersMutex;
     };
 
 } // namespace Tetris
