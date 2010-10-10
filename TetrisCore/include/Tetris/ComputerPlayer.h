@@ -18,14 +18,13 @@ namespace Tetris
 
     class GameStateNode;
     class Worker;
-    class Worker;
     typedef std::vector<int> Widths;
 
 
     class ComputerPlayer : boost::noncopyable
     {
     public:
-        ComputerPlayer(Worker * inWorker,
+        ComputerPlayer(boost::shared_ptr<Worker> inWorker,
                        std::auto_ptr<GameStateNode> inNode,
                        const BlockTypes & inBlockTypes,
                        const Widths & inWidths,
@@ -49,6 +48,8 @@ namespace Tetris
         {
             Status_Nil,
             Status_Started,
+            Status_Working,
+            Status_Stopped,
             Status_Finished
         };
 
@@ -100,7 +101,6 @@ namespace Tetris
         int mCompletedSearchDepth;
         mutable boost::mutex mCompletedSearchDepthMutex;
 
-
         BlockTypes mBlockTypes;
         Widths mWidths;
         boost::scoped_ptr<Evaluator> mEvaluator;
@@ -108,7 +108,7 @@ namespace Tetris
         Status mStatus;
         mutable boost::mutex mStatusMutex;
 
-        Worker * mWorker;
+        boost::shared_ptr<Worker> mWorker;
     };
 
 } // namespace Tetris

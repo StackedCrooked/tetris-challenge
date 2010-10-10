@@ -20,30 +20,29 @@ namespace Tetris
         return T(inValue.begin() + 1, inValue.end());
     }
 
-    ComputerPlayerMt::ComputerPlayerMt(WorkerPool * inWorkerPool,
-                                   std::auto_ptr<GameStateNode> inNode,
-                                   const BlockTypes & inBlockTypes,
-                                   const std::vector<int> & inWidths,
-                                   std::auto_ptr<Evaluator> inEvaluator) :
+    ComputerPlayerMt::ComputerPlayerMt(boost::shared_ptr<WorkerPool> inWorkerPool, 
+                                       std::auto_ptr<GameStateNode> inNode,
+                                       const BlockTypes & inBlockTypes,
+                                       const std::vector<int> & inWidths,
+                                       std::auto_ptr<Evaluator> inEvaluator) :
         mMaxSearchDepth(inWidths.size()),
         mRootNode(inNode.release()),
         mComputerPlayers(),
         mWorkerPool(inWorkerPool),
-        mEvaluator(inEvaluator.release())
+        mEvaluator(inEvaluator.release()),
+        mFinished(false)
     {   
         ChildNodes layer1Nodes(getLayer1Nodes(inBlockTypes[0], inWidths[0]));
         ChildNodes::iterator it = layer1Nodes.begin(), end = layer1Nodes.end();
         for (; it != end; ++it)
         {
             NodePtr childNode(*it);
-            mComputerPlayers.push_back(
-                ComputerPlayerPtr(
-                    new ComputerPlayer(
-                        inWorkerPool->getWorker(),
-                        childNode->clone(),
-                        DropFirst(inBlockTypes),
-                        DropFirst(inWidths),
-                        mEvaluator->clone())));
+            mComputerPlayers.push_back(ComputerPlayerInfo(childNode,
+                                                          ComputerPlayerPtr(new ComputerPlayer(inWorkerPool->getWorker(),
+                                                                                               childNode->clone(),
+                                                                                               DropFirst(inBlockTypes),
+                                                                                               DropFirst(inWidths),
+                                                                                               mEvaluator->clone()))));
         }
     }
 
@@ -73,14 +72,20 @@ namespace Tetris
 
     bool ComputerPlayerMt::isFinished() const
     {
-        for (size_t idx = 0; idx != mComputerPlayers.size(); ++idx)
+        if (!mFinished)
         {
-            if (!mComputerPlayers[idx]->isFinished())
+            size_t idx = 0;
+            size_t numComputers = mComputerPlayers.size();
+            for (; idx != numComputers; ++idx)
             {
-                return false;
+                if (!mComputerPlayers[idx].mComputerPlayer->isFinished())
+                {
+                    break;
+                }
             }
+            mFinished = (idx == numComputers);
         }
-        return true;
+        return mFinished;
     }
 
 
@@ -89,7 +94,15 @@ namespace Tetris
         int result = 0;
         for (size_t idx = 0; idx != mComputerPlayers.size(); ++idx)
         {
-            result = std::min<int>(result, mComputerPlayers[idx]->getCurrentSearchDepth());
+            int currentDepth = 1 + mComputerPlayers[idx].mComputerPlayer->getCurrentSearchDepth();
+            if (idx == 0)
+            {
+                result = currentDepth;
+            }
+            else
+            {
+                result = std::min<int>(result, currentDepth);
+            }
         }
         return result;
     }
@@ -105,15 +118,17 @@ namespace Tetris
     {
         NodePtr result;
         int searchDepth = getCurrentSearchDepth();
-        LogInfo(MakeString() << "Search depth: " << searchDepth);
+        int selected = 0;
         for (size_t idx = 0; idx != mComputerPlayers.size(); ++idx)
         {
-            ComputerPlayer & comp = *mComputerPlayers[idx];
-            ComputerPlayer::LayerData layerData;
-            comp.getLayerData(searchDepth, layerData);
-            if (!result || layerData.mBestChild->state().quality() > result->state().quality())
+            const ComputerPlayerInfo & compInfo = mComputerPlayers[idx];
+            NodePtr compResult = compInfo.mComputerPlayer->result();
+            if (!result || compResult->endNode()->state().quality() > result->state().quality())
             {
-                result = layerData.mBestChild;
+                Assert(compInfo.mChildNode->children().empty());
+                compInfo.mChildNode->children().insert(compResult);
+                result = compInfo.mChildNode;
+                selected = idx;
             }
         }
         return result;
@@ -124,8 +139,7 @@ namespace Tetris
     {
         for (size_t idx = 0; idx != mComputerPlayers.size(); ++idx)
         {
-            mComputerPlayers[idx]->stop();
-            LogInfo(MakeString() << "Computer " << idx << " stopped.");
+            mComputerPlayers[idx].mComputerPlayer->stop();
         }
     }
 
@@ -134,8 +148,7 @@ namespace Tetris
     {
         for (size_t idx = 0; idx != mComputerPlayers.size(); ++idx)
         {
-            mComputerPlayers[idx]->start();
-            LogInfo(MakeString() << "Computer " << idx << " started.");
+            mComputerPlayers[idx].mComputerPlayer->start();
         }
     }
 

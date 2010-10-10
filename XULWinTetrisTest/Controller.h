@@ -154,7 +154,7 @@ namespace Tetris
         boost::scoped_ptr<BlockMover> mBlockMover;
         boost::scoped_ptr<Evaluator> mEvaluator;
         bool mConsoleVisible;
-        boost::scoped_ptr<WorkerPool> mWorkerPool;
+        boost::shared_ptr<WorkerPool> mWorkerPool;
     };
 
 } // namespace Tetris

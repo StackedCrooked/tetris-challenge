@@ -11,7 +11,7 @@
 namespace Tetris
 {
 
-    ComputerPlayer::ComputerPlayer(Worker * inWorker,
+    ComputerPlayer::ComputerPlayer(boost::shared_ptr<Worker> inWorker,
                                    std::auto_ptr<GameStateNode> inNode,
                                    const BlockTypes & inBlockTypes,
                                    const Widths & inWidths,
@@ -33,7 +33,7 @@ namespace Tetris
 
     ComputerPlayer::~ComputerPlayer()
     {
-        mWorker->interrupt();
+        mWorker->interrupt(Worker::Interrupt_Wait);
     }
 
 
@@ -239,7 +239,11 @@ namespace Tetris
 
     void ComputerPlayer::stop()
     {
-        mWorker->interrupt();
+        if (status() == Status_Started || status() == Status_Working)
+        {
+            setStatus(Status_Stopped);
+            mWorker->interrupt(Worker::Interrupt_Wait);
+        }
     }
 
 
@@ -248,14 +252,15 @@ namespace Tetris
         // Thread entry point has try/catch block
         try
         {
+            setStatus(Status_Working);
             populate();
             destroyInferiorChildren();
-            setStatus(Status_Finished);
         }
         catch (const std::exception & inException)
         {
             LogError(MakeString() << inException.what());
         }
+        setStatus(Status_Finished);
     }
 
 

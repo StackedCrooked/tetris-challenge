@@ -19,15 +19,17 @@ namespace Tetris
     }
     
     
-    Worker * WorkerPool::getWorker(size_t inIndex)
+    WorkerPtr WorkerPool::getWorker(size_t inIndex)
     {
-        return mWorkers[inIndex].get();
+        boost::mutex::scoped_lock workersLock(mWorkersMutex);
+        return mWorkers[inIndex];
     }
     
     
-    Worker * WorkerPool::getWorker()
+    WorkerPtr WorkerPool::getWorker()
     {        
-        Worker * result = mWorkers[mRotation].get();
+        boost::mutex::scoped_lock workersLock(mWorkersMutex);
+        WorkerPtr result = mWorkers[mRotation];
         mRotation = (mRotation + 1) % mWorkers.size();
         return result;
     }
@@ -35,12 +37,14 @@ namespace Tetris
     
     size_t WorkerPool::size() const
     {
+        boost::mutex::scoped_lock workersLock(mWorkersMutex);
         return mWorkers.size();
     }
 
 
     void WorkerPool::setSize(size_t inSize)
     {
+        boost::mutex::scoped_lock workersLock(mWorkersMutex);
         if (inSize > mWorkers.size())
         {
             mWorkers.resize(inSize, WorkerPtr(new Worker(MakeString() << mName << mWorkers.size())));
@@ -54,26 +58,19 @@ namespace Tetris
     
     void WorkerPool::interruptAll()
     {
-        // Some typedefs to reduce the typing
-        typedef boost::mutex::scoped_lock ScopedLock;
-        typedef boost::shared_ptr<ScopedLock> ScopedLockPtr;
-        typedef std::vector<ScopedLockPtr> ScopedLocks;
+        LogInfo("void WorkerPool::interruptAll()");
+        boost::mutex::scoped_lock workersLock(mWorkersMutex);
 
-        ScopedLocks locks;
-        
-        // Send all workers the interrupt all without waiting for the tasks.
         for (size_t idx = 0; idx != mWorkers.size(); ++idx)
         {
             Worker & worker = *mWorkers[idx];
-            locks.push_back(ScopedLockPtr(new ScopedLock(worker.mQueueMutex)));
-            worker.interruptImpl();
+            worker.interrupt(Worker::Interrupt_NoWait);
         }
 
-	    // Wait for the tasks to finish.
         for (size_t idx = 0; idx != mWorkers.size(); ++idx)
         {
             Worker & worker = *mWorkers[idx];
-            worker.mTaskProcessedCondition.wait(*locks[idx]);
+            worker.waitForStatus(Worker::Status_Waiting);
         }
     }
 
