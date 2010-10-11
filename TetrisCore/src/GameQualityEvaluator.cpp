@@ -165,21 +165,21 @@ namespace Tetris
                   NumDoublesFactor(2),
                   NumTriplesFactor(4),
                   NumTetrisesFactor(8),
-                  SearchDepth(8),
-                  SearchWidth(4))
+                  SearchDepth(6),
+                  SearchWidth(6))
     {
     }
 
 
     Survival::Survival() :
-        Evaluator(GameHeightFactor(-2),
+        Evaluator(GameHeightFactor(-4),
                   LastBlockHeightFactor(-1),
                   NumHolesFactor(-2),
                   NumSinglesFactor(1),
                   NumDoublesFactor(2),
                   NumTriplesFactor(4),
                   NumTetrisesFactor(8),
-                  SearchDepth(4),
+                  SearchDepth(8),
                   SearchWidth(4))
     {
     }
@@ -211,20 +211,5 @@ namespace Tetris
                   SearchWidth(1))
     {
     }
-
-
-    Shabby::Shabby() :
-        Evaluator(GameHeightFactor(-1),
-                  LastBlockHeightFactor(-1),
-                  NumHolesFactor(0),
-                  NumSinglesFactor(0),
-                  NumDoublesFactor(0),
-                  NumTriplesFactor(0),
-                  NumTetrisesFactor(0),
-                  SearchDepth(4),
-                  SearchWidth(4))
-    {
-    }
-
 
 } // namespace Tetris

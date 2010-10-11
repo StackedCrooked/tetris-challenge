@@ -390,11 +390,11 @@ namespace Tetris
                 game->clearPrecalculatedNodes();
             }
         }
-        else if (id == "Shabby")
+        else if (id == "Balanced")
         {
             if (!dynamic_cast<Survival *>(mEvaluator.get()))
             {
-                mEvaluator.reset(new Shabby);
+                mEvaluator.reset(new Balanced);
                 ScopedAtom<Game> game(*mProtectedGame);
                 game->clearPrecalculatedNodes();
             }

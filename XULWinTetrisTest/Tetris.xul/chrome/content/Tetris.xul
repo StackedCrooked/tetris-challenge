@@ -108,8 +108,8 @@
             <menupopup id="strategiesPopup">
               <menuitem id="customMenuItem" label="Custom" />
               <menuitem id="makeTetrisesMenuItem" label="Make Tetrises" />
+              <menuitem id="balancedMenuItem" label="Balanced" />
               <menuitem id="surviveMenuItem" label="Survive" />
-              <menuitem id="shabbyMenuItem" label="Shabby" />
               <menuitem id="depressedMenuItem" label="Depressed" />
             </menupopup>
           </menulist>
@@ -143,7 +143,7 @@
               <textbox id="numDoublesFactor" type="number" readonly="true" style="text-align:right" value="2" disabled="true" flex="1" />
             </row>
             <row align="center">
-              <label value="Drop depth:" style="text-align:right" />
+              <label value="Last block height:" style="text-align:right" />
               <textbox id="lastBlockHeightFactor" type="number" readonly="true" style="text-align:right" value="-1" disabled="true" flex="1" />
               <label value="Triple lines:" style="text-align:right" />
               <textbox id="numTriplesFactor" type="number" readonly="true" style="text-align:right" value="4" disabled="true" flex="1" />
