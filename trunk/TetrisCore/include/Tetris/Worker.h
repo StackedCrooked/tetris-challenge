@@ -49,17 +49,27 @@ namespace Tetris
             Status_Working
         };
 
-        // Get the current status.
+        /**
+         * Get the current status.
+         */
         Status status() const;
 
         void waitForStatus(Status inStatus);
 
         /**
-         * Sends an interrupt message to the current task. This call is
-         * blocking until the task has completed. After that the Worker
-         * will start processing the next task or enter waiting mode.
+         * Sends an interrupt message to the current task. This method is
+         * blocking until the task has completed. To improve responsiveness
+         * the functor should periodically call
+         * boost::this_thread::interruption_point().
+         *
+         * After this method has returned the worker starts on the next task
+         * or enters the waiting state.
          */
         void interrupt();
+
+        /**
+         * Same as interrupt() but also clears the queue.
+         */
         void interruptAndClearQueue();
 
     private:
