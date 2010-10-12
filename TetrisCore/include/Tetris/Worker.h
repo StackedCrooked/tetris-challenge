@@ -59,8 +59,8 @@ namespace Tetris
          * blocking until the task has completed. After that the Worker
          * will start processing the next task or enter waiting mode.
          */
-        void interrupt(bool inWaitForStatus = true);
-        void interruptAndClearQueue(bool inWaitForStatus = true);
+        void interrupt();
+        void interruptAndClearQueue();
 
     private:
         friend class WorkerPool;

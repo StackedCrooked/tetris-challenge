@@ -18,6 +18,8 @@ namespace Tetris
     public:
         WorkerPool(const std::string & inName, size_t inSize);
 
+        ~WorkerPool();
+
         inline const std::string & name() const { return mName; }
 
         // Returns a different worker on each call.
@@ -36,7 +38,9 @@ namespace Tetris
         // Interrupts all workers.
         void interruptAndClearQueue();
 
-    private:
+    private:        
+        void interruptRange(size_t inBegin, size_t inCount);
+
         std::string mName;
         typedef std::vector<WorkerPtr> Workers;
         mutable size_t mRotation;
