@@ -45,7 +45,6 @@ namespace Tetris
 
         enum Status
         {
-            Status_Nil,
             Status_Waiting,
             Status_Working
         };
@@ -59,13 +58,9 @@ namespace Tetris
          * Sends an interrupt message to the current task. This call is
          * blocking until the task has completed. After that the Worker
          * will start processing the next task or enter waiting mode.
-         *
-         * Usage:
-         *   worker.interrupt(Worker::ClearQueue(true));
-         *   worker.interrupt(Worker::ClearQueue(false));
          */
-        void interruptOne(bool inWaitForStatus = true);
-        void interruptAll(bool inWaitForStatus = true);
+        void interrupt(bool inWaitForStatus = true);
+        void interruptAndClearQueue(bool inWaitForStatus = true);
 
     private:
         friend class WorkerPool;

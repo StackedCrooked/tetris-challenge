@@ -49,7 +49,7 @@ namespace Tetris
 
     ComputerPlayerMt::~ComputerPlayerMt()
     {
-        mWorkerPool->interruptAll();
+        mWorkerPool->interruptAndClearQueue();
     }
 
 

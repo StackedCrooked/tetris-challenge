@@ -34,7 +34,7 @@ namespace Tetris
         void setSize(size_t inSize);
         
         // Interrupts all workers.
-        void interruptAll();
+        void interruptAndClearQueue();
 
     private:
         std::string mName;
