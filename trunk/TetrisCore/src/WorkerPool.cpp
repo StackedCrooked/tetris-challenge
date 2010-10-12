@@ -15,6 +15,12 @@ namespace Tetris
             mWorkers.push_back(WorkerPtr(new Worker(MakeString() << inName << mWorkers.size())));
         }
     }
+
+
+    WorkerPool::~WorkerPool()
+    {
+        interruptAndClearQueue();
+    }
     
     
     WorkerPtr WorkerPool::getWorker(size_t inIndex)
@@ -52,22 +58,20 @@ namespace Tetris
         }
         else if (inSize < mWorkers.size()) // Deletes a few workers
         {
-            mWorkers.resize(inSize);
+            interruptRange(inSize, mWorkers.size() - inSize);
         }
     }
     
     
-    void WorkerPool::interruptAndClearQueue()
+    void WorkerPool::interruptRange(size_t inBegin, size_t inCount)
     {
-        boost::mutex::scoped_lock workersLock(mWorkersMutex);
-
         std::vector<boost::shared_ptr<boost::mutex::scoped_lock> > queueLocks(mWorkers.size());
         std::vector<boost::shared_ptr<boost::mutex::scoped_lock> > statusLocks(mWorkers.size());
 
         //
         // Lock all workers' queue and status.
         //
-        for (size_t idx = 0; idx != mWorkers.size(); ++idx)
+        for (size_t idx = inBegin; idx != inBegin + inCount; ++idx)
         {
             Worker & worker = *mWorkers[idx];
             queueLocks[idx].reset(new boost::mutex::scoped_lock(worker.mQueueMutex));
@@ -77,7 +81,7 @@ namespace Tetris
         //
         // Interrupt all threads.
         //
-        for (size_t idx = 0; idx != mWorkers.size(); ++idx)
+        for (size_t idx = inBegin; idx != inBegin + inCount; ++idx)
         {
             Worker & worker = *mWorkers[idx];
             worker.mThread->interrupt();
@@ -86,7 +90,7 @@ namespace Tetris
         //
         // Wait for Status_Waiting on all workers.
         //
-        for (size_t idx = 0; idx != mWorkers.size(); ++idx)
+        for (size_t idx = inBegin; idx != inBegin + inCount; ++idx)
         {
             Worker & worker = *mWorkers[idx];
             while (worker.mStatus != Worker::Status_Waiting)
@@ -94,6 +98,13 @@ namespace Tetris
                 worker.mStatusCondition.wait(*statusLocks[idx]);
             }
         }
+    }
+    
+    
+    void WorkerPool::interruptAndClearQueue()
+    {
+        boost::mutex::scoped_lock workersLock(mWorkersMutex);
+        interruptRange(0, mWorkers.size());
     }
 
 } // namespace Tetris
