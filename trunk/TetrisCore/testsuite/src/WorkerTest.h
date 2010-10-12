@@ -14,7 +14,9 @@ public:
 
     static void CountTo(Poco::UInt64 inNumber);
 
-	void test();
+	void testStatus();
+	void testSimpleInterrupt();
+	void testAdvancedInterrupt();
 	
 	void setUp();
 	void tearDown();
