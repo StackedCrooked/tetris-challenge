@@ -15,11 +15,13 @@
     class ClassName \
     { \
     public: \
-        explicit ClassName(PrimitiveType inValue) : mValue(inValue) {} \
-        PrimitiveType get() const \
-        { return mValue; } \
-    private: \
-        PrimitiveType mValue; \
+        explicit ClassName(PrimitiveType inValue) : mValue(inValue) {}        \
+        PrimitiveType get() const                                             \
+        { return mValue; }                                                    \
+        operator PrimitiveType() const                                        \
+        { return mValue; }                                                    \
+    private:                                                                  \
+        PrimitiveType mValue;                                                 \
     };
 
 

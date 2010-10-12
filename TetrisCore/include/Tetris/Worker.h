@@ -47,9 +47,7 @@ namespace Tetris
         {
             Status_Nil,
             Status_Waiting,
-            Status_Scheduled,
-            Status_Working,
-            Status_Interrupted
+            Status_Working
         };
 
         // Get the current status.
@@ -57,16 +55,17 @@ namespace Tetris
 
         void waitForStatus(Status inStatus);
 
-        // Sends an interrupt message to the current task.
-        // This call is blocking until the task has completed.
-        // After that the Worker will start working on
-        // the next task or enter waiting mode.
-        enum Interrupt
-        {
-            Interrupt_Wait,
-            Interrupt_NoWait
-        };
-        void interrupt(Interrupt inInterrupt);
+        /**
+         * Sends an interrupt message to the current task. This call is
+         * blocking until the task has completed. After that the Worker
+         * will start processing the next task or enter waiting mode.
+         *
+         * Usage:
+         *   worker.interrupt(Worker::ClearQueue(true));
+         *   worker.interrupt(Worker::ClearQueue(false));
+         */
+        void interruptOne(bool inWaitForStatus = true);
+        void interruptAll(bool inWaitForStatus = true);
 
     private:
         friend class WorkerPool;
@@ -88,13 +87,13 @@ namespace Tetris
         mutable boost::mutex mQueueMutex;
         boost::condition_variable mQueueCondition;
 
-        boost::condition_variable mTaskProcessedCondition;
-
         mutable boost::mutex mQuitFlagMutex;
         bool mQuitFlag;
 
         boost::scoped_ptr<boost::thread> mThread;
     };
+
+    std::string ToString(Worker::Status);
 
 } // namespace Tetris
 
