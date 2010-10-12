@@ -80,11 +80,15 @@ namespace Tetris
 
     Worker::~Worker()
     {
-        boost::mutex::scoped_lock queueLock(mQueueMutex);
-        boost::mutex::scoped_lock statusLock(mStatusMutex);
-        setQuitFlag();
-        mQueue.clear();
-        mThread->interrupt();
+        {
+            setQuitFlag();
+            boost::mutex::scoped_lock queueLock(mQueueMutex);
+            boost::mutex::scoped_lock statusLock(mStatusMutex);
+            mQueue.clear();
+            mThread->interrupt();
+            mQueueCondition.notify_all();
+            mStatusCondition.notify_all();
+        }
         mThread->join();
         mThread.reset();
     }
@@ -191,7 +195,7 @@ namespace Tetris
         {
             // Task was interrupted. Ok.
         }
-        mStatusCondition.notify_all();
+        setStatus(Status_Nil);
     }
 
 
