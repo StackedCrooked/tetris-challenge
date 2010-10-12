@@ -1,5 +1,4 @@
 #include "Tetris/WorkerPool.h"
-#include "Tetris/Logger.h"
 #include "Tetris/MakeString.h"
 
 
@@ -14,7 +13,6 @@ namespace Tetris
         for (size_t idx = 0; idx != inSize; ++idx)
         {
             mWorkers.push_back(WorkerPtr(new Worker(MakeString() << inName << mWorkers.size())));
-            LogInfo(MakeString() << "WorkerPool: Created worker " << idx << ".");
         }
     }
     
@@ -47,7 +45,10 @@ namespace Tetris
         boost::mutex::scoped_lock workersLock(mWorkersMutex);
         if (inSize > mWorkers.size())
         {
-            mWorkers.resize(inSize, WorkerPtr(new Worker(MakeString() << mName << mWorkers.size())));
+            while (mWorkers.size() < inSize)
+            {
+                mWorkers.push_back(WorkerPtr(new Worker(MakeString() << mName << mWorkers.size())));
+            }
         }
         else if (inSize < mWorkers.size()) // Deletes a few workers
         {
@@ -58,7 +59,6 @@ namespace Tetris
     
     void WorkerPool::interruptAndClearQueue()
     {
-        LogInfo("void WorkerPool::interruptAndClearQueue()");
         boost::mutex::scoped_lock workersLock(mWorkersMutex);
 
         std::vector<boost::shared_ptr<boost::mutex::scoped_lock> > queueLocks(mWorkers.size());

@@ -7,9 +7,12 @@
 #include <iostream>
 
 
+using namespace Tetris;
+
+
 WorkerTest::WorkerTest(const std::string & inName):
     CppUnit::TestCase(inName),
-    mRepeat(100)
+    mRepeat(20)
 {
 }
 
@@ -30,7 +33,7 @@ void WorkerTest::CountTo(Poco::UInt64 inNumber)
     for (Poco::UInt64 idx = 0; idx != inNumber; ++idx)
     {
         boost::this_thread::interruption_point();
-        Poco::Thread::sleep(1);
+        Poco::Thread::sleep(10);
     }
 }
 
@@ -49,17 +52,17 @@ void WorkerTest::testStatus()
 
 void WorkerTest::testStatusImpl()
 {
-    Tetris::Worker worker("TestWorker");
-    assertEqual(worker.status(), Tetris::Worker::Status_Waiting);
+    Worker worker("TestWorker");
+    assertEqual(worker.status(), Worker::Status_Waiting);
 
-    Poco::Thread::sleep(1);
-    assertEqual(worker.status(), Tetris::Worker::Status_Waiting);
+    Poco::Thread::sleep(10);
+    assertEqual(worker.status(), Worker::Status_Waiting);
 
     worker.schedule(boost::bind(&WorkerTest::CountTo, 1000 * 1000));
-    assertEqual(worker.status(), Tetris::Worker::Status_Waiting);
+    assertEqual(worker.status(), Worker::Status_Waiting);
 
-    Poco::Thread::sleep(1);
-    assertEqual(worker.status(), Tetris::Worker::Status_Working);
+    Poco::Thread::sleep(10);
+    assertEqual(worker.status(), Worker::Status_Working);
     assertEqual(worker.size(), 0);
 }
 
@@ -78,25 +81,25 @@ void WorkerTest::testSimpleInterrupt()
 
 void WorkerTest::testSimpleInterruptImpl()
 {
-    Tetris::Worker worker("TestWorker");
+    Worker worker("TestWorker");
     
     // Interrupt while waiting
     worker.interrupt();
-    Poco::Thread::sleep(1);
+    Poco::Thread::sleep(10);
 
     // Interrupt and clear queue while waiting
     worker.interruptAndClearQueue();
-    Poco::Thread::sleep(1);
+    Poco::Thread::sleep(10);
 
     // Schedule a job
     worker.schedule(boost::bind(&WorkerTest::CountTo, 1000 * 1000));
-    Poco::Thread::sleep(1);
-    assertEqual(worker.status(), Tetris::Worker::Status_Working);
+    worker.waitForStatus(Worker::Status_Working);
+    assertEqual(worker.status(), Worker::Status_Working);
     assertEqual(worker.size(), 0);
     
     worker.interrupt();
-    Poco::Thread::sleep(1);
-    assertEqual(worker.status(), Tetris::Worker::Status_Waiting);
+    worker.waitForStatus(Worker::Status_Waiting);
+    assertEqual(worker.status(), Worker::Status_Waiting);
     assertEqual(worker.size(), 0);
 
     // Just a test
@@ -112,6 +115,8 @@ void WorkerTest::testSimpleInterruptImpl()
     worker.interruptAndClearQueue();
     worker.interruptAndClearQueue();
     worker.interruptAndClearQueue();
+
+    worker.waitForStatus(Worker::Status_Waiting);
 }
 
 
@@ -129,21 +134,21 @@ void WorkerTest::testAdvancedInterrupt()
 
 void WorkerTest::testAdvancedInterruptImpl()
 {
-    Tetris::Worker worker("TestWorker");
+    Worker worker("TestWorker");
     worker.schedule(boost::bind(&WorkerTest::CountTo, 1000 * 1000));
     worker.schedule(boost::bind(&WorkerTest::CountTo, 1000 * 1000));
-    Poco::Thread::sleep(1);
-    assertEqual(worker.status(), Tetris::Worker::Status_Working);
+    Poco::Thread::sleep(10);
+    assertEqual(worker.status(), Worker::Status_Working);
     assertEqual(worker.size(), 1);
 
     worker.interrupt();
-    Poco::Thread::sleep(1);
-    assertEqual(worker.status(), Tetris::Worker::Status_Working);
+    Poco::Thread::sleep(10);
+    assertEqual(worker.status(), Worker::Status_Working);
     assertEqual(worker.size(), 0);
 
     worker.interrupt();
-    Poco::Thread::sleep(1);
-    assertEqual(worker.status(), Tetris::Worker::Status_Waiting);
+    Poco::Thread::sleep(10);
+    assertEqual(worker.status(), Worker::Status_Waiting);
     assertEqual(worker.size(), 0);
 
     worker.schedule(boost::bind(&WorkerTest::CountTo, 1000 * 1000));
@@ -151,9 +156,9 @@ void WorkerTest::testAdvancedInterruptImpl()
     worker.schedule(boost::bind(&WorkerTest::CountTo, 1000 * 1000));
     worker.schedule(boost::bind(&WorkerTest::CountTo, 1000 * 1000));
     worker.schedule(boost::bind(&WorkerTest::CountTo, 1000 * 1000));
-    Poco::Thread::sleep(1);
+    Poco::Thread::sleep(10);
     worker.interruptAndClearQueue();
-    assertEqual(worker.status(), Tetris::Worker::Status_Waiting);
+    assertEqual(worker.status(), Worker::Status_Waiting);
     assertEqual(worker.size(), 0);
 }
 
