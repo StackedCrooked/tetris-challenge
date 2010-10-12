@@ -12,7 +12,7 @@ using namespace Tetris;
 
 WorkerTest::WorkerTest(const std::string & inName):
     CppUnit::TestCase(inName),
-    mRepeat(20)
+    mRepeat(100)
 {
 }
 
