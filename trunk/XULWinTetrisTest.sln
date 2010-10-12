@@ -20,6 +20,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PocoXML", "3rdParty\Poco\XM
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "XULWin", "XULWin\XULWin_vs90.vcproj", "{82864729-DFC2-4F6D-A1AE-984D82CF81E1}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestSuite", "TetrisCore\testsuite\TestSuite_vs90.vcproj", "{CB848309-5527-4A5E-8CDB-BA0DBA7151F9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -50,6 +52,10 @@ Global
 		{82864729-DFC2-4F6D-A1AE-984D82CF81E1}.Debug|Win32.Build.0 = Debug|Win32
 		{82864729-DFC2-4F6D-A1AE-984D82CF81E1}.Release|Win32.ActiveCfg = Release|Win32
 		{82864729-DFC2-4F6D-A1AE-984D82CF81E1}.Release|Win32.Build.0 = Release|Win32
+		{CB848309-5527-4A5E-8CDB-BA0DBA7151F9}.Debug|Win32.ActiveCfg = Debug|Win32
+		{CB848309-5527-4A5E-8CDB-BA0DBA7151F9}.Debug|Win32.Build.0 = Debug|Win32
+		{CB848309-5527-4A5E-8CDB-BA0DBA7151F9}.Release|Win32.ActiveCfg = Release|Win32
+		{CB848309-5527-4A5E-8CDB-BA0DBA7151F9}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

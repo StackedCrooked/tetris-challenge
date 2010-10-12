@@ -33,7 +33,7 @@ namespace Tetris
 
     ComputerPlayer::~ComputerPlayer()
     {
-        mWorker->interrupt(Worker::Interrupt_Wait);
+        mWorker->interruptAll();
     }
 
 
@@ -242,7 +242,7 @@ namespace Tetris
         if (status() == Status_Started || status() == Status_Working)
         {
             setStatus(Status_Stopped);
-            mWorker->interrupt(Worker::Interrupt_Wait);
+            mWorker->interruptAll();
         }
     }
 

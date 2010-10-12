@@ -44,6 +44,29 @@
 
 namespace Tetris
 {
+    
+    std::string ToString(Worker::Status inStatus)
+    {
+        switch (inStatus)
+        {
+            case Worker::Status_Nil:
+            {
+                return "Nil";
+            }
+            case Worker::Status_Waiting:
+            {
+                return "Waiting";
+            }
+            case Worker::Status_Working:
+            {
+                return "Working";
+            }
+            default:
+            {
+                throw std::logic_error("Invalid enum value for Worker::Status.");
+            }
+        }
+    }
 
 
     Worker::Worker(const std::string & inName) :
@@ -57,8 +80,11 @@ namespace Tetris
 
     Worker::~Worker()
     {
+        boost::mutex::scoped_lock queueLock(mQueueMutex);
+        boost::mutex::scoped_lock statusLock(mStatusMutex);
         setQuitFlag();
-        interrupt(Interrupt_Wait);
+        mQueue.clear();
+        mThread->interrupt();
         mThread->join();
         mThread.reset();
     }
@@ -110,34 +136,27 @@ namespace Tetris
     }
 
 
-    void Worker::interrupt(Interrupt inInterrupt)
+    void Worker::interruptOne(bool inWaitForStatus)
     {
-        boost::mutex::scoped_lock queueLock(mQueueMutex);        
-        
-        setStatus(Status_Interrupted);
-
-        // Clear the queue
-        mQueue.clear();
-
-        // Interrupt the current task.
+        boost::mutex::scoped_lock statusLock(mStatusMutex);
         mThread->interrupt();
-
-        // If no task is currently being processed then
-        // we'll need to break out of the wait() call.
-        mQueueCondition.notify_all();
-
-        if (inInterrupt == Interrupt_Wait)
-        {
-            mTaskProcessedCondition.wait(queueLock);
-        }
+        mStatusCondition.wait(statusLock);
     }
 
+
+    void Worker::interruptAll(bool inWaitForStatus)
+    {
+        boost::mutex::scoped_lock queueLock(mQueueMutex);
+        boost::mutex::scoped_lock statusLock(mStatusMutex);
+        mQueue.clear();
+        mThread->interrupt();
+        mStatusCondition.wait(statusLock);
+    }
 
     void Worker::schedule(const Worker::Task & inTask)
     {
         boost::mutex::scoped_lock lock(mQueueMutex);
         mQueue.push_back(inTask);
-        setStatus(Status_Scheduled);
         mQueueCondition.notify_all();
     }
 
@@ -147,7 +166,6 @@ namespace Tetris
         boost::mutex::scoped_lock lock(mQueueMutex);
         while (mQueue.empty())
         {
-            Assert(status() != Status_Scheduled);
             setStatus(Status_Waiting);
             mQueueCondition.wait(lock);
             boost::this_thread::interruption_point();
@@ -173,7 +191,7 @@ namespace Tetris
         {
             // Task was interrupted. Ok.
         }
-        mTaskProcessedCondition.notify_all();
+        mStatusCondition.notify_all();
     }
 
 
