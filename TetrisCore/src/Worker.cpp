@@ -146,10 +146,12 @@ namespace Tetris
 
     void Worker::interruptAndClearQueue(bool inWaitForStatus)
     {
-        boost::mutex::scoped_lock queueLock(mQueueMutex);
+        boost::scoped_ptr<boost::mutex::scoped_lock> queueLock(new boost::mutex::scoped_lock(mQueueMutex));
         mQueue.clear();
         boost::mutex::scoped_lock statusLock(mStatusMutex);
         mThread->interrupt();
+        mQueueCondition.notify_all();
+        queueLock.reset();
         mStatusCondition.wait(statusLock);
     }
 
