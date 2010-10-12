@@ -155,6 +155,7 @@ namespace Tetris
         mStatusCondition.wait(statusLock);
     }
 
+
     void Worker::schedule(const Worker::Task & inTask)
     {
         boost::mutex::scoped_lock lock(mQueueMutex);
