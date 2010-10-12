@@ -8,14 +8,20 @@
 
 
 WorkerTest::WorkerTest(const std::string & inName):
-    CppUnit::TestCase(inName)
+    CppUnit::TestCase(inName),
+    mRepeat(10)
 {
 }
 
 
 WorkerTest::~WorkerTest()
 {
-    std::cout << "~WorkerTest()" << std::endl;
+}
+
+
+void WorkerTest::printProgress(size_t a, size_t b)
+{
+    std::cout << (a + 1) << "/" << b << "\r";
 }
 
 
@@ -29,16 +35,22 @@ void WorkerTest::CountTo(Poco::UInt64 inNumber)
 }
 
 
-void Print(const std::string & inMessage)
+void WorkerTest::testStatus()
 {
-    std::cout << inMessage << "\n";
+    std::cout << "\n";
+    for (size_t idx = 0; idx != mRepeat; ++idx)
+    {
+        printProgress(idx, mRepeat);
+        testStatusImpl();
+    }
+    std::cout << "\n";
 }
 
 
-void WorkerTest::testStatus()
+void WorkerTest::testStatusImpl()
 {
     Tetris::Worker worker("TestWorker");
-    assertEqual(worker.status(), Tetris::Worker::Status_Nil);
+    assertEqual(worker.status(), Tetris::Worker::Status_Waiting);
 
     Poco::Thread::sleep(10);
     assertEqual(worker.status(), Tetris::Worker::Status_Waiting);
@@ -54,13 +66,26 @@ void WorkerTest::testStatus()
 
 void WorkerTest::testSimpleInterrupt()
 {
+    std::cout << "\n";
+    for (size_t idx = 0; idx != mRepeat; ++idx)
+    {
+        printProgress(idx, mRepeat);
+        testSimpleInterruptImpl();
+    }
+    std::cout << "\n";
+}
+
+
+void WorkerTest::testSimpleInterruptImpl()
+{
     Tetris::Worker worker("TestWorker");
+    worker.interrupt();
     worker.schedule(boost::bind(&WorkerTest::CountTo, 1000 * 1000));
     Poco::Thread::sleep(10);
     assertEqual(worker.status(), Tetris::Worker::Status_Working);
     assertEqual(worker.size(), 0);
     
-    worker.interruptOne();
+    worker.interrupt();
     Poco::Thread::sleep(10);
     assertEqual(worker.status(), Tetris::Worker::Status_Waiting);
     assertEqual(worker.size(), 0);
@@ -69,6 +94,18 @@ void WorkerTest::testSimpleInterrupt()
 
 void WorkerTest::testAdvancedInterrupt()
 {
+    std::cout << "\n";
+    for (size_t idx = 0; idx != mRepeat; ++idx)
+    {
+        printProgress(idx, mRepeat);
+        testAdvancedInterruptImpl();
+    }
+    std::cout << "\n";
+}
+
+
+void WorkerTest::testAdvancedInterruptImpl()
+{
     Tetris::Worker worker("TestWorker");
     worker.schedule(boost::bind(&WorkerTest::CountTo, 1000 * 1000));
     worker.schedule(boost::bind(&WorkerTest::CountTo, 1000 * 1000));
@@ -76,12 +113,12 @@ void WorkerTest::testAdvancedInterrupt()
     assertEqual(worker.status(), Tetris::Worker::Status_Working);
     assertEqual(worker.size(), 1);
 
-    worker.interruptOne();
+    worker.interrupt();
     Poco::Thread::sleep(10);
     assertEqual(worker.status(), Tetris::Worker::Status_Working);
     assertEqual(worker.size(), 0);
 
-    worker.interruptOne();
+    worker.interrupt();
     Poco::Thread::sleep(10);
     assertEqual(worker.status(), Tetris::Worker::Status_Waiting);
     assertEqual(worker.size(), 0);
@@ -92,7 +129,7 @@ void WorkerTest::testAdvancedInterrupt()
     worker.schedule(boost::bind(&WorkerTest::CountTo, 1000 * 1000));
     worker.schedule(boost::bind(&WorkerTest::CountTo, 1000 * 1000));
     Poco::Thread::sleep(10);
-    worker.interruptAll();
+    worker.interruptAndClearQueue();
     assertEqual(worker.status(), Tetris::Worker::Status_Waiting);
     assertEqual(worker.size(), 0);
 }

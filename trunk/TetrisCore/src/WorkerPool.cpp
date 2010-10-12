@@ -56,9 +56,9 @@ namespace Tetris
     }
     
     
-    void WorkerPool::interruptAll()
+    void WorkerPool::interruptAndClearQueue()
     {
-        LogInfo("void WorkerPool::interruptAll()");
+        LogInfo("void WorkerPool::interruptAndClearQueue()");
         boost::mutex::scoped_lock workersLock(mWorkersMutex);
 
         std::vector<boost::shared_ptr<boost::mutex::scoped_lock> > queueLocks(mWorkers.size());

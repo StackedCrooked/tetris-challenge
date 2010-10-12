@@ -15,8 +15,14 @@ public:
     static void CountTo(Poco::UInt64 inNumber);
 
 	void testStatus();
+	void testStatusImpl();
+
 	void testSimpleInterrupt();
+	void testSimpleInterruptImpl();
+
 	void testAdvancedInterrupt();
+	void testAdvancedInterruptImpl();
+    
 	
 	void setUp();
 	void tearDown();
@@ -24,6 +30,8 @@ public:
 	static CppUnit::Test* suite();
 
 private:
+    void printProgress(size_t a, size_t b);
+    size_t mRepeat;
 };
 
 

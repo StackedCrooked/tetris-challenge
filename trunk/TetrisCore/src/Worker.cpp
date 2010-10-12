@@ -49,10 +49,6 @@ namespace Tetris
     {
         switch (inStatus)
         {
-            case Worker::Status_Nil:
-            {
-                return "Nil";
-            }
             case Worker::Status_Waiting:
             {
                 return "Waiting";
@@ -71,7 +67,7 @@ namespace Tetris
 
     Worker::Worker(const std::string & inName) :
         mName(inName),
-        mStatus(Status_Nil),
+        mStatus(Status_Waiting),
         mQuitFlag(false)
     {
         mThread.reset(new boost::thread(boost::bind(&Worker::run, this)));
@@ -140,7 +136,7 @@ namespace Tetris
     }
 
 
-    void Worker::interruptOne(bool inWaitForStatus)
+    void Worker::interrupt(bool inWaitForStatus)
     {
         boost::mutex::scoped_lock statusLock(mStatusMutex);
         mThread->interrupt();
@@ -148,11 +144,11 @@ namespace Tetris
     }
 
 
-    void Worker::interruptAll(bool inWaitForStatus)
+    void Worker::interruptAndClearQueue(bool inWaitForStatus)
     {
         boost::mutex::scoped_lock queueLock(mQueueMutex);
-        boost::mutex::scoped_lock statusLock(mStatusMutex);
         mQueue.clear();
+        boost::mutex::scoped_lock statusLock(mStatusMutex);
         mThread->interrupt();
         mStatusCondition.wait(statusLock);
     }
@@ -170,7 +166,6 @@ namespace Tetris
         boost::mutex::scoped_lock lock(mQueueMutex);
         while (mQueue.empty())
         {
-            setStatus(Status_Waiting);
             mQueueCondition.wait(lock);
             boost::this_thread::interruption_point();
         }
@@ -195,7 +190,7 @@ namespace Tetris
         {
             // Task was interrupted. Ok.
         }
-        setStatus(Status_Nil);
+        setStatus(Status_Waiting);
     }
 
 
