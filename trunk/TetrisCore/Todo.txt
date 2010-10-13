@@ -1,7 +1,7 @@
 Todo
 ----
+- Move the AI code in the Controller::refresh() method to a Tetris::ComputerPlayer class.
 - Fix crash that occurs when toying with AI settings during game play (esp release mode).
-- Remove the AI code from the Controller!
 - Clean up asserts
 - Write more unit tests
 - GameState::quality() should not require an Evaluator argument.
