@@ -220,7 +220,7 @@ namespace Tetris
 
         if (mMovementSpeed = findComponentById<XULWin::SpinButton>("movementSpeed"))
         {
-            XULWin::WinAPI::SpinButton_SetRange(mMovementSpeed->handle(), 1, 100);
+            XULWin::WinAPI::SpinButton_SetRange(mMovementSpeed->handle(), 1, 1000);
         }
 
 
@@ -285,6 +285,10 @@ namespace Tetris
         //
         mRefreshTimer.reset(new XULWin::WinAPI::Timer);
         mRefreshTimer->start(boost::bind(&Controller::onRefresh, this), 10);
+
+		// Main thread should have highest priority for responsiveness.
+        ::SetThreadPriority(::GetCurrentThread(), THREAD_PRIORITY_TIME_CRITICAL);
+        
     }
 
 
