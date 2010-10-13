@@ -58,6 +58,7 @@ namespace Tetris
         std::vector<ComputerPlayerInfo> mComputerPlayers;
         boost::shared_ptr<WorkerPool> mWorkerPool;
         boost::scoped_ptr<Evaluator> mEvaluator;
+        mutable NodePtr mResult;
         mutable bool mFinished;
     };
 

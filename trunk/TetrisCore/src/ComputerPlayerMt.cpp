@@ -37,6 +37,7 @@ namespace Tetris
         for (; it != end; ++it)
         {
             NodePtr childNode(*it);
+            Assert(childNode->children().empty());
             mComputerPlayers.push_back(ComputerPlayerInfo(childNode,
                                                           ComputerPlayerPtr(new ComputerPlayer(inWorkerPool->getWorker(),
                                                                                                childNode->clone(),
@@ -58,6 +59,7 @@ namespace Tetris
         ChildNodes result(GameStateComparisonFunctor(mEvaluator->clone()));
         ChildNodes generatedChildNodes(GameStateComparisonFunctor(mEvaluator->clone()));
         GenerateOffspring(mRootNode, inBlockType, *mEvaluator, generatedChildNodes);
+        Assert(mRootNode->children().empty());
         size_t count = 0;
         ChildNodes::iterator it = generatedChildNodes.begin(), end = generatedChildNodes.end();
         while (it != end && count < inWidth)
@@ -116,22 +118,27 @@ namespace Tetris
 
     NodePtr ComputerPlayerMt::result() const
     {
-        NodePtr result;
-        int searchDepth = getCurrentSearchDepth();
-        int selected = 0;
-        for (size_t idx = 0; idx != mComputerPlayers.size(); ++idx)
+        if (!mResult)
         {
-            const ComputerPlayerInfo & compInfo = mComputerPlayers[idx];
-            NodePtr compResult = compInfo.mComputerPlayer->result();
-            if (!result || compResult->endNode()->state().quality() > result->state().quality())
+            Assert(mRootNode->children().empty());
+            NodePtr result;
+            int searchDepth = getCurrentSearchDepth();
+            int selected = 0;
+            for (size_t idx = 0; idx != mComputerPlayers.size(); ++idx)
             {
-                Assert(compInfo.mChildNode->children().empty());
-                compInfo.mChildNode->children().insert(compResult);
-                result = compInfo.mChildNode;
-                selected = idx;
+                const ComputerPlayerInfo & compInfo = mComputerPlayers[idx];
+                NodePtr compResult = compInfo.mComputerPlayer->result();
+                if (!result || compResult->endNode()->state().quality() > result->state().quality())
+                {
+                    Assert(compInfo.mChildNode->children().empty());
+                    compInfo.mChildNode->children().insert(compResult);
+                    result = compInfo.mChildNode;
+                    selected = idx;
+                }
             }
+            mResult = result;
         }
-        return result;
+        return mResult;
     }
 
 
