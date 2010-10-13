@@ -1,5 +1,6 @@
 Todo
 ----
+- Fix crash that occurs when toying with AI settings during game play (esp release mode).
 - Remove the AI code from the Controller!
 - Clean up asserts
 - Write more unit tests
