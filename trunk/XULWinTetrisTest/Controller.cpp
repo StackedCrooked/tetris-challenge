@@ -39,7 +39,6 @@ namespace Tetris
         mLevelTextBox(0),
         mScoreTextBox(0),
         mTotalLinesTextBox(0),
-        mComputerEnabledCheckBox(0),
         mSearchDepth(0),
         mCurrentSearchDepth(0),
         mMovementSpeed(0),
@@ -204,14 +203,6 @@ namespace Tetris
             }
         }
 
-
-        if (XULWin::Element * el = mRootElement->getElementById("computerEnabled"))
-        {
-            if (!(mComputerEnabledCheckBox = el->component()->downcast<XULWin::CheckBox>()))
-            {
-                LogWarning("The element with id 'computerEnabled' was found but it was not of type 'checkbox'.");
-            }
-        }
 
         if (mSearchDepth = findComponentById<XULWin::SpinButton>("searchDepth"))
         {
@@ -515,42 +506,6 @@ namespace Tetris
     }
 
 
-    void Controller::startAI(Game & game, size_t inDepth, size_t inWidth)
-    {
-        Assert(!mComputerPlayer);
-        Assert(!game.isGameOver());
-        if (!mComputerPlayer && !game.isGameOver())
-        {
-            //
-            // Clone the starting node
-            //
-            std::auto_ptr<GameStateNode> endNode = game.lastPrecalculatedNode()->clone();
-            Assert(endNode->children().empty());
-            Assert(endNode->depth() >= game.currentNode()->depth());
-
-
-            //
-            // Create the list of future blocks
-            //
-            BlockTypes futureBlocks;
-            game.getFutureBlocksWithOffset(endNode->depth(), inDepth, futureBlocks);
-            Widths widths;
-            for (size_t idx = 0; idx != futureBlocks.size(); ++idx)
-            {
-                widths.push_back(inWidth);
-            }
-
-
-            //
-            // Create and start the ComputerPlayer.
-            //
-            mWorkerPool->interruptAndClearQueue();
-            mComputerPlayer.reset(new ComputerPlayerMt(mWorkerPool, endNode, futureBlocks, widths, mEvaluator->clone()));
-            mComputerPlayer->start();
-        }
-    }
-
-
     void Controller::setText(XULWin::StringValueController * inComponent, const std::string & inText)
     {
         if (inComponent->getValue() != inText)
@@ -596,8 +551,17 @@ namespace Tetris
 
         if (mComputerPlayer)
         {
-            // Check if the computer player has finished. If yes, then get the results.
-            if (mComputerPlayer->isFinished())
+            // Check if the computer player has finished.
+            if (!mComputerPlayer->isFinished())
+            {
+                // Check if there is the danger of crashing the current block.
+                if (game.numPrecalculatedMoves() == 0 && calculateRemainingTimeMs(game) < 1500)
+                {
+                    mComputerPlayer->stop();
+                }
+                // else: keep working.
+            }
+            else
             {
                 NodePtr resultNode = mComputerPlayer->result();
                 if (!resultNode->state().isGameOver())
@@ -605,23 +569,71 @@ namespace Tetris
                     // The created node should follow the last precalculated one.
                     const int resultNodeDepth = resultNode->depth();
                     const int endNodeDepth = game.lastPrecalculatedNode()->depth();
-                    Assert(resultNodeDepth == endNodeDepth + 1);
                     if (resultNodeDepth == endNodeDepth + 1)
                     {
                         game.lastPrecalculatedNode()->addChild(resultNode);
                     }
                     else
                     {
-                        LogError("The computer generated move does not have the correct depth.");
+                        LogWarning("Computer is TOO SLOW!!");
                     }
                 }
+                else
+                {
+                    // Game over. Too bad.
+                    return;
+                }                
+
+                // Once the computer has finished it's job we destroy the object.
                 mComputerPlayer.reset();
             }
-            // Check if there is the danger of crashing the current block.
-            else if (game.numPrecalculatedMoves() == 0 && calculateRemainingTimeMs(game) < 1500)
+        }
+        else
+        {
+            int searchDepth = mSearchDepth ? XULWin::String2Int(mSearchDepth->getValue(), cDefaultSearchDepth) : cDefaultSearchDepth;
+            GameStateNode * endNode = game.lastPrecalculatedNode();
+            Assert(!endNode->state().isGameOver());
+
+            int numPrecalculated = endNode->depth() - game.currentNode()->depth();
+            if (numPrecalculated + searchDepth <= 3 * cMaxSearchDepth)
             {
-                mComputerPlayer->stop();
+                Assert(!mComputerPlayer);
+
+                //
+                // Clone the starting node
+                //
+                std::auto_ptr<GameStateNode> endNode = game.lastPrecalculatedNode()->clone();
+                Assert(endNode->children().empty());
+                Assert(endNode->depth() >= game.currentNode()->depth());
+
+
+                //
+                // Create the list of future blocks
+                //
+                BlockTypes futureBlocks;
+                game.getFutureBlocksWithOffset(endNode->depth(), searchDepth, futureBlocks);
+
+
+                //
+                // Fill the Widths vector (use the same width for each level).
+                //
+                Widths widths;
+                int searchWidth = mSearchWidth ? XULWin::String2Int(mSearchWidth->getValue(), cDefaultSearchWidth)
+                                               : cDefaultSearchWidth;
+                for (size_t idx = 0; idx != futureBlocks.size(); ++idx)
+                {
+                    widths.push_back(searchWidth);
+                }
+
+
+                //
+                // Create and start the ComputerPlayer.
+                //
+                Assert(mWorkerPool->stats().activeWorkerCount == 0);
+                mComputerPlayer.reset(new ComputerPlayerMt(mWorkerPool, endNode, futureBlocks, widths, mEvaluator->clone()));
+                mComputerPlayer->start();
             }
+            // else: we have plenty of precalculated nodes. Do nothing for know.
         }
 
 
@@ -640,19 +652,6 @@ namespace Tetris
         if (mTotalLinesTextBox)
         {
             setText(mTotalLinesTextBox, MakeString() << game.currentNode()->state().stats().numLines());
-        }
-
-
-        if (!game.isGameOver() && !mComputerPlayer && (!mComputerEnabledCheckBox || mComputerEnabledCheckBox->isChecked()))
-        {
-            int searchDepth = mSearchDepth ? XULWin::String2Int(mSearchDepth->getValue(), cDefaultSearchDepth) : cDefaultSearchDepth;
-            GameStateNode * endNode = game.lastPrecalculatedNode();
-            if (!endNode->state().isGameOver() &&
-                endNode->depth() - game.currentNode()->depth() + searchDepth <= 3 * cMaxSearchDepth)
-            {
-                int searchWidth = mSearchWidth ? XULWin::String2Int(mSearchWidth->getValue(), cDefaultSearchWidth) : cDefaultSearchWidth;
-                startAI(game, searchDepth, searchWidth);
-            }
         }
 
         if (mCurrentSearchDepth && mComputerPlayer)

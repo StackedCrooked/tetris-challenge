@@ -36,8 +36,6 @@ namespace Tetris
 
         void stop();
 
-        bool isFinished() const;
-
         int getCurrentSearchDepth() const;
 
         int getMaxSearchDepth() const;
@@ -109,6 +107,7 @@ namespace Tetris
         mutable boost::mutex mStatusMutex;
 
         boost::shared_ptr<Worker> mWorker;
+        bool mDestroyedInferiorChildren; // just for testing
     };
 
 } // namespace Tetris

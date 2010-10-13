@@ -100,7 +100,6 @@ namespace Tetris
         void setText(XULWin::StringValueController * inComponent, const std::string & inText);
 
         int calculateRemainingTimeMs(Game & game) const;
-        void startAI(Game & game, size_t inDepth, size_t inWidth);
 
         LRESULT onNew(WPARAM wParam, LPARAM lParam);
         LRESULT onShowConsole(WPARAM wParam, LPARAM lParam);
@@ -124,7 +123,6 @@ namespace Tetris
         XULWin::TextBox * mTotalLinesTextBox;
         XULWin::TextBox * mScoreTextBox;
         XULWin::TextBox * mLevelTextBox;
-        XULWin::CheckBox * mComputerEnabledCheckBox;
         XULWin::TextBox * mCurrentSearchDepth;
         XULWin::SpinButton * mMovementSpeed;
         XULWin::TextBox * mStatusTextBox;
