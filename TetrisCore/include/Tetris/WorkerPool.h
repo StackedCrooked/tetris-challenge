@@ -37,6 +37,20 @@ namespace Tetris
         
         // Interrupts all workers.
         void interruptAndClearQueue();
+        
+        struct Stats
+        {
+            Stats(int inActiveWorkerCount, int inTotalWorkerCount) :
+                activeWorkerCount(inActiveWorkerCount),
+                totalWorkerCount(inTotalWorkerCount)
+            {
+            }
+
+            int activeWorkerCount;
+            int totalWorkerCount;
+        };
+
+        Stats stats() const;
 
     private:        
         void interruptRange(size_t inBegin, size_t inCount);
