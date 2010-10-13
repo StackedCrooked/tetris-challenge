@@ -68,9 +68,18 @@ namespace Tetris
                     if (resultNode->depth() == clonedGame.lastPrecalculatedNode()->depth() + 1)
                     {
                         const int resultNodeDepth = resultNode->depth();
-                        GameStateNode * endNode(clonedGame.lastPrecalculatedNode());
-                        Assert(endNode->depth() + 1 == resultNodeDepth);
-                        endNode->addChild(resultNode);
+
+                        //
+                        // TODO:
+                        //
+                        // Use *real* game object here and detect any sync errors.
+                        //
+                        //
+
+                        // GameStateNode * endNode(clonedGame.lastPrecalculatedNode());
+                        // Assert(endNode->depth() + 1 == resultNodeDepth);
+                        // endNode->addChild(resultNode);
+
                     }
                     else
                     {
