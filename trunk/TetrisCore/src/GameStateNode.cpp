@@ -51,8 +51,8 @@ namespace Tetris
     std::auto_ptr<GameStateNode> GameStateNode::clone() const
     {
         NodePtr parent = mParent.lock();
-        std::auto_ptr<GameStateNode> result(parent ? new GameStateNode(parent, std::auto_ptr<GameState>(new GameState(*mGameState)), mEvaluator->clone())
-                                            : new GameStateNode(std::auto_ptr<GameState>(new GameState(*mGameState)), mEvaluator->clone()));
+        std::auto_ptr<GameStateNode> result(parent ? new GameStateNode(parent, Create<GameState>(*mGameState), mEvaluator->clone())
+                                                   : new GameStateNode(Create<GameState>(*mGameState), mEvaluator->clone()));
         result->mDepth = mDepth;
 
         ChildNodes::const_iterator it = mChildren.begin(), end = mChildren.end();
