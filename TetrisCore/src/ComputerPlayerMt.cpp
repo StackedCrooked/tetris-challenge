@@ -127,7 +127,7 @@ namespace Tetris
                 const ComputerPlayerInfo & compInfo = mComputerPlayers[idx];
                 Assert(compInfo.mMoveCalculator->status() == ConcreteMoveCalculator::Status_Finished);
                 NodePtr compResult = compInfo.mMoveCalculator->result();
-                if (!result || compResult->endNode()->state().quality() > result->state().quality())
+                if (!result || compResult->endNode()->state().quality(*mEvaluator) > result->state().quality(*mEvaluator))
                 {
                     Assert(compInfo.mChildNode->children().empty());
                     compInfo.mChildNode->children().insert(compResult);
