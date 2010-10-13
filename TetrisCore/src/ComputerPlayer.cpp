@@ -11,11 +11,13 @@
 namespace Tetris
 {
 
-    ComputerPlayer::ComputerPlayer(boost::shared_ptr<Worker> inWorker,
-                                   std::auto_ptr<GameStateNode> inNode,
-                                   const BlockTypes & inBlockTypes,
-                                   const Widths & inWidths,
-                                   std::auto_ptr<Evaluator> inEvaluator) :
+
+    ConcreteMoveCalculator::ConcreteMoveCalculator(boost::shared_ptr<Worker> inWorker,
+                                                   std::auto_ptr<GameStateNode> inNode,
+                                                   const BlockTypes & inBlockTypes,
+                                                   const Widths & inWidths,
+                                                   std::auto_ptr<Evaluator> inEvaluator) :
+        MoveCalculator(),
         mLayers(inBlockTypes.size()),
         mCompletedSearchDepth(0),
         mNode(inNode.release()),
@@ -32,27 +34,27 @@ namespace Tetris
     }
 
 
-    ComputerPlayer::~ComputerPlayer()
+    ConcreteMoveCalculator::~ConcreteMoveCalculator()
     {
         mWorker->interruptAndClearQueue();
     }
 
 
-    void ComputerPlayer::getLayerData(int inIndex, LayerData & outLayerData)
+    void ConcreteMoveCalculator::getLayerData(int inIndex, LayerData & outLayerData)
     {
         boost::mutex::scoped_lock lock(mLayersMutex);
         outLayerData = mLayers[inIndex];
     }
 
 
-    int ComputerPlayer::getCurrentSearchDepth() const
+    int ConcreteMoveCalculator::getCurrentSearchDepth() const
     {
         boost::mutex::scoped_lock lock(mCompletedSearchDepthMutex);
         return mCompletedSearchDepth;
     }
 
 
-    void ComputerPlayer::setCurrentSearchDepth(int inDepth)
+    void ConcreteMoveCalculator::setCurrentSearchDepth(int inDepth)
     {
         boost::mutex::scoped_lock lock(mCompletedSearchDepthMutex);
         if (inDepth > mCompletedSearchDepth)
@@ -62,13 +64,13 @@ namespace Tetris
     }
 
 
-    int ComputerPlayer::getMaxSearchDepth() const
+    int ConcreteMoveCalculator::getMaxSearchDepth() const
     {
         return mWidths.size();
     }
 
 
-    NodePtr ComputerPlayer::result() const
+    NodePtr ConcreteMoveCalculator::result() const
     {
         Assert(status() == Status_Finished);
 
@@ -89,21 +91,21 @@ namespace Tetris
     }
 
 
-    ComputerPlayer::Status ComputerPlayer::status() const
+    MoveCalculator::Status ConcreteMoveCalculator::status() const
     {
         boost::mutex::scoped_lock lock(mStatusMutex);
         return mStatus;
     }
 
 
-    void ComputerPlayer::setStatus(Status inStatus)
+    void ConcreteMoveCalculator::setStatus(Status inStatus)
     {
         boost::mutex::scoped_lock lock(mStatusMutex);
         mStatus = inStatus;
     }
 
 
-    void ComputerPlayer::updateLayerData(size_t inIndex, NodePtr inNodePtr, size_t inCount)
+    void ConcreteMoveCalculator::updateLayerData(size_t inIndex, NodePtr inNodePtr, size_t inCount)
     {
         boost::mutex::scoped_lock lock(mLayersMutex);
         LayerData & layerData = mLayers[inIndex];
@@ -115,7 +117,7 @@ namespace Tetris
     }
 
 
-    void ComputerPlayer::populateNodesRecursively(
+    void ConcreteMoveCalculator::populateNodesRecursively(
         NodePtr ioNode,
         const BlockTypes & inBlockTypes,
         const Widths & inWidths,
@@ -183,7 +185,7 @@ namespace Tetris
     }
 
 
-    void ComputerPlayer::markTreeRowAsFinished(size_t inIndex)
+    void ConcreteMoveCalculator::markTreeRowAsFinished(size_t inIndex)
     {
         setCurrentSearchDepth(inIndex + 1);
         boost::mutex::scoped_lock lock(mLayersMutex);
@@ -191,7 +193,7 @@ namespace Tetris
     }
 
 
-    void ComputerPlayer::populate()
+    void ConcreteMoveCalculator::populate()
     {
         try
         {
@@ -212,12 +214,12 @@ namespace Tetris
         }
         catch (const std::exception & inException)
         {
-            LogError(MakeString() << "Exception caught in ComputerPlayer::populate(). Detail: " << inException.what());
+            LogError(MakeString() << "Exception caught in ConcreteMoveCalculator::populate(). Detail: " << inException.what());
         }
     }
 
 
-    void ComputerPlayer::destroyInferiorChildren()
+    void ConcreteMoveCalculator::destroyInferiorChildren()
     {
         Assert(!mDestroyedInferiorChildren);
         size_t reachedDepth = getCurrentSearchDepth();
@@ -235,7 +237,7 @@ namespace Tetris
     }
 
 
-    void ComputerPlayer::stop()
+    void ConcreteMoveCalculator::stop()
     {
         if (status() == Status_Started || status() == Status_Working)
         {
@@ -245,7 +247,7 @@ namespace Tetris
     }
 
 
-    void ComputerPlayer::startImpl()
+    void ConcreteMoveCalculator::startImpl()
     {
         // Thread entry point has try/catch block
         try
@@ -262,11 +264,11 @@ namespace Tetris
     }
 
 
-    void ComputerPlayer::start()
+    void ConcreteMoveCalculator::start()
     {
         boost::mutex::scoped_lock lock(mStatusMutex);
         Assert(mStatus == Status_Nil);
-        mWorker->schedule(boost::bind(&ComputerPlayer::startImpl, this));
+        mWorker->schedule(boost::bind(&ConcreteMoveCalculator::startImpl, this));
         mStatus = Status_Started;
     }
 
