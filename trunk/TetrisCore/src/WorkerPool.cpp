@@ -106,5 +106,21 @@ namespace Tetris
         boost::mutex::scoped_lock workersLock(mWorkersMutex);
         interruptRange(0, mWorkers.size());
     }
+    
+    
+    WorkerPool::Stats WorkerPool::stats() const
+    {
+        boost::mutex::scoped_lock workersLock(mWorkersMutex);
+        int activeWorkerCount = 0;
+        for (size_t idx = 0; idx != mWorkers.size(); ++idx)
+        {
+            Worker & worker = *mWorkers[idx];
+            if (worker.status() == Worker::Status_Working)
+            {
+                activeWorkerCount++;
+            }
+        }
+        return Stats(activeWorkerCount, mWorkers.size());
+    }
 
 } // namespace Tetris
