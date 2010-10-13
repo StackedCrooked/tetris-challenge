@@ -21,37 +21,77 @@ namespace Tetris
     typedef std::vector<int> Widths;
 
 
-    class ComputerPlayer : boost::noncopyable
+    class MoveCalculator : boost::noncopyable
     {
     public:
-        ComputerPlayer(boost::shared_ptr<Worker> inWorker,
-                       std::auto_ptr<GameStateNode> inNode,
-                       const BlockTypes & inBlockTypes,
-                       const Widths & inWidths,
-                       std::auto_ptr<Evaluator> inEvaluator);
+        virtual ~MoveCalculator() = 0 {}
 
-        ~ComputerPlayer();
+        virtual void start() = 0;
 
-        void start();
+        virtual void stop() = 0;
 
-        void stop();
+        virtual int getCurrentSearchDepth() const = 0;
 
-        int getCurrentSearchDepth() const;
-
-        int getMaxSearchDepth() const;
-
-        NodePtr result() const;
+        virtual int getMaxSearchDepth() const = 0;
 
         enum Status
         {
-            Status_Nil,
+            Status_Begin,
+            Status_Nil = Status_Begin,
             Status_Started,
             Status_Working,
             Status_Stopped,
-            Status_Finished
+            Status_Finished,
+            Status_End
         };
+        
+        virtual Status status() const = 0;
 
-        Status status() const;
+        virtual NodePtr result() const = 0;
+    };
+
+
+    class CompositeMoveCalculator : public MoveCalculator
+    {
+    public:
+        virtual ~CompositeMoveCalculator() = 0 {}
+
+        virtual void start() = 0;
+
+        virtual void stop() = 0;
+
+        virtual int getCurrentSearchDepth() const = 0;
+
+        virtual int getMaxSearchDepth() const = 0;
+
+        virtual NodePtr result() const = 0;
+
+        MoveCalculator::Status status() const = 0;
+    };
+
+
+    class ConcreteMoveCalculator : public MoveCalculator
+    {
+    public:
+        ConcreteMoveCalculator(boost::shared_ptr<Worker> inWorker,
+                               std::auto_ptr<GameStateNode> inNode,
+                               const BlockTypes & inBlockTypes,
+                               const Widths & inWidths,
+                               std::auto_ptr<Evaluator> inEvaluator);
+
+        virtual ~ConcreteMoveCalculator();
+
+        virtual void start();
+
+        virtual void stop();
+
+        virtual int getCurrentSearchDepth() const;
+
+        virtual int getMaxSearchDepth() const;
+
+        virtual NodePtr result() const;
+
+        MoveCalculator::Status status() const;
 
         // LayerData contains the accumulated data for all branches at a same depth.
         struct LayerData
@@ -103,7 +143,7 @@ namespace Tetris
         Widths mWidths;
         boost::scoped_ptr<Evaluator> mEvaluator;
 
-        Status mStatus;
+        MoveCalculator::Status mStatus;
         mutable boost::mutex mStatusMutex;
 
         boost::shared_ptr<Worker> mWorker;

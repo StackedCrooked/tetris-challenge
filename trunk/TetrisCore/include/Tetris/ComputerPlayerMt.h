@@ -15,51 +15,51 @@ namespace Tetris
     class Evaluator;
     class WorkerPool;
 
-    class ComputerPlayerMt
+    class MoveCalculatorMt : public CompositeMoveCalculator
     {
     public:
-        ComputerPlayerMt(boost::shared_ptr<WorkerPool> inWorkerPool,
+        MoveCalculatorMt(boost::shared_ptr<WorkerPool> inWorkerPool,
                          std::auto_ptr<GameStateNode> inNode,
                          const BlockTypes & inBlockTypes,
                          const std::vector<int> & inWidths,
                          std::auto_ptr<Evaluator> inEvaluator);
 
-        ~ComputerPlayerMt();
+        virtual ~MoveCalculatorMt();
         
-        void start();
+        virtual void start();
 
-        void stop();
+        virtual void stop();
 
-        bool isFinished() const;
+        virtual int getCurrentSearchDepth() const;
 
-        int getCurrentSearchDepth() const;
+        virtual int getMaxSearchDepth() const;
 
-        int getMaxSearchDepth() const;
+        virtual MoveCalculator::Status status() const;
 
-        NodePtr result() const;
+        virtual NodePtr result() const;
 
     private:
         ChildNodes getLayer1Nodes(BlockType inBlockType, size_t inWidth) const;
 
-        int mMaxSearchDepth;
         NodePtr mRootNode;
-        typedef boost::shared_ptr<ComputerPlayer> ComputerPlayerPtr;
+        int mMaxSearchDepth;
+        
+        typedef boost::shared_ptr<ConcreteMoveCalculator> MoveCalculatorPtr;
         struct ComputerPlayerInfo
         {
-            ComputerPlayerInfo(NodePtr inChildNode, ComputerPlayerPtr inComputerPlayerPtr) :
+            ComputerPlayerInfo(NodePtr inChildNode, MoveCalculatorPtr inComputerPlayerPtr) :
                 mChildNode(inChildNode),
-                mComputerPlayer(inComputerPlayerPtr)
+                mMoveCalculator(inComputerPlayerPtr)
             {
             }
             NodePtr mChildNode;
-            ComputerPlayerPtr mComputerPlayer;
+            MoveCalculatorPtr mMoveCalculator;
         };
 
         std::vector<ComputerPlayerInfo> mComputerPlayers;
-        boost::shared_ptr<WorkerPool> mWorkerPool;
         boost::scoped_ptr<Evaluator> mEvaluator;
-        mutable NodePtr mResult;
-        mutable bool mFinished;
+        boost::shared_ptr<WorkerPool> mWorkerPool;
+        mutable NodePtr mCachedResult;
     };
 
 } // namespace Tetris

@@ -20,17 +20,17 @@ namespace Tetris
         return T(inValue.begin() + 1, inValue.end());
     }
 
-    ComputerPlayerMt::ComputerPlayerMt(boost::shared_ptr<WorkerPool> inWorkerPool, 
+    MoveCalculatorMt::MoveCalculatorMt(boost::shared_ptr<WorkerPool> inWorkerPool, 
                                        std::auto_ptr<GameStateNode> inNode,
                                        const BlockTypes & inBlockTypes,
                                        const std::vector<int> & inWidths,
                                        std::auto_ptr<Evaluator> inEvaluator) :
-        mMaxSearchDepth(inWidths.size()),
+        CompositeMoveCalculator(),
         mRootNode(inNode.release()),
+        mMaxSearchDepth(inWidths.size()),
         mComputerPlayers(),
-        mWorkerPool(inWorkerPool),
         mEvaluator(inEvaluator.release()),
-        mFinished(false)
+        mWorkerPool(inWorkerPool)
     {   
         ChildNodes layer1Nodes(getLayer1Nodes(inBlockTypes[0], inWidths[0]));
         ChildNodes::iterator it = layer1Nodes.begin(), end = layer1Nodes.end();
@@ -38,23 +38,24 @@ namespace Tetris
         {
             NodePtr childNode(*it);
             Assert(childNode->children().empty());
-            mComputerPlayers.push_back(ComputerPlayerInfo(childNode,
-                                                          ComputerPlayerPtr(new ComputerPlayer(inWorkerPool->getWorker(),
-                                                                                               childNode->clone(),
-                                                                                               DropFirst(inBlockTypes),
-                                                                                               DropFirst(inWidths),
-                                                                                               mEvaluator->clone()))));
+            MoveCalculatorPtr calc(new ConcreteMoveCalculator(inWorkerPool->getWorker(),
+                                                              childNode->clone(),
+                                                              DropFirst(inBlockTypes),
+                                                              DropFirst(inWidths),
+                                                              mEvaluator->clone()));
+            ComputerPlayerInfo compInfo(childNode, calc);
+            mComputerPlayers.push_back(compInfo);
         }
     }
 
 
-    ComputerPlayerMt::~ComputerPlayerMt()
+    MoveCalculatorMt::~MoveCalculatorMt()
     {
         mWorkerPool->interruptAndClearQueue();
     }
 
 
-    ChildNodes ComputerPlayerMt::getLayer1Nodes(BlockType inBlockType, size_t inWidth) const
+    ChildNodes MoveCalculatorMt::getLayer1Nodes(BlockType inBlockType, size_t inWidth) const
     {   
         ChildNodes result(GameStateComparisonFunctor(mEvaluator->clone()));
         ChildNodes generatedChildNodes(GameStateComparisonFunctor(mEvaluator->clone()));
@@ -72,31 +73,27 @@ namespace Tetris
     }
 
 
-    bool ComputerPlayerMt::isFinished() const
+    MoveCalculator::Status MoveCalculatorMt::status() const
     {
-        if (!mFinished)
+        Status result = static_cast<Status>(Status_End - 1);
+        for (size_t idx = 0; idx != mComputerPlayers.size(); ++idx)
         {
-            bool finished = true;
-            for (size_t idx = 0; idx != mComputerPlayers.size(); ++idx)
+            Status compStatus = mComputerPlayers[idx].mMoveCalculator->status();
+            if (compStatus < result)
             {
-                if (mComputerPlayers[idx].mComputerPlayer->status() != ComputerPlayer::Status_Finished)
-                {
-                    finished = false;
-                    break;
-                }
+                result = compStatus;
             }
-            mFinished = finished;
         }
-        return mFinished;
+        return result;
     }
 
 
-    int ComputerPlayerMt::getCurrentSearchDepth() const
+    int MoveCalculatorMt::getCurrentSearchDepth() const
     {
         int result = 0;
         for (size_t idx = 0; idx != mComputerPlayers.size(); ++idx)
         {
-            int currentDepth = 1 + mComputerPlayers[idx].mComputerPlayer->getCurrentSearchDepth();
+            int currentDepth = 1 + mComputerPlayers[idx].mMoveCalculator->getCurrentSearchDepth();
             if (idx == 0)
             {
                 result = currentDepth;
@@ -110,16 +107,16 @@ namespace Tetris
     }
 
 
-    int ComputerPlayerMt::getMaxSearchDepth() const
+    int MoveCalculatorMt::getMaxSearchDepth() const
     {
         return mMaxSearchDepth;
     }
 
 
-    NodePtr ComputerPlayerMt::result() const
+    NodePtr MoveCalculatorMt::result() const
     {
-        Assert(isFinished());
-        if (!mResult)
+        Assert(status() == Status_Finished);
+        if (!mCachedResult)
         {
             Assert(mRootNode->children().empty());
             NodePtr result;
@@ -128,8 +125,8 @@ namespace Tetris
             for (size_t idx = 0; idx != mComputerPlayers.size(); ++idx)
             {
                 const ComputerPlayerInfo & compInfo = mComputerPlayers[idx];
-                Assert(compInfo.mComputerPlayer->status() == ComputerPlayer::Status_Finished);
-                NodePtr compResult = compInfo.mComputerPlayer->result();
+                Assert(compInfo.mMoveCalculator->status() == ConcreteMoveCalculator::Status_Finished);
+                NodePtr compResult = compInfo.mMoveCalculator->result();
                 if (!result || compResult->endNode()->state().quality() > result->state().quality())
                 {
                     Assert(compInfo.mChildNode->children().empty());
@@ -138,27 +135,28 @@ namespace Tetris
                     selected = idx;
                 }
             }
-            mResult = result;
+            mCachedResult = result;
         }
-        return mResult;
+        return mCachedResult;
     }
 
 
-    void ComputerPlayerMt::stop()
+    void MoveCalculatorMt::stop()
     {
+        LogInfo(MakeString() << "MoveCalculatorMt::stop(). Search depth: " << getCurrentSearchDepth() << "/" << getMaxSearchDepth());
         mWorkerPool->interruptAndClearQueue();
         for (size_t idx = 0; idx != mComputerPlayers.size(); ++idx)
         {
-            mComputerPlayers[idx].mComputerPlayer->stop();
+            mComputerPlayers[idx].mMoveCalculator->stop();
         }
     }
 
 
-    void ComputerPlayerMt::start()
+    void MoveCalculatorMt::start()
     {
         for (size_t idx = 0; idx != mComputerPlayers.size(); ++idx)
         {
-            mComputerPlayers[idx].mComputerPlayer->start();
+            mComputerPlayers[idx].mMoveCalculator->start();
         }
     }
 
