@@ -23,7 +23,8 @@ namespace Tetris
         mWidths(inWidths),
         mEvaluator(inEvaluator.release()),
         mStatus(Status_Nil),
-        mWorker(inWorker)
+        mWorker(inWorker),
+        mDestroyedInferiorChildren(false)
     {
         Assert(!mNode->state().isGameOver());
         Assert(mNode->children().empty());
@@ -41,12 +42,6 @@ namespace Tetris
     {
         boost::mutex::scoped_lock lock(mLayersMutex);
         outLayerData = mLayers[inIndex];
-    }
-
-
-    bool ComputerPlayer::isFinished() const
-    {
-        return status() == Status_Finished;
     }
 
 
@@ -75,18 +70,19 @@ namespace Tetris
 
     NodePtr ComputerPlayer::result() const
     {
-        if (status() != Status_Finished)
-        {
-            throw std::logic_error("ComputerPlayer::result() was called while not yet finished.");
-        }
+        Assert(status() == Status_Finished);
 
         boost::mutex::scoped_lock lock(mNodeMutex);
-        if (mNode->children().empty())
-        {
-            throw std::runtime_error("The computer player failed to generate any results.");
-        }
+        
+        // Impossible since the thread interruption point is
+        // not triggered before search depth 1 is complete.
+        Assert(!mNode->children().empty());
 
         size_t numChildren = mNode->children().size();
+
+        // DestroyInferiorChildren should
+        // have taken care of this.
+        Assert(mDestroyedInferiorChildren);
         Assert(numChildren == 1);
 
         return *mNode->children().begin();
@@ -213,7 +209,7 @@ namespace Tetris
         catch (const boost::thread_interrupted &)
         {
             // Task was interrupted. Ok.
-            LogInfo(MakeString() << "ComputerPlayer was interrupted at search depth: " << getCurrentSearchDepth() << "/" << mBlockTypes.size());
+            LogInfo(MakeString() << mWorker->name() << " was interrupted at search depth: " << getCurrentSearchDepth() << "/" << mBlockTypes.size());
         }
         catch (const std::exception & inException)
         {
@@ -224,6 +220,7 @@ namespace Tetris
 
     void ComputerPlayer::destroyInferiorChildren()
     {
+        Assert(!mDestroyedInferiorChildren);
         size_t reachedDepth = getCurrentSearchDepth();
         Assert(reachedDepth >= 1);
 
@@ -234,6 +231,8 @@ namespace Tetris
         boost::mutex::scoped_lock nodeLock(mNodeMutex);
         Assert((reachedDepth - 1) < mLayers.size());
         CarveBestPath(mNode, mLayers[reachedDepth - 1].mBestChild);
+        Assert(mNode->children().size() == 1);
+        mDestroyedInferiorChildren = true;
     }
 
 

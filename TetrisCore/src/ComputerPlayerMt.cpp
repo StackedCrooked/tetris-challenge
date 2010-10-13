@@ -76,16 +76,16 @@ namespace Tetris
     {
         if (!mFinished)
         {
-            size_t idx = 0;
-            size_t numComputers = mComputerPlayers.size();
-            for (; idx != numComputers; ++idx)
+            bool finished = true;
+            for (size_t idx = 0; idx != mComputerPlayers.size(); ++idx)
             {
-                if (!mComputerPlayers[idx].mComputerPlayer->isFinished())
+                if (mComputerPlayers[idx].mComputerPlayer->status() != ComputerPlayer::Status_Finished)
                 {
+                    finished = false;
                     break;
                 }
             }
-            mFinished = (idx == numComputers);
+            mFinished = finished;
         }
         return mFinished;
     }
@@ -118,6 +118,7 @@ namespace Tetris
 
     NodePtr ComputerPlayerMt::result() const
     {
+        Assert(isFinished());
         if (!mResult)
         {
             Assert(mRootNode->children().empty());
@@ -127,6 +128,7 @@ namespace Tetris
             for (size_t idx = 0; idx != mComputerPlayers.size(); ++idx)
             {
                 const ComputerPlayerInfo & compInfo = mComputerPlayers[idx];
+                Assert(compInfo.mComputerPlayer->status() == ComputerPlayer::Status_Finished);
                 NodePtr compResult = compInfo.mComputerPlayer->result();
                 if (!result || compResult->endNode()->state().quality() > result->state().quality())
                 {
@@ -144,6 +146,7 @@ namespace Tetris
 
     void ComputerPlayerMt::stop()
     {
+        mWorkerPool->interruptAndClearQueue();
         for (size_t idx = 0; idx != mComputerPlayers.size(); ++idx)
         {
             mComputerPlayers[idx].mComputerPlayer->stop();
