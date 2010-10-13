@@ -20,6 +20,7 @@
 #include "XULWin/Window.h"
 #include "Poco/DateTime.h"
 #include "Poco/DateTimeFormatter.h"
+#include "Poco/Environment.h"
 #include <boost/lexical_cast.hpp>
 #include <iostream>
 
@@ -62,7 +63,12 @@ namespace Tetris
         mComputerPlayer(),
         mBlockMover(),
         mEvaluator(new Balanced),
+        #ifdef _DEBUG
+        // Console shown by default
+        mConsoleVisible(true),
+        #else
         mConsoleVisible(false),
+        #endif
         mWorkerPool()
     {
         //
@@ -98,7 +104,11 @@ namespace Tetris
         
         
         // Initialize worker pool after the logger.
-        mWorkerPool.reset(new WorkerPool("Tetris Workers", 6));
+        // On multicore systems the number of workers is equal to the number of CPUs minus one.
+        // On a single core system we use one worker.
+        mWorkerPool.reset(new WorkerPool("Tetris Workers", std::max<int>(1, Poco::Environment::processorCount() - 1)));
+        LogInfo(MakeString() << "AI has been granted a pool of " << mWorkerPool->size() << " threads.");
+
 
         //
         // Get the Tetris component.
@@ -534,7 +544,7 @@ namespace Tetris
             //
             // Create and start the ComputerPlayer.
             //
-            //mWorkerPool->interruptAll();
+            mWorkerPool->interruptAndClearQueue();
             mComputerPlayer.reset(new ComputerPlayerMt(mWorkerPool, endNode, futureBlocks, widths, mEvaluator->clone()));
             mComputerPlayer->start();
         }
