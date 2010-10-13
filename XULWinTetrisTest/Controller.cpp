@@ -238,10 +238,10 @@ namespace Tetris
             mScopedEventListener.connect(mStrategiesMenuList->el(), boost::bind(&Controller::onStrategySelected, this, _1, _2));
         }
 
-        if (mClearPrecalculatedButton = findComponentById<XULWin::Button>("clearPrecalculatedButton"))
-        {
-            mScopedEventListener.connect(mClearPrecalculatedButton->el(), boost::bind(&Controller::onClearPrecalculated, this, _1, _2));
-        }
+        //if (mClearPrecalculatedButton = findComponentById<XULWin::Button>("clearPrecalculatedButton"))
+        //{
+        //    mScopedEventListener.connect(mClearPrecalculatedButton->el(), boost::bind(&Controller::onClearPrecalculated, this, _1, _2));
+        //}
 
         mGameHeightFactor = findComponentById<XULWin::SpinButton>("gameHeightFactor");
         mLastBlockHeightFactor = findComponentById<XULWin::SpinButton>("lastBlockHeightFactor");
