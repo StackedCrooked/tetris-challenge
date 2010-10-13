@@ -24,12 +24,14 @@ namespace Tetris
      *
      * It is the class that needs to be exposed to the client.
      */
-    class Game : boost::noncopyable
+    class Game
     {
     public:
         Game(size_t inNumRows, size_t inNumColumns);
 
         ~Game();
+
+        std::auto_ptr<Game> clone();
 
         int numRows() const;
 
@@ -79,6 +81,12 @@ namespace Tetris
         bool navigateNodeDown();
 
     private:
+        // implemented for the clone() method
+        Game(const Game & inGame);
+
+        // not allowed
+        Game & operator=(const Game&);
+
         void setCurrentNode(NodePtr inCurrentNode);
 
         void supplyBlocks() const;

@@ -55,6 +55,39 @@ namespace Tetris
             throw std::logic_error("Failed to find the current node. Childnodes require cleanup first.");
         }
     }
+    
+    
+    Game::Game(const Game & inGame) :
+        mNumRows(inGame.mNumRows),
+        mNumColumns(inGame.mNumColumns),
+        mCurrentNode(inGame.mCurrentNode->clone()),
+        mActiveBlock(new Block(*inGame.mActiveBlock)),
+        mBlockFactory(), // YES! Because we must be CERTAIN that getFutureBlocks() will always return the same result.
+                         //      The clone method will provide us with 100 precalculated blocks. After that this clone
+                         //      becomes invalid. A runtime_exception will thrown the next time mBlockFactory will be
+                         //      accessed.
+        mBlocks(inGame.mBlocks),
+        mCurrentBlockIndex(inGame.mCurrentBlockIndex)
+    {
+    }
+
+
+    std::auto_ptr<Game> Game::clone()
+    {
+        if (!mBlockFactory)
+        {
+            throw std::runtime_error("You cannot clone a Game that was already cloned.");
+        }
+
+
+        // Make sure we have 100 blocks from the factory.
+        // This ensures 
+        while (mCurrentBlockIndex + 100 > mBlocks.size())
+        {
+            mBlocks.push_back(mBlockFactory->getNext());
+        }
+        return std::auto_ptr<Game>(new Game(*this));
+    }
 
 
     Game::~Game()
@@ -76,6 +109,11 @@ namespace Tetris
 
     void Game::reserveBlocks(size_t inCount)
     {
+        if (!mBlockFactory && (mBlocks.size() < inCount))
+        {
+            throw std::runtime_error("This is a cloned Game object and its number of future blocks is depleted.");
+        }
+
         while (mBlocks.size() < inCount)
         {
             mBlocks.push_back(mBlockFactory->getNext());
@@ -91,6 +129,11 @@ namespace Tetris
 
     void Game::supplyBlocks() const
     {
+        if (!mBlockFactory && (mCurrentBlockIndex >= mBlocks.size()))
+        {
+            throw std::runtime_error("This is a cloned Game object and its number of future blocks is depleted.");
+        }
+
         while (mCurrentBlockIndex >= mBlocks.size())
         {
             mBlocks.push_back(mBlockFactory->getNext());
@@ -114,6 +157,10 @@ namespace Tetris
 
     void Game::getFutureBlocks(size_t inCount, BlockTypes & outBlocks) const
     {
+        if (!mBlockFactory && (mBlocks.size() < mCurrentBlockIndex + inCount))
+        {
+            throw std::runtime_error("This is a cloned Game object and its number of future blocks is depleted.");
+        }
 
         // Make sure we have all blocks we need.
         while (mBlocks.size() < mCurrentBlockIndex + inCount)
@@ -129,7 +176,13 @@ namespace Tetris
 
 
     void Game::getFutureBlocksWithOffset(size_t inOffset, size_t inCount, BlockTypes & outBlocks) const
-    {
+    {        
+        if (!mBlockFactory && (mBlocks.size() < inOffset + inCount))
+        {
+            throw std::runtime_error("This is a cloned Game object and its number of future blocks is depleted.");
+        }
+
+
         // Make sure we have all blocks we need.
         while (mBlocks.size() < inOffset + inCount)
         {

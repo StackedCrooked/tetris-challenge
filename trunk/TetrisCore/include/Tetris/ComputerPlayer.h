@@ -15,10 +15,37 @@
 namespace Tetris
 {
 
-
+    class BlockMover;
+    class Game;
     class GameStateNode;
+    class Gravity;
     class Worker;
+    class WorkerPool;
     typedef std::vector<int> Widths;
+    class MoveCalculator;
+
+
+    class ComputerPlayer
+    {
+    public:
+        ComputerPlayer(Protected<Game> inProtectedGame);
+
+        void runImpl();
+
+
+    private:
+        int calculateRemainingTimeMs(Game & game) const;
+
+        boost::shared_ptr<WorkerPool> mWorkerPool;
+        Protected<Game> mProtectedGame;
+        boost::scoped_ptr<MoveCalculator> mMoveCalculator;
+        boost::scoped_ptr<Gravity> mGravity;
+        boost::scoped_ptr<BlockMover> mBlockMover;
+        boost::scoped_ptr<Evaluator> mEvaluator;
+        int mCurrentSearchDepth;
+        int mMaxSearchDepth;
+        int mSearchWidth;
+    };
 
 
     class MoveCalculator : boost::noncopyable
