@@ -533,13 +533,50 @@ namespace Tetris
 
         // Flush the logger.
         Logger::Instance().flush();
-
-        ScopedAtom<Game> wgame(*mProtectedGame);
-        Game & game = *(wgame.get());
-        if (game.isGameOver())
+    
+        class GameStats
         {
-            setText(mStatusTextBox, "Game Over!");
-            return;
+        public:
+            GameStats(Game & game) :
+                mNumPrecalculatedMoves(game.numPrecalculatedMoves()),
+                mCurrentNode(game.currentNode()->clone()),
+                mEndNode(mCurrentNode->endNode()->clone())
+            {
+            }
+
+            inline int numPrecalculatedMoves() const
+            { return mNumPrecalculatedMoves; }
+
+            const GameStateNode * currentNode() const
+            { return mCurrentNode.get(); }
+
+            GameStateNode * currentNode()
+            { return mCurrentNode.get(); }
+
+            const GameStateNode * endNode() const
+            { return mEndNode.get(); }
+
+            GameStateNode * endNode()
+            { return mEndNode.get(); }
+
+        private:
+            int mNumPrecalculatedMoves;
+            std::auto_ptr<GameStateNode> mCurrentNode;
+            std::auto_ptr<GameStateNode> mEndNode;
+        };
+
+        boost::scoped_ptr<GameStats> gameStats;
+
+        // Keep the locking very short.
+        {
+            ScopedAtom<Game> wgame(*mProtectedGame);
+            Game & game = *(wgame.get());
+            if (game.isGameOver())
+            {
+                setText(mStatusTextBox, "Game Over!");
+                return;
+            }
+            gameStats.reset(new GameStats(game));
         }
 
         // Create only once
@@ -555,9 +592,19 @@ namespace Tetris
             if (!mComputerPlayer->isFinished())
             {
                 // Check if there is the danger of crashing the current block.
-                if (game.numPrecalculatedMoves() == 0 && calculateRemainingTimeMs(game) < 1500)
+
+                if (gameStats->numPrecalculatedMoves() == 0)
                 {
-                    mComputerPlayer->stop();
+                    int timeRemaining = 0;
+                    {
+                        ScopedAtom<Game> wgame(*mProtectedGame);
+                        Game & game = *(wgame.get());
+                        timeRemaining = calculateRemainingTimeMs(game);
+                    }
+                    if (timeRemaining < 1500)
+                    {
+                        mComputerPlayer->stop();
+                    }
                 }
                 // else: keep working.
             }
@@ -567,11 +614,14 @@ namespace Tetris
                 if (!resultNode->state().isGameOver())
                 {
                     // The created node should follow the last precalculated one.
-                    const int resultNodeDepth = resultNode->depth();
-                    const int endNodeDepth = game.lastPrecalculatedNode()->depth();
-                    if (resultNodeDepth == endNodeDepth + 1)
+                    if (resultNode->depth() == gameStats->endNode()->depth() + 1)
                     {
-                        game.lastPrecalculatedNode()->addChild(resultNode);
+                        const int resultNodeDepth = resultNode->depth();
+                        ScopedAtom<Game> wgame(*mProtectedGame);
+                        Game & game = *(wgame.get());
+                        GameStateNode * endNode(game.lastPrecalculatedNode());
+                        Assert(endNode->depth() + 1 == resultNodeDepth);
+                        endNode->addChild(resultNode);
                     }
                     else
                     {
@@ -581,6 +631,7 @@ namespace Tetris
                 else
                 {
                     // Game over. Too bad.
+                    mComputerPlayer.reset();
                     return;
                 }                
 
@@ -591,10 +642,10 @@ namespace Tetris
         else
         {
             int searchDepth = mSearchDepth ? XULWin::String2Int(mSearchDepth->getValue(), cDefaultSearchDepth) : cDefaultSearchDepth;
-            GameStateNode * endNode = game.lastPrecalculatedNode();
+            GameStateNode * endNode = gameStats->endNode();
             Assert(!endNode->state().isGameOver());
 
-            int numPrecalculated = endNode->depth() - game.currentNode()->depth();
+            int numPrecalculated = endNode->depth() - gameStats->currentNode()->depth();
             if (numPrecalculated + searchDepth <= 3 * cMaxSearchDepth)
             {
                 Assert(!mComputerPlayer);
@@ -602,16 +653,20 @@ namespace Tetris
                 //
                 // Clone the starting node
                 //
-                std::auto_ptr<GameStateNode> endNode = game.lastPrecalculatedNode()->clone();
+                std::auto_ptr<GameStateNode> endNode = gameStats->endNode()->clone();
                 Assert(endNode->children().empty());
-                Assert(endNode->depth() >= game.currentNode()->depth());
+                Assert(endNode->depth() >= gameStats->currentNode()->depth());
 
 
                 //
                 // Create the list of future blocks
                 //
                 BlockTypes futureBlocks;
-                game.getFutureBlocksWithOffset(endNode->depth(), searchDepth, futureBlocks);
+                {
+                    ScopedAtom<Game> wgame(*mProtectedGame);
+                    Game & game = *(wgame.get());
+                    game.getFutureBlocksWithOffset(endNode->depth(), searchDepth, futureBlocks);
+                }                
 
 
                 //
@@ -645,13 +700,13 @@ namespace Tetris
 
         if (mScoreTextBox)
         {
-            setText(mScoreTextBox, MakeString() << game.currentNode()->state().stats().score());
+            setText(mScoreTextBox, MakeString() << gameStats->currentNode()->state().stats().score());
         }
 
 
         if (mTotalLinesTextBox)
         {
-            setText(mTotalLinesTextBox, MakeString() << game.currentNode()->state().stats().numLines());
+            setText(mTotalLinesTextBox, MakeString() << gameStats->currentNode()->state().stats().numLines());
         }
 
         if (mCurrentSearchDepth && mComputerPlayer)
@@ -669,25 +724,25 @@ namespace Tetris
 
         if (mStatusTextBox)
         {
-            setText(mStatusTextBox, game.currentNode()->children().empty() ? "Thinking" : "Moving");
+            setText(mStatusTextBox, gameStats->currentNode()->children().empty() ? "Thinking" : "Moving");
         }
 
 
         if (mBlockCountTextBox)
         {
-            setText(mBlockCountTextBox, MakeString() << game.currentBlockIndex());
+            setText(mBlockCountTextBox, MakeString() << (gameStats->currentNode()->depth() + 1));
         }
 
 
         if (mMovesAheadTextBox)
         {
-            setText(mMovesAheadTextBox, MakeString() << (game.lastPrecalculatedNode()->depth() - game.currentNode()->depth()) << "/" << 3 * cMaxSearchDepth);
+            setText(mMovesAheadTextBox, MakeString() << (gameStats->endNode()->depth() - gameStats->currentNode()->depth()) << "/" << 3 * cMaxSearchDepth);
         }
 
 
         for (size_t idx = 0; idx != 4; ++idx)
         {
-            const GameState::Stats & stats = game.currentNode()->state().stats();
+            const GameState::Stats & stats = gameStats->currentNode()->state().stats();
             if (mLinesTextBoxes[idx])
             {
                 setText(mLinesTextBoxes[idx], MakeString() << stats.numLines(idx));
@@ -748,7 +803,7 @@ namespace Tetris
 
             if (mGameStateScore)
             {
-                setText(mGameStateScore, XULWin::Int2String(mEvaluator->evaluate(game.currentNode()->state())));
+                setText(mGameStateScore, XULWin::Int2String(mEvaluator->evaluate(gameStats->currentNode()->state())));
             }
         }
 
