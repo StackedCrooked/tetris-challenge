@@ -209,7 +209,6 @@ namespace Tetris
         catch (const boost::thread_interrupted &)
         {
             // Task was interrupted. Ok.
-            LogInfo(MakeString() << mWorker->name() << " was interrupted at search depth: " << getCurrentSearchDepth() << "/" << mBlockTypes.size());
         }
         catch (const std::exception & inException)
         {
