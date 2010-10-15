@@ -5,8 +5,6 @@
 #include "Tetris/Tetris.h"
 #include "Tetris/BlockFactory.h"
 #include "Tetris/Block.h"
-#include "Tetris/BlockType.h"
-#include "Tetris/NodePtr.h"
 
 
 namespace Tetris

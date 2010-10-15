@@ -6,8 +6,6 @@
 #include "Tetris/GameQualityEvaluator.h"
 #include "Tetris/Block.h"
 #include "Tetris/GenericGrid.h"
-#include "Tetris/Grid.h"
-#include <memory>
 
 
 namespace Tetris

@@ -4,9 +4,7 @@
 #include "Tetris/GameState.h"
 #include "Tetris/Block.h"
 #include "Tetris/Direction.h"
-#include "Tetris/NodePtr.h"
 #include "Poco/Timer.h"
-#include <boost/scoped_ptr.hpp>
 
 
 namespace Tetris

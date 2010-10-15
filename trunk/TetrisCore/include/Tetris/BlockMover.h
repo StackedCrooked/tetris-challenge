@@ -4,7 +4,6 @@
 
 #include "Tetris/Tetris.h"
 #include "Tetris/Threading.h"
-#include <boost/noncopyable.hpp>
 
 
 namespace Poco

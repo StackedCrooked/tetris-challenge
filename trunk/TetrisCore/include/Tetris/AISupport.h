@@ -3,8 +3,6 @@
 
 
 #include "Tetris/Tetris.h"
-#include "Tetris/BlockType.h"
-#include "Tetris/NodePtr.h"
 
 
 namespace Tetris

@@ -1,6 +1,4 @@
 #include "Tetris/GameState.h"
-#include "Tetris/BlockType.h"
-#include "Tetris/Assert.h"
 #include <algorithm>
 
 
