@@ -1,17 +1,17 @@
 #include "Tetris/ComputerPlayer.h"
-#include "Tetris/Assert.h"
 #include "Tetris/AISupport.h"
 #include "Tetris/BlockMover.h"
-#include "Tetris/BlockType.h"
 #include "Tetris/ComputerPlayerMt.h"
+#include "Tetris/Gravity.h"
 #include "Tetris/Game.h"
 #include "Tetris/GameQualityEvaluator.h"
 #include "Tetris/GameState.h"
-#include "Tetris/Gravity.h"
+#include "Tetris/BlockType.h"
+#include "Tetris/WorkerPool.h"
+#include "Tetris/Worker.h"
 #include "Tetris/Logger.h"
 #include "Tetris/MakeString.h"
-#include "Tetris/Worker.h"
-#include "Tetris/WorkerPool.h"
+#include "Tetris/Assert.h"
 #include <boost/bind.hpp>
 
 

@@ -1,14 +1,14 @@
 #include "Tetris/ComputerPlayerMt.h"
 #include "Tetris/AISupport.h"
-#include "Tetris/Assert.h"
-#include "Tetris/BlockType.h"
 #include "Tetris/ComputerPlayer.h"
-#include "Tetris/GameQualityEvaluator.h"
-#include "Tetris/GameState.h"
 #include "Tetris/GameStateNode.h"
+#include "Tetris/GameState.h"
+#include "Tetris/GameQualityEvaluator.h"
+#include "Tetris/BlockType.h"
 #include "Tetris/Logger.h"
 #include "Tetris/MakeString.h"
 #include "Tetris/WorkerPool.h"
+#include "Tetris/Assert.h"
 #include <boost/bind.hpp>
 #include <algorithm>
 
