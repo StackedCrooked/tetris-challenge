@@ -161,6 +161,30 @@
 			Name="Header Files"
 			>
 			<Filter
+				Name="TetrisThreading"
+				>
+				<File
+					RelativePath=".\include\Tetris\Threading.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Worker.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Tetris\Worker.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\WorkerPool.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Tetris\WorkerPool.h"
+					>
+				</File>
+			</Filter>
+			<Filter
 				Name="TetrisClasses"
 				>
 				<File
@@ -308,10 +332,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\include\Tetris\Threading.h"
-					>
-				</File>
-				<File
 					RelativePath=".\include\Tetris\TypedWrapper.h"
 					>
 				</File>
@@ -325,22 +345,6 @@
 				</File>
 				<File
 					RelativePath=".\include\Tetris\Utilities.h"
-					>
-				</File>
-				<File
-					RelativePath=".\src\Worker.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Tetris\Worker.h"
-					>
-				</File>
-				<File
-					RelativePath=".\src\WorkerPool.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Tetris\WorkerPool.h"
 					>
 				</File>
 			</Filter>

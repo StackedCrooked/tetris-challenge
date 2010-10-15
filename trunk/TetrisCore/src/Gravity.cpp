@@ -4,7 +4,6 @@
 #include "Tetris/GameState.h"
 #include "Tetris/BlockType.h"
 #include "Tetris/Direction.h"
-#include "Tetris/Logging.h"
 
 
 namespace Tetris
