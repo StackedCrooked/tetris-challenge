@@ -42,7 +42,7 @@ namespace Tetris
     }
 
 
-    void Logger::setHandler(const Handler & inHandler)
+    void Logger::setLogHandler(const LogHandler & inHandler)
     {
         mHandler = inHandler;
     }
@@ -77,23 +77,4 @@ namespace Tetris
         }
     }
 
-
-    void LogInfo(const std::string & inMessage)
-    {
-        Logger::Instance().log(LogLevel_Info, inMessage);
-    }
-
-
-    void LogWarning(const std::string & inMessage)
-    {
-        Logger::Instance().log(LogLevel_Warning, inMessage);
-    }
-
-
-    void LogError(const std::string & inMessage)
-    {
-        Logger::Instance().log(LogLevel_Error, inMessage);
-    }
-
 } // namespace Tetris
-

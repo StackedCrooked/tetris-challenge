@@ -296,6 +296,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\Logging.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Tetris\Logging.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Tetris\MakeString.h"
 					>
 				</File>

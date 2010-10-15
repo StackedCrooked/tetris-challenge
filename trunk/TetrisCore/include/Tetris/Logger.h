@@ -24,9 +24,9 @@ namespace Tetris
     public:
         static Logger & Instance();
 
-        typedef boost::function<void(const std::string &)> Handler;
+        typedef boost::function<void(const std::string &)> LogHandler;
 
-        void setHandler(const Handler & inHandler);
+        void setLogHandler(const LogHandler & inHandler);
 
         void log(LogLevel inLogLevel, const std::string & inMessage);
 
@@ -41,17 +41,11 @@ namespace Tetris
     private:
         void logImpl(const std::string & inMessage);
 
-        Handler mHandler;
+        LogHandler mHandler;
         typedef std::vector<std::string> Queue;
         Protected<Queue> mProtectedQueue;
         boost::mutex mQueueMutex;
     };
-
-    void LogInfo(const std::string & inMessage);
-
-    void LogWarning(const std::string & inMessage);
-
-    void LogError(const std::string & inMessage);
 
 } // namespace Tetris
 

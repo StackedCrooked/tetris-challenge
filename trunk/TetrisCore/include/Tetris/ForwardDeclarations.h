@@ -29,7 +29,10 @@ namespace std
 namespace boost
 {
 
-    template <class>
+    template<class>
+    class function;
+
+    template<class>
     class scoped_ptr;
 
     template <class>
@@ -37,13 +40,6 @@ namespace boost
 
     template <class>
     class weak_ptr;
-
-    namespace noncopyable_  // protection from unintended ADL
-    {
-        class noncopyable;
-    }
-
-    typedef noncopyable_::noncopyable noncopyable;
 
 } // namespace boost
 
