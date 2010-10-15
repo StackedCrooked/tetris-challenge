@@ -2,28 +2,19 @@
 #define TETRIS_PLAYER_H_INCLUDED
 
 
-#include "Tetris/AISupport.h"
 #include "Tetris/BlockType.h"
+#include "Tetris/NodePtr.h"
 #include "Tetris/Threading.h"
 #include <memory>
 #include <vector>
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
+#include <boost/shared_ptr.hpp>
 #include <boost/thread.hpp>
 
 
 namespace Tetris
 {
-
-    class BlockMover;
-    class Game;
-    class GameStateNode;
-    class Gravity;
-    class Worker;
-    class WorkerPool;
-    typedef std::vector<int> Widths;
-    class MoveCalculator;
-
 
     class ComputerPlayer
     {

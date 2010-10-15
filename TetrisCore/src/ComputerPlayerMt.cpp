@@ -1,4 +1,5 @@
 #include "Tetris/ComputerPlayerMt.h"
+#include "Tetris/AISupport.h"
 #include "Tetris/Assert.h"
 #include "Tetris/BlockType.h"
 #include "Tetris/ComputerPlayer.h"

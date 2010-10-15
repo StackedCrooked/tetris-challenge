@@ -3,6 +3,8 @@
 
 
 #include "Tetris/BlockType.h"
+#include "Tetris/ForwardDeclarations.h"
+#include "Tetris/NodePtr.h"
 #include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
@@ -11,13 +13,6 @@
 
 namespace Tetris
 {
-
-    class Block;
-    class Evaluator;
-    class GameState;
-    class GameStateNode;
-    typedef boost::shared_ptr<GameStateNode> NodePtr;
-
 
     class GameStateComparisonFunctor
     {
@@ -36,7 +31,7 @@ namespace Tetris
     };
 
 
-    typedef std::multiset<NodePtr, GameStateComparisonFunctor> ChildNodes;
+    
 
     /**
      * GameStateNode is a tree of game states.
