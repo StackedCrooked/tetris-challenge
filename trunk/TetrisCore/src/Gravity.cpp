@@ -2,6 +2,7 @@
 #include "Tetris/BlockType.h"
 #include "Tetris/Game.h"
 #include "Tetris/GameState.h"
+#include "Tetris/GameStateNode.h"
 #include "Tetris/Logger.h"
 
 
