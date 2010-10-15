@@ -3,7 +3,7 @@
 
 
 #include "Tetris/Threading.h"
-#include <boost/scoped_ptr.hpp>
+#include "Tetris/ForwardDeclarations.h"
 #include <boost/noncopyable.hpp>
 
 

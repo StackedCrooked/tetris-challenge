@@ -3,11 +3,14 @@
 
 
 #include "Tetris/BlockType.h"
-#include "Tetris/GameStateNode.h"
+#include "Tetris/NodePtr.h"
 
 
 namespace Tetris
 {
+
+    class Evaluator;
+    class GameState;
 
     /**
      * CarveBestPath

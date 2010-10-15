@@ -2,7 +2,8 @@
 #define TETRIS_BLOCKTYPE_H_INCLUDED
 
 
-#include <vector>
+#include "Tetris/Enum.h"
+#include "Tetris/ForwardDeclarations.h"
 
 
 namespace Tetris
@@ -18,8 +19,8 @@ namespace Tetris
      * J = J shaped block
      * O = square block
      * etc...
-     */
-    enum BlockType
+     */    
+    DefineEnum(BlockType)
     {
         BlockType_Nil = 0,                  // value 0 enables us to type code like: `if (blockType)' and `if (!blockType)'
         BlockType_Begin,                    // 'begin' is value 1.
@@ -40,7 +41,7 @@ namespace Tetris
      *
      * Represents a list of block types.
      */
-    typedef std::vector<BlockType> BlockTypes;
+    typedef std::vector<BlockType, std::allocator<BlockType> > BlockTypes;
 
 
     /**

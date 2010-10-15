@@ -2,14 +2,16 @@
 #define TETRIS_BLOCK_H_INCLUDED
 
 
-#include "Tetris/BlockType.h"
-#include "Tetris/Direction.h"
+#include "Tetris/Enum.h"
 #include "Tetris/Grid.h"
 #include "Tetris/TypedWrapper.h"
 
 
 namespace Tetris
 {
+    
+    DeclareEnum(BlockType);
+    DeclareEnum(Direction);
 
     // Generate the Rotation class
     GENERATE_TYPESAFE_WRAPPER(size_t, Rotation)
@@ -73,14 +75,6 @@ namespace Tetris
 
     // Gets the Grid object that is associated with a block identifier
     const Grid & GetGrid(int inBlockIdentifier);
-
-    Grid GetIGrid(int rotation);
-    Grid GetJGrid(int rotation);
-    Grid GetLGrid(int rotation);
-    Grid GetOGrid(int rotation);
-    Grid GetSGrid(int rotation);
-    Grid GetTGrid(int rotation);
-    Grid GetZGrid(int rotation);
 
 
 } // namespace Tetris

@@ -197,6 +197,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\include\Tetris\Enum.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\Tetris\ForwardDeclarations.h"
+				>
+			</File>
+			<File
 				RelativePath=".\include\Tetris\Game.h"
 				>
 			</File>
@@ -230,6 +238,10 @@
 			</File>
 			<File
 				RelativePath=".\include\Tetris\MakeString.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\Tetris\NodePtr.h"
 				>
 			</File>
 			<File
