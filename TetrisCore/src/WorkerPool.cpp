@@ -1,4 +1,5 @@
 #include "Tetris/WorkerPool.h"
+#include "Tetris/Logging.h"
 #include "Tetris/MakeString.h"
 
 

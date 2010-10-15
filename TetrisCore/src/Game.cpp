@@ -4,8 +4,6 @@
 #include "Tetris/GameQualityEvaluator.h"
 #include "Tetris/Direction.h"
 #include "Tetris/Utilities.h"
-#include "Tetris/Logging.h"
-#include "Tetris/Assert.h"
 
 
 namespace Tetris
