@@ -4,13 +4,9 @@
 
 #include "Tetris/GameQualityEvaluator.h"
 #include "Tetris/Block.h"
-#include "Tetris/BlockType.h"
 #include "Tetris/GenericGrid.h"
 #include "Tetris/Grid.h"
-#include "Tetris/TypedWrapper.h"
-#include <boost/shared_ptr.hpp>
 #include <memory>
-#include <stdexcept>
 
 
 namespace Tetris

@@ -55,8 +55,6 @@ namespace Tetris
     };
 
 
-
-
     class LockTimeout : public std::runtime_error
     {
     public:

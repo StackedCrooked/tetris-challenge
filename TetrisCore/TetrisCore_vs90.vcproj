@@ -164,6 +164,10 @@
 				Name="TetrisFoundation"
 				>
 				<File
+					RelativePath=".\src\BlockType.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Tetris\BlockType.h"
 					>
 				</File>
@@ -176,7 +180,15 @@
 				Name="TetrisClasses"
 				>
 				<File
+					RelativePath=".\src\Block.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Tetris\Block.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\BlockFactory.cpp"
 					>
 				</File>
 				<File
@@ -184,7 +196,15 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\Game.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Tetris\Game.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\GameQualityEvaluator.cpp"
 					>
 				</File>
 				<File
@@ -192,7 +212,15 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\GameState.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Tetris\GameState.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\GameStateNode.cpp"
 					>
 				</File>
 				<File
@@ -204,7 +232,15 @@
 				Name="TetrisUtils"
 				>
 				<File
+					RelativePath=".\src\AISupport.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Tetris\AISupport.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\BlockMover.cpp"
 					>
 				</File>
 				<File
@@ -212,11 +248,23 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\ComputerPlayer.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Tetris\ComputerPlayer.h"
 					>
 				</File>
 				<File
+					RelativePath=".\src\ComputerPlayerMt.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Tetris\ComputerPlayerMt.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Gravity.cpp"
 					>
 				</File>
 				<File
@@ -240,6 +288,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\Logger.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Tetris\Logger.h"
 					>
 				</File>
@@ -256,6 +308,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\Unicode.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Tetris\Unicode.h"
 					>
 				</File>
@@ -264,7 +320,15 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\Worker.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Tetris\Worker.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\WorkerPool.cpp"
 					>
 				</File>
 				<File
@@ -288,74 +352,6 @@
 					>
 				</File>
 			</Filter>
-		</Filter>
-		<Filter
-			Name="Source Files"
-			>
-			<File
-				RelativePath=".\src\AISupport.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\Block.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\BlockFactory.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\BlockMover.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\BlockType.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\ComputerPlayer.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\ComputerPlayerMt.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\Game.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\GameQualityEvaluator.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\GameState.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\GameStateNode.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\Gravity.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\Logger.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\Unicode.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\Worker.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\WorkerPool.cpp"
-				>
-			</File>
 		</Filter>
 		<File
 			RelativePath=".\Todo.txt"

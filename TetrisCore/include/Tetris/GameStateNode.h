@@ -2,8 +2,6 @@
 #define TETRIS_GAMESTATENODE_H_INCLUDED
 
 
-#include "Tetris/BlockType.h"
-#include "Tetris/ForwardDeclarations.h"
 #include "Tetris/NodePtr.h"
 #include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
@@ -31,7 +29,8 @@ namespace Tetris
     };
 
 
-    
+    class GameState;
+
 
     /**
      * GameStateNode is a tree of game states.

@@ -6,7 +6,7 @@
 #include "Tetris/BlockFactory.h"
 #include "Tetris/BlockType.h"
 #include "Tetris/Direction.h"
-#include "Tetris/GameStateNode.h"
+#include "Tetris/NodePtr.h"
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <memory>
@@ -15,6 +15,8 @@
 
 namespace Tetris
 {
+
+    class GameStateNode;
 
     /**
      * Game is a top-level class for the Tetris core. It manages the following things:
