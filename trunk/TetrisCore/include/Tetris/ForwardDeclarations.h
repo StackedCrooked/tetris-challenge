@@ -48,4 +48,29 @@ namespace boost
 } // namespace boost
 
 
+namespace Tetris
+{
+
+    //
+    // Classes
+    //
+    class BlockMover;
+    class Evaluator;
+    class Game;
+    class GameState;
+    class GameStateNode;
+    class Gravity;
+    class MoveCalculator;
+    class Worker;
+    class WorkerPool;
+
+
+    //
+    // Typedefs
+    //
+    typedef std::vector<int, std::allocator<int> > Widths;
+
+} // namespace Tetris
+
+
 #endif // TETRIS_FORWARDDECLARATIONS_H_INCLUDED
