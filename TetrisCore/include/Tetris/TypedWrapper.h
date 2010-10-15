@@ -3,26 +3,35 @@
 
 
 /**
- * Macro GENERATE_TYPESAFE_WRAPPER
+ * Macro TypedWrapper
  *
- * This macro can be used to create different typenames
- * for different values of the same primitive type. This
- * provides type-safety.
+ * This macro generates simple class wrapper for a given type.
+ * Accidental mix-ups will result in compile errors instead of 
+ * runtime-errors.
  *
- * See Block.h for a few examples.
+ * Example:
+ *
+ *     TypedWrapper(Width, int);
+ *     TypedWrapper(Height, int);
+ *
+ *     Width w = 800;
+ *     Width h = 600;
+ *
+ *     // Signature is: 'SetSize(Width inWidth, Height height);'
+ *     SetSize(h, w); // => compiler error
  */
-#define GENERATE_TYPESAFE_WRAPPER(PrimitiveType, ClassName) \
-    class ClassName \
-    { \
-    public: \
-        explicit ClassName(PrimitiveType inValue) : mValue(inValue) {}        \
-        PrimitiveType get() const                                             \
+#define TypedWrapper(ClassName, WrappedType)                                  \
+    class ClassName                                                           \
+    {                                                                         \
+    public:                                                                   \
+        explicit ClassName(WrappedType inValue) : mValue(inValue) {}          \
+        WrappedType get() const                                               \
         { return mValue; }                                                    \
-        operator PrimitiveType() const                                        \
+        operator WrappedType() const                                          \
         { return mValue; }                                                    \
     private:                                                                  \
-        PrimitiveType mValue;                                                 \
-    };
+        WrappedType mValue;                                                   \
+    } // semi-colon must be typed by the user.
 
 
 #endif // TYPEDWRAPPER_H_INCLUDED
