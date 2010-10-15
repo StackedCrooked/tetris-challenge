@@ -5,7 +5,7 @@
 #include "Tetris/GameState.h"
 #include "Tetris/GameQualityEvaluator.h"
 #include "Tetris/BlockType.h"
-#include "Tetris/Logger.h"
+#include "Tetris/Logging.h"
 #include "Tetris/MakeString.h"
 #include "Tetris/WorkerPool.h"
 #include "Tetris/Assert.h"

@@ -9,6 +9,7 @@
 #include "Tetris/GameStateNode.h"
 #include "Tetris/Gravity.h"
 #include "Tetris/Logger.h"
+#include "Tetris/Logging.h"
 #include "Tetris/MakeString.h"
 #include "Tetris/Worker.h"
 #include "Tetris/WorkerPool.h"
@@ -99,7 +100,7 @@ namespace Tetris
         //
         boost::function<void(const std::string &)> logFunction = boost::bind(&Controller::log, this, _1);
         XULWin::ErrorReporter::Instance().setLogger(logFunction);
-        Tetris::Logger::Instance().setHandler(logFunction);
+        Logger::Instance().setLogHandler(logFunction);
         
         
         // Initialize worker pool after the logger.

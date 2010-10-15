@@ -1,5 +1,5 @@
 #include "Tetris/Worker.h"
-#include "Tetris/Logger.h"
+#include "Tetris/Logging.h"
 #include "Tetris/MakeString.h"
 #include "Tetris/Assert.h"
 

@@ -9,7 +9,7 @@
 #include "Tetris/BlockType.h"
 #include "Tetris/WorkerPool.h"
 #include "Tetris/Worker.h"
-#include "Tetris/Logger.h"
+#include "Tetris/Logging.h"
 #include "Tetris/MakeString.h"
 #include "Tetris/Assert.h"
 #include <boost/bind.hpp>

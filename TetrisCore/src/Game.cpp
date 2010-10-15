@@ -3,7 +3,7 @@
 #include "Tetris/GameState.h"
 #include "Tetris/GameQualityEvaluator.h"
 #include "Tetris/Utilities.h"
-#include "Tetris/Logger.h"
+#include "Tetris/Logging.h"
 #include "Tetris/Assert.h"
 
 namespace Tetris
