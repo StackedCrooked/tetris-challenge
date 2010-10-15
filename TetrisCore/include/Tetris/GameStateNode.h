@@ -2,6 +2,7 @@
 #define TETRIS_GAMESTATENODE_H_INCLUDED
 
 
+#include "Tetris/Tetris.h"
 #include "Tetris/NodePtr.h"
 #include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>

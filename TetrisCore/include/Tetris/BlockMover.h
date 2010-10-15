@@ -2,8 +2,8 @@
 #define TETRIS_BLOCKMOVER_H_INCLUDED
 
 
+#include "Tetris/Tetris.h"
 #include "Tetris/Threading.h"
-#include "Tetris/ForwardDeclarations.h"
 #include <boost/noncopyable.hpp>
 
 

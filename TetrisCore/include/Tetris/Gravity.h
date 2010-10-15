@@ -2,6 +2,7 @@
 #define TETRIS_GRAVITY_H_INCLUDED
 
 
+#include "Tetris/Tetris.h"
 #include "Tetris/Threading.h"
 #include "Poco/Timer.h"
 #include <boost/noncopyable.hpp>

@@ -2,6 +2,7 @@
 #define TETRIS_GAMESTATE_H_INCLUDED
 
 
+#include "Tetris/Tetris.h"
 #include "Tetris/GameQualityEvaluator.h"
 #include "Tetris/Block.h"
 #include "Tetris/GenericGrid.h"

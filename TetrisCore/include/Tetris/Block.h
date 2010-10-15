@@ -2,9 +2,8 @@
 #define TETRIS_BLOCK_H_INCLUDED
 
 
-#include "Tetris/Enum.h"
+#include "Tetris/Tetris.h"
 #include "Tetris/Grid.h"
-#include "Tetris/TypedWrapper.h"
 
 
 namespace Tetris

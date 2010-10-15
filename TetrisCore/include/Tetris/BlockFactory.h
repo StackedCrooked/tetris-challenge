@@ -2,7 +2,7 @@
 #define TETRIS_BLOCKFACTORY_H_INCLUDED
 
 
-#include "Tetris/Block.h"
+#include "Tetris/Tetris.h"
 #include "Tetris/BlockType.h"
 #include <vector>
 

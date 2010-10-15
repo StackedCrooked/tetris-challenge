@@ -2,10 +2,10 @@
 #define TETRIS_GAME_H_INCLUDED
 
 
+#include "Tetris/Tetris.h"
 #include "Tetris/Block.h"
 #include "Tetris/BlockFactory.h"
 #include "Tetris/BlockType.h"
-#include "Tetris/Direction.h"
 #include "Tetris/NodePtr.h"
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
