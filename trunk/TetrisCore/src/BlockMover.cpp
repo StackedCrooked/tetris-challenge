@@ -25,7 +25,7 @@ namespace Tetris
     }
 
 
-    BlockMover::BlockMover(Protected<Game> & inGame, int inNumMovesPerSecond) :
+    BlockMover::BlockMover(const Protected<Game> & inGame, int inNumMovesPerSecond) :
         mGame(inGame),
         mTimer(),
         mNumMovesPerSecond(inNumMovesPerSecond),

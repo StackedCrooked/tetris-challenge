@@ -2,9 +2,17 @@
 #define TETRIS_TETRIS_H_INCLUDED
 
 
+//
+// Include the forward declarations of common classes.
+//
+#include "Tetris/ForwardDeclarations.h"
+
+
+//
+// Includes of the common general-purpose foundation classes.
+//
 #include "Tetris/Assert.h"
 #include "Tetris/Enum.h"
-#include "Tetris/ForwardDeclarations.h"
 #include "Tetris/Logging.h"
 #include "Tetris/MakeString.h"
 #include "Tetris/Unicode.h"
