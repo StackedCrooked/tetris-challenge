@@ -24,7 +24,7 @@ namespace Tetris
     class ComputerPlayer
     {
     public:
-        ComputerPlayer(Protected<Game> inProtectedGame);
+        ComputerPlayer(const Protected<Game> & inProtectedGame);
 
         void runImpl();
 

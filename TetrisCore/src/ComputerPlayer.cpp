@@ -18,7 +18,7 @@
 namespace Tetris
 {
     
-    ComputerPlayer::ComputerPlayer(Protected<Game> inProtectedGame) :
+    ComputerPlayer::ComputerPlayer(const Protected<Game> & inProtectedGame) :
         mWorkerPool(new WorkerPool("ComputerPlayer", 6)),
         mProtectedGame(inProtectedGame),
         mGravity(new Gravity(mProtectedGame)),

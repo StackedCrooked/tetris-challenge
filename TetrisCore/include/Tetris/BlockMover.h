@@ -29,7 +29,7 @@ namespace Tetris
     class BlockMover : boost::noncopyable
     {
     public:
-        BlockMover(Protected<Game> & inGame, int inNumMovesPerSecond);
+        BlockMover(const Protected<Game> & inGame, int inNumMovesPerSecond);
 
         ~BlockMover();
 
@@ -52,7 +52,7 @@ namespace Tetris
         void onTimer(Poco::Timer & ioTimer);
         void move();
 
-        Protected<Game> & mGame;
+        Protected<Game> mGame;
         boost::scoped_ptr<Poco::Timer> mTimer;
         int mNumMovesPerSecond;
         MoveDownBehavior mMoveDownBehavior;

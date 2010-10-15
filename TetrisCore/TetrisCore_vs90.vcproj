@@ -161,22 +161,6 @@
 			Name="Header Files"
 			>
 			<Filter
-				Name="TetrisFoundation"
-				>
-				<File
-					RelativePath=".\src\BlockType.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Tetris\BlockType.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Tetris\Direction.h"
-					>
-				</File>
-			</Filter>
-			<Filter
 				Name="TetrisClasses"
 				>
 				<File
@@ -193,6 +177,18 @@
 				</File>
 				<File
 					RelativePath=".\include\Tetris\BlockFactory.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\BlockType.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Tetris\BlockType.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Tetris\Direction.h"
 					>
 				</File>
 				<File
