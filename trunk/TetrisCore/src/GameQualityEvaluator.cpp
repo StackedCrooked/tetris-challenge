@@ -1,6 +1,6 @@
 #include "Tetris/GameQualityEvaluator.h"
-#include "Tetris/BlockType.h"
 #include "Tetris/GameState.h"
+#include "Tetris/BlockType.h"
 
 
 namespace Tetris

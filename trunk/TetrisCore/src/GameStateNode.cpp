@@ -1,10 +1,10 @@
 #include "Tetris/GameStateNode.h"
-#include "Tetris/Assert.h"
 #include "Tetris/Block.h"
 #include "Tetris/BlockType.h"
-#include "Tetris/GameQualityEvaluator.h"
 #include "Tetris/GameState.h"
+#include "Tetris/GameQualityEvaluator.h"
 #include "Tetris/Utilities.h"
+#include "Tetris/Assert.h"
 
 
 namespace Tetris

@@ -1,13 +1,15 @@
 #include "Tetris/BlockMover.h"
-#include "Tetris/Assert.h"
-#include "Tetris/BlockType.h"
 #include "Tetris/Game.h"
-#include "Tetris/GameState.h"
 #include "Tetris/GameStateNode.h"
+#include "Tetris/GameState.h"
+#include "Tetris/Block.h"
+#include "Tetris/Direction.h"
+#include "Tetris/NodePtr.h"
 #include "Tetris/Logger.h"
 #include "Tetris/MakeString.h"
+#include "Tetris/Assert.h"
 #include "Poco/Timer.h"
-#include <stdexcept>
+#include <boost/scoped_ptr.hpp>
 
 
 namespace Tetris

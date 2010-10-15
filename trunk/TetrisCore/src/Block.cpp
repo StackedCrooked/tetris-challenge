@@ -1,7 +1,7 @@
 #include "Tetris/Block.h"
-#include "Tetris/Assert.h"
 #include "Tetris/BlockType.h"
 #include "Tetris/GenericGrid.h"
+#include "Tetris/Assert.h"
 #include <stdexcept>
 
 

@@ -1,7 +1,7 @@
 #include "Tetris/Worker.h"
-#include "Tetris/Assert.h"
 #include "Tetris/Logger.h"
 #include "Tetris/MakeString.h"
+#include "Tetris/Assert.h"
 
 //
 // SetThreadName

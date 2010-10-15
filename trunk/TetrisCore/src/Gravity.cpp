@@ -1,8 +1,8 @@
 #include "Tetris/Gravity.h"
-#include "Tetris/BlockType.h"
 #include "Tetris/Game.h"
-#include "Tetris/GameState.h"
 #include "Tetris/GameStateNode.h"
+#include "Tetris/GameState.h"
+#include "Tetris/BlockType.h"
 #include "Tetris/Logger.h"
 
 
