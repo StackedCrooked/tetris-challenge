@@ -13,16 +13,16 @@ namespace Tetris
 
 
     // Type-safe int wrappers to prevent mix-ups in arg lists.
-    TypedWrapper(GameHeightFactor,int );
-    TypedWrapper(LastBlockHeightFactor,int );
-    TypedWrapper(NumHolesFactor,int );
-    TypedWrapper(NumLines,int );
-    TypedWrapper(NumSinglesFactor,int );
-    TypedWrapper(NumDoublesFactor,int );
-    TypedWrapper(NumTriplesFactor,int );
-    TypedWrapper(NumTetrisesFactor,int );
-    TypedWrapper(SearchDepth,int );
-    TypedWrapper(SearchWidth,int );
+    Tetris_TypedWrapper(GameHeightFactor, int);
+    Tetris_TypedWrapper(LastBlockHeightFactor, int);
+    Tetris_TypedWrapper(NumHolesFactor, int);
+    Tetris_TypedWrapper(NumLines, int);
+    Tetris_TypedWrapper(NumSinglesFactor, int);
+    Tetris_TypedWrapper(NumDoublesFactor, int);
+    Tetris_TypedWrapper(NumTriplesFactor, int);
+    Tetris_TypedWrapper(NumTetrisesFactor, int);
+    Tetris_TypedWrapper(SearchDepth, int);
+    Tetris_TypedWrapper(SearchWidth, int);
 
 
     class Evaluator

@@ -9,7 +9,7 @@
 namespace Tetris
 {
 
-    DefineEnum(Direction)
+    Tetris_DefineEnum(Direction)
     {
         Direction_Nil,
         Direction_Up,
@@ -22,4 +22,3 @@ namespace Tetris
 
 
 #endif // DIRECTION_H_INCLUDED
-

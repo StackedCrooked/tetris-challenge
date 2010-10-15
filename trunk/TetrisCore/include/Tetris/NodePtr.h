@@ -2,8 +2,8 @@
 #define TETRIS_NODEPTR_H_INCLUDED
 
 
-#include "ForwardDeclarations.h"
 #include <boost/shared_ptr.hpp>
+#include <set>
 
 
 namespace Tetris
@@ -13,7 +13,7 @@ namespace Tetris
     typedef boost::shared_ptr<GameStateNode> NodePtr;
 
     class GameStateComparisonFunctor;
-    typedef std::multiset<NodePtr, GameStateComparisonFunctor, std::allocator<NodePtr> > ChildNodes;
+    typedef std::multiset<NodePtr, GameStateComparisonFunctor> ChildNodes;
 
 }
 
