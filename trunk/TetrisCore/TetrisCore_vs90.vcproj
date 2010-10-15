@@ -308,6 +308,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\Tetris\Tetris.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Tetris\Threading.h"
 					>
 				</File>
