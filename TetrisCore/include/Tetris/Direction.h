@@ -3,7 +3,6 @@
 
 
 #include "Tetris/Tetris.h"
-#include "Tetris/Enum.h"
 
 
 namespace Tetris

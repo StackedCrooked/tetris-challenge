@@ -4,7 +4,6 @@
 
 #include "Tetris/Threading.h"
 #include <boost/function.hpp>
-#include <string>
 
 
 namespace Tetris

@@ -3,11 +3,8 @@
 
 
 #include "Tetris/Tetris.h"
-#include "Tetris/BlockType.h"
 #include "Tetris/ComputerPlayer.h"
 #include "Tetris/GameStateNode.h"
-#include <boost/shared_ptr.hpp>
-#include <memory>
 
 
 namespace Tetris
