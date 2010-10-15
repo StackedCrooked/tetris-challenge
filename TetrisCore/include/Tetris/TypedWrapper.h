@@ -3,7 +3,7 @@
 
 
 /**
- * Macro TypedWrapper
+ * Macro Tetris_TypedWrapper
  *
  * This macro generates simple class wrapper for a given type.
  * Accidental mix-ups will result in compile errors instead of 
@@ -11,16 +11,16 @@
  *
  * Example:
  *
- *     TypedWrapper(Width, int);
- *     TypedWrapper(Height, int);
+ *     Tetris_TypedWrapper(Width, int);
+ *     Tetris_TypedWrapper(Height, int);
  *
- *     Width w = 800;
- *     Width h = 600;
+ *     Width width = 800;
+ *     Width height = 600;
  *
- *     // Signature is: 'SetSize(Width inWidth, Height height);'
- *     SetSize(h, w); // => compiler error
+ *     // Signature is: 'SetSize(Width width, Height height);'
+ *     SetSize(height, width); // => compiler error
  */
-#define TypedWrapper(ClassName, WrappedType)                                  \
+#define Tetris_TypedWrapper(ClassName, WrappedType)                                  \
     class ClassName                                                           \
     {                                                                         \
     public:                                                                   \
@@ -31,7 +31,7 @@
         { return mValue; }                                                    \
     private:                                                                  \
         WrappedType mValue;                                                   \
-    } // semi-colon must be typed by the user.
+    } // semi-colon must be typed when calling the macro
 
 
 #endif // TYPEDWRAPPER_H_INCLUDED

@@ -10,22 +10,22 @@ namespace Tetris
 {
     
     // Forward declaration of the BlockType 'enum'
-    DeclareEnum(BlockType);
+    Tetris_DeclareEnum(BlockType);
 
     // Forward declaration of the Direction 'enum'
-    DeclareEnum(Direction);
+    Tetris_DeclareEnum(Direction);
 
     // Generate the Rotation class
-    TypedWrapper(Rotation, size_t);
+    Tetris_TypedWrapper(Rotation, size_t);
 
     // Generate the Row class
-    TypedWrapper(Row, size_t);
+    Tetris_TypedWrapper(Row, size_t);
 
     // Generate the Column class
-    TypedWrapper(Column, size_t);
+    Tetris_TypedWrapper(Column, size_t);
 
     // Generate the GameOver class
-    TypedWrapper(GameOver, bool);
+    Tetris_TypedWrapper(GameOver, bool);
 
 
     /**

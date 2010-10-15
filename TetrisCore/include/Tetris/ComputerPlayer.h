@@ -6,16 +6,20 @@
 #include "Tetris/BlockType.h"
 #include "Tetris/NodePtr.h"
 #include "Tetris/Threading.h"
-#include <memory>
-#include <vector>
-#include <boost/noncopyable.hpp>
-#include <boost/scoped_ptr.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/thread.hpp>
 
 
 namespace Tetris
 {
+
+    class BlockMover;
+    class Evaluator;
+    class Gravity;
+    class MoveCalculator;
+    class Worker;
+    class WorkerPool;
+    typedef std::vector<int> Widths;
+
 
     class ComputerPlayer
     {

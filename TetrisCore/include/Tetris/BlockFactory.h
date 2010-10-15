@@ -4,7 +4,6 @@
 
 #include "Tetris/Tetris.h"
 #include "Tetris/BlockType.h"
-#include <vector>
 
 
 namespace Tetris

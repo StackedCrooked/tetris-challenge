@@ -3,14 +3,10 @@
 
 
 #include "Tetris/Tetris.h"
-#include "Tetris/Block.h"
 #include "Tetris/BlockFactory.h"
+#include "Tetris/Block.h"
 #include "Tetris/BlockType.h"
 #include "Tetris/NodePtr.h"
-#include <boost/noncopyable.hpp>
-#include <boost/scoped_ptr.hpp>
-#include <memory>
-#include <vector>
 
 
 namespace Tetris

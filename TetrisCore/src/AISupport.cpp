@@ -3,7 +3,6 @@
 #include "Tetris/GameState.h"
 #include "Tetris/BlockType.h"
 #include "Tetris/Grid.h"
-#include "Tetris/Assert.h"
 
 
 namespace Tetris

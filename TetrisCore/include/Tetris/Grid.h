@@ -11,7 +11,7 @@ namespace Tetris
     template<class T>
     class GenericGrid;
 
-    DeclareEnum(BlockType);
+    Tetris_DeclareEnum(BlockType);
 
     typedef GenericGrid<BlockType> Grid;
 
