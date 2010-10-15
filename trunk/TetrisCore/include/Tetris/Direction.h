@@ -2,10 +2,13 @@
 #define TETRIS_DIRECTION_H_INCLUDED
 
 
+#include "Tetris/Enum.h"
+
+
 namespace Tetris
 {
 
-    enum Direction
+    DefineEnum(Direction)
     {
         Direction_Nil,
         Direction_Up,
@@ -18,3 +21,4 @@ namespace Tetris
 
 
 #endif // DIRECTION_H_INCLUDED
+

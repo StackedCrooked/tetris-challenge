@@ -1,4 +1,5 @@
 #include "Tetris/GameQualityEvaluator.h"
+#include "Tetris/BlockType.h"
 #include "Tetris/GameState.h"
 
 

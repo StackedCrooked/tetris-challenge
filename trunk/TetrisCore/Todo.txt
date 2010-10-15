@@ -1,5 +1,6 @@
 Todo
 ----
+- Make TetrisCore compilation faster by using forward declares.
 - Move the AI code in the Controller::refresh() method to a Tetris::ComputerPlayer class.
 - Fix crash that occurs when toying with AI settings during game play (esp release mode).
 - Clean up asserts

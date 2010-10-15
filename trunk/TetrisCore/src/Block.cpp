@@ -1,5 +1,7 @@
 #include "Tetris/Block.h"
 #include "Tetris/Assert.h"
+#include "Tetris/BlockType.h"
+#include "Tetris/GenericGrid.h"
 #include <stdexcept>
 
 
@@ -115,6 +117,15 @@ namespace Tetris
         }
         return result;
     }
+    
+
+    Grid GetIGrid(int rotation);
+    Grid GetJGrid(int rotation);
+    Grid GetLGrid(int rotation);
+    Grid GetOGrid(int rotation);
+    Grid GetSGrid(int rotation);
+    Grid GetTGrid(int rotation);
+    Grid GetZGrid(int rotation);
 
 
     const Grid & GetGrid(int inId)

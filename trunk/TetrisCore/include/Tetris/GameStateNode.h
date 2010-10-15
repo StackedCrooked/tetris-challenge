@@ -19,8 +19,9 @@ namespace Tetris
     typedef boost::shared_ptr<GameStateNode> NodePtr;
 
 
-    struct GameStateComparisonFunctor
+    class GameStateComparisonFunctor
     {
+    public:
         GameStateComparisonFunctor()
         {
             throw std::logic_error("Should never come here!");
