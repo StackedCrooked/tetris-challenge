@@ -1,4 +1,6 @@
 #include "TetrisPaintFunctions.h"
+#include "Tetris/Grid.h"
+#include "Tetris/GenericGrid.h"
 #include "XULWin/Gdiplus.h"
 #include "XULWin/Unicode.h"
 #include <boost/lexical_cast.hpp>

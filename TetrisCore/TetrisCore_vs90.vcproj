@@ -224,6 +224,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\Tetris\GameOver.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\GameQualityEvaluator.cpp"
 					>
 				</File>

@@ -1,6 +1,8 @@
 #include "TetrisComponent.h"
 #include "TetrisPaintFunctions.h"
 #include "Tetris/ComputerPlayer.h"
+#include "Tetris/Block.h"
+#include "Tetris/GenericGrid.h"
 #include "XULWin/Conversions.h"
 #include "XULWin/ErrorReporter.h"
 #include "XULWin/Gdiplus.h"

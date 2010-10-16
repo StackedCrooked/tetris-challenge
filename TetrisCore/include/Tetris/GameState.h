@@ -2,20 +2,34 @@
 #define TETRIS_GAMESTATE_H_INCLUDED
 
 
-#include "Tetris/Tetris.h"
-#include "Tetris/GameQualityEvaluator.h"
-#include "Tetris/Block.h"
-#include "Tetris/GenericGrid.h"
+#include "Tetris/GameOver.h"
+#include "Tetris/Grid.h"
+#include <memory>
+#include <stdexcept>
 
 
 namespace Tetris
 {
 
+    // Forward declarations    
+    class Block;
+    class Evaluator;
+
+
+    // Impl declaration
+    class GameStateImpl;
+    class Stats;
+
+    
     class GameState
     {
     public:
         // Creates a new GameState
         GameState(size_t inNumRows, size_t inNumColumns);
+        
+        GameState(const GameState &);
+
+        ~GameState();
 
         const Grid & grid() const;
 
@@ -41,116 +55,49 @@ namespace Tetris
         // Use inGameOver = true to mark the new gamestate as "game over".
         std::auto_ptr<GameState> commit(const Block & inBlock, GameOver inGameOver) const;
 
-        class Stats
-        {
-        public:
-            Stats() :
-                mNumLines(0),
-                mNumSingles(0),
-                mNumDoubles(0),
-                mNumTriples(0),
-                mNumTetrises(0),
-                mFirstOccupiedRow(0)
-            {
-            }
-
-            int score() const;
-
-            inline int numLines() const
-            { return mNumLines; }
-
-            inline int numSingles() const
-            { return mNumSingles; }
-
-            inline int numDoubles() const
-            { return mNumDoubles; }
-
-            inline int numTriples() const
-            { return mNumTriples; }
-
-            inline int numTetrises() const
-            { return mNumTetrises; }
-
-            inline int firstOccupiedRow() const
-            { return mFirstOccupiedRow; }
-
-            // Use zero based index!
-            inline int numLines(size_t idx) const
-            {
-                switch (idx)
-                {
-                    case 0: return mNumSingles;
-                    case 1: return mNumDoubles;
-                    case 2: return mNumTriples;
-                    case 3: return mNumTetrises;
-                    default: throw std::invalid_argument("Invalid number of lines scored requested.");
-                }
-                return 0; // compiler happy
-            }
-
-        private:
-            friend class GameState;
-            int mNumLines;
-            int mNumSingles;
-            int mNumDoubles;
-            int mNumTriples;
-            int mNumTetrises;
-            int mFirstOccupiedRow;
-        };
-
         const Stats & stats() const;
 
     private:
-        void solidifyBlock(const Block & inBlock);
+        // not allowed
+        GameState& operator=(const GameState&);
 
-        void clearLines();
+        friend class GameStateImpl;
+        GameStateImpl * mImpl;
+    };
 
-        Grid mGrid;
-        Stats mStats;
-        bool mIsGameOver;
-        Block mOriginalBlock;
 
-        class Quality
-        {
-        public:
-            Quality() :
-                mIsInitialized(false),
-                mScore(0),
-                mNumHoles(0)
-            {
-            }
+    // GameState stats
+    class Stats
+    {
+    public:
+        Stats();
 
-            bool isInitialized() const
-            { return mIsInitialized; }
+        int score() const;
 
-            void setInitialized(bool inIsInitialized)
-            { mIsInitialized = inIsInitialized; }
+        int numLines() const;
 
-            int score() const
-            { return mScore; }
+        int numSingles() const;
 
-            void setScore(int inScore)
-            { mScore = inScore; }
+        int numDoubles() const;
 
-            int numHoles() const
-            { return mNumHoles; }
+        int numTriples() const;
 
-            void setNumHoles(int inNumHoles)
-            { mNumHoles = inNumHoles; }
+        int numTetrises() const;
 
-            void reset()
-            {
-                mScore = 0;
-                mNumHoles = 0;
-            }
+        int firstOccupiedRow() const;
 
-        private:
-            bool mIsInitialized;
-            int mScore;
-            int mNumHoles;
-        };
+        // Use zero based index!
+        int numLines(size_t idx) const;
 
-        mutable Quality mQuality;
+    private:
+        friend class GameState;
+        friend class GameStateImpl;
+        int mNumLines;
+        int mNumSingles;
+        int mNumDoubles;
+        int mNumTriples;
+        int mNumTetrises;
+        int mFirstOccupiedRow;
     };
 
 
@@ -158,4 +105,3 @@ namespace Tetris
 
 
 #endif // GAMESTATE_H_INCLUDED
-
