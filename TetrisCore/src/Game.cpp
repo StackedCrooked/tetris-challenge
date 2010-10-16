@@ -8,30 +8,126 @@
 
 namespace Tetris
 {
-
-    std::auto_ptr<Block> CreateDefaultBlock(BlockType inBlockType, size_t inNumColumns)
+    class GameImpl
     {
-        return std::auto_ptr<Block>(new Block(inBlockType,
-                                              Rotation(0),
-                                              Row(0),
-                                              Column(DivideByTwo(inNumColumns - GetGrid(GetBlockIdentifier(inBlockType, 0)).numColumns()))));
-    }
+    public:
+        GameImpl(size_t inNumRows, size_t inNumColumns) :
+            mNumRows(inNumRows),
+            mNumColumns(inNumColumns),
+            mCurrentNode(GameStateNode::CreateRootNode(inNumRows, inNumColumns).release()),
+            mActiveBlock(),
+            mBlockFactory(new BlockFactory),
+            mBlocks(),
+            mCurrentBlockIndex(0)
+        {
+            if (mBlocks.empty())
+            {
+                mBlocks.push_back(mBlockFactory->getNext());
+            }
+            mActiveBlock.reset(CreateDefaultBlock(mBlocks.front(), inNumColumns).release());
+        }
+
+        GameImpl(const GameImpl & rhs) :
+            mNumRows(rhs.mNumRows),
+            mNumColumns(rhs.mNumColumns),
+            mCurrentNode(rhs.mCurrentNode->clone()),
+            mActiveBlock(new Block(*rhs.mActiveBlock)),
+            mBlockFactory(), // YES! Because we must be CERTAIN that getFutureBlocks() will always return the same result.
+                             //      The clone method will provide us with 100 precalculated blocks. After that this clone
+                             //      becomes invalid. A runtime_exception will thrown the next time mBlockFactory will be
+                             //      accessed.
+            mBlocks(rhs.mBlocks),
+            mCurrentBlockIndex(rhs.mCurrentBlockIndex)
+        {
+        }
+
+        // Assignment is now allowed.
+        GameImpl & operator=(const GameImpl &);
+
+    private:
+        static std::auto_ptr<Block> CreateDefaultBlock(BlockType inBlockType, size_t inNumColumns)
+        {
+            return std::auto_ptr<Block>(
+                new Block(inBlockType,
+                          Rotation(0),
+                          Row(0),
+                          Column(DivideByTwo(inNumColumns - GetGrid(GetBlockIdentifier(inBlockType, 0)).numColumns()))));
+        }
+
+        void setCurrentNode(NodePtr inCurrentNode)
+        {            
+            Assert(inCurrentNode->depth() == mCurrentNode->depth() + 1);
+
+            mCurrentNode = inCurrentNode;
+            size_t oldBlockIndex = mCurrentBlockIndex;
+            mCurrentBlockIndex = mCurrentNode->depth();
+            supplyBlocks();
+            mActiveBlock.reset(CreateDefaultBlock(mBlocks[mCurrentBlockIndex], mNumColumns).release());
+            if (!mCurrentNode->children().empty())
+            {
+                GameState & state = (*mCurrentNode->children().begin())->state();
+                Assert(mActiveBlock->type() == state.originalBlock().type());
+            }
+        }
+
+        void supplyBlocks() const
+        {            
+            if (!mBlockFactory && (mCurrentBlockIndex >= mBlocks.size()))
+            {
+                throw std::runtime_error("This is a cloned Game object and its number of future blocks is depleted.");
+            }
+
+            while (mCurrentBlockIndex >= mBlocks.size())
+            {
+                mBlocks.push_back(mBlockFactory->getNext());
+            }
+        }
+
+        friend class Game;
+        size_t mNumRows;
+        size_t mNumColumns;
+        NodePtr mCurrentNode;
+        boost::scoped_ptr<Block> mActiveBlock;
+        boost::scoped_ptr<BlockFactory> mBlockFactory;
+        mutable BlockTypes mBlocks;
+        size_t mCurrentBlockIndex;
+    };
 
 
     Game::Game(size_t inNumRows, size_t inNumColumns) :
-        mNumRows(inNumRows),
-        mNumColumns(inNumColumns),
-        mCurrentNode(GameStateNode::CreateRootNode(inNumRows, inNumColumns).release()),
-        mActiveBlock(),
-        mBlockFactory(new BlockFactory),
-        mBlocks(),
-        mCurrentBlockIndex(0)
+        mImpl(new GameImpl(inNumRows, inNumColumns))
     {
-        if (mBlocks.empty())
+    }
+    
+    
+    Game::Game(const Game & inGame) :
+        mImpl(new GameImpl(*inGame.mImpl))
+    {
+    }
+
+
+    Game::~Game()
+    {
+        delete mImpl;
+        mImpl = 0;
+    }
+
+
+    std::auto_ptr<Game> Game::clone()
+    {
+        if (!mImpl->mBlockFactory)
         {
-            mBlocks.push_back(mBlockFactory->getNext());
+            throw std::runtime_error("You cannot clone a Game that was already cloned.");
         }
-        mActiveBlock.reset(CreateDefaultBlock(mBlocks.front(), inNumColumns).release());
+
+
+        // Make sure we have 100 blocks from the factory.
+        // This ensures 
+        while (mImpl->mCurrentBlockIndex + 100 > mImpl->mBlocks.size())
+        {
+            mImpl->mBlocks.push_back(mImpl->mBlockFactory->getNext());
+        }
+        return std::auto_ptr<Game>(new Game(*this));
     }
 
 
@@ -55,151 +151,105 @@ namespace Tetris
             throw std::logic_error("Failed to find the current node. Childnodes require cleanup first.");
         }
     }
-    
-    
-    Game::Game(const Game & inGame) :
-        mNumRows(inGame.mNumRows),
-        mNumColumns(inGame.mNumColumns),
-        mCurrentNode(inGame.mCurrentNode->clone()),
-        mActiveBlock(new Block(*inGame.mActiveBlock)),
-        mBlockFactory(), // YES! Because we must be CERTAIN that getFutureBlocks() will always return the same result.
-                         //      The clone method will provide us with 100 precalculated blocks. After that this clone
-                         //      becomes invalid. A runtime_exception will thrown the next time mBlockFactory will be
-                         //      accessed.
-        mBlocks(inGame.mBlocks),
-        mCurrentBlockIndex(inGame.mCurrentBlockIndex)
-    {
-    }
-
-
-    std::auto_ptr<Game> Game::clone()
-    {
-        if (!mBlockFactory)
-        {
-            throw std::runtime_error("You cannot clone a Game that was already cloned.");
-        }
-
-
-        // Make sure we have 100 blocks from the factory.
-        // This ensures 
-        while (mCurrentBlockIndex + 100 > mBlocks.size())
-        {
-            mBlocks.push_back(mBlockFactory->getNext());
-        }
-        return std::auto_ptr<Game>(new Game(*this));
-    }
-
-
-    Game::~Game()
-    {
-    }
 
 
     int Game::numRows() const
     {
-        return mNumRows;
+        return mImpl->mNumRows;
     }
 
 
     int Game::numColumns() const
     {
-        return mNumColumns;
+        return mImpl->mNumColumns;
     }
 
 
     void Game::reserveBlocks(size_t inCount)
     {
-        if (!mBlockFactory && (mBlocks.size() < inCount))
+        if (!mImpl->mBlockFactory && (mImpl->mBlocks.size() < inCount))
         {
             throw std::runtime_error("This is a cloned Game object and its number of future blocks is depleted.");
         }
 
-        while (mBlocks.size() < inCount)
+        while (mImpl->mBlocks.size() < inCount)
         {
-            mBlocks.push_back(mBlockFactory->getNext());
+            mImpl->mBlocks.push_back(mImpl->mBlockFactory->getNext());
         }
     }
 
 
     bool Game::isGameOver() const
     {
-        return mCurrentNode->state().isGameOver();
-    }
-
-
-    void Game::supplyBlocks() const
-    {
-        if (!mBlockFactory && (mCurrentBlockIndex >= mBlocks.size()))
-        {
-            throw std::runtime_error("This is a cloned Game object and its number of future blocks is depleted.");
-        }
-
-        while (mCurrentBlockIndex >= mBlocks.size())
-        {
-            mBlocks.push_back(mBlockFactory->getNext());
-        }
+        return mImpl->mCurrentNode->state().isGameOver();
     }
 
 
     const Block & Game::activeBlock() const
     {
-        supplyBlocks();
-        return *mActiveBlock;
+        mImpl->supplyBlocks();
+        return *mImpl->mActiveBlock;
     }
 
 
     Block & Game::activeBlock()
     {
-        supplyBlocks();
-        return *mActiveBlock;
+        mImpl->supplyBlocks();
+        return *mImpl->mActiveBlock;
     }
 
 
     void Game::getFutureBlocks(size_t inCount, BlockTypes & outBlocks) const
     {
-        if (!mBlockFactory && (mBlocks.size() < mCurrentBlockIndex + inCount))
+        if (!mImpl->mBlockFactory && (mImpl->mBlocks.size() < mImpl->mCurrentBlockIndex + inCount))
         {
             throw std::runtime_error("This is a cloned Game object and its number of future blocks is depleted.");
         }
 
         // Make sure we have all blocks we need.
-        while (mBlocks.size() < mCurrentBlockIndex + inCount)
+        while (mImpl->mBlocks.size() < mImpl->mCurrentBlockIndex + inCount)
         {
-            mBlocks.push_back(mBlockFactory->getNext());
+            mImpl->mBlocks.push_back(mImpl->mBlockFactory->getNext());
         }
 
         for (size_t idx = 0; idx < inCount; ++idx)
         {
-            outBlocks.push_back(mBlocks[mCurrentBlockIndex + idx]);
+            outBlocks.push_back(mImpl->mBlocks[mImpl->mCurrentBlockIndex + idx]);
         }
     }
 
 
     void Game::getFutureBlocksWithOffset(size_t inOffset, size_t inCount, BlockTypes & outBlocks) const
     {        
-        if (!mBlockFactory && (mBlocks.size() < inOffset + inCount))
+        if (!mImpl->mBlockFactory && (mImpl->mBlocks.size() < inOffset + inCount))
         {
             throw std::runtime_error("This is a cloned Game object and its number of future blocks is depleted.");
         }
 
 
         // Make sure we have all blocks we need.
-        while (mBlocks.size() < inOffset + inCount)
+        while (mImpl->mBlocks.size() < inOffset + inCount)
         {
-            mBlocks.push_back(mBlockFactory->getNext());
+            mImpl->mBlocks.push_back(mImpl->mBlockFactory->getNext());
         }
 
         for (size_t idx = 0; idx < inCount; ++idx)
         {
-            outBlocks.push_back(mBlocks[inOffset + idx]);
+            outBlocks.push_back(mImpl->mBlocks[inOffset + idx]);
         }
+    }
+
+
+    size_t Game::currentBlockIndex() const
+    {
+        return mImpl->mCurrentBlockIndex;
     }
 
 
     size_t Game::numPrecalculatedMoves() const
     {
         size_t countMovesAhead = 0;
-        const GameStateNode * tmp = mCurrentNode.get();
+        const GameStateNode * tmp = mImpl->mCurrentNode.get();
         while (!tmp->children().empty())
         {
             tmp = tmp->children().begin()->get();
@@ -211,61 +261,44 @@ namespace Tetris
 
     void Game::clearPrecalculatedNodes()
     {
-        mCurrentNode->children().clear();
+        mImpl->mCurrentNode->children().clear();
     }
 
 
     GameStateNode * Game::currentNode()
     {
-        return mCurrentNode.get();
+        return mImpl->mCurrentNode.get();
     }
 
 
     const GameStateNode * Game::currentNode() const
     {
-        return mCurrentNode.get();
+        return mImpl->mCurrentNode.get();
     }
 
 
     const GameStateNode * Game::lastPrecalculatedNode() const
     {
-        return mCurrentNode->endNode();
+        return mImpl->mCurrentNode->endNode();
     }
 
 
     GameStateNode * Game::lastPrecalculatedNode()
     {
-        return mCurrentNode->endNode();
-    }
-
-
-    void Game::setCurrentNode(NodePtr inCurrentNode)
-    {
-        Assert(inCurrentNode->depth() == mCurrentNode->depth() + 1);
-
-        mCurrentNode = inCurrentNode;
-        size_t oldBlockIndex = mCurrentBlockIndex;
-        mCurrentBlockIndex = mCurrentNode->depth();
-        supplyBlocks();
-        mActiveBlock.reset(CreateDefaultBlock(mBlocks[mCurrentBlockIndex], mNumColumns).release());
-        if (!mCurrentNode->children().empty())
-        {
-            GameState & state = (*mCurrentNode->children().begin())->state();
-            Assert(mActiveBlock->type() == state.originalBlock().type());
-        }
+        return mImpl->mCurrentNode->endNode();
     }
 
 
     bool Game::navigateNodeDown()
     {
-        if (mCurrentNode->children().empty())
+        if (mImpl->mCurrentNode->children().empty())
         {
             return false;
         }
 
-        NodePtr nextNode = *mCurrentNode->children().begin();
-        Assert(nextNode->depth() == mCurrentNode->depth() + 1);
-        setCurrentNode(nextNode);
+        NodePtr nextNode = *mImpl->mCurrentNode->children().begin();
+        Assert(nextNode->depth() == mImpl->mCurrentNode->depth() + 1);
+        mImpl->setCurrentNode(nextNode);
         return true;
     }
 
@@ -320,7 +353,7 @@ namespace Tetris
         Block & block = activeBlock();
         size_t newRow = block.row() + GetRowDelta(inDirection);
         size_t newCol = block.column() + GetColumnDelta(inDirection);
-        if (mCurrentNode->state().checkPositionValid(block, newRow, newCol))
+        if (mImpl->mCurrentNode->state().checkPositionValid(block, newRow, newCol))
         {
             block.setRow(newRow);
             block.setColumn(newCol);
@@ -339,9 +372,9 @@ namespace Tetris
         //
 
         // First check if we already have a matching precalculated block.
-        if (!mCurrentNode->children().empty())
+        if (!mImpl->mCurrentNode->children().empty())
         {
-            const GameStateNode & precalculatedChild = **mCurrentNode->children().begin();
+            const GameStateNode & precalculatedChild = **mImpl->mCurrentNode->children().begin();
             const Block & nextBlock = precalculatedChild.state().originalBlock();
             Assert(nextBlock.type() == block.type());
             if (block.column() == nextBlock.column() &&
@@ -353,18 +386,18 @@ namespace Tetris
 
         // We don't have a matching precalculating block.
         // => Erase any existing children (should not happen)
-        if (!mCurrentNode->children().empty())
+        if (!mImpl->mCurrentNode->children().empty())
         {
             LogWarning("Existing children when commiting a block. They will be deleted.");
-            mCurrentNode->children().clear();
+            mImpl->mCurrentNode->children().clear();
         }
 
         // Actually commit the block
-        NodePtr child(new GameStateNode(mCurrentNode,
-                                        mCurrentNode->state().commit(block, GameOver(block.row() == 0)),
+        NodePtr child(new GameStateNode(mImpl->mCurrentNode,
+                                        mImpl->mCurrentNode->state().commit(block, GameOver(block.row() == 0)),
                                         CreatePoly<Evaluator, Balanced>()));
-        mCurrentNode->addChild(child);
-        setCurrentNode(child);
+        mImpl->mCurrentNode->addChild(child);
+        mImpl->setCurrentNode(child);
         return true;
     }
 
@@ -379,7 +412,7 @@ namespace Tetris
         Block & block = activeBlock();
         size_t oldRotation = block.rotation();
         block.rotate();
-        if (!mCurrentNode->state().checkPositionValid(block, block.row(), block.column()))
+        if (!mImpl->mCurrentNode->state().checkPositionValid(block, block.row(), block.column()))
         {
             block.setRotation(oldRotation);
             return false;
