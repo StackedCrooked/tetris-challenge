@@ -1,5 +1,6 @@
 #include "Tetris/Game.h"
 #include "Tetris/GameStateNode.h"
+#include "Tetris/GameStateComparisonFunctor.h"
 #include "Tetris/GameState.h"
 #include "Tetris/GameQualityEvaluator.h"
 #include "Tetris/Direction.h"
@@ -7,6 +8,8 @@
 #include "Tetris/Utilities.h"
 #include "Tetris/Logging.h"
 #include "Tetris/Assert.h"
+#include <set>
+#include <boost/scoped_ptr.hpp>
 
 
 namespace Tetris

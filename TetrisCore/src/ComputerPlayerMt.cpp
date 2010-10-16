@@ -1,12 +1,14 @@
 #include "Tetris/ComputerPlayerMt.h"
 #include "Tetris/AISupport.h"
 #include "Tetris/ComputerPlayer.h"
+#include "Tetris/GameStateComparisonFunctor.h"
 #include "Tetris/GameStateNode.h"
 #include "Tetris/GameState.h"
 #include "Tetris/GameQualityEvaluator.h"
 #include "Tetris/WorkerPool.h"
 #include <boost/bind.hpp>
 #include <algorithm>
+#include <set>
 
 
 namespace Tetris

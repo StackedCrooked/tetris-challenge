@@ -2,11 +2,8 @@
 #define TETRIS_GAMESTATENODE_H_INCLUDED
 
 
-#include "Tetris/GameStateComparisonFunctor.h"
 #include "Tetris/NodePtr.h"
-#include <boost/scoped_ptr.hpp>
-#include <boost/weak_ptr.hpp>
-#include <set>
+#include <memory>
 
 
 namespace Tetris
@@ -14,6 +11,10 @@ namespace Tetris
 
     class Evaluator;
     class GameState;
+
+
+    // Impl declaration.
+    class GameStateNodeImpl;
 
 
     /**
@@ -42,13 +43,12 @@ namespace Tetris
 
         NodePtr parent();
 
-        void makeRoot()
-        { mParent.reset(); }
+        void makeRoot();
 
         const ChildNodes & children() const;
 
         // yeah
-        ChildNodes & children() { return mChildren; }
+        ChildNodes & children();
 
         void clearChildren();
 
@@ -63,16 +63,13 @@ namespace Tetris
         GameState & state();
 
     private:
-        // Creates a root node
+        friend class GameStateNodeImpl;
+
+        // Constructor for creating a root node.
         GameStateNode(std::auto_ptr<GameState> inGameState, std::auto_ptr<Evaluator> inEvaluator);
+        
 
-        boost::weak_ptr<GameStateNode> mParent;
-        int mIdentifier;
-        int mDepth;
-        boost::scoped_ptr<GameState> mGameState;
-
-        boost::scoped_ptr<Evaluator> mEvaluator; // }
-        ChildNodes mChildren;                    // } => Order matters!
+        GameStateNodeImpl * mImpl;
     };
 
 } // namespace Tetris

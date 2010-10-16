@@ -4,10 +4,12 @@
 #include "Tetris/ComputerPlayerMt.h"
 #include "Tetris/Gravity.h"
 #include "Tetris/Game.h"
+#include "Tetris/GameStateComparisonFunctor.h"
 #include "Tetris/GameQualityEvaluator.h"
 #include "Tetris/GameState.h"
 #include "Tetris/WorkerPool.h"
 #include "Tetris/Worker.h"
+#include <set>
 #include <boost/bind.hpp>
 
 

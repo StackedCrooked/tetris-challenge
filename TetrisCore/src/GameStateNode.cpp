@@ -1,45 +1,49 @@
 #include "Tetris/GameStateNode.h"
-#include "Tetris/Block.h"
-#include "Tetris/GameState.h"
 #include "Tetris/GameStateComparisonFunctor.h"
 #include "Tetris/GameQualityEvaluator.h"
+#include "Tetris/GameState.h"
+#include "Tetris/Block.h"
 #include "Tetris/Utilities.h"
 #include "Tetris/Assert.h"
+#include <set>
+#include <boost/scoped_ptr.hpp>
+#include <boost/weak_ptr.hpp>
 
 
 namespace Tetris
 {
-
-
-    std::auto_ptr<GameStateNode> GameStateNode::CreateRootNode(size_t inNumRows, size_t inNumColumns)
+    
+    class GameStateNodeImpl
     {
-        return std::auto_ptr<GameStateNode>(new GameStateNode(Create<GameState>(inNumRows, inNumColumns),
-                                            CreatePoly<Evaluator, Balanced>()));
-    }
+    public:
+        GameStateNodeImpl(NodePtr inParent, std::auto_ptr<GameState> inGameState, std::auto_ptr<Evaluator> inEvaluator);
 
+        // Creates a root node
+        GameStateNodeImpl(std::auto_ptr<GameState> inGameState, std::auto_ptr<Evaluator> inEvaluator);
+        
+        std::auto_ptr<GameStateNode> clone() const;
 
-    ChildNodes nodes(Balanced);
+    private:
+        friend class GameStateNode;
+        boost::weak_ptr<GameStateNode> mParent;
+        int mIdentifier;
+        int mDepth;
+        boost::scoped_ptr<GameState> mGameState;
+        boost::scoped_ptr<Evaluator> mEvaluator; // }
+        ChildNodes mChildren;                    // } => Order matters!
+    };
+
 
     static int GetIdentifier(const GameState & inGameState)
     {
         const Block & block = inGameState.originalBlock();
         return block.numRotations() * block.column() + block.rotation();
     }
+    
 
-
-    GameStateNode::GameStateNode(std::auto_ptr<GameState> inGameState, std::auto_ptr<Evaluator> inEvaluator) :
-        mParent(),
-        mIdentifier(GetIdentifier(*inGameState)),
-        mDepth(0),
-        mGameState(inGameState),
-        mEvaluator(inEvaluator.release()),
-        mChildren(GameStateComparisonFunctor(mEvaluator->clone()))
-    {
-
-    }
-
-
-    GameStateNode::GameStateNode(NodePtr inParent, std::auto_ptr<GameState> inGameState, std::auto_ptr<Evaluator> inEvaluator) :
+    GameStateNodeImpl::GameStateNodeImpl(NodePtr inParent,
+                                         std::auto_ptr<GameState> inGameState,
+                                         std::auto_ptr<Evaluator> inEvaluator) :
         mParent(inParent),
         mIdentifier(GetIdentifier(*inGameState)),
         mDepth(inParent->depth() + 1),
@@ -50,12 +54,25 @@ namespace Tetris
     }
 
 
-    std::auto_ptr<GameStateNode> GameStateNode::clone() const
+
+    GameStateNodeImpl::GameStateNodeImpl(std::auto_ptr<GameState> inGameState,
+                                         std::auto_ptr<Evaluator> inEvaluator) :
+        mParent(),
+        mIdentifier(GetIdentifier(*inGameState)),
+        mDepth(0),
+        mGameState(inGameState),
+        mEvaluator(inEvaluator.release()),
+        mChildren(GameStateComparisonFunctor(mEvaluator->clone()))
+    {
+    }
+
+
+    std::auto_ptr<GameStateNode> GameStateNodeImpl::clone() const
     {
         NodePtr parent = mParent.lock();
         std::auto_ptr<GameStateNode> result(parent ? new GameStateNode(parent, Create<GameState>(*mGameState), mEvaluator->clone())
                                                    : new GameStateNode(Create<GameState>(*mGameState), mEvaluator->clone()));
-        result->mDepth = mDepth;
+        result->mImpl->mDepth = mDepth;
 
         ChildNodes::const_iterator it = mChildren.begin(), end = mChildren.end();
         for (; it != end; ++it)
@@ -63,90 +80,126 @@ namespace Tetris
             GameStateNode & node(*(*it));
             NodePtr newChild(node.clone().release());
             Assert(newChild->depth() == mDepth + 1);
-            result->mChildren.insert(newChild);
+            result->mImpl->mChildren.insert(newChild);
         }
         return result;
     }
 
 
+    std::auto_ptr<GameStateNode> GameStateNode::CreateRootNode(size_t inNumRows, size_t inNumColumns)
+    {
+        return std::auto_ptr<GameStateNode>(new GameStateNode(Create<GameState>(inNumRows, inNumColumns), CreatePoly<Evaluator, Balanced>()));
+    }
+
+
+    GameStateNode::GameStateNode(std::auto_ptr<GameState> inGameState, std::auto_ptr<Evaluator> inEvaluator) :
+        mImpl(new GameStateNodeImpl(inGameState, inEvaluator))
+    {
+    }
+
+
+    GameStateNode::GameStateNode(NodePtr inParent, std::auto_ptr<GameState> inGameState, std::auto_ptr<Evaluator> inEvaluator) :
+        mImpl(new GameStateNodeImpl(inParent, inGameState, inEvaluator))
+    {
+    }
+
+
+    std::auto_ptr<GameStateNode> GameStateNode::clone() const
+    {
+        return mImpl->clone();
+    }
+
+
     int GameStateNode::identifier() const
     {
-        return mIdentifier;
+        return mImpl->mIdentifier;
     }
 
 
     const Evaluator & GameStateNode::qualityEvaluator() const
     {
-        return *mEvaluator;
+        return *mImpl->mEvaluator;
     }
 
 
     const GameState & GameStateNode::state() const
     {
-        return *mGameState;
+        return *mImpl->mGameState;
     }
 
 
     GameState & GameStateNode::state()
     {
-        return *mGameState;
+        return *mImpl->mGameState;
+    }
+
+
+    ChildNodes & GameStateNode::children()
+    {
+        return mImpl->mChildren;
     }
 
 
     const ChildNodes & GameStateNode::children() const
     {
-        return mChildren;
+        return mImpl->mChildren;
     }
 
 
     void GameStateNode::clearChildren()
     {
-        mChildren.clear();
+        mImpl->mChildren.clear();
     }
 
 
     void GameStateNode::addChild(NodePtr inChildNode)
     {
-        Assert(inChildNode->depth() == mDepth + 1);
-        mChildren.insert(inChildNode);
+        Assert(inChildNode->depth() == mImpl->mDepth + 1);
+        mImpl->mChildren.insert(inChildNode);
     }
 
 
     const GameStateNode * GameStateNode::endNode() const
     {
-        if (mChildren.empty())
+        if (mImpl->mChildren.empty())
         {
             return this;
         }
-        return (*mChildren.begin())->endNode();
+        return (*mImpl->mChildren.begin())->endNode();
     }
 
 
     GameStateNode * GameStateNode::endNode()
     {
-        if (mChildren.empty())
+        if (mImpl->mChildren.empty())
         {
             return this;
         }
-        return (*mChildren.begin())->endNode();
+        return (*mImpl->mChildren.begin())->endNode();
     }
 
 
     NodePtr GameStateNode::parent()
     {
-        return mParent.lock();
+        return mImpl->mParent.lock();
     }
 
 
     int GameStateNode::depth() const
     {
-        return mDepth;
+        return mImpl->mDepth;
     }
 
 
     const NodePtr GameStateNode::parent() const
     {
-        return mParent.lock();
+        return mImpl->mParent.lock();
+    }
+
+
+    void GameStateNode::makeRoot()
+    {
+        mImpl->mParent.reset();
     }
 
 } // namespace Tetris

@@ -1,4 +1,5 @@
 #include "Tetris/AISupport.h"
+#include "Tetris/GameStateComparisonFunctor.h"
 #include "Tetris/GameQualityEvaluator.h"
 #include "Tetris/GameStateNode.h"
 #include "Tetris/GameState.h"
