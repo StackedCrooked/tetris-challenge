@@ -3,8 +3,8 @@
 
 
 /**
- * Tetris_DefineEnum can be used to define a fake enum. The purpose of this macro
- * is to enable enums that can be forward declared.
+ * Tetris_DefineEnum can be used to define a fake enum. The purpose
+ * of this macro is to provide a way to forward declare enum types.
  *
  * Example:
  *
