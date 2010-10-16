@@ -5,7 +5,6 @@
 #include "Tetris/GameState.h"
 #include "Tetris/Block.h"
 #include "Tetris/Grid.h"
-#include "Tetris/GenericGrid.h"
 #include "Tetris/Utilities.h"
 #include "Tetris/Assert.h"
 

@@ -6,6 +6,9 @@
 #include "Tetris/GameState.h"
 #include "Tetris/GameQualityEvaluator.h"
 #include "Tetris/WorkerPool.h"
+#include "Tetris/Logging.h"
+#include "Tetris/MakeString.h"
+#include "Tetris/Assert.h"
 #include <boost/bind.hpp>
 #include <algorithm>
 #include <set>

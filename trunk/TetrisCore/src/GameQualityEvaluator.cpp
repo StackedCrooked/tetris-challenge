@@ -3,7 +3,6 @@
 #include "Tetris/Block.h"
 #include "Tetris/BlockType.h"
 #include "Tetris/Grid.h"
-#include "Tetris/GenericGrid.h"
 
 
 namespace Tetris

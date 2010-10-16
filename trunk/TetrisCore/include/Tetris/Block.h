@@ -2,18 +2,12 @@
 #define TETRIS_BLOCK_H_INCLUDED
 
 
-#include "Tetris/Enum.h"
 #include "Tetris/Grid.h"
 #include "Tetris/TypedWrapper.h"
 
 
 namespace Tetris
 {
-
-    // Forward declaration of the fake enums
-    Tetris_DeclareEnum(BlockType);
-    Tetris_DeclareEnum(Direction);
-
 
     // Generate the typesafe wrapper classes
     Tetris_TypedWrapper(Rotation, size_t);
@@ -23,6 +17,7 @@ namespace Tetris
 
     // Forward declarations.
     class BlockImpl;
+    typedef int BlockType;
 
 
     /**
@@ -63,7 +58,6 @@ namespace Tetris
     private:
         BlockImpl * mImpl;
     };
-
 
 
     size_t GetBlockRotationCount(BlockType inType);

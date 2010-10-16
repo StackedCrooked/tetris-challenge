@@ -1,5 +1,6 @@
 #include "Tetris/BlockFactory.h"
 #include "Tetris/BlockType.h"
+#include "Tetris/BlockTypes.h"
 #include <algorithm>
 #include <ctime>
 
