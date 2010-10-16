@@ -1,5 +1,6 @@
 #include "Tetris/GameQualityEvaluator.h"
 #include "Tetris/GameState.h"
+#include "Tetris/Grid.h"
 
 
 namespace Tetris

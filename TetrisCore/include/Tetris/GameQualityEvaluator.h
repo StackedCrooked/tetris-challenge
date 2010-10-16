@@ -2,8 +2,9 @@
 #define TETRIS_GAMEQUALITYEVALUATOR_H_INCLUDED
 
 
-#include "Tetris/Tetris.h"
+#include "Tetris/TypedWrapper.h"
 #include "Tetris/Utilities.h"
+#include <memory>
 
 
 namespace Tetris
