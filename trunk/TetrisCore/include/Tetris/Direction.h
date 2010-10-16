@@ -2,9 +2,6 @@
 #define TETRIS_DIRECTION_H_INCLUDED
 
 
-#include "Tetris/Tetris.h"
-
-
 namespace Tetris
 {
 
