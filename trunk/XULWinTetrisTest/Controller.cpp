@@ -7,6 +7,7 @@
 #include "Tetris/GameQualityEvaluator.h"
 #include "Tetris/GameState.h"
 #include "Tetris/GameStateNode.h"
+#include "Tetris/GenericGrid.h"
 #include "Tetris/Gravity.h"
 #include "Tetris/Logger.h"
 #include "Tetris/Logging.h"
@@ -747,7 +748,7 @@ namespace Tetris
 
         for (size_t idx = 0; idx != 4; ++idx)
         {
-            const GameState::Stats & stats = gameStats->currentNode()->state().stats();
+            const Stats & stats = gameStats->currentNode()->state().stats();
             if (mLinesTextBoxes[idx])
             {
                 setText(mLinesTextBoxes[idx], MakeString() << stats.numLines(idx));

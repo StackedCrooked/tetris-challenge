@@ -3,6 +3,7 @@
 #include "Tetris/GameState.h"
 #include "Tetris/GameQualityEvaluator.h"
 #include "Tetris/Direction.h"
+#include "Tetris/GenericGrid.h"
 #include "Tetris/Utilities.h"
 
 

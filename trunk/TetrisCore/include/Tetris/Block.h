@@ -19,7 +19,6 @@ namespace Tetris
     Tetris_TypedWrapper(Rotation, size_t);
     Tetris_TypedWrapper(Row, size_t);
     Tetris_TypedWrapper(Column, size_t);
-    Tetris_TypedWrapper(GameOver, bool);
 
 
     // Forward declarations.
