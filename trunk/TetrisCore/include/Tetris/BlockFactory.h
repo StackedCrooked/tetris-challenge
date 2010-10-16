@@ -2,8 +2,7 @@
 #define TETRIS_BLOCKFACTORY_H_INCLUDED
 
 
-#include "Tetris/BlockType.h"
-#include <boost/scoped_ptr.hpp>
+#include "Tetris/Enum.h"
 
 
 namespace Tetris
@@ -20,13 +19,16 @@ namespace Tetris
         // The size of the bag of blocks that shuffled and taken from.
         BlockFactory(int inBagSize = 1);
 
+        ~BlockFactory();
+
         // Returns a random block type.
         BlockType getNext() const;
 
     private:
-        size_t mBagSize;
-        mutable size_t mCurrentIndex;
-        mutable BlockTypes mBag;
+        BlockFactory(const BlockFactory &);
+        BlockFactory& operator=(const BlockFactory&);
+
+        BlockFactoryImpl * mImpl;
     };
 
 } // namespace Tetris

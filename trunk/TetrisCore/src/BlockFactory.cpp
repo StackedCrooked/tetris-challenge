@@ -1,40 +1,60 @@
 #include "Tetris/BlockFactory.h"
-#include "Tetris/Block.h"
+#include "Tetris/BlockType.h"
 #include <algorithm>
 #include <ctime>
 
 
 namespace Tetris
 {
+    
+    class BlockFactoryImpl
+    {
+    public:
+        BlockFactoryImpl(int inBagSize) :
+            mBagSize(inBagSize),
+            mCurrentIndex(0)
+        {
+        }
+
+        size_t mBagSize;
+        mutable size_t mCurrentIndex;
+        mutable BlockTypes mBag;
+    };
+
 
     BlockFactory::BlockFactory(int inBagSize) :
-        mBagSize(inBagSize),
-        mCurrentIndex(0)
+        mImpl(new BlockFactoryImpl(inBagSize))
     {
         // Pick a new seed.
         srand(static_cast<unsigned int>(time(NULL)));
 
-        size_t totalSize = mBagSize * cBlockTypeCount;
-        mBag.reserve(totalSize);
+        size_t totalSize = mImpl->mBagSize * cBlockTypeCount;
+        mImpl->mBag.reserve(totalSize);
         for (size_t idx = 0; idx != totalSize; ++idx)
         {
             BlockType blockType = static_cast<BlockType>(1 + (idx % cBlockTypeCount));
-            mBag.push_back(blockType);
+            mImpl->mBag.push_back(blockType);
         }
-        std::random_shuffle(mBag.begin(), mBag.end());
+        std::random_shuffle(mImpl->mBag.begin(), mImpl->mBag.end());
+    }
+
+
+    BlockFactory::~BlockFactory()
+    {
+        delete mImpl;
+        mImpl = 0;
     }
 
 
     BlockType BlockFactory::getNext() const
     {
-        if (mCurrentIndex >= mBag.size())
+        if (mImpl->mCurrentIndex >= mImpl->mBag.size())
         {
             // Reshuffle the bag.
-            std::random_shuffle(mBag.begin(), mBag.end());
-            mCurrentIndex = 0;
+            std::random_shuffle(mImpl->mBag.begin(), mImpl->mBag.end());
+            mImpl->mCurrentIndex = 0;
         }
-        return mBag[mCurrentIndex++];
+        return mImpl->mBag[mImpl->mCurrentIndex++];
     }
-
 
 } // namespace Tetris
