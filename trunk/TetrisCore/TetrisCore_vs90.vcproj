@@ -244,6 +244,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\GameStateComparisonFunctor.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Tetris\GameStateComparisonFunctor.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\GameStateNode.cpp"
 					>
 				</File>
