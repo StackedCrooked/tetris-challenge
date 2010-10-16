@@ -4,6 +4,7 @@
 #include "Tetris/BlockMover.h"
 #include "Tetris/ComputerPlayerMt.h"
 #include "Tetris/Game.h"
+#include "Tetris/GameStateComparisonFunctor.h"
 #include "Tetris/GameQualityEvaluator.h"
 #include "Tetris/GameState.h"
 #include "Tetris/GameStateNode.h"
