@@ -1,5 +1,4 @@
 #include "Tetris/Logger.h"
-#include "Poco/Thread.h"
 #include <stdexcept>
 
 

@@ -2,15 +2,15 @@
 #define TETRIS_GAME_H_INCLUDED
 
 
-#include "Tetris/BlockFactory.h"
-#include "Tetris/Block.h"
 #include "Tetris/BlockType.h"
+#include "Tetris/Direction.h"
 #include <memory>
 
 
 namespace Tetris
 {
 
+    class Block;
     class GameStateNode;
     class GameImpl;
 

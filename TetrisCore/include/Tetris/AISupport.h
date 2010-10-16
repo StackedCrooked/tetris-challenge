@@ -2,7 +2,8 @@
 #define TETRIS_AISUPPORT_H_INCLUDED
 
 
-#include "Tetris/Tetris.h"
+#include "Tetris/BlockType.h"
+#include "Tetris/NodePtr.h"
 
 
 namespace Tetris

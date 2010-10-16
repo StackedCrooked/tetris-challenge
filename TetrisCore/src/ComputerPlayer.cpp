@@ -7,6 +7,7 @@
 #include "Tetris/GameStateComparisonFunctor.h"
 #include "Tetris/GameQualityEvaluator.h"
 #include "Tetris/GameState.h"
+#include "Tetris/Block.h"
 #include "Tetris/WorkerPool.h"
 #include "Tetris/Worker.h"
 #include <set>
