@@ -2,7 +2,6 @@
 #define TETRIS_COMPUTERPLAYERMT_H_INCLUDED
 
 
-#include "Tetris/Tetris.h"
 #include "Tetris/ComputerPlayer.h"
 #include "Tetris/GameStateNode.h"
 

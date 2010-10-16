@@ -2,7 +2,9 @@
 #define TETRIS_PLAYER_H_INCLUDED
 
 
-#include "Tetris/Tetris.h"
+#include "Tetris/Game.h"
+#include "Tetris/NodePtr.h"
+#include "Tetris/BlockTypes.h"
 #include "Tetris/Threading.h"
 #include <boost/thread.hpp>
 

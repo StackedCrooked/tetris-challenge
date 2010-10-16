@@ -2,15 +2,12 @@
 #define TETRIS_BLOCKFACTORY_H_INCLUDED
 
 
-#include "Tetris/Enum.h"
-
-
 namespace Tetris
 {
  
     class Block;    
     class BlockFactoryImpl;
-    Tetris_DeclareEnum(BlockType);
+    typedef int BlockType;
     
 
     class BlockFactory

@@ -212,6 +212,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\Tetris\BlockTypes.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Tetris\Direction.h"
 					>
 				</File>
@@ -257,6 +261,14 @@
 				</File>
 				<File
 					RelativePath=".\include\Tetris\GameStateNode.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Tetris\Grid.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Tetris\NodePtr.h"
 					>
 				</File>
 				<File
@@ -316,14 +328,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\include\Tetris\Base.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Tetris\Enum.h"
-					>
-				</File>
-				<File
 					RelativePath=".\include\Tetris\GenericGrid.h"
 					>
 				</File>
@@ -361,22 +365,6 @@
 				</File>
 				<File
 					RelativePath=".\include\Tetris\Utilities.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="TetrisForwardDeclarations"
-				>
-				<File
-					RelativePath=".\include\Tetris\ForwardDeclarations.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Tetris\Grid.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Tetris\NodePtr.h"
 					>
 				</File>
 			</Filter>

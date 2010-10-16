@@ -2,7 +2,7 @@
 #define TETRIS_GAME_H_INCLUDED
 
 
-#include "Tetris/BlockType.h"
+#include "Tetris/BlockTypes.h"
 #include "Tetris/Direction.h"
 #include <memory>
 

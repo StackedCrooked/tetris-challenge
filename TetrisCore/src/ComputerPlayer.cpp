@@ -10,6 +10,9 @@
 #include "Tetris/Block.h"
 #include "Tetris/WorkerPool.h"
 #include "Tetris/Worker.h"
+#include "Tetris/Logging.h"
+#include "Tetris/MakeString.h"
+#include "Tetris/Assert.h"
 #include <set>
 #include <boost/bind.hpp>
 

@@ -6,7 +6,6 @@
 #include "Tetris/BlockFactory.h"
 #include "Tetris/Block.h"
 #include "Tetris/Direction.h"
-#include "Tetris/GenericGrid.h"
 #include "Tetris/Utilities.h"
 #include "Tetris/Logging.h"
 #include "Tetris/Assert.h"

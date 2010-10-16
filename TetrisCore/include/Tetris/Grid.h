@@ -2,17 +2,14 @@
 #define TETRIS_GRID_H_INCLUDED
 
 
-#include "Tetris/Enum.h"
+#include "Tetris/BlockType.h"
+#include "Tetris/GenericGrid.h"
 
 
 namespace Tetris
 {
 
-    template<class T>
-    class GenericGrid;
-
-    Tetris_DeclareEnum(BlockType);
-
+    template<class T> class GenericGrid;
     typedef GenericGrid<BlockType> Grid;
 
 
@@ -20,4 +17,4 @@ namespace Tetris
 
 
 
-#endif // GRID_H_INCLUDED
+#endif // TETRIS_GRID_H_INCLUDED

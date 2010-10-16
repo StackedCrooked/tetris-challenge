@@ -5,6 +5,9 @@
 #include "Tetris/GameState.h"
 #include "Tetris/Block.h"
 #include "Tetris/Direction.h"
+#include "Tetris/Logging.h"
+#include "Tetris/MakeString.h"
+#include "Tetris/Assert.h"
 #include "Poco/Timer.h"
 
 

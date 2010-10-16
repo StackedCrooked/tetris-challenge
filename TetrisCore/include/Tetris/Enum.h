@@ -1,6 +1,7 @@
 #ifndef TETRIS_ENUM_H_INCLUDED
 #define TETRIS_ENUM_H_INCLUDED
 
+--;
 
 /**
  * Tetris_DefineEnum can be used to define a fake enum. The purpose
