@@ -2,15 +2,18 @@
 #define TETRIS_GAME_H_INCLUDED
 
 
-#include "Tetris/Tetris.h"
 #include "Tetris/BlockFactory.h"
 #include "Tetris/Block.h"
+#include "Tetris/BlockType.h"
+#include <memory>
 
 
 namespace Tetris
 {
 
     class GameStateNode;
+    class GameImpl;
+
 
     /**
      * Game is a top-level class for the Tetris core. It manages the following things:
@@ -57,8 +60,7 @@ namespace Tetris
         //
         // Statistics
         //
-        size_t currentBlockIndex() const
-        { return mCurrentBlockIndex; }
+        size_t currentBlockIndex() const;
 
         size_t numPrecalculatedMoves() const;
 
@@ -83,17 +85,7 @@ namespace Tetris
         // not allowed
         Game & operator=(const Game&);
 
-        void setCurrentNode(NodePtr inCurrentNode);
-
-        void supplyBlocks() const;
-
-        size_t mNumRows;
-        size_t mNumColumns;
-        NodePtr mCurrentNode;
-        boost::scoped_ptr<Block> mActiveBlock;
-        boost::scoped_ptr<BlockFactory> mBlockFactory;
-        mutable BlockTypes mBlocks;
-        size_t mCurrentBlockIndex;
+        GameImpl * mImpl;
     };
 
 } // namespace Tetris
