@@ -1,81 +1,122 @@
 #include "Tetris/Block.h"
+#include "Tetris/BlockType.h"
 #include "Tetris/GenericGrid.h"
+#include "Tetris/Assert.h"
 #include <stdexcept>
 
 
 namespace Tetris
 {
 
+    class BlockImpl
+    {
+    public:
+        BlockImpl(BlockType inType, Rotation inRotation, Row inRow, Column inColumn) :
+            mType(inType),
+            mRotation(inRotation.get()),
+            mRow(inRow.get()),
+            mColumn(inColumn.get()),
+            mGrid(&GetGrid(GetBlockIdentifier(inType, inRotation.get())))
+        {
+        }
+        BlockType mType;
+        size_t mRotation;
+        size_t mRow;
+        size_t mColumn;
+        const Grid * mGrid;
+    };
+
 
     Block::Block(BlockType inType, Rotation inRotation, Row inRow, Column inColumn) :
-        mType(inType),
-        mRotation(inRotation.get()),
-        mRow(inRow.get()),
-        mColumn(inColumn.get()),
-        mGrid(&GetGrid(GetBlockIdentifier(inType, inRotation.get())))
+        mImpl(new BlockImpl(inType, inRotation, inRow, inColumn))
     {
-        Assert(mRotation >= 0 && mRotation <= 3);
+        Assert(mImpl->mRotation >= 0 && mImpl->mRotation <= 3);
+    }
+
+
+    Block::Block(const Block & rhs) :
+        mImpl(new BlockImpl(*rhs.mImpl))
+    {
+    }
+
+    
+    Block & Block::operator=(const Block & rhs)
+    {
+        if (&rhs != this)
+        {
+            delete mImpl;
+            mImpl = 0;
+            mImpl = new BlockImpl(*rhs.mImpl);
+        }
+        return *this;
+    }
+
+
+    Block::~Block()
+    {
+        delete mImpl;
+        mImpl = 0;
     }
 
 
     BlockType Block::type() const
     {
-        return mType;
+        return mImpl->mType;
     }
 
 
     size_t Block::rotation() const
     {
-        return mRotation;
+        return mImpl->mRotation;
     }
 
 
     size_t Block::numRotations() const
     {
-        return GetBlockRotationCount(mType);
+        return GetBlockRotationCount(mImpl->mType);
     }
 
 
     const Grid & Block::grid() const
     {
-        return *mGrid;
+        return *mImpl->mGrid;
     }
 
 
     size_t Block::row() const
     {
-        return mRow;
+        return mImpl->mRow;
     }
 
 
     size_t Block::column() const
     {
-        return mColumn;
+        return mImpl->mColumn;
     }
 
 
     void Block::setRow(size_t inRow)
     {
-        mRow = inRow;
+        mImpl->mRow = inRow;
     }
 
 
     void Block::setColumn(size_t inColumn)
     {
-        mColumn = inColumn;
+        mImpl->mColumn = inColumn;
     }
 
 
     void Block::setRotation(size_t inRotation)
     {
-        mRotation = inRotation % GetBlockRotationCount(mType);
-        mGrid = &GetGrid(GetBlockIdentifier(mType, mRotation));
+        mImpl->mRotation = inRotation % GetBlockRotationCount(mImpl->mType);
+        mImpl->mGrid = &GetGrid(GetBlockIdentifier(mImpl->mType, mImpl->mRotation));
     }
 
 
     void Block::rotate()
     {
-        setRotation((mRotation + 1) % GetBlockRotationCount(mType));
+        setRotation((mImpl->mRotation + 1) % GetBlockRotationCount(mImpl->mType));
     }
 
 

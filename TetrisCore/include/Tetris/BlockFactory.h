@@ -2,13 +2,17 @@
 #define TETRIS_BLOCKFACTORY_H_INCLUDED
 
 
-#include "Tetris/Tetris.h"
+#include "Tetris/BlockType.h"
+#include <boost/scoped_ptr.hpp>
 
 
 namespace Tetris
 {
-
-    class Block;
+ 
+    class Block;    
+    class BlockFactoryImpl;
+    Tetris_DeclareEnum(BlockType);
+    
 
     class BlockFactory
     {

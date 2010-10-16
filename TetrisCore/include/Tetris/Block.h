@@ -2,29 +2,28 @@
 #define TETRIS_BLOCK_H_INCLUDED
 
 
-#include "Tetris/Tetris.h"
+#include "Tetris/Enum.h"
+#include "Tetris/Grid.h"
+#include "Tetris/TypedWrapper.h"
 
 
 namespace Tetris
 {
-    
-    // Forward declaration of the BlockType 'enum'
-    Tetris_DeclareEnum(BlockType);
 
-    // Forward declaration of the Direction 'enum'
+    // Forward declaration of the fake enums
+    Tetris_DeclareEnum(BlockType);
     Tetris_DeclareEnum(Direction);
 
-    // Generate the Rotation class
+
+    // Generate the typesafe wrapper classes
     Tetris_TypedWrapper(Rotation, size_t);
-
-    // Generate the Row class
     Tetris_TypedWrapper(Row, size_t);
-
-    // Generate the Column class
     Tetris_TypedWrapper(Column, size_t);
-
-    // Generate the GameOver class
     Tetris_TypedWrapper(GameOver, bool);
+
+
+    // Forward declarations.
+    class BlockImpl;
 
 
     /**
@@ -34,6 +33,12 @@ namespace Tetris
     {
     public:
         Block(BlockType inType, Rotation inRotation, Row inRow, Column inColumn);
+
+        Block(const Block & inBlock);
+
+        Block & operator=(const Block & inBlock);
+
+        ~Block();
 
         BlockType type() const;
 
@@ -57,11 +62,7 @@ namespace Tetris
         void setRotation(size_t inRotation);
 
     private:
-        BlockType mType;
-        size_t mRotation;
-        size_t mRow;
-        size_t mColumn;
-        const Grid * mGrid;
+        BlockImpl * mImpl;
     };
 
 
