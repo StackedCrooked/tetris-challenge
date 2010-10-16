@@ -2,7 +2,9 @@
 #define TETRIS_GAMESTATENODE_H_INCLUDED
 
 
-#include "Tetris/Tetris.h"
+#include "Tetris/GameStateComparisonFunctor.h"
+#include "Tetris/NodePtr.h"
+#include <boost/scoped_ptr.hpp>
 #include <boost/weak_ptr.hpp>
 #include <set>
 
@@ -10,23 +12,7 @@
 namespace Tetris
 {
 
-    class GameStateComparisonFunctor
-    {
-    public:
-        GameStateComparisonFunctor()
-        {
-            throw std::logic_error("Should never come here!");
-        }
-
-        GameStateComparisonFunctor(std::auto_ptr<Evaluator> inChildPtrCompare);
-
-        bool operator()(NodePtr lhs, NodePtr rhs);
-
-    private:
-        boost::shared_ptr<Evaluator> mEvaluator;
-    };
-
-
+    class Evaluator;
     class GameState;
 
 
