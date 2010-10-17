@@ -1,5 +1,5 @@
 #include "Tetris/ComputerPlayer.h"
-#include "Tetris/MultithreadedNodeCalculator.h"
+#include "Tetris/NodeCalculator.h"
 #include "Tetris/AISupport.h"
 #include "Tetris/BlockMover.h"
 #include "Tetris/Gravity.h"
@@ -11,40 +11,61 @@
 #include "Tetris/Block.h"
 #include "Tetris/WorkerPool.h"
 #include "Tetris/Worker.h"
+#include "Tetris/Threading.h"
 #include "Tetris/Logging.h"
 #include "Tetris/MakeString.h"
 #include "Tetris/Assert.h"
+#include "Poco/Timer.h"
 #include <set>
 #include <boost/bind.hpp>
 
 
 namespace Tetris
 {
-    
-    ComputerPlayer::ComputerPlayer(const Protected<Game> & inProtectedGame) :
-        mWorkerPool(new WorkerPool("ComputerPlayer", 6)),
-        mProtectedGame(inProtectedGame),
-        mGravity(new Gravity(mProtectedGame)),
-        mBlockMover(new BlockMover(mProtectedGame, 20)),
-        mEvaluator(new Balanced),
-        mCurrentSearchDepth(0),
-        mMaxSearchDepth(6),
-        mSearchWidth(6)
+
+    class ComputerPlayerImpl
     {
+    public:
+        ComputerPlayerImpl(const Protected<Game> & inProtectedGame);
+
+    private:
+        void onTimerEvent(Poco::Timer & inTimer);
+        int calculateRemainingTimeMs(Game & game) const;
+        Protected<Game> mProtectedGame;
+        boost::shared_ptr<WorkerPool> mWorkerPool;
+        boost::scoped_ptr<AbstractNodeCalculator> mNodeCalculator;
+        boost::scoped_ptr<Evaluator> mEvaluator;
+        boost::scoped_ptr<BlockMover> mBlockMover;
+        Poco::Timer mTimer;
+        int mSearchDepth;
+        int mSearchWidth;
+    };
+
+
+    ComputerPlayerImpl::ComputerPlayerImpl(const Protected<Game> & inProtectedGame) :
+        mProtectedGame(inProtectedGame),
+        mWorkerPool(new WorkerPool("ComputerPlayer WorkerPool", 6)),
+        mEvaluator(new Balanced),
+        mBlockMover(new BlockMover(mProtectedGame, 20)),
+        mTimer(10, 10),
+        mSearchDepth(8),
+        mSearchWidth(4)
+    {
+        mTimer.start(Poco::TimerCallback<ComputerPlayerImpl>(*this, &ComputerPlayerImpl::onTimerEvent));
     }
 
 
-    int ComputerPlayer::calculateRemainingTimeMs(Game & game) const
+    int ComputerPlayerImpl::calculateRemainingTimeMs(Game & game) const
     {
         float numRemainingRows = static_cast<float>(game.currentNode()->state().stats().firstOccupiedRow() - (game.activeBlock().row() + 4));
-        float numRowsPerSecond = mGravity->currentSpeed();
+        float numRowsPerSecond = Gravity::CalculateSpeed(game.level());
         float remainingTime = 1000 * numRemainingRows / numRowsPerSecond;
         float timeRequiredForMove = static_cast<float>(game.activeBlock().numRotations() + game.numColumns()) / static_cast<float>(mBlockMover->speed());
         return static_cast<int>(0.5 + remainingTime - timeRequiredForMove);
     }
 
     
-    void ComputerPlayer::runImpl()
+    void ComputerPlayerImpl::onTimerEvent(Poco::Timer & inTimer)
     {
         boost::scoped_ptr<Game> clonedGamePtr;
         {
@@ -74,16 +95,12 @@ namespace Tetris
                     {
                         const int resultNodeDepth = resultNode->depth();
 
-                        //
-                        // TODO:
-                        //
-                        // Use *real* game object here and detect any sync errors.
-                        //
-                        //
+                        ScopedAtom<Game> wgame(mProtectedGame);
+                        clonedGamePtr.reset(wgame->clone().release());
+                        Game & game(*wgame.get());
 
-                        // GameStateNode * endNode(clonedGame.lastPrecalculatedNode());
-                        // Assert(endNode->depth() + 1 == resultNodeDepth);
-                        // endNode->addChild(resultNode);
+                        Assert(game.lastPrecalculatedNode()->depth() + 1 == resultNodeDepth);
+                        game.lastPrecalculatedNode()->addChild(resultNode);
 
                     }
                     else
@@ -105,8 +122,8 @@ namespace Tetris
         else
         {
             int numPrecalculated = clonedGame.lastPrecalculatedNode()->depth() - clonedGame.currentNode()->depth();
-            if (numPrecalculated + mCurrentSearchDepth <= 3 * mMaxSearchDepth)
-            {
+            if (numPrecalculated == 0)
+            {                
                 Assert(!mNodeCalculator);
 
                 //
@@ -121,7 +138,7 @@ namespace Tetris
                 // Create the list of future blocks
                 //
                 BlockTypes futureBlocks;
-                clonedGame.getFutureBlocksWithOffset(endNode->depth(), mCurrentSearchDepth, futureBlocks);
+                clonedGame.getFutureBlocksWithOffset(endNode->depth(), mSearchDepth, futureBlocks);
 
 
                 //
@@ -138,11 +155,24 @@ namespace Tetris
                 // Create and start the NodeCalculator.
                 //
                 Assert(mWorkerPool->stats().activeWorkerCount == 0);
-                mNodeCalculator.reset(new MultithreadedNodeCalculator(mWorkerPool, endNode, futureBlocks, widths, mEvaluator->clone()));
+                mNodeCalculator.reset(new NodeCalculator(mWorkerPool->getWorker(), endNode, futureBlocks, widths, mEvaluator->clone()));
                 mNodeCalculator->start();
             }
             // else: we have plenty of precalculated nodes. Do nothing for know.
         }
+    }
+
+
+    ComputerPlayer::ComputerPlayer(const Protected<Game> & inProtectedGame) :
+        mImpl(new ComputerPlayerImpl(inProtectedGame))
+    {
+    }
+
+
+    ComputerPlayer::~ComputerPlayer()
+    {
+        delete mImpl;
+        mImpl = 0;
     }
 
 } // namespace Tetris
