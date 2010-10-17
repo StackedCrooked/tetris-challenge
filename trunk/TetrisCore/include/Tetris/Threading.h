@@ -3,7 +3,8 @@
 
 
 #include <memory>
-#include <boost/thread.hpp>
+#include <boost/thread/mutex.hpp>
+#include <boost/scoped_ptr.hpp>
 
 
 namespace Tetris

@@ -6,7 +6,6 @@
 #include "Tetris/NodePtr.h"
 #include "Tetris/BlockTypes.h"
 #include "Tetris/Threading.h"
-#include <boost/thread.hpp>
 
 
 namespace Tetris
