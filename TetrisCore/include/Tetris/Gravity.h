@@ -2,13 +2,15 @@
 #define TETRIS_GRAVITY_H_INCLUDED
 
 
-#include "Tetris/Threading.h"
-#include "Poco/Timer.h"
-
-
 namespace Tetris
 {
+    
+    template<class Variable> class Protected;
     class Game;
+
+
+    class GravityImpl;
+
 
     /**
      * Gravity
@@ -16,7 +18,7 @@ namespace Tetris
      * Gravity implements the the gravity aspect to the game.
      * It moves the active block one unit down at regular intervals.
      */
-    class Gravity : boost::noncopyable
+    class Gravity
     {
     public:
         Gravity(const Protected<Game> & inGame);
@@ -34,12 +36,10 @@ namespace Tetris
         void setLevel(int inLevel);
 
     private:
-        void onTimerEvent(Poco::Timer & inTimer);
+        Gravity(const Gravity &);
+        Gravity & operator=(const Gravity &);
 
-        Protected<Game> mThreadSafeGame;
-        int mLevel;
-        mutable boost::mutex mLevelMutex;
-        Poco::Timer mTimer;
+        GravityImpl * mImpl;
     };
 
 } // namespace Tetris

@@ -4,15 +4,39 @@
 #include "Tetris/GameStateComparisonFunctor.h"
 #include "Tetris/GameState.h"
 #include "Tetris/Block.h"
-#include "Tetris/Direction.h"
 #include "Tetris/Logging.h"
 #include "Tetris/MakeString.h"
+#include "Tetris/Threading.h"
 #include "Tetris/Assert.h"
 #include "Poco/Timer.h"
 
 
 namespace Tetris
 {
+
+    class BlockMoverImpl
+    {
+    public:
+        BlockMoverImpl(const Protected<Game> & inGame, int inNumMovesPerSecond);
+
+        ~BlockMoverImpl();
+
+        void setSpeed(int inNumMovesPerSecond);
+
+        int speed() const;
+
+    private:
+        BlockMoverImpl(const BlockMoverImpl &);
+        BlockMoverImpl & operator=(const BlockMoverImpl&);
+
+        void onTimer(Poco::Timer & ioTimer);
+        void move();
+
+        Protected<Game> mGame;
+        boost::scoped_ptr<Poco::Timer> mTimer;
+        int mNumMovesPerSecond;
+    };
+
 
     static int GetIntervalMs(int inNumMovesPerSecond)
     {
@@ -24,38 +48,31 @@ namespace Tetris
     }
 
 
-    BlockMover::BlockMover(const Protected<Game> & inGame, int inNumMovesPerSecond) :
+    BlockMoverImpl::BlockMoverImpl(const Protected<Game> & inGame, int inNumMovesPerSecond) :
         mGame(inGame),
         mTimer(),
-        mNumMovesPerSecond(inNumMovesPerSecond),
-        mMoveDownBehavior(MoveDownBehavior_Move)
+        mNumMovesPerSecond(inNumMovesPerSecond)
     {
         mTimer.reset(new Poco::Timer(GetIntervalMs(inNumMovesPerSecond), GetIntervalMs(inNumMovesPerSecond)));
-        Poco::TimerCallback<BlockMover> callback(*this, &BlockMover::onTimer);
+        Poco::TimerCallback<BlockMoverImpl> callback(*this, &BlockMoverImpl::onTimer);
         mTimer->start(callback);
     }
 
 
-    BlockMover::~BlockMover()
+    BlockMoverImpl::~BlockMoverImpl()
     {
         mTimer->stop();
         mTimer.reset();
     }
 
 
-    void BlockMover::setMoveDownBehavior(MoveDownBehavior inMoveDown)
-    {
-        mMoveDownBehavior = inMoveDown;
-    }
-
-
-    int BlockMover::speed() const
+    int BlockMoverImpl::speed() const
     {
         return mNumMovesPerSecond;
     }
 
 
-    void BlockMover::setSpeed(int inNumMovesPerSecond)
+    void BlockMoverImpl::setSpeed(int inNumMovesPerSecond)
     {
         if (inNumMovesPerSecond > 0)
         {
@@ -65,7 +82,7 @@ namespace Tetris
     }
 
 
-    void BlockMover::onTimer(Poco::Timer & ioTimer)
+    void BlockMoverImpl::onTimer(Poco::Timer & ioTimer)
     {
         try
         {
@@ -73,16 +90,16 @@ namespace Tetris
         }
         catch (const LockTimeout & inException)
         {
-            LogWarning(MakeString() << "BlockMover failed to lock the Game due to timeout. Details: " << inException.what());
+            LogWarning(MakeString() << "BlockMoverImpl failed to lock the Game due to timeout. Details: " << inException.what());
         }
         catch (const std::exception & inException)
         {
-            LogError(MakeString() << "Unanticipated exception thrown in BlockMover::move(). Details: " << inException.what());
+            LogError(MakeString() << "Unanticipated exception thrown in BlockMoverImpl::move(). Details: " << inException.what());
         }
     }
 
 
-    void BlockMover::move()
+    void BlockMoverImpl::move()
     {
         ScopedAtom<Game> wgame(mGame);
         Game & game = *wgame.get();
@@ -127,29 +144,33 @@ namespace Tetris
         }
         else
         {
-            switch (mMoveDownBehavior)
-            {
-                case MoveDownBehavior_Move:
-                {
-                    game.move(Direction_Down);
-                    break;
-                }
-                case MoveDownBehavior_Drop:
-                {
-                    game.drop();
-                    break;
-                }
-                case MoveDownBehavior_DontMove:
-                {
-                    // Do nothing.
-                    break;
-                }
-                default:
-                {
-                    throw std::logic_error("Invalid enum value.");
-                }
-            }
+            game.move(Direction_Down);
         }
+    }
+
+
+    BlockMover::BlockMover(const Protected<Game> & inGame, int inNumMovesPerSecond) :
+        mImpl(new BlockMoverImpl(inGame, inNumMovesPerSecond))
+    {
+    }
+
+
+    BlockMover::~BlockMover()
+    {
+        delete mImpl;
+        mImpl = 0;
+    }
+
+
+    int BlockMover::speed() const
+    {
+        return mImpl->speed();
+    }
+
+
+    void BlockMover::setSpeed(int inNumMovesPerSecond)
+    {
+        mImpl->setSpeed(inNumMovesPerSecond);
     }
 
 
