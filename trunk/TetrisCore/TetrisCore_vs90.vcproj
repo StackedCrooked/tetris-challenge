@@ -168,6 +168,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\Todo.txt"
+					>
+				</File>
+				<File
 					RelativePath=".\src\Worker.cpp"
 					>
 				</File>
@@ -369,10 +373,6 @@
 				</File>
 			</Filter>
 		</Filter>
-		<File
-			RelativePath=".\Todo.txt"
-			>
-		</File>
 	</Files>
 	<Globals>
 	</Globals>
