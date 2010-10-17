@@ -92,7 +92,6 @@ namespace Tetris
         mutable boost::mutex mStatusMutex;
 
         boost::shared_ptr<Worker> mWorker;
-        bool mDestroyedInferiorChildren; // just for testing
     };
 
 
@@ -108,8 +107,7 @@ namespace Tetris
         mWidths(inWidths),
         mEvaluator(inEvaluator.release()),
         mStatus(AbstractNodeCalculator::Status_Nil),
-        mWorker(inWorker),
-        mDestroyedInferiorChildren(false)
+        mWorker(inWorker)
     {
         Assert(!mNode->state().isGameOver());
         Assert(mNode->children().empty());
@@ -166,7 +164,6 @@ namespace Tetris
 
         // DestroyInferiorChildren should
         // have taken care of this.
-        Assert(mDestroyedInferiorChildren);
         Assert(numChildren == 1);
 
         return *mNode->children().begin();
@@ -303,7 +300,6 @@ namespace Tetris
 
     void NodeCalculatorImpl::destroyInferiorChildren()
     {
-        Assert(!mDestroyedInferiorChildren);
         size_t reachedDepth = getCurrentSearchDepth();
         Assert(reachedDepth >= 1);
 
@@ -313,9 +309,12 @@ namespace Tetris
         boost::mutex::scoped_lock layersLock(mLayersMutex);
         boost::mutex::scoped_lock nodeLock(mNodeMutex);
         Assert((reachedDepth - 1) < mLayers.size());
-        CarveBestPath(mNode, mLayers[reachedDepth - 1].mBestChild);
-        Assert(mNode->children().size() == 1);
-        mDestroyedInferiorChildren = true;
+        NodePtr endNode = mLayers[reachedDepth - 1].mBestChild;
+        if (endNode)
+        {
+            CarveBestPath(mNode, endNode);
+            Assert(mNode->children().size() == 1);
+        }
     }
 
 

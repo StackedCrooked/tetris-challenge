@@ -26,7 +26,36 @@ namespace Tetris
     class ComputerPlayerImpl
     {
     public:
-        ComputerPlayerImpl(const Protected<Game> & inProtectedGame);
+        ComputerPlayerImpl(const Protected<Game> & inProtectedGame,
+                           std::auto_ptr<Evaluator> inEvaluator,
+                           int inSearchDepth,
+                           int inSearchWidth);
+
+        inline int searchDepth() const
+        { return mSearchDepth; }
+
+        inline void setSearchDepth(int inSearchDepth)
+        { mSearchDepth = inSearchDepth; }
+
+        inline int searchWidth() const
+        { return mSearchWidth; }
+
+        inline void setSearchWidth(int inSearchWidth)
+        { mSearchWidth = inSearchWidth; }
+
+        inline int moveSpeed() const
+        { return mBlockMover->speed(); }
+
+        inline void setMoveSpeed(int inMoveSpeed)
+        { mBlockMover->setSpeed(inMoveSpeed); }
+
+        int currentSearchDepth() const;
+
+        void setEvaluator(std::auto_ptr<Evaluator> inEvaluator)
+        { mEvaluator.reset(inEvaluator.release()); }
+
+        const Evaluator & evaluator() const
+        { return *mEvaluator; }
 
     private:
         void onTimerEvent(Poco::Timer & inTimer);
@@ -39,17 +68,22 @@ namespace Tetris
         Poco::Timer mTimer;
         int mSearchDepth;
         int mSearchWidth;
+        int mMoveSpeed;
     };
 
 
-    ComputerPlayerImpl::ComputerPlayerImpl(const Protected<Game> & inProtectedGame) :
+    ComputerPlayerImpl::ComputerPlayerImpl(const Protected<Game> & inProtectedGame,
+                                           std::auto_ptr<Evaluator> inEvaluator,
+                                           int inSearchDepth,
+                                           int inSearchWidth) :
         mProtectedGame(inProtectedGame),
         mWorkerPool(new WorkerPool("ComputerPlayer WorkerPool", 6)),
-        mEvaluator(new Balanced),
+        mEvaluator(inEvaluator.release()),
         mBlockMover(new BlockMover(mProtectedGame, 20)),
         mTimer(10, 10),
-        mSearchDepth(8),
-        mSearchWidth(4)
+        mSearchDepth(inSearchDepth),
+        mSearchWidth(inSearchWidth),
+        mMoveSpeed(20)
     {
         mTimer.start(Poco::TimerCallback<ComputerPlayerImpl>(*this, &ComputerPlayerImpl::onTimerEvent));
     }
@@ -62,6 +96,16 @@ namespace Tetris
         float remainingTime = 1000 * numRemainingRows / numRowsPerSecond;
         float timeRequiredForMove = static_cast<float>(game.activeBlock().numRotations() + game.numColumns()) / static_cast<float>(mBlockMover->speed());
         return static_cast<int>(0.5 + remainingTime - timeRequiredForMove);
+    }
+
+
+    int ComputerPlayerImpl::currentSearchDepth() const
+    {
+        if (mNodeCalculator)
+        {
+            return mNodeCalculator->getCurrentSearchDepth();
+        }
+        return 0;
     }
 
     
@@ -163,8 +207,11 @@ namespace Tetris
     }
 
 
-    ComputerPlayer::ComputerPlayer(const Protected<Game> & inProtectedGame) :
-        mImpl(new ComputerPlayerImpl(inProtectedGame))
+    ComputerPlayer::ComputerPlayer(const Protected<Game> & inProtectedGame,
+                                   std::auto_ptr<Evaluator> inEvaluator,
+                                   int inSearchDepth,
+                                   int inSearchWidth) :
+        mImpl(new ComputerPlayerImpl(inProtectedGame, inEvaluator, inSearchDepth, inSearchWidth))
     {
     }
 
@@ -173,6 +220,60 @@ namespace Tetris
     {
         delete mImpl;
         mImpl = 0;
+    }
+
+    
+    int ComputerPlayer::searchDepth() const
+    {
+        return mImpl->searchDepth();
+    }
+
+
+    void ComputerPlayer::setSearchDepth(int inSearchDepth)
+    {
+        mImpl->setSearchDepth(inSearchDepth);
+    }
+
+
+    int ComputerPlayer::currentSearchDepth() const
+    {
+        return mImpl->currentSearchDepth();
+    }
+
+    
+    int ComputerPlayer::searchWidth() const
+    {
+        return mImpl->searchWidth();
+    }
+
+
+    void ComputerPlayer::setSearchWidth(int inSearchWidth)
+    {
+        mImpl->setSearchWidth(inSearchWidth);
+    }
+
+    
+    int ComputerPlayer::moveSpeed() const
+    {
+        return mImpl->moveSpeed();
+    }
+
+
+    void ComputerPlayer::setMoveSpeed(int inMoveSpeed)
+    {
+        mImpl->setMoveSpeed(inMoveSpeed);
+    }
+    
+    
+    void ComputerPlayer::setEvaluator(std::auto_ptr<Evaluator> inEvaluator)
+    {
+        mImpl->setEvaluator(inEvaluator);
+    }
+    
+    
+    const Evaluator & ComputerPlayer::evaluator() const
+    {
+        return mImpl->evaluator();
     }
 
 } // namespace Tetris
