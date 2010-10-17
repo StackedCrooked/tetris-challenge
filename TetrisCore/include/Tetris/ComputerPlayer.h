@@ -2,22 +2,14 @@
 #define TETRIS_COMPUTERPLAYER_H_INCLUDED
 
 
-#include "Tetris/Game.h"
-#include "Tetris/NodePtr.h"
-#include "Tetris/BlockTypes.h"
-#include "Tetris/Threading.h"
-
-
 namespace Tetris
 {
+    
+    template<class Variable> class Protected;
+    class Game;
 
-    class BlockMover;
-    class Evaluator;
-    class Gravity;
-    class AbstractNodeCalculator;
-    class Worker;
-    class WorkerPool;
-    typedef std::vector<int> Widths;
+
+    class ComputerPlayerImpl;
 
 
     class ComputerPlayer
@@ -25,21 +17,13 @@ namespace Tetris
     public:
         ComputerPlayer(const Protected<Game> & inProtectedGame);
 
-        void runImpl();
-
+        ~ComputerPlayer();
 
     private:
-        int calculateRemainingTimeMs(Game & game) const;
+        ComputerPlayer(const ComputerPlayer &);
+        ComputerPlayer & operator= (const ComputerPlayer&);
 
-        boost::shared_ptr<WorkerPool> mWorkerPool;
-        Protected<Game> mProtectedGame;
-        boost::scoped_ptr<AbstractNodeCalculator> mNodeCalculator;
-        boost::scoped_ptr<Gravity> mGravity;
-        boost::scoped_ptr<BlockMover> mBlockMover;
-        boost::scoped_ptr<Evaluator> mEvaluator;
-        int mCurrentSearchDepth;
-        int mMaxSearchDepth;
-        int mSearchWidth;
+        ComputerPlayerImpl * mImpl;
     };
 
 } // namespace Tetris

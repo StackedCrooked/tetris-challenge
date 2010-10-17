@@ -64,7 +64,6 @@ namespace Tetris
         mProtectedGame(),
         mGravity(),
         mRefreshTimer(),
-        mNodeCalculator(),
         mBlockMover(),
         mEvaluator(new Balanced),
         #ifdef _DEBUG
@@ -136,6 +135,11 @@ namespace Tetris
         //
         mGravity.reset(new Gravity(*mProtectedGame));
 
+        //
+        // Enable the computer player.
+        //
+        mComputerPlayer.reset(new ComputerPlayer(*mProtectedGame));
+
 
         //
         // Enable keyboard listener for activating the AI.
@@ -182,13 +186,7 @@ namespace Tetris
         }
 
 
-        if (mLevelTextBox = findComponentById<XULWin::TextBox>("levelTextBox"))
-        {
-            if (mGravity)
-            {
-                mGravity->setLevel(XULWin::String2Int(mLevelTextBox->getValue(), mGravity->getLevel()));
-            }
-        }
+        mLevelTextBox = findComponentById<XULWin::TextBox>("levelTextBox");
 
 
         if (XULWin::Element * el = mRootElement->getElementById("scoreTextBox"))
@@ -299,7 +297,7 @@ namespace Tetris
 
     Controller::~Controller()
     {
-        mNodeCalculator.reset();
+        mComputerPlayer.reset();
         mGravity.reset();
         mBlockMover.reset();
     }
@@ -307,15 +305,15 @@ namespace Tetris
 
     LRESULT Controller::onNew(WPARAM wParam, LPARAM lParam)
     {
-        mNodeCalculator.reset();
-        mGravity.reset();
+        mComputerPlayer.reset();
         mBlockMover.reset();
+        mGravity.reset();
+        mProtectedGame.reset();
+        
         mProtectedGame.reset(new Protected<Game>(std::auto_ptr<Game>(new Game(mTetrisComponent->getNumRows(), mTetrisComponent->getNumColumns()))));
         mGravity.reset(new Gravity(*mProtectedGame));
-        if (mLevelTextBox)
-        {
-            mGravity->setLevel(XULWin::String2Int(mLevelTextBox->getValue(), mGravity->getLevel()));
-        }
+        mBlockMover.reset(new BlockMover(*mProtectedGame, XULWin::String2Int(mMovementSpeed->getValue(), 20)));
+        mComputerPlayer.reset(new ComputerPlayer(*mProtectedGame));
         return XULWin::cHandled;
     }
 
@@ -459,7 +457,7 @@ namespace Tetris
 
     bool Controller::move(TetrisComponent * tetrisComponent, Direction inDirection)
     {
-        if (mNodeCalculator || mBlockMover)
+        if (mComputerPlayer || mBlockMover)
         {
             return false;
         }
@@ -471,7 +469,7 @@ namespace Tetris
 
     void Controller::drop(TetrisComponent * tetrisComponent)
     {
-        if (mNodeCalculator || mBlockMover)
+        if (mComputerPlayer || mBlockMover)
         {
             return;
         }
@@ -483,7 +481,7 @@ namespace Tetris
 
     bool Controller::rotate(TetrisComponent * tetrisComponent)
     {
-        if (mNodeCalculator || mBlockMover)
+        if (mComputerPlayer || mBlockMover)
         {
             return false;
         }
@@ -547,11 +545,15 @@ namespace Tetris
         {
         public:
             GameStats(Game & game) :
+                mLevel(game.level()),
                 mNumPrecalculatedMoves(game.numPrecalculatedMoves()),
                 mCurrentNode(game.currentNode()->clone()),
                 mEndNode(mCurrentNode->endNode()->clone())
             {
             }
+
+            inline int level() const
+            { return mLevel; }
 
             inline int numPrecalculatedMoves() const
             { return mNumPrecalculatedMoves; }
@@ -570,6 +572,7 @@ namespace Tetris
 
         private:
             int mNumPrecalculatedMoves;
+            int mLevel;
             std::auto_ptr<GameStateNode> mCurrentNode;
             std::auto_ptr<GameStateNode> mEndNode;
         };
@@ -588,122 +591,9 @@ namespace Tetris
             gameStats.reset(new GameStats(game));
         }
 
-        // Create only once
-        if (!mBlockMover)
-        {
-            mBlockMover.reset(new BlockMover(*mProtectedGame, XULWin::String2Int(mMovementSpeed->getValue(), 20)));
-        }
-
-
-        if (mNodeCalculator)
-        {
-            // Check if the computer player has finished.
-            if (mNodeCalculator->status() != AbstractNodeCalculator::Status_Finished)
-            {
-                // Check if there is the danger of crashing the current block.
-
-                if (gameStats->numPrecalculatedMoves() == 0)
-                {
-                    int timeRemaining = 0;
-                    {
-                        ScopedAtom<Game> wgame(*mProtectedGame);
-                        Game & game = *(wgame.get());
-                        timeRemaining = calculateRemainingTimeMs(game);
-                    }
-                    if (timeRemaining < 1500)
-                    {
-                        mNodeCalculator->stop();
-                    }
-                }
-                // else: keep working.
-            }
-            else
-            {
-                NodePtr resultNode = mNodeCalculator->result();
-                if (!resultNode->state().isGameOver())
-                {
-                    // The created node should follow the last precalculated one.
-                    if (resultNode->depth() == gameStats->endNode()->depth() + 1)
-                    {
-                        const int resultNodeDepth = resultNode->depth();
-                        ScopedAtom<Game> wgame(*mProtectedGame);
-                        Game & game = *(wgame.get());
-                        GameStateNode * endNode(game.lastPrecalculatedNode());
-                        Assert(endNode->depth() + 1 == resultNodeDepth);
-                        endNode->addChild(resultNode);
-                    }
-                    else
-                    {
-                        LogWarning("Computer is TOO SLOW!!");
-                    }
-                }
-                else
-                {
-                    // Game over. Too bad.
-                    mNodeCalculator.reset();
-                    return;
-                }                
-
-                // Once the computer has finished it's job we destroy the object.
-                mNodeCalculator.reset();
-            }
-        }
-        else
-        {
-            int searchDepth = mSearchDepth ? XULWin::String2Int(mSearchDepth->getValue(), cDefaultSearchDepth) : cDefaultSearchDepth;
-            GameStateNode * endNode = gameStats->endNode();
-            Assert(!endNode->state().isGameOver());
-
-            int numPrecalculated = endNode->depth() - gameStats->currentNode()->depth();
-            if (numPrecalculated + searchDepth <= 3 * cMaxSearchDepth)
-            {
-                Assert(!mNodeCalculator);
-
-                //
-                // Clone the starting node
-                //
-                std::auto_ptr<GameStateNode> endNode = gameStats->endNode()->clone();
-                Assert(endNode->children().empty());
-                Assert(endNode->depth() >= gameStats->currentNode()->depth());
-
-
-                //
-                // Create the list of future blocks
-                //
-                BlockTypes futureBlocks;
-                {
-                    ScopedAtom<Game> wgame(*mProtectedGame);
-                    Game & game = *(wgame.get());
-                    game.getFutureBlocksWithOffset(endNode->depth(), searchDepth, futureBlocks);
-                }                
-
-
-                //
-                // Fill the Widths vector (use the same width for each level).
-                //
-                Widths widths;
-                int searchWidth = mSearchWidth ? XULWin::String2Int(mSearchWidth->getValue(), cDefaultSearchWidth)
-                                               : cDefaultSearchWidth;
-                for (size_t idx = 0; idx != futureBlocks.size(); ++idx)
-                {
-                    widths.push_back(searchWidth);
-                }
-
-
-                //
-                // Create and start the ConcreteMoveCalculator.
-                //
-                Assert(mWorkerPool->stats().activeWorkerCount == 0);
-                mNodeCalculator.reset(new MultithreadedNodeCalculator(mWorkerPool, endNode, futureBlocks, widths, mEvaluator->clone()));
-                mNodeCalculator->start();
-            }
-            // else: we have plenty of precalculated nodes. Do nothing for know.
-        }
-
-
         if (mLevelTextBox && mGravity)
         {
-            setText(mLevelTextBox, MakeString() << mGravity->getLevel());
+            setText(mLevelTextBox, MakeString() << gameStats->level());
         }
 
 
@@ -718,11 +608,11 @@ namespace Tetris
             setText(mTotalLinesTextBox, MakeString() << gameStats->currentNode()->state().stats().numLines());
         }
 
-        if (mCurrentSearchDepth && mNodeCalculator)
-        {
-            std::string text = MakeString() << mNodeCalculator->getCurrentSearchDepth() << "/" << mNodeCalculator->getMaxSearchDepth();
-            setText(mCurrentSearchDepth, text);
-        }
+        //if (mCurrentSearchDepth && mComputerPlayer)
+        //{
+        //    std::string text = MakeString() << mComputerPlayer->getCurrentSearchDepth() << "/" << mNodeCalculator->getMaxSearchDepth();
+        //    setText(mCurrentSearchDepth, text);
+        //}
 
 
         if (mMovementSpeed && mBlockMover)

@@ -31,15 +31,10 @@ namespace Tetris
 
         ~GravityImpl();
 
-        int getLevel() const;
-
         // Number of rows per second
         float currentSpeed() const;
 
-        // The higher the level the faster the blocks are falling.
-        // Levels go from 0 to 20. If the level is set to a
-        // bigger value then it is set to 20 instead.
-        void setLevel(int inLevel);
+        static float CalculateSpeed(int inLevel);
 
     private:
         GravityImpl(const GravityImpl &);
@@ -49,7 +44,6 @@ namespace Tetris
 
         Protected<Game> mThreadSafeGame;
         int mLevel;
-        mutable boost::mutex mLevelMutex;
         Poco::Timer mTimer;
     };
 
@@ -58,8 +52,9 @@ namespace Tetris
         mThreadSafeGame(inThreadSafeGame),
         mLevel(0)
     {
+        ScopedConstAtom<Game> rgame(mThreadSafeGame);
         mTimer.start(Poco::TimerCallback<GravityImpl>(*this, &GravityImpl::onTimerEvent));
-        mTimer.setPeriodicInterval(sIntervals[getLevel()]);
+        mTimer.setPeriodicInterval(sIntervals[rgame->level()]);
     }
 
 
@@ -73,22 +68,16 @@ namespace Tetris
     {
         try
         {
-            int level = 0;
-            // Scoped lock
             {
                 ScopedAtom<Game> game(mThreadSafeGame, 1000);
-                if (!game->isGameOver())
+                if (game->isGameOver())
                 {
-                    game->move(Direction_Down);
+                    return;
                 }
-                level = game->currentNode()->state().stats().numLines() / 10;
-            }
-
-            if (level > getLevel() && level <= cMaxLevel)
-            {
-                setLevel(level);
-                mTimer.setPeriodicInterval(sIntervals[level]);
-            }
+                game->move(Direction_Down);
+                mLevel = game->level();
+            }           
+            mTimer.setPeriodicInterval(sIntervals[mLevel]);
         }
         catch (const std::exception & inException)
         {
@@ -99,22 +88,13 @@ namespace Tetris
 
     float GravityImpl::currentSpeed() const
     {
-        return static_cast<float>(1000.0 / static_cast<float>(sIntervals[getLevel()]));
+        return CalculateSpeed(mLevel);
     }
-
-
-    int GravityImpl::getLevel() const
+    
+    
+    float GravityImpl::CalculateSpeed(int inLevel)
     {
-        boost::mutex::scoped_lock lock(mLevelMutex);
-        return mLevel;
-    }
-
-
-    void GravityImpl::setLevel(int inLevel)
-    {
-        boost::mutex::scoped_lock lock(mLevelMutex);
-        mLevel = std::min<int>(inLevel, cMaxLevel);
-        mTimer.setPeriodicInterval(sIntervals[mLevel]);
+        return static_cast<float>(1000.0 / static_cast<float>(sIntervals[inLevel]));
     }
 
     
@@ -130,22 +110,16 @@ namespace Tetris
         mImpl = 0;
     }
 
-    
-    int Gravity::getLevel() const
-    {
-        return mImpl->getLevel();
-    }
-
-
-    void Gravity::setLevel(int inLevel)
-    {
-        mImpl->setLevel(inLevel);
-    }
-
 
     float Gravity::currentSpeed() const
     {
         return mImpl->currentSpeed();
+    }
+    
+    
+    float Gravity::CalculateSpeed(int inLevel)
+    {
+        return GravityImpl::CalculateSpeed(inLevel);
     }
 
 } // namespace Tetris

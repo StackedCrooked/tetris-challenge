@@ -32,55 +32,51 @@ namespace Tetris
 
         std::auto_ptr<Game> clone();
 
+        bool isGameOver() const;
+
         int numRows() const;
 
         int numColumns() const;
-
-        void reserveBlocks(size_t inCount);
-
-        const Block & activeBlock() const;
-
-        Block & activeBlock();
-
-        // Includes the currently active block
-        void getFutureBlocks(size_t inCount, BlockTypes & outBlocks) const;
-
-        void getFutureBlocksWithOffset(size_t inOffset, size_t inCount, BlockTypes & outBlocks) const;
-
-        bool isGameOver() const;
-
-        GameStateNode * currentNode();
-
-        const GameStateNode * lastPrecalculatedNode() const;
-
-        GameStateNode * lastPrecalculatedNode();
-
-        const GameStateNode * currentNode() const;
-
-        //
-        // Statistics
-        //
-        size_t currentBlockIndex() const;
-
-        size_t numPrecalculatedMoves() const;
-
-        void clearPrecalculatedNodes();
-
-        //
-        // Game commands
-        //
+        
         bool move(Direction inDirection);
 
         bool rotate();
 
         void drop();
 
-        // Make the next queued game state the current game state.
+        int level() const;
+
+        const Block & activeBlock() const;
+
+        // Gets the currently active block and any blocks that follow.
+        void getFutureBlocks(size_t inCount, BlockTypes & outBlocks) const;
+
+        void getFutureBlocksWithOffset(size_t inOffset, size_t inCount, BlockTypes & outBlocks) const;
+
+        // How many blocks have been dropped?
+        size_t currentBlockIndex() const;
+
+        //
+        // For AI
+        //
+        GameStateNode * currentNode();
+
+        const GameStateNode * currentNode() const;
+
+        const GameStateNode * lastPrecalculatedNode() const;
+
+        GameStateNode * lastPrecalculatedNode();
+
         bool navigateNodeDown();
+
+        size_t numPrecalculatedMoves() const;
+
+        void clearPrecalculatedNodes();
 
     private:
         // implemented for the clone() method
         Game(const Game & inGame);
+        Game(std::auto_ptr<GameImpl> inImpl);
 
         // not allowed
         Game & operator=(const Game&);

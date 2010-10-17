@@ -15,8 +15,8 @@ namespace Tetris
     /**
      * Gravity
      *
-     * Gravity implements the the gravity aspect to the game.
-     * It moves the active block one unit down at regular intervals.
+     * Adds gravity to the game causing the blocks to fall down.
+     * The speed at which they fall depends on the game level.
      */
     class Gravity
     {
@@ -25,15 +25,10 @@ namespace Tetris
 
         ~Gravity();
 
-        int getLevel() const;
-
         // Number of rows per second
         float currentSpeed() const;
 
-        // The higher the level the faster the blocks are falling.
-        // Levels go from 0 to 20. If the level is set to a
-        // bigger value then it is set to 20 instead.
-        void setLevel(int inLevel);
+        static float CalculateSpeed(int inLevel);
 
     private:
         Gravity(const Gravity &);
