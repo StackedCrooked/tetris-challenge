@@ -2,7 +2,9 @@
 #include "Console.h"
 #include "Tetris/Assert.h"
 #include "Tetris/BlockMover.h"
-#include "Tetris/ComputerPlayerMt.h"
+#include "Tetris/ComputerPlayer.h"
+#include "Tetris/NodeCalculator.h"
+#include "Tetris/MultithreadedNodeCalculator.h"
 #include "Tetris/Game.h"
 #include "Tetris/GameStateComparisonFunctor.h"
 #include "Tetris/GameQualityEvaluator.h"
@@ -62,7 +64,7 @@ namespace Tetris
         mProtectedGame(),
         mGravity(),
         mRefreshTimer(),
-        mMoveCalculator(),
+        mNodeCalculator(),
         mBlockMover(),
         mEvaluator(new Balanced),
         #ifdef _DEBUG
@@ -297,7 +299,7 @@ namespace Tetris
 
     Controller::~Controller()
     {
-        mMoveCalculator.reset();
+        mNodeCalculator.reset();
         mGravity.reset();
         mBlockMover.reset();
     }
@@ -305,7 +307,7 @@ namespace Tetris
 
     LRESULT Controller::onNew(WPARAM wParam, LPARAM lParam)
     {
-        mMoveCalculator.reset();
+        mNodeCalculator.reset();
         mGravity.reset();
         mBlockMover.reset();
         mProtectedGame.reset(new Protected<Game>(std::auto_ptr<Game>(new Game(mTetrisComponent->getNumRows(), mTetrisComponent->getNumColumns()))));
@@ -457,7 +459,7 @@ namespace Tetris
 
     bool Controller::move(TetrisComponent * tetrisComponent, Direction inDirection)
     {
-        if (mMoveCalculator || mBlockMover)
+        if (mNodeCalculator || mBlockMover)
         {
             return false;
         }
@@ -469,7 +471,7 @@ namespace Tetris
 
     void Controller::drop(TetrisComponent * tetrisComponent)
     {
-        if (mMoveCalculator || mBlockMover)
+        if (mNodeCalculator || mBlockMover)
         {
             return;
         }
@@ -481,7 +483,7 @@ namespace Tetris
 
     bool Controller::rotate(TetrisComponent * tetrisComponent)
     {
-        if (mMoveCalculator || mBlockMover)
+        if (mNodeCalculator || mBlockMover)
         {
             return false;
         }
@@ -593,10 +595,10 @@ namespace Tetris
         }
 
 
-        if (mMoveCalculator)
+        if (mNodeCalculator)
         {
             // Check if the computer player has finished.
-            if (mMoveCalculator->status() != MoveCalculator::Status_Finished)
+            if (mNodeCalculator->status() != AbstractNodeCalculator::Status_Finished)
             {
                 // Check if there is the danger of crashing the current block.
 
@@ -610,14 +612,14 @@ namespace Tetris
                     }
                     if (timeRemaining < 1500)
                     {
-                        mMoveCalculator->stop();
+                        mNodeCalculator->stop();
                     }
                 }
                 // else: keep working.
             }
             else
             {
-                NodePtr resultNode = mMoveCalculator->result();
+                NodePtr resultNode = mNodeCalculator->result();
                 if (!resultNode->state().isGameOver())
                 {
                     // The created node should follow the last precalculated one.
@@ -638,12 +640,12 @@ namespace Tetris
                 else
                 {
                     // Game over. Too bad.
-                    mMoveCalculator.reset();
+                    mNodeCalculator.reset();
                     return;
                 }                
 
                 // Once the computer has finished it's job we destroy the object.
-                mMoveCalculator.reset();
+                mNodeCalculator.reset();
             }
         }
         else
@@ -655,7 +657,7 @@ namespace Tetris
             int numPrecalculated = endNode->depth() - gameStats->currentNode()->depth();
             if (numPrecalculated + searchDepth <= 3 * cMaxSearchDepth)
             {
-                Assert(!mMoveCalculator);
+                Assert(!mNodeCalculator);
 
                 //
                 // Clone the starting node
@@ -692,8 +694,8 @@ namespace Tetris
                 // Create and start the ConcreteMoveCalculator.
                 //
                 Assert(mWorkerPool->stats().activeWorkerCount == 0);
-                mMoveCalculator.reset(new MoveCalculatorMt(mWorkerPool, endNode, futureBlocks, widths, mEvaluator->clone()));
-                mMoveCalculator->start();
+                mNodeCalculator.reset(new MultithreadedNodeCalculator(mWorkerPool, endNode, futureBlocks, widths, mEvaluator->clone()));
+                mNodeCalculator->start();
             }
             // else: we have plenty of precalculated nodes. Do nothing for know.
         }
@@ -716,9 +718,9 @@ namespace Tetris
             setText(mTotalLinesTextBox, MakeString() << gameStats->currentNode()->state().stats().numLines());
         }
 
-        if (mCurrentSearchDepth && mMoveCalculator)
+        if (mCurrentSearchDepth && mNodeCalculator)
         {
-            std::string text = MakeString() << mMoveCalculator->getCurrentSearchDepth() << "/" << mMoveCalculator->getMaxSearchDepth();
+            std::string text = MakeString() << mNodeCalculator->getCurrentSearchDepth() << "/" << mNodeCalculator->getMaxSearchDepth();
             setText(mCurrentSearchDepth, text);
         }
 

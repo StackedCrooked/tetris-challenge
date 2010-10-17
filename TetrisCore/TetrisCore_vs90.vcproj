@@ -357,32 +357,52 @@
 				</Filter>
 			</Filter>
 			<Filter
-				Name="AI"
+				Name="ComputerPlayer"
 				>
-				<File
-					RelativePath=".\src\AISupport.cpp"
+				<Filter
+					Name="Header Files"
 					>
-				</File>
-				<File
-					RelativePath=".\include\Tetris\AISupport.h"
+					<File
+						RelativePath=".\include\Tetris\AbstractNodeCalculator.h"
+						>
+					</File>
+					<File
+						RelativePath=".\include\Tetris\AISupport.h"
+						>
+					</File>
+					<File
+						RelativePath=".\include\Tetris\ComputerPlayer.h"
+						>
+					</File>
+					<File
+						RelativePath=".\include\Tetris\MultithreadedNodeCalculator.h"
+						>
+					</File>
+					<File
+						RelativePath=".\include\Tetris\NodeCalculator.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="Source Files"
 					>
-				</File>
-				<File
-					RelativePath=".\src\ComputerPlayer.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Tetris\ComputerPlayer.h"
-					>
-				</File>
-				<File
-					RelativePath=".\src\ComputerPlayerMt.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Tetris\ComputerPlayerMt.h"
-					>
-				</File>
+					<File
+						RelativePath=".\src\AISupport.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\ComputerPlayer.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\MultiThreadedNodeCalculator.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\NodeCalculator.cpp"
+						>
+					</File>
+				</Filter>
 			</Filter>
 		</Filter>
 		<File
