@@ -98,7 +98,7 @@ namespace Tetris
         mActiveBlock.reset(CreateDefaultBlock(mBlocks.front(), inNumColumns).release());
     }
 
-    
+
     GameImpl::GameImpl(const GameImpl & rhs) :
         mNumRows(rhs.mNumRows),
         mNumColumns(rhs.mNumColumns),
@@ -112,7 +112,7 @@ namespace Tetris
         mBlocks(rhs.mBlocks),
         mCurrentBlockIndex(rhs.mCurrentBlockIndex)
     {
-    }    
+    }
 
 
     std::auto_ptr<Block> GameImpl::CreateDefaultBlock(BlockType inBlockType, size_t inNumColumns)
@@ -141,6 +141,7 @@ namespace Tetris
         }
     }
 
+
     void GameImpl::supplyBlocks() const
     {            
         if (!mBlockFactory && (mCurrentBlockIndex >= mBlocks.size()))
@@ -164,7 +165,8 @@ namespace Tetris
 
 
         // Make sure we have 100 blocks from the factory.
-        // This ensures 
+        // This ensures the AI will have enough to do its
+        // precalculation.
         while (mCurrentBlockIndex + 100 > mBlocks.size())
         {
             mBlocks.push_back(mBlockFactory->getNext());
