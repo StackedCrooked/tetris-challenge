@@ -3,7 +3,7 @@
 
 
 #include "Tetris/TypedWrapper.h"
-#include "Tetris/Utilities.h"
+#include "Tetris/AutoPtrSupport.h"
 #include <memory>
 
 
