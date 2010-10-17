@@ -113,84 +113,18 @@ namespace Tetris
         }
 
         mTetrisComponent->setController(this);
-
-
-        //
-        // Get the Game object.
-        //
         mProtectedGame.reset(new Protected<Game>(std::auto_ptr<Game>(new Game(mTetrisComponent->getNumRows(), mTetrisComponent->getNumColumns()))));
 
 
-        //
-        // Enable gravity.
-        //
-        mGravity.reset(new Gravity(*mProtectedGame));
-
-        //
-        // Enable keyboard listener for activating the AI.
-        //
-        mTetrisComponent->OnKeyboardPressed.connect(boost::bind(&Controller::processKey, this, _1));
-
-
-        //
-        // Get stats widgets
-        //
-        if (XULWin::Element * el = mRootElement->getElementById("fpsTextBox"))
-        {
-            mFPSTextBox = el->component()->downcast<XULWin::TextBox>();
-        }
-        else
-        {
-            LogWarning("The fps textbox was not found in the XUL document.");
-        }
-
-
-        if (XULWin::Element * el = mRootElement->getElementById("blockCountTextBox"))
-        {
-            mBlockCountTextBox = el->component()->downcast<XULWin::TextBox>();
-        }
-        else
-        {
-            LogWarning("The block counter textbox was not found in the XUL document.");
-        }
-
-
-        for (size_t idx = 0; idx != 4; ++idx)
-        {
-            if (XULWin::Element * el = mRootElement->getElementById(MakeString() << "lines" << (idx + 1) << "TextBox"))
-            {
-                if (!(mLinesTextBoxes[idx] = el->component()->downcast<XULWin::TextBox>()))
-                {
-                    throw std::runtime_error("This is not a textbox!");
-                }
-            }
-            else
-            {
-                LogWarning(MakeString() << "The lines x" << idx << "TextBox element was not found in the XUL document.");
-            }
-        }
-
-
+        mFPSTextBox = findComponentById<XULWin::TextBox>("fpsTextBox");
+        mBlockCountTextBox = findComponentById<XULWin::TextBox>("blockCountTextBox");
+        mLinesTextBoxes[0] = findComponentById<XULWin::TextBox>("lines1TextBox");
+        mLinesTextBoxes[1] = findComponentById<XULWin::TextBox>("lines2TextBox");
+        mLinesTextBoxes[2] = findComponentById<XULWin::TextBox>("lines3TextBox");
+        mLinesTextBoxes[3] = findComponentById<XULWin::TextBox>("lines4TextBox");
         mLevelTextBox = findComponentById<XULWin::TextBox>("levelTextBox");
-
-
-        if (XULWin::Element * el = mRootElement->getElementById("scoreTextBox"))
-        {
-            if (!(mScoreTextBox = el->component()->downcast<XULWin::TextBox>()))
-            {
-                LogWarning("The element with id 'scoreTextBox' was found but it was not of type 'textbox'.");
-            }
-        }
-
-
-        if (XULWin::Element * el = mRootElement->getElementById("totalLinesTextBox"))
-        {
-            if (!(mTotalLinesTextBox = el->component()->downcast<XULWin::TextBox>()))
-            {
-                LogWarning("The element with id 'totalLinesTextBox' was found but it was not of type 'textbox'.");
-            }
-        }
-
+        mScoreTextBox = findComponentById<XULWin::TextBox>("scoreTextBox");
+        mTotalLinesTextBox = findComponentById<XULWin::TextBox>("totalLinesTextBox");
 
         if (mSearchDepth = findComponentById<XULWin::SpinButton>("searchDepth"))
         {
@@ -202,34 +136,19 @@ namespace Tetris
             XULWin::WinAPI::SpinButton_SetRange(mSearchWidth->handle(), cMinSearchWidth, cMaxSearchWidth);
         }
 
-
         mCurrentSearchDepth = findComponentById<XULWin::TextBox>("currentSearchDepth");
-
 
         if (mMovementSpeed = findComponentById<XULWin::SpinButton>("movementSpeed"))
         {
             XULWin::WinAPI::SpinButton_SetRange(mMovementSpeed->handle(), 1, 1000);
         }
 
-
-        if (XULWin::Element * el = mRootElement->getElementById("movesAheadTextBox"))
-        {
-            if (!(mMovesAheadTextBox = el->component()->downcast<XULWin::TextBox>()))
-            {
-                LogWarning("The 'moves ahead' textbox was not found in the XUL document.");
-            }
-        }
-
+        mMovesAheadTextBox = findComponentById<XULWin::TextBox>("movesAheadTextBox");
 
         if (mStrategiesMenuList = findComponentById<XULWin::MenuList>("strategiesMenuList"))
         {
             mScopedEventListener.connect(mStrategiesMenuList->el(), boost::bind(&Controller::onStrategySelected, this, _1, _2));
         }
-
-        //if (mClearPrecalculatedButton = findComponentById<XULWin::Button>("clearPrecalculatedButton"))
-        //{
-        //    mScopedEventListener.connect(mClearPrecalculatedButton->el(), boost::bind(&Controller::onClearPrecalculated, this, _1, _2));
-        //}
 
         mGameHeightFactor = findComponentById<XULWin::SpinButton>("gameHeightFactor");
         mLastBlockHeightFactor = findComponentById<XULWin::SpinButton>("lastBlockHeightFactor");
@@ -263,25 +182,19 @@ namespace Tetris
         }
 
 
-        //
-        // Activate the stats updater.
-        // The WinAPI::Timer is non-threaded and you can safely access the WinAPI in its callbacks.
-        //
+        mTetrisComponent->OnKeyboardPressed.connect(boost::bind(&Controller::processKey, this, _1));       
+        mGravity.reset(new Gravity(*mProtectedGame));
+
         mRefreshTimer.reset(new XULWin::WinAPI::Timer);
         mRefreshTimer->start(boost::bind(&Controller::onRefresh, this), 10);
 
 		// Main thread should have highest priority for responsiveness.
         ::SetThreadPriority(::GetCurrentThread(), THREAD_PRIORITY_TIME_CRITICAL);
-
         
-        //
-        // Enable the computer player.
-        //
         mComputerPlayer.reset(new ComputerPlayer(*mProtectedGame,
                                                  createEvaluator(), 
                                                  mSearchDepth ? XULWin::String2Int(mSearchDepth->getValue(), 4) : 4,
                                                  mSearchWidth ? XULWin::String2Int(mSearchWidth->getValue(), 4) : 4));
-        
     }
 
 

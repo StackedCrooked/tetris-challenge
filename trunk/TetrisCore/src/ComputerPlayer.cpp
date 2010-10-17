@@ -77,7 +77,7 @@ namespace Tetris
                                            int inSearchDepth,
                                            int inSearchWidth) :
         mProtectedGame(inProtectedGame),
-        mWorkerPool(new WorkerPool("ComputerPlayer WorkerPool", 6)),
+        mWorkerPool(new WorkerPool("ComputerPlayer WorkerPool", 2)),
         mEvaluator(inEvaluator.release()),
         mBlockMover(new BlockMover(mProtectedGame, 20)),
         mTimer(10, 10),
