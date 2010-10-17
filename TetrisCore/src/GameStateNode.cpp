@@ -54,7 +54,6 @@ namespace Tetris
     }
 
 
-
     GameStateNodeImpl::GameStateNodeImpl(std::auto_ptr<GameState> inGameState,
                                          std::auto_ptr<Evaluator> inEvaluator) :
         mParent(),
