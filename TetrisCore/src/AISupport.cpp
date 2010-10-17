@@ -12,9 +12,8 @@
 namespace Tetris
 {
 
-    void CarveBestPath(NodePtr startNode, NodePtr endNode)
+    void CarveBestPath(NodePtr startNode, NodePtr dst)
     {
-        NodePtr dst = endNode;
         Assert(dst->depth() > startNode->depth());
         while (dst->depth() != startNode->depth())
         {

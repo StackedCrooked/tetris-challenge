@@ -63,16 +63,14 @@ namespace Tetris
         mLoggingTextBox(0),
         mProtectedGame(),
         mGravity(),
+        mCustomEvaluator(),
         mRefreshTimer(),
-        mBlockMover(),
-        mEvaluator(new Balanced),
         #ifdef _DEBUG
         // Console shown by default
-        mConsoleVisible(true),
+        mConsoleVisible(true)
         #else
-        mConsoleVisible(false),
+        mConsoleVisible(false)
         #endif
-        mWorkerPool()
     {
         //
         // Parse the XUL document.
@@ -106,13 +104,6 @@ namespace Tetris
         Logger::Instance().setLogHandler(logFunction);
         
         
-        // Initialize worker pool after the logger.
-        // On multicore systems the number of workers is equal to the number of CPUs minus one.
-        // On a single core system we use one worker.
-        mWorkerPool.reset(new WorkerPool("Tetris Workers", std::max<int>(1, Poco::Environment::processorCount() - 1)));
-        LogInfo(MakeString() << "AI has been granted a pool of " << mWorkerPool->size() << " threads.");
-
-
         //
         // Get the Tetris component.
         //
@@ -134,12 +125,6 @@ namespace Tetris
         // Enable gravity.
         //
         mGravity.reset(new Gravity(*mProtectedGame));
-
-        //
-        // Enable the computer player.
-        //
-        mComputerPlayer.reset(new ComputerPlayer(*mProtectedGame));
-
 
         //
         // Enable keyboard listener for activating the AI.
@@ -278,10 +263,6 @@ namespace Tetris
         }
 
 
-        // Refresh the AI strategy
-        updateStrategy();
-
-
         //
         // Activate the stats updater.
         // The WinAPI::Timer is non-threaded and you can safely access the WinAPI in its callbacks.
@@ -291,6 +272,15 @@ namespace Tetris
 
 		// Main thread should have highest priority for responsiveness.
         ::SetThreadPriority(::GetCurrentThread(), THREAD_PRIORITY_TIME_CRITICAL);
+
+        
+        //
+        // Enable the computer player.
+        //
+        mComputerPlayer.reset(new ComputerPlayer(*mProtectedGame,
+                                                 createEvaluator(), 
+                                                 mSearchDepth ? XULWin::String2Int(mSearchDepth->getValue(), 4) : 4,
+                                                 mSearchWidth ? XULWin::String2Int(mSearchWidth->getValue(), 4) : 4));
         
     }
 
@@ -299,21 +289,21 @@ namespace Tetris
     {
         mComputerPlayer.reset();
         mGravity.reset();
-        mBlockMover.reset();
     }
 
 
     LRESULT Controller::onNew(WPARAM wParam, LPARAM lParam)
     {
         mComputerPlayer.reset();
-        mBlockMover.reset();
         mGravity.reset();
         mProtectedGame.reset();
         
         mProtectedGame.reset(new Protected<Game>(std::auto_ptr<Game>(new Game(mTetrisComponent->getNumRows(), mTetrisComponent->getNumColumns()))));
-        mGravity.reset(new Gravity(*mProtectedGame));
-        mBlockMover.reset(new BlockMover(*mProtectedGame, XULWin::String2Int(mMovementSpeed->getValue(), 20)));
-        mComputerPlayer.reset(new ComputerPlayer(*mProtectedGame));
+        mGravity.reset(new Gravity(*mProtectedGame));        
+        mComputerPlayer.reset(new ComputerPlayer(*mProtectedGame,
+                                                 createEvaluator(), 
+                                                 mSearchDepth ? XULWin::String2Int(mSearchDepth->getValue(), 4) : 4,
+                                                 mSearchWidth ? XULWin::String2Int(mSearchWidth->getValue(), 4) : 4));
         return XULWin::cHandled;
     }
 
@@ -377,49 +367,96 @@ namespace Tetris
     }
 
 
+    std::auto_ptr<Evaluator> Controller::createEvaluator()
+    {
+        if (!mStrategiesMenuList)
+        {
+            LogWarning("mStrategiesMenuList is not defined. Using 'Balanced' strategy.");
+            return CreatePoly<Evaluator, Balanced>();
+        }
+
+
+        std::string id = mStrategiesMenuList->getLabel();
+        if (id == "Make Tetrises")
+        {
+            return CreatePoly<Evaluator, MakeTetrises>();
+        }
+        else if (id == "Survive")
+        {
+            return CreatePoly<Evaluator, Survival>();
+        }
+        else if (id == "Balanced")
+        {
+            return CreatePoly<Evaluator, Balanced>();
+        }
+        else if (id == "Depressed")
+        {
+            return CreatePoly<Evaluator, Depressed>();
+        }
+        else if (id == "Custom")
+        {
+            // We continuously recreate this object so that the most recent values from the GUI are always applied.
+            std::auto_ptr<Evaluator> customEvaluator(
+                new CustomEvaluator(
+                    GameHeightFactor(XULWin::String2Int(mGameHeightFactor->getValue(), 0)),
+                    LastBlockHeightFactor(XULWin::String2Int(mLastBlockHeightFactor->getValue(), 0)),
+                    NumHolesFactor(XULWin::String2Int(mNumHolesFactor->getValue(), 0)),
+                    NumSinglesFactor(XULWin::String2Int(mNumSinglesFactor->getValue(), 0)),
+                    NumDoublesFactor(XULWin::String2Int(mNumDoublesFactor->getValue(), 0)),
+                    NumTriplesFactor(XULWin::String2Int(mNumTriplesFactor->getValue(), 0)),
+                    NumTetrisesFactor(XULWin::String2Int(mNumTetrisesFactor->getValue(), 0)),
+                    SearchDepth(XULWin::String2Int(mSearchDepth->getValue(), 4)),
+                    SearchWidth(XULWin::String2Int(mSearchDepth->getValue(), 4))));
+            return customEvaluator;
+        }
+
+        throw std::runtime_error("Unknown evaluator.");
+    }
+
+
     void Controller::updateStrategy()
     {
         std::string id = mStrategiesMenuList->getLabel();
         if (id == "Make Tetrises")
         {
-            if (!dynamic_cast<MakeTetrises *>(mEvaluator.get()))
+            if (!dynamic_cast<const MakeTetrises *>(&mComputerPlayer->evaluator()))
             {
-                mEvaluator.reset(new MakeTetrises);
                 ScopedAtom<Game> game(*mProtectedGame);
                 game->clearPrecalculatedNodes();
+                mComputerPlayer->setEvaluator(Create<MakeTetrises>());
             }
         }
         else if (id == "Survive")
         {
-            if (!dynamic_cast<Survival *>(mEvaluator.get()))
+            if (!dynamic_cast<const Survival *>(&mComputerPlayer->evaluator()))
             {
-                mEvaluator.reset(new Survival);
                 ScopedAtom<Game> game(*mProtectedGame);
                 game->clearPrecalculatedNodes();
+                mComputerPlayer->setEvaluator(Create<Survival>());
             }
         }
         else if (id == "Balanced")
         {
-            if (!dynamic_cast<Survival *>(mEvaluator.get()))
+            if (!dynamic_cast<const Balanced *>(&mComputerPlayer->evaluator()))
             {
-                mEvaluator.reset(new Balanced);
                 ScopedAtom<Game> game(*mProtectedGame);
                 game->clearPrecalculatedNodes();
+                mComputerPlayer->setEvaluator(Create<Balanced>());
             }
         }
         else if (id == "Depressed")
         {
-            if (!dynamic_cast<Depressed *>(mEvaluator.get()))
+            if (!dynamic_cast<const Depressed *>(&mComputerPlayer->evaluator()))
             {
-                mEvaluator.reset(new Depressed);
                 ScopedAtom<Game> game(*mProtectedGame);
                 game->clearPrecalculatedNodes();
+                mComputerPlayer->setEvaluator(Create<Depressed>());
             }
         }
         else if (id == "Custom")
         {
             // We continuously recreate this object so that the most recent values from the GUI are always applied.
-            mEvaluator.reset(new CustomEvaluator(
+            mCustomEvaluator.reset(new CustomEvaluator(
                 GameHeightFactor(XULWin::String2Int(mGameHeightFactor->getValue(), 0)),
                 LastBlockHeightFactor(XULWin::String2Int(mLastBlockHeightFactor->getValue(), 0)),
                 NumHolesFactor(XULWin::String2Int(mNumHolesFactor->getValue(), 0)),
@@ -428,7 +465,8 @@ namespace Tetris
                 NumTriplesFactor(XULWin::String2Int(mNumTriplesFactor->getValue(), 0)),
                 NumTetrisesFactor(XULWin::String2Int(mNumTetrisesFactor->getValue(), 0)),
                 SearchDepth(XULWin::String2Int(mSearchDepth->getValue(), 4)),
-                SearchWidth(XULWin::String2Int(mSearchDepth->getValue(), 4))));
+                SearchWidth(XULWin::String2Int(mSearchWidth->getValue(), 4))));
+            mComputerPlayer->setEvaluator(mCustomEvaluator->clone());
         }
     }
 
@@ -457,7 +495,7 @@ namespace Tetris
 
     bool Controller::move(TetrisComponent * tetrisComponent, Direction inDirection)
     {
-        if (mComputerPlayer || mBlockMover)
+        if (mComputerPlayer)
         {
             return false;
         }
@@ -469,7 +507,7 @@ namespace Tetris
 
     void Controller::drop(TetrisComponent * tetrisComponent)
     {
-        if (mComputerPlayer || mBlockMover)
+        if (mComputerPlayer)
         {
             return;
         }
@@ -481,7 +519,7 @@ namespace Tetris
 
     bool Controller::rotate(TetrisComponent * tetrisComponent)
     {
-        if (mComputerPlayer || mBlockMover)
+        if (mComputerPlayer)
         {
             return false;
         }
@@ -508,7 +546,7 @@ namespace Tetris
         float numRemainingRows = static_cast<float>(game.currentNode()->state().stats().firstOccupiedRow() - (game.activeBlock().row() + 4));
         float numRowsPerSecond = mGravity->currentSpeed();
         float remainingTime = 1000 * numRemainingRows / numRowsPerSecond;
-        float timeRequiredForMove = static_cast<float>(game.activeBlock().numRotations() + game.numColumns()) / static_cast<float>(mBlockMover->speed());
+        float timeRequiredForMove = static_cast<float>(game.activeBlock().numRotations() + game.numColumns()) / static_cast<float>(mComputerPlayer->moveSpeed());
         return static_cast<int>(0.5 + remainingTime - timeRequiredForMove);
     }
 
@@ -608,16 +646,10 @@ namespace Tetris
             setText(mTotalLinesTextBox, MakeString() << gameStats->currentNode()->state().stats().numLines());
         }
 
-        //if (mCurrentSearchDepth && mComputerPlayer)
-        //{
-        //    std::string text = MakeString() << mComputerPlayer->getCurrentSearchDepth() << "/" << mNodeCalculator->getMaxSearchDepth();
-        //    setText(mCurrentSearchDepth, text);
-        //}
 
-
-        if (mMovementSpeed && mBlockMover)
+        if (mMovementSpeed && mComputerPlayer)
         {
-            mBlockMover->setSpeed(XULWin::String2Int(mMovementSpeed->getValue(), 1));
+            mComputerPlayer->setMoveSpeed(XULWin::String2Int(mMovementSpeed->getValue(), 1));
         }
 
 
@@ -658,7 +690,7 @@ namespace Tetris
             && mNumTriplesFactor
             && mNumTetrisesFactor)
         {
-            bool useCustomEvaluator = dynamic_cast<CustomEvaluator*>(mEvaluator.get()) != 0;
+            bool useCustomEvaluator = mCustomEvaluator.get() != 0;
 
             // Enable/disable the spin buttons
             mSearchDepth->setDisabled(!useCustomEvaluator);
@@ -675,7 +707,7 @@ namespace Tetris
             if (useCustomEvaluator)
             {
                 // Create a CustomEvaluator using the values from the GUI
-                mEvaluator.reset(new CustomEvaluator(
+                mCustomEvaluator.reset(new CustomEvaluator(
                     GameHeightFactor(XULWin::String2Int(mGameHeightFactor->getValue(), 0)),
                     LastBlockHeightFactor(XULWin::String2Int(mLastBlockHeightFactor->getValue(), 0)),
                     NumHolesFactor(XULWin::String2Int(mNumHolesFactor->getValue(), 0)),
@@ -685,24 +717,25 @@ namespace Tetris
                     NumTetrisesFactor(XULWin::String2Int(mNumTetrisesFactor->getValue(), 0)),
                     SearchDepth(XULWin::String2Int(mSearchDepth->getValue(), 4)),
                     SearchWidth(XULWin::String2Int(mSearchWidth->getValue(), 4))));
+                mComputerPlayer->setEvaluator(mCustomEvaluator->clone());
             }
             else
             {
                 // Update the GUI with the values from the evaluator.
-                mGameHeightFactor->setValue(MakeString() << mEvaluator->gameHeightFactor());
-                mLastBlockHeightFactor->setValue(MakeString() << mEvaluator->lastBlockHeightFactor());
-                mNumHolesFactor->setValue(MakeString() << mEvaluator->numHolesFactor());
-                mNumSinglesFactor->setValue(MakeString() << mEvaluator->numSinglesFactor());
-                mNumDoublesFactor->setValue(MakeString() << mEvaluator->numDoublesFactor());
-                mNumTriplesFactor->setValue(MakeString() << mEvaluator->numTriplesFactor());
-                mNumTetrisesFactor->setValue(MakeString() << mEvaluator->numTetrisesFactor());
-                mSearchDepth->setValue(MakeString() << mEvaluator->recommendedSearchDepth());
-                mSearchWidth->setValue(MakeString() << mEvaluator->recommendedSearchWidth());
+                mGameHeightFactor->setValue(MakeString() << mComputerPlayer->evaluator().gameHeightFactor());
+                mLastBlockHeightFactor->setValue(MakeString() << mComputerPlayer->evaluator().lastBlockHeightFactor());
+                mNumHolesFactor->setValue(MakeString() << mComputerPlayer->evaluator().numHolesFactor());
+                mNumSinglesFactor->setValue(MakeString() << mComputerPlayer->evaluator().numSinglesFactor());
+                mNumDoublesFactor->setValue(MakeString() << mComputerPlayer->evaluator().numDoublesFactor());
+                mNumTriplesFactor->setValue(MakeString() << mComputerPlayer->evaluator().numTriplesFactor());
+                mNumTetrisesFactor->setValue(MakeString() << mComputerPlayer->evaluator().numTetrisesFactor());
+                mSearchDepth->setValue(MakeString() << mComputerPlayer->evaluator().recommendedSearchDepth());
+                mSearchWidth->setValue(MakeString() << mComputerPlayer->evaluator().recommendedSearchWidth());
             }
 
             if (mGameStateScore)
             {
-                setText(mGameStateScore, XULWin::Int2String(mEvaluator->evaluate(gameStats->currentNode()->state())));
+                setText(mGameStateScore, XULWin::Int2String(mComputerPlayer->evaluator().evaluate(gameStats->currentNode()->state())));
             }
         }
 

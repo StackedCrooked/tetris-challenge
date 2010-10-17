@@ -110,6 +110,8 @@ namespace Tetris
         LRESULT onStrategySelected(WPARAM wParam, LPARAM lParam);
         LRESULT onClearPrecalculated(WPARAM wParam, LPARAM lParam);
 
+        std::auto_ptr<Evaluator> createEvaluator();
+
         void updateStrategy();
 
 
@@ -149,12 +151,10 @@ namespace Tetris
         XULWin::ScopedEventListener mScopedEventListener;
         boost::scoped_ptr<Protected<Game> > mProtectedGame;
         boost::scoped_ptr<Tetris::Gravity> mGravity;
+        boost::scoped_ptr<Tetris::Evaluator> mCustomEvaluator;
         boost::scoped_ptr<Tetris::ComputerPlayer> mComputerPlayer;
         boost::scoped_ptr<XULWin::WinAPI::Timer> mRefreshTimer;
-        boost::scoped_ptr<BlockMover> mBlockMover;
-        boost::scoped_ptr<Evaluator> mEvaluator;
         bool mConsoleVisible;
-        boost::shared_ptr<WorkerPool> mWorkerPool;
     };
 
 } // namespace Tetris
