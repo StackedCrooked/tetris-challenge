@@ -65,6 +65,7 @@ namespace Tetris
         mGravity(),
         mCustomEvaluator(),
         mRefreshTimer(),
+        mGameCopyTimer(new Poco::Timer(0, 10)),
         #ifdef _DEBUG
         // Console shown by default
         mConsoleVisible(true)
@@ -195,13 +196,25 @@ namespace Tetris
                                                  createEvaluator(), 
                                                  mSearchDepth ? XULWin::String2Int(mSearchDepth->getValue(), 4) : 4,
                                                  mSearchWidth ? XULWin::String2Int(mSearchWidth->getValue(), 4) : 4));
+
+        
+        mGameCopyTimer->start(Poco::TimerCallback<Controller>(*this, &Controller::onGameCopy));
     }
 
 
     Controller::~Controller()
     {
+        mGameCopyTimer.reset();
         mComputerPlayer.reset();
         mGravity.reset();
+    }
+
+        
+    void Controller::onGameCopy(Poco::Timer & timer)
+    {
+        boost::mutex::scoped_lock lock(mGameCopyMutex);
+        ScopedAtom<Game> game(*mProtectedGame.get());
+        mGameCopy.reset(game->clone().release());
     }
 
 
@@ -488,75 +501,30 @@ namespace Tetris
 
     void Controller::refresh()
     {
-
         // Flush the logger.
         Logger::Instance().flush();
-    
-        class GameStats
+
+        boost::mutex::scoped_lock lock(mGameCopyMutex);
+        if (!mGameCopy)
         {
-        public:
-            GameStats(Game & game) :
-                mLevel(game.level()),
-                mNumPrecalculatedMoves(game.numPrecalculatedMoves()),
-                mCurrentNode(game.currentNode()->clone()),
-                mEndNode(mCurrentNode->endNode()->clone())
-            {
-            }
-
-            inline int level() const
-            { return mLevel; }
-
-            inline int numPrecalculatedMoves() const
-            { return mNumPrecalculatedMoves; }
-
-            const GameStateNode * currentNode() const
-            { return mCurrentNode.get(); }
-
-            GameStateNode * currentNode()
-            { return mCurrentNode.get(); }
-
-            const GameStateNode * endNode() const
-            { return mEndNode.get(); }
-
-            GameStateNode * endNode()
-            { return mEndNode.get(); }
-
-        private:
-            int mNumPrecalculatedMoves;
-            int mLevel;
-            std::auto_ptr<GameStateNode> mCurrentNode;
-            std::auto_ptr<GameStateNode> mEndNode;
-        };
-
-        boost::scoped_ptr<GameStats> gameStats;
-
-        // Keep the locking very short.
-        {
-            ScopedAtom<Game> wgame(*mProtectedGame);
-            Game & game = *(wgame.get());
-            if (game.isGameOver())
-            {
-                setText(mStatusTextBox, "Game Over!");
-                return;
-            }
-            gameStats.reset(new GameStats(game));
+            LogWarning("GameCopy not yet created. Returning");
         }
 
         if (mLevelTextBox && mGravity)
         {
-            setText(mLevelTextBox, MakeString() << gameStats->level());
+            setText(mLevelTextBox, MakeString() << mGameCopy->level());
         }
 
 
         if (mScoreTextBox)
         {
-            setText(mScoreTextBox, MakeString() << gameStats->currentNode()->state().stats().score());
+            setText(mScoreTextBox, MakeString() << mGameCopy->currentNode()->state().stats().score());
         }
 
 
         if (mTotalLinesTextBox)
         {
-            setText(mTotalLinesTextBox, MakeString() << gameStats->currentNode()->state().stats().numLines());
+            setText(mTotalLinesTextBox, MakeString() << mGameCopy->currentNode()->state().stats().numLines());
         }
 
 
@@ -568,25 +536,31 @@ namespace Tetris
 
         if (mStatusTextBox)
         {
-            setText(mStatusTextBox, gameStats->currentNode()->children().empty() ? "Thinking" : "Moving");
+            setText(mStatusTextBox, mGameCopy->currentNode()->children().empty() ? "Thinking" : "Moving");
         }
 
 
         if (mBlockCountTextBox)
         {
-            setText(mBlockCountTextBox, MakeString() << (gameStats->currentNode()->depth() + 1));
+            setText(mBlockCountTextBox, MakeString() << (mGameCopy->currentNode()->depth() + 1));
+        }
+
+
+        if (mCurrentSearchDepth)
+        {
+            setText(mCurrentSearchDepth, MakeString() << mComputerPlayer->currentSearchDepth() << "/" << mComputerPlayer->searchDepth());
         }
 
 
         if (mMovesAheadTextBox)
         {
-            setText(mMovesAheadTextBox, MakeString() << (gameStats->endNode()->depth() - gameStats->currentNode()->depth()) << "/" << 3 * cMaxSearchDepth);
+            setText(mMovesAheadTextBox, MakeString() << (mGameCopy->lastPrecalculatedNode()->depth() - mGameCopy->currentNode()->depth()));
         }
 
 
         for (size_t idx = 0; idx != 4; ++idx)
         {
-            const Stats & stats = gameStats->currentNode()->state().stats();
+            const Stats & stats = mGameCopy->currentNode()->state().stats();
             if (mLinesTextBoxes[idx])
             {
                 setText(mLinesTextBoxes[idx], MakeString() << stats.numLines(idx));
@@ -634,6 +608,7 @@ namespace Tetris
             }
             else
             {
+                updateStrategy();
                 // Update the GUI with the values from the evaluator.
                 mGameHeightFactor->setValue(MakeString() << mComputerPlayer->evaluator().gameHeightFactor());
                 mLastBlockHeightFactor->setValue(MakeString() << mComputerPlayer->evaluator().lastBlockHeightFactor());
@@ -648,7 +623,7 @@ namespace Tetris
 
             if (mGameStateScore)
             {
-                setText(mGameStateScore, XULWin::Int2String(mComputerPlayer->evaluator().evaluate(gameStats->currentNode()->state())));
+                setText(mGameStateScore, XULWin::Int2String(mComputerPlayer->evaluator().evaluate(mGameCopy->currentNode()->state())));
             }
         }
 

@@ -106,11 +106,11 @@
           <label style="text-align:right" value="Preset: " />
           <menulist id="strategiesMenuList">
             <menupopup id="strategiesPopup">
-              <menuitem id="customMenuItem" label="Custom" />
               <menuitem id="makeTetrisesMenuItem" label="Make Tetrises" />
               <menuitem id="balancedMenuItem" label="Balanced" />
               <menuitem id="surviveMenuItem" label="Survive" />
               <menuitem id="depressedMenuItem" label="Depressed" />
+              <menuitem id="customMenuItem" label="Custom" />
             </menupopup>
           </menulist>
           <!--<button id="clearPrecalculatedButton" label="Clear precalculated" />-->

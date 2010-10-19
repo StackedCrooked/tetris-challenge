@@ -14,6 +14,7 @@
 #include "XULWin/Window.h"
 #include "XULWin/WinUtils.h"
 #include "XULWin/XULRunner.h"
+#include "Poco/Timer.h"
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread.hpp>
@@ -155,6 +156,12 @@ namespace Tetris
         boost::scoped_ptr<Tetris::ComputerPlayer> mComputerPlayer;
         boost::scoped_ptr<XULWin::WinAPI::Timer> mRefreshTimer;
         bool mConsoleVisible;
+
+
+        void onGameCopy(Poco::Timer &);
+        boost::scoped_ptr<Poco::Timer> mGameCopyTimer;
+        boost::scoped_ptr<Game> mGameCopy;
+        mutable boost::mutex mGameCopyMutex;
     };
 
 } // namespace Tetris
