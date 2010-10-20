@@ -40,7 +40,6 @@ namespace Tetris
 
     NodeCalculatorImpl::~NodeCalculatorImpl()
     {
-        mWorkerPool->interruptAndClearQueue();
     }
 
 
@@ -193,33 +192,6 @@ namespace Tetris
         setCurrentSearchDepth(inIndex + 1);
         boost::mutex::scoped_lock lock(mLayersMutex);
         mLayers[inIndex].mFinished = true;
-    }
-
-
-    void NodeCalculatorImpl::populate()
-    {
-        try
-        {
-            // The nodes are populated using a "Iterative deepening" algorithm.
-            // See: http://en.wikipedia.org/wiki/Iterative_deepening_depth-first_search for more information.
-            size_t targetDepth = 0;
-            while (targetDepth < mBlockTypes.size())
-            {
-                boost::mutex::scoped_lock lock(mNodeMutex);
-                populateNodesRecursively(mNode, mBlockTypes, mWidths, 0, targetDepth);
-                markTreeRowAsFinished(targetDepth);
-                targetDepth++;
-            }
-            destroyInferiorChildren();
-        }
-        catch (const boost::thread_interrupted &)
-        {
-            // Task was interrupted. Ok.
-        }
-        catch (const std::exception & inException)
-        {
-            LogError(MakeString() << "Exception caught in NodeCalculatorImpl::populate(). Detail: " << inException.what());
-        }
     }
 
 
