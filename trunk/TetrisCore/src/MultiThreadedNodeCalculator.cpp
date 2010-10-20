@@ -45,7 +45,6 @@ namespace Tetris
                 markTreeRowAsFinished(targetDepth);
                 targetDepth++;
             }
-            destroyInferiorChildren();
         }
         catch (const boost::thread_interrupted &)
         {
