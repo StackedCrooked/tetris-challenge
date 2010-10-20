@@ -48,6 +48,12 @@ namespace Tetris
         return std::auto_ptr<T>(new T(arg0, arg1, arg2, arg3));
     }
 
+    template<class T, class Arg0, class Arg1, class Arg2, class Arg3, class Arg4>
+    std::auto_ptr<T> Create(Arg0 arg0, Arg1 arg1, Arg2 arg2, Arg4 arg4)
+    {
+        return std::auto_ptr<T>(new T(arg0, arg1, arg2, arg3, arg4));
+    }
+
 
     // Create can be used to create polymorphic instances for std::auto_ptr. For example:
     //
@@ -85,6 +91,13 @@ namespace Tetris
     std::auto_ptr<T> CreatePoly(Arg0 arg0, Arg1 arg1, Arg2 arg2, Arg3 arg3)
     {
         return std::auto_ptr<T>(new U(arg0, arg1, arg2, arg3));
+    }
+
+
+    template<class T, class U, class Arg0, class Arg1, class Arg2, class Arg3, class Arg4>
+    std::auto_ptr<T> CreatePoly(Arg0 arg0, Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4)
+    {
+        return std::auto_ptr<T>(new U(arg0, arg1, arg2, arg3, arg4));
     }
 
 

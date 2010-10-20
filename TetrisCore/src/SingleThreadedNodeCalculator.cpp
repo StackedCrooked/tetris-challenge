@@ -1,4 +1,4 @@
-#include "Tetris/MultithreadedNodeCalculator.h"
+#include "Tetris/SingleThreadedNodeCalculator.h"
 #include "Tetris/GameQualityEvaluator.h"
 #include "Tetris/GameStateNode.h"
 #include "Tetris/GameState.h"
@@ -15,7 +15,7 @@
 namespace Tetris
 {
 
-    MultithreadedNodeCalculator::MultithreadedNodeCalculator(std::auto_ptr<GameStateNode> inNode,
+    SingleThreadedNodeCalculator::SingleThreadedNodeCalculator(std::auto_ptr<GameStateNode> inNode,
                                                                const BlockTypes & inBlockTypes,
                                                                const std::vector<int> & inWidths,
                                                                std::auto_ptr<Evaluator> inEvaluator,
@@ -25,14 +25,8 @@ namespace Tetris
     }
 
 
-    void MultithreadedNodeCalculator::populate()
+    void SingleThreadedNodeCalculator::populate()
     {
-
-        //
-        // Fallback to single threaded implementation.
-        //
-        // Todo: implement
-        // 
         try
         {
             // The nodes are populated using a "Iterative deepening" algorithm.
@@ -53,7 +47,7 @@ namespace Tetris
         }
         catch (const std::exception & inException)
         {
-            LogError(MakeString() << "Exception caught in MultithreadedNodeCalculator::populate(). Detail: " << inException.what());
+            LogError(MakeString() << "Exception caught in SingleThreadedNodeCalculator::populate(). Detail: " << inException.what());
         }
     }
 

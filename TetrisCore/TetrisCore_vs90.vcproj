@@ -291,6 +291,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\include\Tetris\ComputerPlayer.h"
+						>
+					</File>
+					<File
 						RelativePath=".\include\Tetris\GenericGrid.h"
 						>
 					</File>
@@ -335,6 +339,10 @@
 					Name="Source Files"
 					>
 					<File
+						RelativePath=".\src\ComputerPlayer.cpp"
+						>
+					</File>
+					<File
 						RelativePath=".\src\Logger.cpp"
 						>
 					</File>
@@ -363,15 +371,7 @@
 					Name="Header Files"
 					>
 					<File
-						RelativePath=".\include\Tetris\AbstractNodeCalculator.h"
-						>
-					</File>
-					<File
 						RelativePath=".\include\Tetris\AISupport.h"
-						>
-					</File>
-					<File
-						RelativePath=".\include\Tetris\ComputerPlayer.h"
 						>
 					</File>
 					<File
@@ -380,6 +380,14 @@
 					</File>
 					<File
 						RelativePath=".\include\Tetris\NodeCalculator.h"
+						>
+					</File>
+					<File
+						RelativePath=".\include\Tetris\NodeCalculatorImpl.h"
+						>
+					</File>
+					<File
+						RelativePath=".\include\Tetris\SingleThreadedNodeCalculator.h"
 						>
 					</File>
 				</Filter>
@@ -391,15 +399,19 @@
 						>
 					</File>
 					<File
-						RelativePath=".\src\ComputerPlayer.cpp"
-						>
-					</File>
-					<File
 						RelativePath=".\src\MultiThreadedNodeCalculator.cpp"
 						>
 					</File>
 					<File
 						RelativePath=".\src\NodeCalculator.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\NodeCalculatorImpl.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\SingleThreadedNodeCalculator.cpp"
 						>
 					</File>
 				</Filter>

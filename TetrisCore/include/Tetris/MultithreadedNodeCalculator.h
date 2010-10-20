@@ -1,57 +1,30 @@
-#ifndef TETRIS_MULTITHREADEDNODECALCULATOR_H_INCLUDED
-#define TETRIS_MULTITHREADEDNODECALCULATOR_H_INCLUDED
+#ifndef TETRIS_MULTITHREADEDNODECALCULATORIMPL_H_INCLUDED
+#define TETRIS_MULTITHREADEDNODECALCULATORIMPL_H_INCLUDED
 
 
-#include "Tetris/AbstractNodeCalculator.h"
-#include "Tetris/BlockTypes.h"
-#include <boost/shared_ptr.hpp>
-#include <vector>
-#include <memory>
+#include "Tetris/NodeCalculatorImpl.h"
 
 
 namespace Tetris
 {
 
-    class Evaluator;
-    class GameStateNode;
-    class WorkerPool;
-    typedef std::vector<int> Widths;
-
-
-    class MultithreadedNodeCalculatorImpl;
-
-
-    class MultithreadedNodeCalculator : public AbstractNodeCalculator
+    class MultithreadedNodeCalculator : public NodeCalculatorImpl
     {
     public:
-        MultithreadedNodeCalculator(boost::shared_ptr<WorkerPool> inWorkerPool,
-                                    std::auto_ptr<GameStateNode> inNode,
+        MultithreadedNodeCalculator(std::auto_ptr<GameStateNode> inNode,
                                     const BlockTypes & inBlockTypes,
-                                    const Widths & inWidths,
-                                    std::auto_ptr<Evaluator> inEvaluator);
+                                    const std::vector<int> & inWidths,
+                                    std::auto_ptr<Evaluator> inEvaluator,
+                                    boost::shared_ptr<WorkerPool> inWorkerPool);
 
-        virtual ~MultithreadedNodeCalculator();
-
-        virtual void start();
-
-        virtual void stop();
-
-        virtual int getCurrentSearchDepth() const;
-
-        virtual int getMaxSearchDepth() const;
-
-        virtual NodePtr result() const;
-
-        AbstractNodeCalculator::Status status() const;
+        virtual ~MultithreadedNodeCalculator() {}
 
     private:
-        MultithreadedNodeCalculator(const MultithreadedNodeCalculator &);
-        MultithreadedNodeCalculator & operator=(const MultithreadedNodeCalculator &);
-
-        MultithreadedNodeCalculatorImpl * mImpl;
+        virtual void populate();
     };
 
 } // namespace Tetris
 
 
-#endif // TETRIS_MULTITHREADEDNODECALCULATOR_H_INCLUDED
+#endif // TETRIS_MULTITHREADEDNODECALCULATORIMPL_H_INCLUDED
+
