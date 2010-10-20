@@ -59,10 +59,13 @@ namespace Tetris
 
     private:
         void onTimerEvent(Poco::Timer & inTimer);
+
+        void timerEvent();
+
         int calculateRemainingTimeMs(Game & game) const;
         Protected<Game> mProtectedGame;
         boost::shared_ptr<WorkerPool> mWorkerPool;
-        boost::scoped_ptr<AbstractNodeCalculator> mNodeCalculator;
+        boost::scoped_ptr<NodeCalculator> mNodeCalculator;
         boost::scoped_ptr<Evaluator> mEvaluator;
         boost::scoped_ptr<BlockMover> mBlockMover;
         Poco::Timer mTimer;
@@ -111,6 +114,19 @@ namespace Tetris
     
     void ComputerPlayerImpl::onTimerEvent(Poco::Timer & inTimer)
     {
+        try
+        {
+            timerEvent();
+        }
+        catch (const std::exception & exc)
+        {
+            LogError(MakeString() << "ComputerPlayerImpl::onTimerEvent: " << exc.what());
+        }
+    }
+
+    
+    void ComputerPlayerImpl::timerEvent()
+    {
         boost::scoped_ptr<Game> clonedGamePtr;
         {
             ScopedAtom<Game> wgame(mProtectedGame);
@@ -120,7 +136,7 @@ namespace Tetris
         if (mNodeCalculator)
         {
             // Check if the computer player has finished.
-            if (mNodeCalculator->status() != AbstractNodeCalculator::Status_Finished)
+            if (mNodeCalculator->status() != NodeCalculator::Status_Finished)
             {
                 // Check if there is the danger of crashing the current block.
                 if (clonedGame.numPrecalculatedMoves() == 0 && calculateRemainingTimeMs(clonedGame) < 1500)
@@ -186,9 +202,9 @@ namespace Tetris
 
 
                 //
-                // Fill the Widths vector (use the same width for each level).
+                // Fill the std::vector<int> vector (use the same width for each level).
                 //
-                Widths widths;
+                std::vector<int> widths;
                 for (size_t idx = 0; idx != futureBlocks.size(); ++idx)
                 {
                     widths.push_back(mSearchWidth);
@@ -199,7 +215,7 @@ namespace Tetris
                 // Create and start the NodeCalculator.
                 //
                 Assert(mWorkerPool->stats().activeWorkerCount == 0);
-                mNodeCalculator.reset(new NodeCalculator(mWorkerPool->getWorker(), endNode, futureBlocks, widths, mEvaluator->clone()));
+                mNodeCalculator.reset(new NodeCalculator(endNode, futureBlocks, widths, mEvaluator->clone(), mWorkerPool));
                 mNodeCalculator->start();
             }
             // else: we have plenty of precalculated nodes. Do nothing for know.

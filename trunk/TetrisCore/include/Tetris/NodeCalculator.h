@@ -2,8 +2,8 @@
 #define TETRIS_NODECALCULATOR_H_INCLUDED
 
 
-#include "Tetris/AbstractNodeCalculator.h"
 #include "Tetris/BlockTypes.h"
+#include "Tetris/NodePtr.h"
 #include <boost/shared_ptr.hpp>
 #include <vector>
 #include <memory>
@@ -13,37 +13,47 @@ namespace Tetris
 {
 
     class Evaluator;
-    class Worker;
-    typedef std::vector<int> Widths;
-
-
+    class GameStateNode;
+    class WorkerPool;
     class NodeCalculatorImpl;
 
 
-    class NodeCalculator : public AbstractNodeCalculator
+    class NodeCalculator
     {
     public:
-        NodeCalculator(boost::shared_ptr<Worker> inWorker,
-                       std::auto_ptr<GameStateNode> inNode,
+        NodeCalculator(std::auto_ptr<GameStateNode> inNode,
                        const BlockTypes & inBlockTypes,
-                       const Widths & inWidths,
-                       std::auto_ptr<Evaluator> inEvaluator);
+                       const std::vector<int> & inWidths,
+                       std::auto_ptr<Evaluator> inEvaluator,
+                       boost::shared_ptr<WorkerPool> inWorkerPool);
 
-        virtual ~NodeCalculator();
+        ~NodeCalculator();
 
-        virtual void start();
+        void start();
 
-        virtual void stop();
+        void stop();
 
-        virtual int getCurrentSearchDepth() const;
+        int getCurrentSearchDepth() const;
 
-        virtual int getMaxSearchDepth() const;
+        int getMaxSearchDepth() const;
 
-        virtual NodePtr result() const;
+        NodePtr result() const;
+
+        enum Status
+        {
+            Status_Begin,
+            Status_Nil = Status_Begin,
+            Status_Started,
+            Status_Working,
+            Status_Stopped,
+            Status_Finished,
+            Status_End
+        };
 
         Status status() const;
 
     private:
+        // non-copyable
         NodeCalculator(const NodeCalculator &);
         NodeCalculator & operator=(const NodeCalculator &);
 
