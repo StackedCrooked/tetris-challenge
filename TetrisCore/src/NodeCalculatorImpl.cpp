@@ -232,6 +232,7 @@ namespace Tetris
         {
             setStatus(NodeCalculator::Status_Working);
             populate();
+            destroyInferiorChildren();
         }
         catch (const std::exception & inException)
         {
