@@ -16,10 +16,10 @@ namespace Tetris
 {
 
     MultithreadedNodeCalculator::MultithreadedNodeCalculator(std::auto_ptr<GameStateNode> inNode,
-                                                               const BlockTypes & inBlockTypes,
-                                                               const std::vector<int> & inWidths,
-                                                               std::auto_ptr<Evaluator> inEvaluator,
-                                                               boost::shared_ptr<WorkerPool> inWorkerPool) :
+                                                             const BlockTypes & inBlockTypes,
+                                                             const std::vector<int> & inWidths,
+                                                             std::auto_ptr<Evaluator> inEvaluator,
+                                                             WorkerPool & inWorkerPool) :
         NodeCalculatorImpl(inNode, inBlockTypes, inWidths, inEvaluator, inWorkerPool)
     {
     }

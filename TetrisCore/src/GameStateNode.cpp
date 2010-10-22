@@ -115,7 +115,7 @@ namespace Tetris
     }
 
 
-    const Evaluator & GameStateNode::qualityEvaluator() const
+    const Evaluator & GameStateNode::evaluator() const
     {
         return *mImpl->mEvaluator;
     }

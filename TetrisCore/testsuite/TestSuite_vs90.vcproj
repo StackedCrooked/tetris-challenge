@@ -185,6 +185,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\NodeCalculatorTest.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\NodeCalculatorTest.h"
+				>
+			</File>
+			<File
 				RelativePath=".\src\TetrisCoreTestSuite.cpp"
 				>
 			</File>

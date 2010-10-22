@@ -34,7 +34,7 @@ namespace Tetris
         // Each node is produced by a unique combination of the current block's column and rotation.
         int identifier() const;
 
-        const Evaluator & qualityEvaluator() const;
+        const Evaluator & evaluator() const;
 
         // Distance from the root node.
         int depth() const;

@@ -42,7 +42,7 @@ void WorkerPoolTest::BeBusy()
 
 void WorkerPoolTest::testWorkerPool()
 {
-    const int cPoolSize[] = {1, 2, 4, 8, 16, 32};
+    const int cPoolSize[] = {1, 2, 4, 8, 16};
     const int cPoolSizeCount = sizeof(cPoolSize) / sizeof(cPoolSize[0]);
 
     // Test without interrupt

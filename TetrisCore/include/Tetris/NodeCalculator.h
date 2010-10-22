@@ -4,7 +4,6 @@
 
 #include "Tetris/BlockTypes.h"
 #include "Tetris/NodePtr.h"
-#include <boost/shared_ptr.hpp>
 #include <vector>
 #include <memory>
 
@@ -25,7 +24,7 @@ namespace Tetris
                        const BlockTypes & inBlockTypes,
                        const std::vector<int> & inWidths,
                        std::auto_ptr<Evaluator> inEvaluator,
-                       boost::shared_ptr<WorkerPool> inWorkerPool);
+                       WorkerPool & inWorkerPool);
 
         ~NodeCalculator();
 
