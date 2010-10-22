@@ -222,6 +222,8 @@ namespace Tetris
         if (status() == NodeCalculator::Status_Started || status() == NodeCalculator::Status_Working)
         {
             setStatus(NodeCalculator::Status_Stopped);
+            mMainWorker.interrupt();
+            Assert(mMainWorker.size() == 0);
             mWorkerPool.interruptAndClearQueue();
         }
     }
