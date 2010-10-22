@@ -60,11 +60,16 @@ namespace Tetris
 
     void NodeCalculatorImpl::setCurrentSearchDepth(int inDepth)
     {
-        boost::mutex::scoped_lock lock(mCompletedSearchDepthMutex);
-        if (inDepth > mCompletedSearchDepth)
         {
-            mCompletedSearchDepth = inDepth;
-        }
+            boost::mutex::scoped_lock lock(mCompletedSearchDepthMutex);
+            if (inDepth > mCompletedSearchDepth)
+            {
+                mCompletedSearchDepth = inDepth;
+            }
+        }        
+
+        boost::mutex::scoped_lock lock(mLayersMutex);
+        Assert(mLayers[inDepth - 1].mBestChild);
     }
 
 

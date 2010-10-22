@@ -35,10 +35,10 @@ NodeCalculatorTest::~NodeCalculatorTest()
 
 void NodeCalculatorTest::testNodeCalculator()
 {
-    test(Depth(4), Width(4), WorkerCount(1), TimeMs(2000));
     test(Depth(4), Width(4), WorkerCount(4), TimeMs(2000));
-    test(Depth(8), Width(5), WorkerCount(1), TimeMs(2000));
     test(Depth(8), Width(5), WorkerCount(4), TimeMs(2000));
+    test(Depth(8), Width(5), WorkerCount(1), TimeMs(2000));
+    test(Depth(4), Width(4), WorkerCount(1), TimeMs(2000));
 }
 
 
