@@ -106,11 +106,11 @@
           <label style="text-align:right" value="Preset: " />
           <menulist id="strategiesMenuList">
             <menupopup id="strategiesPopup">
+              <menuitem id="customMenuItem" label="Custom" />
               <menuitem id="makeTetrisesMenuItem" label="Make Tetrises" />
               <menuitem id="balancedMenuItem" label="Balanced" />
               <menuitem id="surviveMenuItem" label="Survive" />
               <menuitem id="depressedMenuItem" label="Depressed" />
-              <menuitem id="customMenuItem" label="Custom" />
             </menupopup>
           </menulist>
           <!--<button id="clearPrecalculatedButton" label="Clear precalculated" />-->
@@ -126,9 +126,9 @@
           <rows>
             <row align="center">
               <label value="Search depth:" style="text-align:right" />
-              <textbox id="searchDepth" type="number" readonly="true" style="text-align:right" value="6" disabled="true" flex="1" />
+              <textbox id="searchDepth" type="number" readonly="true" style="text-align:right" value="4" disabled="true" flex="1" />
               <label value="Search width:" style="text-align:right" />
-              <textbox id="searchWidth" type="number" readonly="true" style="text-align:right" value="6" disabled="true" flex="1" />
+              <textbox id="searchWidth" type="number" readonly="true" style="text-align:right" value="4" disabled="true" flex="1" />
             </row>
             <row align="center">
               <label value="Holes:" style="text-align:right" />

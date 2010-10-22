@@ -3,7 +3,7 @@
 #include <iostream>
 
 
-int main(int ac, char **av)
+int RunTetrisTestSuite()
 {
 	std::vector<std::string> args;
     args.push_back("-all");
@@ -13,7 +13,13 @@ int main(int ac, char **av)
 	runner.addTest("TetrisCoreTestSuite", TetrisCoreTestSuite::suite());
 	int res = runner.run(args) ? 0 : 1;
     std::cout << "Test result: " << res << std::endl;
+    return res;
+}
+
+int main(int ac, char **av)
+{
+    int res = RunTetrisTestSuite();
     std::cout << "Press ENTER to quit.";
     std::cin.get();
-    return res;
+    return res;    
 }
