@@ -60,6 +60,7 @@ namespace Tetris
         else if (inSize < mWorkers.size()) // Deletes a few workers
         {
             interruptRange(inSize, mWorkers.size() - inSize);
+            mWorkers.resize(inSize);
         }
     }
     
