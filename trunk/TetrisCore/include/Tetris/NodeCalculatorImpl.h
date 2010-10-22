@@ -5,8 +5,8 @@
 #include "Tetris/BlockTypes.h"
 #include "Tetris/GameStateNode.h"
 #include "Tetris/GameQualityEvaluator.h"
+#include "Tetris/Worker.h"
 #include "Tetris/WorkerPool.h"
-#include <boost/shared_ptr.hpp>
 #include <vector>
 #include <memory>
 
@@ -21,7 +21,7 @@ namespace Tetris
                            const BlockTypes & inBlockTypes,
                            const std::vector<int> & inWidths,
                            std::auto_ptr<Evaluator> inEvaluator,
-                           boost::shared_ptr<WorkerPool> inWorkerPool);
+                           WorkerPool & inWorkerPool);
 
         virtual ~NodeCalculatorImpl() = 0;
 
@@ -92,7 +92,8 @@ namespace Tetris
         int mStatus;
         mutable boost::mutex mStatusMutex;
 
-        boost::shared_ptr<WorkerPool> mWorkerPool;
+        Worker mMainWorker;
+        WorkerPool & mWorkerPool;
     };
 
 } // namespace Tetris

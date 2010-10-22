@@ -23,7 +23,7 @@ namespace Tetris
                                            const BlockTypes & inBlockTypes,
                                            const std::vector<int> & inWidths,
                                            std::auto_ptr<Evaluator> inEvaluator,
-                                           boost::shared_ptr<WorkerPool> inWorkerPool) :
+                                           WorkerPool & inWorkerPool) :
         mLayers(inBlockTypes.size()),
         mCompletedSearchDepth(0),
         mNode(inNode.release()),
@@ -31,6 +31,7 @@ namespace Tetris
         mWidths(inWidths),
         mEvaluator(inEvaluator.release()),
         mStatus(0),
+        mMainWorker("NodeCalculatorImpl"),
         mWorkerPool(inWorkerPool)
     {
         Assert(!mNode->state().isGameOver());
@@ -112,7 +113,7 @@ namespace Tetris
         boost::mutex::scoped_lock lock(mLayersMutex);
         LayerData & layerData = mLayers[inIndex];
         layerData.mNumItems += inCount;
-        if (!layerData.mBestChild || inNodePtr->state().quality(inNodePtr->qualityEvaluator()) > layerData.mBestChild->state().quality(inNodePtr->qualityEvaluator()))
+        if (!layerData.mBestChild || inNodePtr->state().quality(inNodePtr->evaluator()) > layerData.mBestChild->state().quality(inNodePtr->evaluator()))
         {
             layerData.mBestChild = inNodePtr;
         }
@@ -207,6 +208,7 @@ namespace Tetris
         boost::mutex::scoped_lock nodeLock(mNodeMutex);
         Assert((reachedDepth - 1) < mLayers.size());
         NodePtr endNode = mLayers[reachedDepth - 1].mBestChild;
+        Assert(endNode);
         if (endNode)
         {
             CarveBestPath(mNode, endNode);
@@ -220,7 +222,7 @@ namespace Tetris
         if (status() == NodeCalculator::Status_Started || status() == NodeCalculator::Status_Working)
         {
             setStatus(NodeCalculator::Status_Stopped);
-            mWorkerPool->interruptAndClearQueue();
+            mWorkerPool.interruptAndClearQueue();
         }
     }
 
@@ -246,7 +248,7 @@ namespace Tetris
     {
         boost::mutex::scoped_lock lock(mStatusMutex);
         Assert(mStatus == NodeCalculator::Status_Nil);
-        mWorkerPool->getWorker()->schedule(boost::bind(&NodeCalculatorImpl::startImpl, this));
+        mMainWorker.schedule(boost::bind(&NodeCalculatorImpl::startImpl, this));
         mStatus = NodeCalculator::Status_Started;
     }
 

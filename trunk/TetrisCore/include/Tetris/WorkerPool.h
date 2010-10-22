@@ -13,7 +13,7 @@ namespace Tetris
     /**
      * WorkerPool manages a pool of WorkerThreads
      */
-    class WorkerPool : boost::noncopyable
+    class WorkerPool
     {
     public:
         WorkerPool(const std::string & inName, size_t inSize);
@@ -34,6 +34,8 @@ namespace Tetris
         // Change the number of workers in the pool.
         // Setting a smaller size when there are workers active is safe, but interrupts their task.
         void setSize(size_t inSize);
+
+        void waitForStatus(Worker::Status inStatus);
         
         // Interrupts all workers.
         void interruptAndClearQueue();
@@ -52,7 +54,11 @@ namespace Tetris
 
         Stats stats() const;
 
-    private:        
+    private:
+        // non-coyable
+        WorkerPool(const WorkerPool&);
+        WorkerPool& operator=(const WorkerPool&);
+
         void interruptRange(size_t inBegin, size_t inCount);
 
         std::string mName;

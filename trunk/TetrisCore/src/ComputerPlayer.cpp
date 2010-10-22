@@ -64,7 +64,7 @@ namespace Tetris
 
         int calculateRemainingTimeMs(Game & game) const;
         Protected<Game> mProtectedGame;
-        boost::shared_ptr<WorkerPool> mWorkerPool;
+        WorkerPool mWorkerPool;
         boost::scoped_ptr<NodeCalculator> mNodeCalculator;
         boost::scoped_ptr<Evaluator> mEvaluator;
         boost::scoped_ptr<BlockMover> mBlockMover;
@@ -80,7 +80,7 @@ namespace Tetris
                                            int inSearchDepth,
                                            int inSearchWidth) :
         mProtectedGame(inProtectedGame),
-        mWorkerPool(new WorkerPool("ComputerPlayer WorkerPool", 2)),
+        mWorkerPool("ComputerPlayer WorkerPool", 2),
         mEvaluator(inEvaluator.release()),
         mBlockMover(new BlockMover(mProtectedGame, 20)),
         mTimer(10, 10),
@@ -214,7 +214,7 @@ namespace Tetris
                 //
                 // Create and start the NodeCalculator.
                 //
-                Assert(mWorkerPool->stats().activeWorkerCount == 0);
+                Assert(mWorkerPool.stats().activeWorkerCount == 0);
                 mNodeCalculator.reset(new NodeCalculator(endNode, futureBlocks, widths, mEvaluator->clone(), mWorkerPool));
                 mNodeCalculator->start();
             }

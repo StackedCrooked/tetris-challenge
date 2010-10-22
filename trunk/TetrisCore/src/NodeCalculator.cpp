@@ -11,15 +11,17 @@ namespace Tetris
                                                         const BlockTypes & inBlockTypes,
                                                         const std::vector<int> & inWidths,
                                                         std::auto_ptr<Evaluator> inEvaluator,
-                                                        boost::shared_ptr<WorkerPool> inWorkerPool)
+                                                        WorkerPool & inWorkerPool)
     {
-        if (inWorkerPool->size() > 1)
+        if (inWorkerPool.size() > 1)
         {
-            return CreatePoly<NodeCalculatorImpl, MultithreadedNodeCalculator>(inNode, inBlockTypes, inWidths, inEvaluator, inWorkerPool);
+            return std::auto_ptr<NodeCalculatorImpl>(
+                new MultithreadedNodeCalculator(inNode, inBlockTypes, inWidths, inEvaluator, inWorkerPool));
         }
-        else if (inWorkerPool->size() == 1)
+        else if (inWorkerPool.size() == 1)
         {
-            return CreatePoly<NodeCalculatorImpl, SingleThreadedNodeCalculator>(inNode, inBlockTypes, inWidths, inEvaluator, inWorkerPool);
+            return std::auto_ptr<NodeCalculatorImpl>(
+                new SingleThreadedNodeCalculator(inNode, inBlockTypes, inWidths, inEvaluator, inWorkerPool));
         }
         else
         {
@@ -32,7 +34,7 @@ namespace Tetris
                                    const BlockTypes & inBlockTypes,
                                    const std::vector<int> & inWidths,
                                    std::auto_ptr<Evaluator> inEvaluator,
-                                   boost::shared_ptr<WorkerPool> inWorkerPool) :
+                                   WorkerPool & inWorkerPool) :
         mImpl(CreateImpl(inNode, inBlockTypes, inWidths, inEvaluator, inWorkerPool).release())
     {
     }
