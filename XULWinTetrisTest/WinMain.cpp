@@ -10,6 +10,10 @@
 #include <windows.h>
 
 
+// Defined in TetrisTestSuite's Driver.cpp
+int RunTetrisTestSuite();
+
+
 int StartProgram(HINSTANCE hInstance)
 {
 #ifndef NDEBUG // only required when launching from Visual Studio
@@ -20,6 +24,12 @@ int StartProgram(HINSTANCE hInstance)
 #ifdef _DEBUG
     AttachToConsole();
 #endif
+    
+    int res = RunTetrisTestSuite();
+    if (res != 0)
+    {
+        throw std::runtime_error("TestSuite failed");
+    }
 
     XULWin::Initializer initializer(hInstance);
 
