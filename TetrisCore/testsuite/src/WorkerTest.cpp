@@ -3,6 +3,7 @@
 #include "CppUnit/TestSuite.h"
 #include "Tetris/Worker.h"
 #include "Poco/Thread.h"
+#include "Poco/Stopwatch.h"
 #include <boost/thread.hpp>
 #include <iostream>
 
@@ -10,9 +11,13 @@
 using namespace Tetris;
 
 
+static const int cSleepTimeMs = 100;
+
+
 WorkerTest::WorkerTest(const std::string & inName):
     CppUnit::TestCase(inName),
-    mRepeat(100)
+    mStopwatch(),
+    mRepeat(1)
 {
 }
 
@@ -24,142 +29,86 @@ WorkerTest::~WorkerTest()
 
 void WorkerTest::printProgress(size_t a, size_t b)
 {
-    std::cout << (a + 1) << "/" << b << "\r";
+    //std::cout << (a + 1) << "/" << b << "\r";
 }
 
 
-void WorkerTest::CountTo(Poco::UInt64 inNumber)
+void WorkerTest::BeBusy()
 {
-    for (Poco::UInt64 idx = 0; idx != inNumber; ++idx)
+    while (true)
     {
         boost::this_thread::interruption_point();
-        Poco::Thread::sleep(10);
+        Poco::Thread::sleep(cSleepTimeMs);
     }
 }
 
 
-void WorkerTest::testStatus()
+void WorkerTest::testWorker()
 {
-    std::cout << "\n";
     for (size_t idx = 0; idx != mRepeat; ++idx)
     {
-        printProgress(idx, mRepeat);
-        testStatusImpl();
+        testWorkerImpl();
     }
-    std::cout << "\n";
 }
 
 
-void WorkerTest::testStatusImpl()
+void WorkerTest::testWorkerImpl()
 {
     Worker worker("TestWorker");
+    assertEqual(worker.name(), "TestWorker");
     assertEqual(worker.status(), Worker::Status_Waiting);
-
-    Poco::Thread::sleep(10);
-    assertEqual(worker.status(), Worker::Status_Waiting);
-
-    worker.schedule(boost::bind(&WorkerTest::CountTo, 1000 * 1000));
-    assertEqual(worker.status(), Worker::Status_Waiting);
-
-    Poco::Thread::sleep(10);
-    assertEqual(worker.status(), Worker::Status_Working);
-    assertEqual(worker.size(), 0);
-}
-
-
-void WorkerTest::testSimpleInterrupt()
-{
-    std::cout << "\n";
-    for (size_t idx = 0; idx != mRepeat; ++idx)
-    {
-        printProgress(idx, mRepeat);
-        testSimpleInterruptImpl();
-    }
-    std::cout << "\n";
-}
-
-
-void WorkerTest::testSimpleInterruptImpl()
-{
-    Worker worker("TestWorker");
-    
-    // Interrupt while waiting
+    worker.waitForStatus(Worker::Status_Waiting);
     worker.interrupt();
-    Poco::Thread::sleep(10);
-
-    // Interrupt and clear queue while waiting
     worker.interruptAndClearQueue();
-    Poco::Thread::sleep(10);
+    assertEqual(worker.size(), 0);
 
-    // Schedule a job
-    worker.schedule(boost::bind(&WorkerTest::CountTo, 1000 * 1000));
+
+    // Test without interrupt
+    mStopwatch.restart();
+    worker.schedule(boost::bind(&Poco::Thread::sleep, cSleepTimeMs));
     worker.waitForStatus(Worker::Status_Working);
-    assertEqual(worker.status(), Worker::Status_Working);
     assertEqual(worker.size(), 0);
-    
-    worker.interrupt();
     worker.waitForStatus(Worker::Status_Waiting);
-    assertEqual(worker.status(), Worker::Status_Waiting);
+    mStopwatch.stop();
+    assert(mStopwatch.elapsed() / 1000.0 >= cSleepTimeMs - 100);
+    assert(mStopwatch.elapsed() / 1000.0 < 100 + cSleepTimeMs);
+
+
+    // Test with interrupt
+    mStopwatch.restart();
+    worker.schedule(boost::bind(&WorkerTest::BeBusy));
+    worker.waitForStatus(Worker::Status_Working);
+    worker.interrupt();
     assertEqual(worker.size(), 0);
+    mStopwatch.stop();
+    assert(mStopwatch.elapsed() / 1000.0 < 100 + cSleepTimeMs);
 
-    // Just a test
+
+    // Test with interrupt
+    mStopwatch.restart();
+    worker.schedule(boost::bind(&WorkerTest::BeBusy));
+    worker.schedule(boost::bind(&WorkerTest::BeBusy));
+    worker.schedule(boost::bind(&WorkerTest::BeBusy));
+    worker.schedule(boost::bind(&WorkerTest::BeBusy));
+    worker.schedule(boost::bind(&WorkerTest::BeBusy));
+    worker.waitForStatus(Worker::Status_Working);
+    assertEqual(worker.size(), 4);
     worker.interrupt();
+    assert(mStopwatch.elapsed() / 1000 < 2 * cSleepTimeMs);
+    assertEqual(worker.size(), 3);
     worker.interrupt();
-    worker.interrupt();
-    worker.interrupt();
-    worker.interrupt();
-    
-    // Just a test
+    assert(mStopwatch.elapsed() / 1000 < 3 * cSleepTimeMs);
+    assertEqual(worker.size(), 2);
     worker.interruptAndClearQueue();
-    worker.interruptAndClearQueue();
-    worker.interruptAndClearQueue();
-    worker.interruptAndClearQueue();
-    worker.interruptAndClearQueue();
-
-    worker.waitForStatus(Worker::Status_Waiting);
-}
-
-
-void WorkerTest::testAdvancedInterrupt()
-{
-    std::cout << "\n";
-    for (size_t idx = 0; idx != mRepeat; ++idx)
-    {
-        printProgress(idx, mRepeat);
-        testAdvancedInterruptImpl();
-    }
-    std::cout << "\n";
-}
-
-
-void WorkerTest::testAdvancedInterruptImpl()
-{
-    Worker worker("TestWorker");
-    worker.schedule(boost::bind(&WorkerTest::CountTo, 1000 * 1000));
-    worker.schedule(boost::bind(&WorkerTest::CountTo, 1000 * 1000));
-    Poco::Thread::sleep(10);
-    assertEqual(worker.status(), Worker::Status_Working);
-    assertEqual(worker.size(), 1);
-
-    worker.interrupt();
-    Poco::Thread::sleep(10);
-    assertEqual(worker.status(), Worker::Status_Working);
     assertEqual(worker.size(), 0);
+    mStopwatch.stop();
+    assert(mStopwatch.elapsed() / 1000 < 4 * cSleepTimeMs);
 
+    // Interrupt twice should not crash.
     worker.interrupt();
-    Poco::Thread::sleep(10);
-    assertEqual(worker.status(), Worker::Status_Waiting);
-    assertEqual(worker.size(), 0);
-
-    worker.schedule(boost::bind(&WorkerTest::CountTo, 1000 * 1000));
-    worker.schedule(boost::bind(&WorkerTest::CountTo, 1000 * 1000));
-    worker.schedule(boost::bind(&WorkerTest::CountTo, 1000 * 1000));
-    worker.schedule(boost::bind(&WorkerTest::CountTo, 1000 * 1000));
-    worker.schedule(boost::bind(&WorkerTest::CountTo, 1000 * 1000));
-    Poco::Thread::sleep(10);
+    worker.interrupt();   
     worker.interruptAndClearQueue();
-    assertEqual(worker.status(), Worker::Status_Waiting);
-    assertEqual(worker.size(), 0);
+    worker.interruptAndClearQueue();
 }
 
 
@@ -176,8 +125,6 @@ void WorkerTest::tearDown()
 CppUnit::Test * WorkerTest::suite()
 {
     CppUnit::TestSuite * suite(new CppUnit::TestSuite("WorkerTest"));
-	CppUnit_addTest(suite, WorkerTest, testStatus);
-	CppUnit_addTest(suite, WorkerTest, testSimpleInterrupt);
-	CppUnit_addTest(suite, WorkerTest, testAdvancedInterrupt);
+	CppUnit_addTest(suite, WorkerTest, testWorker);
 	return suite;
 }

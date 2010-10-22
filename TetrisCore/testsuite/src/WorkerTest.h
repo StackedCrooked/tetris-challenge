@@ -3,6 +3,7 @@
 
 
 #include "CppUnit/TestCase.h"
+#include "Poco/Stopwatch.h"
 #include "Poco/Types.h"
 
 
@@ -10,27 +11,23 @@ class WorkerTest: public CppUnit::TestCase
 {
 public:
 	WorkerTest(const std::string & name);
+
 	~WorkerTest();
 
-    static void CountTo(Poco::UInt64 inNumber);
+    void testWorker();    
 
-	void testStatus();
-	void testStatusImpl();
-
-	void testSimpleInterrupt();
-	void testSimpleInterruptImpl();
-
-	void testAdvancedInterrupt();
-	void testAdvancedInterruptImpl();
-    
+    void testWorkerImpl();
 	
 	void setUp();
+
 	void tearDown();
 
 	static CppUnit::Test* suite();
 
 private:
+    static void BeBusy();
     void printProgress(size_t a, size_t b);
+    Poco::Stopwatch mStopwatch;
     size_t mRepeat;
 };
 

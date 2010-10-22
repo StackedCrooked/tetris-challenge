@@ -10,9 +10,11 @@
 using namespace Tetris;
 
 
+static const int cSleepTime = 100;
+
+
 WorkerPoolTest::WorkerPoolTest(const std::string & inName):
-    CppUnit::TestCase(inName),
-    mRepeat(100)
+    CppUnit::TestCase(inName)
 {
 }
 
@@ -28,103 +30,77 @@ void WorkerPoolTest::printProgress(size_t a, size_t b)
 }
 
 
-void WorkerPoolTest::CountTo(Poco::UInt64 inNumber)
+void WorkerPoolTest::BeBusy()
 {
-    for (Poco::UInt64 idx = 0; idx != inNumber; ++idx)
+    while (true)
     {
         boost::this_thread::interruption_point();
-        Poco::Thread::sleep(200);
+        Poco::Thread::sleep(cSleepTime);
     }
 }
 
 
-void WorkerPoolTest::testSimple()
+void WorkerPoolTest::testWorkerPool()
 {
-    std::cout << "1" << std::endl;
-    WorkerPool pool("Johnny", 1);
-    assert(pool.getWorker() == pool.getWorker());
+    const int cPoolSize[] = {1, 2, 4, 8, 16, 32};
+    const int cPoolSizeCount = sizeof(cPoolSize) / sizeof(cPoolSize[0]);
 
-    std::cout << "2" << std::endl;
-    pool.setSize(2);
-    assert(pool.getWorker() != pool.getWorker());
-
-    std::cout << "3" << std::endl;
-    pool.setSize(1);
-    pool.getWorker()->schedule(boost::bind(&WorkerPoolTest::CountTo, 1000 * 1000));
-    pool.interruptAndClearQueue();
-
-    std::cout << "4" << std::endl;
-    pool.setSize(2);
-    pool.getWorker()->schedule(boost::bind(&WorkerPoolTest::CountTo, 1000 * 1000));
-    pool.interruptAndClearQueue();
-
-    std::cout << "5" << std::endl;
-    pool.setSize(3);
-    pool.getWorker()->schedule(boost::bind(&WorkerPoolTest::CountTo, 1000 * 1000));
-    pool.getWorker()->schedule(boost::bind(&WorkerPoolTest::CountTo, 1000 * 1000));
-    pool.interruptAndClearQueue();
-
-    std::cout << "6" << std::endl;
-    pool.setSize(3);
-    pool.getWorker()->schedule(boost::bind(&WorkerPoolTest::CountTo, 1000 * 1000));
-    pool.getWorker()->schedule(boost::bind(&WorkerPoolTest::CountTo, 1000 * 1000));
-    pool.getWorker()->schedule(boost::bind(&WorkerPoolTest::CountTo, 1000 * 1000));
-    pool.interruptAndClearQueue();
-
-    std::cout << "7" << std::endl;
-    pool.setSize(3);
-    pool.getWorker()->schedule(boost::bind(&WorkerPoolTest::CountTo, 1000 * 1000));
-    pool.getWorker()->schedule(boost::bind(&WorkerPoolTest::CountTo, 1000 * 1000));
-    pool.getWorker()->schedule(boost::bind(&WorkerPoolTest::CountTo, 1000 * 1000));
-    pool.getWorker()->schedule(boost::bind(&WorkerPoolTest::CountTo, 1000 * 1000));
-    pool.getWorker()->schedule(boost::bind(&WorkerPoolTest::CountTo, 1000 * 1000));
-    pool.getWorker()->schedule(boost::bind(&WorkerPoolTest::CountTo, 1000 * 1000));
-    pool.interruptAndClearQueue();
-
-    std::cout << "8" << std::endl;
-    pool.setSize(10);
-    for (size_t idx = 0; idx != 10; ++idx)
+    // Test without interrupt
+    for (int i = 0; i < cPoolSizeCount; ++i)
     {
-        pool.getWorker()->schedule(boost::bind(&WorkerPoolTest::CountTo, 1000 * 1000));
+        mStopwatch.restart();
+        WorkerPool pool("WorkerPool Test", cPoolSize[i]);
+        for (size_t idx = 0; idx != cPoolSize[i]; ++idx)
+        {
+            pool.getWorker()->schedule(boost::bind(&Poco::Thread::sleep, cSleepTime));
+        }
+        mStopwatch.stop();
+        int overhead = static_cast<int>(mStopwatch.elapsed() / 1000) - cSleepTime;
+        assert(overhead > -200);
+        assert(overhead < 200);
     }
-    Poco::Thread::sleep(10);
-    pool.interruptAndClearQueue();
 
-    std::cout << "9" << std::endl;
-    pool.setSize(10);
-    for (size_t idx = 0; idx != 20; ++idx)
+    // Test with interrupt
+    for (int i = 0; i < cPoolSizeCount; ++i)
     {
-        pool.getWorker()->schedule(boost::bind(&WorkerPoolTest::CountTo, 1000 * 1000));
+        mStopwatch.restart();
+        WorkerPool pool("WorkerPool Test", cPoolSize[i]);
+        for (size_t idx = 0; idx != cPoolSize[i]; ++idx)
+        {
+            pool.getWorker()->schedule(boost::bind(&WorkerPoolTest::BeBusy));
+        }
+        pool.interruptAndClearQueue();
+        mStopwatch.stop();
+        int overhead = static_cast<int>(mStopwatch.elapsed() / 1000) - cSleepTime;
+        assert(overhead > -200);
+        assert(overhead < 200);
     }
-    Poco::Thread::sleep(10);
-    pool.interruptAndClearQueue();
 
-    std::cout << "10" << std::endl;
-    pool.setSize(200);
-    for (size_t idx = 0; idx != 300; ++idx)
+    // Test setSize
+    for (int i = 0; i < cPoolSizeCount; ++i)
     {
-        pool.getWorker()->schedule(boost::bind(&WorkerPoolTest::CountTo, 1000 * 1000));
-    }    
-    Poco::Thread::sleep(10);
-    pool.interruptAndClearQueue();
+        mStopwatch.restart();
+        WorkerPool pool("WorkerPool Test", cPoolSize[i]);
+        for (size_t idx = 0; idx != cPoolSize[i]; ++idx)
+        {
+            pool.getWorker()->schedule(boost::bind(&WorkerPoolTest::BeBusy));
+        }
 
-    std::cout << "11" << std::endl;
-    pool.setSize(200);
-    for (size_t idx = 0; idx != 500; ++idx)
-    {
-        pool.getWorker()->schedule(boost::bind(&WorkerPoolTest::CountTo, 1000 * 1000));
-    }    
-    Poco::Thread::sleep(10);
-    pool.setSize(0);
+        pool.setSize(cPoolSize[i]);
+        assert(pool.size() == cPoolSize[i]);
 
-    std::cout << "12" << std::endl;
-    std::cout << "Destructor is taking too long..." << std::endl;
-    pool.setSize(50);
-    for (size_t idx = 0; idx != 50; ++idx)
-    {
-        pool.getWorker()->schedule(boost::bind(&WorkerPoolTest::CountTo, 1000 * 1000));
-    }    
-    Poco::Thread::sleep(10);
+        int newSize = static_cast<int>(0.5 + (cPoolSize[i] / 2.0));
+        pool.setSize(newSize);
+        assert(pool.size() == newSize);
+
+        pool.setSize(0);
+        assert(pool.size() == 0);
+
+        mStopwatch.stop();
+        int overhead = static_cast<int>(mStopwatch.elapsed() / 1000) - cSleepTime;
+        assert(overhead > -200);
+        assert(overhead < 200);
+    }
 }
 
 
@@ -141,6 +117,6 @@ void WorkerPoolTest::tearDown()
 CppUnit::Test * WorkerPoolTest::suite()
 {
     CppUnit::TestSuite * suite(new CppUnit::TestSuite("WorkerPoolTest"));
-	CppUnit_addTest(suite, WorkerPoolTest, testSimple);
+	CppUnit_addTest(suite, WorkerPoolTest, testWorkerPool);
 	return suite;
 }

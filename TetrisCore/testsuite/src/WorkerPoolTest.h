@@ -3,6 +3,7 @@
 
 
 #include "CppUnit/TestCase.h"
+#include "Poco/Stopwatch.h"
 #include "Poco/Types.h"
 
 
@@ -12,9 +13,9 @@ public:
 	WorkerPoolTest(const std::string & name);
 	~WorkerPoolTest();
 
-    static void CountTo(Poco::UInt64 inNumber);
+    static void BeBusy();
 
-	void testSimple();
+	void testWorkerPool();
 
     void setUp();
 
@@ -24,7 +25,7 @@ public:
 
 private:
     void printProgress(size_t a, size_t b);
-    size_t mRepeat;
+    Poco::Stopwatch mStopwatch;
 };
 
 
