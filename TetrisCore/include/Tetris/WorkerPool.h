@@ -35,7 +35,8 @@ namespace Tetris
         // Setting a smaller size when there are workers active is safe, but interrupts their task.
         void setSize(size_t inSize);
 
-        void waitForStatus(Worker::Status inStatus);
+        // Wait until all Workers have finished their queue
+        void waitForAll();
         
         // Interrupts all workers.
         void interruptAndClearQueue();

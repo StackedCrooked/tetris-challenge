@@ -65,23 +65,41 @@ namespace Tetris
     }
 
 
-    void WorkerPool::waitForStatus(Worker::Status inStatus)
+    void WorkerPool::waitForAll()
     {        
-        boost::mutex::scoped_lock workersLock(mWorkersMutex);        
-        std::vector<boost::shared_ptr<boost::mutex::scoped_lock> > statusLocks(mWorkers.size());
+        boost::mutex::scoped_lock workersLock(mWorkersMutex);
+        std::vector<boost::shared_ptr<boost::mutex::scoped_lock> > queueLocks(mWorkers.size());
 
-        // First lock all Worker statuses
+        // Lock all Worker queues
+        for (size_t idx = 0; idx != mWorkers.size(); ++idx)
+        {
+            Worker & worker = *mWorkers[idx];
+            queueLocks[idx].reset(new boost::mutex::scoped_lock(worker.mQueueMutex));
+        }
+        
+        // Wait until each Worker has an empty queue.
+        for (size_t idx = 0; idx != mWorkers.size(); ++idx)
+        {
+            Worker & worker = *mWorkers[idx];
+            while (!worker.mQueue.empty())
+            {
+                worker.mQueueCondition.wait(*queueLocks[idx]);
+            }
+        }
+
+        // Lock all Worker statuses
+        std::vector<boost::shared_ptr<boost::mutex::scoped_lock> > statusLocks(mWorkers.size());
         for (size_t idx = 0; idx != mWorkers.size(); ++idx)
         {
             Worker & worker = *mWorkers[idx];
             statusLocks[idx].reset(new boost::mutex::scoped_lock(worker.mStatusMutex));
         }
         
-        // Then wait for each one to finish.
+        // Wait until each Worker is in waiting state.
         for (size_t idx = 0; idx != mWorkers.size(); ++idx)
         {
             Worker & worker = *mWorkers[idx];
-            while (worker.mStatus != Worker::Status_Waiting)
+            while (worker.mStatus != Worker::Status_Waiting && worker.mStatus != Worker::Status_FinishedOne)
             {
                 worker.mStatusCondition.wait(*statusLocks[idx]);
             }
@@ -114,12 +132,12 @@ namespace Tetris
         }
 
         //
-        // Wait for Status_Waiting on all workers.
+        // Wait for Status_Waiting or Status_FinishedOne on all workers.
         //
         for (size_t idx = inBegin; idx != inBegin + inCount; ++idx)
         {
             Worker & worker = *mWorkers[idx];
-            while (worker.mStatus != Worker::Status_Waiting)
+            while (worker.mStatus != Worker::Status_Waiting && worker.mStatus != Worker::Status_FinishedOne)
             {
                 worker.mStatusCondition.wait(*statusLocks[idx]);
             }

@@ -92,7 +92,8 @@ namespace Tetris
             if (inIndex + 1 == inMaxIndex)
             {
                 Assert(ioNode->children().empty());
-                populateNodesMt(ioNode, inBlockTypes, inWidths, inIndex, inMaxIndex);
+                Worker::Task task = boost::bind(&MultithreadedNodeCalculator::populateNodesMt, this, ioNode, inBlockTypes, inWidths, inIndex, inMaxIndex);
+                mWorkerPool.getWorker()->schedule(task);
             }
             else
             {            
@@ -125,7 +126,7 @@ namespace Tetris
             {
                 boost::mutex::scoped_lock lock(mNodeMutex);
                 populateNodes(mNode, mBlockTypes, mWidths, 0, targetDepth);
-                mWorkerPool.waitForStatus(Worker::Status_Waiting);
+                mWorkerPool.waitForAll();
                 markTreeRowAsFinished(targetDepth - 1);
                 targetDepth++;
             }
@@ -133,6 +134,7 @@ namespace Tetris
         catch (const boost::thread_interrupted &)
         {
             // Task was interrupted. Ok.
+            mWorkerPool.interruptAndClearQueue();
         }
         catch (const std::exception & inException)
         {

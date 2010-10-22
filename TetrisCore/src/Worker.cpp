@@ -169,6 +169,7 @@ namespace Tetris
         boost::mutex::scoped_lock lock(mQueueMutex);
         while (mQueue.empty())
         {
+            setStatus(Status_Waiting);
             mQueueCondition.wait(lock);
             boost::this_thread::interruption_point();
         }
@@ -192,8 +193,8 @@ namespace Tetris
         catch (const boost::thread_interrupted &)
         {
             // Task was interrupted. Ok.
-        }
-        setStatus(Status_Waiting);
+        }        
+        setStatus(Status_FinishedOne);
     }
 
 
