@@ -101,6 +101,27 @@ void WorkerPoolTest::testWorkerPool()
         assert(overhead > -200);
         assert(overhead < 200);
     }
+
+    // Test waitForAll
+    {
+        mStopwatch.restart();
+        WorkerPool pool("WorkerPool Test", 10);
+        assert(pool.size() == 10);
+        for (size_t i = 0; i < pool.size(); ++i)
+        {
+            pool.getWorker()->schedule(boost::bind(&Poco::Thread::sleep, 1000));
+        }
+        pool.waitForAll();
+        mStopwatch.stop();
+        assert(pool.size() == 10);
+        for (size_t i = 0; i < pool.size(); ++i)
+        {
+            assert(pool.getWorker()->status() == Worker::Status_Waiting);
+        }
+        int overhead = static_cast<int>(mStopwatch.elapsed() / 1000) - 1000;
+        assert(overhead >= 0);
+        assert(overhead < 200);
+    }
 }
 
 
