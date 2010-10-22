@@ -66,33 +66,26 @@ namespace Tetris
 
 
     void WorkerPool::waitForStatus(Worker::Status inStatus)
-    {
-        boost::mutex::scoped_lock workersLock(mWorkersMutex);
+    {        
+        boost::mutex::scoped_lock workersLock(mWorkersMutex);        
+        std::vector<boost::shared_ptr<boost::mutex::scoped_lock> > statusLocks(mWorkers.size());
+
+        // First lock all Worker statuses
         for (size_t idx = 0; idx != mWorkers.size(); ++idx)
         {
             Worker & worker = *mWorkers[idx];
-            worker.waitForStatus(inStatus);
+            statusLocks[idx].reset(new boost::mutex::scoped_lock(worker.mStatusMutex));
         }
         
-        //boost::mutex::scoped_lock workersLock(mWorkersMutex);        
-        //std::vector<boost::shared_ptr<boost::mutex::scoped_lock> > statusLocks(mWorkers.size());
-
-        //// First lock all Worker statuses
-        //for (size_t idx = 0; idx != mWorkers.size(); ++idx)
-        //{
-        //    Worker & worker = *mWorkers[idx];
-        //    statusLocks[idx].reset(new boost::mutex::scoped_lock(worker.mStatusMutex));
-        //}
-        //
-        //// Then wait for each one to finish.
-        //for (size_t idx = 0; idx != mWorkers.size(); ++idx)
-        //{
-        //    Worker & worker = *mWorkers[idx];
-        //    while (worker.mStatus != Worker::Status_Waiting)
-        //    {
-        //        worker.mStatusCondition.wait(*statusLocks[idx]);
-        //    }
-        //}
+        // Then wait for each one to finish.
+        for (size_t idx = 0; idx != mWorkers.size(); ++idx)
+        {
+            Worker & worker = *mWorkers[idx];
+            while (worker.mStatus != Worker::Status_Waiting)
+            {
+                worker.mStatusCondition.wait(*statusLocks[idx]);
+            }
+        }
     }
     
     

@@ -3,6 +3,7 @@
 
 
 #include "CppUnit/TestCase.h"
+#include "Tetris/TypedWrapper.h"
 #include "Poco/Stopwatch.h"
 #include "Poco/Types.h"
 
@@ -14,7 +15,14 @@ public:
 
 	~NodeCalculatorTest();
 
-    void testNodeCalculator();    
+    void testNodeCalculator();
+
+    Tetris_TypedWrapper(Depth, int);
+    Tetris_TypedWrapper(Width, int);
+    Tetris_TypedWrapper(WorkerCount, int);
+    Tetris_TypedWrapper(TimeMs, int);
+
+    void test(Depth inDepth, Width inWidth, WorkerCount inWorkerCount, TimeMs inTimeMs);
 	
 	void setUp();
 

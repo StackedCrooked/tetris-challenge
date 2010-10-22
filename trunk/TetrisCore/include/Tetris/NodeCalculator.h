@@ -40,9 +40,9 @@ namespace Tetris
 
         enum Status
         {
+            Status_Nil,
             Status_Begin,
-            Status_Nil = Status_Begin,
-            Status_Started,
+            Status_Started = Status_Begin,
             Status_Working,
             Status_Stopped,
             Status_Finished,
