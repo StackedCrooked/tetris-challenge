@@ -84,7 +84,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\CppUnitmtd.lib"
+				OutputFile="$(OutDir)$(ProjectName).lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -170,7 +170,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\CppUnitmt.lib"
+				OutputFile="$(OutDir)$(ProjectName).lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
