@@ -202,7 +202,7 @@ namespace Tetris
             }
             default:
             {
-                OnKeyboardPressed(wParam);
+                //OnKeyboardPressed(wParam);
                 break;
             }
         }

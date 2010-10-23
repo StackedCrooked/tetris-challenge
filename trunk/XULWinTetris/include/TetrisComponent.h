@@ -16,7 +16,7 @@
 #include "XULWin/WinUtils.h"
 #include "Poco/Stopwatch.h"
 #include <boost/scoped_ptr.hpp>
-#include <boost/signals.hpp>
+//#include <boost/signals.hpp>
 #include <boost/thread.hpp>
 
 
@@ -144,7 +144,7 @@ namespace Tetris
 
         virtual ~TetrisComponent();
 
-        boost::signal<void(int)> OnKeyboardPressed;
+        //boost::signal<void(int)> OnKeyboardPressed;
 
         virtual bool init();
 
