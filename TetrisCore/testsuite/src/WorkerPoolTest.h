@@ -24,7 +24,6 @@ public:
     static CppUnit::Test* suite();
 
 private:
-    void printProgress(size_t a, size_t b);
     Poco::Stopwatch mStopwatch;
 };
 

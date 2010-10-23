@@ -26,7 +26,6 @@ public:
 
 private:
     static void BeBusy();
-    void printProgress(size_t a, size_t b);
     Poco::Stopwatch mStopwatch;
     size_t mRepeat;
 };

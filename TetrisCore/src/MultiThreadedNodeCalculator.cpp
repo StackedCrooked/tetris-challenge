@@ -26,6 +26,13 @@ namespace Tetris
         NodeCalculatorImpl(inNode, inBlockTypes, inWidths, inEvaluator, inWorkerPool)
     {
     }
+		
+		
+	MultithreadedNodeCalculator::~MultithreadedNodeCalculator()
+	{
+		// We must stop all workers here or else they will be referencing a destroyed object.
+		mWorkerPool.interruptAndClearQueue();
+	}
 
 
     void MultithreadedNodeCalculator::populateNodesMt(

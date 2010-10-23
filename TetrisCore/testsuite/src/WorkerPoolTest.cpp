@@ -25,12 +25,6 @@ WorkerPoolTest::~WorkerPoolTest()
 }
 
 
-void WorkerPoolTest::printProgress(size_t a, size_t b)
-{
-    std::cout << (a + 1) << "/" << b << "\r";
-}
-
-
 void WorkerPoolTest::BeBusy()
 {
     while (true)
@@ -57,8 +51,8 @@ void WorkerPoolTest::testWorkerPool()
         }
         mStopwatch.stop();
         int overhead = static_cast<int>(mStopwatch.elapsed() / 1000) - cSleepTime;
-        assert(overhead > -200);
-        assert(overhead < 200);
+        Assert(overhead > -200);
+        Assert(overhead < 200);
     }
 
     // Test with interrupt
@@ -73,8 +67,8 @@ void WorkerPoolTest::testWorkerPool()
         pool.interruptAndClearQueue();
         mStopwatch.stop();
         int overhead = static_cast<int>(mStopwatch.elapsed() / 1000) - cSleepTime;
-        assert(overhead > -200);
-        assert(overhead < 200);
+        Assert(overhead > -200);
+        Assert(overhead < 200);
     }
 
     // Test setSize
@@ -88,33 +82,33 @@ void WorkerPoolTest::testWorkerPool()
         }
 
         pool.setSize(cPoolSize[i]);
-        assert(pool.size() == cPoolSize[i]);
+        Assert(pool.size() == cPoolSize[i]);
 
         int newSize = static_cast<int>(0.5 + (cPoolSize[i] / 2.0));
         pool.setSize(newSize);
-        assert(pool.size() == newSize);
+        Assert(pool.size() == newSize);
 
         pool.setSize(0);
-        assert(pool.size() == 0);
+        Assert(pool.size() == 0);
 
         mStopwatch.stop();
         int overhead = static_cast<int>(mStopwatch.elapsed() / 1000) - cSleepTime;
-        assert(overhead > -200);
-        assert(overhead < 200);
+        Assert(overhead > -200);
+        Assert(overhead < 200);
     }
 
     // Test waitForAll
     {
         mStopwatch.restart();
         WorkerPool pool("WorkerPool Test", 10);
-        assert(pool.size() == 10);
+        Assert(pool.size() == 10);
         for (size_t i = 0; i < pool.size(); ++i)
         {
             pool.getWorker()->schedule(boost::bind(&Poco::Thread::sleep, 1000));
         }
         pool.waitForAll();
         mStopwatch.stop();
-        assert(pool.size() == 10);
+        Assert(pool.size() == 10);
         for (size_t i = 0; i < pool.size(); ++i)
         {
             Worker & worker = *pool.getWorker(i);
@@ -122,8 +116,8 @@ void WorkerPoolTest::testWorkerPool()
             Assert(worker.status() == Worker::Status_Waiting);
         }
         int overhead = static_cast<int>(mStopwatch.elapsed() / 1000) - 1000;
-        assert(overhead >= 0);
-        assert(overhead < 200);
+        Assert(overhead >= 0);
+        Assert(overhead < 200);
     }
 }
 
