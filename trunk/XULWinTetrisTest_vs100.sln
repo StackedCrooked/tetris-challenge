@@ -7,6 +7,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Foundation", "3rdParty\Poco
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "XULWinTetrisTest", "XULWinTetrisTest\XULWinTetrisTest_vs100.vcxproj", "{F4F3AC1B-9535-4036-ACF0-F67E8C6C7333}"
 	ProjectSection(ProjectDependencies) = postProject
+		{82864729-DFC2-4F6D-A1AE-984D82CF81E1} = {82864729-DFC2-4F6D-A1AE-984D82CF81E1}
 		{B2480335-73B3-46C5-8B8D-3BDEF912B161} = {B2480335-73B3-46C5-8B8D-3BDEF912B161}
 	EndProjectSection
 EndProject
@@ -16,9 +17,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TetrisTestSuite", "TetrisCo
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PocoCppUnit", "3rdParty\Poco\CppUnit\CppUnit_vs100.vcxproj", "{138BB448-808A-4FE5-A66D-78D1F8770F59}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "XULWin", "XULWin\XULWin_vs100.vcxproj", "{82864729-DFC2-4F6D-A1AE-984D82CF81E1}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "XULWinTetris", "XULWinTetris\XULWinTetris_vs100.vcxproj", "{B2480335-73B3-46C5-8B8D-3BDEF912B161}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "XULWin", "XULWin\XULWin_vs100.vcxproj", "{82864729-DFC2-4F6D-A1AE-984D82CF81E1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -50,14 +51,14 @@ Global
 		{138BB448-808A-4FE5-A66D-78D1F8770F59}.Debug|Win32.Build.0 = Debug|Win32
 		{138BB448-808A-4FE5-A66D-78D1F8770F59}.Release|Win32.ActiveCfg = Release|Win32
 		{138BB448-808A-4FE5-A66D-78D1F8770F59}.Release|Win32.Build.0 = Release|Win32
-		{82864729-DFC2-4F6D-A1AE-984D82CF81E1}.Debug|Win32.ActiveCfg = Debug|Win32
-		{82864729-DFC2-4F6D-A1AE-984D82CF81E1}.Debug|Win32.Build.0 = Debug|Win32
-		{82864729-DFC2-4F6D-A1AE-984D82CF81E1}.Release|Win32.ActiveCfg = Release|Win32
-		{82864729-DFC2-4F6D-A1AE-984D82CF81E1}.Release|Win32.Build.0 = Release|Win32
 		{B2480335-73B3-46C5-8B8D-3BDEF912B161}.Debug|Win32.ActiveCfg = Debug|Win32
 		{B2480335-73B3-46C5-8B8D-3BDEF912B161}.Debug|Win32.Build.0 = Debug|Win32
 		{B2480335-73B3-46C5-8B8D-3BDEF912B161}.Release|Win32.ActiveCfg = Release|Win32
 		{B2480335-73B3-46C5-8B8D-3BDEF912B161}.Release|Win32.Build.0 = Release|Win32
+		{82864729-DFC2-4F6D-A1AE-984D82CF81E1}.Debug|Win32.ActiveCfg = Debug|Win32
+		{82864729-DFC2-4F6D-A1AE-984D82CF81E1}.Debug|Win32.Build.0 = Debug|Win32
+		{82864729-DFC2-4F6D-A1AE-984D82CF81E1}.Release|Win32.ActiveCfg = Release|Win32
+		{82864729-DFC2-4F6D-A1AE-984D82CF81E1}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

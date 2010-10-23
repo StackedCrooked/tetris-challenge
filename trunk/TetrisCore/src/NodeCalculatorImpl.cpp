@@ -41,6 +41,8 @@ namespace Tetris
 
     NodeCalculatorImpl::~NodeCalculatorImpl()
     {
+		mWorkerPool.interruptAndClearQueue();
+		mWorkerPool.waitForAll();
     }
 
 

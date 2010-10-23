@@ -2,6 +2,7 @@
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Tetris/Worker.h"
+#include "Tetris/Assert.h"
 #include "Poco/Thread.h"
 #include "Poco/Stopwatch.h"
 #include <boost/thread.hpp>
@@ -24,12 +25,6 @@ WorkerTest::WorkerTest(const std::string & inName):
 
 WorkerTest::~WorkerTest()
 {
-}
-
-
-void WorkerTest::printProgress(size_t a, size_t b)
-{
-    //std::cout << (a + 1) << "/" << b << "\r";
 }
 
 
@@ -70,8 +65,8 @@ void WorkerTest::testWorkerImpl()
     assertEqual(worker.size(), 0);
     worker.waitForStatus(Worker::Status_Waiting);
     mStopwatch.stop();
-    assert(mStopwatch.elapsed() / 1000.0 >= cSleepTimeMs - 100);
-    assert(mStopwatch.elapsed() / 1000.0 < 100 + cSleepTimeMs);
+    Assert(mStopwatch.elapsed() / 1000.0 >= cSleepTimeMs - 100);
+    Assert(mStopwatch.elapsed() / 1000.0 < 100 + cSleepTimeMs);
 
 
     // Test with interrupt
@@ -81,7 +76,7 @@ void WorkerTest::testWorkerImpl()
     worker.interrupt();
     assertEqual(worker.size(), 0);
     mStopwatch.stop();
-    assert(mStopwatch.elapsed() / 1000.0 < 100 + cSleepTimeMs);
+    Assert(mStopwatch.elapsed() / 1000.0 < 100 + cSleepTimeMs);
 
 
     // Test with interrupt
@@ -94,15 +89,15 @@ void WorkerTest::testWorkerImpl()
     worker.waitForStatus(Worker::Status_Working);
     assertEqual(worker.size(), 4);
     worker.interrupt();
-    assert(mStopwatch.elapsed() / 1000 < 2 * cSleepTimeMs);
+    Assert(mStopwatch.elapsed() / 1000 < 2 * cSleepTimeMs);
     assertEqual(worker.size(), 3);
     worker.interrupt();
-    assert(mStopwatch.elapsed() / 1000 < 3 * cSleepTimeMs);
+    Assert(mStopwatch.elapsed() / 1000 < 3 * cSleepTimeMs);
     assertEqual(worker.size(), 2);
     worker.interruptAndClearQueue();
     assertEqual(worker.size(), 0);
     mStopwatch.stop();
-    assert(mStopwatch.elapsed() / 1000 < 4 * cSleepTimeMs);
+    Assert(mStopwatch.elapsed() / 1000 < 4 * cSleepTimeMs);
 
     // Interrupt twice should not crash.
     worker.interrupt();

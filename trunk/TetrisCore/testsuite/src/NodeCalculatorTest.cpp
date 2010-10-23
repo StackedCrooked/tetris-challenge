@@ -35,15 +35,11 @@ NodeCalculatorTest::~NodeCalculatorTest()
 
 void NodeCalculatorTest::testNodeCalculator()
 {
-    test(Depth(4), Width(4), WorkerCount(1), TimeMs(2000));
-    test(Depth(8), Width(5), WorkerCount(1), TimeMs(2000));
-    test(Depth(4), Width(4), WorkerCount(4), TimeMs(2000));
-    test(Depth(8), Width(5), WorkerCount(4), TimeMs(2000));
-    test(Depth(4), Width(4), WorkerCount(4), TimeMs(4000));
-    test(Depth(8), Width(5), WorkerCount(4), TimeMs(4000));
-    test(Depth(4), Width(4), WorkerCount(8), TimeMs(4000));
-    test(Depth(8), Width(5), WorkerCount(8), TimeMs(4000));
-    test(Depth(8), Width(8), WorkerCount(8), TimeMs(8000));
+    test(Depth(1), Width(2), WorkerCount(1), TimeMs(1000));
+    test(Depth(1), Width(1), WorkerCount(1), TimeMs(1000));
+    test(Depth(1), Width(2), WorkerCount(2), TimeMs(1000));
+    test(Depth(1), Width(1), WorkerCount(2), TimeMs(1000));
+    test(Depth(6), Width(6), WorkerCount(4), TimeMs(1000));
 }
 
 
@@ -66,14 +62,14 @@ void NodeCalculatorTest::test(Depth inDepth, Width inWidth, WorkerCount inWorker
 
     NodeCalculator nodeCalculator(rootNode->clone(), blockTypes, widths, rootNode->evaluator().clone(), workerPool);
 
-    assert(nodeCalculator.getCurrentSearchDepth() == 0);
-    assert(blockTypes.size() == widths.size());
-    assert(nodeCalculator.getMaxSearchDepth() == blockTypes.size());
-    assert(nodeCalculator.status() == NodeCalculator::Status_Nil);
+    Assert(nodeCalculator.getCurrentSearchDepth() == 0);
+    Assert(blockTypes.size() == widths.size());
+    Assert(nodeCalculator.getMaxSearchDepth() == blockTypes.size());
+    Assert(nodeCalculator.status() == NodeCalculator::Status_Nil);
     
     nodeCalculator.start();
 
-    assert(nodeCalculator.status() == NodeCalculator::Status_Started);
+    Assert(nodeCalculator.status() == NodeCalculator::Status_Started);
 
     Poco::Stopwatch stopwatch;
     stopwatch.start();
@@ -86,7 +82,7 @@ void NodeCalculatorTest::test(Depth inDepth, Width inWidth, WorkerCount inWorker
             {
                 nodeCalculator.stop();
                 stopwatch.stop();
-                assert(nodeCalculator.status() == NodeCalculator::Status_Stopped ||
+                Assert(nodeCalculator.status() == NodeCalculator::Status_Stopped ||
                        nodeCalculator.status() == NodeCalculator::Status_Finished);
                 interrupted = true;
             }
@@ -97,30 +93,39 @@ void NodeCalculatorTest::test(Depth inDepth, Width inWidth, WorkerCount inWorker
     if (stopwatch.elapsed() / 1000 > inTimeMs)
     {
         int overtime = static_cast<int>(0.5 + stopwatch.elapsed() / 1000.0) - inTimeMs;
-        assert(overtime < 500);
+        Assert(overtime < 500);
     }
 
     std::cout << (interrupted ? " -> Timeout" : " -> Succeeded");
 
     NodePtr resultPtr = nodeCalculator.result();
     GameStateNode & result(*resultPtr);
-    assert(result.depth() == rootNode->depth() + 1);
-    assert(result.state().originalBlock().type() == blockTypes[0]);
-    assert(result.children().size() == 1);
+    Assert(result.depth() == rootNode->depth() + 1);
+    Assert(result.state().originalBlock().type() == blockTypes[0]);
+
+	if (inDepth > 1)
+	{
+		Assert(result.children().size() == 1);
+	}
+	else
+	{
+		Assert(result.children().empty());
+	}
+
     int depthDifference = result.endNode()->depth() - rootNode->depth();
     
     if (!interrupted)
     {
-        assert(depthDifference == blockTypes.size());
-        assert(nodeCalculator.getCurrentSearchDepth() == nodeCalculator.getMaxSearchDepth());
-        assert(result.endNode()->state().originalBlock().type() == blockTypes.back());
+        Assert(depthDifference == blockTypes.size());
+        Assert(nodeCalculator.getCurrentSearchDepth() == nodeCalculator.getMaxSearchDepth());
+        Assert(result.endNode()->state().originalBlock().type() == blockTypes.back());
     }
     else
     {
         std::cout << " (" << nodeCalculator.getCurrentSearchDepth() << "/" << nodeCalculator.getMaxSearchDepth() << ")";
-        assert(nodeCalculator.getCurrentSearchDepth() < nodeCalculator.getMaxSearchDepth());
+        Assert(nodeCalculator.getCurrentSearchDepth() < nodeCalculator.getMaxSearchDepth());
     }
-    assert(result.endNode()->children().empty());
+    Assert(result.endNode()->children().empty());
 }
 
 
