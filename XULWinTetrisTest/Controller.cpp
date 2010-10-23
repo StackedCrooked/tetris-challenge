@@ -183,7 +183,7 @@ namespace Tetris
         }
 
 
-        mTetrisComponent->OnKeyboardPressed.connect(boost::bind(&Controller::processKey, this, _1));       
+        //mTetrisComponent->OnKeyboardPressed.connect(boost::bind(&Controller::processKey, this, _1));       
         mGravity.reset(new Gravity(*mProtectedGame));
 
         mRefreshTimer.reset(new XULWin::WinAPI::Timer);
