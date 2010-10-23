@@ -13,6 +13,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{B2480335-73B3-46C5-8B8D-3BDEF912B161}</ProjectGuid>
     <RootNamespace>XULWinTetris</RootNamespace>
+    <ProjectName>XULWinTetris</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -44,7 +45,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)XULWinTetris\include;$(SolutionDir)TetrisCore\include;$(SolutionDir)XULWin\include;$(SolutionDir)3rdParty\Poco\Foundation\include;$(SolutionDir)3rdParty\Boost_1_42_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)XULWinTetris\include;$(SolutionDir)TetrisCore\include;$(SolutionDir)XULWin\include;$(SolutionDir)3rdParty\Poco\Foundation\include;$(SolutionDir)3rdParty\Boost_1_44_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -61,7 +62,7 @@
       <OmitFramePointers>true</OmitFramePointers>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)XULWinTetris\include;$(SolutionDir)TetrisCore\include;$(SolutionDir)XULWin\include;$(SolutionDir)3rdParty\Poco\Foundation\include;$(SolutionDir)3rdParty\Boost_1_42_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)XULWinTetris\include;$(SolutionDir)TetrisCore\include;$(SolutionDir)XULWin\include;$(SolutionDir)3rdParty\Poco\Foundation\include;$(SolutionDir)3rdParty\Boost_1_44_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <WarningLevel>Level3</WarningLevel>

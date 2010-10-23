@@ -35,31 +35,25 @@ namespace Tetris
         size_t inIndex,
         size_t inMaxIndex)
     {
-
         //
         // Generate the child nodes.
         //
         // It is possible that the nodes were already generated at this depth.
         // If that is the case then we immediately jump to the recursive call below.
         //
-        ChildNodes generatedChildNodes = ioNode->children();
-        Assert(generatedChildNodes.empty());
-        if (generatedChildNodes.empty())
+        ChildNodes childNodes = ioNode->children();
+        childNodes = ChildNodes(GameStateComparisonFunctor(mEvaluator->clone()));
+        GenerateOffspring(ioNode, inBlockTypes[inIndex], *mEvaluator, childNodes);
+
+        int count = 0;
+        ChildNodes::iterator it = childNodes.begin(), end = childNodes.end();
+        while (count < inWidths[inIndex] && it != end)
         {
-            generatedChildNodes = ChildNodes(GameStateComparisonFunctor(mEvaluator->clone()));
-            GenerateOffspring(ioNode, inBlockTypes[inIndex], *mEvaluator, generatedChildNodes);
-
-            int count = 0;
-            ChildNodes::iterator it = generatedChildNodes.begin(), end = generatedChildNodes.end();
-            while (count < inWidths[inIndex] && it != end)
-            {
-                ioNode->addChild(*it);
-                ++count;
-                ++it;
-            }
-            updateLayerData(inIndex, *ioNode->children().begin(), count);
+            ioNode->addChild(*it);
+            ++count;
+            ++it;
         }
-
+        updateLayerData(inIndex, *ioNode->children().begin(), count);
     }
 
 
@@ -87,24 +81,22 @@ namespace Tetris
         //
         // Check stop conditions
         //
-        if (inIndex < inMaxIndex)
+        Assert(inIndex < inMaxIndex);
+        if (inIndex + 1 == inMaxIndex)
         {
-            if (inIndex + 1 == inMaxIndex)
+            Assert(ioNode->children().empty());
+            Worker::Task task = boost::bind(&MultithreadedNodeCalculator::populateNodesMt, this, ioNode, inBlockTypes, inWidths, inIndex, inMaxIndex);
+            mWorkerPool.getWorker()->schedule(task);
+        }
+        else
+        {            
+            ChildNodes childNodes = ioNode->children();
+            Assert(!childNodes.empty());
+            for (ChildNodes::iterator it = childNodes.begin(); it != childNodes.end(); ++it)
             {
-                Assert(ioNode->children().empty());
-                Worker::Task task = boost::bind(&MultithreadedNodeCalculator::populateNodesMt, this, ioNode, inBlockTypes, inWidths, inIndex, inMaxIndex);
-                mWorkerPool.getWorker()->schedule(task);
-            }
-            else
-            {            
-                ChildNodes childNodes = ioNode->children();
-                Assert(!childNodes.empty());
-                for (ChildNodes::iterator it = childNodes.begin(); it != childNodes.end(); ++it)
-                {
-                    NodePtr child = *it;
-                    populateNodes(child, inBlockTypes, inWidths, inIndex + 1, inMaxIndex);
-                }                
-            }
+                NodePtr child = *it;
+                populateNodes(child, inBlockTypes, inWidths, inIndex + 1, inMaxIndex);
+            }                
         }
     }
 

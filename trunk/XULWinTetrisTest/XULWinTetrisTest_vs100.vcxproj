@@ -48,7 +48,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)XULWinTetris\include;$(SolutionDir)TetrisCore\include;$(SolutionDir)XULWin\include;$(SolutionDir)3rdParty\Boost_1_42_0;$(SolutionDir)3rdParty\Poco\Foundation\include;$(SolutionDir)3rdParty\Poco\XML\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)XULWinTetris\include;$(SolutionDir)TetrisCore\include;$(SolutionDir)XULWin\include;$(SolutionDir)3rdParty\Boost_1_44_0;$(SolutionDir)3rdParty\Poco\Foundation\include;$(SolutionDir)3rdParty\Poco\XML\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -59,8 +59,8 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>comctl32.lib;GdiPlus.lib;Iphlpapi.lib;wsock32.lib;WS2_32.lib;Winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)3rdParty\Boost_1_42_0\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>comctl32.lib;GdiPlus.lib;Iphlpapi.lib;wsock32.lib;WS2_32.lib;Winmm.lib;XULWinTetris.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)3rdParty\Boost_1_44_0\lib\;$(SolutionDir)Build\vs100\Debug\XULWinTetris\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <LargeAddressAware>true</LargeAddressAware>
@@ -76,7 +76,7 @@
       <OmitFramePointers>true</OmitFramePointers>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)XULWinTetris\include;$(SolutionDir)TetrisCore\include;$(SolutionDir)XULWin\include;$(SolutionDir)3rdParty\Boost_1_42_0;$(SolutionDir)3rdParty\Poco\Foundation\include;$(SolutionDir)3rdParty\Poco\XML\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)XULWinTetris\include;$(SolutionDir)TetrisCore\include;$(SolutionDir)XULWin\include;$(SolutionDir)3rdParty\Boost_1_44_0;$(SolutionDir)3rdParty\Poco\Foundation\include;$(SolutionDir)3rdParty\Poco\XML\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -87,7 +87,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>comctl32.lib;GdiPlus.lib;Iphlpapi.lib;wsock32.lib;WS2_32.lib;Winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)3rdParty\Boost_1_42_0\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)3rdParty\Boost_1_44_0\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <LargeAddressAware>true</LargeAddressAware>
@@ -135,10 +135,6 @@
     </ProjectReference>
     <ProjectReference Include="..\TetrisCore\TetrisCore_vs100.vcxproj">
       <Project>{d623c05b-bdd9-4d6e-8e51-e3275608debe}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="..\XULWinTetris\XULWinTetris.vcxproj">
-      <Project>{b2480335-73b3-46c5-8b8d-3bdef912b161}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
     <ProjectReference Include="..\XULWin\XULWin_vs100.vcxproj">
