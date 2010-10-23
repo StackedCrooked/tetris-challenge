@@ -2,6 +2,7 @@
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Tetris/WorkerPool.h"
+#include "Tetris/Assert.h"
 #include "Poco/Thread.h"
 #include <boost/thread.hpp>
 #include <iostream>
@@ -116,7 +117,9 @@ void WorkerPoolTest::testWorkerPool()
         assert(pool.size() == 10);
         for (size_t i = 0; i < pool.size(); ++i)
         {
-            assert(pool.getWorker()->status() == Worker::Status_Waiting);
+            Worker & worker = *pool.getWorker(i);
+            Assert(worker.size() == 0);
+            Assert(worker.status() == Worker::Status_Waiting);
         }
         int overhead = static_cast<int>(mStopwatch.elapsed() / 1000) - 1000;
         assert(overhead >= 0);
