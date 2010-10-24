@@ -1,3 +1,4 @@
+#include "Tetris/Config.h"
 #include "Tetris/BlockMover.h"
 #include "Tetris/Game.h"
 #include "Tetris/GameStateNode.h"

@@ -15,7 +15,7 @@ namespace Tetris
      * O = square block
      * etc...
      */
-    typedef int BlockType;
+    typedef char BlockType;
     enum
     {
         BlockType_Nil = 0,

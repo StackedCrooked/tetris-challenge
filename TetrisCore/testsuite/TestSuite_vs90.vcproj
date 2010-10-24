@@ -40,6 +40,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/D &quot;_HAS_ITERATOR_DEBUGGING=0&quot; /D &quot;_SECURE_SCL=0&quot;"
 				Optimization="0"
 				AdditionalIncludeDirectories="&quot;$(SolutionDir)TetrisCore\include&quot;;&quot;$(SolutionDir)3rdParty\Poco\CppUnit\include&quot;;&quot;$(SolutionDir)3rdParty\Poco\Foundation\include&quot;;&quot;$(SolutionDir)3rdParty\Boost_1_42_0&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
@@ -103,6 +104,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/D &quot;_HAS_ITERATOR_DEBUGGING=0&quot; /D &quot;_SECURE_SCL=0&quot;"
 				Optimization="3"
 				InlineFunctionExpansion="2"
 				EnableIntrinsicFunctions="true"
@@ -159,10 +161,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\NodeCalculatorTest.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\src\NodeCalculatorTest.h"
 				>
 			</File>
@@ -191,6 +189,14 @@
 				>
 			</File>
 		</Filter>
+		<File
+			RelativePath=".\src\NodeCalculatorTest.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\Todo.txt"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

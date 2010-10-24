@@ -1,3 +1,4 @@
+#include "Tetris/Config.h"
 #include "Tetris/Worker.h"
 #include "Tetris/Logging.h"
 #include "Tetris/MakeString.h"

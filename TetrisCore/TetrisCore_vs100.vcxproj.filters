@@ -185,9 +185,6 @@
     <ClCompile Include="src\ComputerPlayer.cpp">
       <Filter>ComputerPlayer\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\MultiThreadedNodeCalculator.cpp">
-      <Filter>ComputerPlayer\Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\NodeCalculator.cpp">
       <Filter>ComputerPlayer\Source Files</Filter>
     </ClCompile>
@@ -197,6 +194,7 @@
     <ClCompile Include="src\SingleThreadedNodeCalculator.cpp">
       <Filter>ComputerPlayer\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\MultiThreadedNodeCalculator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Todo.txt" />

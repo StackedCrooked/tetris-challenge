@@ -10,9 +10,6 @@
     <ClCompile Include="src\Driver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\NodeCalculatorTest.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\TetrisCoreTestSuite.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -22,6 +19,7 @@
     <ClCompile Include="src\WorkerTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\NodeCalculatorTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\NodeCalculatorTest.h">

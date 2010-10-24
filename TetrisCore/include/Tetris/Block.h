@@ -17,7 +17,7 @@ namespace Tetris
 
     // Forward declarations.
     class BlockImpl;
-    typedef int BlockType;
+    typedef char BlockType;
 
 
     /**
