@@ -1,3 +1,4 @@
+#include "Tetris/Config.h"
 #include "Tetris/GameState.h"
 #include "Tetris/GameQualityEvaluator.h"
 #include "Tetris/Block.h"
@@ -157,33 +158,31 @@ namespace Tetris
             }
         }
 
-
+        
         void clearLines()
         {
             size_t numLines = 0;
-            std::vector<bool> lines(mGrid.numRows(), false);
+            
+            std::vector<char> linesVector(mGrid.numRows(), 0);
+            char * lines = &linesVector[0];
+            //std::vector<char> lines(mGrid.numRows(), 0);
 
-            // Get numLines and lines
+            size_t endRow = std::min<size_t>(mGrid.numRows(), mOriginalBlock.row() + mOriginalBlock.grid().numRows());
+            for (size_t rowIndex = mOriginalBlock.row(); rowIndex < endRow; ++rowIndex)
             {
-                for (size_t rowIndex = mOriginalBlock.row();
-                        rowIndex < std::min<size_t>(mGrid.numRows(),
-                                                    mOriginalBlock.row() + mOriginalBlock.grid().numRows());
-                        ++rowIndex)
+                lines[rowIndex] = 1;
+                for (size_t ci = 0; ci != mGrid.numColumns(); ++ci)
                 {
-                    lines[rowIndex] = true;
-                    for (size_t ci = 0; ci != mGrid.numColumns(); ++ci)
+                    if (mGrid.get(rowIndex, ci) == 0)
                     {
-                        if (mGrid.get(rowIndex, ci) == 0)
-                        {
-                            lines[rowIndex] = false;
-                            break;
-                        }
+                        lines[rowIndex] = 0;
+                        break;
                     }
+                }
 
-                    if (lines[rowIndex])
-                    {
-                        numLines++;
-                    }
+                if (lines[rowIndex])
+                {
+                    numLines++;
                 }
             }
 

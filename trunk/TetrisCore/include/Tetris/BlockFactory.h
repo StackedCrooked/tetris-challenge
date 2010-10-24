@@ -7,7 +7,7 @@ namespace Tetris
  
     class Block;    
     class BlockFactoryImpl;
-    typedef int BlockType;
+    typedef char BlockType;
     
 
     class BlockFactory

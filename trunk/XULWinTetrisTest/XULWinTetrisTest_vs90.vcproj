@@ -40,6 +40,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/D &quot;_HAS_ITERATOR_DEBUGGING=0&quot; /D &quot;_SECURE_SCL=0&quot;"
 				Optimization="0"
 				AdditionalIncludeDirectories="&quot;$(SolutionDir)XULWinTetris\include&quot;;&quot;$(SolutionDir)TetrisCore\include&quot;;&quot;$(SolutionDir)XULWin\include&quot;;&quot;$(SolutionDir)3rdParty\Boost_1_42_0&quot;;&quot;$(SolutionDir)3rdParty\Poco\Foundation\include&quot;;&quot;$(SolutionDir)3rdParty\Poco\XML\include&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
@@ -116,6 +117,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/D &quot;_HAS_ITERATOR_DEBUGGING=0&quot; /D &quot;_SECURE_SCL=0&quot;"
 				Optimization="2"
 				InlineFunctionExpansion="2"
 				EnableIntrinsicFunctions="true"

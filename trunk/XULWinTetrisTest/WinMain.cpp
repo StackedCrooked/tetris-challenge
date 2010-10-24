@@ -21,9 +21,7 @@ int StartProgram(HINSTANCE hInstance)
     XULWin::WinAPI::CurrentDirectoryChanger cd("Tetris.xul");
 #endif
 
-#ifdef _DEBUG
     AttachToConsole();
-#endif
     
     int res = RunTetrisTestSuite();
     if (res != 0)
