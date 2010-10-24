@@ -49,7 +49,7 @@ namespace Tetris
     }
 
     template<class T, class Arg0, class Arg1, class Arg2, class Arg3, class Arg4>
-    std::auto_ptr<T> Create(Arg0 arg0, Arg1 arg1, Arg2 arg2, Arg4 arg4)
+    std::auto_ptr<T> Create(Arg0 arg0, Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4)
     {
         return std::auto_ptr<T>(new T(arg0, arg1, arg2, arg3, arg4));
     }

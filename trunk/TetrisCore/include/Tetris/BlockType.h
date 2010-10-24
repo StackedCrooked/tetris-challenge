@@ -2,6 +2,9 @@
 #define TETRIS_BLOCKTYPE_H_INCLUDED
 
 
+#include <cstring>
+
+
 namespace Tetris
 {
 

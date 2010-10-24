@@ -1,6 +1,7 @@
 #include "Tetris/Config.h"
 #include "Tetris/BlockType.h"
 #include "Tetris/MakeString.h"
+#include <stdexcept>
 
 
 namespace Tetris
