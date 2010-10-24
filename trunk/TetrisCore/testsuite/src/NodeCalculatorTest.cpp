@@ -35,12 +35,20 @@ NodeCalculatorTest::~NodeCalculatorTest()
 
 void NodeCalculatorTest::testNodeCalculator()
 {
+#ifdef _DEBUG
+    int depth = 5;
+    int width = 5;
+#else
+    int depth = 6;
+    int width = 6;
+#endif
+
+    test(Depth(depth), Width(width), WorkerCount(6), TimeMs(2000));
+    test(Depth(depth), Width(width), WorkerCount(4), TimeMs(2000));
+    test(Depth(depth), Width(width), WorkerCount(3), TimeMs(2000));
+    test(Depth(depth), Width(width), WorkerCount(2), TimeMs(2000));
+    test(Depth(depth), Width(width), WorkerCount(1), TimeMs(2000));
     test(Depth(1), Width(1), WorkerCount(1), TimeMs(2000));
-    test(Depth(1), Width(1), WorkerCount(4), TimeMs(2000));
-    test(Depth(4), Width(4), WorkerCount(1), TimeMs(2000));
-    test(Depth(4), Width(4), WorkerCount(4), TimeMs(2000));
-    test(Depth(8), Width(8), WorkerCount(1), TimeMs(2000));
-    test(Depth(8), Width(8), WorkerCount(4), TimeMs(2000));
 }
 
 
@@ -91,13 +99,14 @@ void NodeCalculatorTest::test(Depth inDepth, Width inWidth, WorkerCount inWorker
         Poco::Thread::sleep(10);
     }
 
+    int duration = static_cast<int>(0.5 + stopwatch.elapsed() / 1000.0);
     if (stopwatch.elapsed() / 1000 > inTimeMs)
     {
-        int overtime = static_cast<int>(0.5 + stopwatch.elapsed() / 1000.0) - inTimeMs;
+        int overtime = duration - inTimeMs;
         Assert(overtime < 500);
     }
 
-    std::cout << (interrupted ? " -> Timeout" : " -> Succeeded");
+    std::cout << (interrupted ? " -> Timeout" : std::string(MakeString() << " -> Succeeded in " << duration << "ms"));
 
     NodePtr resultPtr = nodeCalculator.result();
     GameStateNode & result(*resultPtr);
