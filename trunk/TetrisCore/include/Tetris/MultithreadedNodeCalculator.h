@@ -22,17 +22,17 @@ namespace Tetris
     private:
         virtual void populate();
         
+        void generateChildNodes(NodePtr ioNode,
+			                    Evaluator * inEvaluator,
+								BlockType inBlockType,
+								int inDepth,
+								int inWidth);
+        
         void populateNodes(NodePtr ioNode,
                            const BlockTypes & inBlockTypes,
                            const std::vector<int> & inWidths,
                            size_t inIndex,
-                           size_t inMaxIndex);
-        
-        void populateNodesMt(NodePtr ioNode,
-                             const BlockTypes & inBlockTypes,
-                             const std::vector<int> & inWidths,
-                             size_t inIndex,
-                             size_t inMaxIndex);
+                           size_t inEndIndex);
     };
 
 } // namespace Tetris

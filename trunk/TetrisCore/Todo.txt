@@ -1,5 +1,6 @@
 Todo
 ----
+- Fix memory leak.
 - Fix GUI spinbuttons etc...
 - Don't use boost::shared_ptr for WorkerPool.
 - Make TetrisCore compilation faster by using forward declares.
