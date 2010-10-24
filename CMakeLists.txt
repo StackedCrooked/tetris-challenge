@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 2.6) 
+project(TETRISTESTSUITE) 
+find_package(Boost 1.44.0 REQUIRED)
+include_directories(${Boost_INCLUDE_DIR})
+add_subdirectory(TetrisCore) 
+add_subdirectory(TetrisCore/testsuite)
