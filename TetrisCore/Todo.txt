@@ -3,8 +3,6 @@ Todo
 - Fix memory leak.
 - Fix GUI spinbuttons etc...
 - Don't use boost::shared_ptr for WorkerPool.
-- Make TetrisCore compilation faster by using forward declares.
-- Move the AI code in the Controller::refresh() method to a Tetris::ComputerPlayer class.
 - Fix crash that occurs when toying with AI settings during game play (esp release mode).
 - Clean up asserts
 - Write more unit tests
@@ -12,6 +10,8 @@ Todo
 - Add multicore search and add spin button to GUI to specify number of threads.
 - Add checkbox: 'switch to Survive when height reaches xx%'
 - Implement NodeCalculator vs Computer modus.
+v Make TetrisCore compilation faster by using forward declares.
+v Move the AI code in the Controller::refresh() method to a Tetris::ComputerPlayer class.
 v On Wine (Linux) the combobox height is item to short. XULWin issue?
 v Add menulist for AI preset
 v Rename NodeCalculator to NodeCalculator.

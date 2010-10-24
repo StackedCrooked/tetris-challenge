@@ -43,12 +43,12 @@ void NodeCalculatorTest::testNodeCalculator()
     int width = 6;
 #endif
 
-    test(Depth(depth), Width(width), WorkerCount(6), TimeMs(2000));
-    test(Depth(depth), Width(width), WorkerCount(4), TimeMs(2000));
-    test(Depth(depth), Width(width), WorkerCount(3), TimeMs(2000));
-    test(Depth(depth), Width(width), WorkerCount(2), TimeMs(2000));
-    test(Depth(depth), Width(width), WorkerCount(1), TimeMs(2000));
-    test(Depth(1), Width(1), WorkerCount(1), TimeMs(2000));
+    test(Depth(depth), Width(width), WorkerCount(6), TimeMs(10000));
+    test(Depth(depth), Width(width), WorkerCount(4), TimeMs(10000));
+    test(Depth(depth), Width(width), WorkerCount(3), TimeMs(10000));
+    test(Depth(depth), Width(width), WorkerCount(2), TimeMs(10000));
+    test(Depth(depth), Width(width), WorkerCount(1), TimeMs(10000));
+    test(Depth(1), Width(1), WorkerCount(1), TimeMs(10000));
 }
 
 
