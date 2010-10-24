@@ -5,4 +5,3 @@ export CMAKE_OSX_ARCHITECTURES=i386
 cmake ../..
 make VERBOSE=1 -j6
 echo ""
-echo "Created executable: `find ../../Build -name test`"
