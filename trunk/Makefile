@@ -1,6 +1,6 @@
 :PHONY Darwin Xcode
 
-all: Darwin Xcode
+all: Darwin
 
 Darwin:
 	echo "Making Darwin"

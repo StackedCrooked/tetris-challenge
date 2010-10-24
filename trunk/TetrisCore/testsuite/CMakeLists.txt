@@ -1,10 +1,21 @@
 include_directories(../include)
-link_directories(${TETRISTESTSUITE_BINARY_DIR}/TetrisCore)
-link_directories(/usr/local/lib)
-add_executable(test 
+
+add_executable(${EXECUTABLE} 
     src/Driver.cpp 
     src/NodeCalculatorTest.cpp 
     src/TetrisCoreTestSuite.cpp 
     src/WorkerPoolTest.cpp 
     src/WorkerTest.cpp)
-target_link_libraries(test Tetris PocoFoundation CppUnit boost_thread)
+
+set_target_properties(${EXECUTABLE} PROPERTIES COMPILE_FLAGS "-arch i386")
+target_link_libraries(${EXECUTABLE} TetrisCore PocoFoundation CppUnit boost_thread)
+
+
+message("CMAKE_PROJECT_NAME: ${CMAKE_PROJECT_NAME}")
+message("BUILDDIR CMAKE_PROJECT_NAME: ${BUILDDIR}${CMAKE_PROJECT_NAME}")
+
+install(TARGETS         ${EXECUTABLE}
+        RUNTIME
+        DESTINATION     ${BUILDDIR}${CMAKE_PROJECT_NAME}
+        CONFIGURATIONS  ${CONFIGURATION})
+
