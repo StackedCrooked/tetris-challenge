@@ -35,13 +35,13 @@ namespace Tetris
 	}
 
 
-    void MultithreadedNodeCalculator::populateNodesMt(
-        NodePtr ioNode,
-        const BlockTypes & inBlockTypes,
-        const std::vector<int> & inWidths,
-        size_t inIndex,
-        size_t inMaxIndex)
+    void MultithreadedNodeCalculator::generateChildNodes(NodePtr ioNode,
+		                                                 Evaluator * inEvaluator,
+														 BlockType inBlockType,
+														 int inDepth,
+														 int inWidth)
     {
+		std::auto_ptr<Evaluator> evaluatorPtr(inEvaluator);
         //
         // Generate the child nodes.
         //
@@ -49,27 +49,27 @@ namespace Tetris
         // If that is the case then we immediately jump to the recursive call below.
         //
         ChildNodes childNodes = ioNode->children();
-        childNodes = ChildNodes(GameStateComparisonFunctor(mEvaluator->clone()));
-        GenerateOffspring(ioNode, inBlockTypes[inIndex], *mEvaluator, childNodes);
+		const Evaluator & evaluator(*evaluatorPtr);
+		childNodes = ChildNodes(GameStateComparisonFunctor(evaluatorPtr));
+        GenerateOffspring(ioNode, inBlockType, evaluator, childNodes);
 
         int count = 0;
         ChildNodes::iterator it = childNodes.begin(), end = childNodes.end();
-        while (count < inWidths[inIndex] && it != end)
+        while (count < inWidth && it != end)
         {
             ioNode->addChild(*it);
             ++count;
             ++it;
         }
-        updateLayerData(inIndex, *ioNode->children().begin(), count);
+		updateLayerData(inDepth - 1, *ioNode->children().begin(), count);
     }
 
 
-    void MultithreadedNodeCalculator::populateNodes(
-        NodePtr ioNode,
-        const BlockTypes & inBlockTypes,
-        const std::vector<int> & inWidths,
-        size_t inIndex,
-        size_t inMaxIndex)
+    void MultithreadedNodeCalculator::populateNodes(NodePtr ioNode,
+		                                            const BlockTypes & inBlockTypes,
+													const std::vector<int> & inWidths,
+													size_t inIndex,
+													size_t inEndIndex)
     {
 
         // We want to at least perform a depth-1 search.
@@ -88,11 +88,17 @@ namespace Tetris
         //
         // Check stop conditions
         //
-        Assert(inIndex < inMaxIndex);
-        if (inIndex + 1 == inMaxIndex)
+        Assert(inIndex < inEndIndex);
+        if (inIndex + 1 == inEndIndex)
         {
             Assert(ioNode->children().empty());
-            Worker::Task task = boost::bind(&MultithreadedNodeCalculator::populateNodesMt, this, ioNode, inBlockTypes, inWidths, inIndex, inMaxIndex);
+			Worker::Task task = boost::bind(&MultithreadedNodeCalculator::generateChildNodes,
+				                            this,
+											ioNode,
+											mEvaluator->clone().release(),
+											inBlockTypes[inIndex],
+											inIndex + 1,
+											inWidths[inIndex]);
             mWorkerPool.getWorker()->schedule(task);
         }
         else
@@ -102,7 +108,7 @@ namespace Tetris
             for (ChildNodes::iterator it = childNodes.begin(); it != childNodes.end(); ++it)
             {
                 NodePtr child = *it;
-                populateNodes(child, inBlockTypes, inWidths, inIndex + 1, inMaxIndex);
+                populateNodes(child, inBlockTypes, inWidths, inIndex + 1, inEndIndex);
             }                
         }
     }
