@@ -67,8 +67,8 @@ void WorkerPoolTest::testWorkerPool()
         pool.interruptAndClearQueue();
         mStopwatch.stop();
         int overhead = static_cast<int>(mStopwatch.elapsed() / 1000) - cSleepTime;
-        Assert(overhead > -200);
-        Assert(overhead < 200);
+        Assert(overhead > -500);
+        Assert(overhead < 500);
     }
 
     // Test setSize
@@ -93,8 +93,8 @@ void WorkerPoolTest::testWorkerPool()
 
         mStopwatch.stop();
         int overhead = static_cast<int>(mStopwatch.elapsed() / 1000) - cSleepTime;
-        Assert(overhead > -200);
-        Assert(overhead < 200);
+        Assert(overhead > -500);
+        Assert(overhead < 500);
     }
 
     // Test waitForAll
@@ -117,7 +117,7 @@ void WorkerPoolTest::testWorkerPool()
         }
         int overhead = static_cast<int>(mStopwatch.elapsed() / 1000) - 1000;
         Assert(overhead >= 0);
-        Assert(overhead < 200);
+        Assert(overhead < 500);
     }
 }
 
