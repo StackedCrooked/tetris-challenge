@@ -1,10 +1,8 @@
 rm -rf Build/
-mkdir Build
-cd Build
+mkdir -p Build/CMake
+cd Build/CMake
 export CMAKE_OSX_ARCHITECTURES=i386
-cmake ..
-cd Build
+cmake ../..
 make VERBOSE=1 -j6
 echo ""
-cd .. 
-echo "Created executable: `find Build -name test`"
+echo "Created executable: `find ../../Build -name test`"

@@ -1,5 +1,7 @@
 include_directories(include)
-add_library(Tetris 
+
+
+add_library(TetrisCore
     src/AISupport.cpp 
     src/Block.cpp 
     src/BlockFactory.cpp 
@@ -19,5 +21,8 @@ add_library(Tetris
     src/NodeCalculatorImpl.cpp 
     src/SingleThreadedNodeCalculator.cpp 
     src/Unicode.cpp 
-    src/Worker.cpp 
+    src/Worker.cpp
     src/WorkerPool.cpp)
+
+set_target_properties(TetrisCore PROPERTIES COMPILE_FLAGS "-arch i386")
+
