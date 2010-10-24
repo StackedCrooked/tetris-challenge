@@ -11,9 +11,6 @@ set_target_properties(${EXECUTABLE} PROPERTIES COMPILE_FLAGS "-arch i386")
 target_link_libraries(${EXECUTABLE} TetrisCore PocoFoundation CppUnit boost_thread)
 
 
-message("CMAKE_PROJECT_NAME: ${CMAKE_PROJECT_NAME}")
-message("BUILDDIR CMAKE_PROJECT_NAME: ${BUILDDIR}${CMAKE_PROJECT_NAME}")
-
 install(TARGETS         ${EXECUTABLE}
         RUNTIME
         DESTINATION     ${BUILDDIR}${CMAKE_PROJECT_NAME}
