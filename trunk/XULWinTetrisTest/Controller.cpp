@@ -528,7 +528,7 @@ namespace Tetris
         }
 
 
-        if (mMovementSpeed && mComputerPlayer)
+        if (mMovementSpeed)
         {
             mComputerPlayer->setMoveSpeed(XULWin::String2Int(mMovementSpeed->getValue(), 1));
         }
@@ -555,6 +555,17 @@ namespace Tetris
         if (mMovesAheadTextBox)
         {
             setText(mMovesAheadTextBox, MakeString() << (mGameCopy->lastPrecalculatedNode()->depth() - mGameCopy->currentNode()->depth()));
+        }
+
+
+        if (mSearchDepth)
+        {
+            mComputerPlayer->setSearchDepth(XULWin::String2Int(mSearchDepth->getValue(), 4));
+        }
+
+        if (mSearchWidth)
+        {
+            mComputerPlayer->setSearchWidth(XULWin::String2Int(mSearchWidth->getValue(), 4));
         }
 
 
