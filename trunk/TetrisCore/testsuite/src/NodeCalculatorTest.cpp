@@ -42,17 +42,26 @@ void NodeCalculatorTest::testNodeCalculator()
     int depth = 5;
     int width = 5;
 #endif
+    
+    {
+        WorkerPool workerPool("NodeCalculatorTest", 1);
+        for (size_t idx = 1; idx < 12; ++idx)
+        {
+            workerPool.setSize(idx);
+            testDestroy(workerPool);
+        }
+    }
 
-    test(Depth(depth), Width(width), WorkerCount(6), TimeMs(10000));
-    test(Depth(depth), Width(width), WorkerCount(4), TimeMs(10000));
-    test(Depth(depth), Width(width), WorkerCount(3), TimeMs(10000));
-    test(Depth(depth), Width(width), WorkerCount(2), TimeMs(10000));
-    test(Depth(depth), Width(width), WorkerCount(1), TimeMs(10000));
-    test(Depth(1), Width(1), WorkerCount(1), TimeMs(10000));
+    testInterrupt(Depth(depth), Width(width), WorkerCount(6), TimeMs(10000));
+    testInterrupt(Depth(depth), Width(width), WorkerCount(4), TimeMs(10000));
+    testInterrupt(Depth(depth), Width(width), WorkerCount(3), TimeMs(10000));
+    testInterrupt(Depth(depth), Width(width), WorkerCount(2), TimeMs(10000));
+    testInterrupt(Depth(depth), Width(width), WorkerCount(1), TimeMs(10000));
+    testInterrupt(Depth(1), Width(1), WorkerCount(1), TimeMs(10000));
 }
 
 
-void NodeCalculatorTest::test(Depth inDepth, Width inWidth, WorkerCount inWorkerCount, TimeMs inTimeMs)
+void NodeCalculatorTest::testInterrupt(Depth inDepth, Width inWidth, WorkerCount inWorkerCount, TimeMs inTimeMs)
 {
     std::cout << std::endl << "    Depth: " << inDepth << ", Width: " << inWidth << ", WorkerCount: " << inWorkerCount << ", TimeMs: " << inTimeMs;
     std::auto_ptr<GameStateNode> rootNode = GameStateNode::CreateRootNode(20, 10);
@@ -136,6 +145,51 @@ void NodeCalculatorTest::test(Depth inDepth, Width inWidth, WorkerCount inWorker
         Assert(nodeCalculator.getCurrentSearchDepth() < nodeCalculator.getMaxSearchDepth());
     }
     Assert(result.endNode()->children().empty());
+}
+
+
+void NodeCalculatorTest::testDestroy(WorkerPool & inWorkerPool)
+{
+    const int cWidth = 6;
+    const int cDepth = 6;
+    std::auto_ptr<GameStateNode> rootNode = GameStateNode::CreateRootNode(20, 10);
+
+    BlockTypes blockTypes;
+    BlockType type = BlockType_Begin;
+    for (int idx = 0; idx != cDepth; ++idx)
+    {
+        blockTypes.push_back(type);
+        type = (type + 1) < BlockType_End ? (type + 1) : BlockType_Begin;
+    }
+
+    std::vector<int> widths(cDepth, cWidth);
+
+    NodeCalculator nodeCalculator(rootNode->clone(), blockTypes, widths, rootNode->evaluator().clone(), inWorkerPool);
+
+    Assert(nodeCalculator.getCurrentSearchDepth() == 0);
+    Assert(blockTypes.size() == widths.size());
+    Assert(nodeCalculator.getMaxSearchDepth() == blockTypes.size());
+    Assert(nodeCalculator.status() == NodeCalculator::Status_Nil);
+    
+    nodeCalculator.start();
+
+    Assert(nodeCalculator.status() == NodeCalculator::Status_Started);
+
+    Poco::Stopwatch stopwatch;
+    stopwatch.start();
+    bool interrupted = false;
+    while (nodeCalculator.status() != NodeCalculator::Status_Finished)
+    {
+        if (nodeCalculator.status() != NodeCalculator::Status_Stopped)
+        {
+            if (stopwatch.elapsed() > 1000)
+            {
+                rootNode.reset();
+                break;
+            }
+        }
+        Poco::Thread::sleep(10);
+    }
 }
 
 

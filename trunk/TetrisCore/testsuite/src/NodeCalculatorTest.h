@@ -4,6 +4,7 @@
 
 #include "CppUnit/TestCase.h"
 #include "Tetris/TypedWrapper.h"
+#include "Tetris/WorkerPool.h"
 #include "Poco/Stopwatch.h"
 #include "Poco/Types.h"
 
@@ -22,7 +23,9 @@ public:
     Tetris_TypedWrapper(WorkerCount, int);
     Tetris_TypedWrapper(TimeMs, int);
 
-    void test(Depth inDepth, Width inWidth, WorkerCount inWorkerCount, TimeMs inTimeMs);
+    void testInterrupt(Depth inDepth, Width inWidth, WorkerCount inWorkerCount, TimeMs inTimeMs);
+
+    void testDestroy(Tetris::WorkerPool & inWorkerPool);
 	
 	void setUp();
 
