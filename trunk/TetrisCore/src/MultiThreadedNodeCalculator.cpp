@@ -105,7 +105,11 @@ namespace Tetris
         else
         {            
             ChildNodes childNodes = ioNode->children();
-            Assert(!childNodes.empty());
+            if (childNodes.empty())
+            {
+                LogWarning("Nodes have disappeared.");
+            }
+
             for (ChildNodes::iterator it = childNodes.begin(); it != childNodes.end(); ++it)
             {
                 NodePtr child = *it;
