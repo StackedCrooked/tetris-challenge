@@ -219,7 +219,8 @@ namespace Tetris
 
 
     LRESULT Controller::onNew(WPARAM wParam, LPARAM lParam)
-    {
+    {        
+        boost::mutex::scoped_lock lock(mGameCopyMutex);
         mComputerPlayer.reset();
         mGravity.reset();
         mProtectedGame.reset();
@@ -278,7 +279,6 @@ namespace Tetris
         if (HIWORD(wParam) == CBN_SELCHANGE)
         {
             updateStrategy();
-            ScopedAtom<Game> game(*mProtectedGame);
         }
         // Must return unhandled otherwise the popup menu stays.
         return XULWin::cUnhandled;

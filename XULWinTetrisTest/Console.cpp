@@ -8,6 +8,12 @@
 
 void AttachToConsole()
 {
+    static bool fAlreadyAttached = false;
+    if (fAlreadyAttached)
+    {
+        return;
+    }
+
     if (!::AttachConsole(ATTACH_PARENT_PROCESS))
     {
         if (::GetLastError() == ERROR_ACCESS_DENIED)
@@ -30,4 +36,6 @@ void AttachToConsole()
     setvbuf(stdin, NULL, _IONBF, 0);
     // Fix all cout, wcout, cin, wcin, cerr, wcerr, clog and wclog.
     std::ios::sync_with_stdio();
+
+    fAlreadyAttached = true;
 }
