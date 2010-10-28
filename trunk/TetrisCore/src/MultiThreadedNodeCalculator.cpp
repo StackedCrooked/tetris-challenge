@@ -31,12 +31,8 @@ namespace Tetris
 		
 	MultithreadedNodeCalculator::~MultithreadedNodeCalculator()
 	{
-		// We must stop all workers here or else they will be referencing a destroyed object.
         mMainWorker.interruptAndClearQueue();
-        mMainWorker.waitForStatus(Worker::Status_Waiting);
-
 		mWorkerPool.interruptAndClearQueue();
-        mWorkerPool.waitForAll();
 	}
 
 
@@ -140,6 +136,7 @@ namespace Tetris
                 boost::mutex::scoped_lock lock(mNodeMutex);
                 populateNodes(mNode, mBlockTypes, mWidths, 0, targetDepth);
                 mWorkerPool.waitForAll();
+                Assert(mWorkerPool.stats().activeWorkerCount == 0);
                 markTreeRowAsFinished(targetDepth - 1);
                 targetDepth++;
             }
@@ -147,7 +144,10 @@ namespace Tetris
         catch (const boost::thread_interrupted &)
         {
             // Task was interrupted. Ok.
-            mWorkerPool.interruptAndClearQueue();
+            if (getCurrentSearchDepth() >= 1)
+            {
+                mWorkerPool.interruptAndClearQueue();
+            }
         }
         catch (const std::exception & inException)
         {
@@ -155,6 +155,7 @@ namespace Tetris
             mWorkerPool.interruptAndClearQueue();
         }        
         mWorkerPool.waitForAll();
+        Assert(getCurrentSearchDepth() >= 1);
     }
 
 } // namespace Tetris

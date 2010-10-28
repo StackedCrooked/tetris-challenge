@@ -174,23 +174,8 @@ void NodeCalculatorTest::testDestroy(WorkerPool & inWorkerPool)
     
     nodeCalculator.start();
 
-    Assert(nodeCalculator.status() == NodeCalculator::Status_Started);
-
-    Poco::Stopwatch stopwatch;
-    stopwatch.start();
-    bool interrupted = false;
-    while (nodeCalculator.status() != NodeCalculator::Status_Finished)
-    {
-        if (nodeCalculator.status() != NodeCalculator::Status_Stopped)
-        {
-            if (stopwatch.elapsed() > 1000)
-            {
-                rootNode.reset();
-                break;
-            }
-        }
-        Poco::Thread::sleep(10);
-    }
+    Assert(nodeCalculator.status() >= NodeCalculator::Status_Started);
+    Poco::Thread::sleep(10);
 }
 
 
