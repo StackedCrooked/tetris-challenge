@@ -68,15 +68,29 @@ namespace Tetris
 
     void WorkerPool::waitForAll()
     {
-        boost::mutex::scoped_lock workersLock(mWorkersMutex);
+        std::vector<boost::shared_ptr<boost::mutex::scoped_lock> > queueLocks(mWorkers.size());
+        std::vector<boost::shared_ptr<boost::mutex::scoped_lock> > statusLocks(mWorkers.size());
 
+        //
+        // Lock all workers' queue and status.
+        //
         for (size_t idx = 0; idx != mWorkers.size(); ++idx)
         {
             Worker & worker = *mWorkers[idx];
-            while (worker.size() > 0 || worker.status() != Worker::Status_Waiting)
+            queueLocks[idx].reset(new boost::mutex::scoped_lock(worker.mQueueMutex));
+            statusLocks[idx].reset(new boost::mutex::scoped_lock(worker.mStatusMutex));
+        }
+
+        //
+        // Wait for Status_Waiting or Status_FinishedOne on all workers.
+        //
+        for (size_t idx = 0; idx != mWorkers.size(); ++idx)
+        {
+            Worker & worker = *mWorkers[idx];
+            while (!worker.mQueue.empty() || (worker.mStatus != Worker::Status_Waiting && worker.mStatus != Worker::Status_FinishedOne))
             {
-                mWorkers[idx]->waitForStatus(Worker::Status_Waiting);
-            }            
+                worker.mStatusCondition.wait(*statusLocks[idx]);
+            }
         }
     }
     
