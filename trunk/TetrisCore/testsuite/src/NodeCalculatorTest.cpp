@@ -43,6 +43,7 @@ void NodeCalculatorTest::testNodeCalculator()
     int width = 5;
 #endif
     
+    for (size_t idx = 0; idx != 10; ++idx)
     {
         WorkerPool workerPool("NodeCalculatorTest", 1);
         for (size_t idx = 1; idx < 12; ++idx)

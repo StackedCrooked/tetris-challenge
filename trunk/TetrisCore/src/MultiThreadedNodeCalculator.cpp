@@ -32,17 +32,20 @@ namespace Tetris
 	MultithreadedNodeCalculator::~MultithreadedNodeCalculator()
 	{
 		// We must stop all workers here or else they will be referencing a destroyed object.
+        mMainWorker.interruptAndClearQueue();
+        mMainWorker.waitForStatus(Worker::Status_Waiting);
+
 		mWorkerPool.interruptAndClearQueue();
+        mWorkerPool.waitForAll();
 	}
 
 
     void MultithreadedNodeCalculator::generateChildNodes(NodePtr ioNode,
-		                                                 Evaluator * inEvaluator,
+                                                         boost::shared_ptr<Evaluator> inEvaluator,
 														 BlockType inBlockType,
 														 int inDepth,
 														 int inWidth)
     {
-		std::auto_ptr<Evaluator> evaluatorPtr(inEvaluator);
         //
         // Generate the child nodes.
         //
@@ -50,9 +53,8 @@ namespace Tetris
         // If that is the case then we immediately jump to the recursive call below.
         //
         ChildNodes childNodes = ioNode->children();
-		const Evaluator & evaluator(*evaluatorPtr);
-		childNodes = ChildNodes(GameStateComparisonFunctor(evaluatorPtr));
-        GenerateOffspring(ioNode, inBlockType, evaluator, childNodes);
+        childNodes = ChildNodes(GameStateComparisonFunctor(inEvaluator->clone()));
+        GenerateOffspring(ioNode, inBlockType, *inEvaluator, childNodes);
 
         int count = 0;
         ChildNodes::iterator it = childNodes.begin(), end = childNodes.end();
@@ -93,10 +95,11 @@ namespace Tetris
         if (inIndex + 1 == inEndIndex)
         {
             Assert(ioNode->children().empty());
+            boost::shared_ptr<Evaluator> evaluator(mEvaluator->clone().release());
 			Worker::Task task = boost::bind(&MultithreadedNodeCalculator::generateChildNodes,
 				                            this,
 											ioNode,
-											mEvaluator->clone().release(),
+										    evaluator,
 											inBlockTypes[inIndex],
 											inIndex + 1,
 											inWidths[inIndex]);
@@ -149,7 +152,9 @@ namespace Tetris
         catch (const std::exception & inException)
         {
             LogError(MakeString() << "Exception caught in MultithreadedNodeCalculator::populate(). Detail: " << inException.what());
-        }
+            mWorkerPool.interruptAndClearQueue();
+        }        
+        mWorkerPool.waitForAll();
     }
 
 } // namespace Tetris
