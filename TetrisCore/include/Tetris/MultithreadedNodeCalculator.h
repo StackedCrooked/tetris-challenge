@@ -3,6 +3,7 @@
 
 
 #include "Tetris/NodeCalculatorImpl.h"
+#include "boost/shared_ptr.hpp"
 
 
 namespace Tetris
@@ -21,13 +22,13 @@ namespace Tetris
 
     private:
         virtual void populate();
-        
+
         void generateChildNodes(NodePtr ioNode,
-			                    Evaluator * inEvaluator,
-								BlockType inBlockType,
-								int inDepth,
-								int inWidth);
-        
+                                boost::shared_ptr<Evaluator> inEvaluator,
+                                BlockType inBlockType,
+                                int inDepth,
+                                int inWidth);
+
         void populateNodes(NodePtr ioNode,
                            const BlockTypes & inBlockTypes,
                            const std::vector<int> & inWidths,
