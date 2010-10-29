@@ -47,7 +47,7 @@ void WorkerPoolTest::testWorkerPool()
         WorkerPool pool("WorkerPool Test", cPoolSize[i]);
         for (size_t idx = 0; idx != cPoolSize[i]; ++idx)
         {
-            pool.getWorker()->schedule(boost::bind(&Poco::Thread::sleep, cSleepTime));
+            pool.schedule(boost::bind(&Poco::Thread::sleep, cSleepTime));
         }
         mStopwatch.stop();
         int overhead = static_cast<int>(mStopwatch.elapsed() / 1000) - cSleepTime;
@@ -62,7 +62,7 @@ void WorkerPoolTest::testWorkerPool()
         WorkerPool pool("WorkerPool Test", cPoolSize[i]);
         for (size_t idx = 0; idx != cPoolSize[i]; ++idx)
         {
-            pool.getWorker()->schedule(boost::bind(&WorkerPoolTest::BeBusy));
+            pool.schedule(boost::bind(&WorkerPoolTest::BeBusy));
         }
         pool.interruptAndClearQueue();
         mStopwatch.stop();
@@ -78,7 +78,7 @@ void WorkerPoolTest::testWorkerPool()
         WorkerPool pool("WorkerPool Test", cPoolSize[i]);
         for (size_t idx = 0; idx != cPoolSize[i]; ++idx)
         {
-            pool.getWorker()->schedule(boost::bind(&WorkerPoolTest::BeBusy));
+            pool.schedule(boost::bind(&WorkerPoolTest::BeBusy));
         }
 
         pool.setSize(cPoolSize[i]);
@@ -97,24 +97,18 @@ void WorkerPoolTest::testWorkerPool()
         Assert(overhead < 500);
     }
 
-    // Test waitForAll
+    // Test joinAll
     {
         mStopwatch.restart();
         WorkerPool pool("WorkerPool Test", 10);
         Assert(pool.size() == 10);
         for (size_t i = 0; i < pool.size(); ++i)
         {
-            pool.getWorker()->schedule(boost::bind(&Poco::Thread::sleep, 1000));
+            pool.schedule(boost::bind(&Poco::Thread::sleep, 1000));
         }
-        pool.waitForAll();
+        pool.wait();
         mStopwatch.stop();
         Assert(pool.size() == 10);
-        for (size_t i = 0; i < pool.size(); ++i)
-        {
-            Worker & worker = *pool.getWorker(i);
-            Assert(worker.size() == 0);
-            Assert(worker.status() == Worker::Status_Waiting);
-        }
         int overhead = static_cast<int>(mStopwatch.elapsed() / 1000) - 1000;
         Assert(overhead >= 0);
         Assert(overhead < 500);

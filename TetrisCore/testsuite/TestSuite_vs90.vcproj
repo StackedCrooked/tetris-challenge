@@ -222,6 +222,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\NodeCalculatorTest.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\src\NodeCalculatorTest.h"
 				>
 			</File>
@@ -250,10 +254,6 @@
 				>
 			</File>
 		</Filter>
-		<File
-			RelativePath=".\src\NodeCalculatorTest.cpp"
-			>
-		</File>
 		<File
 			RelativePath="..\Todo.txt"
 			>

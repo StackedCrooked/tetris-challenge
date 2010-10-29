@@ -52,7 +52,7 @@ void WorkerTest::testWorkerImpl()
     Worker worker("TestWorker");
     assertEqual(worker.name(), "TestWorker");
     assertEqual(worker.status(), Worker::Status_Waiting);
-    worker.waitForStatus(Worker::Status_Waiting);
+    worker.wait();
     worker.interrupt();
     worker.interruptAndClearQueue();
     assertEqual(worker.size(), 0);
@@ -63,7 +63,7 @@ void WorkerTest::testWorkerImpl()
     worker.schedule(boost::bind(&Poco::Thread::sleep, cSleepTimeMs));
     worker.waitForStatus(Worker::Status_Working);
     assertEqual(worker.size(), 0);
-    worker.waitForStatus(Worker::Status_Waiting);
+    worker.wait();
     mStopwatch.stop();
     Assert(mStopwatch.elapsed() / 1000.0 >= cSleepTimeMs - 100);
     Assert(mStopwatch.elapsed() / 1000.0 < 100 + cSleepTimeMs);
