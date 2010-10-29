@@ -239,7 +239,7 @@ namespace Tetris
         mImpl = 0;
     }
 
-    
+
     int ComputerPlayer::searchDepth() const
     {
         return mImpl->searchDepth();
