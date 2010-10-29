@@ -11,14 +11,29 @@ namespace Tetris
     class BlockImpl
     {
     public:
-        BlockImpl(BlockType inType, Rotation inRotation, Row inRow, Column inColumn) :
-            mType(inType),
-            mRotation(inRotation.get()),
-            mRow(inRow.get()),
-            mColumn(inColumn.get()),
-            mGrid(&GetGrid(GetBlockIdentifier(inType, inRotation.get())))
-        {
-        }
+        BlockImpl(BlockType inType, Rotation inRotation, Row inRow, Column inColumn);
+
+        BlockType type() const;
+
+        size_t rotation() const;
+
+        size_t numRotations() const;
+
+        const Grid & grid() const;
+
+        size_t row() const;
+
+        size_t column() const;
+
+        void rotate();
+
+        void setRow(size_t inRow);
+
+        void setColumn(size_t inColumn);
+
+        void setRotation(size_t inRotation);
+
+    private:
         BlockType mType;
         size_t mRotation;
         size_t mRow;
@@ -27,10 +42,81 @@ namespace Tetris
     };
 
 
+    BlockImpl::BlockImpl(BlockType inType, Rotation inRotation, Row inRow, Column inColumn) :
+        mType(inType),
+        mRotation(inRotation.get()),
+        mRow(inRow.get()),
+        mColumn(inColumn.get()),
+        mGrid(&GetGrid(GetBlockIdentifier(inType, inRotation.get())))
+    {
+        Assert(mRotation >= 0 && mRotation <= 3);
+    }
+
+
+    BlockType BlockImpl::type() const
+    {
+        return mType;
+    }
+
+
+    size_t BlockImpl::rotation() const
+    {
+        return mRotation;
+    }
+
+
+    size_t BlockImpl::numRotations() const
+    {
+        return GetBlockRotationCount(mType);
+    }
+
+
+    const Grid & BlockImpl::grid() const
+    {
+        return *mGrid;
+    }
+
+
+    size_t BlockImpl::row() const
+    {
+        return mRow;
+    }
+
+
+    size_t BlockImpl::column() const
+    {
+        return mColumn;
+    }
+
+
+    void BlockImpl::setRow(size_t inRow)
+    {
+        mRow = inRow;
+    }
+
+
+    void BlockImpl::setColumn(size_t inColumn)
+    {
+        mColumn = inColumn;
+    }
+
+
+    void BlockImpl::setRotation(size_t inRotation)
+    {
+        mRotation = inRotation % GetBlockRotationCount(mType);
+        mGrid = &GetGrid(GetBlockIdentifier(mType, mRotation));
+    }
+
+
+    void BlockImpl::rotate()
+    {
+        setRotation((mRotation + 1) % GetBlockRotationCount(mType));
+    }
+
+
     Block::Block(BlockType inType, Rotation inRotation, Row inRow, Column inColumn) :
         mImpl(new BlockImpl(inType, inRotation, inRow, inColumn))
     {
-        Assert(mImpl->mRotation >= 0 && mImpl->mRotation <= 3);
     }
 
 
@@ -60,62 +146,61 @@ namespace Tetris
 
     BlockType Block::type() const
     {
-        return mImpl->mType;
+        return mImpl->type();
     }
 
 
     size_t Block::rotation() const
     {
-        return mImpl->mRotation;
+        return mImpl->rotation();
     }
 
 
     size_t Block::numRotations() const
     {
-        return GetBlockRotationCount(mImpl->mType);
+        return mImpl->numRotations();
     }
 
 
     const Grid & Block::grid() const
     {
-        return *mImpl->mGrid;
+        return mImpl->grid();
     }
 
 
     size_t Block::row() const
     {
-        return mImpl->mRow;
+        return mImpl->row();
     }
 
 
     size_t Block::column() const
     {
-        return mImpl->mColumn;
+        return mImpl->column();
     }
 
 
     void Block::setRow(size_t inRow)
     {
-        mImpl->mRow = inRow;
+        mImpl->setRow(inRow);
     }
 
 
     void Block::setColumn(size_t inColumn)
     {
-        mImpl->mColumn = inColumn;
+        mImpl->setColumn(inColumn);
     }
 
 
     void Block::setRotation(size_t inRotation)
     {
-        mImpl->mRotation = inRotation % GetBlockRotationCount(mImpl->mType);
-        mImpl->mGrid = &GetGrid(GetBlockIdentifier(mImpl->mType, mImpl->mRotation));
+        mImpl->setRotation(inRotation);
     }
 
 
     void Block::rotate()
     {
-        setRotation((mImpl->mRotation + 1) % GetBlockRotationCount(mImpl->mType));
+        mImpl->rotate();
     }
 
 
