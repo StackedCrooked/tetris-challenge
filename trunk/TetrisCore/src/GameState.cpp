@@ -268,13 +268,6 @@ namespace Tetris
     }
 
 
-    GameState::~GameState()
-    {
-        delete mImpl;
-        mImpl = 0;
-    }
-
-
     bool GameState::isGameOver() const
     {
         return mImpl->mIsGameOver;

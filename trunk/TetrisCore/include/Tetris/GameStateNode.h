@@ -68,9 +68,8 @@ namespace Tetris
 
         // Constructor for creating a root node.
         GameStateNode(std::auto_ptr<GameState> inGameState, std::auto_ptr<Evaluator> inEvaluator);
-        
 
-        GameStateNodeImpl * mImpl;
+        std::auto_ptr<GameStateNodeImpl> mImpl;
     };
 
 } // namespace Tetris

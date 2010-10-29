@@ -24,8 +24,6 @@ namespace Tetris
                        int inSearchDepth,
                        int inSearchWidth);
 
-        ~ComputerPlayer();
-
         int searchDepth() const;
 
         void setSearchDepth(int inSearchDepth);
@@ -49,7 +47,7 @@ namespace Tetris
         ComputerPlayer(const ComputerPlayer &);
         ComputerPlayer & operator= (const ComputerPlayer&);
 
-        ComputerPlayerImpl * mImpl;
+        std::auto_ptr<ComputerPlayerImpl> mImpl;
     };
 
 } // namespace Tetris

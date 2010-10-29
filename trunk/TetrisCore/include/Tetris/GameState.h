@@ -29,8 +29,6 @@ namespace Tetris
         
         GameState(const GameState &);
 
-        ~GameState();
-
         const Grid & grid() const;
 
         Grid & grid();
@@ -62,7 +60,7 @@ namespace Tetris
         GameState& operator=(const GameState&);
 
         friend class GameStateImpl;
-        GameStateImpl * mImpl;
+        std::auto_ptr<GameStateImpl> mImpl;
     };
 
 

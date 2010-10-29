@@ -233,13 +233,6 @@ namespace Tetris
     }
 
 
-    ComputerPlayer::~ComputerPlayer()
-    {
-        delete mImpl;
-        mImpl = 0;
-    }
-
-
     int ComputerPlayer::searchDepth() const
     {
         return mImpl->searchDepth();

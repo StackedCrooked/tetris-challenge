@@ -468,13 +468,6 @@ namespace Tetris
     }
 
 
-    Game::~Game()
-    {
-        delete mImpl;
-        mImpl = 0;
-    }
-
-    
     std::auto_ptr<Game> Game::clone()
     {
         return std::auto_ptr<Game>(new Game(mImpl->clone()));

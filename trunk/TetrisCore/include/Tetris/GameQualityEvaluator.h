@@ -39,6 +39,8 @@ namespace Tetris
                   SearchDepth inRecommendedSearchDepth,
                   SearchWidth inRecommendedSearchWidth);
 
+        virtual ~Evaluator() {}
+
         virtual std::auto_ptr<Evaluator> clone() const
         { return Create<Evaluator>(*this); }
 
