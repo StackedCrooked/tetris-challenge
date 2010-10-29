@@ -7,7 +7,6 @@
 #include "Poco/Stopwatch.h"
 #include <stdexcept>
 #include <iostream>
-#include <windows.h>
 
 
 using namespace Tetris;
@@ -18,7 +17,7 @@ int SimpleTest()
     std::cout << "Running a simple test..." << std::endl;
 
     int result = 0;    
-    ThreadSafeGame threadSafeGame(std::auto_ptr<Game>(new Game));
+    ThreadSafeGame threadSafeGame(std::auto_ptr<Game>(new Game(10)));
     while (!ReadOnlyGame(threadSafeGame)->isGameOver())
     {
         std::auto_ptr<GameStateNode> currentNode;
@@ -55,14 +54,6 @@ int SimpleTest()
     }
     std::cout << "Game over!" << std::endl;
     return ReadOnlyGame(threadSafeGame)->currentNode()->state().stats().numLines();
-}
-
-
-int GetCPUCount()
-{    
-    SYSTEM_INFO sysinfo;
-    GetSystemInfo(&sysinfo);
-    return static_cast<int>(sysinfo.dwNumberOfProcessors);
 }
 
 

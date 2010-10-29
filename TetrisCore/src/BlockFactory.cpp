@@ -41,13 +41,6 @@ namespace Tetris
     }
 
 
-    BlockFactory::~BlockFactory()
-    {
-        delete mImpl;
-        mImpl = 0;
-    }
-
-
     BlockType BlockFactory::getNext() const
     {
         if (mImpl->mCurrentIndex >= mImpl->mBag.size())

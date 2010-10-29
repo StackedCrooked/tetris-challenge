@@ -4,6 +4,7 @@
 
 #include "Tetris/Grid.h"
 #include "Tetris/TypedWrapper.h"
+#include <memory>
 
 
 namespace Tetris
@@ -32,8 +33,6 @@ namespace Tetris
 
         Block & operator=(const Block & inBlock);
 
-        ~Block();
-
         BlockType type() const;
 
         // Get the grid associated with this block
@@ -56,7 +55,7 @@ namespace Tetris
         void setRotation(size_t inRotation);
 
     private:
-        BlockImpl * mImpl;
+        std::auto_ptr<BlockImpl> mImpl;
     };
 
 

@@ -2,6 +2,9 @@
 #define TETRIS_GRAVITY_H_INCLUDED
 
 
+#include <memory>
+
+
 namespace Tetris
 {
     
@@ -23,8 +26,6 @@ namespace Tetris
     public:
         Gravity(const Protected<Game> & inGame);
 
-        ~Gravity();
-
         // Number of rows per second
         float currentSpeed() const;
 
@@ -34,7 +35,7 @@ namespace Tetris
         Gravity(const Gravity &);
         Gravity & operator=(const Gravity &);
 
-        GravityImpl * mImpl;
+        std::auto_ptr<GravityImpl> mImpl;
     };
 
 } // namespace Tetris

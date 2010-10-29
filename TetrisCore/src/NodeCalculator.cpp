@@ -41,13 +41,6 @@ namespace Tetris
     }
 
 
-    NodeCalculator::~NodeCalculator()
-    {
-        delete mImpl;
-        mImpl = 0;
-    }
-
-
     void NodeCalculator::start()
     {
         return mImpl->start();

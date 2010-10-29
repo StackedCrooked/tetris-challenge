@@ -1,6 +1,10 @@
 :PHONY Darwin Xcode
 
-all: Darwin
+all: Linux
+
+Linux:
+	echo "Making Linux"
+	Scripts/Make/MakeLinux.sh
 
 Darwin:
 	echo "Making Darwin"
