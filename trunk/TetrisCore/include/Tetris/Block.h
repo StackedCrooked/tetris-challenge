@@ -33,6 +33,8 @@ namespace Tetris
 
         Block & operator=(const Block & inBlock);
 
+        ~Block();
+
         BlockType type() const;
 
         // Get the grid associated with this block
@@ -55,7 +57,7 @@ namespace Tetris
         void setRotation(size_t inRotation);
 
     private:
-        std::auto_ptr<BlockImpl> mImpl;
+        BlockImpl * mImpl;
     };
 
 

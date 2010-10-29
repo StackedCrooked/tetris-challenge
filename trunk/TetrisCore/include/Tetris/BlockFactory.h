@@ -19,6 +19,8 @@ namespace Tetris
         // The size of the bag of blocks that shuffled and taken from.
         BlockFactory(int inBagSize = 1);
 
+        ~BlockFactory();
+
         // Returns a random block type.
         BlockType getNext() const;
 
@@ -26,7 +28,7 @@ namespace Tetris
         BlockFactory(const BlockFactory &);
         BlockFactory& operator=(const BlockFactory&);
 
-        std::auto_ptr<BlockFactoryImpl> mImpl;
+        BlockFactoryImpl * mImpl;
     };
 
 } // namespace Tetris

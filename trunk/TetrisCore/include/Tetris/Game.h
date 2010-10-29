@@ -28,6 +28,8 @@ namespace Tetris
     public:
         Game(size_t inNumRows, size_t inNumColumns);
 
+        ~Game();
+
         std::auto_ptr<Game> clone();
 
         bool isGameOver() const;
@@ -79,7 +81,7 @@ namespace Tetris
         // not allowed
         Game & operator=(const Game&);
 
-        std::auto_ptr<GameImpl> mImpl;
+        GameImpl * mImpl;
     };
 
 } // namespace Tetris

@@ -104,6 +104,13 @@ namespace Tetris
     {
     }
 
+
+    Gravity::~Gravity()
+    {
+        delete mImpl;
+        mImpl = 0;
+    }
+
     
     float Gravity::currentSpeed() const
     {
