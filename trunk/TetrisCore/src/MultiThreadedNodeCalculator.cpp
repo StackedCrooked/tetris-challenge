@@ -99,7 +99,7 @@ namespace Tetris
 											inBlockTypes[inIndex],
 											inIndex + 1,
 											inWidths[inIndex]);
-            mWorkerPool.getWorker()->schedule(task);
+            mWorkerPool.schedule(task);
         }
         else
         {            
@@ -135,7 +135,7 @@ namespace Tetris
             {
                 boost::mutex::scoped_lock lock(mNodeMutex);
                 populateNodes(mNode, mBlockTypes, mWidths, 0, targetDepth);
-                mWorkerPool.waitForAll();
+                mWorkerPool.wait();
                 Assert(mWorkerPool.stats().activeWorkerCount == 0);
                 markTreeRowAsFinished(targetDepth - 1);
                 targetDepth++;
@@ -154,7 +154,7 @@ namespace Tetris
             LogError(MakeString() << "Exception caught in MultithreadedNodeCalculator::populate(). Detail: " << inException.what());
             mWorkerPool.interruptAndClearQueue();
         }        
-        mWorkerPool.waitForAll();
+        mWorkerPool.wait();
         Assert(getCurrentSearchDepth() >= 1);
     }
 

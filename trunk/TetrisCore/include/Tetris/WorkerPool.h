@@ -20,13 +20,9 @@ namespace Tetris
 
         ~WorkerPool();
 
-        inline const std::string & name() const { return mName; }
+        const std::string & name() const { return mName; }
 
-        // Returns a different worker on each call.
-        // This enables you to evenly spread tasks.
-        WorkerPtr getWorker();
-
-        WorkerPtr getWorker(size_t inIndex);
+        void schedule(const Worker::Task & inTask);
 
         // Returns the number of workers.
         size_t size() const;
@@ -36,7 +32,7 @@ namespace Tetris
         void setSize(size_t inSize);
 
         // Wait until all Workers have finished their queue
-        void waitForAll();
+        void wait();
         
         // Interrupts all workers.
         void interruptAndClearQueue();
@@ -67,7 +63,7 @@ namespace Tetris
         mutable size_t mRotation;
 
         Workers mWorkers;
-        mutable boost::mutex mWorkersMutex;
+        mutable boost::mutex mMutex;
     };
 
 } // namespace Tetris

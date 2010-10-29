@@ -118,6 +118,12 @@ namespace Tetris
         boost::mutex::scoped_lock lock(mStatusMutex);
         return mStatus;
     }
+
+
+    void Worker::wait()
+    {
+        waitForStatus(Status_Waiting);
+    }
     
     
     void Worker::waitForStatus(Status inStatus)
@@ -147,12 +153,12 @@ namespace Tetris
 
     void Worker::interruptAndClearQueue()
     {
-        boost::scoped_ptr<boost::mutex::scoped_lock> queueLock(new boost::mutex::scoped_lock(mQueueMutex));
+        boost::mutex::scoped_lock queueLock(mQueueMutex);
         mQueue.clear();
         boost::mutex::scoped_lock statusLock(mStatusMutex);
         mThread->interrupt();
         mQueueCondition.notify_all();
-        queueLock.reset();
+        queueLock.unlock();
         mStatusCondition.wait(statusLock);
     }
 

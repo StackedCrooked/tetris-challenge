@@ -55,6 +55,9 @@ namespace Tetris
          */
         Status status() const;
 
+        // Wait for the Worker to finish all tasks.
+        void wait();
+
         void waitForStatus(Status inStatus);
 
         /**
@@ -74,6 +77,7 @@ namespace Tetris
         void interruptAndClearQueue();
 
     private:
+
         friend class WorkerPool;
         void setQuitFlag();
         bool getQuitFlag() const;
