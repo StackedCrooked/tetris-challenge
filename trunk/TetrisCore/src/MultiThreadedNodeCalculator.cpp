@@ -42,35 +42,22 @@ namespace Tetris
 														 int inDepth,
 														 int inWidth)
     {
-        //
-        // Generate the child nodes.
-        //
-        // It is possible that the nodes were already generated at this depth.
-        // If that is the case then we immediately jump to the recursive call below.
-        //
-        ChildNodes childNodes = ioNode->children(); // use copy in order to have the same evaluator
-        Assert(childNodes.empty());
-
-        childNodes = ChildNodes(GameStateComparisonFunctor(inEvaluator->clone()));
+        ChildNodes childNodes = ChildNodes(GameStateComparisonFunctor(inEvaluator->clone()));
         GenerateOffspring(ioNode, inBlockType, *inEvaluator, childNodes);
         if (childNodes.empty())
         {
             throw std::logic_error("GenerateOffspring produced zero children. This should not happen!");
         }
 
-        Assert(!childNodes.empty());
-        if (!childNodes.empty())
+        int count = 0;
+        ChildNodes::iterator it = childNodes.begin(), end = childNodes.end();
+        while (count < inWidth && it != end)
         {
-            int count = 0;
-            ChildNodes::iterator it = childNodes.begin(), end = childNodes.end();
-            while (count < inWidth && it != end)
-            {
-                ioNode->addChild(*it);
-                ++count;
-                ++it;
-            }
-            mTreeRowInfos.registerNode(*ioNode->children().begin(), inDepth);
+            ioNode->addChild(*it);
+            ++count;
+            ++it;
         }
+        mTreeRowInfos.registerNode(*ioNode->children().begin(), inDepth);
     }
 
 
@@ -81,7 +68,7 @@ namespace Tetris
 													size_t inEndIndex)
     {
 
-        // We want to at least perform a depth-1 search.
+        // We want to at least perform a depth - 1 search.
         if (inIndex > 0)
         {
             boost::this_thread::interruption_point();
@@ -110,6 +97,8 @@ namespace Tetris
 											inIndex + 1,
 											inWidths[inIndex]);
             mWorkerPool.schedule(task);
+            
+            // End of recursion.
         }
         else
         {            
@@ -122,6 +111,8 @@ namespace Tetris
             for (ChildNodes::iterator it = childNodes.begin(); it != childNodes.end(); ++it)
             {
                 NodePtr child = *it;
+
+                // Start recursion.
                 populateNodes(child, inBlockTypes, inWidths, inIndex + 1, inEndIndex);
             }                
         }
