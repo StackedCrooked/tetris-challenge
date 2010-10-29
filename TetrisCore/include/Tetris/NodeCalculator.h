@@ -56,7 +56,7 @@ namespace Tetris
         NodeCalculator(const NodeCalculator &);
         NodeCalculator & operator=(const NodeCalculator &);
 
-        std::auto_ptr<NodeCalculatorImpl> mImpl;
+        NodeCalculatorImpl * mImpl;
     };
 
 } // namespace Tetris

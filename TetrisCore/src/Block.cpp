@@ -44,9 +44,17 @@ namespace Tetris
     {
         if (&rhs != this)
         {
-            mImpl.reset(new BlockImpl(*rhs.mImpl));
+            delete mImpl;
+            mImpl = new BlockImpl(*rhs.mImpl);
         }
         return *this;
+    }
+
+
+    Block::~Block()
+    {
+        delete mImpl;
+        mImpl = 0;
     }
 
 

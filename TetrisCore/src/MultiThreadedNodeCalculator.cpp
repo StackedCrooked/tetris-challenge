@@ -68,7 +68,7 @@ namespace Tetris
 													size_t inEndIndex)
     {
 
-        // We want to at least perform a depth - 1 search.
+        // We want to at least perform a search of depth 1.
         if (inIndex > 0)
         {
             boost::this_thread::interruption_point();

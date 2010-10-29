@@ -29,6 +29,8 @@ namespace Tetris
 
         GameStateNode(NodePtr inParent, std::auto_ptr<GameState> inGameState, std::auto_ptr<Evaluator> inEvaluator);
 
+        ~GameStateNode();
+
         // Creates a deep copy of this node and all child nodes.
         std::auto_ptr<GameStateNode> clone() const;
 
@@ -69,7 +71,7 @@ namespace Tetris
         // Constructor for creating a root node.
         GameStateNode(std::auto_ptr<GameState> inGameState, std::auto_ptr<Evaluator> inEvaluator);
 
-        std::auto_ptr<GameStateNodeImpl> mImpl;
+        GameStateNodeImpl * mImpl;
     };
 
 } // namespace Tetris

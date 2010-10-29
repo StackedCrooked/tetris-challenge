@@ -7,11 +7,9 @@
 
 namespace Tetris
 {
-    
+
     template<class Variable> class Protected;
     class Game;
-
-
     class GravityImpl;
 
 
@@ -26,6 +24,8 @@ namespace Tetris
     public:
         Gravity(const Protected<Game> & inGame);
 
+        ~Gravity();
+
         // Number of rows per second
         float currentSpeed() const;
 
@@ -35,7 +35,7 @@ namespace Tetris
         Gravity(const Gravity &);
         Gravity & operator=(const Gravity &);
 
-        std::auto_ptr<GravityImpl> mImpl;
+        GravityImpl * mImpl;
     };
 
 } // namespace Tetris

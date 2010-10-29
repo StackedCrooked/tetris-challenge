@@ -104,6 +104,13 @@ namespace Tetris
     }
 
 
+    GameStateNode::~GameStateNode()
+    {
+        delete mImpl;
+        mImpl = 0;
+    }
+
+
     std::auto_ptr<GameStateNode> GameStateNode::clone() const
     {
         return mImpl->clone();

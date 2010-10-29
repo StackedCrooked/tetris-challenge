@@ -127,132 +127,142 @@ namespace Tetris
     class GameStateImpl
     {
     public:
-        GameStateImpl(size_t inNumRows, size_t inNumColumns) :
-            mGrid(inNumRows, inNumColumns, BlockType_Nil),
-            mStats(),
-            mIsGameOver(false),
-            mOriginalBlock(BlockType_L, Rotation(0), Row(0), Column(0)),
-            mQuality()
-        {
-            mStats.mFirstOccupiedRow = inNumRows;
-        }
+        GameStateImpl(size_t inNumRows, size_t inNumColumns);
 
-        void solidifyBlock(const Block & inBlock)
-        {
-            const Grid & grid = inBlock.grid();
-            for (size_t r = 0; r != grid.numRows(); ++r)
-            {
-                for (size_t c = 0; c != grid.numColumns(); ++c)
-                {
-                    if (grid.get(r, c) != BlockType_Nil)
-                    {
-                        int gridRow = inBlock.row() + r;
-                        int gridCol = inBlock.column() + c;
-                        mGrid.set(gridRow, gridCol, inBlock.type());
-                        if (gridRow < mStats.mFirstOccupiedRow)
-                        {
-                            mStats.mFirstOccupiedRow = gridRow;
-                        }
-                    }
-                }
-            }
-        }
-
+        void solidifyBlock(const Block & inBlock);
         
-        void clearLines()
-        {
-            size_t numLines = 0;
-            
-            std::vector<char> linesVector(mGrid.numRows(), 0);
-            char * lines = &linesVector[0];
-            //std::vector<char> lines(mGrid.numRows(), 0);
+        void clearLines();
 
-            size_t endRow = std::min<size_t>(mGrid.numRows(), mOriginalBlock.row() + mOriginalBlock.grid().numRows());
-            for (size_t rowIndex = mOriginalBlock.row(); rowIndex < endRow; ++rowIndex)
-            {
-                lines[rowIndex] = 1;
-                for (size_t ci = 0; ci != mGrid.numColumns(); ++ci)
-                {
-                    if (mGrid.get(rowIndex, ci) == 0)
-                    {
-                        lines[rowIndex] = 0;
-                        break;
-                    }
-                }
-
-                if (lines[rowIndex])
-                {
-                    numLines++;
-                }
-            }
-
-            if (numLines == 0)
-            {
-                return;
-            }
-
-            Assert(mStats.mFirstOccupiedRow + numLines <= mGrid.numRows());
-            mStats.mFirstOccupiedRow += numLines;
-
-            // Get newGrid
-            Grid newGrid(mGrid.numRows(), mGrid.numColumns(), BlockType_Nil);
-            int newRowIdx = numLines;
-            for (size_t r = 0; r != mGrid.numRows(); ++r)
-            {
-                if (!lines[r])
-                {
-                    for (size_t c = 0; c != mGrid.numColumns(); ++c)
-                    {
-                        newGrid.set(newRowIdx, c, mGrid.get(r, c));
-                    }
-                    newRowIdx++;
-                }
-            }
-
-            mGrid = newGrid;
-
-            mStats.mNumLines += numLines;
-
-            switch (numLines)
-            {
-                case 0:
-                {
-                    // Do nothing.
-                    break;
-                }
-                case 1:
-                {
-                    mStats.mNumSingles++;
-                    break;
-                }
-                case 2:
-                {
-                    mStats.mNumDoubles++;
-                    break;
-                }
-                case 3:
-                {
-                    mStats.mNumTriples++;
-                    break;
-                }
-                case 4:
-                {
-                    mStats.mNumTetrises++;
-                    break;
-                }
-                default:
-                {
-                    throw std::logic_error("Invalid number of lines scored! ...?");
-                }
-            }
-        }
-
+    private:
+        friend class GameState;
         Grid mGrid;
         Stats mStats;
         bool mIsGameOver;
         Block mOriginalBlock;
         mutable Quality mQuality;
     };
+
+
+    GameStateImpl::GameStateImpl(size_t inNumRows, size_t inNumColumns) :
+        mGrid(inNumRows, inNumColumns, BlockType_Nil),
+        mStats(),
+        mIsGameOver(false),
+        mOriginalBlock(BlockType_L, Rotation(0), Row(0), Column(0)),
+        mQuality()
+    {
+        mStats.mFirstOccupiedRow = inNumRows;
+    }
+
+
+    void GameStateImpl::solidifyBlock(const Block & inBlock)
+    {
+        const Grid & grid = inBlock.grid();
+        for (size_t r = 0; r != grid.numRows(); ++r)
+        {
+            for (size_t c = 0; c != grid.numColumns(); ++c)
+            {
+                if (grid.get(r, c) != BlockType_Nil)
+                {
+                    int gridRow = inBlock.row() + r;
+                    int gridCol = inBlock.column() + c;
+                    mGrid.set(gridRow, gridCol, inBlock.type());
+                    if (gridRow < mStats.mFirstOccupiedRow)
+                    {
+                        mStats.mFirstOccupiedRow = gridRow;
+                    }
+                }
+            }
+        }
+    }
+
+    
+    void GameStateImpl::clearLines()
+    {
+        size_t numLines = 0;
+        
+        std::vector<char> linesVector(mGrid.numRows(), 0);
+        char * lines = &linesVector[0];
+        //std::vector<char> lines(mGrid.numRows(), 0);
+
+        size_t endRow = std::min<size_t>(mGrid.numRows(), mOriginalBlock.row() + mOriginalBlock.grid().numRows());
+        for (size_t rowIndex = mOriginalBlock.row(); rowIndex < endRow; ++rowIndex)
+        {
+            lines[rowIndex] = 1;
+            for (size_t ci = 0; ci != mGrid.numColumns(); ++ci)
+            {
+                if (mGrid.get(rowIndex, ci) == 0)
+                {
+                    lines[rowIndex] = 0;
+                    break;
+                }
+            }
+
+            if (lines[rowIndex])
+            {
+                numLines++;
+            }
+        }
+
+        if (numLines == 0)
+        {
+            return;
+        }
+
+        Assert(mStats.mFirstOccupiedRow + numLines <= mGrid.numRows());
+        mStats.mFirstOccupiedRow += numLines;
+
+        // Get newGrid
+        Grid newGrid(mGrid.numRows(), mGrid.numColumns(), BlockType_Nil);
+        int newRowIdx = numLines;
+        for (size_t r = 0; r != mGrid.numRows(); ++r)
+        {
+            if (!lines[r])
+            {
+                for (size_t c = 0; c != mGrid.numColumns(); ++c)
+                {
+                    newGrid.set(newRowIdx, c, mGrid.get(r, c));
+                }
+                newRowIdx++;
+            }
+        }
+
+        mGrid = newGrid;
+
+        mStats.mNumLines += numLines;
+
+        switch (numLines)
+        {
+            case 0:
+            {
+                // Do nothing.
+                break;
+            }
+            case 1:
+            {
+                mStats.mNumSingles++;
+                break;
+            }
+            case 2:
+            {
+                mStats.mNumDoubles++;
+                break;
+            }
+            case 3:
+            {
+                mStats.mNumTriples++;
+                break;
+            }
+            case 4:
+            {
+                mStats.mNumTetrises++;
+                break;
+            }
+            default:
+            {
+                throw std::logic_error("Invalid number of lines scored! ...?");
+            }
+        }
+    }
 
 
     GameState::GameState(size_t inNumRows, size_t inNumColumns) :
@@ -265,6 +275,13 @@ namespace Tetris
         mImpl(new GameStateImpl(*rhs.mImpl))
     {
         
+    }
+
+
+    GameState::~GameState()
+    {
+        delete mImpl;
+        mImpl = 0;
     }
 
 
