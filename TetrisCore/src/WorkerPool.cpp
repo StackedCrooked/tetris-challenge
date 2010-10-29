@@ -40,24 +40,6 @@ namespace Tetris
     }
 
 
-    void WorkerPool::setSize(size_t inSize)
-    {
-        boost::mutex::scoped_lock lock(mMutex);
-        if (inSize > mWorkers.size())
-        {
-            while (mWorkers.size() < inSize)
-            {
-                mWorkers.push_back(WorkerPtr(new Worker(MakeString() << mName << mWorkers.size())));
-            }
-        }
-        else if (inSize < mWorkers.size()) // Deletes a few workers
-        {
-            interruptRange(inSize, mWorkers.size() - inSize);
-            mWorkers.resize(inSize);
-        }
-    }
-
-
     void WorkerPool::wait()
     {
         boost::mutex::scoped_lock lock(mMutex);

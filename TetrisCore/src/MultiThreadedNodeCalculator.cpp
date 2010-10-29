@@ -120,12 +120,6 @@ namespace Tetris
 
     void MultithreadedNodeCalculator::populate()
     {
-
-        //
-        // Fallback to single threaded implementation.
-        //
-        // Todo: implement
-        // 
         try
         {
             // The nodes are populated using a "Iterative deepening" algorithm.

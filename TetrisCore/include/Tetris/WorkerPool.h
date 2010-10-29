@@ -27,10 +27,6 @@ namespace Tetris
         // Returns the number of workers.
         size_t size() const;
 
-        // Change the number of workers in the pool.
-        // Setting a smaller size when there are workers active is safe, but interrupts their task.
-        void setSize(size_t inSize);
-
         // Wait until all Workers have finished their queue
         void wait();
         

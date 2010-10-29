@@ -71,32 +71,6 @@ void WorkerPoolTest::testWorkerPool()
         Assert(overhead < 500);
     }
 
-    // Test setSize
-    for (int i = 0; i < cPoolSizeCount; ++i)
-    {
-        mStopwatch.restart();
-        WorkerPool pool("WorkerPool Test", cPoolSize[i]);
-        for (size_t idx = 0; idx != cPoolSize[i]; ++idx)
-        {
-            pool.schedule(boost::bind(&WorkerPoolTest::BeBusy));
-        }
-
-        pool.setSize(cPoolSize[i]);
-        Assert(pool.size() == cPoolSize[i]);
-
-        int newSize = static_cast<int>(0.5 + (cPoolSize[i] / 2.0));
-        pool.setSize(newSize);
-        Assert(pool.size() == newSize);
-
-        pool.setSize(0);
-        Assert(pool.size() == 0);
-
-        mStopwatch.stop();
-        int overhead = static_cast<int>(mStopwatch.elapsed() / 1000) - cSleepTime;
-        Assert(overhead > -500);
-        Assert(overhead < 500);
-    }
-
     // Test joinAll
     {
         mStopwatch.restart();
