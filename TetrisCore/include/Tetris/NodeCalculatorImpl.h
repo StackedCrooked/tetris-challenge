@@ -7,6 +7,8 @@
 #include "Tetris/GameQualityEvaluator.h"
 #include "Tetris/Worker.h"
 #include "Tetris/WorkerPool.h"
+#include "Tetris/Assert.h"
+#include "Poco/Types.h"
 #include <vector>
 #include <memory>
 
@@ -37,23 +39,6 @@ namespace Tetris
 
         int status() const;
 
-        // LayerData contains the accumulated data for all branches at a same depth.
-        struct LayerData
-        {
-            LayerData() :
-                mBestChild(),
-                mNumItems(0),
-                mFinished(false)
-            {
-            }
-
-            NodePtr mBestChild;
-            int mNumItems;
-            bool mFinished;
-        };
-
-        void getLayerData(int inIndex, LayerData & outLayerData);
-
     protected:
         virtual void populate() = 0;
 
@@ -61,17 +46,11 @@ namespace Tetris
 
         void setStatus(int inStatus);
 
-        void setCurrentSearchDepth(int inDepth);
-
-        void updateLayerData(size_t inIndex, NodePtr inNodePtr, size_t inCount);
-
         void populateNodesRecursively(NodePtr ioNode,
                                       const BlockTypes & inBlockTypes,
                                       const std::vector<int> & inWidths,
                                       size_t inIndex,
                                       size_t inMaxIndex);
-
-        void markTreeRowAsFinished(size_t inIndex);
 
         void destroyInferiorChildren();
 
@@ -79,11 +58,132 @@ namespace Tetris
         mutable boost::mutex mNodeMutex;
 
         // Store info per horizontal level of nodes.
-        std::vector<LayerData> mLayers;
-        mutable boost::mutex mLayersMutex;
+        class TreeRowInfo
+        {
+        public:
+            TreeRowInfo(std::auto_ptr<Evaluator> inEvaluator) :
+                mBestNode(),
+                mBestScore(0),
+                mEvaluator(inEvaluator.release()),
+                mNodeCount(0),
+                mFinished(false)
+            {
+            }
 
-        int mCompletedSearchDepth;
-        mutable boost::mutex mCompletedSearchDepthMutex;
+            inline NodePtr bestNode() const
+            { return mBestNode; }
+
+            inline Poco::UInt64 nodeCount() const
+            { return mNodeCount; }
+
+            inline bool finished() const
+            { return mFinished; }
+
+            void registerNode(NodePtr inNode)
+            {
+                int score = mEvaluator->evaluate(inNode->state());
+                if (!mBestNode || score > mBestScore)
+                {
+                    mBestNode = inNode;
+                    mBestScore = score;
+                }
+                mNodeCount++;
+            }
+
+            inline void setFinished()
+            { 
+                Assert(!mFinished);
+                Assert(mBestNode);
+                mFinished = true;
+            }
+
+        private:
+            NodePtr mBestNode;
+            int mBestScore;
+            boost::shared_ptr<Evaluator> mEvaluator;
+            Poco::UInt64 mNodeCount;
+            bool mFinished;
+        };
+
+        class TreeRowInfos
+        {
+        public:
+            TreeRowInfos(std::auto_ptr<Evaluator> inEvaluator, size_t inMaxDepth) :
+                mInfos(),
+                mCurrentSearchDepth(0),
+                mMutex()
+            {
+                for (size_t idx = 0; idx != inMaxDepth; ++idx)
+                {
+                    mInfos.push_back(TreeRowInfo(inEvaluator->clone()));
+                }
+            }
+
+            inline int currentSearchDepth() const
+            {
+                return mCurrentSearchDepth;
+            }
+
+            inline int maximumSearchDepth() const
+            {
+                return mInfos.size();
+            }
+
+            inline NodePtr bestNode(size_t inDepth) const
+            {
+                boost::mutex::scoped_lock lock(mMutex);
+                Assert(inDepth > 0 && inDepth <= mInfos.size());
+                return mInfos[inDepth - 1].bestNode();
+            }
+
+            inline NodePtr bestNode() const
+            {
+                Assert(mCurrentSearchDepth > 0 && mCurrentSearchDepth <= mInfos.size());
+                NodePtr result;
+                if (mCurrentSearchDepth > 0)
+                {
+                    result = mInfos[mCurrentSearchDepth - 1].bestNode();
+                    Assert(result);
+                }
+                return result;
+            }
+
+            inline Poco::UInt64 nodeCount(size_t inDepth) const
+            {
+                boost::mutex::scoped_lock lock(mMutex);
+                Assert(inDepth <= mInfos.size());
+                return mInfos[inDepth - 1].nodeCount();
+            }
+
+            inline bool finished(size_t inDepth) const
+            {
+                boost::mutex::scoped_lock lock(mMutex);
+                Assert(inDepth <= mInfos.size());
+                return mInfos[inDepth - 1].finished();
+            }
+
+            void registerNode(NodePtr inNode, size_t inDepth)
+            {
+                boost::mutex::scoped_lock lock(mMutex);
+                Assert(inDepth <= mInfos.size());
+                Assert(inNode);
+                mInfos[inDepth - 1].registerNode(inNode);
+            }
+
+            inline void setFinished(size_t inDepth)
+            {
+                Assert(inDepth <= mInfos.size());
+                mCurrentSearchDepth = inDepth;
+                mInfos[inDepth - 1].setFinished();
+            }
+
+        private:
+            std::vector<TreeRowInfo> mInfos;
+            int mCurrentSearchDepth;
+            mutable boost::mutex mMutex;
+        };
+
+        TreeRowInfos mTreeRowInfos;
 
         BlockTypes mBlockTypes;
         std::vector<int> mWidths;

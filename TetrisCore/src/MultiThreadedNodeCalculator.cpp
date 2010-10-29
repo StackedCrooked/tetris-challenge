@@ -48,19 +48,29 @@ namespace Tetris
         // It is possible that the nodes were already generated at this depth.
         // If that is the case then we immediately jump to the recursive call below.
         //
-        ChildNodes childNodes = ioNode->children();
+        ChildNodes childNodes = ioNode->children(); // use copy in order to have the same evaluator
+        Assert(childNodes.empty());
+
         childNodes = ChildNodes(GameStateComparisonFunctor(inEvaluator->clone()));
         GenerateOffspring(ioNode, inBlockType, *inEvaluator, childNodes);
-
-        int count = 0;
-        ChildNodes::iterator it = childNodes.begin(), end = childNodes.end();
-        while (count < inWidth && it != end)
+        if (childNodes.empty())
         {
-            ioNode->addChild(*it);
-            ++count;
-            ++it;
+            throw std::logic_error("GenerateOffspring produced zero children. This should not happen!");
         }
-		updateLayerData(inDepth - 1, *ioNode->children().begin(), count);
+
+        Assert(!childNodes.empty());
+        if (!childNodes.empty())
+        {
+            int count = 0;
+            ChildNodes::iterator it = childNodes.begin(), end = childNodes.end();
+            while (count < inWidth && it != end)
+            {
+                ioNode->addChild(*it);
+                ++count;
+                ++it;
+            }
+            mTreeRowInfos.registerNode(*ioNode->children().begin(), inDepth);
+        }
     }
 
 
@@ -130,8 +140,8 @@ namespace Tetris
                 boost::mutex::scoped_lock lock(mNodeMutex);
                 populateNodes(mNode, mBlockTypes, mWidths, 0, targetDepth);
                 mWorkerPool.wait();
-                Assert(mWorkerPool.stats().activeWorkerCount == 0);
-                markTreeRowAsFinished(targetDepth - 1);
+                Assert(mWorkerPool.getActiveWorkerCount() == 0);
+                mTreeRowInfos.setFinished(targetDepth);
                 targetDepth++;
             }
         }

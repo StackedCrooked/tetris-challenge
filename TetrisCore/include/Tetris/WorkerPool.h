@@ -27,25 +27,13 @@ namespace Tetris
         // Returns the number of workers.
         size_t size() const;
 
+        int getActiveWorkerCount() const;
+
         // Wait until all Workers have finished their queue
         void wait();
         
         // Interrupts all workers.
         void interruptAndClearQueue();
-        
-        struct Stats
-        {
-            Stats(int inActiveWorkerCount, int inTotalWorkerCount) :
-                activeWorkerCount(inActiveWorkerCount),
-                totalWorkerCount(inTotalWorkerCount)
-            {
-            }
-
-            int activeWorkerCount;
-            int totalWorkerCount;
-        };
-
-        Stats stats() const;
 
     private:
         // non-coyable
