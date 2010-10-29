@@ -8,7 +8,6 @@
 #include "Tetris/GameState.h"
 #include "Tetris/BlockTypes.h"
 #include "Tetris/WorkerPool.h"
-#include "Tetris/Assert.h"
 #include "Tetris/Logging.h"
 #include "Tetris/MakeString.h"
 #include <boost/shared_ptr.hpp>
@@ -25,13 +24,14 @@ namespace Tetris
                                            const std::vector<int> & inWidths,
                                            std::auto_ptr<Evaluator> inEvaluator,
                                            WorkerPool & inWorkerPool) :
-        mLayers(inBlockTypes.size()),
-        mCompletedSearchDepth(0),
         mNode(inNode.release()),
+        mNodeMutex(),
+        mTreeRowInfos(inEvaluator->clone(), inBlockTypes.size()),
         mBlockTypes(inBlockTypes),
         mWidths(inWidths),
-        mEvaluator(inEvaluator.release()),
+        mEvaluator(inEvaluator->clone()),
         mStatus(0),
+        mStatusMutex(),
         mMainWorker("NodeCalculatorImpl"),
         mWorkerPool(inWorkerPool)
     {
@@ -47,32 +47,9 @@ namespace Tetris
     }
 
 
-    void NodeCalculatorImpl::getLayerData(int inIndex, LayerData & outLayerData)
-    {
-        boost::mutex::scoped_lock lock(mLayersMutex);
-        outLayerData = mLayers[inIndex];
-    }
-
-
     int NodeCalculatorImpl::getCurrentSearchDepth() const
     {
-        boost::mutex::scoped_lock lock(mCompletedSearchDepthMutex);
-        return mCompletedSearchDepth;
-    }
-
-
-    void NodeCalculatorImpl::setCurrentSearchDepth(int inDepth)
-    {
-        {
-            boost::mutex::scoped_lock lock(mCompletedSearchDepthMutex);
-            if (inDepth > mCompletedSearchDepth)
-            {
-                mCompletedSearchDepth = inDepth;
-            }
-        }        
-
-        boost::mutex::scoped_lock lock(mLayersMutex);
-        Assert(mLayers[inDepth - 1].mBestChild);
+        return mTreeRowInfos.currentSearchDepth();
     }
 
 
@@ -113,18 +90,6 @@ namespace Tetris
     {
         boost::mutex::scoped_lock lock(mStatusMutex);
         mStatus = inStatus;
-    }
-
-
-    void NodeCalculatorImpl::updateLayerData(size_t inIndex, NodePtr inNodePtr, size_t inCount)
-    {
-        boost::mutex::scoped_lock lock(mLayersMutex);
-        LayerData & layerData = mLayers[inIndex];
-        layerData.mNumItems += inCount;
-        if (!layerData.mBestChild || inNodePtr->state().quality(inNodePtr->evaluator()) > layerData.mBestChild->state().quality(inNodePtr->evaluator()))
-        {
-            layerData.mBestChild = inNodePtr;
-        }
     }
 
 
@@ -178,7 +143,8 @@ namespace Tetris
                 ++count;
                 ++it;
             }
-            updateLayerData(inIndex, *ioNode->children().begin(), count);
+            Assert(count >= 1);
+            mTreeRowInfos.registerNode(*ioNode->children().begin(), inIndex + 1);
         }
 
 
@@ -196,14 +162,6 @@ namespace Tetris
     }
 
 
-    void NodeCalculatorImpl::markTreeRowAsFinished(size_t inIndex)
-    {
-        setCurrentSearchDepth(inIndex + 1);
-        boost::mutex::scoped_lock lock(mLayersMutex);
-        mLayers[inIndex].mFinished = true;
-    }
-
-
     void NodeCalculatorImpl::destroyInferiorChildren()
     {
         size_t reachedDepth = getCurrentSearchDepth();
@@ -212,10 +170,8 @@ namespace Tetris
         // We use the 'best child' from this search depth.
         // The path between the start node and this best
         // child will be the list of precalculated nodes.
-        boost::mutex::scoped_lock layersLock(mLayersMutex);
         boost::mutex::scoped_lock nodeLock(mNodeMutex);
-        Assert((reachedDepth - 1) < mLayers.size());
-        NodePtr endNode = mLayers[reachedDepth - 1].mBestChild;
+        NodePtr endNode = mTreeRowInfos.bestNode();
         Assert(endNode);
         if (endNode)
         {

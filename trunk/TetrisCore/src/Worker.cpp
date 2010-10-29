@@ -50,6 +50,14 @@ namespace Tetris
     {
         switch (inStatus)
         {
+            case Worker::Status_Initial:
+            {
+                return "Initial";
+            }
+            case Worker::Status_Scheduled:
+            {
+                return "Scheduled";
+            }
             case Worker::Status_Waiting:
             {
                 return "Waiting";
@@ -57,6 +65,10 @@ namespace Tetris
             case Worker::Status_Working:
             {
                 return "Working";
+            }
+            case Worker::Status_FinishedOne:
+            {
+                return "FinishedOne";
             }
             default:
             {
@@ -68,7 +80,7 @@ namespace Tetris
 
     Worker::Worker(const std::string & inName) :
         mName(inName),
-        mStatus(Status_Waiting),
+        mStatus(Status_Initial),
         mQuitFlag(false)
     {
         mThread.reset(new boost::thread(boost::bind(&Worker::run, this)));
@@ -167,6 +179,13 @@ namespace Tetris
     {
         boost::mutex::scoped_lock lock(mQueueMutex);
         mQueue.push_back(inTask);
+        {
+            boost::mutex::scoped_lock statusLock(mStatusMutex);
+            if (mStatus <= Status_Waiting)
+            {
+                mStatus = Status_Scheduled;
+            }
+        }
         mQueueCondition.notify_all();
     }
 

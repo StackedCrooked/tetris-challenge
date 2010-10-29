@@ -64,6 +64,7 @@ namespace Tetris
             Worker & worker = *mWorkers[idx];
             queueLocks[idx].reset(new boost::mutex::scoped_lock(worker.mQueueMutex));
             statusLocks[idx].reset(new boost::mutex::scoped_lock(worker.mStatusMutex));
+            worker.mQueue.clear();
         }
 
         //
@@ -81,7 +82,8 @@ namespace Tetris
         for (size_t idx = inBegin; idx != inBegin + inCount; ++idx)
         {
             Worker & worker = *mWorkers[idx];
-            while (worker.mStatus != Worker::Status_Waiting && worker.mStatus != Worker::Status_FinishedOne)
+            
+            if (worker.mStatus == Worker::Status_Working)
             {
                 worker.mStatusCondition.wait(*statusLocks[idx]);
             }
@@ -94,9 +96,9 @@ namespace Tetris
         boost::mutex::scoped_lock lock(mMutex);
         interruptRange(0, mWorkers.size());
     }
-    
-    
-    WorkerPool::Stats WorkerPool::stats() const
+
+
+    int WorkerPool::getActiveWorkerCount() const
     {
         boost::mutex::scoped_lock lock(mMutex);
         int activeWorkerCount = 0;
@@ -108,7 +110,7 @@ namespace Tetris
                 activeWorkerCount++;
             }
         }
-        return Stats(activeWorkerCount, mWorkers.size());
+        return activeWorkerCount;
     }
 
 } // namespace Tetris

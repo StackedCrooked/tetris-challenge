@@ -215,7 +215,7 @@ namespace Tetris
                 //
                 // Create and start the NodeCalculator.
                 //
-                Assert(mWorkerPool.stats().activeWorkerCount == 0);
+                Assert(mWorkerPool.getActiveWorkerCount() == 0);
                 mNodeCalculator.reset(new NodeCalculator(endNode, futureBlocks, widths, mEvaluator->clone(), mWorkerPool));
                 mNodeCalculator->start();
             }

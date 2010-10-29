@@ -42,13 +42,14 @@ void NodeCalculatorTest::testNodeCalculator()
     int depth = 5;
     int width = 5;
 #endif
-    
+
     for (size_t i = 0; i != 10; ++i)
     {
         for (size_t workerCount = 1; workerCount < 12; ++workerCount)
         {
             WorkerPool workerPool("NodeCalculatorTest", workerCount);
             testDestroy(workerPool);
+            std::cout << ".";
         }
     }
 

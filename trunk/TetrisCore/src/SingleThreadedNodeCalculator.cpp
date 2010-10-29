@@ -32,12 +32,12 @@ namespace Tetris
         {
             // The nodes are populated using a "Iterative deepening" algorithm.
             // See: http://en.wikipedia.org/wiki/Iterative_deepening_depth-first_search for more information.
-            size_t targetDepth = 0;
+            size_t targetDepth = 1;
             while (targetDepth < mBlockTypes.size())
             {
                 boost::mutex::scoped_lock lock(mNodeMutex);
-                populateNodesRecursively(mNode, mBlockTypes, mWidths, 0, targetDepth);
-                markTreeRowAsFinished(targetDepth);
+                populateNodesRecursively(mNode, mBlockTypes, mWidths, 0, targetDepth - 1);
+                mTreeRowInfos.setFinished(targetDepth);
                 targetDepth++;
             }
             destroyInferiorChildren();

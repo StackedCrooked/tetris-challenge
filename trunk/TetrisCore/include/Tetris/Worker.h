@@ -45,7 +45,9 @@ namespace Tetris
 
         enum Status
         {
+            Status_Initial,
             Status_Waiting,
+            Status_Scheduled,
             Status_Working,
             Status_FinishedOne
         };
