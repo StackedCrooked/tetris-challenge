@@ -157,8 +157,6 @@ namespace Tetris
                         ScopedAtom<Game> wgame(mProtectedGame);
                         clonedGamePtr.reset(wgame->clone().release());
                         Game & game(*wgame.get());
-
-                        Assert(game.lastPrecalculatedNode()->depth() + 1 == resultNodeDepth);
                         game.lastPrecalculatedNode()->addChild(resultNode);
 
                     }
