@@ -26,6 +26,8 @@ namespace Tetris
                                            WorkerPool & inWorkerPool) :
         mNode(inNode.release()),
         mNodeMutex(),
+        mQuitFlag(false),
+        mQuitFlagMutex(),
         mTreeRowInfos(inEvaluator->clone(), inBlockTypes.size()),
         mBlockTypes(inBlockTypes),
         mWidths(inWidths),
@@ -42,8 +44,20 @@ namespace Tetris
 
     NodeCalculatorImpl::~NodeCalculatorImpl()
     {
-        mMainWorker.interruptAndClearQueue();
-		mWorkerPool.interruptAndClearQueue();
+    }
+
+
+    void NodeCalculatorImpl::setQuitFlag()
+    {
+        boost::mutex::scoped_lock lock(mQuitFlagMutex);
+        mQuitFlag = true;
+    }
+
+
+    bool NodeCalculatorImpl::getQuitFlag() const
+    {
+        boost::mutex::scoped_lock lock(mQuitFlagMutex);
+        return mQuitFlag;
     }
 
 
@@ -165,7 +179,11 @@ namespace Tetris
     void NodeCalculatorImpl::destroyInferiorChildren()
     {
         size_t reachedDepth = getCurrentSearchDepth();
-        Assert(reachedDepth >= 1);
+        if (reachedDepth == 0)
+        {
+            Assert(getQuitFlag());
+            return;
+        }
 
         // We use the 'best child' from this search depth.
         // The path between the start node and this best

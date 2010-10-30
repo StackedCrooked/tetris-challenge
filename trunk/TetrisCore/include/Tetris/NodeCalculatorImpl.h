@@ -44,6 +44,9 @@ namespace Tetris
 
         void startImpl();
 
+        void setQuitFlag();
+        bool getQuitFlag() const;
+
         void setStatus(int inStatus);
 
         void populateNodesRecursively(NodePtr ioNode,
@@ -53,9 +56,6 @@ namespace Tetris
                                       size_t inMaxIndex);
 
         void destroyInferiorChildren();
-
-        NodePtr mNode;
-        mutable boost::mutex mNodeMutex;
 
         // Store info per horizontal level of nodes.
         class TreeRowInfo
@@ -182,6 +182,12 @@ namespace Tetris
             int mCurrentSearchDepth;
             mutable boost::mutex mMutex;
         };
+
+        NodePtr mNode;
+        mutable boost::mutex mNodeMutex;
+
+        bool mQuitFlag;
+        mutable boost::mutex mQuitFlagMutex;
 
         TreeRowInfos mTreeRowInfos;
 

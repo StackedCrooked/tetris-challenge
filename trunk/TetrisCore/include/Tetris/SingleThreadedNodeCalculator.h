@@ -17,7 +17,7 @@ namespace Tetris
                                      std::auto_ptr<Evaluator> inEvaluator,
                                      WorkerPool & inWorkerPool);
 
-        virtual ~SingleThreadedNodeCalculator() {}
+        virtual ~SingleThreadedNodeCalculator();
 
     private:
         virtual void populate();

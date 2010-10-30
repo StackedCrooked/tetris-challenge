@@ -26,6 +26,14 @@ namespace Tetris
     }
 
 
+    SingleThreadedNodeCalculator::~SingleThreadedNodeCalculator()
+    {
+        setQuitFlag();
+        mMainWorker.interruptAndClearQueue();
+        mWorkerPool.interruptAndClearQueue();
+    }
+
+
     void SingleThreadedNodeCalculator::populate()
     {
         try
@@ -50,6 +58,8 @@ namespace Tetris
         {
             LogError(MakeString() << "Exception caught in SingleThreadedNodeCalculator::populate(). Detail: " << inException.what());
         }
+        mWorkerPool.wait();
+        Assert(getCurrentSearchDepth() >= 1 || getQuitFlag())
     }
 
 } // namespace Tetris
