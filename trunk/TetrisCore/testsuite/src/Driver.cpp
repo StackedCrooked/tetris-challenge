@@ -19,8 +19,6 @@ int RunTetrisTestSuite()
 int main(int ac, char **av)
 {
     int res = RunTetrisTestSuite();
-    std::cout << "Press ENTER to quit.";
-    std::cin.get();
     return res;    
 }
 

@@ -9,8 +9,9 @@ namespace Tetris
 
     WorkerPool::WorkerPool(const std::string & inName, size_t inSize) :
         mName(inName),
+        mRotation(0),
         mWorkers(),
-        mRotation(0)
+        mMutex()
     {
         for (size_t idx = 0; idx != inSize; ++idx)
         {

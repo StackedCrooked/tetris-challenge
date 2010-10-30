@@ -131,13 +131,11 @@ namespace Tetris
         Assert(inCurrentNode->depth() == mCurrentNode->depth() + 1);
 
         mCurrentNode = inCurrentNode;
-        size_t oldBlockIndex = mCurrentBlockIndex;
         mCurrentBlockIndex = mCurrentNode->depth();
         supplyBlocks();
         mActiveBlock.reset(CreateDefaultBlock(mBlocks[mCurrentBlockIndex], mNumColumns).release());
         if (!mCurrentNode->children().empty())
         {
-            GameState & state = (*mCurrentNode->children().begin())->state();
             Assert(mActiveBlock->type() == state.originalBlock().type());
         }
     }
