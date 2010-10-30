@@ -1,8 +1,8 @@
 #include "Tetris/Config.h"
 #include "Tetris/MultithreadedNodeCalculator.h"
 #include "Tetris/AISupport.h"
-#include "Tetris/GameStateComparisonFunctor.h"
-#include "Tetris/GameQualityEvaluator.h"
+#include "Tetris/GameStateComparator.h"
+#include "Tetris/Evaluator.h"
 #include "Tetris/GameStateNode.h"
 #include "Tetris/GameState.h"
 #include "Tetris/BlockTypes.h"
@@ -43,7 +43,7 @@ namespace Tetris
 														 int inDepth,
 														 int inWidth)
     {
-        ChildNodes childNodes = ChildNodes(GameStateComparisonFunctor(inEvaluator->clone()));
+        ChildNodes childNodes = ChildNodes(GameStateComparator(inEvaluator->clone()));
         GenerateOffspring(ioNode, inBlockType, *inEvaluator, childNodes);
         if (childNodes.empty())
         {

@@ -5,7 +5,7 @@
 #include "TetrisComponent.h"
 #include "Tetris/Block.h"
 #include "Tetris/Game.h"
-#include "Tetris/GameQualityEvaluator.h"
+#include "Tetris/Evaluator.h"
 #include "Tetris/Threading.h"
 #include "XULWin/Components.h"
 #include "XULWin/Dialog.h"

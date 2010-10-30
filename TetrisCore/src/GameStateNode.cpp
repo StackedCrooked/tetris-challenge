@@ -1,7 +1,7 @@
 #include "Tetris/Config.h"
 #include "Tetris/GameStateNode.h"
-#include "Tetris/GameStateComparisonFunctor.h"
-#include "Tetris/GameQualityEvaluator.h"
+#include "Tetris/GameStateComparator.h"
+#include "Tetris/Evaluator.h"
 #include "Tetris/GameState.h"
 #include "Tetris/Block.h"
 #include "Tetris/Utilities.h"
@@ -76,7 +76,7 @@ namespace Tetris
         mDepth(inParent->depth() + 1),
         mGameState(inGameState),
         mEvaluator(inEvaluator.release()),
-        mChildren(GameStateComparisonFunctor(mEvaluator->clone()))
+        mChildren(GameStateComparator(mEvaluator->clone()))
     {
     }
 
@@ -88,7 +88,7 @@ namespace Tetris
         mDepth(0),
         mGameState(inGameState),
         mEvaluator(inEvaluator.release()),
-        mChildren(GameStateComparisonFunctor(mEvaluator->clone()))
+        mChildren(GameStateComparator(mEvaluator->clone()))
     {
     }
 

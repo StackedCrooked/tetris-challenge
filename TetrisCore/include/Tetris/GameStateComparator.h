@@ -12,12 +12,12 @@ namespace Tetris
 
     class Evaluator;
 
-    class GameStateComparisonFunctor
+    class GameStateComparator
     {
     public:
-        GameStateComparisonFunctor();
+        GameStateComparator();
 
-        GameStateComparisonFunctor(std::auto_ptr<Evaluator> inChildPtrCompare);
+        GameStateComparator(std::auto_ptr<Evaluator> inChildPtrCompare);
 
         bool operator()(NodePtr lhs, NodePtr rhs);
 

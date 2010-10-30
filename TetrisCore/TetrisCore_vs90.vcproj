@@ -255,6 +255,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\Tetris\Evaluator.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Tetris\Game.h"
 					>
 				</File>
@@ -263,15 +267,11 @@
 					>
 				</File>
 				<File
-					RelativePath=".\include\Tetris\GameQualityEvaluator.h"
-					>
-				</File>
-				<File
 					RelativePath=".\include\Tetris\GameState.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Tetris\GameStateComparisonFunctor.h"
+					RelativePath=".\include\Tetris\GameStateComparator.h"
 					>
 				</File>
 				<File
@@ -315,11 +315,11 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\Game.cpp"
+					RelativePath=".\src\Evaluator.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\GameQualityEvaluator.cpp"
+					RelativePath=".\src\Game.cpp"
 					>
 				</File>
 				<File
@@ -327,7 +327,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\GameStateComparisonFunctor.cpp"
+					RelativePath=".\src\GameStateComparator.cpp"
 					>
 				</File>
 				<File
