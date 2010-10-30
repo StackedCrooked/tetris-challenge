@@ -36,12 +36,12 @@ namespace Tetris
     enum
     {
         cMinSearchDepth = 1,
-        cDefaultSearchDepth = 3,
-        cMaxSearchDepth = 10,
+        cDefaultSearchDepth = 4,
+        cMaxSearchDepth = 8,
 
         cMinSearchWidth = 1,
-        cDefaultSearchWidth = 8,
-        cMaxSearchWidth = 40
+        cDefaultSearchWidth = 4,
+        cMaxSearchWidth = 6
     };
 
 
