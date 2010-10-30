@@ -1,17 +1,17 @@
 Todo
 ----
-- CMake: try to make it work for Mac and Linux.
-- Fix memory leak (memory keeps growing in the GUI test, according to the Windows Task Manager).
 - Fix GUI spinbuttons etc...
-- Don't use boost::shared_ptr for WorkerPool.
+
 - Fix crash that occurs when toying with AI settings during game play (esp release mode).
 - Clean up asserts
-- Write more unit tests
 - GameState::quality() should not require an Evaluator argument.
 - Add multicore search and add spin button to GUI to specify number of threads.
 - Add checkbox: 'switch to Survive when height reaches xx%'
 - Implement NodeCalculator vs Computer modus.
-- Make Mac build of the TetrisCoreTestSuite
+v Don't use boost::shared_ptr for WorkerPool.
+v Make Mac build of the TetrisCoreTestSuite
+v CMake: try to make it work for Mac and Linux.
+v Fix memory leak (memory keeps growing in the GUI test, according to the Windows Task Manager).
 v Make TetrisCore compilation faster by using forward declares.
 v Move the AI code in the Controller::refresh() method to a Tetris::ComputerPlayer class.
 v On Wine (Linux) the combobox height is item to short. XULWin issue?

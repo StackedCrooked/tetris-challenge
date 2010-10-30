@@ -16,6 +16,7 @@
 #include "Tetris/Logging.h"
 #include "Tetris/MakeString.h"
 #include "Tetris/Assert.h"
+#include "Poco/Environment.h"
 #include "Poco/Timer.h"
 #include <set>
 #include <boost/bind.hpp>
@@ -76,12 +77,25 @@ namespace Tetris
     };
 
 
+    // Use roughly 75% of all available CPUs.
+    static unsigned int GetWorkerCount()
+    {
+        int cpuCount = Poco::Environment::processorCount();
+        Assert(cpuCount >= 1);
+        if (cpuCount > 1)
+        {
+            cpuCount = static_cast<int>(0.5 + (0.75 * static_cast<double>(cpuCount)));
+        }
+        return cpuCount;
+    }
+
+
     ComputerPlayerImpl::ComputerPlayerImpl(const Protected<Game> & inProtectedGame,
                                            std::auto_ptr<Evaluator> inEvaluator,
                                            int inSearchDepth,
                                            int inSearchWidth) :
         mProtectedGame(inProtectedGame),
-        mWorkerPool("ComputerPlayer WorkerPool", 2),
+        mWorkerPool("ComputerPlayer WorkerPool", GetWorkerCount()),
         mEvaluator(inEvaluator.release()),
         mBlockMover(new BlockMover(mProtectedGame, 20)),
         mTimer(10, 10),
@@ -89,6 +103,7 @@ namespace Tetris
         mSearchWidth(inSearchWidth),
         mMoveSpeed(20)
     {
+        LogInfo(MakeString() << "ComputerPlayer started with " << mWorkerPool.size() << " worker threads.");
         mTimer.start(Poco::TimerCallback<ComputerPlayerImpl>(*this, &ComputerPlayerImpl::onTimerEvent));
     }
 
