@@ -134,10 +134,6 @@ namespace Tetris
         mCurrentBlockIndex = mCurrentNode->depth();
         supplyBlocks();
         mActiveBlock.reset(CreateDefaultBlock(mBlocks[mCurrentBlockIndex], mNumColumns).release());
-        if (!mCurrentNode->children().empty())
-        {
-            Assert(mActiveBlock->type() == state.originalBlock().type());
-        }
     }
 
 
