@@ -31,6 +31,7 @@ namespace Tetris
 		
 	MultithreadedNodeCalculator::~MultithreadedNodeCalculator()
 	{
+        setQuitFlag();
         mMainWorker.interruptAndClearQueue();
 		mWorkerPool.interruptAndClearQueue();
 	}
@@ -149,8 +150,9 @@ namespace Tetris
             LogError(MakeString() << "Exception caught in MultithreadedNodeCalculator::populate(). Detail: " << inException.what());
             mWorkerPool.interruptAndClearQueue();
         }        
+
         mWorkerPool.wait();
-        Assert(getCurrentSearchDepth() >= 1);
+        Assert(getCurrentSearchDepth() >= 1 || getQuitFlag());
     }
 
 } // namespace Tetris
