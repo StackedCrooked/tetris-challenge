@@ -12,8 +12,8 @@ namespace Tetris
     class GameStateNode;
     typedef boost::shared_ptr<GameStateNode> NodePtr;
 
-    class GameStateComparisonFunctor;
-    typedef std::multiset<NodePtr, GameStateComparisonFunctor> ChildNodes;
+    class GameStateComparator;
+    typedef std::multiset<NodePtr, GameStateComparator> ChildNodes;
 
 }
 

@@ -2,7 +2,7 @@
 #include "Tetris/BlockMover.h"
 #include "Tetris/Game.h"
 #include "Tetris/GameStateNode.h"
-#include "Tetris/GameStateComparisonFunctor.h"
+#include "Tetris/GameStateComparator.h"
 #include "Tetris/GameState.h"
 #include "Tetris/Block.h"
 #include "Tetris/Logging.h"

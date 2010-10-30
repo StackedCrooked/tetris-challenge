@@ -4,7 +4,7 @@
 
 #include "Tetris/BlockTypes.h"
 #include "Tetris/GameStateNode.h"
-#include "Tetris/GameQualityEvaluator.h"
+#include "Tetris/Evaluator.h"
 #include "Tetris/Worker.h"
 #include "Tetris/WorkerPool.h"
 #include "Tetris/Assert.h"

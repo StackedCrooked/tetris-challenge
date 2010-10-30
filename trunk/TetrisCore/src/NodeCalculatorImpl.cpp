@@ -2,8 +2,8 @@
 #include "Tetris/NodeCalculatorImpl.h"
 #include "Tetris/NodeCalculator.h"
 #include "Tetris/AISupport.h"
-#include "Tetris/GameQualityEvaluator.h"
-#include "Tetris/GameStateComparisonFunctor.h"
+#include "Tetris/Evaluator.h"
+#include "Tetris/GameStateComparator.h"
 #include "Tetris/GameStateNode.h"
 #include "Tetris/GameState.h"
 #include "Tetris/BlockTypes.h"
@@ -139,7 +139,7 @@ namespace Tetris
         ChildNodes generatedChildNodes = ioNode->children();
         if (generatedChildNodes.empty())
         {
-            generatedChildNodes = ChildNodes(GameStateComparisonFunctor(mEvaluator->clone()));
+            generatedChildNodes = ChildNodes(GameStateComparator(mEvaluator->clone()));
             GenerateOffspring(ioNode, inBlockTypes[inIndex], *mEvaluator, generatedChildNodes);
 
             int count = 0;

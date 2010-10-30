@@ -1,6 +1,6 @@
 #include "Tetris/Config.h"
-#include "Tetris/GameStateComparisonFunctor.h"
-#include "Tetris/GameQualityEvaluator.h"
+#include "Tetris/GameStateComparator.h"
+#include "Tetris/Evaluator.h"
 #include "Tetris/GameStateNode.h"
 #include "Tetris/GameState.h"
 #include "Tetris/Assert.h"
@@ -9,19 +9,19 @@
 namespace Tetris
 {
 
-    GameStateComparisonFunctor::GameStateComparisonFunctor()
+    GameStateComparator::GameStateComparator()
     {
         throw std::logic_error("Should never come here!");
     }
 
 
-    GameStateComparisonFunctor::GameStateComparisonFunctor(std::auto_ptr<Evaluator> inEvaluator) :
+    GameStateComparator::GameStateComparator(std::auto_ptr<Evaluator> inEvaluator) :
         mEvaluator(inEvaluator.release())
     {
     }
 
 
-    bool GameStateComparisonFunctor::operator()(NodePtr lhs, NodePtr rhs)
+    bool GameStateComparator::operator()(NodePtr lhs, NodePtr rhs)
     {
         Assert(lhs && rhs);
         Assert(lhs.get() != rhs.get());
