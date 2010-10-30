@@ -1,6 +1,7 @@
 #include "Tetris/Config.h"
 #include "Tetris/Block.h"
 #include "Tetris/BlockType.h"
+#include "Tetris/AutoPtrSupport.h"
 #include "Tetris/Assert.h"
 #include <stdexcept>
 
@@ -115,13 +116,13 @@ namespace Tetris
 
 
     Block::Block(BlockType inType, Rotation inRotation, Row inRow, Column inColumn) :
-        mImpl(new BlockImpl(inType, inRotation, inRow, inColumn))
+        mImpl(Create<BlockImpl>(inType, inRotation, inRow, inColumn).release())
     {
     }
 
 
     Block::Block(const Block & rhs) :
-        mImpl(new BlockImpl(*rhs.mImpl))
+        mImpl(Create<BlockImpl>(*rhs.mImpl).release())
     {
     }
 
@@ -131,7 +132,7 @@ namespace Tetris
         if (&rhs != this)
         {
             delete mImpl;
-            mImpl = new BlockImpl(*rhs.mImpl);
+            mImpl = Create<BlockImpl>(*rhs.mImpl).release();
         }
         return *this;
     }

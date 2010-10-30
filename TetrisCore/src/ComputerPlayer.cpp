@@ -154,8 +154,6 @@ namespace Tetris
                     // The created node should follow the last precalculated one.
                     if (resultNode->depth() == clonedGame.lastPrecalculatedNode()->depth() + 1)
                     {
-                        const int resultNodeDepth = resultNode->depth();
-
                         ScopedAtom<Game> wgame(mProtectedGame);
                         clonedGamePtr.reset(wgame->clone().release());
                         Game & game(*wgame.get());

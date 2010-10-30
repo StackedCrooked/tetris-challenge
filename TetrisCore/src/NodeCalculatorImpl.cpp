@@ -82,13 +82,6 @@ namespace Tetris
         // Impossible since the thread interruption point is
         // not triggered before search depth 1 is complete.
         Assert(!mNode->children().empty());
-
-        size_t numChildren = mNode->children().size();
-
-        // DestroyInferiorChildren should
-        // have taken care of this.
-        Assert(numChildren == 1);
-
         return *mNode->children().begin();
     }
 

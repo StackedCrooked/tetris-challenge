@@ -27,4 +27,5 @@ add_library(TetrisCore
 if(APPLE)
 set_target_properties(TetrisCore PROPERTIES COMPILE_FLAGS "-arch i386")
 endif(APPLE)
+set_target_properties(TetrisCore PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS} -Wall")
 
