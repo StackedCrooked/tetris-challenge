@@ -110,10 +110,20 @@ namespace Tetris
 
     int ComputerPlayerImpl::calculateRemainingTimeMs(Game & game) const
     {
-        float numRemainingRows = static_cast<float>(game.currentNode()->state().stats().firstOccupiedRow() - (game.activeBlock().row() + 4));
-        float numRowsPerSecond = Gravity::CalculateSpeed(game.level());
-        float remainingTime = 1000 * numRemainingRows / numRowsPerSecond;
-        float timeRequiredForMove = static_cast<float>(game.activeBlock().numRotations() + game.numColumns()) / static_cast<float>(mBlockMover->speed());
+        int firstOccupiedRow = game.currentNode()->state().stats().firstOccupiedRow();
+        int currentBlockRow = game.activeBlock().row();
+        int numBlockRows = std::max<int>(game.activeBlock().grid().numRows(), game.activeBlock().grid().numColumns());        
+        int numRemainingRows = firstOccupiedRow - (currentBlockRow + numBlockRows);
+        if (numRemainingRows <= 2)
+        {
+            return 0;
+        }
+
+        double numRowsPerSecond = Gravity::CalculateSpeed(game.level());
+        double remainingTime = 1000 * static_cast<double>(numRemainingRows) / numRowsPerSecond;        
+        int maxRequiredMoves = game.activeBlock().numRotations() + (game.numColumns()/2);
+        int moveSpeed = mBlockMover->speed();
+        double timeRequiredForMove = 1000.0 * static_cast<double>(maxRequiredMoves) / static_cast<double>(moveSpeed);
         return static_cast<int>(0.5 + remainingTime - timeRequiredForMove);
     }
 
@@ -153,11 +163,18 @@ namespace Tetris
         {
             // Check if the computer player has finished.
             if (mNodeCalculator->status() != NodeCalculator::Status_Finished)
-            {
-                // Check if there is the danger of crashing the current block.
-                if (clonedGame.numPrecalculatedMoves() == 0 && calculateRemainingTimeMs(clonedGame) < 1500)
+            {                
+                if (clonedGame.numPrecalculatedMoves() == 0)
                 {
-                    mNodeCalculator->stop();
+                    // Check if there is the danger of crashing the current block.  
+                    int remainingTime = calculateRemainingTimeMs(clonedGame);
+                    const int cRequiredTimeForMemoryCleanup = 5000;
+                    if (remainingTime + 1000 <= cRequiredTimeForMemoryCleanup)
+                    {
+                        LogInfo("Stop calculations now. Start memory cleanup.");
+                        mNodeCalculator->stop();
+                        LogInfo("Memory cleanup done.");
+                    }
                 }
                 // else: keep working.
             }
@@ -179,22 +196,16 @@ namespace Tetris
                     {
                         LogWarning("Computer is TOO SLOW!!");
                     }
-                }
-                else
-                {
-                    // Game over. Too bad.
-                    mNodeCalculator.reset();
-                    return;
-                }                
+                }              
 
                 // Once the computer has finished it's job we destroy the object.
                 mNodeCalculator.reset();
             }
         }
-        else
+        else if (!clonedGame.isGameOver())
         {
             int numPrecalculated = clonedGame.lastPrecalculatedNode()->depth() - clonedGame.currentNode()->depth();
-            if (numPrecalculated == 0)
+            if (numPrecalculated < 8)
             {                
                 Assert(!mNodeCalculator);
 
