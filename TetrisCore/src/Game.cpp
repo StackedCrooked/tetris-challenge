@@ -400,7 +400,7 @@ namespace Tetris
                                         CreatePoly<Evaluator, Balanced>()));
         mCurrentNode->addChild(child);
         setCurrentNode(child);
-        return true;
+        return false;
     }
 
 
