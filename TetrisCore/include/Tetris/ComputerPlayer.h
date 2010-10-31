@@ -22,7 +22,8 @@ namespace Tetris
         ComputerPlayer(const Protected<Game> & inProtectedGame,
                        std::auto_ptr<Evaluator> inEvaluator,
                        int inSearchDepth,
-                       int inSearchWidth);
+                       int inSearchWidth,
+                       int inWorkerCount);
 
         ~ComputerPlayer();
 
