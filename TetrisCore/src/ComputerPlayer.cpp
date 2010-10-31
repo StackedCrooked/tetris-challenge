@@ -33,6 +33,14 @@ namespace Tetris
                            int inSearchDepth,
                            int inSearchWidth);
 
+        ~ComputerPlayerImpl()
+        {
+            if (mNodeCalculator)
+            {
+                mNodeCalculator->stop();
+            }
+        }
+
         inline int searchDepth() const
         { return mSearchDepth; }
 
@@ -65,6 +73,9 @@ namespace Tetris
         void setWorkerCount(int inWorkerCount);
 
     private:
+        const ComputerPlayerImpl(ComputerPlayerImpl&);
+        ComputerPlayerImpl& operator=(const ComputerPlayerImpl&);
+
         void onTimerEvent(Poco::Timer & inTimer);
 
         void timerEvent();

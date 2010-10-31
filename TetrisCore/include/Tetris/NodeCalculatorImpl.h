@@ -94,7 +94,6 @@ namespace Tetris
             inline void setFinished()
             { 
                 Assert(!mFinished);
-                Assert(mBestNode);
                 mFinished = true;
             }
 
