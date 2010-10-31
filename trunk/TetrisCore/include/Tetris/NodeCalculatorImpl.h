@@ -42,7 +42,7 @@ namespace Tetris
     protected:
         virtual void populate() = 0;
 
-        void startImpl();
+		void startImpl();
 
         void setQuitFlag();
         bool getQuitFlag() const;
@@ -56,6 +56,7 @@ namespace Tetris
                                       size_t inMaxIndex);
 
         void destroyInferiorChildren();
+		void calculateResult() const;
 
         // Store info per horizontal level of nodes.
         class TreeRowInfo
@@ -138,7 +139,10 @@ namespace Tetris
 
             inline NodePtr bestNode() const
             {
-                Assert(mCurrentSearchDepth > 0 && mCurrentSearchDepth <= mInfos.size());
+				if (!(mCurrentSearchDepth > 0 && mCurrentSearchDepth <= mInfos.size()))
+				{
+					Assert(mCurrentSearchDepth > 0 && mCurrentSearchDepth <= mInfos.size());
+				}
                 NodePtr result;
                 if (mCurrentSearchDepth > 0)
                 {
@@ -184,7 +188,9 @@ namespace Tetris
         };
 
         NodePtr mNode;
+		mutable NodePtr mResult;
         mutable boost::mutex mNodeMutex;
+
 
         bool mQuitFlag;
         mutable boost::mutex mQuitFlagMutex;

@@ -98,11 +98,11 @@
     <ClInclude Include="include\Tetris\BlockType.h" />
     <ClInclude Include="include\Tetris\BlockTypes.h" />
     <ClInclude Include="include\Tetris\Direction.h" />
+    <ClInclude Include="include\Tetris\Evaluator.h" />
     <ClInclude Include="include\Tetris\Game.h" />
     <ClInclude Include="include\Tetris\GameOver.h" />
-    <ClInclude Include="include\Tetris\GameQualityEvaluator.h" />
     <ClInclude Include="include\Tetris\GameState.h" />
-    <ClInclude Include="include\Tetris\GameStateComparisonFunctor.h" />
+    <ClInclude Include="include\Tetris\GameStateComparator.h" />
     <ClInclude Include="include\Tetris\GameStateNode.h" />
     <ClInclude Include="include\Tetris\Gravity.h" />
     <ClInclude Include="include\Tetris\Grid.h" />
@@ -132,10 +132,10 @@
     <ClCompile Include="src\BlockFactory.cpp" />
     <ClCompile Include="src\BlockMover.cpp" />
     <ClCompile Include="src\BlockType.cpp" />
+    <ClCompile Include="src\Evaluator.cpp" />
     <ClCompile Include="src\Game.cpp" />
-    <ClCompile Include="src\GameQualityEvaluator.cpp" />
     <ClCompile Include="src\GameState.cpp" />
-    <ClCompile Include="src\GameStateComparisonFunctor.cpp" />
+    <ClCompile Include="src\GameStateComparator.cpp" />
     <ClCompile Include="src\GameStateNode.cpp" />
     <ClCompile Include="src\Gravity.cpp" />
     <ClCompile Include="src\Logger.cpp" />

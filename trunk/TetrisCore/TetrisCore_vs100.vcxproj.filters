@@ -54,13 +54,7 @@
     <ClInclude Include="include\Tetris\GameOver.h">
       <Filter>Tetris\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Tetris\GameQualityEvaluator.h">
-      <Filter>Tetris\Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Tetris\GameState.h">
-      <Filter>Tetris\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Tetris\GameStateComparisonFunctor.h">
       <Filter>Tetris\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Tetris\GameStateNode.h">
@@ -132,6 +126,12 @@
     <ClInclude Include="include\Tetris\SingleThreadedNodeCalculator.h">
       <Filter>ComputerPlayer\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Tetris\GameStateComparator.h">
+      <Filter>Tetris\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Tetris\Evaluator.h">
+      <Filter>Tetris\Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Block.cpp">
@@ -149,13 +149,7 @@
     <ClCompile Include="src\Game.cpp">
       <Filter>Tetris\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\GameQualityEvaluator.cpp">
-      <Filter>Tetris\Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\GameState.cpp">
-      <Filter>Tetris\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GameStateComparisonFunctor.cpp">
       <Filter>Tetris\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\GameStateNode.cpp">
@@ -194,7 +188,15 @@
     <ClCompile Include="src\SingleThreadedNodeCalculator.cpp">
       <Filter>ComputerPlayer\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\MultiThreadedNodeCalculator.cpp" />
+    <ClCompile Include="src\MultiThreadedNodeCalculator.cpp">
+      <Filter>ComputerPlayer\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GameStateComparator.cpp">
+      <Filter>Tetris\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Evaluator.cpp">
+      <Filter>Tetris\Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Todo.txt" />
