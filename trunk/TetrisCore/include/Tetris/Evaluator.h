@@ -123,7 +123,7 @@ namespace Tetris
         virtual std::auto_ptr<Evaluator> clone() const
         { return CreatePoly<Evaluator, MakeTetrises>(*this); }
 
-		virtual int evaluate(const GameState & inGameState) const;
+        virtual int evaluate(const GameState & inGameState) const;
     };
 
 

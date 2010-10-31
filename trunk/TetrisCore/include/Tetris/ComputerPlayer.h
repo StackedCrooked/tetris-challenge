@@ -45,6 +45,11 @@ namespace Tetris
 
         const Evaluator & evaluator() const;
 
+        int workerCount() const;
+
+        // Set to 0 to auto-select (75% of CPU count)
+        void setWorkerCount(int inWorkerCount);
+
     private:
         ComputerPlayer(const ComputerPlayer &);
         ComputerPlayer & operator= (const ComputerPlayer&);

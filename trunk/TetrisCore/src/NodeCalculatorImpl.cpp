@@ -27,7 +27,7 @@ namespace Tetris
                                            std::auto_ptr<Evaluator> inEvaluator,
                                            WorkerPool & inWorkerPool) :
         mNode(inNode.release()),
-		mResult(),
+        mResult(),
         mNodeMutex(),
         mQuitFlag(false),
         mQuitFlagMutex(),
@@ -47,7 +47,7 @@ namespace Tetris
 
     NodeCalculatorImpl::~NodeCalculatorImpl()
     {
-		mNode.reset();
+        mNode.reset();
     }
 
 
@@ -81,7 +81,7 @@ namespace Tetris
     {
         Assert(status() == NodeCalculator::Status_Finished);
         boost::mutex::scoped_lock lock(mNodeMutex);
-		return mResult;
+        return mResult;
     }
 
 
@@ -191,66 +191,66 @@ namespace Tetris
     }
 
 
-	void NodeCalculatorImpl::calculateResult() const
-	{		
-		if (getQuitFlag())
-		{
-			return;
-		}
+    void NodeCalculatorImpl::calculateResult() const
+    {        
+        if (getQuitFlag())
+        {
+            return;
+        }
 
         boost::mutex::scoped_lock lock(mNodeMutex);
 
-		// Get the results in the correct order by pushing the parents on a stack.
-		std::stack<NodePtr> results;
-		NodePtr endNode = mTreeRowInfos.bestNode();
-		while (endNode->depth() > mNode->depth())
-		{
-			results.push(endNode);
-			endNode = endNode->parent();
-		}
+        // Get the results in the correct order by pushing the parents on a stack.
+        std::stack<NodePtr> results;
+        NodePtr endNode = mTreeRowInfos.bestNode();
+        while (endNode->depth() > mNode->depth())
+        {
+            results.push(endNode);
+            endNode = endNode->parent();
+        }
 
-		NodePtr currentNode;
-		NodePtr currentParent = mNode;
-		while (!results.empty())
-		{			
-			currentNode = results.top();
-			NodePtr copy(new GameStateNode(currentParent, Create<GameState>(currentNode->state()), currentNode->evaluator().clone()));
-			if (!mResult)
-			{
-				mResult = copy;
-			}
-			else
-			{
-				Assert(mResult->endNode()->depth() + 1 == copy->depth());
-				mResult->endNode()->addChild(copy);
-			}
-			currentParent = copy;
-			results.pop();
-		}
+        NodePtr currentNode;
+        NodePtr currentParent = mNode;
+        while (!results.empty())
+        {            
+            currentNode = results.top();
+            NodePtr copy(new GameStateNode(currentParent, Create<GameState>(currentNode->state()), currentNode->evaluator().clone()));
+            if (!mResult)
+            {
+                mResult = copy;
+            }
+            else
+            {
+                Assert(mResult->endNode()->depth() + 1 == copy->depth());
+                mResult->endNode()->addChild(copy);
+            }
+            currentParent = copy;
+            results.pop();
+        }
 
 
-		//
-		// A small built-in self-test.
-		//
-		#ifdef _DEBUG
-		Assert(mResult->depth() == mNode->depth() + 1);
-		NodePtr node = mResult;
-		while (true)
-		{
-			Assert(node->children().size() <= 1);
-			if (node->children().size() == 1)
-			{
-				NodePtr nextNode = *node->children().begin();
-				Assert(nextNode->depth() == node->depth() + 1);
-				node = nextNode;				
-			}
-			else
-			{
-				break;
-			}
-		}
-		#endif
-	}
+        //
+        // A small built-in self-test.
+        //
+        #ifdef _DEBUG
+        Assert(mResult->depth() == mNode->depth() + 1);
+        NodePtr node = mResult;
+        while (true)
+        {
+            Assert(node->children().size() <= 1);
+            if (node->children().size() == 1)
+            {
+                NodePtr nextNode = *node->children().begin();
+                Assert(nextNode->depth() == node->depth() + 1);
+                node = nextNode;                
+            }
+            else
+            {
+                break;
+            }
+        }
+        #endif
+    }
 
 
     void NodeCalculatorImpl::stop()
@@ -272,7 +272,7 @@ namespace Tetris
         {
             setStatus(NodeCalculator::Status_Working);
             populate();
-			calculateResult();
+            calculateResult();
         }
         catch (const std::exception & inException)
         {

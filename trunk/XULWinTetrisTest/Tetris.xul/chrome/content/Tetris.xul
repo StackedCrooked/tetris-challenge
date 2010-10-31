@@ -125,11 +125,17 @@
           </columns>
           <rows>
             <row align="center">
-              <label value="Search depth:" style="text-align:right" />
-              <textbox id="searchDepth" type="number" readonly="true" style="text-align:right" value="4" disabled="true" flex="1" />
-              <label value="Search width:" style="text-align:right" />
-              <textbox id="searchWidth" type="number" readonly="true" style="text-align:right" value="4" disabled="true" flex="1" />
+              <label value="Thread count:" style="text-align:right" />
+              <textbox id="threadCount" type="number" readonly="true" style="text-align:right" value="4" disabled="true" flex="1" />
+              <label value="Auto-select:" style="text-align:right" />
+              <checkbox id="autoSelect" style="text-align:right" checked="true" flex="1" />
             </row>
+              <row align="center">
+                <label value="Search depth:" style="text-align:right" />
+                <textbox id="searchDepth" type="number" readonly="true" style="text-align:right" value="4" disabled="true" flex="1" />
+                <label value="Search width:" style="text-align:right" />
+                <textbox id="searchWidth" type="number" readonly="true" style="text-align:right" value="4" disabled="true" flex="1" />
+              </row>
             <row align="center">
               <label value="Holes:" style="text-align:right" />
               <textbox id="numHolesFactor" type="number" readonly="true" style="text-align:right" value="-4" disabled="true" flex="1" />

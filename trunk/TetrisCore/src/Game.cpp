@@ -47,7 +47,7 @@ namespace Tetris
 
         size_t currentBlockIndex() const;
 
-		void appendPrecalculatedNode(NodePtr inNode);
+        void appendPrecalculatedNode(NodePtr inNode);
 
         const GameStateNode * currentNode() const;
 
@@ -285,10 +285,10 @@ namespace Tetris
     }
 
 
-	void GameImpl::appendPrecalculatedNode(NodePtr inNode)
-	{
-		mCurrentNode->endNode()->addChild(inNode);
-	}
+    void GameImpl::appendPrecalculatedNode(NodePtr inNode)
+    {
+        mCurrentNode->endNode()->addChild(inNode);
+    }
 
 
     bool GameImpl::navigateNodeDown()
@@ -545,10 +545,10 @@ namespace Tetris
     }
 
 
-	void Game::appendPrecalculatedNode(NodePtr inNode)
-	{
-		mImpl->appendPrecalculatedNode(inNode);
-	}
+    void Game::appendPrecalculatedNode(NodePtr inNode)
+    {
+        mImpl->appendPrecalculatedNode(inNode);
+    }
 
 
     bool Game::navigateNodeDown()

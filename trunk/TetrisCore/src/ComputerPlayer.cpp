@@ -59,6 +59,11 @@ namespace Tetris
         const Evaluator & evaluator() const
         { return *mEvaluator; }
 
+        int workerCount() const
+        { return mWorkerCount; }
+
+        void setWorkerCount(int inWorkerCount);
+
     private:
         void onTimerEvent(Poco::Timer & inTimer);
 
@@ -74,6 +79,7 @@ namespace Tetris
         int mSearchDepth;
         int mSearchWidth;
         int mMoveSpeed;
+        int mWorkerCount;
     };
 
 
@@ -101,7 +107,8 @@ namespace Tetris
         mTimer(10, 10),
         mSearchDepth(inSearchDepth),
         mSearchWidth(inSearchWidth),
-        mMoveSpeed(20)
+        mMoveSpeed(20),
+        mWorkerCount(0)
     {
         LogInfo(MakeString() << "ComputerPlayer started with " << mWorkerPool.size() << " worker threads.");
         mTimer.start(Poco::TimerCallback<ComputerPlayerImpl>(*this, &ComputerPlayerImpl::onTimerEvent));
@@ -137,6 +144,19 @@ namespace Tetris
         return 0;
     }
 
+
+    void ComputerPlayerImpl::setWorkerCount(int inWorkerCount)
+    {
+        if (inWorkerCount == 0)
+        {
+            mWorkerCount = GetWorkerCount();
+        }
+        else
+        {
+            mWorkerCount = inWorkerCount;
+        }
+    }
+
     
     void ComputerPlayerImpl::onTimerEvent(Poco::Timer & inTimer)
     {
@@ -158,8 +178,8 @@ namespace Tetris
             // Check if the computer player has finished.
             if (mNodeCalculator->status() != NodeCalculator::Status_Finished)
             {      
-				ScopedAtom<Game> wgame(mProtectedGame);
-				Game & game(*wgame.get());          
+                ScopedAtom<Game> wgame(mProtectedGame);
+                Game & game(*wgame.get());          
                 if (game.numPrecalculatedMoves() == 0)
                 {
                     // Check if there is the danger of crashing the current block.  
@@ -172,81 +192,87 @@ namespace Tetris
                 // else: keep working.
             }
             else
-            {	
-				if (NodePtr resultNode = mNodeCalculator->result())
-				{
-					if (!resultNode->state().isGameOver())
-					{
-						ScopedAtom<Game> wgame(mProtectedGame);
-						Game & game(*wgame.get());
+            {    
+                if (NodePtr resultNode = mNodeCalculator->result())
+                {
+                    if (!resultNode->state().isGameOver())
+                    {
+                        ScopedAtom<Game> wgame(mProtectedGame);
+                        Game & game(*wgame.get());
 
-						// The created node should follow the last precalculated one.
-						if (resultNode->depth() == game.lastPrecalculatedNode()->depth() + 1)
-						{
-							game.appendPrecalculatedNode(resultNode);
+                        // The created node should follow the last precalculated one.
+                        if (resultNode->depth() == game.lastPrecalculatedNode()->depth() + 1)
+                        {
+                            game.appendPrecalculatedNode(resultNode);
 
-						}
-						else
-						{
-							LogWarning("Computer is TOO SLOW!!");
-						}
-					}
-				}
-				else
-				{
-					LogError("NodeCalculator did not create any results.");
-				}
+                        }
+                        else
+                        {
+                            LogWarning("Computer is TOO SLOW!!");
+                        }
+                    }
+                }
+                else
+                {
+                    LogError("NodeCalculator did not create any results.");
+                }
 
                 // Once the computer has finished it's job we destroy the object.
                 mNodeCalculator.reset();
             }
         }
         else
-		{			
-			ScopedAtom<Game> wgame(mProtectedGame);
-			Game & game(*wgame.get());
-			if (!game.lastPrecalculatedNode()->state().isGameOver())
-			{
-				int numPrecalculated = game.lastPrecalculatedNode()->depth() - game.currentNode()->depth();
-				if (numPrecalculated < 8)
-				{                
-					Assert(!mNodeCalculator);
+        {            
+            ScopedAtom<Game> wgame(mProtectedGame);
+            Game & game(*wgame.get());
+            if (!game.lastPrecalculatedNode()->state().isGameOver())
+            {
+                int numPrecalculated = game.lastPrecalculatedNode()->depth() - game.currentNode()->depth();
+                if (numPrecalculated < 8)
+                {                
+                    Assert(!mNodeCalculator);
 
-					//
-					// Clone the starting node
-					//
-					std::auto_ptr<GameStateNode> endNode = game.lastPrecalculatedNode()->clone();
-					Assert(endNode->children().empty());
-					Assert(endNode->depth() >= game.currentNode()->depth());
-
-
-					//
-					// Create the list of future blocks
-					//
-					BlockTypes futureBlocks;
-					game.getFutureBlocksWithOffset(endNode->depth(), mSearchDepth, futureBlocks);
+                    //
+                    // Clone the starting node
+                    //
+                    std::auto_ptr<GameStateNode> endNode = game.lastPrecalculatedNode()->clone();
+                    Assert(endNode->children().empty());
+                    Assert(endNode->depth() >= game.currentNode()->depth());
 
 
-					//
-					// Fill the std::vector<int> vector (use the same width for each level).
-					//
-					std::vector<int> widths;
-					for (size_t idx = 0; idx != futureBlocks.size(); ++idx)
-					{
-						widths.push_back(mSearchWidth);
-					}
+                    //
+                    // Create the list of future blocks
+                    //
+                    BlockTypes futureBlocks;
+                    game.getFutureBlocksWithOffset(endNode->depth(), mSearchDepth, futureBlocks);
 
 
-					//
-					// Create and start the NodeCalculator.
-					//
-					Assert(mWorkerPool.getActiveWorkerCount() == 0);
-					mNodeCalculator.reset(new NodeCalculator(endNode, futureBlocks, widths, mEvaluator->clone(), mWorkerPool));
-					mNodeCalculator->start();
-				}
-				// else: we have plenty of precalculated nodes. Do nothing for know.
-			}
-		}
+                    //
+                    // Fill the std::vector<int> vector (use the same width for each level).
+                    //
+                    std::vector<int> widths;
+                    for (size_t idx = 0; idx != futureBlocks.size(); ++idx)
+                    {
+                        widths.push_back(mSearchWidth);
+                    }
+
+
+                    //
+                    // Create and start the NodeCalculator.
+                    //
+                    Assert(mWorkerPool.getActiveWorkerCount() == 0);
+                    if (mWorkerCount == 0)
+                    {
+                        mWorkerCount = GetWorkerCount();
+                    }
+                    mWorkerPool.resize(mWorkerCount);
+
+                    mNodeCalculator.reset(new NodeCalculator(endNode, futureBlocks, widths, mEvaluator->clone(), mWorkerPool));
+                    mNodeCalculator->start();
+                }
+                // else: we have plenty of precalculated nodes. Do nothing for know.
+            }
+        }
     }
 
 
@@ -317,6 +343,18 @@ namespace Tetris
     const Evaluator & ComputerPlayer::evaluator() const
     {
         return mImpl->evaluator();
+    }
+    
+    
+    int ComputerPlayer::workerCount() const
+    {
+        return mImpl->workerCount();
+    }
+
+    
+    void ComputerPlayer::setWorkerCount(int inWorkerCount)
+    {
+        mImpl->setWorkerCount(inWorkerCount);
     }
 
 } // namespace Tetris

@@ -202,22 +202,31 @@ namespace Tetris
     }
 
 
-	int MakeTetrises::evaluate(const GameState & inGameState) const
-	{
-		int result = 0;
-		const Grid & grid = inGameState.grid();
-		if (grid.numRows() >= 4)
-		{
-			for (size_t rowIdx = grid.numRows() - 4; rowIdx != grid.numRows(); ++rowIdx)
-			{
-				if (grid.get(rowIdx, 0))
-				{
-					result -= 1;
-				}
-			}
-		}
-		return result + Evaluator::evaluate(inGameState);
-	}
+    int MakeTetrises::evaluate(const GameState & inGameState) const
+    {
+        int result = 0;
+        const Grid & grid = inGameState.grid();
+        if (grid.numRows() >= 4)
+        {
+            for (size_t colIdx = 0; colIdx != grid.numColumns(); ++colIdx)
+            {
+                size_t rowIdx = grid.numRows() - 4;
+                for (; rowIdx != grid.numRows(); ++rowIdx)
+                {
+                    if (grid.get(rowIdx, 0))
+                    {
+                        break;
+                    }
+                }
+                if (rowIdx == grid.numRows())
+                {
+                    // Bonus points for the reservation of an empty spot for making a tetris.
+                    return 4 + Evaluator::evaluate(inGameState);
+                }
+            }
+        }
+        return Evaluator::evaluate(inGameState);
+    }
 
 
     Depressed::Depressed() :
