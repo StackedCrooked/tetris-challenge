@@ -13,6 +13,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/thread.hpp>
 #include <memory>
+#include <stack>
 #include <stdexcept>
 
 
@@ -25,6 +26,7 @@ namespace Tetris
                                            std::auto_ptr<Evaluator> inEvaluator,
                                            WorkerPool & inWorkerPool) :
         mNode(inNode.release()),
+		mResult(),
         mNodeMutex(),
         mQuitFlag(false),
         mQuitFlagMutex(),
@@ -44,6 +46,7 @@ namespace Tetris
 
     NodeCalculatorImpl::~NodeCalculatorImpl()
     {
+		mNode.reset();
     }
 
 
@@ -76,13 +79,9 @@ namespace Tetris
     NodePtr NodeCalculatorImpl::result() const
     {
         Assert(status() == NodeCalculator::Status_Finished);
-
         boost::mutex::scoped_lock lock(mNodeMutex);
-        
-        // Impossible since the thread interruption point is
-        // not triggered before search depth 1 is complete.
-        Assert(!mNode->children().empty());
-        return *mNode->children().begin();
+		Assert(mResult);
+		return mResult;
     }
 
 
@@ -192,6 +191,44 @@ namespace Tetris
     }
 
 
+	void NodeCalculatorImpl::calculateResult() const
+	{		
+		if (getQuitFlag())
+		{
+			return;
+		}
+
+        boost::mutex::scoped_lock lock(mNodeMutex);
+
+		// First get the results and push them in a stack to get them in good order.
+		std::stack<NodePtr> results;
+		NodePtr endNode = mTreeRowInfos.bestNode();
+		while (endNode)
+		{
+			results.push(endNode);
+			endNode = endNode->parent();
+		}
+		results.pop();
+		
+		NodePtr currentParent = mNode;
+		while (!results.empty())
+		{
+			NodePtr currentNode = results.top();
+			NodePtr copy(new GameStateNode(currentParent, Create<GameState>(results.top()->state()), results.top()->evaluator().clone()));
+			if (!mResult)
+			{
+				mResult = copy;
+			}
+			else
+			{
+				mResult->endNode()->addChild(copy);
+			}
+			currentParent = copy;
+			results.pop();
+		}
+	}
+
+
     void NodeCalculatorImpl::stop()
     {
         if (status() == NodeCalculator::Status_Started || status() == NodeCalculator::Status_Working)
@@ -211,7 +248,7 @@ namespace Tetris
         {
             setStatus(NodeCalculator::Status_Working);
             populate();
-            destroyInferiorChildren();
+			calculateResult();
         }
         catch (const std::exception & inException)
         {
