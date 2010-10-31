@@ -14,6 +14,7 @@
 #include "XULWin/Window.h"
 #include "XULWin/WinUtils.h"
 #include "XULWin/XULRunner.h"
+#include "Poco/Random.h"
 #include "Poco/Timer.h"
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
@@ -109,6 +110,7 @@ namespace Tetris
         LRESULT onStrategySelected(WPARAM wParam, LPARAM lParam);
         LRESULT onClearPrecalculated(WPARAM wParam, LPARAM lParam);
         LRESULT onSelectComputerPlayer(WPARAM wParam, LPARAM lParam);
+        LRESULT onSplatter(WPARAM wParam, LPARAM lParam);
         
 
 
@@ -135,6 +137,7 @@ namespace Tetris
         XULWin::TextBox * mMovesAheadTextBox;
         XULWin::MenuList * mStrategiesMenuList;
         XULWin::Button * mClearPrecalculatedButton;
+        XULWin::Button * mSplatterButton;
         
         XULWin::Radio * mPlayerIsHuman;
         XULWin::Radio * mPlayerIsComputer;
@@ -170,6 +173,8 @@ namespace Tetris
         boost::scoped_ptr<Poco::Timer> mGameCopyTimer;
         boost::scoped_ptr<Game> mGameCopy;
         mutable boost::mutex mGameCopyMutex;
+
+        Poco::Random mRandom;
     };
 
 } // namespace Tetris

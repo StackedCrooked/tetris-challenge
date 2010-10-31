@@ -198,7 +198,7 @@ namespace Tetris
             return;
         }
 
-        if (getCurrentSearchDepth() == 0)
+        if (getCurrentSearchDepth() == 0 || !mTreeRowInfos.bestNode())
         {
             return;
         }

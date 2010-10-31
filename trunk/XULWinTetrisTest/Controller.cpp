@@ -55,6 +55,7 @@ namespace Tetris
         mMovesAheadTextBox(0),
         mStrategiesMenuList(0),
         mClearPrecalculatedButton(0),
+        mSplatterButton(0),
         mGameHeightFactor(0),
         mLastBlockHeightFactor(0),
         mNumHolesFactor(0),
@@ -76,6 +77,7 @@ namespace Tetris
         #else
         mConsoleVisible(false)
         #endif
+        ,mRandom()
     {
         //
         // Parse the XUL document.
@@ -170,7 +172,9 @@ namespace Tetris
             mScopedEventListener.connect(mStrategiesMenuList->el(), boost::bind(&Controller::onStrategySelected, this, _1, _2));
         }
 
-		
+		mSplatterButton = findComponentById<XULWin::Button>("splatterButton");
+        mScopedEventListener.connect(mSplatterButton->el(), boost::bind(&Controller::onSplatter, this, _1, _2));
+
         mGameHeightFactor = findComponentById<XULWin::SpinButton>("gameHeightFactor");
         mLastBlockHeightFactor = findComponentById<XULWin::SpinButton>("lastBlockHeightFactor");
         mNumHolesFactor = findComponentById<XULWin::SpinButton>("numHolesFactor");
@@ -231,6 +235,54 @@ namespace Tetris
         ScopedAtom<Game> game(*mProtectedGame.get());
         mGameCopy.reset(game->clone().release());
     }
+
+        
+    LRESULT Controller::onSplatter(WPARAM wParam, LPARAM lParam)
+    {
+        mComputerPlayer.reset();
+
+        {
+            ScopedAtom<Game> wgame(*mProtectedGame.get());
+            Game & game(*wgame.get());
+            game.clearPrecalculatedNodes();
+
+            Grid & grid = const_cast<GameStateNode*>(game.currentNode())->state().grid();
+
+            for (size_t rowIdx = 8; rowIdx != grid.numRows(); ++rowIdx)
+            {            
+                size_t count = 0;
+                for (size_t colIdx = 0; colIdx != grid.numColumns(); ++colIdx)
+                {
+                    if (grid.get(rowIdx, colIdx))
+                    {
+                        count++;
+                    }
+                }
+
+                for (size_t colIdx = 0; colIdx != grid.numColumns(); ++colIdx)
+                {
+                    if (count + 1 == grid.numColumns())
+                    {
+                        break;
+                    }
+
+                    if (mRandom.nextBool())
+                    {
+                        BlockType blockType = static_cast<BlockType>((mRandom.nextChar() % cBlockTypeCount) + 1);
+                        grid.set(rowIdx, colIdx, blockType);
+                        count++;
+                    }
+                }
+            }
+        }
+        {
+            boost::mutex::scoped_lock lock(mGameCopyMutex);
+            ScopedAtom<Game> wgame(*mProtectedGame.get());
+            Game & game(*wgame.get());
+            mGameCopy.reset(game.clone().release());
+        }
+        return XULWin::cHandled;
+    }
     
         
     LRESULT Controller::onSelectComputerPlayer(WPARAM wParam, LPARAM lParam)
@@ -250,7 +302,7 @@ namespace Tetris
 
 
     LRESULT Controller::onNew(WPARAM wParam, LPARAM lParam)
-    {        
+    {
         boost::mutex::scoped_lock lock(mGameCopyMutex);
         mComputerPlayer.reset();
         mGravity.reset();

@@ -121,6 +121,7 @@
             </menupopup>
           </menulist>
           <!--<button id="clearPrecalculatedButton" label="Clear precalculated" />-->
+          <button id="splatterButton" label="Splatter" />
         </hbox>
         <spacer height="5" />
         <grid>
