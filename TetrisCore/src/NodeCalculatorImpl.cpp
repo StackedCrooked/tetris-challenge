@@ -81,7 +81,6 @@ namespace Tetris
     {
         Assert(status() == NodeCalculator::Status_Finished);
         boost::mutex::scoped_lock lock(mNodeMutex);
-		Assert(mResult);
 		return mResult;
     }
 

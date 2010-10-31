@@ -102,8 +102,6 @@ namespace Tetris
 
         void setText(XULWin::StringValueController * inComponent, const std::string & inText);
 
-        int calculateRemainingTimeMs(Game & game) const;
-
         LRESULT onNew(WPARAM wParam, LPARAM lParam);
         LRESULT onShowConsole(WPARAM wParam, LPARAM lParam);
         LRESULT onQuit(WPARAM wParam, LPARAM lParam);

@@ -152,7 +152,6 @@ namespace Tetris
         }        
 
         mWorkerPool.wait();
-        Assert(getCurrentSearchDepth() >= 1 || getQuitFlag());
     }
 
 } // namespace Tetris
