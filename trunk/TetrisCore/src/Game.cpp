@@ -47,13 +47,11 @@ namespace Tetris
 
         size_t currentBlockIndex() const;
 
-        GameStateNode * currentNode();
+		void appendPrecalculatedNode(NodePtr inNode);
 
         const GameStateNode * currentNode() const;
 
         const GameStateNode * lastPrecalculatedNode() const;
-
-        GameStateNode * lastPrecalculatedNode();
 
         bool navigateNodeDown();
 
@@ -275,12 +273,6 @@ namespace Tetris
     }
 
 
-    GameStateNode * GameImpl::currentNode()
-    {
-        return mCurrentNode.get();
-    }
-
-
     const GameStateNode * GameImpl::currentNode() const
     {
         return mCurrentNode.get();
@@ -293,10 +285,10 @@ namespace Tetris
     }
 
 
-    GameStateNode * GameImpl::lastPrecalculatedNode()
-    {
-        return mCurrentNode->endNode();
-    }
+	void GameImpl::appendPrecalculatedNode(NodePtr inNode)
+	{
+		mCurrentNode->endNode()->addChild(inNode);
+	}
 
 
     bool GameImpl::navigateNodeDown()
@@ -541,12 +533,6 @@ namespace Tetris
     }
 
 
-    GameStateNode * Game::currentNode()
-    {
-        return mImpl->currentNode();
-    }
-
-
     const GameStateNode * Game::currentNode() const
     {
         return mImpl->currentNode();
@@ -559,10 +545,10 @@ namespace Tetris
     }
 
 
-    GameStateNode * Game::lastPrecalculatedNode()
-    {
-        return mImpl->lastPrecalculatedNode();
-    }
+	void Game::appendPrecalculatedNode(NodePtr inNode)
+	{
+		mImpl->appendPrecalculatedNode(inNode);
+	}
 
 
     bool Game::navigateNodeDown()
