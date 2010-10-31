@@ -27,21 +27,21 @@ namespace Tetris
         NodeCalculatorImpl(inNode, inBlockTypes, inWidths, inEvaluator, inWorkerPool)
     {
     }
-		
-		
-	MultithreadedNodeCalculator::~MultithreadedNodeCalculator()
-	{
+        
+        
+    MultithreadedNodeCalculator::~MultithreadedNodeCalculator()
+    {
         setQuitFlag();
         mMainWorker.interruptAndClearQueue();
-		mWorkerPool.interruptAndClearQueue();
-	}
+        mWorkerPool.interruptAndClearQueue();
+    }
 
 
     void MultithreadedNodeCalculator::generateChildNodes(NodePtr ioNode,
                                                          boost::shared_ptr<Evaluator> inEvaluator,
-														 BlockType inBlockType,
-														 int inDepth,
-														 int inWidth)
+                                                         BlockType inBlockType,
+                                                         int inDepth,
+                                                         int inWidth)
     {
         ChildNodes childNodes = ChildNodes(GameStateComparator(inEvaluator->clone()));
         GenerateOffspring(ioNode, inBlockType, *inEvaluator, childNodes);
@@ -63,10 +63,10 @@ namespace Tetris
 
 
     void MultithreadedNodeCalculator::populateNodes(NodePtr ioNode,
-		                                            const BlockTypes & inBlockTypes,
-													const std::vector<int> & inWidths,
-													size_t inIndex,
-													size_t inEndIndex)
+                                                    const BlockTypes & inBlockTypes,
+                                                    const std::vector<int> & inWidths,
+                                                    size_t inIndex,
+                                                    size_t inEndIndex)
     {
 
         // We want to at least perform a search of depth 1.
@@ -90,13 +90,13 @@ namespace Tetris
         {
             Assert(ioNode->children().empty());
             boost::shared_ptr<Evaluator> evaluator(mEvaluator->clone().release());
-			Worker::Task task = boost::bind(&MultithreadedNodeCalculator::generateChildNodes,
-				                            this,
-											ioNode,
-										    evaluator,
-											inBlockTypes[inIndex],
-											inIndex + 1,
-											inWidths[inIndex]);
+            Worker::Task task = boost::bind(&MultithreadedNodeCalculator::generateChildNodes,
+                                            this,
+                                            ioNode,
+                                            evaluator,
+                                            inBlockTypes[inIndex],
+                                            inIndex + 1,
+                                            inWidths[inIndex]);
             mWorkerPool.schedule(task);
             
             // End of recursion.

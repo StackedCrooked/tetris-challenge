@@ -29,6 +29,10 @@ namespace Tetris
 
         int getActiveWorkerCount() const;
 
+        // Change the number of workers in the pool.
+        // Setting a smaller size when there are workers active is safe, but interrupts their task.
+        void resize(size_t inSize);
+
         // Wait until all Workers have finished their queue
         void wait();
         

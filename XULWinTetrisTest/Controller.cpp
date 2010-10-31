@@ -44,6 +44,8 @@ namespace Tetris
         mLevelTextBox(0),
         mScoreTextBox(0),
         mTotalLinesTextBox(0),
+		mAutoSelect(0),
+		mThreadCount(0),
         mSearchDepth(0),
         mCurrentSearchDepth(0),
         mMovementSpeed(0),
@@ -126,6 +128,13 @@ namespace Tetris
         mLevelTextBox = findComponentById<XULWin::TextBox>("levelTextBox");
         mScoreTextBox = findComponentById<XULWin::TextBox>("scoreTextBox");
         mTotalLinesTextBox = findComponentById<XULWin::TextBox>("totalLinesTextBox");
+		
+		mAutoSelect = findComponentById<XULWin::CheckBox>("autoSelect");
+
+		if (mThreadCount = findComponentById<XULWin::SpinButton>("threadCount"))
+		{
+			XULWin::WinAPI::SpinButton_SetRange(mThreadCount->handle(), 0, 32);
+		}
 
         if (mSearchDepth = findComponentById<XULWin::SpinButton>("searchDepth"))
         {
@@ -151,6 +160,7 @@ namespace Tetris
             mScopedEventListener.connect(mStrategiesMenuList->el(), boost::bind(&Controller::onStrategySelected, this, _1, _2));
         }
 
+		
         mGameHeightFactor = findComponentById<XULWin::SpinButton>("gameHeightFactor");
         mLastBlockHeightFactor = findComponentById<XULWin::SpinButton>("lastBlockHeightFactor");
         mNumHolesFactor = findComponentById<XULWin::SpinButton>("numHolesFactor");
@@ -563,6 +573,23 @@ namespace Tetris
                 setText(mLinesTextBoxes[idx], MakeString() << stats.numLines(idx));
             }
         }
+
+		if (mComputerPlayer && mAutoSelect && mThreadCount)
+		{
+			mThreadCount->setDisabled(mAutoSelect->isChecked());
+			if (mAutoSelect->isChecked())
+			{
+				mComputerPlayer->setWorkerCount(0);
+				if (XULWin::String2Int(mThreadCount->getValue()) != mComputerPlayer->workerCount())
+				{
+					mThreadCount->setValue(XULWin::Int2String(mComputerPlayer->workerCount()));
+				}
+			}
+			else
+			{
+				mComputerPlayer->setWorkerCount(XULWin::String2Int(mThreadCount->getValue(), 0));
+			}
+		}
 
         if (mStrategiesMenuList
 			&& !XULWin::WinAPI::ComboBox_IsOpen(mStrategiesMenuList->handle())

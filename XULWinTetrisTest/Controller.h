@@ -133,6 +133,9 @@ namespace Tetris
         XULWin::MenuList * mStrategiesMenuList;
         XULWin::Button * mClearPrecalculatedButton;
 
+
+		XULWin::SpinButton * mThreadCount;
+		XULWin::CheckBox * mAutoSelect;
         XULWin::SpinButton * mSearchDepth;
         XULWin::SpinButton * mSearchWidth;
         XULWin::SpinButton * mGameHeightFactor;

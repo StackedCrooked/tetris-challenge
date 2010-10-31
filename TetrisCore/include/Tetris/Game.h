@@ -64,7 +64,7 @@ namespace Tetris
 
         const GameStateNode * lastPrecalculatedNode() const;
 
-		void appendPrecalculatedNode(NodePtr inNode);
+        void appendPrecalculatedNode(NodePtr inNode);
 
         bool navigateNodeDown();
 
