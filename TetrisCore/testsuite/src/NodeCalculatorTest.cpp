@@ -39,8 +39,8 @@ void NodeCalculatorTest::testNodeCalculator()
     int depth = 5;
     int width = 5;
 #else
-    int depth = 5;
-    int width = 5;
+    int depth = 6;
+    int width = 6;
 #endif
 
     for (size_t i = 0; i != 10; ++i)
@@ -52,12 +52,14 @@ void NodeCalculatorTest::testNodeCalculator()
             std::cout << ".";
         }
     }
-
-    testInterrupt(Depth(depth), Width(width), WorkerCount(6), TimeMs(10000));
-    testInterrupt(Depth(depth), Width(width), WorkerCount(4), TimeMs(10000));
-    testInterrupt(Depth(depth), Width(width), WorkerCount(3), TimeMs(10000));
-    testInterrupt(Depth(depth), Width(width), WorkerCount(2), TimeMs(10000));
-    testInterrupt(Depth(depth), Width(width), WorkerCount(1), TimeMs(10000));
+	
+    testInterrupt(Depth(depth), Width(width), WorkerCount(8), TimeMs(15000));
+    testInterrupt(Depth(depth), Width(width), WorkerCount(6), TimeMs(15000));
+    testInterrupt(Depth(depth), Width(width), WorkerCount(5), TimeMs(15000));
+    testInterrupt(Depth(depth), Width(width), WorkerCount(4), TimeMs(15000));
+    testInterrupt(Depth(depth), Width(width), WorkerCount(3), TimeMs(15000));
+    testInterrupt(Depth(depth), Width(width), WorkerCount(2), TimeMs(15000));
+    testInterrupt(Depth(depth), Width(width), WorkerCount(1), TimeMs(15000));
     testInterrupt(Depth(1), Width(1), WorkerCount(1), TimeMs(10000));
 }
 

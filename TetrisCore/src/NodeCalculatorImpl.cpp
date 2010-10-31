@@ -210,22 +210,47 @@ namespace Tetris
 		}
 		results.pop();
 		
+		NodePtr currentNode;
 		NodePtr currentParent = mNode;
 		while (!results.empty())
-		{
-			NodePtr currentNode = results.top();
-			NodePtr copy(new GameStateNode(currentParent, Create<GameState>(results.top()->state()), results.top()->evaluator().clone()));
+		{			
+			currentNode = results.top();
+			NodePtr copy(new GameStateNode(currentParent, Create<GameState>(currentNode->state()), currentNode->evaluator().clone()));
 			if (!mResult)
 			{
 				mResult = copy;
 			}
 			else
 			{
+				Assert(mResult->endNode()->depth() + 1 == copy->depth());
 				mResult->endNode()->addChild(copy);
 			}
 			currentParent = copy;
 			results.pop();
 		}
+
+
+		//
+		// A small built-in self-test.
+		//
+		#ifdef _DEBUG
+		Assert(mResult->depth() == mNode->depth() + 1);
+		NodePtr node = mResult;
+		while (true)
+		{
+			Assert(node->children().size() <= 1);
+			if (node->children().size() == 1)
+			{
+				NodePtr nextNode = *node->children().begin();
+				Assert(nextNode->depth() == node->depth() + 1);
+				node = nextNode;				
+			}
+			else
+			{
+				break;
+			}
+		}
+		#endif
 	}
 
 

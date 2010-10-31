@@ -19,7 +19,9 @@
     <ClCompile Include="src\WorkerTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\NodeCalculatorTest.cpp" />
+    <ClCompile Include="src\NodeCalculatorTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\NodeCalculatorTest.h">

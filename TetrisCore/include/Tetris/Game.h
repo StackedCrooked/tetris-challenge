@@ -4,6 +4,7 @@
 
 #include "Tetris/BlockTypes.h"
 #include "Tetris/Direction.h"
+#include "Tetris/NodePtr.h"
 #include <memory>
 
 
@@ -59,13 +60,11 @@ namespace Tetris
         //
         // For AI
         //
-        GameStateNode * currentNode();
-
         const GameStateNode * currentNode() const;
 
         const GameStateNode * lastPrecalculatedNode() const;
 
-        GameStateNode * lastPrecalculatedNode();
+		void appendPrecalculatedNode(NodePtr inNode);
 
         bool navigateNodeDown();
 
