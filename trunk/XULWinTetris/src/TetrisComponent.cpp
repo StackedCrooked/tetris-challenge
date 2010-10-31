@@ -356,10 +356,6 @@ namespace Tetris
             ::ReleaseDC(handle(), hDC);
             return 0;
         }
-        else if (inMessage == WM_KEYDOWN)
-        {
-            return onKeyDown(wParam, lParam);
-        }
         return Super::handleMessage(inMessage, wParam, lParam);
     }
 
