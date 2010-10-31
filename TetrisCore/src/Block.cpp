@@ -14,6 +14,8 @@ namespace Tetris
     public:
         BlockImpl(BlockType inType, Rotation inRotation, Row inRow, Column inColumn);
 
+		std::auto_ptr<BlockImpl> clone() const;
+
         BlockType type() const;
 
         size_t rotation() const;
@@ -52,6 +54,12 @@ namespace Tetris
     {
         Assert(mRotation >= 0 && mRotation <= 3);
     }
+
+
+	std::auto_ptr<BlockImpl> BlockImpl::clone() const
+	{
+		return Create<BlockImpl>(*this);
+	}
 
 
     BlockType BlockImpl::type() const
@@ -122,7 +130,7 @@ namespace Tetris
 
 
     Block::Block(const Block & rhs) :
-        mImpl(Create<BlockImpl>(*rhs.mImpl).release())
+		mImpl(rhs.mImpl->clone().release())
     {
     }
 

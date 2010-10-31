@@ -95,7 +95,7 @@ namespace Tetris
                                            int inSearchDepth,
                                            int inSearchWidth) :
         mProtectedGame(inProtectedGame),
-        mWorkerPool("ComputerPlayer WorkerPool", 1), //GetWorkerCount()),
+        mWorkerPool("ComputerPlayer WorkerPool", GetWorkerCount()),
         mEvaluator(inEvaluator.release()),
         mBlockMover(new BlockMover(mProtectedGame, 20)),
         mTimer(10, 10),
@@ -202,7 +202,7 @@ namespace Tetris
 			if (!game.isGameOver())
 			{
 				int numPrecalculated = game.lastPrecalculatedNode()->depth() - game.currentNode()->depth();
-				if (numPrecalculated == 0)
+				if (numPrecalculated < 8)
 				{                
 					Assert(!mNodeCalculator);
 
