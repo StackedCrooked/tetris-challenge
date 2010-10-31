@@ -634,7 +634,8 @@ namespace Tetris
                         *mProtectedGame,
                         createEvaluator(), 
                         mSearchDepth ? XULWin::String2Int(mSearchDepth->getValue(), 4) : 4,
-                        mSearchWidth ? XULWin::String2Int(mSearchWidth->getValue(), 4) : 4));
+                        mSearchWidth ? XULWin::String2Int(mSearchWidth->getValue(), 4) : 4,
+                        XULWin::String2Int(mThreadCount->getValue(), 0)));
             }
 
             if (mMovesAheadTextBox)
@@ -662,21 +663,22 @@ namespace Tetris
                 mComputerPlayer->setSearchWidth(XULWin::String2Int(mSearchWidth->getValue(), 4));
             }
 
-            if (mAutoSelect && mThreadCount)
+            if (mThreadCount && mAutoSelect)
 		    {
 			    mThreadCount->setDisabled(mAutoSelect->isChecked());
 			    if (mAutoSelect->isChecked())
 			    {
 				    mComputerPlayer->setWorkerCount(0);
-				    if (XULWin::String2Int(mThreadCount->getValue()) != mComputerPlayer->workerCount())
-				    {
-					    mThreadCount->setValue(XULWin::Int2String(mComputerPlayer->workerCount()));
-				    }
 			    }
 			    else
 			    {
 				    mComputerPlayer->setWorkerCount(XULWin::String2Int(mThreadCount->getValue(), 0));
 			    }
+                
+				if (XULWin::String2Int(mThreadCount->getValue()) != mComputerPlayer->workerCount())
+				{
+					mThreadCount->setValue(XULWin::Int2String(mComputerPlayer->workerCount()));
+				}
 		    }
         }
         else if (mPlayerIsHuman->isSelected())

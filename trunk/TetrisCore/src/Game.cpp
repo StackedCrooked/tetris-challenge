@@ -71,7 +71,6 @@ namespace Tetris
         friend class Game;
         size_t mNumRows;
         size_t mNumColumns;
-        int mLevel;
         NodePtr mCurrentNode;
         boost::scoped_ptr<Block> mActiveBlock;
         boost::scoped_ptr<BlockFactory> mBlockFactory;
@@ -83,7 +82,6 @@ namespace Tetris
     GameImpl::GameImpl(size_t inNumRows, size_t inNumColumns) :
         mNumRows(inNumRows),
         mNumColumns(inNumColumns),
-        mLevel(0),
         mCurrentNode(GameStateNode::CreateRootNode(inNumRows, inNumColumns).release()),
         mActiveBlock(),
         mBlockFactory(new BlockFactory),
@@ -101,7 +99,6 @@ namespace Tetris
     GameImpl::GameImpl(const GameImpl & rhs) :
         mNumRows(rhs.mNumRows),
         mNumColumns(rhs.mNumColumns),
-        mLevel(0),
         mCurrentNode(rhs.mCurrentNode->clone()),
         mActiveBlock(new Block(*rhs.mActiveBlock)),
         mBlockFactory(), // YES! Because we must be CERTAIN that getFutureBlocks() will always return the same result.
@@ -431,7 +428,7 @@ namespace Tetris
 
     int GameImpl::level() const 
     {
-        return mLevel;
+        return mCurrentNode->state().stats().numLines() / 10;
     }
 
 

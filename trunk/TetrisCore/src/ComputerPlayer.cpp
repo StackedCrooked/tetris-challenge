@@ -31,7 +31,8 @@ namespace Tetris
         ComputerPlayerImpl(const Protected<Game> & inProtectedGame,
                            std::auto_ptr<Evaluator> inEvaluator,
                            int inSearchDepth,
-                           int inSearchWidth);
+                           int inSearchWidth,
+                           int inWorkerCount);
 
         ~ComputerPlayerImpl()
         {
@@ -110,9 +111,10 @@ namespace Tetris
     ComputerPlayerImpl::ComputerPlayerImpl(const Protected<Game> & inProtectedGame,
                                            std::auto_ptr<Evaluator> inEvaluator,
                                            int inSearchDepth,
-                                           int inSearchWidth) :
+                                           int inSearchWidth,
+                                           int inWorkerCount) :
         mProtectedGame(inProtectedGame),
-        mWorkerPool("ComputerPlayer WorkerPool", GetWorkerCount()),
+        mWorkerPool("ComputerPlayer WorkerPool", inWorkerCount > 0 ? inWorkerCount : GetWorkerCount()),
         mEvaluator(inEvaluator.release()),
         mBlockMover(new BlockMover(mProtectedGame, 20)),
         mTimer(10, 10),
@@ -290,8 +292,9 @@ namespace Tetris
     ComputerPlayer::ComputerPlayer(const Protected<Game> & inProtectedGame,
                                    std::auto_ptr<Evaluator> inEvaluator,
                                    int inSearchDepth,
-                                   int inSearchWidth) :
-        mImpl(new ComputerPlayerImpl(inProtectedGame, inEvaluator, inSearchDepth, inSearchWidth))
+                                   int inSearchWidth,
+                                   int inWorkerCount) :
+        mImpl(new ComputerPlayerImpl(inProtectedGame, inEvaluator, inSearchDepth, inSearchWidth, inWorkerCount))
     {
     }
 

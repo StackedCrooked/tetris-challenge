@@ -175,15 +175,15 @@ namespace Tetris
 
 
     Survival::Survival() :
-        Evaluator(GameHeightFactor(-4),
-                  LastBlockHeightFactor(-1),
+        Evaluator(GameHeightFactor(-2),
+                  LastBlockHeightFactor(0),
                   NumHolesFactor(-2),
                   NumSinglesFactor(1),
                   NumDoublesFactor(2),
                   NumTriplesFactor(4),
                   NumTetrisesFactor(8),
-                  SearchDepth(8),
-                  SearchWidth(4))
+                  SearchDepth(5),
+                  SearchWidth(5))
     {
     }
 
@@ -193,8 +193,8 @@ namespace Tetris
                   LastBlockHeightFactor(-1),
                   NumHolesFactor(-4),
                   NumSinglesFactor(-4),
-                  NumDoublesFactor(-6),
-                  NumTriplesFactor(-16),
+                  NumDoublesFactor(-8),
+                  NumTriplesFactor(-8),
                   NumTetrisesFactor(16),
                   SearchDepth(8),
                   SearchWidth(5))
@@ -205,24 +205,20 @@ namespace Tetris
     int MakeTetrises::evaluate(const GameState & inGameState) const
     {
         int result = 0;
+
         const Grid & grid = inGameState.grid();
+    
+        size_t c = grid.numColumns() - 1;
         if (grid.numRows() >= 4)
         {
-            size_t colIdx = 0;
-            for (; colIdx != grid.numColumns(); ++colIdx)
+            size_t r = grid.numRows() - 4;
+            for (; r != grid.numRows(); ++r)
             {
-                size_t rowIdx = grid.numRows() - 4;
-                for (; rowIdx != grid.numRows(); ++rowIdx)
+                if (grid.get(r, c))
                 {
-                    if (grid.get(rowIdx, 0))
-                    {
-                        break;
-                    }
-                }
-                if (rowIdx == grid.numRows())
-                {
-                    // Bonus points for the reservation of an empty spot for making a tetris.
-                    return 2 + Evaluator::evaluate(inGameState);
+                    // Penalty for occupying the last column,
+                    // which is reserved for making tetrises.
+                    return Evaluator::evaluate(inGameState) - 4;
                 }
             }
         }
