@@ -44,6 +44,8 @@ namespace Tetris
         mLevelTextBox(0),
         mScoreTextBox(0),
         mTotalLinesTextBox(0),
+        mPlayerIsComputer(0),
+        mPlayerIsHuman(0),
 		mAutoSelect(0),
 		mThreadCount(0),
         mSearchDepth(0),
@@ -129,6 +131,14 @@ namespace Tetris
         mScoreTextBox = findComponentById<XULWin::TextBox>("scoreTextBox");
         mTotalLinesTextBox = findComponentById<XULWin::TextBox>("totalLinesTextBox");
 		
+		mPlayerIsComputer = findComponentById<XULWin::Radio>("playerIsComputer");
+        mScopedEventListener.connect(mPlayerIsComputer->el(), BM_SETSTATE, boost::bind(&Controller::onSelectComputerPlayer, this, _1, _2));
+		mPlayerIsHuman = findComponentById<XULWin::Radio>("playerIsHuman");
+
+        // HACK! This textbox is used to prevent the arrow keys to
+        // change the selected radio button during human play.
+        mKeyboardSink = findComponentById<XULWin::TextBox>("keyboardSink");
+
 		mAutoSelect = findComponentById<XULWin::CheckBox>("autoSelect");
 
 		if (mThreadCount = findComponentById<XULWin::SpinButton>("threadCount"))
@@ -201,11 +211,6 @@ namespace Tetris
 
 		// Main thread should have highest priority for responsiveness.
         ::SetThreadPriority(::GetCurrentThread(), THREAD_PRIORITY_ABOVE_NORMAL);
-        
-        mComputerPlayer.reset(new ComputerPlayer(*mProtectedGame,
-                                                 createEvaluator(), 
-                                                 mSearchDepth ? XULWin::String2Int(mSearchDepth->getValue(), 4) : 4,
-                                                 mSearchWidth ? XULWin::String2Int(mSearchWidth->getValue(), 4) : 4));
 
         
         mGameCopyTimer->start(Poco::TimerCallback<Controller>(*this, &Controller::onGameCopy));
@@ -226,6 +231,22 @@ namespace Tetris
         ScopedAtom<Game> game(*mProtectedGame.get());
         mGameCopy.reset(game->clone().release());
     }
+    
+        
+    LRESULT Controller::onSelectComputerPlayer(WPARAM wParam, LPARAM lParam)
+    {
+        // HACK! This hack fixes the unwanted side-effect
+        // caused by the previous hack that prevented the
+        // arrow keys to change the radio selection during
+        // human play.
+        if (wParam)
+        {
+            mPlayerIsHuman->setSelected(false);
+            mPlayerIsComputer->setSelected(true);
+            return XULWin::cHandled;
+        }
+        return XULWin::cUnhandled;
+    }
 
 
     LRESULT Controller::onNew(WPARAM wParam, LPARAM lParam)
@@ -234,13 +255,8 @@ namespace Tetris
         mComputerPlayer.reset();
         mGravity.reset();
         mProtectedGame.reset();
-        
         mProtectedGame.reset(new Protected<Game>(std::auto_ptr<Game>(new Game(mTetrisComponent->getNumRows(), mTetrisComponent->getNumColumns()))));
-        mGravity.reset(new Gravity(*mProtectedGame));        
-        mComputerPlayer.reset(new ComputerPlayer(*mProtectedGame,
-                                                 createEvaluator(), 
-                                                 mSearchDepth ? XULWin::String2Int(mSearchDepth->getValue(), 4) : 4,
-                                                 mSearchWidth ? XULWin::String2Int(mSearchWidth->getValue(), 4) : 4));
+        mGravity.reset(new Gravity(*mProtectedGame));
         return XULWin::cHandled;
     }
 
@@ -352,6 +368,11 @@ namespace Tetris
 
     void Controller::updateStrategy()
     {
+        if (!mComputerPlayer)
+        {
+            return;
+        }
+
         std::string id = mStrategiesMenuList->getLabel();
         if (id == "Make Tetrises")
         {
@@ -427,37 +448,36 @@ namespace Tetris
 
     bool Controller::move(TetrisComponent * tetrisComponent, Direction inDirection)
     {
-        if (mComputerPlayer)
+        if (mPlayerIsHuman->isSelected())
         {
-            return false;
+            ScopedAtom<Game> wgame(*mProtectedGame);
+            Game & game = *wgame.get();
+            return game.move(inDirection);
         }
-        ScopedAtom<Game> wgame(*mProtectedGame);
-        Game & game = *wgame.get();
-        return game.move(inDirection);
+        return false;
     }
 
 
     void Controller::drop(TetrisComponent * tetrisComponent)
     {
-        if (mComputerPlayer)
+        if (mPlayerIsHuman->isSelected())
         {
-            return;
+            ScopedAtom<Game> wgame(*mProtectedGame);
+            Game & game = *wgame.get();
+            game.drop();
         }
-        ScopedAtom<Game> wgame(*mProtectedGame);
-        Game & game = *wgame.get();
-        game.drop();
     }
 
 
     bool Controller::rotate(TetrisComponent * tetrisComponent)
     {
-        if (mComputerPlayer)
+        if (mPlayerIsHuman->isSelected())
         {
-            return false;
+            ScopedAtom<Game> wgame(*mProtectedGame);
+            Game & game = *wgame.get();
+            return game.rotate();
         }
-        ScopedAtom<Game> wgame(*mProtectedGame);
-        Game & game = *wgame.get();
-        return game.rotate();
+        return false;
     }
 
 
@@ -524,15 +544,16 @@ namespace Tetris
         }
 
 
-        if (mMovementSpeed)
-        {
-            mComputerPlayer->setMoveSpeed(XULWin::String2Int(mMovementSpeed->getValue(), 1));
-        }
-
-
         if (mStatusTextBox)
         {
-            setText(mStatusTextBox, mGameCopy->currentNode()->children().empty() ? "Thinking" : "Moving");
+            if (mPlayerIsComputer->isSelected())
+            {
+                setText(mStatusTextBox, mGameCopy->currentNode()->children().empty() ? "Thinking" : "Moving");
+            }
+            else
+            {
+                setText(mStatusTextBox, "Inactive");
+            }
         }
 
 
@@ -541,28 +562,6 @@ namespace Tetris
             setText(mBlockCountTextBox, MakeString() << (mGameCopy->currentNode()->depth() + 1));
         }
 
-
-        if (mCurrentSearchDepth)
-        {
-            setText(mCurrentSearchDepth, MakeString() << mComputerPlayer->currentSearchDepth() << "/" << mComputerPlayer->searchDepth());
-        }
-
-
-        if (mMovesAheadTextBox)
-        {
-            setText(mMovesAheadTextBox, MakeString() << (mGameCopy->lastPrecalculatedNode()->depth() - mGameCopy->currentNode()->depth()));
-        }
-
-
-        if (mSearchDepth)
-        {
-            mComputerPlayer->setSearchDepth(XULWin::String2Int(mSearchDepth->getValue(), 4));
-        }
-
-        if (mSearchWidth)
-        {
-            mComputerPlayer->setSearchWidth(XULWin::String2Int(mSearchWidth->getValue(), 4));
-        }
 
 
         for (size_t idx = 0; idx != 4; ++idx)
@@ -574,24 +573,74 @@ namespace Tetris
             }
         }
 
-		if (mComputerPlayer && mAutoSelect && mThreadCount)
-		{
-			mThreadCount->setDisabled(mAutoSelect->isChecked());
-			if (mAutoSelect->isChecked())
-			{
-				mComputerPlayer->setWorkerCount(0);
-				if (XULWin::String2Int(mThreadCount->getValue()) != mComputerPlayer->workerCount())
-				{
-					mThreadCount->setValue(XULWin::Int2String(mComputerPlayer->workerCount()));
-				}
-			}
-			else
-			{
-				mComputerPlayer->setWorkerCount(XULWin::String2Int(mThreadCount->getValue(), 0));
-			}
-		}
+        if (mPlayerIsComputer->isSelected())
+        {
+            if (!mComputerPlayer)
+            {
+                mComputerPlayer.reset(
+                    new ComputerPlayer(
+                        *mProtectedGame,
+                        createEvaluator(), 
+                        mSearchDepth ? XULWin::String2Int(mSearchDepth->getValue(), 4) : 4,
+                        mSearchWidth ? XULWin::String2Int(mSearchWidth->getValue(), 4) : 4));
+            }
 
-        if (mStrategiesMenuList
+            if (mMovesAheadTextBox)
+            {
+                setText(mMovesAheadTextBox, MakeString() << (mGameCopy->lastPrecalculatedNode()->depth() - mGameCopy->currentNode()->depth()));
+            }
+            
+            if (mCurrentSearchDepth)
+            {
+                setText(mCurrentSearchDepth, MakeString() << mComputerPlayer->currentSearchDepth() << "/" << mComputerPlayer->searchDepth());
+            }
+
+            if (mMovementSpeed)
+            {
+                mComputerPlayer->setMoveSpeed(XULWin::String2Int(mMovementSpeed->getValue(), 1));
+            }
+
+            if (mSearchDepth)
+            {
+                mComputerPlayer->setSearchDepth(XULWin::String2Int(mSearchDepth->getValue(), 4));
+            }
+
+            if (mSearchWidth)
+            {
+                mComputerPlayer->setSearchWidth(XULWin::String2Int(mSearchWidth->getValue(), 4));
+            }
+
+            if (mAutoSelect && mThreadCount)
+		    {
+			    mThreadCount->setDisabled(mAutoSelect->isChecked());
+			    if (mAutoSelect->isChecked())
+			    {
+				    mComputerPlayer->setWorkerCount(0);
+				    if (XULWin::String2Int(mThreadCount->getValue()) != mComputerPlayer->workerCount())
+				    {
+					    mThreadCount->setValue(XULWin::Int2String(mComputerPlayer->workerCount()));
+				    }
+			    }
+			    else
+			    {
+				    mComputerPlayer->setWorkerCount(XULWin::String2Int(mThreadCount->getValue(), 0));
+			    }
+		    }
+        }
+        else if (mPlayerIsHuman->isSelected())
+        {
+            // HACK! Move the focus away from the the GUI by forcing it on a hidden text widget.
+            // If we don't do this then the left arrow key would switch the modus back to computer play.
+            if (::GetFocus() != mKeyboardSink->handle())
+            {
+                ::SetFocus(mKeyboardSink->handle());
+            }
+            mComputerPlayer.reset();
+        }
+
+
+        if (mComputerPlayer
+            && mStrategiesMenuList
 			&& !XULWin::WinAPI::ComboBox_IsOpen(mStrategiesMenuList->handle())
 			&& mGameHeightFactor
             && mLastBlockHeightFactor

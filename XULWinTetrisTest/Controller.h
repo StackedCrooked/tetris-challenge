@@ -108,6 +108,9 @@ namespace Tetris
         LRESULT onAboutMenuItem(WPARAM wParam, LPARAM lParam);
         LRESULT onStrategySelected(WPARAM wParam, LPARAM lParam);
         LRESULT onClearPrecalculated(WPARAM wParam, LPARAM lParam);
+        LRESULT onSelectComputerPlayer(WPARAM wParam, LPARAM lParam);
+        
+
 
         std::auto_ptr<Evaluator> createEvaluator();
 
@@ -132,6 +135,10 @@ namespace Tetris
         XULWin::TextBox * mMovesAheadTextBox;
         XULWin::MenuList * mStrategiesMenuList;
         XULWin::Button * mClearPrecalculatedButton;
+        
+        XULWin::Radio * mPlayerIsHuman;
+        XULWin::Radio * mPlayerIsComputer;
+        XULWin::TextBox * mKeyboardSink;
 
 
 		XULWin::SpinButton * mThreadCount;

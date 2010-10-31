@@ -198,6 +198,11 @@ namespace Tetris
             return;
         }
 
+        if (getCurrentSearchDepth() == 0)
+        {
+            return;
+        }
+
         boost::mutex::scoped_lock lock(mNodeMutex);
 
         // Get the results in the correct order by pushing the parents on a stack.

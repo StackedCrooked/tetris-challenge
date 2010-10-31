@@ -208,7 +208,8 @@ namespace Tetris
         const Grid & grid = inGameState.grid();
         if (grid.numRows() >= 4)
         {
-            for (size_t colIdx = 0; colIdx != grid.numColumns(); ++colIdx)
+            size_t colIdx = 0;
+            for (; colIdx != grid.numColumns(); ++colIdx)
             {
                 size_t rowIdx = grid.numRows() - 4;
                 for (; rowIdx != grid.numRows(); ++rowIdx)
@@ -221,7 +222,7 @@ namespace Tetris
                 if (rowIdx == grid.numRows())
                 {
                     // Bonus points for the reservation of an empty spot for making a tetris.
-                    return 4 + Evaluator::evaluate(inGameState);
+                    return 2 + Evaluator::evaluate(inGameState);
                 }
             }
         }

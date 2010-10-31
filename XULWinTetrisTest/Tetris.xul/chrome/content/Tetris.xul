@@ -70,6 +70,14 @@
         </grid>
       </groupbox>
       <groupbox>
+        <caption label="Player" />
+        <radiogroup orient="horizontal">
+          <radio id="playerIsComputer" label="Computer" selected="true" />
+          <radio id="playerIsHuman" label="Human" />
+        </radiogroup>
+        <textbox id="keyboardSink" hidden="true" />
+      </groupbox>
+      <groupbox>
         <caption label="Computer Player" />
         <grid>
           <columns>
@@ -83,7 +91,7 @@
               <label value="Status:" style="text-align:right" />
               <textbox id="statusTextBox" value="Initializing" readonly="true" style="text-align:right" flex="1" />
               <label value="Move speed:" style="text-align:right" />
-              <textbox id="movementSpeed" type="number" readonly="true" style="text-align:right" value="40" flex="1" />
+              <textbox id="movementSpeed" type="number" readonly="true" style="text-align:right" value="30" flex="1" />
             </row>
             <row align="center">
               <label value="Current depth:" style="text-align:right" />
@@ -106,11 +114,10 @@
           <label style="text-align:right" value="Preset: " />
           <menulist id="strategiesMenuList">
             <menupopup id="strategiesPopup">
-              <menuitem id="customMenuItem" label="Custom" />
               <menuitem id="makeTetrisesMenuItem" label="Make Tetrises" />
               <menuitem id="balancedMenuItem" label="Balanced" />
               <menuitem id="surviveMenuItem" label="Survive" />
-              <menuitem id="depressedMenuItem" label="Depressed" />
+              <menuitem id="customMenuItem" label="Custom" />
             </menupopup>
           </menulist>
           <!--<button id="clearPrecalculatedButton" label="Clear precalculated" />-->
