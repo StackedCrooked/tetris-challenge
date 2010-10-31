@@ -122,7 +122,6 @@ namespace Tetris
                         }
                     }
                 }
-
             }
         }
         int gameHeight = grid.numRows() - top;
@@ -194,13 +193,31 @@ namespace Tetris
                   LastBlockHeightFactor(-1),
                   NumHolesFactor(-4),
                   NumSinglesFactor(-4),
-                  NumDoublesFactor(-8),
-                  NumTriplesFactor(-8),
-                  NumTetrisesFactor(8),
+                  NumDoublesFactor(-6),
+                  NumTriplesFactor(-16),
+                  NumTetrisesFactor(16),
                   SearchDepth(8),
                   SearchWidth(5))
     {
     }
+
+
+	int MakeTetrises::evaluate(const GameState & inGameState) const
+	{
+		int result = 0;
+		const Grid & grid = inGameState.grid();
+		if (grid.numRows() >= 4)
+		{
+			for (size_t rowIdx = grid.numRows() - 4; rowIdx != grid.numRows(); ++rowIdx)
+			{
+				if (grid.get(rowIdx, 0))
+				{
+					result -= 1;
+				}
+			}
+		}
+		return result + Evaluator::evaluate(inGameState);
+	}
 
 
     Depressed::Depressed() :

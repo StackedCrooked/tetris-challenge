@@ -139,10 +139,6 @@ namespace Tetris
 
             inline NodePtr bestNode() const
             {
-				if (!(mCurrentSearchDepth > 0 && mCurrentSearchDepth <= mInfos.size()))
-				{
-					Assert(mCurrentSearchDepth > 0 && mCurrentSearchDepth <= mInfos.size());
-				}
                 NodePtr result;
                 if (mCurrentSearchDepth > 0)
                 {

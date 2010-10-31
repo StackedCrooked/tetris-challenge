@@ -190,7 +190,7 @@ namespace Tetris
         mRefreshTimer->start(boost::bind(&Controller::onRefresh, this), 10);
 
 		// Main thread should have highest priority for responsiveness.
-        ::SetThreadPriority(::GetCurrentThread(), THREAD_PRIORITY_TIME_CRITICAL);
+        ::SetThreadPriority(::GetCurrentThread(), THREAD_PRIORITY_ABOVE_NORMAL);
         
         mComputerPlayer.reset(new ComputerPlayer(*mProtectedGame,
                                                  createEvaluator(), 
@@ -348,7 +348,6 @@ namespace Tetris
             if (!dynamic_cast<const MakeTetrises *>(&mComputerPlayer->evaluator()))
             {
                 ScopedAtom<Game> game(*mProtectedGame);
-                game->clearPrecalculatedNodes();
                 mComputerPlayer->setEvaluator(Create<MakeTetrises>());
             }
         }
@@ -357,7 +356,6 @@ namespace Tetris
             if (!dynamic_cast<const Survival *>(&mComputerPlayer->evaluator()))
             {
                 ScopedAtom<Game> game(*mProtectedGame);
-                game->clearPrecalculatedNodes();
                 mComputerPlayer->setEvaluator(Create<Survival>());
             }
         }
@@ -366,7 +364,6 @@ namespace Tetris
             if (!dynamic_cast<const Balanced *>(&mComputerPlayer->evaluator()))
             {
                 ScopedAtom<Game> game(*mProtectedGame);
-                game->clearPrecalculatedNodes();
                 mComputerPlayer->setEvaluator(Create<Balanced>());
             }
         }
@@ -375,7 +372,6 @@ namespace Tetris
             if (!dynamic_cast<const Depressed *>(&mComputerPlayer->evaluator()))
             {
                 ScopedAtom<Game> game(*mProtectedGame);
-                game->clearPrecalculatedNodes();
                 mComputerPlayer->setEvaluator(Create<Depressed>());
             }
         }
@@ -464,16 +460,6 @@ namespace Tetris
     void Controller::log(const std::string & inMessage)
     {
         std::cout << inMessage << "\n";
-    }
-
-
-    int Controller::calculateRemainingTimeMs(Game & game) const
-    {
-        float numRemainingRows = static_cast<float>(game.currentNode()->state().stats().firstOccupiedRow() - (game.activeBlock().row() + 4));
-        float numRowsPerSecond = mGravity->currentSpeed();
-        float remainingTime = 1000 * numRemainingRows / numRowsPerSecond;
-        float timeRequiredForMove = static_cast<float>(game.activeBlock().numRotations() + game.numColumns()) / static_cast<float>(mComputerPlayer->moveSpeed());
-        return static_cast<int>(0.5 + remainingTime - timeRequiredForMove);
     }
 
 
@@ -578,8 +564,9 @@ namespace Tetris
             }
         }
 
-
-        if (mGameHeightFactor
+        if (mStrategiesMenuList
+			&& !XULWin::WinAPI::ComboBox_IsOpen(mStrategiesMenuList->handle())
+			&& mGameHeightFactor
             && mLastBlockHeightFactor
             && mNumHolesFactor
             && mNumLinesFactor
@@ -588,7 +575,7 @@ namespace Tetris
             && mNumTriplesFactor
             && mNumTetrisesFactor)
         {
-            bool useCustomEvaluator = mCustomEvaluator.get() != 0;
+			bool useCustomEvaluator = mStrategiesMenuList->getLabel() == "Custom";
 
             // Enable/disable the spin buttons
             mSearchDepth->setDisabled(!useCustomEvaluator);

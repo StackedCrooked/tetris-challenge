@@ -172,24 +172,30 @@ namespace Tetris
                 // else: keep working.
             }
             else
-            {				
-                NodePtr resultNode = mNodeCalculator->result();
-                if (!resultNode->state().isGameOver())
-                {
-					ScopedAtom<Game> wgame(mProtectedGame);
-					Game & game(*wgame.get());
+            {	
+				if (NodePtr resultNode = mNodeCalculator->result())
+				{
+					if (!resultNode->state().isGameOver())
+					{
+						ScopedAtom<Game> wgame(mProtectedGame);
+						Game & game(*wgame.get());
 
-                    // The created node should follow the last precalculated one.
-                    if (resultNode->depth() == game.lastPrecalculatedNode()->depth() + 1)
-                    {
-						game.appendPrecalculatedNode(resultNode);
+						// The created node should follow the last precalculated one.
+						if (resultNode->depth() == game.lastPrecalculatedNode()->depth() + 1)
+						{
+							game.appendPrecalculatedNode(resultNode);
 
-                    }
-                    else
-                    {
-                        LogWarning("Computer is TOO SLOW!!");
-                    }
-                }              
+						}
+						else
+						{
+							LogWarning("Computer is TOO SLOW!!");
+						}
+					}
+				}
+				else
+				{
+					LogError("NodeCalculator did not create any results.");
+				}
 
                 // Once the computer has finished it's job we destroy the object.
                 mNodeCalculator.reset();
@@ -199,7 +205,7 @@ namespace Tetris
 		{			
 			ScopedAtom<Game> wgame(mProtectedGame);
 			Game & game(*wgame.get());
-			if (!game.isGameOver())
+			if (!game.lastPrecalculatedNode()->state().isGameOver())
 			{
 				int numPrecalculated = game.lastPrecalculatedNode()->depth() - game.currentNode()->depth();
 				if (numPrecalculated < 8)
