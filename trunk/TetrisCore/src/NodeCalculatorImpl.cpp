@@ -6,6 +6,7 @@
 #include "Tetris/GameStateComparator.h"
 #include "Tetris/GameStateNode.h"
 #include "Tetris/GameState.h"
+#include "Tetris/Block.h"
 #include "Tetris/BlockTypes.h"
 #include "Tetris/WorkerPool.h"
 #include "Tetris/Logging.h"
@@ -200,16 +201,15 @@ namespace Tetris
 
         boost::mutex::scoped_lock lock(mNodeMutex);
 
-		// First get the results and push them in a stack to get them in good order.
+		// Get the results in the correct order by pushing the parents on a stack.
 		std::stack<NodePtr> results;
 		NodePtr endNode = mTreeRowInfos.bestNode();
-		while (endNode)
+		while (endNode->depth() > mNode->depth())
 		{
 			results.push(endNode);
 			endNode = endNode->parent();
 		}
-		results.pop();
-		
+
 		NodePtr currentNode;
 		NodePtr currentParent = mNode;
 		while (!results.empty())
