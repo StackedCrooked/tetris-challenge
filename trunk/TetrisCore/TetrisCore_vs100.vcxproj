@@ -137,6 +137,7 @@
     <ClCompile Include="src\GameState.cpp" />
     <ClCompile Include="src\GameStateComparator.cpp" />
     <ClCompile Include="src\GameStateNode.cpp" />
+    <ClCompile Include="src\GenericGrid.cpp" />
     <ClCompile Include="src\Gravity.cpp" />
     <ClCompile Include="src\Logger.cpp" />
     <ClCompile Include="src\Logging.cpp" />

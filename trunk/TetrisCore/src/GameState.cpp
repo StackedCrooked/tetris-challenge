@@ -6,6 +6,7 @@
 #include "Tetris/Grid.h"
 #include "Tetris/Assert.h"
 #include <algorithm>
+#include <vector>
 
 
 namespace Tetris

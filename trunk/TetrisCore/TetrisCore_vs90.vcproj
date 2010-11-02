@@ -403,6 +403,10 @@
 				Name="Source Files"
 				>
 				<File
+					RelativePath=".\src\GenericGrid.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\Logger.cpp"
 					>
 				</File>

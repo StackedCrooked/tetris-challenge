@@ -197,6 +197,9 @@
     <ClCompile Include="src\Evaluator.cpp">
       <Filter>Tetris\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\GenericGrid.cpp">
+      <Filter>Accessories\Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Todo.txt" />

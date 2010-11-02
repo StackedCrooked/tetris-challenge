@@ -39,7 +39,7 @@ void NodeCalculatorTest::testNodeCalculator()
     int depth = 5;
     int width = 5;
 #else
-    int depth = 6;
+    int depth = 7;
     int width = 6;
 #endif
 
@@ -53,7 +53,9 @@ void NodeCalculatorTest::testNodeCalculator()
         }
     }
 	
+    testInterrupt(Depth(7), Width(7), WorkerCount(6), TimeMs(10000));
     testInterrupt(Depth(depth), Width(width), WorkerCount(8), TimeMs(15000));
+    testInterrupt(Depth(depth), Width(width), WorkerCount(7), TimeMs(15000));
     testInterrupt(Depth(depth), Width(width), WorkerCount(6), TimeMs(15000));
     testInterrupt(Depth(depth), Width(width), WorkerCount(5), TimeMs(15000));
     testInterrupt(Depth(depth), Width(width), WorkerCount(4), TimeMs(15000));
