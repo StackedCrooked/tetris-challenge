@@ -102,6 +102,9 @@ namespace Tetris
         }
 
         void setText(XULWin::StringValueController * inComponent, const std::string & inText);
+        std::auto_ptr<Evaluator> createEvaluator();
+        void updateStrategy();
+        void onGameCopy(Poco::Timer &);
 
         LRESULT onNew(WPARAM wParam, LPARAM lParam);
         LRESULT onShowConsole(WPARAM wParam, LPARAM lParam);
@@ -111,13 +114,6 @@ namespace Tetris
         LRESULT onClearPrecalculated(WPARAM wParam, LPARAM lParam);
         LRESULT onSelectComputerPlayer(WPARAM wParam, LPARAM lParam);
         LRESULT onSplatter(WPARAM wParam, LPARAM lParam);
-        
-
-
-        std::auto_ptr<Evaluator> createEvaluator();
-
-        void updateStrategy();
-
 
         XULWin::XULRunner mXULRunner;
         XULWin::ElementPtr mRootElement;;
@@ -137,13 +133,10 @@ namespace Tetris
         XULWin::TextBox * mMovesAheadTextBox;
         XULWin::MenuList * mStrategiesMenuList;
         XULWin::Button * mClearPrecalculatedButton;
-        XULWin::Button * mSplatterButton;
-        
+        XULWin::Button * mSplatterButton;        
         XULWin::Radio * mPlayerIsHuman;
         XULWin::Radio * mPlayerIsComputer;
         XULWin::TextBox * mKeyboardSink;
-
-
 		XULWin::SpinButton * mThreadCount;
 		XULWin::CheckBox * mAutoSelect;
         XULWin::SpinButton * mSearchDepth;
@@ -156,9 +149,7 @@ namespace Tetris
         XULWin::SpinButton * mNumDoublesFactor;
         XULWin::SpinButton * mNumTriplesFactor;
         XULWin::SpinButton * mNumTetrisesFactor;
-
         XULWin::TextBox * mGameStateScore;
-
         XULWin::TextBox * mLoggingTextBox;
         XULWin::ScopedEventListener mScopedEventListener;
         boost::scoped_ptr<Protected<Game> > mProtectedGame;
@@ -167,13 +158,9 @@ namespace Tetris
         boost::scoped_ptr<Tetris::ComputerPlayer> mComputerPlayer;
         boost::scoped_ptr<XULWin::WinAPI::Timer> mRefreshTimer;
         bool mConsoleVisible;
-
-
-        void onGameCopy(Poco::Timer &);
         boost::scoped_ptr<Poco::Timer> mGameCopyTimer;
         boost::scoped_ptr<Game> mGameCopy;
         mutable boost::mutex mGameCopyMutex;
-
         Poco::Random mRandom;
     };
 

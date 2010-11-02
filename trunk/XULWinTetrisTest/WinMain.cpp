@@ -21,13 +21,13 @@ int StartProgram(HINSTANCE hInstance)
     XULWin::WinAPI::CurrentDirectoryChanger cd("Tetris.xul");
 #endif
 
-    AttachToConsole();
-    
-    int res = RunTetrisTestSuite();
-    if (res != 0)
-    {
-        throw std::runtime_error("TestSuite failed");
-    }
+    //AttachToConsole();
+    //
+    //int res = RunTetrisTestSuite();
+    //if (res != 0)
+    //{
+    //    throw std::runtime_error("TestSuite failed");
+    //}
 
     XULWin::Initializer initializer(hInstance);
 
