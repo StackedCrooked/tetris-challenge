@@ -222,6 +222,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\GenericGridTest.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\GenericGridTest.h"
+				>
+			</File>
+			<File
 				RelativePath=".\src\NodeCalculatorTest.cpp"
 				>
 			</File>
