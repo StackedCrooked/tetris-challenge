@@ -415,15 +415,16 @@ namespace Tetris
             case EvaluatorType_Automatic:
             {
                 int percent = percentOccupied(inGameState);
-                LogInfo(MakeString() << "Evaluator. Height percent: " << percent);
-                if (percent < 40)
+                if (percent <= 50)
                 {
-                    LogInfo("Evaluator: MakeTetrises");
                     return CreatePoly<Evaluator, MakeTetrises>();
+                }
+                else if (percent <= 75)
+                {
+                    return CreatePoly<Evaluator, Balanced>();
                 }
                 else
                 {
-                    LogInfo("Evaluator: *** !!! Survival !!! ***");
                     return CreatePoly<Evaluator, Survival>();
                 }
             }

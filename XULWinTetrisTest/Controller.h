@@ -122,7 +122,9 @@ namespace Tetris
         XULWin::ElementPtr mAboutDialogRootElement;
         TetrisComponent * mTetrisComponent;
                 
-        
+        // Since the strategies menulist (mStrategiesMenuList) can only be read in the main thread
+        // we need a variable that holds the last known preset and that is accessible from any thread.
+        // The following combintation of an enum and mutex serves that purpose.
         enum EvaluatorType
         {
             EvaluatorType_Automatic,
