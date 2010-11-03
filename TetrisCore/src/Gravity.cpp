@@ -7,6 +7,7 @@
 #include "Tetris/Logging.h"
 #include "Tetris/Threading.h"
 #include "Poco/Timer.h"
+#include "Poco/Stopwatch.h"
 
 
 namespace Tetris
@@ -33,9 +34,12 @@ namespace Tetris
         ~GravityImpl();
 
         // Number of rows per second
-        float currentSpeed() const;
+        double speed() const;
 
-        static float CalculateSpeed(int inLevel);
+        static double CalculateSpeed(int inLevel);
+
+        // Interval between two moves expressed in milliseconds.
+        int interval() const;
 
     private:
         GravityImpl(const GravityImpl &);
@@ -46,6 +50,7 @@ namespace Tetris
         Protected<Game> mThreadSafeGame;
         int mLevel;
         Poco::Timer mTimer;
+        Poco::Stopwatch mStopwatch;
     };
 
 
@@ -56,6 +61,7 @@ namespace Tetris
         ScopedConstAtom<Game> rgame(mThreadSafeGame);
         mTimer.start(Poco::TimerCallback<GravityImpl>(*this, &GravityImpl::onTimerEvent));
         mTimer.setPeriodicInterval(sIntervals[rgame->level()]);
+        mStopwatch.start();
     }
 
 
@@ -65,18 +71,28 @@ namespace Tetris
     }
 
 
+    int GravityImpl::interval() const
+    {
+        return static_cast<int>(0.5 + speed() / 1000.0);
+    }
+
+
     void GravityImpl::onTimerEvent(Poco::Timer & inTimer)
     {
         try
         {
             {
-                ScopedAtom<Game> game(mThreadSafeGame, 1000);
-                if (game->isGameOver())
+                if (mStopwatch.elapsed() > 1000  * interval())
                 {
-                    return;
+                    mStopwatch.restart();
+                    ScopedAtom<Game> game(mThreadSafeGame);
+                    if (game->isGameOver())
+                    {
+                        return;
+                    }
+                    game->move(Direction_Down);
+                    mLevel = game->level();
                 }
-                game->move(Direction_Down);
-                mLevel = game->level();
             }           
             mTimer.setPeriodicInterval(sIntervals[mLevel]);
         }
@@ -87,15 +103,15 @@ namespace Tetris
     }
 
 
-    float GravityImpl::currentSpeed() const
+    double GravityImpl::speed() const
     {
         return CalculateSpeed(mLevel);
     }
     
     
-    float GravityImpl::CalculateSpeed(int inLevel)
+    double GravityImpl::CalculateSpeed(int inLevel)
     {
-        return static_cast<float>(1000.0 / static_cast<float>(sIntervals[inLevel]));
+        return static_cast<double>(1000.0 / static_cast<double>(sIntervals[inLevel]));
     }
 
     
@@ -112,13 +128,13 @@ namespace Tetris
     }
 
     
-    float Gravity::currentSpeed() const
+    double Gravity::speed() const
     {
-        return mImpl->currentSpeed();
+        return mImpl->speed();
     }
     
     
-    float Gravity::CalculateSpeed(int inLevel)
+    double Gravity::CalculateSpeed(int inLevel)
     {
         return GravityImpl::CalculateSpeed(inLevel);
     }

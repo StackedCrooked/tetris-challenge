@@ -27,9 +27,9 @@ namespace Tetris
         ~Gravity();
 
         // Number of rows per second
-        float currentSpeed() const;
+        double speed() const;
 
-        static float CalculateSpeed(int inLevel);
+        static double CalculateSpeed(int inLevel);
 
     private:
         Gravity(const Gravity &);
