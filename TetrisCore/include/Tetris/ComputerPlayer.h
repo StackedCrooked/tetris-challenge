@@ -3,6 +3,7 @@
 
 
 #include <memory>
+#include <boost/function.hpp>
 
 
 namespace Tetris
@@ -10,6 +11,7 @@ namespace Tetris
     
     class Evaluator;
     class Game;
+    class GameState;
     template<class Variable> class Protected;
 
 
@@ -19,8 +21,16 @@ namespace Tetris
     class ComputerPlayer
     {
     public:
+        typedef boost::function<std::auto_ptr<Evaluator>(const GameState &)> GetEvaluatorCallback;
+
         ComputerPlayer(const Protected<Game> & inProtectedGame,
                        std::auto_ptr<Evaluator> inEvaluator,
+                       int inSearchDepth,
+                       int inSearchWidth,
+                       int inWorkerCount);
+
+        ComputerPlayer(const Protected<Game> & inProtectedGame,
+                       const GetEvaluatorCallback & inGetEvaluator,
                        int inSearchDepth,
                        int inSearchWidth,
                        int inWorkerCount);
@@ -44,7 +54,16 @@ namespace Tetris
 
         void setEvaluator(std::auto_ptr<Evaluator> inEvaluator);
 
-        const Evaluator & evaluator() const;
+        const Evaluator & evaluator() const;        
+
+        // Enables you to have the Evaluator selected in a callback event.
+        // This overrides the evaluator set in the constructor
+        // or in the last call to setEvaluator.
+        void setDelayedEvaluator(const GetEvaluatorCallback & inGetEvaluatorCallback);
+
+        // Removes the delayed evaluator. Falls back to the regular evaluator from the
+        // constructor or last call to setEvaluator().
+        void removeDelayedEvaluator();
 
         int workerCount() const;
 

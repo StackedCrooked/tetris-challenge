@@ -101,9 +101,9 @@ namespace Tetris
             return 0;
         }
 
+        int percentOccupied(const GameState & inGameState) const;
+        std::auto_ptr<Evaluator> getEvaluator(const GameState & inGameState) const;
         void setText(XULWin::StringValueController * inComponent, const std::string & inText);
-        std::auto_ptr<Evaluator> createEvaluator();
-        void updateStrategy();
         void onGameCopy(Poco::Timer &);
 
         LRESULT onNew(WPARAM wParam, LPARAM lParam);
@@ -115,11 +115,26 @@ namespace Tetris
         LRESULT onSelectComputerPlayer(WPARAM wParam, LPARAM lParam);
         LRESULT onSplatter(WPARAM wParam, LPARAM lParam);
 
+
         XULWin::XULRunner mXULRunner;
         XULWin::ElementPtr mRootElement;;
         XULWin::Window * mWindow;
         XULWin::ElementPtr mAboutDialogRootElement;
         TetrisComponent * mTetrisComponent;
+                
+        
+        enum EvaluatorType
+        {
+            EvaluatorType_Automatic,
+            EvaluatorType_MakeTetrises,
+            EvaluatorType_Balanced,
+            EvaluatorType_Survive,
+            EvaluatorType_Custom
+        };
+        EvaluatorType mEvaluatorType;
+        mutable boost::mutex mEvaluatorTypeMutex;
+
+
         XULWin::TextBox * mFPSTextBox;
         XULWin::TextBox * mBlockCountTextBox;
         typedef XULWin::TextBox * TextBoxPtr;
@@ -137,6 +152,7 @@ namespace Tetris
         XULWin::Radio * mPlayerIsHuman;
         XULWin::Radio * mPlayerIsComputer;
         XULWin::TextBox * mKeyboardSink;
+        XULWin::TextBox * mActualPreset;
 		XULWin::SpinButton * mThreadCount;
 		XULWin::CheckBox * mAutoSelect;
         XULWin::SpinButton * mSearchDepth;
@@ -154,10 +170,8 @@ namespace Tetris
         XULWin::ScopedEventListener mScopedEventListener;
         boost::scoped_ptr<Protected<Game> > mProtectedGame;
         boost::scoped_ptr<Tetris::Gravity> mGravity;
-        boost::scoped_ptr<Tetris::Evaluator> mCustomEvaluator;
         boost::scoped_ptr<Tetris::ComputerPlayer> mComputerPlayer;
         boost::scoped_ptr<XULWin::WinAPI::Timer> mRefreshTimer;
-        bool mConsoleVisible;
         boost::scoped_ptr<Poco::Timer> mGameCopyTimer;
         boost::scoped_ptr<Game> mGameCopy;
         mutable boost::mutex mGameCopyMutex;

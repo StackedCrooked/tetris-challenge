@@ -134,6 +134,8 @@ namespace Tetris
         
         void clearLines();
 
+        void forceUpdateStats();
+
     private:
         friend class GameState;
         Grid mGrid;
@@ -152,6 +154,22 @@ namespace Tetris
         mQuality()
     {
         mStats.mFirstOccupiedRow = inNumRows;
+    }
+
+
+    void GameStateImpl::forceUpdateStats()
+    {
+        for (size_t r = 0; r != mGrid.numRows(); ++r)
+        {
+            for (size_t c = 0; c != mGrid.numColumns(); ++c)
+            {
+                if (mGrid.get(r, c) != BlockType_Nil)
+                {
+                    mStats.mFirstOccupiedRow = r;
+                    return;
+                }
+            }
+        }
     }
 
 
@@ -384,6 +402,12 @@ namespace Tetris
     const Stats & GameState::stats() const
     {
         return mImpl->mStats;
+    }
+
+
+    void GameState::forceUpdateStats()
+    {
+        mImpl->forceUpdateStats();
     }
 
 } // namespace Tetris

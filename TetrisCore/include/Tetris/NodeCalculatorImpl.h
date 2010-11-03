@@ -7,6 +7,8 @@
 #include "Tetris/Evaluator.h"
 #include "Tetris/Worker.h"
 #include "Tetris/WorkerPool.h"
+#include "Tetris/Logging.h"
+#include "Tetris/MakeString.h"
 #include "Tetris/Assert.h"
 #include "Poco/Types.h"
 #include <vector>
@@ -150,30 +152,32 @@ namespace Tetris
             inline Poco::UInt64 nodeCount(size_t inDepth) const
             {
                 boost::mutex::scoped_lock lock(mMutex);
-                Assert(inDepth <= mInfos.size());
                 return mInfos[inDepth - 1].nodeCount();
             }
 
             inline bool finished(size_t inDepth) const
             {
                 boost::mutex::scoped_lock lock(mMutex);
-                Assert(inDepth <= mInfos.size());
                 return mInfos[inDepth - 1].finished();
             }
 
             void registerNode(NodePtr inNode, size_t inDepth)
             {
                 boost::mutex::scoped_lock lock(mMutex);
-                Assert(inDepth <= mInfos.size());
-                Assert(inNode);
                 mInfos[inDepth - 1].registerNode(inNode);
             }
 
             inline void setFinished(size_t inDepth)
             {
-                Assert(inDepth <= mInfos.size());
-                mCurrentSearchDepth = inDepth;
-                mInfos[inDepth - 1].setFinished();
+                if (mInfos[inDepth - 1].bestNode())
+                {
+                    mCurrentSearchDepth = inDepth;
+                    mInfos[inDepth - 1].setFinished();
+                }
+                else
+                {
+                    LogError(MakeString() << "TreeRowInfos::setFinished at depth " << inDepth << " failed because it does not contain any nodes.");
+                }
             }
 
         private:

@@ -34,6 +34,12 @@ namespace Tetris
                            int inSearchWidth,
                            int inWorkerCount);
 
+        ComputerPlayerImpl(const Protected<Game> & inProtectedGame,
+                           const ComputerPlayer::GetEvaluatorCallback & inGetEvaluator,
+                           int inSearchDepth,
+                           int inSearchWidth,
+                           int inWorkerCount);
+
         ~ComputerPlayerImpl()
         {
             if (mNodeCalculator)
@@ -65,8 +71,13 @@ namespace Tetris
         void setEvaluator(std::auto_ptr<Evaluator> inEvaluator)
         { mEvaluator.reset(inEvaluator.release()); }
 
-        const Evaluator & evaluator() const
-        { return *mEvaluator; }
+        const Evaluator & evaluator() const;
+
+        void setDelayedEvaluator(const ComputerPlayer::GetEvaluatorCallback & inGetEvaluator)
+        { mGetEvaluator = inGetEvaluator; }
+
+        void removeEvaluator()
+        { mGetEvaluator = ComputerPlayer::GetEvaluatorCallback(); }
 
         int workerCount() const
         { return mWorkerCount; }
@@ -86,6 +97,7 @@ namespace Tetris
         WorkerPool mWorkerPool;
         boost::scoped_ptr<NodeCalculator> mNodeCalculator;
         boost::scoped_ptr<Evaluator> mEvaluator;
+        ComputerPlayer::GetEvaluatorCallback mGetEvaluator;
         boost::scoped_ptr<BlockMover> mBlockMover;
         Poco::Timer mTimer;
         int mSearchDepth;
@@ -116,6 +128,7 @@ namespace Tetris
         mProtectedGame(inProtectedGame),
         mWorkerPool("ComputerPlayer WorkerPool", inWorkerCount > 0 ? inWorkerCount : GetWorkerCount()),
         mEvaluator(inEvaluator.release()),
+        mGetEvaluator(),
         mBlockMover(new BlockMover(mProtectedGame, 20)),
         mTimer(10, 10),
         mSearchDepth(inSearchDepth),
@@ -125,6 +138,37 @@ namespace Tetris
     {
         LogInfo(MakeString() << "ComputerPlayer started with " << mWorkerPool.size() << " worker threads.");
         mTimer.start(Poco::TimerCallback<ComputerPlayerImpl>(*this, &ComputerPlayerImpl::onTimerEvent));
+    }
+
+
+    ComputerPlayerImpl::ComputerPlayerImpl(const Protected<Game> & inProtectedGame,
+                                           const ComputerPlayer::GetEvaluatorCallback & inGetEvaluator,
+                                           int inSearchDepth,
+                                           int inSearchWidth,
+                                           int inWorkerCount) :
+        mProtectedGame(inProtectedGame),
+        mWorkerPool("ComputerPlayer WorkerPool", inWorkerCount > 0 ? inWorkerCount : GetWorkerCount()),
+        mEvaluator(),
+        mGetEvaluator(inGetEvaluator),
+        mBlockMover(new BlockMover(mProtectedGame, 20)),
+        mTimer(10, 10),
+        mSearchDepth(inSearchDepth),
+        mSearchWidth(inSearchWidth),
+        mMoveSpeed(20),
+        mWorkerCount(0)
+    {
+        LogInfo(MakeString() << "ComputerPlayer started with " << mWorkerPool.size() << " worker threads.");
+        mTimer.start(Poco::TimerCallback<ComputerPlayerImpl>(*this, &ComputerPlayerImpl::onTimerEvent));
+
+        ScopedConstAtom<Game> game(mProtectedGame);
+        mEvaluator.reset(mGetEvaluator(game->currentNode()->state()).release());
+    }
+        
+        
+    const Evaluator & ComputerPlayerImpl::evaluator() const
+    {
+        Assert(mEvaluator);
+        return *mEvaluator;
     }
 
 
@@ -280,6 +324,10 @@ namespace Tetris
                     }
                     mWorkerPool.resize(mWorkerCount);
 
+                    if (mGetEvaluator)
+                    {
+                        mEvaluator.reset(mGetEvaluator(game.currentNode()->state()).release());
+                    }
                     mNodeCalculator.reset(new NodeCalculator(endNode, futureBlocks, widths, mEvaluator->clone(), mWorkerPool));
                     mNodeCalculator->start();
                 }
@@ -295,6 +343,16 @@ namespace Tetris
                                    int inSearchWidth,
                                    int inWorkerCount) :
         mImpl(new ComputerPlayerImpl(inProtectedGame, inEvaluator, inSearchDepth, inSearchWidth, inWorkerCount))
+    {
+    }
+
+
+    ComputerPlayer::ComputerPlayer(const Protected<Game> & inProtectedGame,
+                                   const GetEvaluatorCallback & inGetEvaluator,
+                                   int inSearchDepth,
+                                   int inSearchWidth,
+                                   int inWorkerCount) :
+        mImpl(new ComputerPlayerImpl(inProtectedGame, inGetEvaluator, inSearchDepth, inSearchWidth, inWorkerCount))
     {
     }
 
@@ -357,6 +415,18 @@ namespace Tetris
     const Evaluator & ComputerPlayer::evaluator() const
     {
         return mImpl->evaluator();
+    }
+
+
+    void ComputerPlayer::setDelayedEvaluator(const GetEvaluatorCallback & inGetEvaluatorCallback)
+    {
+        mImpl->setDelayedEvaluator(inGetEvaluatorCallback);
+    }
+
+
+    void ComputerPlayer::removeDelayedEvaluator()
+    {
+        mImpl->removeEvaluator();
     }
     
     

@@ -57,6 +57,8 @@ namespace Tetris
 
         const Stats & stats() const;
 
+        void forceUpdateStats();
+
     private:
         // not allowed
         GameState& operator=(const GameState&);
