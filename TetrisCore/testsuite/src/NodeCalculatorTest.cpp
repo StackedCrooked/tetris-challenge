@@ -39,8 +39,8 @@ void NodeCalculatorTest::testNodeCalculator()
     int depth = 5;
     int width = 5;
 #else
-    int depth = 7;
-    int width = 6;
+    int depth = 5;
+    int width = 5;
 #endif
 
     for (size_t i = 0; i != 10; ++i)

@@ -74,7 +74,7 @@ namespace Tetris
         void setWorkerCount(int inWorkerCount);
 
     private:
-        const ComputerPlayerImpl(ComputerPlayerImpl&);
+        ComputerPlayerImpl(const ComputerPlayerImpl&);
         ComputerPlayerImpl& operator=(const ComputerPlayerImpl&);
 
         void onTimerEvent(Poco::Timer & inTimer);

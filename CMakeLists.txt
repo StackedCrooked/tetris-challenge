@@ -50,6 +50,9 @@ include_directories(${POCO_CPPUNIT}include)
 link_directories("/usr/local/lib")
 link_directories(${POCO_LIB})
 
+# FIXME: this is a temporary fix
+link_directories("/home/francis/orig/poco-1.3.6p2/lib/Linux/x86_64")
+
 
 add_subdirectory(TetrisCore ${BUILDDIR}TetrisCore)
 add_subdirectory("TetrisCore/testsuite" ${BUILDDIR}${CMAKE_PROJECT_NAME})

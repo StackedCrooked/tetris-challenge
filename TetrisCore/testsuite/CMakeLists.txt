@@ -2,6 +2,7 @@ include_directories(../include)
 
 add_executable(${EXECUTABLE} 
     src/Driver.cpp 
+    src/GenericGridTest.cpp
     src/NodeCalculatorTest.cpp 
     src/TetrisCoreTestSuite.cpp 
     src/WorkerPoolTest.cpp 

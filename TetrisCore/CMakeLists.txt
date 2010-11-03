@@ -9,6 +9,7 @@ add_library(TetrisCore
     src/BlockType.cpp 
     src/ComputerPlayer.cpp 
     src/Game.cpp 
+    src/GenericGrid.cpp 
     src/Evaluator.cpp 
     src/GameState.cpp 
     src/GameStateComparator.cpp 
