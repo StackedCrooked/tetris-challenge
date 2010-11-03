@@ -9,7 +9,8 @@
 namespace Tetris
 {
 
-    Evaluator::Evaluator(GameHeightFactor inGameHeightFactor,
+    Evaluator::Evaluator(const std::string & inName,
+                         GameHeightFactor inGameHeightFactor,
                          LastBlockHeightFactor inLastBlockHeightFactor,
                          NumHolesFactor inNumHolesFactor,
                          NumSinglesFactor inNumSinglesFactor,
@@ -18,6 +19,7 @@ namespace Tetris
                          NumTetrisesFactor inNumTetrisesFactor,
                          SearchDepth inRecommendedSearchDepth,
                          SearchWidth inRecommendedSearchWidth) :
+        mName(inName),
         mGameHeightFactor(inGameHeightFactor.get()),
         mLastBlockHeightFactor(inLastBlockHeightFactor.get()),
         mNumHolesFactor(inNumHolesFactor.get()),
@@ -28,6 +30,12 @@ namespace Tetris
         mRecommendedSearchDepth(inRecommendedSearchDepth.get()),
         mRecommendedSearchWidth(inRecommendedSearchWidth.get())
     {
+    }
+
+
+    const std::string & Evaluator::name() const
+    {
+        return mName;
     }
 
 
@@ -147,7 +155,8 @@ namespace Tetris
                                      NumTetrisesFactor inNumTetrisesFactor,
                                      SearchDepth inRecommendedSearchDepth,
                                      SearchWidth inRecommendedSearchWidth) :
-        Evaluator(inGameHeightFactor,
+        Evaluator("Custom",
+                  inGameHeightFactor,
                   inLastBlockHeightFactor,
                   inNumHolesFactor,
                   inNumSinglesFactor,
@@ -161,7 +170,8 @@ namespace Tetris
 
 
     Balanced::Balanced() :
-        Evaluator(GameHeightFactor(-2),
+        Evaluator("Balanced",
+                  GameHeightFactor(-2),
                   LastBlockHeightFactor(-1),
                   NumHolesFactor(-4),
                   NumSinglesFactor(1),
@@ -175,9 +185,10 @@ namespace Tetris
 
 
     Survival::Survival() :
-        Evaluator(GameHeightFactor(-2),
-                  LastBlockHeightFactor(0),
-                  NumHolesFactor(-2),
+        Evaluator("Survival",
+                  GameHeightFactor(-2),
+                  LastBlockHeightFactor(-1),
+                  NumHolesFactor(-3),
                   NumSinglesFactor(1),
                   NumDoublesFactor(2),
                   NumTriplesFactor(4),
@@ -189,7 +200,8 @@ namespace Tetris
 
 
     MakeTetrises::MakeTetrises() :
-        Evaluator(GameHeightFactor(-2),
+        Evaluator("Make Tetrises",
+                  GameHeightFactor(-2),
                   LastBlockHeightFactor(-1),
                   NumHolesFactor(-4),
                   NumSinglesFactor(-4),
@@ -225,7 +237,8 @@ namespace Tetris
 
 
     Depressed::Depressed() :
-        Evaluator(GameHeightFactor(0),
+        Evaluator("Depressed",
+                  GameHeightFactor(0),
                   LastBlockHeightFactor(0),
                   NumHolesFactor(0),
                   NumSinglesFactor(0),

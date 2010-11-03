@@ -5,6 +5,7 @@
 #include "Tetris/TypedWrapper.h"
 #include "Tetris/AutoPtrSupport.h"
 #include <memory>
+#include <string>
 
 
 namespace Tetris
@@ -29,7 +30,8 @@ namespace Tetris
     class Evaluator
     {
     public:
-        Evaluator(GameHeightFactor inGameHeightFactor,
+        Evaluator(const std::string & inName,
+                  GameHeightFactor inGameHeightFactor,
                   LastBlockHeightFactor inLastBlockHeightFactor,
                   NumHolesFactor inNumHolesFactor,
                   NumSinglesFactor inNumSinglesFactor,
@@ -45,6 +47,8 @@ namespace Tetris
         { return Create<Evaluator>(*this); }
 
         virtual int evaluate(const GameState & inGameState) const;
+
+        const std::string & name() const;
 
         int gameHeightFactor() const;
 
@@ -65,6 +69,7 @@ namespace Tetris
         int recommendedSearchWidth() const;
 
     private:
+        std::string mName;
         int mGameHeightFactor;
         int mLastBlockHeightFactor;
         int mNumHolesFactor;

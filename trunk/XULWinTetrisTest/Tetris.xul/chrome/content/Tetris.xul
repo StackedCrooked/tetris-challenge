@@ -110,18 +110,36 @@
       </groupbox>
       <groupbox>
         <caption label="AI Parameters" />
+        <grid>
+          <columns>
+            <column flex="0" />
+            <column flex="1" />
+            <column flex="0" />
+          </columns>
+          <rows>
+            <row align="center">
+              <label style="text-align:right" value="Preset: " />
+              <menulist id="strategiesMenuList">
+                <menupopup id="strategiesPopup">
+                  <menuitem id="automaticMenuItem" label="Automatic" />
+                  <menuitem id="makeTetrisesMenuItem" label="Make Tetrises" />
+                  <menuitem id="balancedMenuItem" label="Balanced" />
+                  <menuitem id="surviveMenuItem" label="Survive" />
+                  <menuitem id="customMenuItem" label="Custom" />
+                </menupopup>
+              </menulist>
+              <button id="splatterButton" label="Splatter" />
+            </row>
+            <row align="center">
+              <label style="text-align:right" value="Actual preset: " />
+              <textbox id="actualPreset" readonly="true" value="" style="text-align:left" flex="1" />
+              <spacer />
+            </row>
+          </rows>
+        </grid>
+        <hbox align="center">       
+        </hbox>
         <hbox align="center">
-          <label style="text-align:right" value="Preset: " />
-          <menulist id="strategiesMenuList">
-            <menupopup id="strategiesPopup">
-              <menuitem id="makeTetrisesMenuItem" label="Make Tetrises" />
-              <menuitem id="balancedMenuItem" label="Balanced" />
-              <menuitem id="surviveMenuItem" label="Survive" />
-              <menuitem id="customMenuItem" label="Custom" />
-            </menupopup>
-          </menulist>
-          <!--<button id="clearPrecalculatedButton" label="Clear precalculated" />-->
-          <button id="splatterButton" label="Splatter" />
         </hbox>
         <spacer height="5" />
         <grid>

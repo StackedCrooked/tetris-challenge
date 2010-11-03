@@ -36,24 +36,22 @@ NodeCalculatorTest::~NodeCalculatorTest()
 void NodeCalculatorTest::testNodeCalculator()
 {
 #ifdef _DEBUG
-    int depth = 5;
-    int width = 5;
+    int depth = 4;
+    int width = 4;
 #else
     int depth = 5;
     int width = 5;
 #endif
 
-    for (size_t i = 0; i != 10; ++i)
+    for (size_t i = 0; i != 2; ++i)
     {
         for (size_t workerCount = 1; workerCount < 12; ++workerCount)
         {
             WorkerPool workerPool("NodeCalculatorTest", workerCount);
             testDestroy(workerPool);
-            std::cout << ".";
         }
     }
 	
-    testInterrupt(Depth(7), Width(7), WorkerCount(6), TimeMs(10000));
     testInterrupt(Depth(depth), Width(width), WorkerCount(8), TimeMs(15000));
     testInterrupt(Depth(depth), Width(width), WorkerCount(7), TimeMs(15000));
     testInterrupt(Depth(depth), Width(width), WorkerCount(6), TimeMs(15000));
