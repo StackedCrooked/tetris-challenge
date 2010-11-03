@@ -204,8 +204,6 @@ namespace Tetris
 
     int MakeTetrises::evaluate(const GameState & inGameState) const
     {
-        int result = 0;
-
         const Grid & grid = inGameState.grid();
     
         size_t c = grid.numColumns() - 1;
