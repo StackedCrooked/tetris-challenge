@@ -85,7 +85,7 @@ namespace Tetris
         {
             if (!mLock.timed_lock(boost::posix_time::milliseconds(inTimeoutMs)))
             {
-                throw LockTimeout("Lock timout occured during ScopedAtom constructor.");
+                throw LockTimeout("Lock timeout occured during ScopedAtom constructor.");
             }
         }
 

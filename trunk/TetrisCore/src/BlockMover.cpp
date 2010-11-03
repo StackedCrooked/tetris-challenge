@@ -9,6 +9,7 @@
 #include "Tetris/MakeString.h"
 #include "Tetris/Threading.h"
 #include "Tetris/Assert.h"
+#include "Poco/Stopwatch.h"
 #include "Poco/Timer.h"
 
 
@@ -26,6 +27,10 @@ namespace Tetris
 
         int speed() const;
 
+        void setInterval(int inTimeBetweenMovesInMilliseconds);
+
+        int interval() const;
+
     private:
         BlockMoverImpl(const BlockMoverImpl &);
         BlockMoverImpl & operator=(const BlockMoverImpl&);
@@ -35,7 +40,8 @@ namespace Tetris
 
         Protected<Game> mGame;
         boost::scoped_ptr<Poco::Timer> mTimer;
-        int mNumMovesPerSecond;
+        Poco::Stopwatch mStopwatch;
+        double mInterval;
     };
 
 
@@ -49,14 +55,15 @@ namespace Tetris
     }
 
 
-    BlockMoverImpl::BlockMoverImpl(const Protected<Game> & inGame, int inNumMovesPerSecond) :
+    BlockMoverImpl::BlockMoverImpl(const Protected<Game> & inGame, int inInterval) :
         mGame(inGame),
         mTimer(),
-        mNumMovesPerSecond(inNumMovesPerSecond)
+        mInterval(static_cast<double>(inInterval))
     {
-        mTimer.reset(new Poco::Timer(GetIntervalMs(inNumMovesPerSecond), GetIntervalMs(inNumMovesPerSecond)));
+        mTimer.reset(new Poco::Timer(0, 25));
         Poco::TimerCallback<BlockMoverImpl> callback(*this, &BlockMoverImpl::onTimer);
         mTimer->start(callback);
+        mStopwatch.start();
     }
 
 
@@ -69,25 +76,36 @@ namespace Tetris
 
     int BlockMoverImpl::speed() const
     {
-        return mNumMovesPerSecond;
+        return static_cast<int>(0.5 + (1000.0 / mInterval));
     }
 
 
     void BlockMoverImpl::setSpeed(int inNumMovesPerSecond)
     {
-        if (inNumMovesPerSecond > 0)
-        {
-            mNumMovesPerSecond = inNumMovesPerSecond;
-            mTimer->setPeriodicInterval(GetIntervalMs(inNumMovesPerSecond));
-        }
+        mInterval = 1000.0 / static_cast<double>(inNumMovesPerSecond);
+    }
+    
+
+    void BlockMoverImpl::setInterval(int inTimeBetweenMovesInMilliseconds)
+    {
+        mInterval = static_cast<double>(inTimeBetweenMovesInMilliseconds);
     }
 
+
+    int BlockMoverImpl::interval() const
+    {
+        return static_cast<int>(0.5 + mInterval);
+    }
 
     void BlockMoverImpl::onTimer(Poco::Timer & ioTimer)
     {
         try
         {
-            move();
+            if (mStopwatch.elapsed() > 1000 * mInterval)
+            {
+                mStopwatch.restart();
+                move();
+            }
         }
         catch (const LockTimeout & inException)
         {

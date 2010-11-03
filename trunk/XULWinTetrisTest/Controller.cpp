@@ -72,7 +72,7 @@ namespace Tetris
         mProtectedGame(),
         mGravity(),
         mRefreshTimer(),
-        mGameCopyTimer(new Poco::Timer(0, 10)),
+        mGameCopyTimer(new Poco::Timer(0, 200)),
         mRandom()
     {
         //
@@ -209,7 +209,7 @@ namespace Tetris
         mGravity.reset(new Gravity(*mProtectedGame));
 
         mRefreshTimer.reset(new XULWin::WinAPI::Timer);
-        mRefreshTimer->start(boost::bind(&Controller::onRefresh, this), 10);
+        mRefreshTimer->start(boost::bind(&Controller::onRefresh, this), 20);
 
 		// Main thread should have highest priority for responsiveness.
         ::SetThreadPriority(::GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
@@ -247,7 +247,7 @@ namespace Tetris
 
             Grid & grid = const_cast<GameStateNode*>(game.currentNode())->state().grid();
 
-            for (size_t rowIdx = 8; rowIdx != grid.numRows(); ++rowIdx)
+            for (size_t rowIdx = 7; rowIdx != grid.numRows(); ++rowIdx)
             {            
                 size_t count = 0;
                 for (size_t colIdx = 0; colIdx != grid.numColumns(); ++colIdx)
@@ -277,12 +277,6 @@ namespace Tetris
             const_cast<GameStateNode*>(game.currentNode())->state().forceUpdateStats();
             mGameCopy.reset(game.clone().release());
         }
-        //{
-        //    boost::mutex::scoped_lock lock(mGameCopyMutex);
-        //    ScopedAtom<Game> wgame(*mProtectedGame.get());
-        //    Game & game(*wgame.get());
-        //    mGameCopy.reset(game.clone().release());
-        //}
         
         mComputerPlayer.reset(
             new ComputerPlayer(
@@ -415,11 +409,11 @@ namespace Tetris
             case EvaluatorType_Automatic:
             {
                 int percent = percentOccupied(inGameState);
-                if (percent <= 50)
+                if (percent < 40)
                 {
                     return CreatePoly<Evaluator, MakeTetrises>();
                 }
-                else if (percent <= 75)
+                else if (percent < 70)
                 {
                     return CreatePoly<Evaluator, Balanced>();
                 }

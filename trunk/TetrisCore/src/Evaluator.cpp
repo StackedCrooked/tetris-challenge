@@ -187,7 +187,7 @@ namespace Tetris
     Survival::Survival() :
         Evaluator("Survival",
                   GameHeightFactor(-2),
-                  LastBlockHeightFactor(-1),
+                  LastBlockHeightFactor(-6),
                   NumHolesFactor(-3),
                   NumSinglesFactor(1),
                   NumDoublesFactor(2),

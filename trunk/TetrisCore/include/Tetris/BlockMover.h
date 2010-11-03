@@ -23,13 +23,17 @@ namespace Tetris
     class BlockMover
     {
     public:
-        BlockMover(const Protected<Game> & inGame, int inNumMovesPerSecond);
+        BlockMover(const Protected<Game> & inGame, int inInterval);
 
         ~BlockMover();
 
         void setSpeed(int inNumMovesPerSecond);
 
         int speed() const;
+
+        void setInterval(int inTimeBetweenMovesInMilliseconds);
+
+        int interval() const;
 
     private:
         BlockMover(const BlockMover &);
