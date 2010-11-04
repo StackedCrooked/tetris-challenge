@@ -10,12 +10,17 @@
 #include "Tetris/Utilities.h"
 #include "Tetris/Logging.h"
 #include "Tetris/Assert.h"
+#include <algorithm>
 #include <set>
 #include <boost/scoped_ptr.hpp>
 
 
-namespace Tetris
-{
+namespace Tetris {
+
+
+    extern const int cMaxLevel;
+
+
     class GameImpl
     {
     public:
@@ -38,6 +43,8 @@ namespace Tetris
         void drop();
 
         int level() const;
+
+        void setLevel(int inLevel);
 
         const Block & activeBlock() const;
 
@@ -76,6 +83,7 @@ namespace Tetris
         boost::scoped_ptr<BlockFactory> mBlockFactory;
         mutable BlockTypes mBlocks;
         size_t mCurrentBlockIndex;
+        int mOverrideLevel;
     };
 
 
@@ -86,7 +94,8 @@ namespace Tetris
         mActiveBlock(),
         mBlockFactory(new BlockFactory),
         mBlocks(),
-        mCurrentBlockIndex(0)
+        mCurrentBlockIndex(0),
+        mOverrideLevel(-1)
     {
         if (mBlocks.empty())
         {
@@ -106,7 +115,8 @@ namespace Tetris
                          //      becomes invalid. A runtime_exception will thrown the next time mBlockFactory will be
                          //      accessed.
         mBlocks(rhs.mBlocks),
-        mCurrentBlockIndex(rhs.mCurrentBlockIndex)
+        mCurrentBlockIndex(rhs.mCurrentBlockIndex),
+        mOverrideLevel(-1)
     {
     }
 
@@ -428,7 +438,21 @@ namespace Tetris
 
     int GameImpl::level() const 
     {
-        return mCurrentNode->state().stats().numLines() / 10;
+        if (mOverrideLevel < 0)
+        {
+            int level = mCurrentNode->state().stats().numLines() / 10;
+            return std::min<int>(level, cMaxLevel);
+        }
+        else
+        {
+            return mOverrideLevel;
+        }
+    }
+
+
+    void GameImpl::setLevel(int inLevel)
+    {
+        mOverrideLevel = inLevel;
     }
 
 
@@ -503,6 +527,12 @@ namespace Tetris
     int Game::level() const
     {
         return mImpl->level();
+    }
+
+
+    void Game::setLevel(int inLevel)
+    {
+        mImpl->setLevel(inLevel);
     }
 
 

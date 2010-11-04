@@ -30,8 +30,11 @@
 #include <iostream>
 
 
-namespace Tetris
-{
+namespace Tetris {
+
+    
+    extern const int cMaxLevel;
+
 
     Controller::Controller(HINSTANCE hInstance) :
         mXULRunner(hInstance),
@@ -125,7 +128,11 @@ namespace Tetris
         mLinesTextBoxes[1] = findComponentById<XULWin::TextBox>("lines2TextBox");
         mLinesTextBoxes[2] = findComponentById<XULWin::TextBox>("lines3TextBox");
         mLinesTextBoxes[3] = findComponentById<XULWin::TextBox>("lines4TextBox");
-        mLevelTextBox = findComponentById<XULWin::TextBox>("levelTextBox");
+        if (mLevelTextBox = findComponentById<XULWin::SpinButton>("levelTextBox"))
+        {            
+			XULWin::WinAPI::SpinButton_SetRange(mLevelTextBox->handle(), 0, cMaxLevel);
+        }
+
         mScoreTextBox = findComponentById<XULWin::TextBox>("scoreTextBox");
         mTotalLinesTextBox = findComponentById<XULWin::TextBox>("totalLinesTextBox");
 		
@@ -160,7 +167,7 @@ namespace Tetris
 
         if (mMovementSpeed = findComponentById<XULWin::SpinButton>("movementSpeed"))
         {
-            XULWin::WinAPI::SpinButton_SetRange(mMovementSpeed->handle(), 1, 1000);
+            XULWin::WinAPI::SpinButton_SetRange(mMovementSpeed->handle(), 1, 100);
         }
 
         mMovesAheadTextBox = findComponentById<XULWin::TextBox>("movesAheadTextBox");
@@ -239,7 +246,6 @@ namespace Tetris
     {
 
         {
-            boost::mutex::scoped_lock lock(mGameCopyMutex);
             mComputerPlayer.reset();
             ScopedAtom<Game> wgame(*mProtectedGame.get());
             Game & game(*wgame.get());
@@ -275,7 +281,6 @@ namespace Tetris
             }
 
             const_cast<GameStateNode*>(game.currentNode())->state().forceUpdateStats();
-            mGameCopy.reset(game.clone().release());
         }
         
         mComputerPlayer.reset(
@@ -557,11 +562,6 @@ namespace Tetris
             LogWarning("GameCopy not yet created. Returning");
         }
 
-        if (mLevelTextBox && mGravity)
-        {
-            setText(mLevelTextBox, MakeString() << mGameCopy->level());
-        }
-
 
         if (mScoreTextBox)
         {
@@ -591,6 +591,19 @@ namespace Tetris
         if (mBlockCountTextBox)
         {
             setText(mBlockCountTextBox, MakeString() << (mGameCopy->currentNode()->depth() + 1));
+        }
+
+
+        if (mLevelTextBox)
+        {
+            int level = XULWin::String2Int(mLevelTextBox->getValue(), mGameCopy->level());
+            if (mGameCopy->level() != level)
+            {
+                ScopedAtom<Game> wgame(*mProtectedGame);
+                wgame->setLevel(level);
+                level = wgame->level();
+                mLevelTextBox->setValue(XULWin::Int2String(level));
+            }
         }
 
 

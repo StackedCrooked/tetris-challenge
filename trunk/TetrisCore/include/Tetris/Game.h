@@ -47,6 +47,9 @@ namespace Tetris
 
         int level() const;
 
+        // Set to -1 to revert to default level calculation (#lines/10).
+        void setLevel(int inLevel);
+
         const Block & activeBlock() const;
 
         // Gets the currently active block and any blocks that follow.
