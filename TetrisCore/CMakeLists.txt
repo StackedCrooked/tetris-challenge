@@ -25,8 +25,5 @@ add_library(TetrisCore
     src/Worker.cpp
     src/WorkerPool.cpp)
 
-if(APPLE)
-set_target_properties(TetrisCore PROPERTIES COMPILE_FLAGS "-arch i386")
-endif(APPLE)
-set_target_properties(TetrisCore PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS} -Wall")
+set_target_properties(TetrisCore PROPERTIES COMPILE_FLAGS ${CXX_FLAGS})
 

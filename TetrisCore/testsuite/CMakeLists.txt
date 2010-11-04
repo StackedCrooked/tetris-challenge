@@ -8,16 +8,13 @@ add_executable(${EXECUTABLE}
     src/WorkerPoolTest.cpp 
     src/WorkerTest.cpp)
 
-if(APPLE)
-set_target_properties(${EXECUTABLE} PROPERTIES COMPILE_FLAGS "-arch i386")
+
+set_target_properties(${EXECUTABLE} PROPERTIES COMPILE_FLAGS ${CXX_FLAGS})
+
+set(LIBS TetrisCore PocoFoundation CppUnit boost_thread)
+if (UNIX)
+set(LIBS ${LIBS} pthread)
 endif()
 
-target_link_libraries(${EXECUTABLE} TetrisCore PocoFoundation CppUnit boost_thread)
+target_link_libraries(${EXECUTABLE} ${LIBS})
 
-
-if(APPLE)
-install(TARGETS         ${EXECUTABLE}
-        RUNTIME
-        DESTINATION     ${BUILDDIR}${CMAKE_PROJECT_NAME}
-        CONFIGURATIONS  ${CONFIGURATION})
-endif()
