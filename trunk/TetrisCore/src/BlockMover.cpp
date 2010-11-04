@@ -45,15 +45,6 @@ namespace Tetris
     };
 
 
-    static int GetIntervalMs(int inNumMovesPerSecond)
-    {
-        if (inNumMovesPerSecond <= 0)
-        {
-            return 1;
-        }
-        return static_cast<int>(0.5 + 1000.0 / static_cast<float>(inNumMovesPerSecond != 0 ? inNumMovesPerSecond : 1));
-    }
-
 
     BlockMoverImpl::BlockMoverImpl(const Protected<Game> & inGame, int inInterval) :
         mGame(inGame),
