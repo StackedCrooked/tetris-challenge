@@ -141,6 +141,7 @@
     <ClCompile Include="src\Gravity.cpp" />
     <ClCompile Include="src\Logger.cpp" />
     <ClCompile Include="src\Logging.cpp" />
+    <ClCompile Include="src\Threading.cpp" />
     <ClCompile Include="src\Unicode.cpp" />
     <ClCompile Include="src\Worker.cpp" />
     <ClCompile Include="src\WorkerPool.cpp" />

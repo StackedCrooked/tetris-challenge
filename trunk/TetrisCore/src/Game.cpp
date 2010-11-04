@@ -116,7 +116,7 @@ namespace Tetris {
                          //      accessed.
         mBlocks(rhs.mBlocks),
         mCurrentBlockIndex(rhs.mCurrentBlockIndex),
-        mOverrideLevel(-1)
+        mOverrideLevel(rhs.mOverrideLevel)
     {
     }
 

@@ -2,9 +2,10 @@
 #define TETRIS_THREADING_H_INCLUDED
 
 
-#include <memory>
+#include "Tetris/Assert.h"
 #include <boost/thread/mutex.hpp>
 #include <boost/scoped_ptr.hpp>
+#include <memory>
 
 
 namespace Tetris
@@ -55,17 +56,28 @@ namespace Tetris
         boost::shared_ptr<WithMutex<Variable> > mVariableWithMutex;
     };
 
-
-    class LockTimeout : public std::runtime_error
+    
+    // Simple stopwatch class.
+    // Helper for ScopedAtom and ScopedConstAtom.
+    class StopwatchImpl;
+    class Stopwatch
     {
     public:
-        explicit LockTimeout(const std::string & inMessage) :
-            std::runtime_error(inMessage)
-        {
-        }
+        Stopwatch();
 
-        virtual ~LockTimeout() throw() { }
+        ~Stopwatch();
+
+        int elapsedTimeMs() const;
+
+    private:
+        Stopwatch(const Stopwatch&);
+        Stopwatch& operator=(const Stopwatch&);
+
+        StopwatchImpl * mImpl;
     };
+
+
+    extern const int cMaximumLockDurationMs;
 
 
     template<class Variable>
@@ -79,14 +91,9 @@ namespace Tetris
 
         }
 
-        ScopedAtom(Protected<Variable> & inProtectedVariable, int inTimeoutMs) :
-            mLock(inProtectedVariable.mVariableWithMutex->mMutex, boost::defer_lock),
-            mVariable(inProtectedVariable.mVariableWithMutex->mVariable.get())
+        ~ScopedAtom()
         {
-            if (!mLock.timed_lock(boost::posix_time::milliseconds(inTimeoutMs)))
-            {
-                throw LockTimeout("Lock timeout occured during ScopedAtom constructor.");
-            }
+            Assert(mStopwatch.elapsedTimeMs() < cMaximumLockDurationMs);
         }
 
         Variable * get()
@@ -95,8 +102,12 @@ namespace Tetris
         Variable * operator->()
         { return mVariable; }
     private:
+        ScopedAtom(const ScopedAtom&);
+        ScopedAtom& operator=(const ScopedAtom&);
+
         boost::timed_mutex::scoped_lock mLock;
         Variable * mVariable;
+        Stopwatch mStopwatch;
     };
 
 
@@ -110,14 +121,9 @@ namespace Tetris
         {
         }
 
-        ScopedConstAtom(Protected<Variable> & inProtectedVariable, int inTimeoutMs) :
-            mLock(inProtectedVariable.mVariableWithMutex->mMutex, boost::defer_lock),
-            mVariable(inProtectedVariable.mVariableWithMutex->mVariable.get())
+        ~ScopedConstAtom()
         {
-            if (!mLock.timed_lock(boost::posix_time::milliseconds(inTimeoutMs)))
-            {
-                throw LockTimeout("Lock timout occured during ScopedConstAtom constructor.");
-            }
+            Assert(mStopwatch.elapsedTimeMs() < cMaximumLockDurationMs);
         }
 
         const Variable * get() const
@@ -126,8 +132,12 @@ namespace Tetris
         const Variable * operator->() const
         { return mVariable; }
     private:
+        ScopedConstAtom(const ScopedConstAtom&);
+        ScopedConstAtom& operator=(const ScopedConstAtom&);
+
         boost::timed_mutex::scoped_lock mLock;
         const Variable * mVariable;
+        Stopwatch mStopwatch;
     };
 
 } // namespace Tetris

@@ -4,6 +4,7 @@
 
 #include "Tetris/TypedWrapper.h"
 #include "Tetris/AutoPtrSupport.h"
+#include <boost/thread.hpp>
 #include <memory>
 #include <string>
 
@@ -41,14 +42,19 @@ namespace Tetris
                   SearchDepth inRecommendedSearchDepth,
                   SearchWidth inRecommendedSearchWidth);
 
-        virtual ~Evaluator() {}
+        virtual ~Evaluator();
+
+        Evaluator(const Evaluator& rhs);
+
+        Evaluator& operator=(const Evaluator& rhs);
 
         virtual std::auto_ptr<Evaluator> clone() const
         { return Create<Evaluator>(*this); }
 
         virtual int evaluate(const GameState & inGameState) const;
 
-        const std::string & name() const;
+        // Return by value to prevent race conditions.
+        std::string name() const;
 
         int gameHeightFactor() const;
 
@@ -79,6 +85,7 @@ namespace Tetris
         int mNumTetrisesFactor;
         int mRecommendedSearchDepth;
         int mRecommendedSearchWidth;
+        mutable boost::mutex mMutex;
     };
 
 
