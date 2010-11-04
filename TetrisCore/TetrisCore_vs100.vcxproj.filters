@@ -10,15 +10,6 @@
     <Filter Include="Tetris\Source Files">
       <UniqueIdentifier>{c03eb04f-bd2d-48a4-96f5-7196b3c0a7c2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Accessories">
-      <UniqueIdentifier>{4bc5821b-fdf2-45f4-9b43-95f310ae1b95}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Accessories\Header Files">
-      <UniqueIdentifier>{4d9c06b2-280b-4a4b-8b46-a22a51762db3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Accessories\Source Files">
-      <UniqueIdentifier>{a6ebebd1-ec43-40ee-b8b8-46019d225162}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ComputerPlayer">
       <UniqueIdentifier>{7d145b21-faca-4329-b9d8-3bb3bfbd4742}</UniqueIdentifier>
     </Filter>
@@ -27,6 +18,15 @@
     </Filter>
     <Filter Include="ComputerPlayer\Source Files">
       <UniqueIdentifier>{02b2078d-2fc4-4116-8711-038438ab3cd4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="General">
+      <UniqueIdentifier>{4bc5821b-fdf2-45f4-9b43-95f310ae1b95}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="General\Header Files">
+      <UniqueIdentifier>{4d9c06b2-280b-4a4b-8b46-a22a51762db3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="General\Source Files">
+      <UniqueIdentifier>{a6ebebd1-ec43-40ee-b8b8-46019d225162}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -73,40 +73,40 @@
       <Filter>Tetris\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Tetris\Assert.h">
-      <Filter>Accessories\Header Files</Filter>
+      <Filter>General\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Tetris\AutoPtrSupport.h">
-      <Filter>Accessories\Header Files</Filter>
+      <Filter>General\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Tetris\GenericGrid.h">
-      <Filter>Accessories\Header Files</Filter>
+      <Filter>General\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Tetris\Logger.h">
-      <Filter>Accessories\Header Files</Filter>
+      <Filter>General\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Tetris\Logging.h">
-      <Filter>Accessories\Header Files</Filter>
+      <Filter>General\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Tetris\MakeString.h">
-      <Filter>Accessories\Header Files</Filter>
+      <Filter>General\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Tetris\Threading.h">
-      <Filter>Accessories\Header Files</Filter>
+      <Filter>General\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Tetris\TypedWrapper.h">
-      <Filter>Accessories\Header Files</Filter>
+      <Filter>General\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Tetris\Unicode.h">
-      <Filter>Accessories\Header Files</Filter>
+      <Filter>General\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Tetris\Utilities.h">
-      <Filter>Accessories\Header Files</Filter>
+      <Filter>General\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Tetris\Worker.h">
-      <Filter>Accessories\Header Files</Filter>
+      <Filter>General\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Tetris\WorkerPool.h">
-      <Filter>Accessories\Header Files</Filter>
+      <Filter>General\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Tetris\AISupport.h">
       <Filter>ComputerPlayer\Header Files</Filter>
@@ -159,19 +159,19 @@
       <Filter>Tetris\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Logger.cpp">
-      <Filter>Accessories\Source Files</Filter>
+      <Filter>General\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Logging.cpp">
-      <Filter>Accessories\Source Files</Filter>
+      <Filter>General\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Unicode.cpp">
-      <Filter>Accessories\Source Files</Filter>
+      <Filter>General\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Worker.cpp">
-      <Filter>Accessories\Source Files</Filter>
+      <Filter>General\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\WorkerPool.cpp">
-      <Filter>Accessories\Source Files</Filter>
+      <Filter>General\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\AISupport.cpp">
       <Filter>ComputerPlayer\Source Files</Filter>
@@ -198,7 +198,10 @@
       <Filter>Tetris\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\GenericGrid.cpp">
-      <Filter>Accessories\Source Files</Filter>
+      <Filter>General\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Threading.cpp">
+      <Filter>General\Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

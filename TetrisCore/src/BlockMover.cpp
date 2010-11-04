@@ -98,10 +98,6 @@ namespace Tetris
                 move();
             }
         }
-        catch (const LockTimeout & inException)
-        {
-            LogWarning(MakeString() << "BlockMoverImpl failed to lock the Game due to timeout. Details: " << inException.what());
-        }
         catch (const std::exception & inException)
         {
             LogError(MakeString() << "Unanticipated exception thrown in BlockMoverImpl::move(). Details: " << inException.what());

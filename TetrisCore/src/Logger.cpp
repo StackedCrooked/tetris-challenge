@@ -50,12 +50,27 @@ namespace Tetris
 
     void Logger::flush()
     {
-        ScopedAtom<Queue> queue(mProtectedQueue);
-        for (size_t idx = 0; idx != queue->size(); ++idx)
+        std::vector<std::string> items;
+        items.reserve(100);
+
+
+        // Since the logging can be a slow operation we don't keep the Game object locked here.
+        // We just copy the items, and log them afterwards.
         {
-            logImpl((*queue.get())[idx]);
+            ScopedAtom<Queue> queue(mProtectedQueue);        
+            for (size_t idx = 0; idx != queue->size(); ++idx)
+            {
+                items.push_back((*queue.get())[idx]);
+            }   
+            queue->clear();
         }
-        queue->clear();
+        
+
+        // Ok, the game object is unlocked again. We can log the items here.
+        for (size_t idx = 0; idx != items.size(); ++idx)
+        {
+            logImpl(items[idx]);
+        }
     }
 
 

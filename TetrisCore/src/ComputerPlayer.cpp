@@ -234,13 +234,23 @@ namespace Tetris
         {
             // Check if the computer player has finished.
             if (mNodeCalculator->status() != NodeCalculator::Status_Finished)
-            {      
-                ScopedAtom<Game> wgame(mProtectedGame);
-                Game & game(*wgame.get());          
-                if (game.numPrecalculatedMoves() == 0)
+            {    
+                int numPrecalculatedMoves = -1;
+                int remainingTime = -1;
+                {
+                    ScopedAtom<Game> wgame(mProtectedGame);
+                    Game & game(*wgame.get());          
+                    numPrecalculatedMoves = game.numPrecalculatedMoves();
+                    if (numPrecalculatedMoves == 0)
+                    {
+                        remainingTime = calculateRemainingTimeMs(game);
+                    }
+                }
+
+                if (numPrecalculatedMoves == 0)
                 {
                     // Check if there is the danger of crashing the current block.  
-                    int remainingTime = calculateRemainingTimeMs(game);
+                    
                     if (remainingTime <= 1000)
                     {
                         mNodeCalculator->stop();
