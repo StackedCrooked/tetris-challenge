@@ -334,13 +334,6 @@ namespace Tetris
     }
 
 
-    int GameState::quality() const
-    {
-        Assert(mImpl->mQuality.isInitialized());
-        return mImpl->mQuality.score();
-    }
-
-
     bool GameState::checkPositionValid(const Block & inBlock, size_t inRowIdx, size_t inColIdx) const
     {
         if (inRowIdx >= mImpl->mGrid.numRows() || inColIdx >= mImpl->mGrid.numColumns())
