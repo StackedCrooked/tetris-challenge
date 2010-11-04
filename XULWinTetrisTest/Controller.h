@@ -143,7 +143,7 @@ namespace Tetris
         TextBoxPtr mLinesTextBoxes[4];
         XULWin::TextBox * mTotalLinesTextBox;
         XULWin::TextBox * mScoreTextBox;
-        XULWin::TextBox * mLevelTextBox;
+        XULWin::SpinButton * mLevelTextBox;
         XULWin::TextBox * mCurrentSearchDepth;
         XULWin::SpinButton * mMovementSpeed;
         XULWin::TextBox * mStatusTextBox;

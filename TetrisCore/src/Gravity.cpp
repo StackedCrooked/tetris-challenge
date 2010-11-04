@@ -6,8 +6,11 @@
 #include "Tetris/Direction.h"
 #include "Tetris/Logging.h"
 #include "Tetris/Threading.h"
+#include "Tetris/MakeString.h"
+#include "Tetris/Assert.h"
 #include "Poco/Timer.h"
 #include "Poco/Stopwatch.h"
+#include <algorithm>
 
 
 namespace Tetris
@@ -22,8 +25,8 @@ namespace Tetris
         100, 84, 84, 67, 67, 50
     };
 
-
-    static const int cMaxLevel = sizeof(sIntervals)/sizeof(int) - 1;
+    const int cIntervalCount = sizeof(sIntervals)/sizeof(int);
+    extern const int cMaxLevel = sizeof(sIntervals)/sizeof(int) - 1;
 
 
     class GravityImpl
@@ -81,6 +84,7 @@ namespace Tetris
     {
         try
         {
+            int oldLevel = mLevel;
             {
                 if (mStopwatch.elapsed() > 1000  * interval())
                 {
@@ -91,10 +95,17 @@ namespace Tetris
                         return;
                     }
                     game->move(Direction_Down);
-                    mLevel = game->level();
+                    int maxLevel = cMaxLevel;
+                    mLevel = std::min<int>(maxLevel, game->level());
                 }
-            }           
-            mTimer.setPeriodicInterval(sIntervals[mLevel]);
+            }
+            if (mLevel != oldLevel)
+            {
+                Assert(mLevel < cIntervalCount);
+                int newLevel = sIntervals[mLevel];
+                LogInfo(MakeString() << "Set level to " << newLevel << ".");
+                mTimer.setPeriodicInterval(newLevel);
+            }
         }
         catch (const std::exception & inException)
         {

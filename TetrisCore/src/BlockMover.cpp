@@ -51,7 +51,7 @@ namespace Tetris
         mTimer(),
         mInterval(static_cast<double>(inInterval))
     {
-        mTimer.reset(new Poco::Timer(0, 25));
+        mTimer.reset(new Poco::Timer(0, 1));
         Poco::TimerCallback<BlockMoverImpl> callback(*this, &BlockMoverImpl::onTimer);
         mTimer->start(callback);
         mStopwatch.start();
