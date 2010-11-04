@@ -18,7 +18,7 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="$(SolutionDir)Build\vs90\$(ConfigurationName)\$(ProjectName)\"
+			OutputDirectory="$(SolutionDir)Build\Windows\x86\v90\$(ConfigurationName)\$(ProjectName)\"
 			IntermediateDirectory="$(OutDir)\Intermediate\"
 			ConfigurationType="1"
 			CharacterSet="1"
@@ -63,7 +63,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="comctl32.lib GdiPlus.lib Iphlpapi.lib wsock32.lib WS2_32.lib Winmm.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;$(SolutionDir)3rdParty\Boost_1_44_0\lib&quot;"
+				AdditionalLibraryDirectories="&quot;$(SolutionDir)3rdParty\Boost_1_44_0\lib\Windows\i686&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				LargeAddressAware="2"
@@ -93,7 +93,7 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="$(SolutionDir)Build\vs90\$(ConfigurationName)\$(ProjectName)\"
+			OutputDirectory="$(SolutionDir)Build\Windows\x86\v90\$(ConfigurationName)\$(ProjectName)\"
 			IntermediateDirectory="$(OutDir)\Intermediate\"
 			ConfigurationType="1"
 			CharacterSet="1"
@@ -144,7 +144,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="comctl32.lib GdiPlus.lib Iphlpapi.lib wsock32.lib WS2_32.lib Winmm.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;$(SolutionDir)3rdParty\Boost_1_44_0\lib&quot;"
+				AdditionalLibraryDirectories="&quot;$(SolutionDir)3rdParty\Boost_1_44_0\lib\Windows\i686&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				LargeAddressAware="2"
@@ -176,8 +176,8 @@
 		</Configuration>
 		<Configuration
 			Name="Debug_NoSecureSTL|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)Build\Windows\x86\v90\$(ConfigurationName)\$(ProjectName)\"
+			IntermediateDirectory="$(OutDir)\Intermediate\"
 			ConfigurationType="1"
 			CharacterSet="1"
 			>
@@ -222,7 +222,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="comctl32.lib GdiPlus.lib Iphlpapi.lib wsock32.lib WS2_32.lib Winmm.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;$(SolutionDir)3rdParty\Boost_1_44_0\lib&quot;"
+				AdditionalLibraryDirectories="&quot;$(SolutionDir)3rdParty\Boost_1_44_0\lib\Windows\i686&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				LargeAddressAware="2"
