@@ -76,6 +76,8 @@ namespace Tetris {
         mGravity(),
         mRefreshTimer(),
         mGameCopyTimer(new Poco::Timer(0, 200)),
+        mCustomEvaluator(),
+        mCustomEvaluatorMutex(),
         mRandom()
     {
         //
@@ -237,7 +239,7 @@ namespace Tetris {
     void Controller::onGameCopy(Poco::Timer & timer)
     {
         boost::mutex::scoped_lock lock(mGameCopyMutex);
-        ScopedAtom<Game> game(*mProtectedGame.get());
+        ScopedReaderAndWriter<Game> game(*mProtectedGame.get());
         mGameCopy.reset(game->clone().release());
     }
 
@@ -247,7 +249,7 @@ namespace Tetris {
 
         {
             mComputerPlayer.reset();
-            ScopedAtom<Game> wgame(*mProtectedGame.get());
+            ScopedReaderAndWriter<Game> wgame(*mProtectedGame.get());
             Game & game(*wgame.get());
             game.clearPrecalculatedNodes();
 
@@ -388,7 +390,7 @@ namespace Tetris {
 
     LRESULT Controller::onClearPrecalculated(WPARAM wParam, LPARAM lParam)
     {
-        ScopedAtom<Game> game(*mProtectedGame);
+        ScopedReaderAndWriter<Game> game(*mProtectedGame);
         game->clearPrecalculatedNodes();
         return XULWin::cHandled;
     }
@@ -441,16 +443,16 @@ namespace Tetris {
             }
             case EvaluatorType_Custom:
             {
-                return std::auto_ptr<Evaluator>(new CustomEvaluator(
-                    GameHeightFactor(XULWin::String2Int(mGameHeightFactor->getValue(), 0)),
-                    LastBlockHeightFactor(XULWin::String2Int(mLastBlockHeightFactor->getValue(), 0)),
-                    NumHolesFactor(XULWin::String2Int(mNumHolesFactor->getValue(), 0)),
-                    NumSinglesFactor(XULWin::String2Int(mNumSinglesFactor->getValue(), 0)),
-                    NumDoublesFactor(XULWin::String2Int(mNumDoublesFactor->getValue(), 0)),
-                    NumTriplesFactor(XULWin::String2Int(mNumTriplesFactor->getValue(), 0)),
-                    NumTetrisesFactor(XULWin::String2Int(mNumTetrisesFactor->getValue(), 0)),
-                    SearchDepth(XULWin::String2Int(mSearchDepth->getValue(), 4)),
-                    SearchWidth(XULWin::String2Int(mSearchWidth->getValue(), 4))));
+                boost::mutex::scoped_lock lock(mCustomEvaluatorMutex);
+                if (mCustomEvaluator)
+                {
+                    return mCustomEvaluator->clone();
+                }
+                else
+                {
+                    LogWarning("No custom evaluator defined yet. Returning Balanced.");
+                    return CreatePoly<Evaluator, Balanced>();
+                }
             }
             default:
             {
@@ -473,8 +475,8 @@ namespace Tetris {
     {
         if (tetrisComponent == mTetrisComponent)
         {
-            ScopedConstAtom<Game> rgame(*mProtectedGame);
-            const Game & game = *(rgame.get());
+            ScopedReader<Game> rgame(*mProtectedGame);
+            const Game & game = *rgame.get();
             outGrid = game.currentNode()->state().grid();
             outActiveBlock = game.activeBlock();
             game.getFutureBlocks(mTetrisComponent->getNumFutureBlocks() + 1, outFutureBlockTypes);
@@ -486,7 +488,7 @@ namespace Tetris {
     {
         if (mPlayerIsHuman->isSelected())
         {
-            ScopedAtom<Game> wgame(*mProtectedGame);
+            ScopedReaderAndWriter<Game> wgame(*mProtectedGame);
             Game & game = *wgame.get();
             return game.move(inDirection);
         }
@@ -498,7 +500,7 @@ namespace Tetris {
     {
         if (mPlayerIsHuman->isSelected())
         {
-            ScopedAtom<Game> wgame(*mProtectedGame);
+            ScopedReaderAndWriter<Game> wgame(*mProtectedGame);
             Game & game = *wgame.get();
             game.drop();
         }
@@ -509,7 +511,7 @@ namespace Tetris {
     {
         if (mPlayerIsHuman->isSelected())
         {
-            ScopedAtom<Game> wgame(*mProtectedGame);
+            ScopedReaderAndWriter<Game> wgame(*mProtectedGame);
             Game & game = *wgame.get();
             return game.rotate();
         }
@@ -599,7 +601,7 @@ namespace Tetris {
             int level = XULWin::String2Int(mLevelTextBox->getValue(), mGameCopy->level());
             if (mGameCopy->level() != level)
             {
-                ScopedAtom<Game> wgame(*mProtectedGame);
+                ScopedReaderAndWriter<Game> wgame(*mProtectedGame);
                 wgame->setLevel(level);
                 level = wgame->level();
                 mLevelTextBox->setValue(XULWin::Int2String(level));
@@ -716,16 +718,37 @@ namespace Tetris {
             mNumTriplesFactor->setDisabled(!useCustomEvaluator);
             mNumTetrisesFactor->setDisabled(!useCustomEvaluator);
 
-            // Update the GUI with the values from the evaluator.
-            mGameHeightFactor->setValue(MakeString() << mComputerPlayer->evaluator().gameHeightFactor());
-            mLastBlockHeightFactor->setValue(MakeString() << mComputerPlayer->evaluator().lastBlockHeightFactor());
-            mNumHolesFactor->setValue(MakeString() << mComputerPlayer->evaluator().numHolesFactor());
-            mNumSinglesFactor->setValue(MakeString() << mComputerPlayer->evaluator().numSinglesFactor());
-            mNumDoublesFactor->setValue(MakeString() << mComputerPlayer->evaluator().numDoublesFactor());
-            mNumTriplesFactor->setValue(MakeString() << mComputerPlayer->evaluator().numTriplesFactor());
-            mNumTetrisesFactor->setValue(MakeString() << mComputerPlayer->evaluator().numTetrisesFactor());
-            mSearchDepth->setValue(MakeString() << mComputerPlayer->evaluator().recommendedSearchDepth());
-            mSearchWidth->setValue(MakeString() << mComputerPlayer->evaluator().recommendedSearchWidth());
+            // Update the custom evaluator object
+            if (useCustomEvaluator)
+            {
+                boost::mutex::scoped_lock lock(mCustomEvaluatorMutex);
+                mCustomEvaluator.reset(new CustomEvaluator(
+                        GameHeightFactor(XULWin::String2Int(mGameHeightFactor->getValue(), 0)),
+                        LastBlockHeightFactor(XULWin::String2Int(mLastBlockHeightFactor->getValue(), 0)),
+                        NumHolesFactor(XULWin::String2Int(mNumHolesFactor->getValue(), 0)),
+                        NumSinglesFactor(XULWin::String2Int(mNumSinglesFactor->getValue(), 0)),
+                        NumDoublesFactor(XULWin::String2Int(mNumDoublesFactor->getValue(), 0)),
+                        NumTriplesFactor(XULWin::String2Int(mNumTriplesFactor->getValue(), 0)),
+                        NumTetrisesFactor(XULWin::String2Int(mNumTetrisesFactor->getValue(), 0)),
+                        SearchDepth(XULWin::String2Int(mSearchDepth->getValue(), 4)),
+                        SearchWidth(XULWin::String2Int(mSearchWidth->getValue(), 4))));
+            }
+            else
+            {
+                // Update the GUI with the values from the evaluator.
+                mGameHeightFactor->setValue(MakeString() << mComputerPlayer->evaluator().gameHeightFactor());
+                mLastBlockHeightFactor->setValue(MakeString() << mComputerPlayer->evaluator().lastBlockHeightFactor());
+                mNumHolesFactor->setValue(MakeString() << mComputerPlayer->evaluator().numHolesFactor());
+                mNumSinglesFactor->setValue(MakeString() << mComputerPlayer->evaluator().numSinglesFactor());
+                mNumDoublesFactor->setValue(MakeString() << mComputerPlayer->evaluator().numDoublesFactor());
+                mNumTriplesFactor->setValue(MakeString() << mComputerPlayer->evaluator().numTriplesFactor());
+                mNumTetrisesFactor->setValue(MakeString() << mComputerPlayer->evaluator().numTetrisesFactor());
+                mSearchDepth->setValue(MakeString() << mComputerPlayer->evaluator().recommendedSearchDepth());
+                mSearchWidth->setValue(MakeString() << mComputerPlayer->evaluator().recommendedSearchWidth());
+
+                boost::mutex::scoped_lock lock(mCustomEvaluatorMutex);
+                mCustomEvaluator.reset();
+            }
 
             if (mGameStateScore)
             {

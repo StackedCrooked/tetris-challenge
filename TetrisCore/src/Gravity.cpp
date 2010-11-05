@@ -61,7 +61,7 @@ namespace Tetris
         mThreadSafeGame(inThreadSafeGame),
         mLevel(0)
     {
-        ScopedConstAtom<Game> rgame(mThreadSafeGame);
+        ScopedReader<Game> rgame(mThreadSafeGame);
         mTimer.start(Poco::TimerCallback<GravityImpl>(*this, &GravityImpl::onTimerEvent));
         mTimer.setPeriodicInterval(sIntervals[rgame->level()]);
         mStopwatch.start();
@@ -89,7 +89,7 @@ namespace Tetris
                 if (mStopwatch.elapsed() > 1000  * interval())
                 {
                     mStopwatch.restart();
-                    ScopedAtom<Game> game(mThreadSafeGame);
+                    ScopedReaderAndWriter<Game> game(mThreadSafeGame);
                     if (game->isGameOver())
                     {
                         return;

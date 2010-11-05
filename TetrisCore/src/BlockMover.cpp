@@ -107,7 +107,7 @@ namespace Tetris
 
     void BlockMoverImpl::move()
     {
-        ScopedAtom<Game> wgame(mGame);
+        ScopedReaderAndWriter<Game> wgame(mGame);
         Game & game = *wgame.get();
 
         const ChildNodes & children = game.currentNode()->children();

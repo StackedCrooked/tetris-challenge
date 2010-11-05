@@ -1,9 +1,10 @@
 Todo
 ----
 - Introduce ScopedReader and ScopedReaderAndWriter. Use read lock for the ScopedReader.
-- Clean up asserts
 - Implement Human vs Computer modus.
 - Differentiate between 'level textbox' and 'override level spinbox + override level checkbox'.
+- Rename TetrisCore to Tetris
+- Clean up asserts
 v Add checkbox: 'switch to Survive when height reaches xx%'
 v Add multicore search and add spin button to GUI to specify number of threads.
 v Don't use boost::shared_ptr for WorkerPool.
