@@ -1,5 +1,6 @@
 Todo
 ----
+- !! Linux build is not compatible with built-in libs!!
 - Introduce ScopedReader and ScopedReaderAndWriter. Use read lock for the ScopedReader.
 - Implement Human vs Computer modus.
 - Differentiate between 'level textbox' and 'override level spinbox + override level checkbox'.
