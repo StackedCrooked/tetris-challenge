@@ -1,4 +1,4 @@
-:PHONY Darwin Xcode
+:PHONY Darwin Xcode Linux
 
 all: Linux
 
