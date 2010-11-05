@@ -10,7 +10,6 @@
 #include "Tetris/Logging.h"
 #include "Tetris/MakeString.h"
 #include "Tetris/Assert.h"
-#include "Poco/Types.h"
 #include <vector>
 #include <memory>
 
@@ -76,7 +75,7 @@ namespace Tetris
             inline NodePtr bestNode() const
             { return mBestNode; }
 
-            inline Poco::UInt64 nodeCount() const
+            inline size_t nodeCount() const
             { return mNodeCount; }
 
             inline bool finished() const
@@ -103,7 +102,7 @@ namespace Tetris
             NodePtr mBestNode;
             int mBestScore;
             boost::shared_ptr<Evaluator> mEvaluator;
-            Poco::UInt64 mNodeCount;
+            size_t mNodeCount;
             bool mFinished;
         };
 
@@ -149,7 +148,7 @@ namespace Tetris
                 return result;
             }
 
-            inline Poco::UInt64 nodeCount(size_t inDepth) const
+            inline size_t nodeCount(size_t inDepth) const
             {
                 boost::mutex::scoped_lock lock(mMutex);
                 return mInfos[inDepth - 1].nodeCount();
