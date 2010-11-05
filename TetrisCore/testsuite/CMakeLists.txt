@@ -9,7 +9,8 @@ add_executable(${EXECUTABLE}
     src/WorkerTest.cpp)
 
 
-set_target_properties(${EXECUTABLE} PROPERTIES COMPILE_FLAGS "${CXX_FLAGS_${CMAKE_BUILD_TYPE}}")
+set_target_properties(${EXECUTABLE} PROPERTIES COMPILE_FLAGS ${FINAL_COMPILE_FLAGS})
+
 
 set(LIBS TetrisCore PocoFoundation CppUnit boost_thread)
 if (UNIX)
