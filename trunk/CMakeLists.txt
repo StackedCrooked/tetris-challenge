@@ -30,6 +30,7 @@ set(BOOST ${SOLUTIONDIR}3rdParty/Boost_1_44_0/)
 set(POCO ${SOLUTIONDIR}3rdParty/Poco/)
 set(CXX_FLAGS_Release "${CXX_FLAGS} -Wall -O3")
 set(CXX_FLAGS_Debug   "${CXX_FLAGS} -Wall -ggdb")
+set(FINAL_COMPILE_FLAGS "${CXX_FLAGS_${CMAKE_BUILD_TYPE}}")
 
 
 include_directories(

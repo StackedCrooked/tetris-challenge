@@ -1,6 +1,6 @@
 :PHONY Darwin Xcode Linux Cygwin
 
-all: Cygwin
+all: Linux
 
 Cygwin:
 	echo "Making Cygwin"
