@@ -32,7 +32,9 @@ namespace Tetris
     {
         if (sTetris_Grid_MemoryPools.find(mItemSize) == sTetris_Grid_MemoryPools.end())
         {
-            boost::shared_ptr<Poco::MemoryPool> memoryPool(new Poco::MemoryPool(mItemSize, 0, 0));
+            // TODO: determine amount of free memory and use 60% or so...
+            const size_t cPoolSize = 1 * 1000 * 1000;
+            boost::shared_ptr<Poco::MemoryPool> memoryPool(new Poco::MemoryPool(mItemSize, cPoolSize, cPoolSize));
             sTetris_Grid_MemoryPools.insert(std::make_pair(mItemSize, memoryPool));
         }
         mPool = sTetris_Grid_MemoryPools[mItemSize].get();
