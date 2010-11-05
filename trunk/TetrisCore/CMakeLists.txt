@@ -26,5 +26,5 @@ add_library(TetrisCore
     src/Worker.cpp
     src/WorkerPool.cpp)
 
-set_target_properties(TetrisCore PROPERTIES COMPILE_FLAGS ${CXX_FLAGS})
+set_target_properties(TetrisCore PROPERTIES COMPILE_FLAGS "${CXX_FLAGS}")
 

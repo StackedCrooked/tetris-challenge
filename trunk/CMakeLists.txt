@@ -1,13 +1,7 @@
 cmake_minimum_required(VERSION 2.6) 
 project(TetrisTestSuite) 
 
-set(CONFIGURATION $ENV{CONFIGURATION})
-if("${CONFIGURATION}" STREQUAL "")
-message(WARNING "No CONFIGURATION given. Using Release.")
-set(CONFIGURATION Release)
-elseif (NOT ((${CONFIGURATION} STREQUAL Release) OR (${CONFIGURATION} STREQUAL Debug)))
-message(FATAL_ERROR "${CONFIGURATION} is not a valid configuration. Quitting")
-endif()
+set(CMAKE_BUILD_TYPE Release)
 
 
 if(APPLE)
@@ -23,18 +17,13 @@ endif()
 
 set(EXECUTABLE tetristestsuite)
 set(SOLUTIONDIR ${TetrisTestSuite_SOURCE_DIR}/)
-set(OUTDIR ${SOLUTIONDIR}Build/${PLATFORM}/${ARCH}/${CONFIGURATION}/)
+set(OUTDIR ${SOLUTIONDIR}Build/${PLATFORM}/${ARCH}/${CMAKE_BUILD_TYPE}/)
 set(BOOST ${SOLUTIONDIR}3rdParty/Boost_1_44_0/)
 set(POCO ${SOLUTIONDIR}3rdParty/Poco/)
 
 
-message("CONFIGURATION: ${CONFIGURATION}")
-
-if(${CONFIGURATION} STREQUAL Release)
-set(CXX_FLAGS "${CXX_FLAGS} -Wall -O3")
-elseif(${CONFIGURATION} STREQUAL Debug)
-set(CXX_FLAGS "${CXX_FLAGS} -Wall -ggdb")
-endif()
+set(CXX_FLAGS_Release "${CXX_FLAGS} -Wall -O3")
+set(CXX_FLAGS_Debug   "${CXX_FLAGS} -Wall -ggdb")
 
 
 include_directories(${BOOST}
