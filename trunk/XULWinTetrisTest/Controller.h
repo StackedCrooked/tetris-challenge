@@ -177,6 +177,9 @@ namespace Tetris
         boost::scoped_ptr<Poco::Timer> mGameCopyTimer;
         boost::scoped_ptr<Game> mGameCopy;
         mutable boost::mutex mGameCopyMutex;
+
+        boost::scoped_ptr<Evaluator> mCustomEvaluator;
+        mutable boost::mutex mCustomEvaluatorMutex;
         Poco::Random mRandom;
     };
 

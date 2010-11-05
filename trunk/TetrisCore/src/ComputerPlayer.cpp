@@ -160,7 +160,7 @@ namespace Tetris
         LogInfo(MakeString() << "ComputerPlayer started with " << mWorkerPool.size() << " worker threads.");
         mTimer.start(Poco::TimerCallback<ComputerPlayerImpl>(*this, &ComputerPlayerImpl::onTimerEvent));
 
-        ScopedConstAtom<Game> game(mProtectedGame);
+        ScopedReader<Game> game(mProtectedGame);
         mEvaluator.reset(mGetEvaluator(game->currentNode()->state()).release());
     }
         
@@ -238,7 +238,7 @@ namespace Tetris
                 int numPrecalculatedMoves = -1;
                 int remainingTime = -1;
                 {
-                    ScopedAtom<Game> wgame(mProtectedGame);
+                    ScopedReaderAndWriter<Game> wgame(mProtectedGame);
                     Game & game(*wgame.get());          
                     numPrecalculatedMoves = game.numPrecalculatedMoves();
                     if (numPrecalculatedMoves == 0)
@@ -264,7 +264,7 @@ namespace Tetris
                 {
                     if (!resultNode->state().isGameOver())
                     {
-                        ScopedAtom<Game> wgame(mProtectedGame);
+                        ScopedReaderAndWriter<Game> wgame(mProtectedGame);
                         Game & game(*wgame.get());
 
                         // The created node should follow the last precalculated one.
@@ -290,7 +290,7 @@ namespace Tetris
         }
         else
         {            
-            ScopedAtom<Game> wgame(mProtectedGame);
+            ScopedReaderAndWriter<Game> wgame(mProtectedGame);
             Game & game(*wgame.get());
             if (!game.lastPrecalculatedNode()->state().isGameOver())
             {

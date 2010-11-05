@@ -1,6 +1,10 @@
-:PHONY Darwin Xcode Linux
+:PHONY Darwin Xcode Linux Cygwin
 
-all: Linux
+all: Cygwin
+
+Cygwin:
+	echo "Making Cygwin"
+	Scripts/Make/MakeCygwin.sh	
 
 Linux:
 	echo "Making Linux"
@@ -13,4 +17,3 @@ Darwin:
 Xcode:
 	echo "Making Xcode"
 	Scripts/Make/MakeXcode.sh
-

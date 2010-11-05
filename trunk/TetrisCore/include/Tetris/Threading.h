@@ -3,7 +3,7 @@
 
 
 #include "Tetris/Assert.h"
-#include <boost/thread/mutex.hpp>
+#include <boost/thread.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <memory>
 
@@ -20,16 +20,16 @@ namespace Tetris
         }
 
         boost::scoped_ptr<Variable> mVariable;
-        mutable boost::timed_mutex mMutex;
+        mutable boost::shared_mutex mMutex;
     };
 
     // Forward declaration.
     template<class Variable>
-    class ScopedConstAtom;
+    class ScopedReader;
 
     // Forward declaration.
     template<class Variable>
-    class ScopedAtom;
+    class ScopedReaderAndWriter;
 
 
     template<class Variable>
@@ -51,14 +51,14 @@ namespace Tetris
         { return mVariableWithMutex->mMutex; }
 
     private:
-        friend class ScopedAtom<Variable>;
-        friend class ScopedConstAtom<Variable>;
+        friend class ScopedReaderAndWriter<Variable>;
+        friend class ScopedReader<Variable>;
         boost::shared_ptr<WithMutex<Variable> > mVariableWithMutex;
     };
 
     
     // Simple stopwatch class.
-    // Helper for ScopedAtom and ScopedConstAtom.
+    // Helper for ScopedReaderAndWriter and ScopedReader.
     class StopwatchImpl;
     class Stopwatch
     {
@@ -81,17 +81,18 @@ namespace Tetris
 
 
     template<class Variable>
-    class ScopedAtom
+    class ScopedReaderAndWriter
     {
     public:
-        ScopedAtom(Protected<Variable> & inProtectedVariable) :
-            mLock(inProtectedVariable.mVariableWithMutex->mMutex),
+        ScopedReaderAndWriter(Protected<Variable> & inProtectedVariable) :
+            mSharedLock(inProtectedVariable.mVariableWithMutex->mMutex),
+            mUpgradeLock(mSharedLock),
             mVariable(inProtectedVariable.mVariableWithMutex->mVariable.get())
         {
 
         }
 
-        ~ScopedAtom()
+        ~ScopedReaderAndWriter()
         {
             Assert(mStopwatch.elapsedTimeMs() < cMaximumLockDurationMs);
         }
@@ -102,26 +103,28 @@ namespace Tetris
         Variable * operator->()
         { return mVariable; }
     private:
-        ScopedAtom(const ScopedAtom&);
-        ScopedAtom& operator=(const ScopedAtom&);
+        ScopedReaderAndWriter(const ScopedReaderAndWriter&);
+        ScopedReaderAndWriter& operator=(const ScopedReaderAndWriter&);
 
-        boost::timed_mutex::scoped_lock mLock;
+        boost::upgrade_lock<boost::shared_mutex> mSharedLock;
+        boost::upgrade_to_unique_lock<boost::shared_mutex> mUpgradeLock;
+
         Variable * mVariable;
         Stopwatch mStopwatch;
     };
 
 
     template<class Variable>
-    class ScopedConstAtom
+    class ScopedReader
     {
     public:
-        ScopedConstAtom(const Protected<Variable> & inProtectedVariable) :
-            mLock(inProtectedVariable.mVariableWithMutex->mMutex),
+        ScopedReader(const Protected<Variable> & inProtectedVariable) :
+            mSharedLock(inProtectedVariable.mVariableWithMutex->mMutex),
             mVariable(inProtectedVariable.mVariableWithMutex->mVariable.get())
         {
         }
 
-        ~ScopedConstAtom()
+        ~ScopedReader()
         {
             Assert(mStopwatch.elapsedTimeMs() < cMaximumLockDurationMs);
         }
@@ -132,10 +135,10 @@ namespace Tetris
         const Variable * operator->() const
         { return mVariable; }
     private:
-        ScopedConstAtom(const ScopedConstAtom&);
-        ScopedConstAtom& operator=(const ScopedConstAtom&);
+        ScopedReader(const ScopedReader&);
+        ScopedReader& operator=(const ScopedReader&);
 
-        boost::timed_mutex::scoped_lock mLock;
+        boost::upgrade_lock<boost::shared_mutex> mSharedLock;
         const Variable * mVariable;
         Stopwatch mStopwatch;
     };
