@@ -21,6 +21,7 @@ add_library(TetrisCore
     src/NodeCalculator.cpp 
     src/NodeCalculatorImpl.cpp 
     src/SingleThreadedNodeCalculator.cpp 
+    src/Threading.cpp 
     src/Unicode.cpp 
     src/Worker.cpp
     src/WorkerPool.cpp)
