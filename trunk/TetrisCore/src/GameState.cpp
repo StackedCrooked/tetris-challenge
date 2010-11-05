@@ -341,12 +341,13 @@ namespace Tetris
             return false;
         }
 
-        for (size_t r = 0; r != inBlock.grid().numRows(); ++r)
+        const Grid & blockGrid(inBlock.grid());
+        for (size_t r = 0; r != blockGrid.numRows(); ++r)
         {
-            for (size_t c = 0; c != inBlock.grid().numColumns(); ++c)
+            for (size_t c = 0; c != blockGrid.numColumns(); ++c)
             {
 
-                if (inBlock.grid().get(r, c) != 0)
+                if (blockGrid.get(r, c) != 0)
                 {
                     size_t rowIdx = inRowIdx + r;
                     if (rowIdx >= mImpl->mGrid.numRows())
