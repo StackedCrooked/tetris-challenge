@@ -1,7 +1,14 @@
 cmake_minimum_required(VERSION 2.6) 
 project(TetrisTestSuite) 
 
+set(CONFIGURATION $ENV{CONFIGURATION})
+if("${CONFIGURATION}" STREQUAL "")
+message(WARNING "No CONFIGURATION given. Using Release.")
 set(CONFIGURATION Release)
+elseif (NOT ((${CONFIGURATION} STREQUAL Release) OR (${CONFIGURATION} STREQUAL Debug)))
+message(FATAL_ERROR "${CONFIGURATION} is not a valid configuration. Quitting")
+endif()
+
 
 if(APPLE)
 set(ARCH i386)
