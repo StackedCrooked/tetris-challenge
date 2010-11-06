@@ -136,6 +136,8 @@ namespace Tetris
 
         void forceUpdateStats();
 
+        bool checkPositionValid(const Block & inBlock, size_t inRowIdx, size_t inColIdx) const;
+
     private:
         friend class GameState;
         Grid mGrid;
@@ -154,6 +156,46 @@ namespace Tetris
         mQuality()
     {
         mStats.mFirstOccupiedRow = inNumRows;
+    }
+
+
+    bool GameStateImpl::checkPositionValid(const Block & inBlock, size_t inRowIdx, size_t inColIdx) const
+    {
+        const Grid & blockGrid(inBlock.grid());
+        if (inColIdx < blockGrid.numColumns() &&
+            (inRowIdx + blockGrid.numRows()) < static_cast<size_t>(mStats.firstOccupiedRow()))
+        {
+            return true;
+        }
+
+        if (inRowIdx >= mGrid.numRows())
+        {
+            return false;
+        }
+
+        for (size_t r = 0; r != blockGrid.numRows(); ++r)
+        {
+            size_t rowIdx = inRowIdx + r;
+            if (rowIdx >= mGrid.numRows())
+            {
+                return false;
+            }
+
+            for (size_t c = 0; c != blockGrid.numColumns(); ++c)
+            {
+                size_t colIdx = inColIdx + c;
+                if (colIdx >= mGrid.numColumns())
+                {
+                    return false;
+                }
+
+                if (blockGrid.get(r, c) && mGrid.get(rowIdx, colIdx))
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
 
@@ -336,39 +378,7 @@ namespace Tetris
 
     bool GameState::checkPositionValid(const Block & inBlock, size_t inRowIdx, size_t inColIdx) const
     {
-        if (inRowIdx >= mImpl->mGrid.numRows() || inColIdx >= mImpl->mGrid.numColumns())
-        {
-            return false;
-        }
-
-        const Grid & blockGrid(inBlock.grid());
-        for (size_t r = 0; r != blockGrid.numRows(); ++r)
-        {
-            for (size_t c = 0; c != blockGrid.numColumns(); ++c)
-            {
-
-                if (blockGrid.get(r, c) != 0)
-                {
-                    size_t rowIdx = inRowIdx + r;
-                    if (rowIdx >= mImpl->mGrid.numRows())
-                    {
-                        return false;
-                    }
-
-                    size_t colIdx = inColIdx + c;
-                    if (colIdx >= mImpl->mGrid.numColumns())
-                    {
-                        return false;
-                    }
-
-                    if (mImpl->mGrid.get(rowIdx, colIdx) != BlockType_Nil)
-                    {
-                        return false;
-                    }
-                }
-            }
-        }
-        return true;
+        return mImpl->checkPositionValid(inBlock, inRowIdx, inColIdx);
     }
 
 
