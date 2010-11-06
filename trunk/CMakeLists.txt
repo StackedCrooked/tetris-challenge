@@ -5,21 +5,14 @@ project(TETRIS)
 set(CMAKE_BUILD_TYPE Release)
 
 
-if(APPLE)
-	set(ARCH i386)
-	set(PLATFORM Darwin)
-	
-elseif(CYGWIN)
-	set(ARCH i686)
-	set(PLATFORM Cygwin)
-	
-elseif(UNIX)
-	set(ARCH x86_64)
-	set(PLATFORM Linux)
-	
-elseif(WIN32)
+if(WIN32)
 	set(ARCH x86)
 	set(PLATFORM Windows)
+else()
+    execute_process(COMMAND uname OUTPUT_VARIABLE PLATFORM)
+    string(REPLACE "\n" "" PLATFORM ${PLATFORM})
+    execute_process(COMMAND arch OUTPUT_VARIABLE ARCH)
+    string(REPLACE "\n" "" ARCH ${ARCH})
 endif()
 
 
