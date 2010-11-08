@@ -31,7 +31,7 @@ namespace Tetris
 
         ~Game();
 
-        std::auto_ptr<Game> clone();
+        std::auto_ptr<Game> clone() const;
 
         bool isGameOver() const;
 

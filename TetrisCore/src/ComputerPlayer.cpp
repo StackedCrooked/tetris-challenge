@@ -92,7 +92,7 @@ namespace Tetris
 
         void timerEvent();
 
-        int calculateRemainingTimeMs(Game & game) const;
+        int calculateRemainingTimeMs(const Game & game) const;
         Protected<Game> mProtectedGame;
         WorkerPool mWorkerPool;
         boost::scoped_ptr<NodeCalculator> mNodeCalculator;
@@ -172,7 +172,7 @@ namespace Tetris
     }
 
 
-    int ComputerPlayerImpl::calculateRemainingTimeMs(Game & game) const
+    int ComputerPlayerImpl::calculateRemainingTimeMs(const Game & game) const
     {
         int firstOccupiedRow = game.currentNode()->state().stats().firstOccupiedRow();
         int currentBlockRow = game.activeBlock().row();
@@ -291,7 +291,7 @@ namespace Tetris
         else
         {            
             ScopedReader<Game> wgame(mProtectedGame);
-            Game & game(*wgame.get());
+            const Game & game(*wgame.get());
             if (!game.lastPrecalculatedNode()->state().isGameOver())
             {
                 int numPrecalculated = game.lastPrecalculatedNode()->depth() - game.currentNode()->depth();
