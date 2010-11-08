@@ -239,7 +239,7 @@ namespace Tetris {
     void Controller::onGameCopy(Poco::Timer & timer)
     {
         boost::mutex::scoped_lock lock(mGameCopyMutex);
-        ScopedReaderAndWriter<Game> game(*mProtectedGame.get());
+        ScopedReader<Game> game(*mProtectedGame.get());
         mGameCopy.reset(game->clone().release());
     }
 

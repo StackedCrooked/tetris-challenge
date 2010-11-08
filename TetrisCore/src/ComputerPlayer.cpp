@@ -238,8 +238,8 @@ namespace Tetris
                 int numPrecalculatedMoves = -1;
                 int remainingTime = -1;
                 {
-                    ScopedReaderAndWriter<Game> wgame(mProtectedGame);
-                    Game & game(*wgame.get());          
+                    ScopedReader<Game> wgame(mProtectedGame);
+                    const Game & game(*wgame.get());
                     numPrecalculatedMoves = game.numPrecalculatedMoves();
                     if (numPrecalculatedMoves == 0)
                     {
@@ -290,7 +290,7 @@ namespace Tetris
         }
         else
         {            
-            ScopedReaderAndWriter<Game> wgame(mProtectedGame);
+            ScopedReader<Game> wgame(mProtectedGame);
             Game & game(*wgame.get());
             if (!game.lastPrecalculatedNode()->state().isGameOver())
             {
