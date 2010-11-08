@@ -57,7 +57,7 @@ namespace Tetris
         // Since the logging can be a slow operation we don't keep the Game object locked here.
         // We just copy the items, and log them afterwards.
         {
-            ScopedReaderAndWriter<Queue> queue(mProtectedQueue);        
+            ScopedReader<Queue> queue(mProtectedQueue);        
             for (size_t idx = 0; idx != queue->size(); ++idx)
             {
                 items.push_back((*queue.get())[idx]);
@@ -87,7 +87,7 @@ namespace Tetris
     {
         // Critical section: add the log message to the buffer
         {
-            ScopedReaderAndWriter<Queue> queue(mProtectedQueue);
+            ScopedReader<Queue> queue(mProtectedQueue);
             queue->push_back(GetMessage(inLogLevel, inMessage));
         }
     }
