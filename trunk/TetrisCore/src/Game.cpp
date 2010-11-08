@@ -81,7 +81,10 @@ namespace Tetris {
         NodePtr mCurrentNode;
         boost::scoped_ptr<Block> mActiveBlock;
         boost::scoped_ptr<BlockFactory> mBlockFactory;
+
         mutable BlockTypes mBlocks;
+        mutable boost::mutex mBlocksMutex;
+
         size_t mCurrentBlockIndex;
         int mOverrideLevel;
     };
@@ -138,12 +141,15 @@ namespace Tetris {
         mCurrentNode = inCurrentNode;
         mCurrentBlockIndex = mCurrentNode->depth();
         supplyBlocks();
+
+        boost::mutex::scoped_lock lockBlocks(mBlocksMutex);
         mActiveBlock.reset(CreateDefaultBlock(mBlocks[mCurrentBlockIndex], mNumColumns).release());
     }
 
 
     void GameImpl::supplyBlocks() const
     {            
+        boost::mutex::scoped_lock lockBlocks(mBlocksMutex);
         if (!mBlockFactory && (mCurrentBlockIndex >= mBlocks.size()))
         {
             throw std::runtime_error("This is a cloned Game object and its number of future blocks is depleted.");
@@ -167,6 +173,7 @@ namespace Tetris {
         // Make sure we have 100 blocks from the factory.
         // This ensures the AI will have enough to do its
         // precalculation.
+        boost::mutex::scoped_lock lockBlocks(mBlocksMutex);
         while (mCurrentBlockIndex + 100 > mBlocks.size())
         {
             mBlocks.push_back(mBlockFactory->getNext());
@@ -189,6 +196,7 @@ namespace Tetris {
 
     void GameImpl::reserveBlocks(size_t inCount)
     {
+        boost::mutex::scoped_lock lockBlocks(mBlocksMutex);
         if (!mBlockFactory && (mBlocks.size() < inCount))
         {
             throw std::runtime_error("This is a cloned Game object and its number of future blocks is depleted.");
@@ -216,6 +224,7 @@ namespace Tetris {
 
     void GameImpl::getFutureBlocks(size_t inCount, BlockTypes & outBlocks) const
     {
+        boost::mutex::scoped_lock lockBlocks(mBlocksMutex);
         if (!mBlockFactory && (mBlocks.size() < mCurrentBlockIndex + inCount))
         {
             throw std::runtime_error("This is a cloned Game object and its number of future blocks is depleted.");
@@ -236,6 +245,7 @@ namespace Tetris {
 
     void GameImpl::getFutureBlocksWithOffset(size_t inOffset, size_t inCount, BlockTypes & outBlocks) const
     {        
+        boost::mutex::scoped_lock lockBlocks(mBlocksMutex);
         if (!mBlockFactory && (mBlocks.size() < inOffset + inCount))
         {
             throw std::runtime_error("This is a cloned Game object and its number of future blocks is depleted.");
@@ -456,7 +466,6 @@ namespace Tetris {
     }
 
 
-
     Game::Game(size_t inNumRows, size_t inNumColumns) :
         mImpl(new GameImpl(inNumRows, inNumColumns))
     {
@@ -482,7 +491,7 @@ namespace Tetris {
     }
 
 
-    std::auto_ptr<Game> Game::clone()
+    std::auto_ptr<Game> Game::clone() const
     {
         return std::auto_ptr<Game>(new Game(mImpl->clone()));
     }
