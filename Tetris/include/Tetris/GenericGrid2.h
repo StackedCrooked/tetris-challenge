@@ -17,7 +17,9 @@ class Grid : private Allocator<T>
 public:
     Grid(std::size_t inRowCount, std::size_t inColumnCount);
 
-    Grid::~Grid();
+    Grid(std::size_t inRowCount, std::size_t inColumnCount, const T & inInitialValue);
+
+    ~Grid();
 
     std::size_t rowCount() const;
 
@@ -46,12 +48,12 @@ public:
     {
     }
 
-    T * Alloc()
+    T * alloc()
     {
         return reinterpret_cast<T*>(malloc(mSize));
     }
 
-    void Free(T * inBuffer)
+    void free(T * inBuffer)
     {
         free(inBuffer);
     }
@@ -70,12 +72,12 @@ public:
     {
     }
 
-    T * Alloc()
+    T * alloc()
     {
         return new T[mSize];
     }
 
-    void Free(T * inBuffer)
+    void free(T * inBuffer)
     {
         delete [] inBuffer;
     }
@@ -93,15 +95,31 @@ Grid<T, Allocator>::Grid(std::size_t inRowCount, std::size_t inColumnCount) :
     Allocator<T>(inRowCount * inColumnCount),
     mRowCount(inRowCount),
     mColumnCount(inColumnCount),
-    mBuffer(Allocator<T>::Alloc())
+    mBuffer(Allocator<T>::alloc())
 {
+}
+
+
+template<class T, template <class> class Allocator>
+Grid<T, Allocator>::Grid(std::size_t inRowCount, std::size_t inColumnCount, const T & inInitialValue) :
+    Allocator<T>(inRowCount * inColumnCount),
+    mRowCount(inRowCount),
+    mColumnCount(inColumnCount),
+    mBuffer(Allocator<T>::alloc())
+{
+    // We can't use a memcpy on class objects, we must use copy constructor instead.
+    std::size_t size = inRowCount * inColumnCount;
+    for (size_t idx = 0; idx != size; ++idx)
+    {
+        mBuffer[idx] = inInitialValue;
+    }
 }
 
 
 template<class T, template <class> class Allocator>
 Grid<T, Allocator>::~Grid()
 {
-    Allocator<T>::Free(mBuffer);
+    Allocator<T>::free(mBuffer);
 }
 
 
@@ -130,6 +148,7 @@ const T & Grid<T, Allocator>::get(std::size_t inRow, std::size_t inColumn)
 template<class T, template <class> class Allocator>
 void Grid<T, Allocator>::set(std::size_t inRow, std::size_t inColumn, const T & inValue)
 {
+    assert(inRow < mRowCount && inColumn < mColumnCount);
     mBuffer[inRow * mColumnCount + inColumn] = inValue;
 }
 

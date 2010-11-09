@@ -13,10 +13,13 @@ public:
 	GenericGrid2Test(const std::string & name);
 
 	~GenericGrid2Test();
-
-    void test();
-
-    void testAll();
+    
+    void testAllocator_PocoMemoryPool();
+    void testAllocator_New();
+    void testAllocator_Malloc();
+    void testAllocator_PocoMemoryPool_WithInitialValue();
+    void testAllocator_New_WithInitialValue();
+    void testAllocator_Malloc_WithInitialValue();
 	
 	void setUp();
 
