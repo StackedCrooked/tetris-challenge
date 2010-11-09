@@ -232,29 +232,6 @@ namespace Tetris
             currentParent = copy;
             results.pop();
         }
-
-
-        //
-        // A small built-in self-test.
-        //
-        #ifdef _DEBUG
-        Assert(mResult->depth() == mNode->depth() + 1);
-        NodePtr node = mResult;
-        while (true)
-        {
-            Assert(node->children().size() <= 1);
-            if (node->children().size() == 1)
-            {
-                NodePtr nextNode = *node->children().begin();
-                Assert(nextNode->depth() == node->depth() + 1);
-                node = nextNode;                
-            }
-            else
-            {
-                break;
-            }
-        }
-        #endif
     }
 
 
