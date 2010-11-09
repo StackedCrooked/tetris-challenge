@@ -341,7 +341,7 @@
 			</Filter>
 		</Filter>
 		<Filter
-			Name="Accessories"
+			Name="General"
 			>
 			<Filter
 				Name="Header Files"
@@ -412,6 +412,10 @@
 				</File>
 				<File
 					RelativePath=".\src\Logging.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Threading.cpp"
 					>
 				</File>
 				<File
