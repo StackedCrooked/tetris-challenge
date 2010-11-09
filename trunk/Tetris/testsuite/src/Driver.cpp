@@ -1,5 +1,5 @@
 #include "CppUnit/TestRunner.h"
-#include "TetrisCoreTestSuite.h"
+#include "TetrisTestSuite.h"
 #include <iostream>
 
 

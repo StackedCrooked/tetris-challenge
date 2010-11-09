@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual C++ Express 2008
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TetrisCore", "TetrisCore\TetrisCore_vs90.vcproj", "{D623C05B-BDD9-4D6E-8E51-E3275608DEBE}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tetris", "Tetris\Tetris_vs90.vcproj", "{D623C05B-BDD9-4D6E-8E51-E3275608DEBE}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PocoFoundation", "3rdParty\Poco\Foundation\Foundation_vs90.vcproj", "{8164D41D-B053-405B-826C-CF37AC0EF176}"
 EndProject
@@ -20,7 +20,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PocoXML", "3rdParty\Poco\XM
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "XULWin", "XULWin\XULWin_vs90.vcproj", "{82864729-DFC2-4F6D-A1AE-984D82CF81E1}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TetrisTestSuite", "TetrisCore\testsuite\TestSuite_vs90.vcproj", "{881867C7-4FCC-46D8-9538-4E3974831573}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TetrisTestSuite", "Tetris\testsuite\TestSuite_vs90.vcproj", "{881867C7-4FCC-46D8-9538-4E3974831573}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PocoCppUnit", "3rdParty\Poco\CppUnit\CppUnit_vs90.vcproj", "{138BB448-808A-4FE5-A66D-78D1F8770F59}"
 EndProject

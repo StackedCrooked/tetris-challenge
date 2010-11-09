@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="TetrisCore"
+	Name="Tetris"
 	ProjectGUID="{D623C05B-BDD9-4D6E-8E51-E3275608DEBE}"
-	RootNamespace="TetrisCore"
+	RootNamespace="Tetris"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)TetrisCore\include&quot;;&quot;$(SolutionDir)3rdParty\Poco\Foundation\include&quot;;&quot;$(SolutionDir)3rdParty\Boost_1_44_0&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)Tetris\include&quot;;&quot;$(SolutionDir)3rdParty\Poco\Foundation\include&quot;;&quot;$(SolutionDir)3rdParty\Boost_1_44_0&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
 				StringPooling="true"
 				MinimalRebuild="true"
@@ -114,7 +114,7 @@
 				OmitFramePointers="true"
 				EnableFiberSafeOptimizations="true"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)TetrisCore\include&quot;;&quot;$(SolutionDir)3rdParty\Poco\Foundation\include&quot;;&quot;$(SolutionDir)3rdParty\Boost_1_44_0&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)Tetris\include&quot;;&quot;$(SolutionDir)3rdParty\Poco\Foundation\include&quot;;&quot;$(SolutionDir)3rdParty\Boost_1_44_0&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
 				StringPooling="true"
 				RuntimeLibrary="0"
@@ -179,7 +179,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/D &quot;_HAS_ITERATOR_DEBUGGING=0&quot; /D &quot;_SECURE_SCL=0&quot;"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)TetrisCore\include&quot;;&quot;$(SolutionDir)3rdParty\Poco\Foundation\include&quot;;&quot;$(SolutionDir)3rdParty\Boost_1_44_0&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)Tetris\include&quot;;&quot;$(SolutionDir)3rdParty\Poco\Foundation\include&quot;;&quot;$(SolutionDir)3rdParty\Boost_1_44_0&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
 				StringPooling="true"
 				MinimalRebuild="true"
