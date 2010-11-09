@@ -1,4 +1,4 @@
-#include "TetrisCoreTestSuite.h"
+#include "TetrisTestSuite.h"
 #include "WorkerTest.h"
 #include "WorkerPoolTest.h"
 #include "NodeCalculatorTest.h"
