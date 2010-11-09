@@ -132,6 +132,9 @@
     <ClInclude Include="include\Tetris\Evaluator.h">
       <Filter>Tetris\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Tetris\GenericGrid2.h">
+      <Filter>General\Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Block.cpp">
