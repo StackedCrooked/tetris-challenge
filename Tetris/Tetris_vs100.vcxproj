@@ -104,6 +104,7 @@
     <ClInclude Include="include\Tetris\GameState.h" />
     <ClInclude Include="include\Tetris\GameStateComparator.h" />
     <ClInclude Include="include\Tetris\GameStateNode.h" />
+    <ClInclude Include="include\Tetris\GenericGrid2.h" />
     <ClInclude Include="include\Tetris\Gravity.h" />
     <ClInclude Include="include\Tetris\Grid.h" />
     <ClInclude Include="include\Tetris\NodePtr.h" />

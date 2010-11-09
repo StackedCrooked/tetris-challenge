@@ -77,6 +77,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Driver.cpp" />
+    <ClCompile Include="src\GenericGrid2Test.cpp" />
     <ClCompile Include="src\GenericGridTest.cpp" />
     <ClCompile Include="src\NodeCalculatorTest.cpp" />
     <ClCompile Include="src\TetrisTestSuite.cpp" />
@@ -84,6 +85,7 @@
     <ClCompile Include="src\WorkerTest.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\GenericGrid2Test.h" />
     <ClInclude Include="src\GenericGridTest.h" />
     <ClInclude Include="src\NodeCalculatorTest.h" />
     <ClInclude Include="src\TetrisTestSuite.h" />
