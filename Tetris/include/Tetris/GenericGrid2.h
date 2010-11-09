@@ -39,54 +39,6 @@ private:
 };
 
 
-template<class T>
-class Allocator_Malloc
-{
-public:
-    Allocator_Malloc(size_t inSize) :
-        mSize(sizeof(T) * inSize)
-    {
-    }
-
-    T * alloc()
-    {
-        return reinterpret_cast<T*>(malloc(mSize));
-    }
-
-    void free(T * inBuffer)
-    {
-        free(inBuffer);
-    }
-
-private:
-    size_t mSize;
-};
-
-
-template<class T>
-class Allocator_New
-{
-public:
-    Allocator_New(size_t inSize) :
-        mSize(sizeof(T) * inSize)
-    {
-    }
-
-    T * alloc()
-    {
-        return new T[mSize];
-    }
-
-    void free(T * inBuffer)
-    {
-        delete [] inBuffer;
-    }
-
-private:
-    size_t mSize;
-};
-
-
 //
 // Inlines
 //
