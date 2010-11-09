@@ -221,7 +221,7 @@ namespace Tetris {
         mRefreshTimer->start(boost::bind(&Controller::onRefresh, this), 20);
 
 		// Main thread should have highest priority for responsiveness.
-        ::SetThreadPriority(::GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
+        ::SetThreadPriority(::GetCurrentThread(), THREAD_PRIORITY_TIME_CRITICAL);
 
         
         mGameCopyTimer->start(Poco::TimerCallback<Controller>(*this, &Controller::onGameCopy));

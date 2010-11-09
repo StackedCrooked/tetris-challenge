@@ -19,15 +19,14 @@ int StartProgram(HINSTANCE hInstance)
 #ifndef NDEBUG // only required when launching from Visual Studio
     // Change the current directory to the XUL Directory
     XULWin::WinAPI::CurrentDirectoryChanger cd("Tetris.xul");
-#endif
 
     AttachToConsole();
-    
     int res = RunTetrisTestSuite();
     if (res != 0)
     {
         throw std::runtime_error("TestSuite failed");
     }
+#endif
 
     XULWin::Initializer initializer(hInstance);
 
