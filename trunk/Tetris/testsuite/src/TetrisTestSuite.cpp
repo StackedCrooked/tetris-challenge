@@ -3,6 +3,7 @@
 #include "WorkerPoolTest.h"
 #include "NodeCalculatorTest.h"
 #include "GenericGrid2Test.h"
+#include "GenericGridTest.h"
 
 
 CppUnit::Test* TetrisCoreTestSuite::suite()

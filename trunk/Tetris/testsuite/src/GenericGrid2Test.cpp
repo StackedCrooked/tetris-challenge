@@ -7,43 +7,73 @@
 #include <iostream>
 
 
-using namespace Tetris;
+namespace Allocators {
 
 
-GenericGrid2Test::GenericGrid2Test(const std::string & inName):
-    CppUnit::TestCase(inName)
-{
-}
+    template<class T>
+    Allocator_Malloc<T>::Allocator_Malloc(size_t inSize) :
+        mSize(sizeof(T) * inSize)
+    {
+    }
+
+    
+    template<class T>
+    T * Allocator_Malloc<T>::alloc()
+    {
+        return reinterpret_cast<T*>(malloc(mSize));
+    }
+    
+    
+    template<class T>
+    void Allocator_Malloc<T>::free(T * inBuffer)
+    {
+        ::free(inBuffer);
+    }
 
 
-GenericGrid2Test::~GenericGrid2Test()
-{
-}
+    template<class T>
+    Allocator_New<T>::Allocator_New(size_t inSize) :
+        mSize(sizeof(T) * inSize)
+    {
+    }
+
+    
+    template<class T>
+    T * Allocator_New<T>::alloc()
+    {
+        return new T[mSize];
+    }
+    
+    
+    template<class T>
+    void Allocator_New<T>::free(T * inBuffer)
+    {
+        delete [] inBuffer;
+    }
 
 
-template<class T>
-class Allocator_PocoMemoryPool
-{
-public:
-    Allocator_PocoMemoryPool(size_t inSize) :
+    template<class T>
+    Allocator_Pool<T>::Allocator_Pool(size_t inSize) :
         mMemoryPool(sizeof(T) * inSize)
     {
     }
 
-
-    T * alloc()
+    
+    template<class T>
+    T * Allocator_Pool<T>::alloc()
     {
         return reinterpret_cast<T*>(mMemoryPool.get());
     }
-
-    void free(T * inBuffer)
+    
+    
+    template<class T>
+    void Allocator_Pool<T>::free(T * inBuffer)
     {
         mMemoryPool.release(inBuffer);
     }
 
-private:
-    Poco::MemoryPool mMemoryPool;
-};
+
+} // namespace Allocators
 
 
 template<class GridType>
@@ -92,39 +122,63 @@ static void TestGridWithInitialValue(const T & inInitialValue)
 }
 
 
+GenericGrid2Test::GenericGrid2Test(const std::string & inName):
+    CppUnit::TestCase(inName)
+{
+}
+
+
+GenericGrid2Test::~GenericGrid2Test()
+{
+}
+
+
+
 void GenericGrid2Test::testAllocator_Malloc()
 {
-    TestGrid<Grid<int, Allocator_Malloc>>();
+    using namespace Allocators;
+    using namespace Tetris;
+    TestGrid< Grid< int, Allocator_Malloc > >();
 }
 
 
 void GenericGrid2Test::testAllocator_New()
 {
-    TestGrid<Grid<int, Allocator_New>>();
+    using namespace Allocators;
+    using namespace Tetris;
+    TestGrid< Grid< int, Allocator_New> >();
 }
 
 
 void GenericGrid2Test::testAllocator_PocoMemoryPool()
 {
-    TestGrid<Grid<int, Allocator_PocoMemoryPool>>();
+    using namespace Allocators;
+    using namespace Tetris;
+    TestGrid< Grid< int, Allocator_Pool> >();
 }
 
 
 void GenericGrid2Test::testAllocator_Malloc_WithInitialValue()
 {
-    TestGridWithInitialValue<Grid<int, Allocator_Malloc>>(1);
+    using namespace Allocators;
+    using namespace Tetris;
+    TestGridWithInitialValue< Grid< int, Allocator_Malloc > >(1);
 }
 
 
 void GenericGrid2Test::testAllocator_New_WithInitialValue()
 {
-    TestGridWithInitialValue<Grid<int, Allocator_New>>(2);
+    using namespace Allocators;
+    using namespace Tetris;
+    TestGridWithInitialValue< Grid< int, Allocator_New> >(2);
 }
 
 
 void GenericGrid2Test::testAllocator_PocoMemoryPool_WithInitialValue()
 {
-    TestGridWithInitialValue<Grid<int, Allocator_PocoMemoryPool>>(3);
+    using namespace Allocators;
+    using namespace Tetris;
+    TestGridWithInitialValue< Grid< int, Allocator_Pool> >(3);
 }
 
 
