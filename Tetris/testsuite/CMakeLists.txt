@@ -1,18 +1,18 @@
 include_directories(../include)
 
 add_executable(${EXECUTABLE} 
-    src/Driver.cpp 
+    src/Driver.cpp
+    src/GenericGrid2Test.cpp
     src/GenericGridTest.cpp
-    src/NodeCalculatorTest.cpp 
-    src/TetrisCoreTestSuite.cpp 
-    src/WorkerPoolTest.cpp 
+    src/NodeCalculatorTest.cpp
+    src/TetrisTestSuite.cpp
+    src/WorkerPoolTest.cpp
     src/WorkerTest.cpp)
-
 
 set_target_properties(${EXECUTABLE} PROPERTIES COMPILE_FLAGS ${FINAL_COMPILE_FLAGS})
 
 
-set(LIBS TetrisCore PocoFoundation CppUnit boost_thread)
+set(LIBS Tetris PocoFoundation CppUnit boost_thread)
 if (UNIX)
 set(LIBS ${LIBS} pthread)
 endif()

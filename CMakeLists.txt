@@ -36,6 +36,6 @@ link_directories(
     ${POCO}lib/${PLATFORM}/${ARCH})
 
 
-add_subdirectory(${SOLUTIONDIR}TetrisCore ${OUTDIR}TetrisCore)
-add_subdirectory(${SOLUTIONDIR}TetrisCore/testsuite ${OUTDIR}TetrisTestSuite)
+add_subdirectory(${SOLUTIONDIR}Tetris ${OUTDIR}Tetris)
+add_subdirectory(${SOLUTIONDIR}Tetris/testsuite ${OUTDIR}TetrisTestSuite)
 
