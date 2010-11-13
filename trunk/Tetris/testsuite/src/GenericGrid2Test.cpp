@@ -5,6 +5,7 @@
 #include "Tetris/Assert.h"
 #include "Poco/MemoryPool.h"
 #include <iostream>
+#include <cstdlib>
 
 
 namespace Allocators {

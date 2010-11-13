@@ -1,7 +1,7 @@
 include_directories(include)
 
 
-add_library(TetrisCore
+add_library(Tetris
     src/AISupport.cpp 
     src/Block.cpp 
     src/BlockFactory.cpp 
@@ -26,5 +26,5 @@ add_library(TetrisCore
     src/Worker.cpp
     src/WorkerPool.cpp)
 
-set_target_properties(TetrisCore PROPERTIES COMPILE_FLAGS ${FINAL_COMPILE_FLAGS})
+set_target_properties(Tetris PROPERTIES COMPILE_FLAGS ${FINAL_COMPILE_FLAGS})
 
