@@ -37,11 +37,11 @@ void WorkerPoolTest::BeBusy()
 
 void WorkerPoolTest::testWorkerPool()
 {
-    const int cPoolSize[] = {1, 2, 4, 8, 16};
-    const int cPoolSizeCount = sizeof(cPoolSize) / sizeof(cPoolSize[0]);
+    const size_t cPoolSize[] = {1, 2, 4, 8, 16};
+    const size_t cPoolSizeCount = sizeof(cPoolSize) / sizeof(cPoolSize[0]);
 
     // Test without interrupt
-    for (int i = 0; i < cPoolSizeCount; ++i)
+    for (size_t i = 0; i < cPoolSizeCount; ++i)
     {
         mStopwatch.restart();
         WorkerPool pool("WorkerPool Test", cPoolSize[i]);
@@ -50,13 +50,12 @@ void WorkerPoolTest::testWorkerPool()
             pool.schedule(boost::bind(&Poco::Thread::sleep, cSleepTime));
         }
         mStopwatch.stop();
-        int overhead = static_cast<int>(mStopwatch.elapsed() / 1000) - cSleepTime;
-        Assert(overhead > -200);
-        Assert(overhead < 200);
+        Assert(static_cast<int>(mStopwatch.elapsed() / 1000) - cSleepTime > -200);
+        Assert(static_cast<int>(mStopwatch.elapsed() / 1000) - cSleepTime < 200);
     }
 
     // Test with interrupt
-    for (int i = 0; i < cPoolSizeCount; ++i)
+    for (size_t i = 0; i < cPoolSizeCount; ++i)
     {
         mStopwatch.restart();
         WorkerPool pool("WorkerPool Test", cPoolSize[i]);
@@ -66,9 +65,8 @@ void WorkerPoolTest::testWorkerPool()
         }
         pool.interruptAndClearQueue();
         mStopwatch.stop();
-        int overhead = static_cast<int>(mStopwatch.elapsed() / 1000) - cSleepTime;
-        Assert(overhead > -500);
-        Assert(overhead < 500);
+        Assert(static_cast<int>(mStopwatch.elapsed() / 1000) - cSleepTime > -500);
+        Assert(static_cast<int>(mStopwatch.elapsed() / 1000) - cSleepTime < 500);
     }
 
     // Test resize
@@ -92,9 +90,8 @@ void WorkerPoolTest::testWorkerPool()
         Assert(pool.size() == 0);
 
         mStopwatch.stop();
-        int overhead = static_cast<int>(mStopwatch.elapsed() / 1000) - cSleepTime;
-        Assert(overhead > -500);
-        Assert(overhead < 500);
+        Assert(static_cast<int>(mStopwatch.elapsed() / 1000) - cSleepTime > -500);
+        Assert(static_cast<int>(mStopwatch.elapsed() / 1000) - cSleepTime < 500);
     }
 
     // Test joinAll
@@ -109,9 +106,8 @@ void WorkerPoolTest::testWorkerPool()
         pool.wait();
         mStopwatch.stop();
         Assert(pool.size() == 10);
-        int overhead = static_cast<int>(mStopwatch.elapsed() / 1000) - 1000;
-        Assert(overhead >= 0);
-        Assert(overhead < 500);
+        Assert(static_cast<int>(mStopwatch.elapsed() / 1000) - 1000 >= 0);
+        Assert(static_cast<int>(mStopwatch.elapsed() / 1000) - 1000 < 500);
     }
 }
 
