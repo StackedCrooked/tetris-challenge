@@ -20,8 +20,6 @@ public:
 
     GenericGrid(std::size_t inRowCount, std::size_t inColumnCount, const T & inInitialValue);
 
-    ~GenericGrid();
-
     std::size_t rowCount() const;
 
     std::size_t columnCount() const;
@@ -45,31 +43,18 @@ GenericGrid<T, Allocator>::GenericGrid(std::size_t inRowCount, std::size_t inCol
     Allocator<T>(inRowCount * inColumnCount),
     mRowCount(inRowCount),
     mColumnCount(inColumnCount),
-    mBuffer(Allocator<T>::alloc())
+    mBuffer(Allocator<T>::get())
 {
 }
 
 
 template<class T, template <class> class Allocator>
 GenericGrid<T, Allocator>::GenericGrid(std::size_t inRowCount, std::size_t inColumnCount, const T & inInitialValue) :
-    Allocator<T>(inRowCount * inColumnCount),
+    Allocator<T>(inRowCount * inColumnCount, inInitialValue),
     mRowCount(inRowCount),
     mColumnCount(inColumnCount),
-    mBuffer(Allocator<T>::alloc())
+    mBuffer(Allocator<T>::get())
 {
-    // We can't use a memcpy on class objects, we must use copy constructor instead.
-    std::size_t size = inRowCount * inColumnCount;
-    for (size_t idx = 0; idx != size; ++idx)
-    {
-        mBuffer[idx] = inInitialValue;
-    }
-}
-
-
-template<class T, template <class> class Allocator>
-GenericGrid<T, Allocator>::~GenericGrid()
-{
-    Allocator<T>::free(mBuffer);
 }
 
 

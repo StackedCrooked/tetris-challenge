@@ -153,14 +153,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\GenericGrid2Test.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\GenericGrid2Test.h"
-				>
-			</File>
-			<File
 				RelativePath=".\src\GenericGridTest.cpp"
 				>
 			</File>

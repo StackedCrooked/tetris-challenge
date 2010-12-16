@@ -12,6 +12,7 @@ using namespace Tetris;
 
 
 static const int cSleepTime = 100;
+static const int cMargin = 2000;
 
 
 WorkerPoolTest::WorkerPoolTest(const std::string & inName):
@@ -50,8 +51,8 @@ void WorkerPoolTest::testWorkerPool()
             pool.schedule(boost::bind(&Poco::Thread::sleep, cSleepTime));
         }
         mStopwatch.stop();
-        Assert(static_cast<int>(mStopwatch.elapsed() / 1000) - cSleepTime > -200);
-        Assert(static_cast<int>(mStopwatch.elapsed() / 1000) - cSleepTime < 200);
+        Assert(static_cast<int>(mStopwatch.elapsed() / 1000) - cSleepTime > -cMargin);
+        Assert(static_cast<int>(mStopwatch.elapsed() / 1000) - cSleepTime < cMargin);
     }
 
     // Test with interrupt
@@ -65,8 +66,8 @@ void WorkerPoolTest::testWorkerPool()
         }
         pool.interruptAndClearQueue();
         mStopwatch.stop();
-        Assert(static_cast<int>(mStopwatch.elapsed() / 1000) - cSleepTime > -500);
-        Assert(static_cast<int>(mStopwatch.elapsed() / 1000) - cSleepTime < 500);
+        Assert(static_cast<int>(mStopwatch.elapsed() / 1000) - cSleepTime > -cMargin);
+        Assert(static_cast<int>(mStopwatch.elapsed() / 1000) - cSleepTime < cMargin);
     }
 
     // Test resize
@@ -90,8 +91,8 @@ void WorkerPoolTest::testWorkerPool()
         Assert(pool.size() == 0);
 
         mStopwatch.stop();
-        Assert(static_cast<int>(mStopwatch.elapsed() / 1000) - cSleepTime > -500);
-        Assert(static_cast<int>(mStopwatch.elapsed() / 1000) - cSleepTime < 500);
+        Assert(static_cast<int>(mStopwatch.elapsed() / 1000) - cSleepTime > -cMargin);
+        Assert(static_cast<int>(mStopwatch.elapsed() / 1000) - cSleepTime < cMargin);
     }
 
     // Test joinAll
@@ -106,8 +107,8 @@ void WorkerPoolTest::testWorkerPool()
         pool.wait();
         mStopwatch.stop();
         Assert(pool.size() == 10);
-        Assert(static_cast<int>(mStopwatch.elapsed() / 1000) - 1000 >= 0);
-        Assert(static_cast<int>(mStopwatch.elapsed() / 1000) - 1000 < 500);
+        Assert(static_cast<int>(mStopwatch.elapsed() / 1000) - cSleepTime >= 0); // margin should be bigger than zero
+        Assert(static_cast<int>(mStopwatch.elapsed() / 1000) - cSleepTime < cMargin);
     }
 }
 

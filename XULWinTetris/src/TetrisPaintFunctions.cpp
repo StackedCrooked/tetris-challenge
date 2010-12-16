@@ -57,9 +57,9 @@ namespace Tetris
 
     void PaintGrid(Gdiplus::Graphics & g, const Grid & inGrid, int x, int y, bool inPaintBackground)
     {
-        for (size_t r = 0; r != inGrid.numRows(); ++r)
+        for (size_t r = 0; r != inGrid.rowCount(); ++r)
         {
-            for (size_t c = 0; c != inGrid.numColumns(); ++c)
+            for (size_t c = 0; c != inGrid.columnCount(); ++c)
             {
                 if (inPaintBackground || inGrid.get(r, c))
                 {
