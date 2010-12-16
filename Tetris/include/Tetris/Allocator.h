@@ -37,6 +37,9 @@ public:
     void free(T * inBuffer);
 
 private:
+    Allocator_Malloc(const Allocator_Malloc&);
+    Allocator_Malloc& operator=(const Allocator_Malloc&);
+    
     size_t mSize;
 };
 
@@ -53,6 +56,9 @@ public:
     void free(T * inBuffer);
 
 private:
+    Allocator_New(const Allocator_New&);
+    Allocator_New& operator=(const Allocator_New&);
+    
     size_t mSize;
 };
 
@@ -92,6 +98,9 @@ public:
     void free(T * inBuffer);
 
 private:
+    Allocator_Pool(const Allocator_Pool&);
+    Allocator_Pool& operator=(const Allocator_Pool&);
+    
     MemoryPool mMemoryPool;
 };
 
@@ -116,7 +125,6 @@ T * Allocator_Vector<T>::alloc()
 template<class T>
 void Allocator_Vector<T>::free(T * inBuffer)
 {
-    ::free(inBuffer);
 }
 
 

@@ -133,19 +133,7 @@ void NodeCalculatorTest::testInterrupt(Depth inDepth, Width inWidth, WorkerCount
 	{
 		Assert(result.children().empty());
 	}
-
     
-    if (!interrupted)
-    {
-        Assert((result.endNode()->depth() - rootNode->depth()) == blockTypes.size());
-        Assert(nodeCalculator.getCurrentSearchDepth() == nodeCalculator.getMaxSearchDepth());
-        Assert(result.endNode()->state().originalBlock().type() == blockTypes.back());
-    }
-    else
-    {
-        std::cout << " (" << nodeCalculator.getCurrentSearchDepth() << "/" << nodeCalculator.getMaxSearchDepth() << ")";
-        Assert(nodeCalculator.getCurrentSearchDepth() < nodeCalculator.getMaxSearchDepth());
-    }
     Assert(result.endNode()->children().empty());
 }
 
