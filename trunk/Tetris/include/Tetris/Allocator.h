@@ -32,6 +32,8 @@ public:
 
     T * get();
 
+    const T * get() const;
+
 private:
 	std::vector<T> mVector;
 };
@@ -51,6 +53,8 @@ public:
 	~Allocator_Malloc();
 
     T * get();
+
+    const T * get() const;
 
 private:
     Allocator_Malloc(const Allocator_Malloc&);
@@ -74,6 +78,8 @@ public:
 	~Allocator_New();
 
     T * get();
+
+    const T * get() const;
 
 private:
     Allocator_New(const Allocator_New&);
@@ -100,6 +106,13 @@ Allocator_Vector<T>::Allocator_Vector(size_t inSize, const T & inInitialValue) :
 
 template<class T>
 T * Allocator_Vector<T>::get()
+{
+	return &mVector[0];
+}
+
+
+template<class T>
+const T * Allocator_Vector<T>::get() const
 {
 	return &mVector[0];
 }
@@ -135,6 +148,13 @@ T * Allocator_Malloc<T>::get()
 
 
 template<class T>
+const T * Allocator_Malloc<T>::get() const
+{
+	return mBuffer;
+}
+
+
+template<class T>
 Allocator_New<T>::Allocator_New(size_t inSize) :
     mBuffer(new T[inSize])
 {
@@ -158,6 +178,13 @@ Allocator_New<T>::~Allocator_New()
 
 template<class T>
 T * Allocator_New<T>::get()
+{
+    return &mBuffer[0];
+}
+
+
+template<class T>
+const T * Allocator_New<T>::get() const
 {
     return &mBuffer[0];
 }
