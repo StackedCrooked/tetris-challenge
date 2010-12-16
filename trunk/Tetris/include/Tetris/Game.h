@@ -35,9 +35,9 @@ namespace Tetris
 
         bool isGameOver() const;
 
-        int numRows() const;
+        int rowCount() const;
 
-        int numColumns() const;
+        int columnCount() const;
         
         bool move(Direction inDirection);
 

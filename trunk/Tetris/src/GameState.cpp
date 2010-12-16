@@ -162,29 +162,29 @@ namespace Tetris
     bool GameStateImpl::checkPositionValid(const Block & inBlock, size_t inRowIdx, size_t inColIdx) const
     {
         const Grid & blockGrid(inBlock.grid());
-        if (inColIdx < blockGrid.numColumns() &&
-            (inRowIdx + blockGrid.numRows()) < static_cast<size_t>(mStats.firstOccupiedRow()))
+        if (inColIdx < blockGrid.columnCount() &&
+            (inRowIdx + blockGrid.rowCount()) < static_cast<size_t>(mStats.firstOccupiedRow()))
         {
             return true;
         }
 
-        if (inRowIdx >= mGrid.numRows())
+        if (inRowIdx >= mGrid.rowCount())
         {
             return false;
         }
 
-        for (size_t r = 0; r != blockGrid.numRows(); ++r)
+        for (size_t r = 0; r != blockGrid.rowCount(); ++r)
         {
             size_t rowIdx = inRowIdx + r;
-            if (rowIdx >= mGrid.numRows())
+            if (rowIdx >= mGrid.rowCount())
             {
                 return false;
             }
 
-            for (size_t c = 0; c != blockGrid.numColumns(); ++c)
+            for (size_t c = 0; c != blockGrid.columnCount(); ++c)
             {
                 size_t colIdx = inColIdx + c;
-                if (colIdx >= mGrid.numColumns())
+                if (colIdx >= mGrid.columnCount())
                 {
                     return false;
                 }
@@ -201,9 +201,9 @@ namespace Tetris
 
     void GameStateImpl::forceUpdateStats()
     {
-        for (size_t r = 0; r != mGrid.numRows(); ++r)
+        for (size_t r = 0; r != mGrid.rowCount(); ++r)
         {
-            for (size_t c = 0; c != mGrid.numColumns(); ++c)
+            for (size_t c = 0; c != mGrid.columnCount(); ++c)
             {
                 if (mGrid.get(r, c) != BlockType_Nil)
                 {
@@ -218,9 +218,9 @@ namespace Tetris
     void GameStateImpl::solidifyBlock(const Block & inBlock)
     {
         const Grid & grid = inBlock.grid();
-        for (size_t r = 0; r != grid.numRows(); ++r)
+        for (size_t r = 0; r != grid.rowCount(); ++r)
         {
-            for (size_t c = 0; c != grid.numColumns(); ++c)
+            for (size_t c = 0; c != grid.columnCount(); ++c)
             {
                 if (grid.get(r, c) != BlockType_Nil)
                 {
@@ -241,15 +241,15 @@ namespace Tetris
     {
         size_t numLines = 0;
         
-        std::vector<char> linesVector(mGrid.numRows(), 0);
+        std::vector<char> linesVector(mGrid.rowCount(), 0);
         char * lines = &linesVector[0];
-        //std::vector<char> lines(mGrid.numRows(), 0);
+        //std::vector<char> lines(mGrid.rowCount(), 0);
 
-        size_t endRow = std::min<size_t>(mGrid.numRows(), mOriginalBlock.row() + mOriginalBlock.grid().numRows());
+        size_t endRow = std::min<size_t>(mGrid.rowCount(), mOriginalBlock.row() + mOriginalBlock.grid().rowCount());
         for (size_t rowIndex = mOriginalBlock.row(); rowIndex < endRow; ++rowIndex)
         {
             lines[rowIndex] = 1;
-            for (size_t ci = 0; ci != mGrid.numColumns(); ++ci)
+            for (size_t ci = 0; ci != mGrid.columnCount(); ++ci)
             {
                 if (mGrid.get(rowIndex, ci) == 0)
                 {
@@ -269,17 +269,17 @@ namespace Tetris
             return;
         }
 
-        Assert(mStats.mFirstOccupiedRow + numLines <= mGrid.numRows());
+        Assert(mStats.mFirstOccupiedRow + numLines <= mGrid.rowCount());
         mStats.mFirstOccupiedRow += numLines;
 
         // Get newGrid
-        Grid newGrid(mGrid.numRows(), mGrid.numColumns(), BlockType_Nil);
+        Grid newGrid(mGrid.rowCount(), mGrid.columnCount(), BlockType_Nil);
         int newRowIdx = numLines;
-        for (size_t r = 0; r != mGrid.numRows(); ++r)
+        for (size_t r = 0; r != mGrid.rowCount(); ++r)
         {
             if (!lines[r])
             {
-                for (size_t c = 0; c != mGrid.numColumns(); ++c)
+                for (size_t c = 0; c != mGrid.columnCount(); ++c)
                 {
                     newGrid.set(newRowIdx, c, mGrid.get(r, c));
                 }

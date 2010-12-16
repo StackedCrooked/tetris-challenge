@@ -23,19 +23,19 @@ GenericGridTest::~GenericGridTest()
 void GenericGridTest::testGenericGrid()
 {
     GenericGrid<int> grid(4, 3, 1);
-    Assert(grid.numRows() == 4);
-    Assert(grid.numColumns() == 3);
-    for (size_t r = 0; r < grid.numRows(); ++r)
+    Assert(grid.rowCount() == 4);
+    Assert(grid.columnCount() == 3);
+    for (size_t r = 0; r < grid.rowCount(); ++r)
     {
-        for (size_t c = 0; c < grid.numColumns(); ++c)
+        for (size_t c = 0; c < grid.columnCount(); ++c)
         {
             Assert(grid.get(r, c) == 1);
         }
     }
 
-    for (size_t r = 0; r < grid.numRows(); ++r)
+    for (size_t r = 0; r < grid.rowCount(); ++r)
     {
-        for (size_t c = 0; c < grid.numColumns(); ++c)
+        for (size_t c = 0; c < grid.columnCount(); ++c)
         {
             grid.set(r, c, r*c);
             Assert(grid.get(r, c) == r*c);
@@ -43,13 +43,13 @@ void GenericGridTest::testGenericGrid()
     }
 
     GenericGrid<int> grid2(grid);
-    Assert(grid2.numRows() == grid.numRows());
-    Assert(grid2.numColumns() == grid.numColumns());
+    Assert(grid2.rowCount() == grid.rowCount());
+    Assert(grid2.columnCount() == grid.columnCount());
 
     GenericGrid<int> grid3(4, 3);
     grid3 = grid2;
-    Assert(grid3.numRows() == grid2.numRows());
-    Assert(grid3.numColumns() == grid2.numColumns());
+    Assert(grid3.rowCount() == grid2.rowCount());
+    Assert(grid3.columnCount() == grid2.columnCount());
 
 }
 

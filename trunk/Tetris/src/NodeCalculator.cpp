@@ -36,8 +36,10 @@ namespace Tetris
                                    const std::vector<int> & inWidths,
                                    std::auto_ptr<Evaluator> inEvaluator,
                                    WorkerPool & inWorkerPool) :
-        mImpl(CreateImpl(inNode, inBlockTypes, inWidths, inEvaluator, inWorkerPool).release())
+        mImpl(0)
     {
+        std::auto_ptr<NodeCalculatorImpl> impl(CreateImpl(inNode, inBlockTypes, inWidths, inEvaluator, inWorkerPool));
+        mImpl = impl.release();
     }
 
 

@@ -146,14 +146,14 @@ namespace Tetris
     int Evaluator::evaluate(const GameState & inGameState) const
     {
         const Grid & grid = inGameState.grid();
-        size_t top = grid.numRows();
+        size_t top = grid.rowCount();
         bool foundTop = false;
         int numHoles = 0;
         int numOccupiedUnderTop = 0;
 
-        for (size_t rowIdx = 0; rowIdx != grid.numRows(); ++rowIdx)
+        for (size_t rowIdx = 0; rowIdx != grid.rowCount(); ++rowIdx)
         {
-            for (size_t colIdx = 0; colIdx != grid.numColumns(); ++colIdx)
+            for (size_t colIdx = 0; colIdx != grid.columnCount(); ++colIdx)
             {
                 const int & value = grid.get(rowIdx, colIdx);
                 if (value != BlockType_Nil)
@@ -182,8 +182,8 @@ namespace Tetris
                 }
             }
         }
-        int gameHeight = grid.numRows() - top;
-        int lastBlockHeight = grid.numRows() - inGameState.originalBlock().row();
+        int gameHeight = grid.rowCount() - top;
+        int lastBlockHeight = grid.rowCount() - inGameState.originalBlock().row();
 
 
         return gameHeight * mGameHeightFactor +
@@ -268,11 +268,11 @@ namespace Tetris
     {
         const Grid & grid = inGameState.grid();
     
-        size_t c = grid.numColumns() - 1;
-        if (grid.numRows() >= 4)
+        size_t c = grid.columnCount() - 1;
+        if (grid.rowCount() >= 4)
         {
-            size_t r = grid.numRows() - 4;
-            for (; r != grid.numRows(); ++r)
+            size_t r = grid.rowCount() - 4;
+            for (; r != grid.rowCount(); ++r)
             {
                 if (grid.get(r, c))
                 {

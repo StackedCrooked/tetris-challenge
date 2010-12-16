@@ -32,9 +32,9 @@ namespace Tetris {
 
         bool isGameOver() const;
 
-        int numRows() const;
+        int rowCount() const;
 
-        int numColumns() const;
+        int columnCount() const;
         
         bool move(Direction inDirection);
 
@@ -130,7 +130,7 @@ namespace Tetris {
             new Block(inBlockType,
                       Rotation(0),
                       Row(0),
-                      Column(DivideByTwo(inNumColumns - GetGrid(GetBlockIdentifier(inBlockType, 0)).numColumns()))));
+                      Column(DivideByTwo(inNumColumns - GetGrid(GetBlockIdentifier(inBlockType, 0)).columnCount()))));
     }
 
 
@@ -182,13 +182,13 @@ namespace Tetris {
     }
 
 
-    int GameImpl::numRows() const
+    int GameImpl::rowCount() const
     {
         return mNumRows;
     }
 
 
-    int GameImpl::numColumns() const
+    int GameImpl::columnCount() const
     {
         return mNumColumns;
     }
@@ -503,15 +503,15 @@ namespace Tetris {
     }
 
     
-    int Game::numRows() const
+    int Game::rowCount() const
     {
-        return mImpl->numRows();
+        return mImpl->rowCount();
     }
 
 
-    int Game::numColumns() const
+    int Game::columnCount() const
     {
-        return mImpl->numColumns();
+        return mImpl->columnCount();
     }
     
 
