@@ -24,7 +24,7 @@ GenericGridTest::~GenericGridTest()
 template< template <class> class AllocatorType >
 void GenericGridTest_TestGenericGrid(const std::string & inAllocatorType)
 {
-	std::cout << "Test with allocator type: " << inAllocatorType << std::endl;
+	std::cout << std::endl << "Test with allocator type: " << inAllocatorType;
 
     GenericGrid<int, AllocatorType> grid(4, 3, 1);
     Assert(grid.rowCount() == 4);
@@ -51,7 +51,7 @@ void GenericGridTest_TestGenericGrid(const std::string & inAllocatorType)
 template< template <class> class AllocatorType >
 void GenericGridTest_TestGenericGridCopy(const std::string & inAllocatorType)
 {
-	std::cout << "Test with allocator type: " << inAllocatorType << std::endl;
+	std::cout << std::endl << "Test with allocator type: " << inAllocatorType;
 
     GenericGrid<int, AllocatorType> grid(4, 3, 1);
     Assert(grid.rowCount() == 4);
