@@ -153,6 +153,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\Allocator.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\src\Block.cpp"
 				>
 			</File>
@@ -251,6 +255,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\include\Tetris\Allocator.h"
+				>
+			</File>
+			<File
 				RelativePath=".\include\Tetris\Assert.h"
 				>
 			</File>
@@ -324,10 +332,6 @@
 			</File>
 			<File
 				RelativePath=".\include\Tetris\GenericGrid.h"
-				>
-			</File>
-			<File
-				RelativePath=".\include\Tetris\GenericGrid2.h"
 				>
 			</File>
 			<File

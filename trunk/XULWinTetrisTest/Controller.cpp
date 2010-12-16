@@ -255,10 +255,10 @@ namespace Tetris {
 
             Grid & grid = const_cast<GameStateNode*>(game.currentNode())->state().grid();
 
-            for (size_t rowIdx = 7; rowIdx != grid.numRows(); ++rowIdx)
+            for (size_t rowIdx = 7; rowIdx != grid.rowCount(); ++rowIdx)
             {            
                 size_t count = 0;
-                for (size_t colIdx = 0; colIdx != grid.numColumns(); ++colIdx)
+                for (size_t colIdx = 0; colIdx != grid.columnCount(); ++colIdx)
                 {
                     if (grid.get(rowIdx, colIdx))
                     {
@@ -266,9 +266,9 @@ namespace Tetris {
                     }
                 }
 
-                for (size_t colIdx = 0; colIdx != grid.numColumns(); ++colIdx)
+                for (size_t colIdx = 0; colIdx != grid.columnCount(); ++colIdx)
                 {
-                    if (count + 1 == grid.numColumns())
+                    if (count + 1 == grid.columnCount())
                     {
                         break;
                     }
@@ -398,7 +398,7 @@ namespace Tetris {
 
     int Controller::percentOccupied(const GameState & inGameState) const
     {
-        double occupied = 1.0 - static_cast<double>(inGameState.stats().firstOccupiedRow()) / static_cast<double>(inGameState.grid().numRows());
+        double occupied = 1.0 - static_cast<double>(inGameState.stats().firstOccupiedRow()) / static_cast<double>(inGameState.grid().rowCount());
         return static_cast<int>(0.5 + 100 * occupied);
     }
 

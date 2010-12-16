@@ -9,6 +9,16 @@
 namespace Tetris {
 
 
+template<class T>
+inline void Allocator_FillBuffer(T * inBuffer, size_t inSize, const T & inInitialValue)
+{
+	for (size_t i = 0; i < inSize; ++i)
+	{
+		inBuffer[i] = inInitialValue;
+	}
+}
+
+
 /**
  * Allocator_Vector
  */
@@ -17,8 +27,10 @@ class Allocator_Vector
 {
 public:
     Allocator_Vector(size_t inSize);
-    T * alloc();
-    void free(T * inBuffer);
+
+    Allocator_Vector(size_t inSize, const T & inInitialValue);
+
+    T * get();
 
 private:
 	std::vector<T> mVector;
@@ -33,14 +45,18 @@ class Allocator_Malloc
 {
 public:
     Allocator_Malloc(size_t inSize);
-    T * alloc();
-    void free(T * inBuffer);
+
+    Allocator_Malloc(size_t inSize, const T & inInitialValue);
+
+	~Allocator_Malloc();
+
+    T * get();
 
 private:
     Allocator_Malloc(const Allocator_Malloc&);
     Allocator_Malloc& operator=(const Allocator_Malloc&);
     
-    size_t mSize;
+    T * mBuffer;
 };
 
 
@@ -52,56 +68,18 @@ class Allocator_New
 {
 public:
     Allocator_New(size_t inSize);
-    T * alloc();
-    void free(T * inBuffer);
+
+    Allocator_New(size_t inSize, const T & inInitialValue);
+
+	~Allocator_New();
+
+    T * get();
 
 private:
     Allocator_New(const Allocator_New&);
     Allocator_New& operator=(const Allocator_New&);
     
-    size_t mSize;
-};
-
-
-/**
- * MemoryPool, helper class for Allocator_Pool
- */
-class MemoryPoolImpl;
-class MemoryPool
-{
-public:
-    MemoryPool(size_t inItemSize);
-
-    ~MemoryPool();
-
-    void* get();
-
-    void release(void* inData);
-
-private:
-    MemoryPool(const MemoryPool&);
-    MemoryPool& operator=(const MemoryPool&);
-
-    MemoryPoolImpl * mImpl;
-};
-
-
-/**
- * Allocator_Pool
- */
-template<class T>
-class Allocator_Pool
-{
-public:
-    Allocator_Pool(size_t inSize);
-    T * alloc();
-    void free(T * inBuffer);
-
-private:
-    Allocator_Pool(const Allocator_Pool&);
-    Allocator_Pool& operator=(const Allocator_Pool&);
-    
-    MemoryPool mMemoryPool;
+    T * mBuffer;
 };
 
 
@@ -110,89 +88,82 @@ private:
 //
 template<class T>
 Allocator_Vector<T>::Allocator_Vector(size_t inSize) :
-    mVector(sizeof(T) * inSize)
+    mVector(inSize)
+{
+}
+template<class T>
+Allocator_Vector<T>::Allocator_Vector(size_t inSize, const T & inInitialValue) :
+    mVector(inSize, inInitialValue)
 {
 }
 
 
 template<class T>
-T * Allocator_Vector<T>::alloc()
+T * Allocator_Vector<T>::get()
 {
-	return mVector.data();
-}
-
-
-template<class T>
-void Allocator_Vector<T>::free(T * inBuffer)
-{
+	return &mVector[0];
 }
 
 
 template<class T>
 Allocator_Malloc<T>::Allocator_Malloc(size_t inSize) :
-    mSize(sizeof(T) * inSize)
+    mBuffer(malloc(sizeof(T) * inSize))
 {
 }
 
 
 template<class T>
-T * Allocator_Malloc<T>::alloc()
+Allocator_Malloc<T>::Allocator_Malloc(size_t inSize, const T & inInitialValue) :
+    mBuffer(reinterpret_cast<T*>(malloc(sizeof(T) * inSize)))
 {
-	void * result = malloc(mSize);
-	return reinterpret_cast<T*>(result);
+	Allocator_FillBuffer(mBuffer, inSize, inInitialValue);
 }
 
 
 template<class T>
-void Allocator_Malloc<T>::free(T * inBuffer)
+Allocator_Malloc<T>::~Allocator_Malloc()
 {
-    ::free(inBuffer);
+	free(mBuffer);
+}
+
+
+template<class T>
+T * Allocator_Malloc<T>::get()
+{
+	return mBuffer;
 }
 
 
 template<class T>
 Allocator_New<T>::Allocator_New(size_t inSize) :
-    mSize(sizeof(T) * inSize)
+    mBuffer(new T[inSize])
 {
 }
 
 
 template<class T>
-T * Allocator_New<T>::alloc()
+Allocator_New<T>::Allocator_New(size_t inSize, const T & inInitialValue) :
+    mBuffer(new T[inSize])
 {
-    return new T[mSize];
+	Allocator_FillBuffer(mBuffer, inSize, inInitialValue);
 }
 
 
 template<class T>
-void Allocator_New<T>::free(T * inBuffer)
+Allocator_New<T>::~Allocator_New()
 {
-    delete [] inBuffer;
+	delete [] mBuffer;
 }
 
 
 template<class T>
-Allocator_Pool<T>::Allocator_Pool(size_t inSize) :
-    mMemoryPool(sizeof(T) * inSize)
+T * Allocator_New<T>::get()
 {
-}
-
-
-template<class T>
-T * Allocator_Pool<T>::alloc()
-{
-    return reinterpret_cast<T*>(mMemoryPool.get());
-}
-
-
-template<class T>
-void Allocator_Pool<T>::free(T * inBuffer)
-{
-    mMemoryPool.release(inBuffer);
+    return &mBuffer[0];
 }
 
 
 } // namespace Tetris
 
-#endif // TETRIS_ALLOCATOR_H_INCLUDED
 
+#endif // TETRIS_ALLOCATOR_H_INCLUDED
