@@ -21,8 +21,9 @@ set(SOLUTIONDIR ${TETRIS_SOURCE_DIR}/)
 set(OUTDIR ${SOLUTIONDIR}Build/${PLATFORM}/${ARCH}/${CMAKE_BUILD_TYPE}/)
 set(BOOST ${SOLUTIONDIR}3rdParty/Boost_1_44_0/)
 set(POCO ${SOLUTIONDIR}3rdParty/Poco/)
-set(CXX_FLAGS_Release "${CXX_FLAGS} -Wall -O3")
-set(CXX_FLAGS_Debug   "${CXX_FLAGS} -Wall -ggdb")
+set(WARNING_OPTIONS "-Wall -Werror -Wno-sign-compare")
+set(CXX_FLAGS_Release "${CXX_FLAGS} ${WARNING_OPTIONS} -O3")
+set(CXX_FLAGS_Debug   "${CXX_FLAGS} ${WARNING_OPTIONS} -ggdb")
 set(FINAL_COMPILE_FLAGS "${CXX_FLAGS_${CMAKE_BUILD_TYPE}}")
 
 

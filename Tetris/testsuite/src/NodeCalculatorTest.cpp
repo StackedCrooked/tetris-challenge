@@ -134,11 +134,10 @@ void NodeCalculatorTest::testInterrupt(Depth inDepth, Width inWidth, WorkerCount
 		Assert(result.children().empty());
 	}
 
-    int depthDifference = result.endNode()->depth() - rootNode->depth();
     
     if (!interrupted)
     {
-        Assert(depthDifference == blockTypes.size());
+        Assert((result.endNode()->depth() - rootNode->depth()) == blockTypes.size());
         Assert(nodeCalculator.getCurrentSearchDepth() == nodeCalculator.getMaxSearchDepth());
         Assert(result.endNode()->state().originalBlock().type() == blockTypes.back());
     }

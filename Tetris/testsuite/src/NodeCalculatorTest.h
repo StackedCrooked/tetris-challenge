@@ -2,6 +2,9 @@
 #define NODECALCULATORTEST_H_INCLUDED
 
 
+#define TETRIS_ALWAYS_ASSERT
+
+
 #include "CppUnit/TestCase.h"
 #include "Tetris/TypedWrapper.h"
 #include "Tetris/WorkerPool.h"

@@ -2,7 +2,7 @@
 #define TETRIS_ASSERT_H_INCLUDED
 
 
-#ifdef _DEBUG
+#if defined(_DEBUG) || defined(TETRIS_ALWAYS_ASSERT)
     #ifdef _WIN32
         #include <windows.h>
         #define Assert(condition) if (!(condition)) { ::DebugBreak(); }
