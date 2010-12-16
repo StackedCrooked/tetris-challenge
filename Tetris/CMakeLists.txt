@@ -3,6 +3,7 @@ include_directories(include)
 
 add_library(Tetris
     include/Tetris/AISupport.h
+    include/Tetris/Allocator.h
     include/Tetris/Assert.h
     include/Tetris/AutoPtrSupport.h
     include/Tetris/Block.h
@@ -22,7 +23,6 @@ add_library(Tetris
     include/Tetris/GameStateComparator.h
     include/Tetris/GameStateNode.h
     include/Tetris/GenericGrid.h
-    include/Tetris/GenericGrid2.h
     include/Tetris/Gravity.h
     include/Tetris/Grid.h
     include/Tetris/Logger.h
@@ -41,6 +41,7 @@ add_library(Tetris
     include/Tetris/Worker.h
     include/Tetris/WorkerPool.h
     src/AISupport.cpp 
+    src/Allocator.cpp 
     src/Block.cpp 
     src/BlockFactory.cpp 
     src/BlockMover.cpp 

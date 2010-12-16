@@ -245,7 +245,7 @@ namespace Tetris
         for (size_t idx = 0; idx != numRotations; ++idx)
         {
             const Grid & grid = GetGrid(GetBlockIdentifier(inType, idx));
-            result += inNumColumns - grid.numColumns() + 1;
+            result += inNumColumns - grid.columnCount() + 1;
         }
         return result;
     }

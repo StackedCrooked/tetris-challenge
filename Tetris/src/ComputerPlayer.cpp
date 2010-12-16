@@ -176,7 +176,7 @@ namespace Tetris
     {
         int firstOccupiedRow = game.currentNode()->state().stats().firstOccupiedRow();
         int currentBlockRow = game.activeBlock().row();
-        int numBlockRows = std::max<int>(game.activeBlock().grid().numRows(), game.activeBlock().grid().numColumns());        
+        int numBlockRows = std::max<int>(game.activeBlock().grid().rowCount(), game.activeBlock().grid().columnCount());        
         int numRemainingRows = firstOccupiedRow - (currentBlockRow + numBlockRows);
         if (numRemainingRows <= 2)
         {
@@ -185,7 +185,7 @@ namespace Tetris
 
         double numRowsPerSecond = Gravity::CalculateSpeed(game.level());
         double remainingTime = 1000 * static_cast<double>(numRemainingRows) / numRowsPerSecond;        
-        int maxRequiredMoves = game.activeBlock().numRotations() + (game.numColumns()/2);
+        int maxRequiredMoves = game.activeBlock().numRotations() + (game.columnCount()/2);
         int moveSpeed = mBlockMover->speed();
         double timeRequiredForMove = 1000.0 * static_cast<double>(maxRequiredMoves) / static_cast<double>(moveSpeed);
         return static_cast<int>(0.5 + remainingTime - timeRequiredForMove);

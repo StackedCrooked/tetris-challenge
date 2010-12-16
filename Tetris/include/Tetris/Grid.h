@@ -9,9 +9,7 @@
 namespace Tetris
 {
 
-    template<class T> class GenericGrid;
     typedef GenericGrid<BlockType> Grid;
-
 
 } // namespace Tetris
 

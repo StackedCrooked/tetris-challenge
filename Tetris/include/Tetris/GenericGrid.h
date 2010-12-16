@@ -2,142 +2,106 @@
 #define TETRIS_GENERICGRID_H_INCLUDED
 
 
-#include <boost/scoped_ptr.hpp>
-#include <boost/shared_ptr.hpp>
+#include "Tetris/Allocator.h"
+#include <cassert>
 #include <cstring>
-#include <map>
+#include <vector>
+#include <memory>
 
 
-namespace Tetris
+namespace Tetris {
+
+
+template<class T, template <class> class Allocator = Allocator_Vector>
+class GenericGrid : private Allocator<T>
 {
-    
-    class MemoryPoolImpl;
+public:
+    GenericGrid(std::size_t inRowCount, std::size_t inColumnCount);
 
-    class MemoryPool
+    GenericGrid(std::size_t inRowCount, std::size_t inColumnCount, const T & inInitialValue);
+
+    ~GenericGrid();
+
+    std::size_t rowCount() const;
+
+    std::size_t columnCount() const;
+
+    const T & get(std::size_t inRow, std::size_t inColumn) const;
+
+    void set(std::size_t inRow, std::size_t inColumn, const T & inValue);
+
+private:
+    std::size_t mRowCount;
+    std::size_t mColumnCount;
+    T * mBuffer;
+};
+
+
+//
+// Inlines
+//
+template<class T, template <class> class Allocator>
+GenericGrid<T, Allocator>::GenericGrid(std::size_t inRowCount, std::size_t inColumnCount) :
+    Allocator<T>(inRowCount * inColumnCount),
+    mRowCount(inRowCount),
+    mColumnCount(inColumnCount),
+    mBuffer(Allocator<T>::alloc())
+{
+}
+
+
+template<class T, template <class> class Allocator>
+GenericGrid<T, Allocator>::GenericGrid(std::size_t inRowCount, std::size_t inColumnCount, const T & inInitialValue) :
+    Allocator<T>(inRowCount * inColumnCount),
+    mRowCount(inRowCount),
+    mColumnCount(inColumnCount),
+    mBuffer(Allocator<T>::alloc())
+{
+    // We can't use a memcpy on class objects, we must use copy constructor instead.
+    std::size_t size = inRowCount * inColumnCount;
+    for (size_t idx = 0; idx != size; ++idx)
     {
-    public:
-        MemoryPool(size_t inItemSize);
-
-        ~MemoryPool();
-
-        void* get();
-
-        void release(void* inData);
-
-    private:
-        MemoryPool(const MemoryPool&);
-        MemoryPool& operator=(const MemoryPool&);
-
-        MemoryPoolImpl * mImpl;
-    };
-
-
-    template<class T>
-    class GenericGrid
-    {
-    public:
-        GenericGrid(size_t inNumRows, size_t inNumColumns);
-
-        GenericGrid(size_t inNumRows, size_t inNumColumns, const T & inInitialValue);
-
-        ~GenericGrid();
-
-        GenericGrid(const GenericGrid&);
-        
-        GenericGrid& operator=(const GenericGrid&);
-
-        inline const T & get(size_t inRow, size_t inColumn) const
-        {
-            const T * t = reinterpret_cast<const T*>(mData);
-            return t[inRow * mNumColumns + inColumn];
-        }
-
-        inline void set(size_t inRow, size_t inColumn, const T & inValue)
-        {
-            T * t = reinterpret_cast<T*>(mData);
-            t[inRow * mNumColumns + inColumn] = inValue;
-        }
-
-        inline size_t numColumns() const
-        {
-            return mNumColumns;
-        }
-
-        inline size_t numRows() const
-        {
-            return mNumRows;
-        }
-
-    private:
-        size_t mNumRows;
-        size_t mNumColumns;
-        size_t mItemSize;
-        boost::scoped_ptr<MemoryPool> mMemoryPool;
-        void * mData;
-    };
-
-
-    template<class T>
-    GenericGrid<T>::GenericGrid(size_t inNumRows, size_t inNumColumns) :
-        mNumRows(inNumRows),
-        mNumColumns(inNumColumns),
-        mItemSize(sizeof(T) * inNumColumns * inNumRows),
-        mMemoryPool(new MemoryPool(mItemSize)),
-        mData(mMemoryPool->get())
-    {
+        mBuffer[idx] = inInitialValue;
     }
+}
 
 
-    template<class T>
-    GenericGrid<T>::GenericGrid(size_t inNumRows, size_t inNumColumns, const T & inInitialValue) :
-        mNumRows(inNumRows),
-        mNumColumns(inNumColumns),
-        mItemSize(sizeof(T) * inNumColumns * inNumRows),
-        mMemoryPool(new MemoryPool(mItemSize)),
-        mData(mMemoryPool->get())
-    {        
-        for (size_t i = 0; i < (mNumColumns * mNumRows); ++i)
-        {
-            T * data = reinterpret_cast<T*>(mData);
-            data[i] = inInitialValue;
-        }
-    }
+template<class T, template <class> class Allocator>
+GenericGrid<T, Allocator>::~GenericGrid()
+{
+    Allocator<T>::free(mBuffer);
+}
 
 
-    template<class T>
-    GenericGrid<T>::~GenericGrid()
-    {
-        mMemoryPool->release(mData);
-        mMemoryPool.reset();
-    }
-    
-    
-    template<class T>
-    GenericGrid<T>::GenericGrid(const GenericGrid& rhs) :
-        mNumRows(rhs.mNumRows),
-        mNumColumns(rhs.mNumColumns),
-        mItemSize(rhs.mItemSize),
-        mMemoryPool(new MemoryPool(mItemSize)),
-        mData(mMemoryPool->get())
-    {
-        memcpy(mData, rhs.mData, mItemSize);
-    }
+template<class T, template <class> class Allocator>
+std::size_t GenericGrid<T, Allocator>::rowCount() const
+{
+    return mRowCount;
+}
 
 
-    template<class T>
-    GenericGrid<T>& GenericGrid<T>::operator=(const GenericGrid& rhs)
-    {
-        if (this != &rhs)
-        {
-            mNumRows = rhs.mNumRows;
-            mNumColumns = rhs.mNumColumns;
-            mItemSize = rhs.mItemSize;
-            mMemoryPool.reset(new MemoryPool(mItemSize));
-            mData = mMemoryPool->get();
-            memcpy(mData, rhs.mData, mItemSize);
-        }
-        return *this;
-    }
+template<class T, template <class> class Allocator>
+std::size_t GenericGrid<T, Allocator>::columnCount() const
+{
+    return mColumnCount;
+}
+
+
+template<class T, template <class> class Allocator>
+const T & GenericGrid<T, Allocator>::get(std::size_t inRow, std::size_t inColumn) const
+{
+    assert(inRow < mRowCount && inColumn < mColumnCount);
+    return mBuffer[inRow * mColumnCount + inColumn];
+}
+
+
+template<class T, template <class> class Allocator>
+void GenericGrid<T, Allocator>::set(std::size_t inRow, std::size_t inColumn, const T & inValue)
+{
+    assert(inRow < mRowCount && inColumn < mColumnCount);
+    mBuffer[inRow * mColumnCount + inColumn] = inValue;
+}
+
 
 } // namespace Tetris
 
