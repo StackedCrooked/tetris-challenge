@@ -9,3 +9,6 @@ SOURCES += \
 
 HEADERS += \
     MainWindow.h
+
+OTHER_FILES += \
+    CMakeLists.txt
