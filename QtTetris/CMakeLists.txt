@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.6) 
-project(QtTetris) 
-find_package(Qt4 REQUIRED)
+project(QtTetris)
+FIND_PACKAGE(Qt4 REQUIRED)
 
 
 set(CMAKE_BUILD_TYPE Release)
@@ -18,7 +18,7 @@ endif()
 
 
 set(EXECUTABLE testsuite)
-set(SOLUTIONDIR ${QtTetris_SOURCE_DIR}/../)
+set(SOLUTIONDIR "${QtTetris_SOURCE_DIR}/../")
 set(OUTDIR ${SOLUTIONDIR}Build/${PLATFORM}/${ARCH}/${CMAKE_BUILD_TYPE}/)
 set(BOOST ${SOLUTIONDIR}3rdParty/Boost_1_44_0/)
 set(POCO ${SOLUTIONDIR}3rdParty/Poco/)
@@ -40,3 +40,12 @@ link_directories(
 
 add_subdirectory(${SOLUTIONDIR}Tetris ${OUTDIR}Tetris)
 
+
+
+SET(QtTetris_SOURCES main.cpp MainWindow.cpp)
+SET(QtTetris_HEADERS MainWindow.h)
+QT4_WRAP_CPP(QtTetris_HEADERS_MOC ${QtTetris_HEADERS})
+INCLUDE(${QT_USE_FILE})
+ADD_DEFINITIONS(${QT_DEFINITIONS})
+ADD_EXECUTABLE(QtTetris ${QtTetris_SOURCES} ${QtTetris_HEADERS_MOC})
+TARGET_LINK_LIBRARIES(QtTetris ${QT_LIBRARIES})
