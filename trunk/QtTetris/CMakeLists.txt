@@ -29,8 +29,10 @@ set(FINAL_COMPILE_FLAGS "${CXX_FLAGS_${CMAKE_BUILD_TYPE}}")
 
 
 include_directories(
-	${BOOST} ${POCO}/Foundation/include
-	${POCO}/CppUnit/include)
+    ${BOOST}
+    ${POCO}Foundation/include
+    ${POCO}CppUnit/include
+    ${SOLUTIONDIR}Tetris/include)
 
 
 link_directories(
