@@ -42,7 +42,11 @@ namespace Tetris
 
         size_t row() const;
 
+        size_t rowCount() const;
+
         size_t column() const;
+
+        size_t columnCount() const;
 
         size_t rotation() const;
 

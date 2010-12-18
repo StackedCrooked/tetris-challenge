@@ -4,6 +4,7 @@
 
 #include "Tetris/BlockTypes.h"
 #include "Tetris/Direction.h"
+#include "Tetris/Grid.h"
 #include "Tetris/NodePtr.h"
 #include <memory>
 
@@ -51,6 +52,8 @@ namespace Tetris
         void setLevel(int inLevel);
 
         const Block & activeBlock() const;
+
+        const Grid & gameGrid() const;
 
         // Gets the currently active block and any blocks that follow.
         void getFutureBlocks(size_t inCount, BlockTypes & outBlocks) const;

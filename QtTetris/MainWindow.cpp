@@ -1,11 +1,6 @@
 #include "MainWindow.h"
 #include <QLayout>
 #include <QLabel>
-#include "Tetris/AutoPtrSupport.h"
-#include "Tetris/Block.h"
-#include "Tetris/Game.h"
-#include "Tetris/Threading.h"
-#include "Tetris/Grid.h"
 #include <iostream>
 
 
@@ -21,22 +16,34 @@ static Protected<Game> Tetris_CreateGame()
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
+    mGame(Tetris_CreateGame()),
+    mGravityCallback(),
+    mGravity(mGame),
     mTetrisWidget(0)
 {
     QWidget * centralWidget = new QWidget(this);
 
-    mTetrisWidget = new TetrisWidget(centralWidget, Tetris_CreateGame());
+    mTetrisWidget = new TetrisWidget(centralWidget, mGame);
 
     QHBoxLayout * hbox = new QHBoxLayout();
-    hbox->addWidget(new QLabel("before"), 1, Qt::AlignCenter);
-    hbox->addWidget(mTetrisWidget, 2, Qt::AlignCenter);
-    hbox->addWidget(new QLabel("after"), 1, Qt::AlignCenter);
+    hbox->addWidget(mTetrisWidget, 1, Qt::AlignCenter);
 
     centralWidget->setLayout(hbox);
     setCentralWidget(centralWidget);
+
+    mGravityCallback.reset(new GravityCallback<MainWindow>(this));
+    mGravity.setGravityCallback(mGravityCallback.get());
 }
 
 
 MainWindow::~MainWindow()
 {
+    mGravity.setGravityCallback(NULL);
 }
+
+
+void MainWindow::onGravityCallback(Gravity * )
+{
+    mTetrisWidget->update();
+}
+

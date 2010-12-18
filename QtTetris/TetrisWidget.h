@@ -3,8 +3,7 @@
 
 
 #include <QWidget>
-#include "Tetris/Game.h"
-#include "Tetris/Threading.h"
+#include "Tetris/Tetris.h"
 
 
 //
@@ -40,6 +39,8 @@ signals:
 public slots:
 
 private:
+    const QColor & getColor(Tetris::BlockType inBlockType) const;
+
     Protected<Game> mGame;
     QSize mSize;
 };
