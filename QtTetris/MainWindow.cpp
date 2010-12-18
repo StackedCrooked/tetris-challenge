@@ -35,8 +35,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     mGravity.reset(new Gravity(mGame));
     mBlockMover.reset(new BlockMover(mGame));
-    std::auto_ptr<Evaluator> evaluator(new Balanced);
-    mComputerPlayer.reset(new ComputerPlayer(mGame, evaluator, 6, 6, 4));
+    std::auto_ptr<Evaluator> evaluator(new MakeTetrises);
+    mComputerPlayer.reset(new ComputerPlayer(mGame, evaluator, 8, 5, 6));
 }
 
 
