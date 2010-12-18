@@ -36,7 +36,7 @@ namespace Tetris
 
         ~GravityImpl();
 
-        void setGravityCallback(Gravity * inGravity, AbstractGravityCallback * inGravityCallback);
+        void setCallback(const boost::function<void()> & inCallback);
 
         // Number of rows per second
         double speed() const;
@@ -53,8 +53,7 @@ namespace Tetris
         void onTimerEvent(Poco::Timer & inTimer);
 
         Protected<Game> mThreadSafeGame;
-        Gravity * mGravity;
-        AbstractGravityCallback * mGravityCallback;
+        boost::function<void()> mCallback;
         int mLevel;
         Poco::Timer mTimer;
         Poco::Stopwatch mStopwatch;
@@ -62,10 +61,11 @@ namespace Tetris
 
 
     GravityImpl::GravityImpl(const Protected<Game> & inThreadSafeGame) :
-        mThreadSafeGame(inThreadSafeGame),
-        mGravity(0),
-        mGravityCallback(0),
-        mLevel(0)
+        mThreadSafeGame(inThreadSafeGame),        
+        mCallback(),
+        mLevel(0),
+        mTimer(),
+        mStopwatch()
     {
         ScopedReader<Game> rgame(mThreadSafeGame);
         mTimer.start(Poco::TimerCallback<GravityImpl>(*this, &GravityImpl::onTimerEvent));
@@ -80,10 +80,9 @@ namespace Tetris
     }
 
 
-    void GravityImpl::setGravityCallback(Gravity * inGravity, AbstractGravityCallback * inGravityCallback)
+    void GravityImpl::setCallback(const boost::function<void()> & inCallback)
     {
-        mGravity = inGravity;
-        mGravityCallback = inGravityCallback;
+        mCallback = inCallback;
     }
 
 
@@ -120,9 +119,9 @@ namespace Tetris
                 mTimer.setPeriodicInterval(newLevel);
             }
 
-            if (mGravityCallback && mGravity)
+            if (mCallback)
             {
-                (*mGravityCallback)(mGravity);
+                mCallback();
             }
         }
         catch (const std::exception & inException)
@@ -157,9 +156,9 @@ namespace Tetris
     }
 
 
-    void Gravity::setGravityCallback(AbstractGravityCallback * inGravityCallback)
+    void Gravity::setCallback(const GravityCallback & inGravityCallback)
     {
-        mImpl->setGravityCallback(this, inGravityCallback);
+        mImpl->setCallback(boost::bind(inGravityCallback, this));
     }
 
     

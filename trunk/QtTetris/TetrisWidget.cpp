@@ -1,6 +1,7 @@
 #include "TetrisWidget.h"
-#include <QPainter>
 #include <QColor>
+#include <QPainter>
+#include <QTimer>
 #include <stdexcept>
 #include <iostream>
 
@@ -14,6 +15,11 @@ TetrisWidget::TetrisWidget(QWidget * inParent, const Protected<Game> & inGame) :
     mSize(Tetris_GetUnitWidth() * TetrisWidget_NumColumns(), Tetris_GetUnitHeight() * TetrisWidget_NumRows())
 {
     setUpdatesEnabled(true);
+
+    QTimer *timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(update()));
+    timer->start(30);
+
 }
 
 

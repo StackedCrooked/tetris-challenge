@@ -19,7 +19,7 @@ namespace Tetris
     class BlockMoverImpl
     {
     public:
-        BlockMoverImpl(const Protected<Game> & inGame, int inNumMovesPerSecond);
+        BlockMoverImpl(const Protected<Game> & inGame);
 
         ~BlockMoverImpl();
 
@@ -31,6 +31,8 @@ namespace Tetris
 
         int interval() const;
 
+        void setCallback(const boost::function<void()> & inCallback);
+
     private:
         BlockMoverImpl(const BlockMoverImpl &);
         BlockMoverImpl & operator=(const BlockMoverImpl&);
@@ -39,19 +41,23 @@ namespace Tetris
         void move();
 
         Protected<Game> mGame;
+        boost::function<void()> mCallback;
         boost::scoped_ptr<Poco::Timer> mTimer;
         Poco::Stopwatch mStopwatch;
-        double mInterval;
+        double mIntervalMs;
     };
 
 
 
-    BlockMoverImpl::BlockMoverImpl(const Protected<Game> & inGame, int inInterval) :
+    BlockMoverImpl::BlockMoverImpl(const Protected<Game> & inGame) :
         mGame(inGame),
+        mCallback(),
         mTimer(),
-        mInterval(static_cast<double>(inInterval))
+        mStopwatch(),
+        mIntervalMs(500.0)
     {
-        mTimer.reset(new Poco::Timer(0, 1));
+        int interval = std::min<int>(10, mIntervalMs/3);
+        mTimer.reset(new Poco::Timer(0, interval));
         Poco::TimerCallback<BlockMoverImpl> callback(*this, &BlockMoverImpl::onTimer);
         mTimer->start(callback);
         mStopwatch.start();
@@ -67,35 +73,51 @@ namespace Tetris
 
     int BlockMoverImpl::speed() const
     {
-        return static_cast<int>(0.5 + (1000.0 / mInterval));
+        return static_cast<int>(0.5 + (1000.0 / mIntervalMs));
     }
 
 
     void BlockMoverImpl::setSpeed(int inNumMovesPerSecond)
     {
-        mInterval = 1000.0 / static_cast<double>(inNumMovesPerSecond);
+        mIntervalMs = 1000.0 / static_cast<double>(inNumMovesPerSecond);
+        if (mTimer)
+        {
+            int interval = std::min<int>(10, mIntervalMs/3);
+            mTimer->setPeriodicInterval(interval);
+        }
     }
     
 
     void BlockMoverImpl::setInterval(int inTimeBetweenMovesInMilliseconds)
     {
-        mInterval = static_cast<double>(inTimeBetweenMovesInMilliseconds);
+        mIntervalMs = static_cast<double>(inTimeBetweenMovesInMilliseconds);
     }
 
 
     int BlockMoverImpl::interval() const
     {
-        return static_cast<int>(0.5 + mInterval);
+        return static_cast<int>(0.5 + mIntervalMs);
     }
+
+
+    void BlockMoverImpl::setCallback(const boost::function<void()> & inCallback)
+    {
+        mCallback = inCallback;
+    }
+
 
     void BlockMoverImpl::onTimer(Poco::Timer & ioTimer)
     {
         try
         {
-            if (mStopwatch.elapsed() > 1000 * mInterval)
+            if (mStopwatch.elapsed() > 1000 * mIntervalMs)
             {
                 mStopwatch.restart();
                 move();
+                if (mCallback)
+                {
+                    mCallback();
+                }
             }
         }
         catch (const std::exception & inException)
@@ -155,8 +177,8 @@ namespace Tetris
     }
 
 
-    BlockMover::BlockMover(const Protected<Game> & inGame, int inNumMovesPerSecond) :
-        mImpl(new BlockMoverImpl(inGame, inNumMovesPerSecond))
+    BlockMover::BlockMover(const Protected<Game> & inGame) :
+        mImpl(new BlockMoverImpl(inGame))
     {
     }
 
@@ -179,5 +201,16 @@ namespace Tetris
         mImpl->setSpeed(inNumMovesPerSecond);
     }
 
+
+    int BlockMover::interval() const
+    {
+        return mImpl->interval();
+    }
+
+
+    void BlockMover::setCallback(const BlockMoverCallback & inBlockMoverCallback)
+    {
+        mImpl->setCallback(boost::bind(inBlockMoverCallback, this));
+    }
 
 } // namespace Tetris

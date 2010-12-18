@@ -4,6 +4,9 @@
 
 #include "Tetris/AutoPtrSupport.h"
 #include "Tetris/Block.h"
+#include "Tetris/BlockMover.h"
+#include "Tetris/ComputerPlayer.h"
+#include "Tetris/Evaluator.h"
 #include "Tetris/Game.h"
 #include "Tetris/GameState.h"
 #include "Tetris/GameStateNode.h"

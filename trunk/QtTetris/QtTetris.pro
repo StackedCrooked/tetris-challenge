@@ -6,7 +6,8 @@ CONFIG += i386
 
 INCLUDEPATH += \
     ../Tetris/include \
-    ../3rdParty/Boost_1_44_0
+    ../3rdParty/Boost_1_44_0 \
+    ../3rdParty/Poco/Foundation/include
 
 
 SOURCES += \
