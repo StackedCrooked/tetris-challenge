@@ -54,7 +54,7 @@ namespace Tetris
         mCallback(),
         mTimer(),
         mStopwatch(),
-        mIntervalMs(40)
+        mIntervalMs(50)
     {
         int interval = std::min<int>(10, mIntervalMs/3);
         mTimer.reset(new Poco::Timer(0, interval));
