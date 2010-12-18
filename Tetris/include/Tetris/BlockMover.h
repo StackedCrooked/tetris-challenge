@@ -2,14 +2,19 @@
 #define TETRIS_BLOCKMOVER_H_INCLUDED
 
 
+#include "Tetris/Utilities.h"
+#include <boost/function.hpp>
+
+
 namespace Tetris
 {
 
     template<class Variable> class Protected;
     class Game;
-
-
+    class BlockMover;
     class BlockMoverImpl;
+
+    typedef boost::function<void(BlockMover *)> BlockMoverCallback;
 
 
     /**
@@ -23,7 +28,7 @@ namespace Tetris
     class BlockMover
     {
     public:
-        BlockMover(const Protected<Game> & inGame, int inInterval);
+        BlockMover(const Protected<Game> & inGame);
 
         ~BlockMover();
 
@@ -34,6 +39,8 @@ namespace Tetris
         void setInterval(int inTimeBetweenMovesInMilliseconds);
 
         int interval() const;
+
+        void setCallback(const BlockMoverCallback & inBlockMoverCallback);
 
     private:
         BlockMover(const BlockMover &);

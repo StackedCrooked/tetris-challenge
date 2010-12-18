@@ -2,16 +2,20 @@
 #define TETRIS_UTILITIES_H_INCLUDED
 
 
-namespace Tetris
-{
+namespace Tetris {
 
-    // Rounded division by 2.
-    // To be used for integral values (int, size_t, ...).
-    template<class T>
-    T DivideByTwo(T inValue)
-    {
-        return (int)(0.5 + ((float)inValue / (float)2.0));
-    }
+
+/**
+ * DivideByTwo
+ *
+ * Rounded division by 2 for integral values.
+ */
+template<class T>
+T DivideByTwo(T inValue)
+{
+    return (int)(0.5 + ((float)inValue / (float)2.0));
+}
+
 
 } // namespace Tetris
 

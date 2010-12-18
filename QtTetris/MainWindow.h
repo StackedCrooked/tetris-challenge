@@ -15,11 +15,11 @@ public:
     MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-    void onGravityCallback(Tetris::Gravity * inGravity);
-
     Tetris::Protected<Tetris::Game> mGame;
-    std::auto_ptr<Tetris::AbstractGravityCallback> mGravityCallback;
-    Tetris::Gravity mGravity;
+
+    std::auto_ptr<Tetris::Gravity> mGravity;
+    std::auto_ptr<Tetris::BlockMover> mBlockMover;
+    std::auto_ptr<Tetris::ComputerPlayer> mComputerPlayer;
     Tetris::TetrisWidget * mTetrisWidget;
 };
 
