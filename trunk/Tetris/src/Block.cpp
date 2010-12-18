@@ -28,6 +28,10 @@ namespace Tetris
 
         size_t column() const;
 
+        size_t rowCount() const;
+
+        size_t columnCount() const;
+
         void rotate();
 
         void setRow(size_t inRow);
@@ -95,6 +99,18 @@ namespace Tetris
     size_t BlockImpl::column() const
     {
         return mColumn;
+    }
+
+
+    size_t BlockImpl::rowCount() const
+    {
+        return mGrid->rowCount();
+    }
+
+
+    size_t BlockImpl::columnCount() const
+    {
+        return mGrid->columnCount();
     }
 
 
@@ -186,6 +202,18 @@ namespace Tetris
     size_t Block::column() const
     {
         return mImpl->column();
+    }
+
+
+    size_t Block::rowCount() const
+    {
+        return mImpl->rowCount();
+    }
+
+
+    size_t Block::columnCount() const
+    {
+        return mImpl->columnCount();
     }
 
 

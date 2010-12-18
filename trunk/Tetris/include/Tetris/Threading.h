@@ -97,6 +97,9 @@ namespace Tetris
             Assert(mStopwatch.elapsedTimeMs() < cMaximumLockDurationMs);
         }
 
+        Variable & operator *()
+        { return mVariable; }
+
         Variable * get()
         { return mVariable; }
 
@@ -128,6 +131,9 @@ namespace Tetris
         {
             Assert(mStopwatch.elapsedTimeMs() < cMaximumLockDurationMs);
         }
+
+        const Variable & operator *() const
+        { return mVariable; }
 
         const Variable * get() const
         { return mVariable; }

@@ -48,6 +48,8 @@ namespace Tetris {
 
         const Block & activeBlock() const;
 
+        const Grid & gameGrid() const;
+
         void getFutureBlocks(size_t inCount, BlockTypes & outBlocks) const;
 
         void getFutureBlocksWithOffset(size_t inOffset, size_t inCount, BlockTypes & outBlocks) const;
@@ -219,6 +221,13 @@ namespace Tetris {
     {
         supplyBlocks();
         return *mActiveBlock;
+    }
+
+
+
+    const Grid & GameImpl::gameGrid() const
+    {
+        return mCurrentNode->state().grid();
     }
 
 
@@ -548,6 +557,12 @@ namespace Tetris {
     const Block & Game::activeBlock() const
     {
         return mImpl->activeBlock();
+    }
+
+
+    const Grid & Game::gameGrid() const
+    {
+        return mImpl->gameGrid();
     }
 
 

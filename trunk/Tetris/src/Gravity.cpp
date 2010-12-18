@@ -36,6 +36,8 @@ namespace Tetris
 
         ~GravityImpl();
 
+        void setGravityCallback(Gravity * inGravity, AbstractGravityCallback * inGravityCallback);
+
         // Number of rows per second
         double speed() const;
 
@@ -51,6 +53,8 @@ namespace Tetris
         void onTimerEvent(Poco::Timer & inTimer);
 
         Protected<Game> mThreadSafeGame;
+        Gravity * mGravity;
+        AbstractGravityCallback * mGravityCallback;
         int mLevel;
         Poco::Timer mTimer;
         Poco::Stopwatch mStopwatch;
@@ -59,6 +63,8 @@ namespace Tetris
 
     GravityImpl::GravityImpl(const Protected<Game> & inThreadSafeGame) :
         mThreadSafeGame(inThreadSafeGame),
+        mGravity(0),
+        mGravityCallback(0),
         mLevel(0)
     {
         ScopedReader<Game> rgame(mThreadSafeGame);
@@ -71,6 +77,13 @@ namespace Tetris
     GravityImpl::~GravityImpl()
     {
         mTimer.stop();
+    }
+
+
+    void GravityImpl::setGravityCallback(Gravity * inGravity, AbstractGravityCallback * inGravityCallback)
+    {
+        mGravity = inGravity;
+        mGravityCallback = inGravityCallback;
     }
 
 
@@ -106,6 +119,11 @@ namespace Tetris
                 LogInfo(MakeString() << "Set level to " << newLevel << ".");
                 mTimer.setPeriodicInterval(newLevel);
             }
+
+            if (mGravityCallback && mGravity)
+            {
+                (*mGravityCallback)(mGravity);
+            }
         }
         catch (const std::exception & inException)
         {
@@ -136,6 +154,12 @@ namespace Tetris
     {
         delete mImpl;
         mImpl = 0;
+    }
+
+
+    void Gravity::setGravityCallback(AbstractGravityCallback * inGravityCallback)
+    {
+        mImpl->setGravityCallback(this, inGravityCallback);
     }
 
     
