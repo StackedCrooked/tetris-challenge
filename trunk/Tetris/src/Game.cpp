@@ -451,7 +451,10 @@ namespace Tetris {
 
     void GameImpl::drop()
     {
-        while (move(Direction_Down));
+        while (move(Direction_Down))
+        {
+            // Keep going.
+        }
     }
 
 

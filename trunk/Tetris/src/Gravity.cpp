@@ -92,7 +92,7 @@ namespace Tetris
     }
 
 
-    void GravityImpl::onTimerEvent(Poco::Timer & inTimer)
+    void GravityImpl::onTimerEvent(Poco::Timer & )
     {
         try
         {

@@ -7,40 +7,21 @@
 using namespace Tetris;
 
 
-static Protected<Game> Tetris_CreateGame()
-{
-    return Protected<Game>(Create<Game>(TetrisWidget_NumRows(),
-                                        TetrisWidget_NumColumns()));
-}
-
-
 MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
-    mGame(Tetris_CreateGame()),
-    mGravity(),
-    mBlockMover(),
-    mComputerPlayer(),
-    mTetrisWidget(0)
+    QMainWindow(parent)
 {
     QWidget * centralWidget = new QWidget(this);
 
-    mTetrisWidget = new TetrisWidget(centralWidget, mGame);
+    mTetrisWidget = new TetrisWidget(centralWidget);
 
     QHBoxLayout * hbox = new QHBoxLayout();
     hbox->addWidget(mTetrisWidget, 1, Qt::AlignCenter);
 
     centralWidget->setLayout(hbox);
     setCentralWidget(centralWidget);
-
-
-    mGravity.reset(new Gravity(mGame));
-    mBlockMover.reset(new BlockMover(mGame));
-    std::auto_ptr<Evaluator> evaluator(new MakeTetrises);
-    mComputerPlayer.reset(new ComputerPlayer(mGame, evaluator, 8, 5, 6));
 }
 
 
 MainWindow::~MainWindow()
 {
-    mGravity->setCallback(NULL);
 }

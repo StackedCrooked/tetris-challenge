@@ -134,7 +134,7 @@ namespace Tetris
         mSearchDepth(inSearchDepth),
         mSearchWidth(inSearchWidth),
         mMoveSpeed(20),
-        mWorkerCount(0)
+        mWorkerCount(inWorkerCount)
     {
         LogInfo(MakeString() << "ComputerPlayer started with " << mWorkerPool.size() << " worker threads.");
         mTimer.start(Poco::TimerCallback<ComputerPlayerImpl>(*this, &ComputerPlayerImpl::onTimerEvent));
@@ -147,7 +147,7 @@ namespace Tetris
                                            int inSearchWidth,
                                            int inWorkerCount) :
         mProtectedGame(inProtectedGame),
-        mWorkerPool("ComputerPlayer WorkerPool", inWorkerCount > 0 ? inWorkerCount : GetWorkerCount()),
+        mWorkerPool("ComputerPlayer WorkerPool", (inWorkerCount > 0) ? inWorkerCount : GetWorkerCount()),
         mEvaluator(),
         mGetEvaluator(inGetEvaluator),
         mBlockMover(new BlockMover(mProtectedGame)),
@@ -155,7 +155,7 @@ namespace Tetris
         mSearchDepth(inSearchDepth),
         mSearchWidth(inSearchWidth),
         mMoveSpeed(20),
-        mWorkerCount(0)
+        mWorkerCount(inWorkerCount)
     {
         LogInfo(MakeString() << "ComputerPlayer started with " << mWorkerPool.size() << " worker threads.");
         mTimer.start(Poco::TimerCallback<ComputerPlayerImpl>(*this, &ComputerPlayerImpl::onTimerEvent));
@@ -215,7 +215,7 @@ namespace Tetris
     }
 
     
-    void ComputerPlayerImpl::onTimerEvent(Poco::Timer & inTimer)
+    void ComputerPlayerImpl::onTimerEvent(Poco::Timer & )
     {
         try
         {
