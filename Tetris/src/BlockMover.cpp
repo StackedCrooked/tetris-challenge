@@ -106,7 +106,7 @@ namespace Tetris
     }
 
 
-    void BlockMoverImpl::onTimer(Poco::Timer & ioTimer)
+    void BlockMoverImpl::onTimer(Poco::Timer &)
     {
         try
         {

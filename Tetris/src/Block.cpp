@@ -439,7 +439,7 @@ namespace Tetris
         }
     }
 
-    Grid GetOGrid(int rotation)
+    Grid GetOGrid(int) // rotation is not relevant
     {
         Grid grid(2, 2, BlockType_Nil);
         grid.set(0, 0, BlockType_O);

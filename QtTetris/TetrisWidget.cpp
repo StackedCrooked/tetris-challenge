@@ -9,10 +9,33 @@
 namespace Tetris {
 
 
+static Protected<Game> Tetris_CreateGame()
+{
+    return Protected<Game>(Create<Game>(TetrisWidget_NumRows(),
+                                        TetrisWidget_NumColumns()));
+}
+
+
+TetrisWidget::TetrisWidget(QWidget * inParent) :
+    QWidget(inParent),
+    mGame(Tetris_CreateGame()),
+    mSize(Tetris_GetUnitWidth() * TetrisWidget_NumColumns(), Tetris_GetUnitHeight() * TetrisWidget_NumRows())
+{
+    init();
+
+}
+
+
 TetrisWidget::TetrisWidget(QWidget * inParent, const Protected<Game> & inGame) :
     QWidget(inParent),
     mGame(inGame),
     mSize(Tetris_GetUnitWidth() * TetrisWidget_NumColumns(), Tetris_GetUnitHeight() * TetrisWidget_NumRows())
+{
+    init();
+}
+
+
+void TetrisWidget::init()
 {
     setUpdatesEnabled(true);
 
@@ -20,6 +43,10 @@ TetrisWidget::TetrisWidget(QWidget * inParent, const Protected<Game> & inGame) :
     connect(timer, SIGNAL(timeout()), this, SLOT(update()));
     timer->start(30);
 
+    mGravity.reset(new Gravity(mGame));
+    mBlockMover.reset(new BlockMover(mGame));
+    std::auto_ptr<Evaluator> evaluator(new Balanced);
+    mComputerPlayer.reset(new ComputerPlayer(mGame, evaluator, 6, 6, 1));
 }
 
 
@@ -45,7 +72,7 @@ const QColor & TetrisWidget::getColor(Tetris::BlockType inBlockType) const
 }
 
 
-void TetrisWidget::paintEvent(QPaintEvent * event)
+void TetrisWidget::paintEvent(QPaintEvent * )
 {
     QPainter painter(this);
     painter.fillRect(contentsRect(), getColor(BlockType_Nil));
