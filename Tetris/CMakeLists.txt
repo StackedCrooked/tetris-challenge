@@ -18,6 +18,7 @@ add_library(Tetris
     include/Tetris/Evaluator.h
     include/Tetris/ForwardDeclarations.h
     include/Tetris/Game.h
+    include/Tetris/SimpleGame.h
     include/Tetris/GameOver.h
     include/Tetris/GameState.h
     include/Tetris/GameStateComparator.h
@@ -48,6 +49,7 @@ add_library(Tetris
     src/BlockType.cpp 
     src/ComputerPlayer.cpp 
     src/Game.cpp 
+    src/SimpleGame.cpp 
     src/GenericGrid.cpp 
     src/Evaluator.cpp 
     src/GameState.cpp 

@@ -16,7 +16,8 @@ public:
     ~MainWindow();
 
 private:
-    Tetris::TetrisWidget * mTetrisWidget;
+    Tetris::SimpleGame * mSimpleGame;
+    TetrisWidget * mTetrisWidget;
 };
 
 
