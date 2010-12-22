@@ -1,4 +1,5 @@
-cmake_minimum_required(VERSION 2.6) 
+cmake_minimum_required(VERSION 2.6)
+
 project(TETRIS) 
 
 
@@ -37,6 +38,7 @@ link_directories(
     ${POCO}lib/${PLATFORM}/${ARCH})
 
 
+set(POCO_FOUNDATION_HEADERS "")
 add_subdirectory(${SOLUTIONDIR}Tetris ${OUTDIR}Tetris)
 add_subdirectory(${SOLUTIONDIR}Tetris/testsuite ${OUTDIR}TetrisTestSuite)
 
