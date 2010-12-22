@@ -458,7 +458,7 @@ namespace Tetris {
     }
 
 
-    int GameImpl::level() const 
+    int GameImpl::level() const
     {
         if (mOverrideLevel < 0)
         {
@@ -482,14 +482,14 @@ namespace Tetris {
         mImpl(new GameImpl(inNumRows, inNumColumns))
     {
     }
-    
-    
+
+
     Game::Game(const Game & inGame) :
         mImpl(new GameImpl(*inGame.mImpl))
     {
     }
-    
-    
+
+
     Game::Game(std::auto_ptr<GameImpl> inImpl) :
         mImpl(inImpl.release())
     {
