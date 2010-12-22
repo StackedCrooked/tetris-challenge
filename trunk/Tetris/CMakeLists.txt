@@ -1,6 +1,7 @@
 include_directories(include)
 
-set(TETRIS_HEADERS
+
+add_library(Tetris
     include/Tetris/AISupport.h
     include/Tetris/Allocator.h
     include/Tetris/Assert.h
@@ -39,35 +40,32 @@ set(TETRIS_HEADERS
     include/Tetris/Unicode.h
     include/Tetris/Utilities.h
     include/Tetris/Worker.h
-    include/Tetris/WorkerPool.h)
-
-set(TETRIS_SOURCES
-    src/AISupport.cpp
-    src/Allocator.cpp
-    src/Block.cpp
-    src/BlockFactory.cpp
-    src/BlockMover.cpp
-    src/BlockType.cpp
-    src/ComputerPlayer.cpp
-    src/Game.cpp
-    src/SimpleGame.cpp
+    include/Tetris/WorkerPool.h
+    src/AISupport.cpp 
+    src/Allocator.cpp 
+    src/Block.cpp 
+    src/BlockFactory.cpp 
+    src/BlockMover.cpp 
+    src/BlockType.cpp 
+    src/ComputerPlayer.cpp 
+    src/Game.cpp 
+    src/SimpleGame.cpp 
     src/GenericGrid.cpp 
-    src/Evaluator.cpp
-    src/GameState.cpp
+    src/Evaluator.cpp 
+    src/GameState.cpp 
     src/GameStateComparator.cpp 
-    src/GameStateNode.cpp
+    src/GameStateNode.cpp 
     src/Gravity.cpp 
-    src/Logger.cpp
+    src/Logger.cpp 
     src/Logging.cpp 
     src/MultiThreadedNodeCalculator.cpp 
-    src/NodeCalculator.cpp
-    src/NodeCalculatorImpl.cpp
-    src/SingleThreadedNodeCalculator.cpp
-    src/Threading.cpp
+    src/NodeCalculator.cpp 
+    src/NodeCalculatorImpl.cpp 
+    src/SingleThreadedNodeCalculator.cpp 
+    src/Threading.cpp 
     src/Unicode.cpp 
     src/Worker.cpp
     src/WorkerPool.cpp)
 
-add_library(Tetris ${TETRIS_HEADERS} ${TETRIS_SOURCES})
 set_target_properties(Tetris PROPERTIES COMPILE_FLAGS ${FINAL_COMPILE_FLAGS})
 
