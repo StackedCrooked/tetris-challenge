@@ -1,6 +1,7 @@
 include_directories(../include)
 
-add_executable(${EXECUTABLE} 
+
+set (TESTSUITE_SOURCES
     src/GenericGridTest.h
     src/NodeCalculatorTest.h
     src/TetrisTestSuite.h
@@ -13,8 +14,9 @@ add_executable(${EXECUTABLE}
     src/WorkerPoolTest.cpp
     src/WorkerTest.cpp)
 
-set_target_properties(${EXECUTABLE} PROPERTIES COMPILE_FLAGS ${FINAL_COMPILE_FLAGS})
 
+add_executable(${EXECUTABLE} ${TESTSUITE_SOURCES} ${POCO_FOUNDATION_HEADERS})
+set_target_properties(${EXECUTABLE} PROPERTIES COMPILE_FLAGS ${FINAL_COMPILE_FLAGS})
 
 set(LIBS Tetris PocoFoundation CppUnit boost_thread)
 if (UNIX)
