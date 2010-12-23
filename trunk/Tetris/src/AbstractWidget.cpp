@@ -1,6 +1,7 @@
 #include "Tetris/AbstractWidget.h"
 #include "Tetris/Block.h"
 #include "Tetris/Game.h"
+#include "Poco/Stopwatch.h"
 
 
 namespace Tetris {
@@ -8,6 +9,10 @@ namespace Tetris {
 
 static const int cSpacing = 5;
 static const int cFutureBlockCount = 3;
+
+
+
+static Poco::Stopwatch sFPSStopwatch;
 
 
 RGBColor::RGBColor(int red, int green, int blue) :
@@ -29,8 +34,11 @@ Rect::Rect(int x, int y, int width, int height) :
 
 AbstractWidget::AbstractWidget(int inUnitWidth, int inUnitHeight) :
     mUnitWidth(inUnitWidth),
-    mUnitHeight(inUnitHeight)
+    mUnitHeight(inUnitHeight),
+    mFrameCount(0),
+    mFPS(0)
 {
+    sFPSStopwatch.start();
 }
 
 
@@ -75,6 +83,15 @@ void AbstractWidget::coordinateRepaint(const Game & inGame)
     paintGrid(activeBlock.column() * mUnitWidth,
               activeBlock.row() * mUnitHeight,
               activeBlock.grid());
+
+    mFrameCount++;
+
+    if (sFPSStopwatch.elapsed() > 1000000)
+    {
+        mFPS = (1000.0 * 1000.0 * mFrameCount) / static_cast<double>(sFPSStopwatch.elapsed());
+        mFrameCount = 0;
+        sFPSStopwatch.restart();
+    }
 }
 
 
@@ -117,7 +134,7 @@ void AbstractWidget::paintFutureBlocks(const Rect & inRect, int inSpacing, const
     {
         const Grid & grid(GetGrid(GetBlockIdentifier(inBlockTypes[i], 0)));
         paintGrid(inRect.x(), y, grid);
-        y += 4 * unitHeight();
+        y += 3 * unitHeight();
     }
 }
 

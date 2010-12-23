@@ -81,6 +81,8 @@ public:
 
     virtual Rect getFutureBlocksRect(unsigned int inFutureBlockCount) const = 0;
 
+    int getFPS() const { return static_cast<int>(0.5 + mFPS); }
+
 private:
     void paintGrid(int y, int x, const Grid & inGrid);
     void paintGameGrid(const Grid & inGrid);
@@ -88,6 +90,8 @@ private:
 
     int mUnitWidth;
     int mUnitHeight;
+    unsigned int mFrameCount;
+    double mFPS;
 };
 
 
