@@ -41,6 +41,14 @@ public:
 
     inline int height() const { return mHeight; }
 
+    inline int left() const { return mX; }
+
+    inline int right() const { return mX + mWidth; }
+
+    inline int top() const { return mY; }
+
+    inline int bottom() const { return mY + mHeight; }
+
 private:
     int mX, mY, mWidth, mHeight;
 };
@@ -65,7 +73,7 @@ public:
     //
     // These methods must be implemented by the subclass.
     //
-    virtual void paintRect(const Rect & inRect, const RGBColor & inColor) = 0;
+    virtual void paintSquare(const Rect & inRect, const RGBColor & inColor) = 0;
 
     virtual void drawLine(int x1, int y1, int x2, int y2, int inPenWidth, const RGBColor & inColor) = 0;
 

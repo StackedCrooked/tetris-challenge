@@ -29,7 +29,7 @@ public:
 
     virtual QSize minimumSizeHint() const;
 
-    virtual void paintRect(const Tetris::Rect & inRect, const Tetris::RGBColor & inColor);
+    virtual void paintSquare(const Tetris::Rect & inRect, const Tetris::RGBColor & inColor);
 
     virtual void drawLine(int x1, int y1, int x2, int y2, int inPenWidth, const Tetris::RGBColor & inColor);
 

@@ -60,8 +60,8 @@ void AbstractWidget::coordinateRepaint(const Game & inGame)
     Rect futureBlocksRect(getFutureBlocksRect(futureBlocks.size()));
 
     // Clear the rects
-    paintRect(gameRect, RGBColor(255, 255, 255));
-    paintRect(futureBlocksRect, RGBColor(255, 255, 255));
+    paintSquare(gameRect, RGBColor(255, 255, 255));
+    paintSquare(futureBlocksRect, RGBColor(255, 255, 255));
 
     // Paint the game
     paintGameGrid(inGame.gameGrid());
@@ -87,7 +87,7 @@ void AbstractWidget::paintGrid(int x, int y, const Grid & inGrid)
             BlockType blockType = inGrid.get(r, c);
             if (blockType != BlockType_Nil)
             {
-                paintRect(Rect(x + (c * mUnitWidth),
+                paintSquare(Rect(x + (c * mUnitWidth),
                                y + (r * mUnitHeight),
                                mUnitWidth,
                                mUnitHeight),

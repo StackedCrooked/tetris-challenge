@@ -45,7 +45,7 @@ void TetrisWidget::setSimpleGame(SimpleGame * inSimpleGame)
 }
 
 
-void TetrisWidget::paintRect(const Rect & inRect, const RGBColor & inColor)
+void TetrisWidget::paintSquare(const Rect & inRect, const RGBColor & inColor)
 {
     if (!mPainter.get())
     {
@@ -53,9 +53,24 @@ void TetrisWidget::paintRect(const Rect & inRect, const RGBColor & inColor)
     }
 
 
-    mPainter->fillRect(QRect(inRect.x(), inRect.y(), inRect.width(), inRect.height()),
-                       QColor(inColor.red(), inColor.green(), inColor.blue()));
+    QColor color(inColor.red(), inColor.green(), inColor.blue());
+    int x = inRect.x();
+    int y = inRect.y();
+    int width = inRect.width();
+    int height = inRect.height();
+
+    mPainter->fillRect(x + 1, y + 1, width - 2, height - 2, color);
+
+    mPainter->setPen(color.light());
+    mPainter->drawLine(x, y + height - 1, x, y);
+    mPainter->drawLine(x, y, x + width - 1, y);
+
+    mPainter->setPen(color.dark());
+    mPainter->drawLine(x + 1, y + height - 1, x + width - 1, y + height - 1);
+    mPainter->drawLine(x + width - 1, y + height - 1, x + width - 1, y + 1);
 }
+
+
 
 
 void TetrisWidget::drawLine(int x1, int y1, int x2, int y2, int inPenWidth, const RGBColor & inColor)
@@ -64,6 +79,7 @@ void TetrisWidget::drawLine(int x1, int y1, int x2, int y2, int inPenWidth, cons
     {
         throw std::logic_error("Painter is not set.");
     }
+
 
     // todo: implement
 }
