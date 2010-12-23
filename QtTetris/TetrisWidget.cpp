@@ -26,8 +26,8 @@ TetrisWidget::TetrisWidget(QWidget * inParent, int inUnitWidth, int inUnitHeight
 
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(update()));
-    timer->start(30);
-
+    timer->setInterval(20);
+    timer->start();
 }
 
 
@@ -80,8 +80,8 @@ void TetrisWidget::drawLine(int x1, int y1, int x2, int y2, int inPenWidth, cons
         throw std::logic_error("Painter is not set.");
     }
 
-
-    // todo: implement
+    mPainter->setPen(QColor(inColor.red(), inColor.green(), inColor.blue()));
+    mPainter->drawLine(x1, y1, x2, y2);
 }
 
 
@@ -96,10 +96,10 @@ Tetris::Rect TetrisWidget::getGameRect() const
 
 Tetris::Rect TetrisWidget::getFutureBlocksRect(unsigned int inFutureBlockCount) const
 {
-    int blockHeight = 4 * unitWidth();
+    int blockHeight = 3 * unitHeight();
     return Tetris::Rect(mColCount * unitHeight() + cMargin,
                         0,
-                        blockHeight,
+                        4 * unitWidth(),
                         inFutureBlockCount * blockHeight);
 }
 
