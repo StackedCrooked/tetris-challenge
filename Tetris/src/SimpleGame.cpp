@@ -76,6 +76,14 @@ bool SimpleGame::isGameOver() const
 }
 
 
+void SimpleGame::getSize(int & outColoumCount, int & outRowCount)
+{
+    ScopedReader<Game> game(mGame);
+    outColoumCount = game->columnCount();
+    outRowCount = game->rowCount();
+}
+
+
 int SimpleGame::rowCount() const
 {
     return ScopedReader<Game>(mGame)->rowCount();

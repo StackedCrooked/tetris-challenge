@@ -30,7 +30,14 @@ public:
 
     ~SimpleGame();
 
+	// Get access to the game object.
+    Protected<Game> & getGame() { return mGame; }
+
+    const Protected<Game> & getGame() const { return mGame; }
+
     bool isGameOver() const;
+
+    void getSize(int & outColoumCount, int & outRowCount);
 
     int rowCount() const;
 

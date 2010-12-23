@@ -8,29 +8,29 @@
 using namespace Tetris;
 
 
-extern const int cDefaultRowCount;
-extern const int cDefaultColCount;
+//
+// Configuration
+//
+const int cRowCount(20);
+const int cColumnCount(10);
+const int cUnitWidth(20);
+const int cUnitHeight(20);
 
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    mSimpleGame(new Tetris::SimpleGame(cDefaultRowCount, cDefaultColCount))
+    mSimpleGame(new Tetris::SimpleGame(cRowCount, cColumnCount))
 {
-    QWidget * centralWidget = new QWidget(this);
+    mTetrisWidget = new TetrisWidget(this, cUnitWidth, cUnitHeight);
 
-    mTetrisWidget = new TetrisWidget(centralWidget);
-
-    QHBoxLayout * hbox = new QHBoxLayout();
-    hbox->addWidget(mTetrisWidget, 1, Qt::AlignCenter);
-
-    centralWidget->setLayout(hbox);
-    setCentralWidget(centralWidget);
+    mTetrisWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    setCentralWidget(mTetrisWidget);
 
     mTetrisWidget->setSimpleGame(mSimpleGame);
     mSimpleGame->enableGravity(true);
     mSimpleGame->enableComputerPlayer(true);
-    mSimpleGame->setComputerMoveSpeed(100);
-    mSimpleGame->setLevel(10);
+    mSimpleGame->setComputerMoveSpeed(40);
+    mSimpleGame->setLevel(6);
 }
 
 

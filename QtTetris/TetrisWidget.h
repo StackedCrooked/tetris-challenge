@@ -2,19 +2,24 @@
 #define TETRISWIDGET_H
 
 
+#include "Tetris/AbstractWidget.h"
+#include <QPainter>
 #include <QWidget>
 
 
 namespace Tetris {
 class SimpleGame;
+class Rect;
+class RGBColor;
 }
 
 
-class TetrisWidget : public QWidget
+class TetrisWidget : public QWidget,
+                     public Tetris::AbstractWidget
 {
     Q_OBJECT
 public:
-    explicit TetrisWidget(QWidget * inParent);
+    explicit TetrisWidget(QWidget * inParent, int inUnitWidth, int inUnitHeight);
 
     ~TetrisWidget();
 
@@ -22,12 +27,15 @@ public:
 
     virtual void paintEvent(QPaintEvent * event);
 
-    virtual QSize sizeHint() const;
-
     virtual QSize minimumSizeHint() const;
 
-protected:
-    virtual const QColor & getBlockColor(int inBlockType) const;
+    virtual void paintRect(const Tetris::Rect & inRect, const Tetris::RGBColor & inColor);
+
+    virtual void drawLine(int x1, int y1, int x2, int y2, int inPenWidth, const Tetris::RGBColor & inColor);
+
+    virtual Tetris::Rect getGameRect() const;
+
+    virtual Tetris::Rect getFutureBlocksRect(unsigned int inFutureBlockCount) const;
 
 signals:
 
@@ -35,8 +43,10 @@ public slots:
 
 private:
     Tetris::SimpleGame * mSimpleGame;
-    int mSquareSize;
-    QSize mSize;
+    int mRowCount;
+    int mColCount;
+    QSize mMinSize;
+    std::auto_ptr<QPainter> mPainter;
 };
 
 
