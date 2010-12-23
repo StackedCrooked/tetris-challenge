@@ -15,6 +15,7 @@ SOURCES += \
     main.cpp \
     TetrisWidget.cpp \
     ../Tetris/src/Game.cpp \
+    ../Tetris/src/AbstractWidget.cpp \
     ../Tetris/src/AISupport.cpp \
     ../Tetris/src/Allocator.cpp \
     ../Tetris/src/Block.cpp \
@@ -43,6 +44,7 @@ SOURCES += \
 HEADERS += \
     MainWindow.h \
     TetrisWidget.h \
+    ../Tetris/include/Tetris/AbstractWidget.h \
     ../Tetris/include/Tetris/AISupport.h \
     ../Tetris/include/Tetris/Allocator.h \
     ../Tetris/include/Tetris/Assert.h \

@@ -58,6 +58,8 @@ namespace Tetris
         // Gets the currently active block and any blocks that follow.
         void getFutureBlocks(size_t inCount, BlockTypes & outBlocks) const;
 
+        // Offset 0 retrieves the first block.
+        // Use offset currentBlocIndex() + 1 to get futures blocks.
         void getFutureBlocksWithOffset(size_t inOffset, size_t inCount, BlockTypes & outBlocks) const;
 
         // How many blocks have been dropped?

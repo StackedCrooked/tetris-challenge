@@ -1,26 +1,26 @@
 #include "TetrisWidget.h"
 #include "Tetris/SimpleGame.h"
 #include <QColor>
-#include <QPainter>
 #include <QTimer>
 #include <stdexcept>
 #include <iostream>
 
 
+// Margin between the game rect and the future blocks rect.
+static const int cMargin = 4;
+
+
 using namespace Tetris;
 
 
-extern const int cDefaultSquareSize = 20;
-extern const int cDefaultRowCount = 20;
-extern const int cDefaultColCount = 10;
-
-
-TetrisWidget::TetrisWidget(QWidget * inParent) :
+TetrisWidget::TetrisWidget(QWidget * inParent, int inUnitWidth, int inUnitHeight) :
     QWidget(inParent),
+    AbstractWidget(inUnitWidth, inUnitHeight),
     mSimpleGame(0),
-    mSquareSize(cDefaultSquareSize),
-    mSize(cDefaultColCount * cDefaultSquareSize,
-          cDefaultRowCount * cDefaultSquareSize)
+    mRowCount(20),
+    mColCount(10),
+    mMinSize(14 * inUnitWidth, 20 * inUnitHeight),
+    mPainter()
 {
     setUpdatesEnabled(true);
 
@@ -39,88 +39,71 @@ TetrisWidget::~TetrisWidget()
 void TetrisWidget::setSimpleGame(SimpleGame * inSimpleGame)
 {
     mSimpleGame = inSimpleGame;
-    mSize = QSize(cDefaultColCount * cDefaultSquareSize,
-                  cDefaultRowCount * cDefaultSquareSize);
+    mSimpleGame->getSize(mColCount, mRowCount);
+    mMinSize = QSize((mColCount + 4) * unitWidth(),
+                     mRowCount * unitHeight());
 }
 
 
-const QColor & TetrisWidget::getBlockColor(int inBlockType) const
+void TetrisWidget::paintRect(const Rect & inRect, const RGBColor & inColor)
 {
-    if (inBlockType < BlockType_Nil || inBlockType >= BlockType_End)
+    if (!mPainter.get())
     {
-        throw std::logic_error("Invalid BlockType enum value.");
+        throw std::logic_error("Painter is not set.");
     }
 
-    static const QColor fColors[] =
+
+    mPainter->fillRect(QRect(inRect.x(), inRect.y(), inRect.width(), inRect.height()),
+                       QColor(inColor.red(), inColor.green(), inColor.blue()));
+}
+
+
+void TetrisWidget::drawLine(int x1, int y1, int x2, int y2, int inPenWidth, const RGBColor & inColor)
+{
+    if (!mPainter.get())
     {
-        QColor(Qt::white),          // Background
-        QColor(Qt::cyan),           // I-Shape
-        QColor(Qt::blue),           // J-Shape
-        QColor(255, 165, 0),        // L-Shape
-        QColor(Qt::yellow),         // O-Shape
-        QColor(Qt::green),          // S-Shape
-        QColor(160, 32, 240),       // T-Shape
-        QColor(Qt::red)             // Z-Shape
-    };
-    return fColors[static_cast<int>(inBlockType)];
+        throw std::logic_error("Painter is not set.");
+    }
+
+    // todo: implement
+}
+
+
+Tetris::Rect TetrisWidget::getGameRect() const
+{
+    return Tetris::Rect(0,
+                        0,
+                        mColCount * unitWidth(),
+                        mRowCount * unitHeight());
+}
+
+
+Tetris::Rect TetrisWidget::getFutureBlocksRect(unsigned int inFutureBlockCount) const
+{
+    int blockHeight = 4 * unitWidth();
+    return Tetris::Rect(mColCount * unitHeight() + cMargin,
+                        0,
+                        blockHeight,
+                        inFutureBlockCount * blockHeight);
 }
 
 
 void TetrisWidget::paintEvent(QPaintEvent * )
 {
-    QPainter painter(this);
-    painter.fillRect(contentsRect(), getBlockColor(BlockType_Nil));
-
     if (!mSimpleGame)
     {
         return;
     }
 
-    int w = mSquareSize;
-    int h = mSquareSize;
-
-    QRect unitRect(0, 0, w, h);
-    Grid gameGrid = mSimpleGame->gameGrid();
-    for (unsigned int c = 0; c < gameGrid.columnCount(); ++c)
-    {
-        for (unsigned int r = 0; r < gameGrid.rowCount(); ++r)
-        {
-            unitRect = QRect(c * w, r * h, w, h);
-            BlockType blockType = gameGrid.get(r, c);
-            if (blockType != BlockType_Nil)
-            {
-                const QColor & color(getBlockColor(blockType));
-                painter.fillRect(unitRect, color);
-            }
-        }
-    }
-
-    Block activeBlock(mSimpleGame->activeBlock());
-    int offsetCol = activeBlock.column();
-    int offsetRow = activeBlock.row();
-    for (unsigned int c = 0; c < activeBlock.columnCount(); ++c)
-    {
-        for (unsigned int r = 0; r < activeBlock.rowCount(); ++r)
-        {
-            unitRect = QRect((offsetCol + c) * w, (offsetRow + r) * h, w, h);
-            BlockType blockType = activeBlock.grid().get(r, c);
-            if (blockType != BlockType_Nil)
-            {
-                const QColor & color(getBlockColor(blockType));
-                painter.fillRect(unitRect, color);
-            }
-        }
-    }
-}
-
-
-QSize TetrisWidget::sizeHint() const
-{
-    return mSize;
+    mPainter.reset(new QPainter(this));
+    ScopedReader<Game> gameReader(mSimpleGame->getGame());
+    const Game & game(*gameReader.get());
+    coordinateRepaint(game);
+    mPainter.reset();
 }
 
 
 QSize TetrisWidget::minimumSizeHint() const
 {
-    return mSize;
+    return mMinSize;
 }

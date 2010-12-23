@@ -3,6 +3,7 @@ include_directories(include)
 
 add_library(Tetris
     include/Tetris/AISupport.h
+    include/Tetris/AbstractWidget.h
     include/Tetris/Allocator.h
     include/Tetris/Assert.h
     include/Tetris/AutoPtrSupport.h
@@ -42,6 +43,7 @@ add_library(Tetris
     include/Tetris/Worker.h
     include/Tetris/WorkerPool.h
     src/AISupport.cpp 
+    src/AbstractWidget.cpp 
     src/Allocator.cpp 
     src/Block.cpp 
     src/BlockFactory.cpp 
