@@ -239,55 +239,40 @@ namespace Tetris
     
     void GameStateImpl::clearLines()
     {
-        size_t numLines = 0;
-        
-        std::vector<char> linesVector(mGrid.rowCount(), 0);
-        char * lines = &linesVector[0];
-        //std::vector<char> lines(mGrid.rowCount(), 0);
-
-        size_t endRow = std::min<size_t>(mGrid.rowCount(), mOriginalBlock.row() + mOriginalBlock.grid().rowCount());
-        for (size_t rowIndex = mOriginalBlock.row(); rowIndex < endRow; ++rowIndex)
+        int numLines = 0;
+        int r = mOriginalBlock.row() + mOriginalBlock.rowCount() - 1;
+        for (; r >= mStats.firstOccupiedRow(); --r)
         {
-            lines[rowIndex] = 1;
-            for (size_t ci = 0; ci != mGrid.columnCount(); ++ci)
+            int c = 0;
+            bool line = true;
+            for (; c < mGrid.columnCount(); ++c)
             {
-                if (mGrid.get(rowIndex, ci) == 0)
+                BlockType value = mGrid.get(r, c);
+                if (numLines > 0)
                 {
-                    lines[rowIndex] = 0;
-                    break;
+                    mGrid.set(r + numLines, c, value);
+                }
+
+                if (!value)
+                {
+                    line = false;
+                    if (numLines == 0)
+                    {
+                        break;
+                    }
                 }
             }
-
-            if (lines[rowIndex])
+            if (line)
             {
                 numLines++;
             }
         }
 
-        if (numLines == 0)
+        if (numLines > 0)
         {
-            return;
+            BlockType * gridBegin = const_cast<BlockType*>(&(mGrid.get(mStats.firstOccupiedRow(), 0)));
+            memset(&gridBegin[0], 0, numLines * mGrid.columnCount());
         }
-
-        Assert(mStats.mFirstOccupiedRow + numLines <= mGrid.rowCount());
-        mStats.mFirstOccupiedRow += numLines;
-
-        // Get newGrid
-        Grid newGrid(mGrid.rowCount(), mGrid.columnCount(), BlockType_Nil);
-        int newRowIdx = numLines;
-        for (size_t r = 0; r != mGrid.rowCount(); ++r)
-        {
-            if (!lines[r])
-            {
-                for (size_t c = 0; c != mGrid.columnCount(); ++c)
-                {
-                    newGrid.set(newRowIdx, c, mGrid.get(r, c));
-                }
-                newRowIdx++;
-            }
-        }
-
-        mGrid = newGrid;
 
         mStats.mNumLines += numLines;
 
