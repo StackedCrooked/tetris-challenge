@@ -45,7 +45,7 @@ void SimpleGame::enableComputerPlayer(bool inEnabled)
     {
         if (!mComputerPlayer)
         {
-            mComputerPlayer.reset(new ComputerPlayer(mGame, CreatePoly<Evaluator, MakeTetrises>(), 100, 6, 6));
+            mComputerPlayer.reset(new ComputerPlayer(mGame, CreatePoly<Evaluator, MakeTetrises>(), 8, 5, 1));
 
             if (mComputerMoveSpeed)
             {

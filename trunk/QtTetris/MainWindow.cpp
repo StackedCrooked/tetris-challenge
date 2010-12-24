@@ -33,8 +33,6 @@ MainWindow::MainWindow(QWidget *parent) :
     mTetrisWidget->setSimpleGame(mSimpleGame);
     mSimpleGame->enableGravity(true);
     mSimpleGame->enableComputerPlayer(true);
-    mSimpleGame->setComputerMoveSpeed(40);
-    mSimpleGame->setLevel(6);
 
 
     // Refresh the FPS
