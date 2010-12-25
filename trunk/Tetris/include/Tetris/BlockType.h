@@ -21,9 +21,9 @@ namespace Tetris
     typedef char BlockType;
     enum
     {
-        BlockType_Nil = 0,
-        BlockType_Begin,
-        BlockType_I = BlockType_Begin,
+        BlockType_Nil,
+        BlockType_Begin = BlockType_Nil,
+        BlockType_I,
         BlockType_J,
         BlockType_L,
         BlockType_O,
