@@ -9,6 +9,7 @@ add_library(Tetris
     include/Tetris/AutoPtrSupport.h
     include/Tetris/Block.h
     include/Tetris/BlockFactory.h
+    include/Tetris/EvilBlockFactory.h
     include/Tetris/BlockMover.h
     include/Tetris/BlockType.h
     include/Tetris/BlockTypes.h
@@ -47,6 +48,7 @@ add_library(Tetris
     src/Allocator.cpp 
     src/Block.cpp 
     src/BlockFactory.cpp 
+    src/EvilBlockFactory.cpp 
     src/BlockMover.cpp 
     src/BlockType.cpp 
     src/ComputerPlayer.cpp 
