@@ -40,7 +40,7 @@ void TetrisWidget::setSimpleGame(SimpleGame * inSimpleGame)
 {
     mSimpleGame = inSimpleGame;
     mSimpleGame->getSize(mColCount, mRowCount);
-    mMinSize = QSize((mColCount + 4) * unitWidth(),
+    mMinSize = QSize((mColCount + 4) * unitWidth() + cMargin,
                      mRowCount * unitHeight());
 }
 
