@@ -1,3 +1,4 @@
+#include "Tetris/Config.h"
 #include "Tetris/EvilBlockFactory.h"
 #include "Tetris/BlockType.h"
 #include "Tetris/BlockTypes.h"

@@ -25,9 +25,6 @@
     <ClCompile Include="src\TetrisTestSuite.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\GenericGrid2Test.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\NodeCalculatorTest.h">
@@ -43,8 +40,5 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="src\TetrisTestSuite.h" />
-    <ClInclude Include="src\GenericGrid2Test.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

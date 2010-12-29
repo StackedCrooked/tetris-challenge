@@ -165,6 +165,7 @@ void NodeCalculatorTest::testDestroy(WorkerPool & inWorkerPool)
 
     Assert(nodeCalculator.status() >= NodeCalculator::Status_Started);
     Poco::Thread::sleep(10);
+	Assert(nodeCalculator.status() != NodeCalculator::Status_Error);
 }
 
 

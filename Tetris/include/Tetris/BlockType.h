@@ -22,8 +22,8 @@ namespace Tetris
     enum
     {
         BlockType_Nil,
-        BlockType_Begin = BlockType_Nil,
         BlockType_I,
+        BlockType_Begin = BlockType_I,
         BlockType_J,
         BlockType_L,
         BlockType_O,

@@ -56,7 +56,7 @@ namespace Tetris
 
     void NodeCalculator::stop()
     {
-        return mImpl->stop();
+        mImpl->stop();
     }
 
 
@@ -74,6 +74,7 @@ namespace Tetris
 
     NodePtr NodeCalculator::result() const
     {
+		Assert(status() != Status_Error);
         return mImpl->result();
     }
 
@@ -82,5 +83,11 @@ namespace Tetris
     {
         return static_cast<Status>(mImpl->status());
     }
+
+
+	const std::string & NodeCalculator::errorMessage() const
+	{
+		return mImpl->errorMessage();
+	}
 
 } // namespace Tetris

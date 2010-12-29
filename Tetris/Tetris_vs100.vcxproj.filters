@@ -1,213 +1,222 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Tetris">
-      <UniqueIdentifier>{b8c54914-215b-4871-aab7-8f90dc7b6220}</UniqueIdentifier>
+    <None Include="Todo.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{ed70eaac-0166-475d-b373-54dc213ef00d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Tetris\Header Files">
-      <UniqueIdentifier>{3ecb5461-56f5-4cea-9f33-f604a32386f5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Tetris\Source Files">
-      <UniqueIdentifier>{c03eb04f-bd2d-48a4-96f5-7196b3c0a7c2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ComputerPlayer">
-      <UniqueIdentifier>{7d145b21-faca-4329-b9d8-3bb3bfbd4742}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ComputerPlayer\Header Files">
-      <UniqueIdentifier>{398bd8c2-0815-4774-b3d2-6533644e9446}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ComputerPlayer\Source Files">
-      <UniqueIdentifier>{02b2078d-2fc4-4116-8711-038438ab3cd4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="General">
-      <UniqueIdentifier>{4bc5821b-fdf2-45f4-9b43-95f310ae1b95}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="General\Header Files">
-      <UniqueIdentifier>{4d9c06b2-280b-4a4b-8b46-a22a51762db3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="General\Source Files">
-      <UniqueIdentifier>{a6ebebd1-ec43-40ee-b8b8-46019d225162}</UniqueIdentifier>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{75f8bbf0-da8e-4d59-a707-5f0b7b66423c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\Tetris\Block.h">
-      <Filter>Tetris\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Tetris\BlockFactory.h">
-      <Filter>Tetris\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Tetris\BlockMover.h">
-      <Filter>Tetris\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Tetris\BlockType.h">
-      <Filter>Tetris\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Tetris\BlockTypes.h">
-      <Filter>Tetris\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Tetris\Direction.h">
-      <Filter>Tetris\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Tetris\Game.h">
-      <Filter>Tetris\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Tetris\GameOver.h">
-      <Filter>Tetris\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Tetris\GameState.h">
-      <Filter>Tetris\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Tetris\GameStateNode.h">
-      <Filter>Tetris\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Tetris\Gravity.h">
-      <Filter>Tetris\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Tetris\Grid.h">
-      <Filter>Tetris\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Tetris\NodePtr.h">
-      <Filter>Tetris\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Tetris\Tetris.h">
-      <Filter>Tetris\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Tetris\Assert.h">
-      <Filter>General\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Tetris\AutoPtrSupport.h">
-      <Filter>General\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Tetris\GenericGrid.h">
-      <Filter>General\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Tetris\Logger.h">
-      <Filter>General\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Tetris\Logging.h">
-      <Filter>General\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Tetris\MakeString.h">
-      <Filter>General\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Tetris\Threading.h">
-      <Filter>General\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Tetris\TypedWrapper.h">
-      <Filter>General\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Tetris\Unicode.h">
-      <Filter>General\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Tetris\Utilities.h">
-      <Filter>General\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Tetris\Worker.h">
-      <Filter>General\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Tetris\WorkerPool.h">
-      <Filter>General\Header Files</Filter>
+    <ClInclude Include="include\Tetris\AbstractWidget.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Tetris\AISupport.h">
-      <Filter>ComputerPlayer\Header Files</Filter>
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Tetris\Allocator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Tetris\Assert.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Tetris\AutoPtrSupport.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Tetris\Block.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Tetris\BlockFactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Tetris\BlockMover.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Tetris\BlockType.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Tetris\BlockTypes.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Tetris\ComputerPlayer.h">
-      <Filter>ComputerPlayer\Header Files</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Tetris\MultithreadedNodeCalculator.h">
-      <Filter>ComputerPlayer\Header Files</Filter>
+    <ClInclude Include="include\Tetris\Config.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Tetris\NodeCalculator.h">
-      <Filter>ComputerPlayer\Header Files</Filter>
+    <ClInclude Include="include\Tetris\Direction.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Tetris\NodeCalculatorImpl.h">
-      <Filter>ComputerPlayer\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Tetris\SingleThreadedNodeCalculator.h">
-      <Filter>ComputerPlayer\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Tetris\GameStateComparator.h">
-      <Filter>Tetris\Header Files</Filter>
+    <ClInclude Include="include\Tetris\Enum.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Tetris\Evaluator.h">
-      <Filter>Tetris\Header Files</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Tetris\GenericGrid2.h">
-      <Filter>General\Header Files</Filter>
+    <ClInclude Include="include\Tetris\EvilBlockFactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Tetris\ForwardDeclarations.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Tetris\Game.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Tetris\GameOver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Tetris\GameState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Tetris\GameStateComparator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Tetris\GameStateNode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Tetris\GenericGrid.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Tetris\Gravity.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Tetris\Grid.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Tetris\Logger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Tetris\Logging.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Tetris\MakeString.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Tetris\MultithreadedNodeCalculator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Tetris\NodeCalculator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Tetris\NodeCalculatorImpl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Tetris\NodePtr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Tetris\SimpleGame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Tetris\SingleThreadedNodeCalculator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Tetris\Tetris.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Tetris\Threading.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Tetris\TypedWrapper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Tetris\Unicode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Tetris\Utilities.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Tetris\Worker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Tetris\WorkerPool.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Block.cpp">
-      <Filter>Tetris\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\BlockFactory.cpp">
-      <Filter>Tetris\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\BlockMover.cpp">
-      <Filter>Tetris\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\BlockType.cpp">
-      <Filter>Tetris\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Game.cpp">
-      <Filter>Tetris\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GameState.cpp">
-      <Filter>Tetris\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GameStateNode.cpp">
-      <Filter>Tetris\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Gravity.cpp">
-      <Filter>Tetris\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Logger.cpp">
-      <Filter>General\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Logging.cpp">
-      <Filter>General\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Unicode.cpp">
-      <Filter>General\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Worker.cpp">
-      <Filter>General\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\WorkerPool.cpp">
-      <Filter>General\Source Files</Filter>
+    <ClCompile Include="src\AbstractWidget.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\AISupport.cpp">
-      <Filter>ComputerPlayer\Source Files</Filter>
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Allocator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Block.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BlockFactory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BlockMover.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BlockType.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\ComputerPlayer.cpp">
-      <Filter>ComputerPlayer\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\NodeCalculator.cpp">
-      <Filter>ComputerPlayer\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\NodeCalculatorImpl.cpp">
-      <Filter>ComputerPlayer\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SingleThreadedNodeCalculator.cpp">
-      <Filter>ComputerPlayer\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\MultiThreadedNodeCalculator.cpp">
-      <Filter>ComputerPlayer\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GameStateComparator.cpp">
-      <Filter>Tetris\Source Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Evaluator.cpp">
-      <Filter>Tetris\Source Files</Filter>
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EvilBlockFactory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GameState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GameStateComparator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GameStateNode.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\GenericGrid.cpp">
-      <Filter>General\Source Files</Filter>
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Gravity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Logger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Logging.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MultiThreadedNodeCalculator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\NodeCalculator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\NodeCalculatorImpl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SimpleGame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SingleThreadedNodeCalculator.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Threading.cpp">
-      <Filter>General\Source Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Todo.txt" />
+    <ClCompile Include="src\Unicode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Worker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WorkerPool.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

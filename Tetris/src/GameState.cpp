@@ -273,7 +273,9 @@ namespace Tetris
             BlockType * gridBegin = const_cast<BlockType*>(&(mGrid.get(mStats.firstOccupiedRow(), 0)));
             memset(&gridBegin[0], 0, numLines * mGrid.columnCount());
         }
-
+		
+        Assert(mStats.mFirstOccupiedRow + numLines <= mGrid.rowCount());
+        mStats.mFirstOccupiedRow += numLines;
         mStats.mNumLines += numLines;
 
         switch (numLines)
