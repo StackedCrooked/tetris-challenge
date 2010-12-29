@@ -2,9 +2,6 @@
 #define TETRIS_BLOCKTYPE_H_INCLUDED
 
 
-#include <cstring>
-
-
 namespace Tetris
 {
 
@@ -33,7 +30,7 @@ namespace Tetris
         BlockType_End
     };
 
-    static const size_t cBlockTypeCount = static_cast<size_t>(BlockType_End) - 1;
+    static const unsigned int cBlockTypeCount = static_cast<unsigned int>(BlockType_End) - 1;
 
 } // namespace Tetris
 

@@ -83,4 +83,4 @@ private:
 } // namespace Tetris
 
 
-#endif // GAME_H_INCLUDED
+#endif // TETRIS_SIMPLEGAME_H_INCLUDED
