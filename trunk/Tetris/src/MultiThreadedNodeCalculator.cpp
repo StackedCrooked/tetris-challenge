@@ -139,18 +139,13 @@ namespace Tetris
         }
         catch (const boost::thread_interrupted &)
         {
-            // Task was interrupted. Ok.
-            if (getCurrentSearchDepth() >= 1)
-            {
-                mWorkerPool.interruptAndClearQueue();
-            }
+            // Task was interrupted. Ok.		
         }
-        catch (const std::exception & inException)
-        {
-            LogError(MakeString() << "Exception caught in MultithreadedNodeCalculator::populate(). Detail: " << inException.what());
-            mWorkerPool.interruptAndClearQueue();
-        }        
+		//
+		// catch: allow other exceptions pass to the parent handler
+		//
 
+		mWorkerPool.interruptAndClearQueue();
         mWorkerPool.wait();
     }
 

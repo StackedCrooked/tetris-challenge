@@ -1,3 +1,4 @@
+#include "Tetris/Config.h"
 #include "Tetris/SimpleGame.h"
 #include "Tetris/ComputerPlayer.h"
 #include "Tetris/Evaluator.h"

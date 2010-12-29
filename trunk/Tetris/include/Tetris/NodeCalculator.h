@@ -46,10 +46,14 @@ namespace Tetris
             Status_Working,
             Status_Stopped,
             Status_Finished,
+			Status_Error,
             Status_End
         };
 
         Status status() const;
+
+		// Returns the error message (in case of Status_Error).
+		const std::string & errorMessage() const;
 
     private:
         // non-copyable

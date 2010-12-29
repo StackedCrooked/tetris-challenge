@@ -53,12 +53,8 @@ namespace Tetris
         {
             // Task was interrupted. Ok.
         }
-        catch (const std::exception & inException)
-        {
-            LogError(MakeString() << "Exception caught in SingleThreadedNodeCalculator::populate(). Detail: " << inException.what());
-        }
         mWorkerPool.wait();
-        Assert(getCurrentSearchDepth() >= 1 || getQuitFlag())
+        Assert(getCurrentSearchDepth() >= 1 || getQuitFlag());
     }
 
 } // namespace Tetris

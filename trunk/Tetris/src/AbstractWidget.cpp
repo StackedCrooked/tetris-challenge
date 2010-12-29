@@ -1,3 +1,4 @@
+#include "Tetris/Config.h"
 #include "Tetris/AbstractWidget.h"
 #include "Tetris/Block.h"
 #include "Tetris/Game.h"

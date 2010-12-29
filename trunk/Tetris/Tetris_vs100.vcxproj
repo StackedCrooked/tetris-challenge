@@ -92,48 +92,62 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="Todo.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Tetris\AbstractWidget.h" />
+    <ClInclude Include="include\Tetris\AISupport.h" />
+    <ClInclude Include="include\Tetris\Allocator.h" />
+    <ClInclude Include="include\Tetris\Assert.h" />
+    <ClInclude Include="include\Tetris\AutoPtrSupport.h" />
     <ClInclude Include="include\Tetris\Block.h" />
     <ClInclude Include="include\Tetris\BlockFactory.h" />
     <ClInclude Include="include\Tetris\BlockMover.h" />
     <ClInclude Include="include\Tetris\BlockType.h" />
     <ClInclude Include="include\Tetris\BlockTypes.h" />
+    <ClInclude Include="include\Tetris\ComputerPlayer.h" />
+    <ClInclude Include="include\Tetris\Config.h" />
     <ClInclude Include="include\Tetris\Direction.h" />
+    <ClInclude Include="include\Tetris\Enum.h" />
     <ClInclude Include="include\Tetris\Evaluator.h" />
+    <ClInclude Include="include\Tetris\EvilBlockFactory.h" />
+    <ClInclude Include="include\Tetris\ForwardDeclarations.h" />
     <ClInclude Include="include\Tetris\Game.h" />
     <ClInclude Include="include\Tetris\GameOver.h" />
     <ClInclude Include="include\Tetris\GameState.h" />
     <ClInclude Include="include\Tetris\GameStateComparator.h" />
     <ClInclude Include="include\Tetris\GameStateNode.h" />
-    <ClInclude Include="include\Tetris\GenericGrid2.h" />
+    <ClInclude Include="include\Tetris\GenericGrid.h" />
     <ClInclude Include="include\Tetris\Gravity.h" />
     <ClInclude Include="include\Tetris\Grid.h" />
-    <ClInclude Include="include\Tetris\NodePtr.h" />
-    <ClInclude Include="include\Tetris\Tetris.h" />
-    <ClInclude Include="include\Tetris\Assert.h" />
-    <ClInclude Include="include\Tetris\AutoPtrSupport.h" />
-    <ClInclude Include="include\Tetris\GenericGrid.h" />
     <ClInclude Include="include\Tetris\Logger.h" />
     <ClInclude Include="include\Tetris\Logging.h" />
     <ClInclude Include="include\Tetris\MakeString.h" />
+    <ClInclude Include="include\Tetris\MultithreadedNodeCalculator.h" />
+    <ClInclude Include="include\Tetris\NodeCalculator.h" />
+    <ClInclude Include="include\Tetris\NodeCalculatorImpl.h" />
+    <ClInclude Include="include\Tetris\NodePtr.h" />
+    <ClInclude Include="include\Tetris\SimpleGame.h" />
+    <ClInclude Include="include\Tetris\SingleThreadedNodeCalculator.h" />
+    <ClInclude Include="include\Tetris\Tetris.h" />
     <ClInclude Include="include\Tetris\Threading.h" />
     <ClInclude Include="include\Tetris\TypedWrapper.h" />
     <ClInclude Include="include\Tetris\Unicode.h" />
     <ClInclude Include="include\Tetris\Utilities.h" />
     <ClInclude Include="include\Tetris\Worker.h" />
     <ClInclude Include="include\Tetris\WorkerPool.h" />
-    <ClInclude Include="include\Tetris\AISupport.h" />
-    <ClInclude Include="include\Tetris\ComputerPlayer.h" />
-    <ClInclude Include="include\Tetris\MultithreadedNodeCalculator.h" />
-    <ClInclude Include="include\Tetris\NodeCalculator.h" />
-    <ClInclude Include="include\Tetris\NodeCalculatorImpl.h" />
-    <ClInclude Include="include\Tetris\SingleThreadedNodeCalculator.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\AbstractWidget.cpp" />
+    <ClCompile Include="src\AISupport.cpp" />
+    <ClCompile Include="src\Allocator.cpp" />
     <ClCompile Include="src\Block.cpp" />
     <ClCompile Include="src\BlockFactory.cpp" />
     <ClCompile Include="src\BlockMover.cpp" />
     <ClCompile Include="src\BlockType.cpp" />
+    <ClCompile Include="src\ComputerPlayer.cpp" />
     <ClCompile Include="src\Evaluator.cpp" />
+    <ClCompile Include="src\EvilBlockFactory.cpp" />
     <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\GameState.cpp" />
     <ClCompile Include="src\GameStateComparator.cpp" />
@@ -142,19 +156,15 @@
     <ClCompile Include="src\Gravity.cpp" />
     <ClCompile Include="src\Logger.cpp" />
     <ClCompile Include="src\Logging.cpp" />
+    <ClCompile Include="src\MultiThreadedNodeCalculator.cpp" />
+    <ClCompile Include="src\NodeCalculator.cpp" />
+    <ClCompile Include="src\NodeCalculatorImpl.cpp" />
+    <ClCompile Include="src\SimpleGame.cpp" />
+    <ClCompile Include="src\SingleThreadedNodeCalculator.cpp" />
     <ClCompile Include="src\Threading.cpp" />
     <ClCompile Include="src\Unicode.cpp" />
     <ClCompile Include="src\Worker.cpp" />
     <ClCompile Include="src\WorkerPool.cpp" />
-    <ClCompile Include="src\AISupport.cpp" />
-    <ClCompile Include="src\ComputerPlayer.cpp" />
-    <ClCompile Include="src\MultiThreadedNodeCalculator.cpp" />
-    <ClCompile Include="src\NodeCalculator.cpp" />
-    <ClCompile Include="src\NodeCalculatorImpl.cpp" />
-    <ClCompile Include="src\SingleThreadedNodeCalculator.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Todo.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

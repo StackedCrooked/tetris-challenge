@@ -40,6 +40,8 @@ namespace Tetris
 
         int status() const;
 
+		const std::string & errorMessage() const;
+
     protected:
         virtual void populate() = 0;
 
@@ -201,6 +203,7 @@ namespace Tetris
 
         int mStatus;
         mutable boost::mutex mStatusMutex;
+		std::string mErrorMessage;
 
         Worker mMainWorker;
         WorkerPool & mWorkerPool;

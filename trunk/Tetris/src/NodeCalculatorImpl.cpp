@@ -90,6 +90,12 @@ namespace Tetris
         boost::mutex::scoped_lock lock(mStatusMutex);
         return mStatus;
     }
+	
+	
+	const std::string & NodeCalculatorImpl::errorMessage() const
+	{
+		return mErrorMessage;
+	}
 
 
     void NodeCalculatorImpl::setStatus(int inStatus)
@@ -255,12 +261,13 @@ namespace Tetris
             setStatus(NodeCalculator::Status_Working);
             populate();
             calculateResult();
+			setStatus(NodeCalculator::Status_Finished);
         }
         catch (const std::exception & inException)
         {
-            LogError(MakeString() << inException.what());
+			mErrorMessage = inException.what();
+			setStatus(NodeCalculator::Status_Error);
         }
-        setStatus(NodeCalculator::Status_Finished);
     }
 
 
