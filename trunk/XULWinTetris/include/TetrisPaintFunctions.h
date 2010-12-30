@@ -8,30 +8,30 @@
 #include <string>
 
 
-namespace Gdiplus
-{
-    class Brush;
-    class Color;
-    class Graphics;
+namespace Gdiplus {
+class Brush;
+class Color;
+class Graphics;
 }
 
 
-namespace Tetris
+namespace Tetris {
+
+
+enum Coords
 {
+    cUnitWidth    = 20,
+    cUnitHeight   = 20
+};
+	
+const Gdiplus::Color & GetColor(BlockType inType);
+const Gdiplus::Color & GetLightColor(BlockType inType);
+const Gdiplus::Color & GetDarkColor(BlockType inType);
 
-    using XULWin::Rect;
+void PaintUnit(Gdiplus::Graphics & g, int x, int y, BlockType inBlockType);
 
-    enum Coords
-    {
-        cUnitWidth    = 20,
-        cUnitHeight   = 20
-    };
+void PaintGrid(Gdiplus::Graphics & g, const Grid & inGrid, int x, int y, bool inPaintBackground);
 
-    const Gdiplus::Color & GetColor(BlockType inType);
-
-    void PaintUnit(Gdiplus::Graphics & g, int x, int y, BlockType inBlockType);
-
-    void PaintGrid(Gdiplus::Graphics & g, const Grid & inGrid, int x, int y, bool inPaintBackground);
 
 } // namespace Tetris
 
