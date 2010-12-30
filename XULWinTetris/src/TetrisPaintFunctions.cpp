@@ -9,113 +9,137 @@
 #include <sstream>
 
 
-namespace Tetris
-{
+namespace Tetris {
+
 		
-	using XULWin::RGBColor;
-	using XULWin::HSVColor;
-	using XULWin::RGB2HSV;
-	using XULWin::HSV2RGB;
+using XULWin::RGBColor;
+using XULWin::HSVColor;
+using XULWin::RGB2HSV;
+using XULWin::HSV2RGB;
+using XULWin::Rect;
 
 
-    Gdiplus::RectF ToRectF(const Rect & inRect)
+Gdiplus::RectF ToRectF(const Rect & inRect)
+{
+    return Gdiplus::RectF(static_cast<float>(inRect.x()),
+                            static_cast<float>(inRect.y()),
+                            static_cast<float>(inRect.width()),
+                            static_cast<float>(inRect.height()));
+}
+
+
+const Gdiplus::Color & GetColor(BlockType inBlockType)
+{
+    if (inBlockType < BlockType_Nil || inBlockType >= BlockType_End)
     {
-        return Gdiplus::RectF(static_cast<float>(inRect.x()),
-                              static_cast<float>(inRect.y()),
-                              static_cast<float>(inRect.width()),
-                              static_cast<float>(inRect.height()));
+        throw std::logic_error("Invalid BlockType enum value.");
     }
 
-
-    const Gdiplus::Color & GetColor(BlockType inBlockType)
+    static const Gdiplus::Color fColors[] =
     {
-        if (inBlockType < BlockType_Nil || inBlockType >= BlockType_End)
-        {
-            throw std::logic_error("Invalid BlockType enum value.");
-        }
+        Gdiplus::Color(Gdiplus::Color::White),          // Background
+        Gdiplus::Color(Gdiplus::Color::Cyan),           // I-Shape
+        Gdiplus::Color(Gdiplus::Color::Blue),           // J-Shape
+        Gdiplus::Color(Gdiplus::Color::Orange),         // L-Shape
+        Gdiplus::Color(Gdiplus::Color::Yellow),         // O-Shape
+        Gdiplus::Color(Gdiplus::Color::LightGreen),     // S-Shape
+        Gdiplus::Color(Gdiplus::Color::Purple),         // T-Shape
+        Gdiplus::Color(Gdiplus::Color::Red)             // Z-Shape
+    };
 
-        static const Gdiplus::Color fColors[] =
-        {
-            Gdiplus::Color(Gdiplus::Color::White),          // Background
-            Gdiplus::Color(Gdiplus::Color::Cyan),           // I-Shape
-            Gdiplus::Color(Gdiplus::Color::Blue),           // J-Shape
-            Gdiplus::Color(Gdiplus::Color::Orange),         // L-Shape
-            Gdiplus::Color(Gdiplus::Color::Yellow),         // O-Shape
-            Gdiplus::Color(Gdiplus::Color::LightGreen),     // S-Shape
-            Gdiplus::Color(Gdiplus::Color::Purple),         // T-Shape
-            Gdiplus::Color(Gdiplus::Color::Red)             // Z-Shape
-        };
+    return fColors[static_cast<int>(inBlockType)];
+}
 
-        return fColors[static_cast<int>(inBlockType)];
+
+const Gdiplus::Color & GetLightColor(BlockType inBlockType)
+{
+    if (inBlockType < BlockType_Nil || inBlockType >= BlockType_End)
+    {
+        throw std::logic_error("Invalid BlockType enum value.");
     }
 
-
-    Gdiplus::Color GetLightColor(const Gdiplus::Color & inColor)
+    static const Gdiplus::Color fColors[] =
     {
-		RGBColor rgb(inColor.GetA(), inColor.GetR(), inColor.GetG(), inColor.GetB());
-		HSVColor hsv(XULWin::RGB2HSV(rgb));
-		double newValue = std::min<double>(1.5 * static_cast<double>(hsv.value()), 100.0);
-		HSVColor lightHSV(hsv.hue(), hsv.saturation(), static_cast<int>(0.5 + newValue));
-		RGBColor lightRGB(HSV2RGB(lightHSV));
-		return Gdiplus::Color(inColor.GetA(), lightRGB.red(), lightRGB.green(), lightRGB.blue());
+        Gdiplus::Color(Gdiplus::Color::White),          // Background
+        Gdiplus::Color(127, 255, 255),                  // I-Shape
+        Gdiplus::Color(127, 127, 255),                  // J-Shape
+        Gdiplus::Color(255, 210, 127),                  // L-Shape
+        Gdiplus::Color(255, 255, 127),                  // O-Shape
+        Gdiplus::Color(127, 255, 127),                  // S-Shape
+        Gdiplus::Color(211, 139, 255),                  // T-Shape
+        Gdiplus::Color(255, 127, 127)                   // Z-Shape
+    };
+
+    return fColors[static_cast<int>(inBlockType)];
+}
+
+
+const Gdiplus::Color & GetDarkColor(BlockType inBlockType)
+{
+    if (inBlockType < BlockType_Nil || inBlockType >= BlockType_End)
+    {
+        throw std::logic_error("Invalid BlockType enum value.");
     }
 
-
-    Gdiplus::Color GetDarkColor(const Gdiplus::Color & inColor)
+    static const Gdiplus::Color fColors[] =
     {
-		RGBColor rgb(inColor.GetA(), inColor.GetR(), inColor.GetG(), inColor.GetB());
-		HSVColor hsv(XULWin::RGB2HSV(rgb));
-		double newValue = 0.5 * static_cast<double>(hsv.value());
-		HSVColor darkHSV(hsv.hue(), hsv.saturation(), static_cast<int>(0.5 + newValue));
-		RGBColor darkRGB(HSV2RGB(darkHSV));
-		return Gdiplus::Color(inColor.GetA(), darkRGB.red(), darkRGB.green(), darkRGB.blue());
-    }
+        Gdiplus::Color(Gdiplus::Color::White),          // Background
+        Gdiplus::Color(0, 127, 127),                    // I-Shape
+        Gdiplus::Color(0, 0, 127),                      // J-Shape
+        Gdiplus::Color(127, 82, 0),                     // L-Shape
+        Gdiplus::Color(127, 127, 0),                    // O-Shape
+        Gdiplus::Color(0, 127, 0),                      // S-Shape
+        Gdiplus::Color(80, 16, 120),                    // T-Shape
+        Gdiplus::Color(127, 0, 0)                       // Z-Shape
+    };
+
+    return fColors[static_cast<int>(inBlockType)];
+}
 
 
-    void PaintUnit(Gdiplus::Graphics & g, int inX, int inY, BlockType inBlockType)
-    {
+void PaintUnit(Gdiplus::Graphics & g, int inX, int inY, BlockType inBlockType)
+{
+	float x = static_cast<float>(inX);
+	float y = static_cast<float>(inY);
+	float width = static_cast<float>(cUnitWidth);
+	float height = static_cast<float>(cUnitHeight);
+		
+	Gdiplus::SolidBrush solidBrush(GetColor(inBlockType));
+	g.FillRectangle(&solidBrush, Gdiplus::RectF(x + 1, y + 1, width - 2, height - 2));
+
+	Gdiplus::Pen lightPen(GetLightColor(inBlockType));
+	g.DrawLine(&lightPen, x, y + height - 1, x, y);
+	g.DrawLine(&lightPen, x, y, x + width - 1, y);
+
+	Gdiplus::Pen darkPen(GetDarkColor(inBlockType));
+	g.DrawLine(&darkPen, x + 1, y + height - 1, x + width - 1, y + height - 1);
+	g.DrawLine(&darkPen, x + width - 1, y + height - 1, x + width - 1, y + 1);
+}
+
+
+void PaintGrid(Gdiplus::Graphics & g, const Grid & inGrid, int inX, int inY, bool inPaintBackground)
+{
+	if (inPaintBackground)
+	{
+		Gdiplus::SolidBrush solidBrush(GetColor(BlockType_Nil));
 		float x = static_cast<float>(inX);
 		float y = static_cast<float>(inY);
-		float width = static_cast<float>(cUnitWidth);
-		float height = static_cast<float>(cUnitHeight);
+		float w = static_cast<float>(inGrid.columnCount() * cUnitWidth);
+		float h = static_cast<float>(inGrid.rowCount() * cUnitHeight);
+		g.FillRectangle(&solidBrush, Gdiplus::RectF(x, y, w, h));
+	}
 
-		const Gdiplus::Color & color = GetColor(inBlockType);
-
-		Gdiplus::SolidBrush solidBrush(color);
-		g.FillRectangle(&solidBrush, Gdiplus::RectF(x + 1, y + 1, width - 2, height - 2));
-
-		Gdiplus::Pen lightPen(GetLightColor(color));
-		g.DrawLine(&lightPen, x, y + height - 1, x, y);
-		g.DrawLine(&lightPen, x, y, x + width - 1, y);
-
-		Gdiplus::Pen darkPen(GetDarkColor(color));
-		g.DrawLine(&darkPen, x + 1, y + height - 1, x + width - 1, y + height - 1);
-		g.DrawLine(&darkPen, x + width - 1, y + height - 1, x + width - 1, y + 1);
-    }
-
-
-    void PaintGrid(Gdiplus::Graphics & g, const Grid & inGrid, int inX, int inY, bool inPaintBackground)
+    for (size_t r = 0; r != inGrid.rowCount(); ++r)
     {
-		if (inPaintBackground)
-		{
-			Gdiplus::SolidBrush solidBrush(GetColor(BlockType_Nil));
-			float x = static_cast<float>(inX);
-			float y = static_cast<float>(inY);
-			float w = static_cast<float>(inGrid.columnCount() * cUnitWidth);
-			float h = static_cast<float>(inGrid.rowCount() * cUnitHeight);
-			g.FillRectangle(&solidBrush, Gdiplus::RectF(x, y, w, h));
-		}
-
-        for (size_t r = 0; r != inGrid.rowCount(); ++r)
+        for (size_t c = 0; c != inGrid.columnCount(); ++c)
         {
-            for (size_t c = 0; c != inGrid.columnCount(); ++c)
+            if (inGrid.get(r, c))
             {
-                if (inGrid.get(r, c))
-                {
-                    PaintUnit(g, inX + c * cUnitWidth, inY + r * cUnitHeight, inGrid.get(r, c));
-                }
+                PaintUnit(g, inX + c * cUnitWidth, inY + r * cUnitHeight, inGrid.get(r, c));
             }
         }
     }
+}
+
 
 } // namespace Tetris
