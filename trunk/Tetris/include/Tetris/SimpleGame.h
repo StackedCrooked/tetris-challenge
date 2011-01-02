@@ -31,9 +31,9 @@ public:
     ~SimpleGame();
 
 	// Get access to the game object.
-    Protected<Game> & getGame() { return mGame; }
+    ThreadSafe<Game> & getGame() { return mGame; }
 
-    const Protected<Game> & getGame() const { return mGame; }
+    const ThreadSafe<Game> & getGame() const { return mGame; }
 
     bool isGameOver() const;
 
@@ -74,7 +74,7 @@ private:
     SimpleGame(const SimpleGame & );
     SimpleGame & operator=(const SimpleGame&);
 
-    Protected<Game> mGame;
+    ThreadSafe<Game> mGame;
     boost::scoped_ptr<Gravity> mGravity;
     boost::scoped_ptr<ComputerPlayer> mComputerPlayer;
     int mComputerMoveSpeed;

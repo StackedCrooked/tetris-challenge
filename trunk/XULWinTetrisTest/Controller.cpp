@@ -119,7 +119,7 @@ namespace Tetris {
         }
 
         mTetrisComponent->setController(this);
-        mProtectedGame.reset(new Protected<Game>(std::auto_ptr<Game>(new Game(mTetrisComponent->getNumRows(), mTetrisComponent->getNumColumns()))));
+        mProtectedGame.reset(new ThreadSafe<Game>(std::auto_ptr<Game>(new Game(mTetrisComponent->getNumRows(), mTetrisComponent->getNumColumns()))));
 
 
         mFPSTextBox = findComponentById<XULWin::TextBox>("fpsTextBox");
@@ -300,7 +300,7 @@ namespace Tetris {
         mComputerPlayer.reset();
         mGravity.reset();
         mProtectedGame.reset();
-        mProtectedGame.reset(new Protected<Game>(std::auto_ptr<Game>(new Game(mTetrisComponent->getNumRows(), mTetrisComponent->getNumColumns()))));
+        mProtectedGame.reset(new ThreadSafe<Game>(std::auto_ptr<Game>(new Game(mTetrisComponent->getNumRows(), mTetrisComponent->getNumColumns()))));
         mGravity.reset(new Gravity(*mProtectedGame));
         return XULWin::cHandled;
     }
@@ -500,7 +500,7 @@ namespace Tetris {
     }
 
 
-    Protected<Game> & Controller::threadSafeGame()
+    ThreadSafe<Game> & Controller::threadSafeGame()
     {
         return *mProtectedGame;
     }

@@ -44,7 +44,7 @@ namespace Tetris
 
         LogHandler mHandler;
         typedef std::vector<std::string> Queue;
-        Protected<Queue> mProtectedQueue;
+        ThreadSafe<Queue> mProtectedQueue;
         boost::mutex mQueueMutex;
     };
 
