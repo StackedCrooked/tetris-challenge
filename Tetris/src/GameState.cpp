@@ -172,7 +172,7 @@ void GameState::solidifyBlock(const Block & inBlock)
 void GameState::clearLines()
 {
     int numLines = 0;
-    unsigned int r = mOriginalBlock.row() + mOriginalBlock.rowCount() - 1;
+    int r = mOriginalBlock.row() + mOriginalBlock.rowCount() - 1;
     for (; r >= mStats.firstOccupiedRow(); --r)
     {
         unsigned int c = 0;

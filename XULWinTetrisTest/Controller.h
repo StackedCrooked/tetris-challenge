@@ -104,7 +104,6 @@ namespace Tetris
         int percentOccupied(const GameState & inGameState) const;
         std::auto_ptr<Evaluator> getEvaluator(const GameState & inGameState) const;
         void setText(XULWin::StringValueController * inComponent, const std::string & inText);
-        void onGameCopy(Poco::Timer &);
 
         LRESULT onNew(WPARAM wParam, LPARAM lParam);
         LRESULT onShowConsole(WPARAM wParam, LPARAM lParam);
@@ -143,7 +142,6 @@ namespace Tetris
         TextBoxPtr mLinesTextBoxes[4];
         XULWin::TextBox * mTotalLinesTextBox;
         XULWin::TextBox * mScoreTextBox;
-        XULWin::SpinButton * mLevelTextBox;
         XULWin::TextBox * mCurrentSearchDepth;
         XULWin::SpinButton * mMovementSpeed;
         XULWin::TextBox * mStatusTextBox;
@@ -174,9 +172,6 @@ namespace Tetris
         boost::scoped_ptr<Tetris::Gravity> mGravity;
         boost::scoped_ptr<Tetris::ComputerPlayer> mComputerPlayer;
         boost::scoped_ptr<XULWin::WinAPI::Timer> mRefreshTimer;
-        boost::scoped_ptr<Poco::Timer> mGameCopyTimer;
-        boost::scoped_ptr<Game> mGameCopy;
-        mutable boost::mutex mGameCopyMutex;
 
         boost::scoped_ptr<Evaluator> mCustomEvaluator;
         mutable boost::mutex mCustomEvaluatorMutex;
