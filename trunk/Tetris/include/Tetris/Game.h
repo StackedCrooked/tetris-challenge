@@ -2,94 +2,94 @@
 #define TETRIS_GAME_H_INCLUDED
 
 
+#include "Tetris/BlockFactory.h"
 #include "Tetris/BlockTypes.h"
 #include "Tetris/Direction.h"
 #include "Tetris/Grid.h"
 #include "Tetris/NodePtr.h"
+#include <boost/scoped_ptr.hpp>
+#include <boost/thread.hpp>
 #include <memory>
 
 
-namespace Tetris
+namespace Tetris {
+
+class Block;
+class GameStateNode;
+class GameImpl;
+
+
+/**
+    * Game is a top-level class for the Tetris core. It manages the following things:
+    *   - the currently active block
+    *   - the list of future blocks
+    *   - the root gamestate node
+    *
+    * It is the class that needs to be exposed to the client.
+    */
+class Game
 {
+public:
+    Game(size_t inNumRows, size_t inNumColumns);
 
-    class Block;
-    class GameStateNode;
-    class GameImpl;
+    bool isGameOver() const;
 
+    int rowCount() const;
 
-    /**
-     * Game is a top-level class for the Tetris core. It manages the following things:
-     *   - the currently active block
-     *   - the list of future blocks
-     *   - the root gamestate node
-     *
-     * It is the class that needs to be exposed to the client.
-     */
-    class Game
-    {
-    public:
-        Game(size_t inNumRows, size_t inNumColumns);
-
-        ~Game();
-
-        std::auto_ptr<Game> clone() const;
-
-        bool isGameOver() const;
-
-        int rowCount() const;
-
-        int columnCount() const;
+    int columnCount() const;
         
-        bool move(Direction inDirection);
+    bool move(Direction inDirection);
 
-        bool rotate();
+    bool rotate();
 
-        void drop();
+    void drop();
 
-        int level() const;
+    int level() const;
 
-        // Set to -1 to revert to default level calculation (#lines/10).
-        void setLevel(int inLevel);
+    void setLevel(int inLevel);
 
-        const Block & activeBlock() const;
+    const Block & activeBlock() const;
 
-        const Grid & gameGrid() const;
+    const Grid & gameGrid() const;
 
-        // Gets the currently active block and any blocks that follow.
-        void getFutureBlocks(size_t inCount, BlockTypes & outBlocks) const;
+    void getFutureBlocks(size_t inCount, BlockTypes & outBlocks) const;
 
-        // Offset 0 retrieves the first block.
-        // Use offset currentBlocIndex() + 1 to get futures blocks.
-        void getFutureBlocksWithOffset(size_t inOffset, size_t inCount, BlockTypes & outBlocks) const;
+    void getFutureBlocksWithOffset(size_t inOffset, size_t inCount, BlockTypes & outBlocks) const;
 
-        // How many blocks have been dropped?
-        size_t currentBlockIndex() const;
+    size_t currentBlockIndex() const;
 
-        //
-        // For AI
-        //
-        const GameStateNode * currentNode() const;
+    void appendPrecalculatedNode(NodePtr inNode);
 
-        const GameStateNode * lastPrecalculatedNode() const;
+    const GameStateNode * currentNode() const;
 
-        void appendPrecalculatedNode(NodePtr inNode);
+    const GameStateNode * lastPrecalculatedNode() const;
 
-        bool navigateNodeDown();
+    bool navigateNodeDown();
 
-        size_t numPrecalculatedMoves() const;
+    size_t numPrecalculatedMoves() const;
 
-        void clearPrecalculatedNodes();
+    void clearPrecalculatedNodes();
 
-    private:
-        // implemented for the clone() method
-        Game(const Game & inGame);
-        Game(std::auto_ptr<GameImpl> inImpl);
+private:
+	// non-copyable
+	Game(const Game&);
+	Game& operator=(const Game&);
+		
+    static std::auto_ptr<Block> CreateDefaultBlock(BlockType inBlockType, size_t inNumColumns);
+    void reserveBlocks(size_t inCount);
+    void setCurrentNode(NodePtr inCurrentNode);
+    void supplyBlocks() const;
 
-        // not allowed
-        Game & operator=(const Game&);
+    size_t mNumRows;
+    size_t mNumColumns;
+    NodePtr mCurrentNode;
+    boost::scoped_ptr<Block> mActiveBlock;
+    boost::scoped_ptr<BlockFactory> mBlockFactory;
+    mutable BlockTypes mBlocks;
+    size_t mCurrentBlockIndex;
+    int mOverrideLevel;
+};
 
-        GameImpl * mImpl;
-    };
 
 } // namespace Tetris
 

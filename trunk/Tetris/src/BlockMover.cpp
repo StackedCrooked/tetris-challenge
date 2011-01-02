@@ -56,7 +56,7 @@ namespace Tetris
         mStopwatch(),
         mIntervalMs(50)
     {
-        int interval = std::min<int>(10, mIntervalMs/3);
+        int interval = std::min<int>(10, int(mIntervalMs/3));
         mTimer.reset(new Poco::Timer(0, interval));
         Poco::TimerCallback<BlockMoverImpl> callback(*this, &BlockMoverImpl::onTimer);
         mTimer->start(callback);
@@ -82,7 +82,7 @@ namespace Tetris
         mIntervalMs = 1000.0 / static_cast<double>(inNumMovesPerSecond);
         if (mTimer)
         {
-            int interval = std::min<int>(10, mIntervalMs/3);
+            int interval = std::min<int>(10, int(mIntervalMs/3));
             mTimer->setPeriodicInterval(interval);
         }
     }

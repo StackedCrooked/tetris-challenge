@@ -46,7 +46,6 @@ namespace Tetris {
         mEvaluatorTypeMutex(),
         mFPSTextBox(0),
         mBlockCountTextBox(0),
-        mLevelTextBox(0),
         mScoreTextBox(0),
         mTotalLinesTextBox(0),
         mPlayerIsComputer(0),
@@ -75,7 +74,6 @@ namespace Tetris {
         mProtectedGame(),
         mGravity(),
         mRefreshTimer(),
-        mGameCopyTimer(new Poco::Timer(0, 200)),
         mCustomEvaluator(),
         mCustomEvaluatorMutex(),
         mRandom()
@@ -130,10 +128,6 @@ namespace Tetris {
         mLinesTextBoxes[1] = findComponentById<XULWin::TextBox>("lines2TextBox");
         mLinesTextBoxes[2] = findComponentById<XULWin::TextBox>("lines3TextBox");
         mLinesTextBoxes[3] = findComponentById<XULWin::TextBox>("lines4TextBox");
-        if (mLevelTextBox = findComponentById<XULWin::SpinButton>("levelTextBox"))
-        {            
-			XULWin::WinAPI::SpinButton_SetRange(mLevelTextBox->handle(), 0, cMaxLevel);
-        }
 
         mScoreTextBox = findComponentById<XULWin::TextBox>("scoreTextBox");
         mTotalLinesTextBox = findComponentById<XULWin::TextBox>("totalLinesTextBox");
@@ -222,25 +216,13 @@ namespace Tetris {
 
 		// Main thread should have highest priority for responsiveness.
         ::SetThreadPriority(::GetCurrentThread(), THREAD_PRIORITY_TIME_CRITICAL);
-
-        
-        mGameCopyTimer->start(Poco::TimerCallback<Controller>(*this, &Controller::onGameCopy));
     }
 
 
     Controller::~Controller()
     {
-        mGameCopyTimer.reset();
         mComputerPlayer.reset();
         mGravity.reset();
-    }
-
-        
-    void Controller::onGameCopy(Poco::Timer & timer)
-    {
-        boost::mutex::scoped_lock lock(mGameCopyMutex);
-        ScopedReader<Game> game(*mProtectedGame.get());
-        mGameCopy.reset(game->clone().release());
     }
 
         
@@ -315,7 +297,6 @@ namespace Tetris {
 
     LRESULT Controller::onNew(WPARAM wParam, LPARAM lParam)
     {
-        boost::mutex::scoped_lock lock(mGameCopyMutex);
         mComputerPlayer.reset();
         mGravity.reset();
         mProtectedGame.reset();
@@ -558,22 +539,31 @@ namespace Tetris {
         // Flush the logger.
         Logger::Instance().flush();
 
-        boost::mutex::scoped_lock lock(mGameCopyMutex);
-        if (!mGameCopy)
-        {
-            LogWarning("GameCopy not yet created. Returning");
-        }
+		boost::scoped_ptr<GameState> gameState;
+		int blockCount = 0;
+		int level = 0;
+		bool hasPrecalculatedNodes = false;
+		int numPrecalculatedMoves = 0;
+		{
+			ScopedReader<Game> gameReader(*mProtectedGame);
+			const Game & game(*gameReader.get());
+			gameState.reset(new GameState(game.currentNode()->state()));
+			blockCount = game.currentNode()->depth() + 1;
+			level = game.level();
+			hasPrecalculatedNodes = game.currentNode()->children().empty();
+			numPrecalculatedMoves = game.lastPrecalculatedNode()->depth() - game.currentNode()->depth();
+		}
 
 
         if (mScoreTextBox)
         {
-            setText(mScoreTextBox, MakeString() << mGameCopy->currentNode()->state().stats().score());
+            setText(mScoreTextBox, MakeString() << gameState->stats().score());
         }
 
 
         if (mTotalLinesTextBox)
         {
-            setText(mTotalLinesTextBox, MakeString() << mGameCopy->currentNode()->state().stats().numLines());
+            setText(mTotalLinesTextBox, MakeString() << gameState->stats().numLines());
         }
 
 
@@ -581,7 +571,7 @@ namespace Tetris {
         {
             if (mPlayerIsComputer->isSelected())
             {
-                setText(mStatusTextBox, mGameCopy->currentNode()->children().empty() ? "Thinking" : "Moving");
+                setText(mStatusTextBox, hasPrecalculatedNodes ? "Thinking" : "Moving");
             }
             else
             {
@@ -592,27 +582,14 @@ namespace Tetris {
 
         if (mBlockCountTextBox)
         {
-            setText(mBlockCountTextBox, MakeString() << (mGameCopy->currentNode()->depth() + 1));
-        }
-
-
-        if (mLevelTextBox)
-        {
-            int level = XULWin::String2Int(mLevelTextBox->getValue(), mGameCopy->level());
-            if (mGameCopy->level() != level)
-            {
-                ScopedReaderAndWriter<Game> wgame(*mProtectedGame);
-                wgame->setLevel(level);
-                level = wgame->level();
-                mLevelTextBox->setValue(XULWin::Int2String(level));
-            }
+            setText(mBlockCountTextBox, MakeString() << blockCount);
         }
 
 
 
         for (size_t idx = 0; idx != 4; ++idx)
         {
-            const Stats & stats = mGameCopy->currentNode()->state().stats();
+            const Stats & stats = gameState->stats();
             if (mLinesTextBoxes[idx])
             {
                 setText(mLinesTextBoxes[idx], MakeString() << stats.numLines(idx));
@@ -634,7 +611,7 @@ namespace Tetris {
 
             if (mMovesAheadTextBox)
             {
-                setText(mMovesAheadTextBox, MakeString() << (mGameCopy->lastPrecalculatedNode()->depth() - mGameCopy->currentNode()->depth()));
+                setText(mMovesAheadTextBox, MakeString() << numPrecalculatedMoves);
             }
             
             if (mCurrentSearchDepth)
@@ -752,7 +729,7 @@ namespace Tetris {
 
             if (mGameStateScore)
             {
-                setText(mGameStateScore, XULWin::Int2String(mComputerPlayer->evaluator().evaluate(mGameCopy->currentNode()->state())));
+                setText(mGameStateScore, XULWin::Int2String(mComputerPlayer->evaluator().evaluate(*gameState)));
             }
         }
 
