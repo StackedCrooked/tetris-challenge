@@ -254,7 +254,7 @@ namespace Tetris
         }
 
         Gdiplus::Graphics g(inHDC);
-		g.SetSmoothingMode(Gdiplus::SmoothingModeHighQuality);
+		g.SetSmoothingMode(Gdiplus::SmoothingModeNone);
         
         Grid grid(mNumRows, mNumColumns);
         Block activeBlock(BlockType_Begin, Rotation(0), Row(0), Column(0));
