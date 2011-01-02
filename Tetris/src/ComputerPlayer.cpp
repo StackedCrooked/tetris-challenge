@@ -28,13 +28,13 @@ namespace Tetris
     class ComputerPlayerImpl
     {
     public:
-        ComputerPlayerImpl(const Protected<Game> & inProtectedGame,
+        ComputerPlayerImpl(const ThreadSafe<Game> & inProtectedGame,
                            std::auto_ptr<Evaluator> inEvaluator,
                            int inSearchDepth,
                            int inSearchWidth,
                            int inWorkerCount);
 
-        ComputerPlayerImpl(const Protected<Game> & inProtectedGame,
+        ComputerPlayerImpl(const ThreadSafe<Game> & inProtectedGame,
                            const ComputerPlayer::GetEvaluatorCallback & inGetEvaluator,
                            int inSearchDepth,
                            int inSearchWidth,
@@ -93,7 +93,7 @@ namespace Tetris
         void timerEvent();
 
         int calculateRemainingTimeMs(const Game & game) const;
-        Protected<Game> mProtectedGame;
+        ThreadSafe<Game> mProtectedGame;
         WorkerPool mWorkerPool;
         boost::scoped_ptr<NodeCalculator> mNodeCalculator;
         boost::scoped_ptr<Evaluator> mEvaluator;
@@ -120,7 +120,7 @@ namespace Tetris
     }
 
 
-    ComputerPlayerImpl::ComputerPlayerImpl(const Protected<Game> & inProtectedGame,
+    ComputerPlayerImpl::ComputerPlayerImpl(const ThreadSafe<Game> & inProtectedGame,
                                            std::auto_ptr<Evaluator> inEvaluator,
                                            int inSearchDepth,
                                            int inSearchWidth,
@@ -141,7 +141,7 @@ namespace Tetris
     }
 
 
-    ComputerPlayerImpl::ComputerPlayerImpl(const Protected<Game> & inProtectedGame,
+    ComputerPlayerImpl::ComputerPlayerImpl(const ThreadSafe<Game> & inProtectedGame,
                                            const ComputerPlayer::GetEvaluatorCallback & inGetEvaluator,
                                            int inSearchDepth,
                                            int inSearchWidth,
@@ -347,7 +347,7 @@ namespace Tetris
     }
 
 
-    ComputerPlayer::ComputerPlayer(const Protected<Game> & inProtectedGame,
+    ComputerPlayer::ComputerPlayer(const ThreadSafe<Game> & inProtectedGame,
                                    std::auto_ptr<Evaluator> inEvaluator,
                                    int inSearchDepth,
                                    int inSearchWidth,
@@ -357,7 +357,7 @@ namespace Tetris
     }
 
 
-    ComputerPlayer::ComputerPlayer(const Protected<Game> & inProtectedGame,
+    ComputerPlayer::ComputerPlayer(const ThreadSafe<Game> & inProtectedGame,
                                    const GetEvaluatorCallback & inGetEvaluator,
                                    int inSearchDepth,
                                    int inSearchWidth,

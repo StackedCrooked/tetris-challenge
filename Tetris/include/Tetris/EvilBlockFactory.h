@@ -18,14 +18,14 @@ namespace Tetris {
 class EvilBlockFactory : public AbstractBlockFactory
 {
 public:
-    EvilBlockFactory(Protected<Game> inGame);
+    EvilBlockFactory(ThreadSafe<Game> inGame);
 
     virtual BlockType getNext() const;
 
 private:
     std::auto_ptr<NodeCalculator> createNodeCalculator(const BlockTypes & inBlockTypes);
 
-    Protected<Game> mGame;
+    ThreadSafe<Game> mGame;
     mutable WorkerPool mWorkerPool;
 };
 

@@ -12,7 +12,7 @@ namespace Tetris
     class Evaluator;
     class Game;
     class GameState;
-    template<class Variable> class Protected;
+    template<class Variable> class ThreadSafe;
 
 
     class ComputerPlayerImpl;
@@ -23,13 +23,13 @@ namespace Tetris
     public:
         typedef boost::function<std::auto_ptr<Evaluator>(const GameState &)> GetEvaluatorCallback;
 
-        ComputerPlayer(const Protected<Game> & inProtectedGame,
+        ComputerPlayer(const ThreadSafe<Game> & inProtectedGame,
                        std::auto_ptr<Evaluator> inEvaluator,
                        int inSearchDepth,
                        int inSearchWidth,
                        int inWorkerCount);
 
-        ComputerPlayer(const Protected<Game> & inProtectedGame,
+        ComputerPlayer(const ThreadSafe<Game> & inProtectedGame,
                        const GetEvaluatorCallback & inGetEvaluator,
                        int inSearchDepth,
                        int inSearchWidth,

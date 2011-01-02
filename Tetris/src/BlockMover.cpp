@@ -19,7 +19,7 @@ namespace Tetris
     class BlockMoverImpl
     {
     public:
-        BlockMoverImpl(const Protected<Game> & inGame);
+        BlockMoverImpl(const ThreadSafe<Game> & inGame);
 
         ~BlockMoverImpl();
 
@@ -40,7 +40,7 @@ namespace Tetris
         void onTimer(Poco::Timer & ioTimer);
         void move();
 
-        Protected<Game> mGame;
+        ThreadSafe<Game> mGame;
         boost::function<void()> mCallback;
         boost::scoped_ptr<Poco::Timer> mTimer;
         Poco::Stopwatch mStopwatch;
@@ -49,7 +49,7 @@ namespace Tetris
 
 
 
-    BlockMoverImpl::BlockMoverImpl(const Protected<Game> & inGame) :
+    BlockMoverImpl::BlockMoverImpl(const ThreadSafe<Game> & inGame) :
         mGame(inGame),
         mCallback(),
         mTimer(),
@@ -177,7 +177,7 @@ namespace Tetris
     }
 
 
-    BlockMover::BlockMover(const Protected<Game> & inGame) :
+    BlockMover::BlockMover(const ThreadSafe<Game> & inGame) :
         mImpl(new BlockMoverImpl(inGame))
     {
     }

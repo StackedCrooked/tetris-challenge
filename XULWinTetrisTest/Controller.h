@@ -66,7 +66,7 @@ namespace Tetris
 
         void drop(TetrisComponent * tetrisComponent);
 
-        Protected<Game> & threadSafeGame();
+        ThreadSafe<Game> & threadSafeGame();
 
         void log(const std::string & inMessage);
 
@@ -168,7 +168,7 @@ namespace Tetris
         XULWin::TextBox * mGameStateScore;
         XULWin::TextBox * mLoggingTextBox;
         XULWin::ScopedEventListener mScopedEventListener;
-        boost::scoped_ptr<Protected<Game> > mProtectedGame;
+        boost::scoped_ptr<ThreadSafe<Game> > mProtectedGame;
         boost::scoped_ptr<Tetris::Gravity> mGravity;
         boost::scoped_ptr<Tetris::ComputerPlayer> mComputerPlayer;
         boost::scoped_ptr<XULWin::WinAPI::Timer> mRefreshTimer;

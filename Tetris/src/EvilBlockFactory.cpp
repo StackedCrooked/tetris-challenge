@@ -10,7 +10,7 @@
 namespace Tetris {
 
 
-EvilBlockFactory::EvilBlockFactory(Protected<Game> inGame) :
+EvilBlockFactory::EvilBlockFactory(ThreadSafe<Game> inGame) :
     mGame(inGame),
     mWorkerPool("EvilBlockFactory", 4)
 {

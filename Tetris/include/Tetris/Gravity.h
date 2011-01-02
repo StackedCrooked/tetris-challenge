@@ -10,7 +10,7 @@
 namespace Tetris
 {
 
-    template<class Variable> class Protected;
+    template<class Variable> class ThreadSafe;
     class Game;
     class Gravity;
     class GravityImpl;
@@ -26,7 +26,7 @@ namespace Tetris
     class Gravity
     {
     public:
-        Gravity(const Protected<Game> & inGame);
+        Gravity(const ThreadSafe<Game> & inGame);
 
         ~Gravity();
 

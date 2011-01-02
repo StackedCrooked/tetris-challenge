@@ -32,7 +32,7 @@ namespace Tetris
     class GravityImpl
     {
     public:
-        GravityImpl(const Protected<Game> & inGame);
+        GravityImpl(const ThreadSafe<Game> & inGame);
 
         ~GravityImpl();
 
@@ -52,7 +52,7 @@ namespace Tetris
 
         void onTimerEvent(Poco::Timer & inTimer);
 
-        Protected<Game> mThreadSafeGame;
+        ThreadSafe<Game> mThreadSafeGame;
         boost::function<void()> mCallback;
         int mLevel;
         Poco::Timer mTimer;
@@ -60,7 +60,7 @@ namespace Tetris
     };
 
 
-    GravityImpl::GravityImpl(const Protected<Game> & inThreadSafeGame) :
+    GravityImpl::GravityImpl(const ThreadSafe<Game> & inThreadSafeGame) :
         mThreadSafeGame(inThreadSafeGame),        
         mCallback(),
         mLevel(0),
@@ -143,7 +143,7 @@ namespace Tetris
     }
 
     
-    Gravity::Gravity(const Protected<Game> & inGame) :
+    Gravity::Gravity(const ThreadSafe<Game> & inGame) :
         mImpl(new GravityImpl(inGame))
     {
     }

@@ -33,16 +33,16 @@ namespace Tetris
 
 
     template<class Variable>
-    class Protected
+    class ThreadSafe
     {
     public:
-        Protected(std::auto_ptr<Variable> inVariable) :
+        ThreadSafe(std::auto_ptr<Variable> inVariable) :
             mVariableWithMutex(new WithMutex<Variable>(inVariable))
         {
         }
 
         // Default constructor can only be used if Variable has a default constructor.
-        Protected() :
+        ThreadSafe() :
             mVariableWithMutex(new WithMutex<Variable>(std::auto_ptr<Variable>(new Variable)))
         {
         }
@@ -84,7 +84,7 @@ namespace Tetris
     class ScopedReaderAndWriter
     {
     public:
-        ScopedReaderAndWriter(Protected<Variable> & inProtectedVariable) :
+        ScopedReaderAndWriter(ThreadSafe<Variable> & inProtectedVariable) :
             mSharedLock(inProtectedVariable.mVariableWithMutex->mMutex),
             mUpgradeLock(mSharedLock),
             mVariable(inProtectedVariable.mVariableWithMutex->mVariable.get())
@@ -121,7 +121,7 @@ namespace Tetris
     class ScopedReader
     {
     public:
-        ScopedReader(const Protected<Variable> & inProtectedVariable) :
+        ScopedReader(const ThreadSafe<Variable> & inProtectedVariable) :
             mSharedLock(inProtectedVariable.mVariableWithMutex->mMutex),
             mVariable(inProtectedVariable.mVariableWithMutex->mVariable.get())
         {
