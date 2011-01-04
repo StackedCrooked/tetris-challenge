@@ -12,82 +12,18 @@
 namespace Tetris {
 
 
-Stats::Stats() :
-    mNumLines(0),
-    mNumSingles(0),
-    mNumDoubles(0),
-    mNumTriples(0),
-    mNumTetrises(0),
-    mFirstOccupiedRow(0)
-{
-}
-
-
-int Stats::score() const
-{
-    return 40 * mNumSingles + 100 * mNumDoubles + 300 * mNumTriples + 1200 * mNumTetrises;
-}
-
-
-int Stats::numLines() const
-{
-    return mNumLines;
-}
-
-
-int Stats::numSingles() const
-{
-    return mNumSingles;
-}
-
-
-int Stats::numDoubles() const
-{
-    return mNumDoubles;
-}
-
-
-int Stats::numTriples() const
-{
-    return mNumTriples;
-}
-
-
-int Stats::numTetrises() const
-{
-    return mNumTetrises;
-}
-
-
-int Stats::firstOccupiedRow() const
-{
-    return mFirstOccupiedRow;
-}
-
-
-// Use zero based index!
-int Stats::numLines(size_t idx) const
-{
-    switch (idx)
-    {
-        case 0: return mNumSingles;
-        case 1: return mNumDoubles;
-        case 2: return mNumTriples;
-        case 3: return mNumTetrises;
-        default: throw std::invalid_argument("Invalid number of lines scored requested.");
-    }
-    return 0; // compiler happy
-}
-
-
 GameState::GameState(size_t inNumRows, size_t inNumColumns) :
     mGrid(inNumRows, inNumColumns, BlockType_Nil),
     mOriginalBlock(BlockType_L, Rotation(0), Row(0), Column(0)),
     mIsGameOver(false),
-    mStats(),
+	mFirstOccupiedRow(inNumRows),
+	mNumLines(0),
+	mNumSingles(0),
+	mNumDoubles(0),
+	mNumTriples(0),
+	mNumTetrises(0),
     mQuality()
 {
-    mStats.mFirstOccupiedRow = inNumRows;
 }
 
 
@@ -95,7 +31,7 @@ bool GameState::checkPositionValid(const Block & inBlock, size_t inRowIdx, size_
 {
     const Grid & blockGrid(inBlock.grid());
     if (inColIdx < blockGrid.columnCount() &&
-        (inRowIdx + blockGrid.rowCount()) < static_cast<size_t>(mStats.firstOccupiedRow()))
+        (inRowIdx + blockGrid.rowCount()) < static_cast<size_t>(mFirstOccupiedRow))
     {
         return true;
     }
@@ -131,22 +67,6 @@ bool GameState::checkPositionValid(const Block & inBlock, size_t inRowIdx, size_
 }
 
 
-void GameState::forceUpdateStats()
-{
-    for (size_t r = 0; r != mGrid.rowCount(); ++r)
-    {
-        for (size_t c = 0; c != mGrid.columnCount(); ++c)
-        {
-            if (mGrid.get(r, c) != BlockType_Nil)
-            {
-                mStats.mFirstOccupiedRow = r;
-                return;
-            }
-        }
-    }
-}
-
-
 void GameState::solidifyBlock(const Block & inBlock)
 {
     const Grid & grid = inBlock.grid();
@@ -159,9 +79,9 @@ void GameState::solidifyBlock(const Block & inBlock)
                 int gridRow = inBlock.row() + r;
                 int gridCol = inBlock.column() + c;
                 mGrid.set(gridRow, gridCol, inBlock.type());
-                if (gridRow < mStats.mFirstOccupiedRow)
+                if (gridRow < mFirstOccupiedRow)
                 {
-                    mStats.mFirstOccupiedRow = gridRow;
+                    mFirstOccupiedRow = gridRow;
                 }
             }
         }
@@ -173,7 +93,7 @@ void GameState::clearLines()
 {
     int numLines = 0;
     int r = mOriginalBlock.row() + mOriginalBlock.rowCount() - 1;
-    for (; r >= mStats.firstOccupiedRow(); --r)
+    for (; r >= mFirstOccupiedRow; --r)
     {
         unsigned int c = 0;
         bool line = true;
@@ -202,13 +122,13 @@ void GameState::clearLines()
 
     if (numLines > 0)
     {
-        BlockType * gridBegin = const_cast<BlockType*>(&(mGrid.get(mStats.firstOccupiedRow(), 0)));
+        BlockType * gridBegin = const_cast<BlockType*>(&(mGrid.get(mFirstOccupiedRow, 0)));
         memset(&gridBegin[0], 0, numLines * mGrid.columnCount());
     }
 		
-    Assert(mStats.mFirstOccupiedRow + numLines <= static_cast<int>(mGrid.rowCount()));
-    mStats.mFirstOccupiedRow += numLines;
-    mStats.mNumLines += numLines;
+    Assert(mFirstOccupiedRow + numLines <= static_cast<int>(mGrid.rowCount()));
+    mFirstOccupiedRow += numLines;
+    mNumLines += numLines;
 
     switch (numLines)
     {
@@ -219,22 +139,22 @@ void GameState::clearLines()
         }
         case 1:
         {
-            mStats.mNumSingles++;
+            mNumSingles++;
             break;
         }
         case 2:
         {
-            mStats.mNumDoubles++;
+            mNumDoubles++;
             break;
         }
         case 3:
         {
-            mStats.mNumTriples++;
+            mNumTriples++;
             break;
         }
         case 4:
         {
-            mStats.mNumTetrises++;
+            mNumTetrises++;
             break;
         }
         default:
@@ -260,6 +180,16 @@ const Grid & GameState::grid() const
 Grid & GameState::grid()
 {
     return mGrid;
+}
+
+
+int GameState::score() const
+{
+	// Same values as Tetris on the Gameboy.
+	return   40 * mNumSingles +
+		    100 * mNumDoubles +
+		    300 * mNumTriples +
+		   1200 * mNumTetrises;
 }
 
 
@@ -293,12 +223,6 @@ std::auto_ptr<GameState> GameState::commit(const Block & inBlock, GameOver inGam
     result->mOriginalBlock = inBlock;
     result->clearLines();
     return result;
-}
-
-
-const Stats & GameState::stats() const
-{
-    return mStats;
 }
 
 

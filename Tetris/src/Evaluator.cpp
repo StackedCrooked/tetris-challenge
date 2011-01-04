@@ -189,10 +189,10 @@ namespace Tetris
         return gameHeight * mGameHeightFactor +
                lastBlockHeight * mLastBlockHeightFactor +
                numHoles * mNumHolesFactor +
-               inGameState.stats().numSingles() * mNumSinglesFactor +
-               inGameState.stats().numDoubles() * mNumDoublesFactor +
-               inGameState.stats().numTriples() * mNumTriplesFactor +
-               inGameState.stats().numTetrises() * mNumTetrisesFactor;
+               inGameState.numSingles() * mNumSinglesFactor +
+               inGameState.numDoubles() * mNumDoublesFactor +
+               inGameState.numTriples() * mNumTriplesFactor +
+               inGameState.numTetrises() * mNumTetrisesFactor;
     }
 
 

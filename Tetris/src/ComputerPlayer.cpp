@@ -174,7 +174,7 @@ namespace Tetris
 
     int ComputerPlayerImpl::calculateRemainingTimeMs(const Game & game) const
     {
-        int firstOccupiedRow = game.currentNode()->state().stats().firstOccupiedRow();
+        int firstOccupiedRow = game.currentNode()->state().firstOccupiedRow();
         int currentBlockRow = game.activeBlock().row();
         int numBlockRows = std::max<int>(game.activeBlock().grid().rowCount(), game.activeBlock().grid().columnCount());        
         int numRemainingRows = firstOccupiedRow - (currentBlockRow + numBlockRows);

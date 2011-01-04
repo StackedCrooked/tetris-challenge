@@ -112,7 +112,7 @@ namespace Tetris
         LRESULT onStrategySelected(WPARAM wParam, LPARAM lParam);
         LRESULT onClearPrecalculated(WPARAM wParam, LPARAM lParam);
         LRESULT onSelectComputerPlayer(WPARAM wParam, LPARAM lParam);
-        LRESULT onSplatter(WPARAM wParam, LPARAM lParam);
+        //LRESULT onSplatter(WPARAM wParam, LPARAM lParam);
 
 
         XULWin::XULRunner mXULRunner;
@@ -148,7 +148,7 @@ namespace Tetris
         XULWin::TextBox * mMovesAheadTextBox;
         XULWin::MenuList * mStrategiesMenuList;
         XULWin::Button * mClearPrecalculatedButton;
-        XULWin::Button * mSplatterButton;        
+        //XULWin::Button * mSplatterButton;        
         XULWin::Radio * mPlayerIsHuman;
         XULWin::Radio * mPlayerIsComputer;
         XULWin::TextBox * mKeyboardSink;
