@@ -7,74 +7,72 @@
 #include <memory>
 
 
-namespace Tetris
+namespace Tetris {
+
+
+class Evaluator;
+class GameState;
+
+
+/**
+ * GameStateNode is a tree of game states.
+ * Each node object contains one GameState object and a collection of child nodes.
+ */
+class GameStateNode
 {
+public:
+    static std::auto_ptr<GameStateNode> CreateRootNode(size_t inNumRows, size_t inNumColumns);
 
-    class Evaluator;
-    class GameState;
+    GameStateNode(NodePtr inParent, std::auto_ptr<GameState> inGameState, std::auto_ptr<Evaluator> inEvaluator);
 
+    ~GameStateNode();
 
-    // Impl declaration.
-    class GameStateNodeImpl;
+    // Creates a deep copy of this node and all child nodes.
+    std::auto_ptr<GameStateNode> clone() const;
 
+    // Each node is produced by a unique combination of the current block's column and rotation.
+    int identifier() const;
 
-    /**
-     * GameStateNode is a tree of game states.
-     * Each node object contains one GameState object and a collection of child nodes.
-     */
-    class GameStateNode
-    {
-    public:
-        static std::auto_ptr<GameStateNode> CreateRootNode(size_t inNumRows, size_t inNumColumns);
+    const Evaluator & evaluator() const;
 
-        GameStateNode(NodePtr inParent, std::auto_ptr<GameState> inGameState, std::auto_ptr<Evaluator> inEvaluator);
+    // Distance from the root node.
+    int depth() const;
 
-        ~GameStateNode();
+    const NodePtr parent() const;
 
-        // Creates a deep copy of this node and all child nodes.
-        std::auto_ptr<GameStateNode> clone() const;
+    NodePtr parent();
 
-        // Each node is produced by a unique combination of the current block's column and rotation.
-        int identifier() const;
+    void makeRoot();
 
-        const Evaluator & evaluator() const;
+    const ChildNodes & children() const;
 
-        // Distance from the root node.
-        int depth() const;
+    // yeah
+    ChildNodes & children();
 
-        const NodePtr parent() const;
+    void clearChildren();
 
-        NodePtr parent();
+    void addChild(NodePtr inChildNode);
 
-        void makeRoot();
+    const GameStateNode * endNode() const;
 
-        const ChildNodes & children() const;
+    GameStateNode * endNode();
 
-        // yeah
-        ChildNodes & children();
+    const GameState & state() const;
 
-        void clearChildren();
+    GameState & state();
 
-        void addChild(NodePtr inChildNode);
+	int quality() const;
 
-        const GameStateNode * endNode() const;
+private:
+    friend class GameStateNodeImpl;
 
-        GameStateNode * endNode();
+    // Constructor for creating a root node.
+    GameStateNode(std::auto_ptr<GameState> inGameState, std::auto_ptr<Evaluator> inEvaluator);
+		
+	class GameStateNodeImpl;
+    GameStateNodeImpl * mImpl;
+};
 
-        const GameState & state() const;
-
-        GameState & state();
-
-		int quality() const;
-
-    private:
-        friend class GameStateNodeImpl;
-
-        // Constructor for creating a root node.
-        GameStateNode(std::auto_ptr<GameState> inGameState, std::auto_ptr<Evaluator> inEvaluator);
-
-        GameStateNodeImpl * mImpl;
-    };
 
 } // namespace Tetris
 

@@ -9,79 +9,74 @@
 #include <stdexcept>
 
 
-namespace Tetris
+namespace Tetris {
+
+class GameState
 {
+public:
+    // Creates a new GameState
+    GameState(size_t inNumRows, size_t inNumColumns);
 
-    // Forward declarations    
-    class Evaluator;
+    const Grid & grid() const;
 
-    class GameState
-    {
-    public:
-        // Creates a new GameState
-        GameState(size_t inNumRows, size_t inNumColumns);
+    Grid & grid();
 
-        const Grid & grid() const;
+    // The Block that was used in the commit(...) call.
+    const Block & originalBlock() const;
 
-        Grid & grid();
+    bool isGameOver() const;
 
-        // The Block that was used in the commit(...) call.
-        const Block & originalBlock() const;
+    // Checks if a activeBlock can be placed at a given location without
+    // overlapping with previously placed blocks.
+    bool checkPositionValid(const Block & inBlock, size_t inRowIdx, size_t inColIdx) const;
 
-        bool isGameOver() const;
-
-        // Checks if a activeBlock can be placed at a given location without
-        // overlapping with previously placed blocks.
-        bool checkPositionValid(const Block & inBlock, size_t inRowIdx, size_t inColIdx) const;
-
-        // Creates a copy of the current gamestate with the given active block committed.
-        // Use inGameOver = true to mark the new gamestate as "game over".
-        std::auto_ptr<GameState> commit(const Block & inBlock, GameOver inGameOver) const;
+    // Creates a copy of the current gamestate with the given active block committed.
+    // Use inGameOver = true to mark the new gamestate as "game over".
+    std::auto_ptr<GameState> commit(const Block & inBlock, GameOver inGameOver) const;
 		
-		// Statistics
-		int numLines() const { return mNumLines; }
-		int numSingles() const { return mNumSingles; }
-		int numDoubles() const { return mNumDoubles; }
-		int numTriples() const { return mNumTriples; }
-		int numTetrises() const { return mNumTetrises; }
-		int score() const;
-		int firstOccupiedRow() const { return mFirstOccupiedRow; }
+	// Statistics
+	int numLines() const { return mNumLines; }
+	int numSingles() const { return mNumSingles; }
+	int numDoubles() const { return mNumDoubles; }
+	int numTriples() const { return mNumTriples; }
+	int numTetrises() const { return mNumTetrises; }
+	int score() const;
+	int firstOccupiedRow() const { return mFirstOccupiedRow; }
 
-    private:
-        void solidifyBlock(const Block & inBlock);        
-        void clearLines();
+private:
+    void solidifyBlock(const Block & inBlock);        
+    void clearLines();
 
-        Grid mGrid;
-        Block mOriginalBlock;
-        bool mIsGameOver;
-		int mFirstOccupiedRow;
-		int mNumLines;
-        int mNumSingles;
-        int mNumDoubles;
-        int mNumTriples;
-        int mNumTetrises;
-    };
+    Grid mGrid;
+    Block mOriginalBlock;
+    bool mIsGameOver;
+	int mFirstOccupiedRow;
+	int mNumLines;
+    int mNumSingles;
+    int mNumDoubles;
+    int mNumTriples;
+    int mNumTetrises;
+};
 
 	
-	class EvaluatedGameState
-	{
-	public:
-		EvaluatedGameState(std::auto_ptr<GameState> inGameState, int inQuality);
+class EvaluatedGameState
+{
+public:
+	EvaluatedGameState(std::auto_ptr<GameState> inGameState, int inQuality);
 
-		const GameState & gameState() const;
+	const GameState & gameState() const;
 
-		GameState & gameState();
+	GameState & gameState();
 
-		int quality() const;
+	int quality() const;
 
-	private:
-		EvaluatedGameState(const EvaluatedGameState &);
-		EvaluatedGameState& operator=(const EvaluatedGameState&);
+private:
+	EvaluatedGameState(const EvaluatedGameState &);
+	EvaluatedGameState& operator=(const EvaluatedGameState&);
 
-		std::auto_ptr<GameState> mGameState;
-		int mQuality;
-	};
-
+	std::auto_ptr<GameState> mGameState;
+	int mQuality;
+};
 
 
 } // namespace Tetris
