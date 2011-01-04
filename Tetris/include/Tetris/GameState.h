@@ -21,8 +21,7 @@ namespace Tetris
 	public:
 		Quality() :
 			mIsInitialized(false),
-			mScore(0),
-			mNumHoles(0)
+			mScore(0)
 		{
 		}
 
@@ -46,26 +45,14 @@ namespace Tetris
 			mScore = inScore;
 		}
 
-		int numHoles() const
-		{
-			return mNumHoles;
-		}
-
-		void setNumHoles(int inNumHoles)
-		{
-			mNumHoles = inNumHoles;
-		}
-
 		void reset()
 		{
 			mScore = 0;
-			mNumHoles = 0;
 		}
 
 	private:
 		bool mIsInitialized;
 		int mScore;
-		int mNumHoles;
 	};
 
 
@@ -104,7 +91,6 @@ namespace Tetris
 		int numTetrises() const { return mNumTetrises; }
 		int score() const;
 		int firstOccupiedRow() const { return mFirstOccupiedRow; }
-
 
     private:
         void solidifyBlock(const Block & inBlock);        
