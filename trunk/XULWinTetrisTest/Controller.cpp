@@ -60,7 +60,7 @@ namespace Tetris {
         mMovesAheadTextBox(0),
         mStrategiesMenuList(0),
         mClearPrecalculatedButton(0),
-        mSplatterButton(0),
+        //mSplatterButton(0),
         mGameHeightFactor(0),
         mLastBlockHeightFactor(0),
         mNumHolesFactor(0),
@@ -173,8 +173,8 @@ namespace Tetris {
             mScopedEventListener.connect(mStrategiesMenuList->el(), boost::bind(&Controller::onStrategySelected, this, _1, _2));
         }
 
-		mSplatterButton = findComponentById<XULWin::Button>("splatterButton");
-        mScopedEventListener.connect(mSplatterButton->el(), boost::bind(&Controller::onSplatter, this, _1, _2));
+		//mSplatterButton = findComponentById<XULWin::Button>("splatterButton");
+        //mScopedEventListener.connect(mSplatterButton->el(), boost::bind(&Controller::onSplatter, this, _1, _2));
 
         mGameHeightFactor = findComponentById<XULWin::SpinButton>("gameHeightFactor");
         mLastBlockHeightFactor = findComponentById<XULWin::SpinButton>("lastBlockHeightFactor");
@@ -225,58 +225,61 @@ namespace Tetris {
         mGravity.reset();
     }
 
-        
-    LRESULT Controller::onSplatter(WPARAM wParam, LPARAM lParam)
-    {
 
-        {
-            mComputerPlayer.reset();
-            ScopedReaderAndWriter<Game> wgame(*mProtectedGame.get());
-            Game & game(*wgame.get());
-            game.clearPrecalculatedNodes();
+	//
+	// NOTE: this method is temporarily distabled. It required a hack to make it work. Needs cleanup/deletion.
+	//
+    //LRESULT Controller::onSplatter(WPARAM wParam, LPARAM lParam)
+    //{
 
-            Grid & grid = const_cast<GameStateNode*>(game.currentNode())->state().grid();
+    //    {
+    //        mComputerPlayer.reset();
+    //        ScopedReaderAndWriter<Game> wgame(*mProtectedGame.get());
+    //        Game & game(*wgame.get());
+    //        game.clearPrecalculatedNodes();
 
-            for (size_t rowIdx = 7; rowIdx != grid.rowCount(); ++rowIdx)
-            {            
-                size_t count = 0;
-                for (size_t colIdx = 0; colIdx != grid.columnCount(); ++colIdx)
-                {
-                    if (grid.get(rowIdx, colIdx))
-                    {
-                        count++;
-                    }
-                }
+    //        Grid & grid = const_cast<GameStateNode*>(game.currentNode())->state().grid();
 
-                for (size_t colIdx = 0; colIdx != grid.columnCount(); ++colIdx)
-                {
-                    if (count + 1 == grid.columnCount())
-                    {
-                        break;
-                    }
+    //        for (size_t rowIdx = 7; rowIdx != grid.rowCount(); ++rowIdx)
+    //        {            
+    //            size_t count = 0;
+    //            for (size_t colIdx = 0; colIdx != grid.columnCount(); ++colIdx)
+    //            {
+    //                if (grid.get(rowIdx, colIdx))
+    //                {
+    //                    count++;
+    //                }
+    //            }
 
-                    if (mRandom.nextBool())
-                    {
-                        BlockType blockType = static_cast<BlockType>((mRandom.nextChar() % cBlockTypeCount) + 1);
-                        grid.set(rowIdx, colIdx, blockType);
-                        count++;
-                    }
-                }
-            }
+    //            for (size_t colIdx = 0; colIdx != grid.columnCount(); ++colIdx)
+    //            {
+    //                if (count + 1 == grid.columnCount())
+    //                {
+    //                    break;
+    //                }
 
-            const_cast<GameStateNode*>(game.currentNode())->state().forceUpdateStats();
-        }
-        
-        mComputerPlayer.reset(
-            new ComputerPlayer(
-                *mProtectedGame,
-                boost::bind(&Controller::getEvaluator, this, _1),
-                mSearchDepth ? XULWin::String2Int(mSearchDepth->getValue(), 4) : 4,
-                mSearchWidth ? XULWin::String2Int(mSearchWidth->getValue(), 4) : 4,
-                XULWin::String2Int(mThreadCount->getValue(), 0)));
+    //                if (mRandom.nextBool())
+    //                {
+    //                    BlockType blockType = static_cast<BlockType>((mRandom.nextChar() % cBlockTypeCount) + 1);
+    //                    grid.set(rowIdx, colIdx, blockType);
+    //                    count++;
+    //                }
+    //            }
+    //        }
 
-        return XULWin::cHandled;
-    }
+    //        const_cast<GameStateNode*>(game.currentNode())->state().forceUpdateStats();
+    //    }
+    //    
+    //    mComputerPlayer.reset(
+    //        new ComputerPlayer(
+    //            *mProtectedGame,
+    //            boost::bind(&Controller::getEvaluator, this, _1),
+    //            mSearchDepth ? XULWin::String2Int(mSearchDepth->getValue(), 4) : 4,
+    //            mSearchWidth ? XULWin::String2Int(mSearchWidth->getValue(), 4) : 4,
+    //            XULWin::String2Int(mThreadCount->getValue(), 0)));
+
+    //    return XULWin::cHandled;
+    //}
     
         
     LRESULT Controller::onSelectComputerPlayer(WPARAM wParam, LPARAM lParam)
@@ -379,7 +382,7 @@ namespace Tetris {
 
     int Controller::percentOccupied(const GameState & inGameState) const
     {
-        double occupied = 1.0 - static_cast<double>(inGameState.stats().firstOccupiedRow()) / static_cast<double>(inGameState.grid().rowCount());
+        double occupied = 1.0 - static_cast<double>(inGameState.firstOccupiedRow()) / static_cast<double>(inGameState.grid().rowCount());
         return static_cast<int>(0.5 + 100 * occupied);
     }
 
@@ -557,13 +560,13 @@ namespace Tetris {
 
         if (mScoreTextBox)
         {
-            setText(mScoreTextBox, MakeString() << gameState->stats().score());
+            setText(mScoreTextBox, MakeString() << gameState->score());
         }
 
 
         if (mTotalLinesTextBox)
         {
-            setText(mTotalLinesTextBox, MakeString() << gameState->stats().numLines());
+            setText(mTotalLinesTextBox, MakeString() << gameState->numLines());
         }
 
 
@@ -585,16 +588,15 @@ namespace Tetris {
             setText(mBlockCountTextBox, MakeString() << blockCount);
         }
 
+		
+		//
+		// Update the line counters
+		//
+		setText(mLinesTextBoxes[0], MakeString() << gameState->numLines());
+        setText(mLinesTextBoxes[1], MakeString() << gameState->numDoubles());
+		setText(mLinesTextBoxes[2], MakeString() << gameState->numTriples());
+        setText(mLinesTextBoxes[3], MakeString() << gameState->numTetrises());
 
-
-        for (size_t idx = 0; idx != 4; ++idx)
-        {
-            const Stats & stats = gameState->stats();
-            if (mLinesTextBoxes[idx])
-            {
-                setText(mLinesTextBoxes[idx], MakeString() << stats.numLines(idx));
-            }
-        }
 
         if (mPlayerIsComputer->isSelected())
         {

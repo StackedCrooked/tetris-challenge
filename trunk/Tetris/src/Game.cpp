@@ -347,7 +347,7 @@ int Game::level() const
 {
     if (mOverrideLevel < 0)
     {
-        int level = mCurrentNode->state().stats().numLines() / 10;
+        int level = mCurrentNode->state().numLines() / 10;
         return std::min<int>(level, cMaxLevel);
     }
     else

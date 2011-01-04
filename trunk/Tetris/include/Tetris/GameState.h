@@ -15,47 +15,8 @@ namespace Tetris
     // Forward declarations    
     class Evaluator;
 
-
-    // Impl declaration
-    class GameStateImpl;
-
-
-    // GameState stats
-    class Stats
-    {
-    public:
-        Stats();
-
-        int score() const;
-
-        int numLines() const;
-
-        int numSingles() const;
-
-        int numDoubles() const;
-
-        int numTriples() const;
-
-        int numTetrises() const;
-
-        int firstOccupiedRow() const;
-
-        // Use zero based index!
-        int numLines(size_t idx) const;
-
-    private:
-        friend class GameState;
-        friend class GameStateImpl;
-        int mNumLines;
-        int mNumSingles;
-        int mNumDoubles;
-        int mNumTriples;
-        int mNumTetrises;
-        int mFirstOccupiedRow;
-    };
-
-
-    class Quality
+	
+	class Quality
 	{
 	public:
 		Quality() :
@@ -134,20 +95,30 @@ namespace Tetris
         // Creates a copy of the current gamestate with the given active block committed.
         // Use inGameOver = true to mark the new gamestate as "game over".
         std::auto_ptr<GameState> commit(const Block & inBlock, GameOver inGameOver) const;
+		
+		// Statistics
+		int numLines() const { return mNumLines; }
+		int numSingles() const { return mNumSingles; }
+		int numDoubles() const { return mNumDoubles; }
+		int numTriples() const { return mNumTriples; }
+		int numTetrises() const { return mNumTetrises; }
+		int score() const;
+		int firstOccupiedRow() const { return mFirstOccupiedRow; }
 
-        const Stats & stats() const;
-
-        void forceUpdateStats();
 
     private:
-        void solidifyBlock(const Block & inBlock);
-        
+        void solidifyBlock(const Block & inBlock);        
         void clearLines();
 
         Grid mGrid;
         Block mOriginalBlock;
         bool mIsGameOver;
-        Stats mStats;
+		int mFirstOccupiedRow;
+		int mNumLines;
+        int mNumSingles;
+        int mNumDoubles;
+        int mNumTriples;
+        int mNumTetrises;
         mutable Quality mQuality;
     };
 
