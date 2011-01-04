@@ -176,6 +176,7 @@ void GameStateNode::makeRoot()
     mImpl->mParent.reset();
 }
 
+
 const GameStateNode * GameStateNode::endNode() const
 {
     if (mImpl->mChildren.empty())
