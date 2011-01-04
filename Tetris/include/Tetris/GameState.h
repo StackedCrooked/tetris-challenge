@@ -15,47 +15,6 @@ namespace Tetris
     // Forward declarations    
     class Evaluator;
 
-	
-	class Quality
-	{
-	public:
-		Quality() :
-			mIsInitialized(false),
-			mScore(0)
-		{
-		}
-
-		bool isInitialized() const
-		{
-			return mIsInitialized;
-		}
-
-		void setInitialized(bool inIsInitialized)
-		{
-			mIsInitialized = inIsInitialized;
-		}
-
-		int score() const
-		{
-			return mScore;
-		}
-
-		void setScore(int inScore)
-		{
-			mScore = inScore;
-		}
-
-		void reset()
-		{
-			mScore = 0;
-		}
-
-	private:
-		bool mIsInitialized;
-		int mScore;
-	};
-
-
     class GameState
     {
     public:
@@ -70,10 +29,6 @@ namespace Tetris
         const Block & originalBlock() const;
 
         bool isGameOver() const;
-
-        // Calculates the quality of the playing field.
-        // Caches the value.
-        int quality(const Evaluator & inEvaluator) const;
 
         // Checks if a activeBlock can be placed at a given location without
         // overlapping with previously placed blocks.
@@ -105,8 +60,28 @@ namespace Tetris
         int mNumDoubles;
         int mNumTriples;
         int mNumTetrises;
-        mutable Quality mQuality;
     };
+
+	
+	class EvaluatedGameState
+	{
+	public:
+		EvaluatedGameState(std::auto_ptr<GameState> inGameState, int inQuality);
+
+		const GameState & gameState() const;
+
+		GameState & gameState();
+
+		int quality() const;
+
+	private:
+		EvaluatedGameState(const EvaluatedGameState &);
+		EvaluatedGameState& operator=(const EvaluatedGameState&);
+
+		std::auto_ptr<GameState> mGameState;
+		int mQuality;
+	};
+
 
 
 } // namespace Tetris

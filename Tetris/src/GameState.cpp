@@ -21,8 +21,7 @@ GameState::GameState(size_t inNumRows, size_t inNumColumns) :
 	mNumSingles(0),
 	mNumDoubles(0),
 	mNumTriples(0),
-	mNumTetrises(0),
-    mQuality()
+	mNumTetrises(0)
 {
 }
 
@@ -192,19 +191,6 @@ int GameState::score() const
 		   1200 * mNumTetrises;
 }
 
-
-int GameState::quality(const Evaluator & inEvaluator) const
-{
-    if (!mQuality.isInitialized())
-    {
-        mQuality.reset();
-        mQuality.setScore(inEvaluator.evaluate(*this));
-        mQuality.setInitialized(true);
-    }
-    return mQuality.score();
-}
-
-
 const Block & GameState::originalBlock() const
 {
     return mOriginalBlock;
@@ -215,7 +201,6 @@ std::auto_ptr<GameState> GameState::commit(const Block & inBlock, GameOver inGam
 {
     std::auto_ptr<GameState> result(new GameState(*this));
     result->mIsGameOver = inGameOver.get();
-    result->mQuality.setInitialized(false);
     if (!inGameOver.get())
     {
         result->solidifyBlock(inBlock);
@@ -223,6 +208,31 @@ std::auto_ptr<GameState> GameState::commit(const Block & inBlock, GameOver inGam
     result->mOriginalBlock = inBlock;
     result->clearLines();
     return result;
+}
+
+
+EvaluatedGameState::EvaluatedGameState(std::auto_ptr<GameState> inGameState, int inQuality) :
+	mGameState(inGameState),
+	mQuality(inQuality)
+{
+}
+	
+
+const GameState & EvaluatedGameState::gameState() const
+{
+	return *mGameState;
+}
+
+
+GameState & EvaluatedGameState::gameState()
+{
+	return *mGameState;
+}
+
+
+int EvaluatedGameState::quality() const
+{
+	return mQuality;
 }
 
 

@@ -48,12 +48,14 @@ namespace Tetris
 
         GameState & state();
 
+		int quality() const;
+
     private:
         friend class GameStateNode;
         boost::weak_ptr<GameStateNode> mParent;
         int mIdentifier;
         int mDepth;
-        boost::scoped_ptr<GameState> mGameState;
+        EvaluatedGameState mEvaluatedGameState;
         boost::scoped_ptr<Evaluator> mEvaluator; // }
         ChildNodes mChildren;                    // } => Order matters!
     };
@@ -74,7 +76,7 @@ namespace Tetris
         mParent(inParent),
         mIdentifier(GetIdentifier(*inGameState)),
         mDepth(inParent->depth() + 1),
-        mGameState(inGameState),
+		mEvaluatedGameState(inGameState, inEvaluator->evaluate(*inGameState)),
         mEvaluator(inEvaluator.release()),
         mChildren(GameStateComparator(mEvaluator->clone()))
     {
@@ -86,7 +88,7 @@ namespace Tetris
         mParent(),
         mIdentifier(GetIdentifier(*inGameState)),
         mDepth(0),
-        mGameState(inGameState),
+		mEvaluatedGameState(inGameState, inEvaluator->evaluate(*inGameState)),
         mEvaluator(inEvaluator.release()),
         mChildren(GameStateComparator(mEvaluator->clone()))
     {
@@ -96,8 +98,8 @@ namespace Tetris
     std::auto_ptr<GameStateNode> GameStateNodeImpl::clone() const
     {
         NodePtr parent = mParent.lock();
-        std::auto_ptr<GameStateNode> result(parent ? new GameStateNode(parent, Create<GameState>(*mGameState), mEvaluator->clone())
-                                                   : new GameStateNode(Create<GameState>(*mGameState), mEvaluator->clone()));
+		std::auto_ptr<GameStateNode> result(parent ? new GameStateNode(parent, Create<GameState>(mEvaluatedGameState.gameState()), mEvaluator->clone())
+                                                   : new GameStateNode(Create<GameState>(mEvaluatedGameState.gameState()), mEvaluator->clone()));
         result->mImpl->mDepth = mDepth;
 
         ChildNodes::const_iterator it = mChildren.begin(), end = mChildren.end();
@@ -126,14 +128,20 @@ namespace Tetris
 
     const GameState & GameStateNodeImpl::state() const
     {
-        return *mGameState;
+        return mEvaluatedGameState.gameState();
     }
 
 
     GameState & GameStateNodeImpl::state()
     {
-        return *mGameState;
+        return mEvaluatedGameState.gameState();
     }
+
+
+	int GameStateNodeImpl::quality() const
+	{
+		return mEvaluatedGameState.quality();
+	}
 
 
     ChildNodes & GameStateNodeImpl::children()
@@ -240,6 +248,12 @@ namespace Tetris
     GameState & GameStateNode::state()
     {
         return mImpl->state();
+    }
+
+
+    int GameStateNode::quality() const
+    {
+        return mImpl->quality();
     }
 
 
