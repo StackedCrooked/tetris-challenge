@@ -27,7 +27,7 @@ namespace Tetris
         Assert(lhs.get() != rhs.get());
 
         // Order by descending quality.
-        return lhs->state().quality(*mEvaluator) > rhs->state().quality(*mEvaluator);
+		return lhs->quality() > rhs->quality();
     }
 
 } // namespace Tetris

@@ -65,6 +65,8 @@ namespace Tetris
 
         GameState & state();
 
+		int quality() const;
+
     private:
         friend class GameStateNodeImpl;
 

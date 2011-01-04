@@ -111,6 +111,7 @@
     <ClInclude Include="include\Tetris\Enum.h" />
     <ClInclude Include="include\Tetris\Evaluator.h" />
     <ClInclude Include="include\Tetris\EvilBlockFactory.h" />
+    <ClInclude Include="include\Tetris\Fallible.h" />
     <ClInclude Include="include\Tetris\ForwardDeclarations.h" />
     <ClInclude Include="include\Tetris\Game.h" />
     <ClInclude Include="include\Tetris\GameOver.h" />

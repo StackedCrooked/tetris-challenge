@@ -73,7 +73,7 @@ BlockType EvilBlockFactory::getNext() const
     {
         NodeCalculator & nodeCalculator(*nodeCalculators[i]);
         NodePtr result = nodeCalculator.result();
-        results.insert(std::make_pair(result->state().quality(Balanced()), allBlockTypes[i]));
+		results.insert(std::make_pair(result->quality(), allBlockTypes[i]));
     }
 
     BlockTypes & blockTypes = results.begin()->second;
