@@ -78,6 +78,7 @@ GameStateNode::~GameStateNode()
     mImpl = 0;
 }
 
+
 std::auto_ptr<GameStateNode> GameStateNode::clone() const
 {
     NodePtr parent = mImpl->mParent.lock();
