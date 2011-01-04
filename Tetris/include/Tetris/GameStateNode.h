@@ -3,7 +3,6 @@
 
 
 #include "Tetris/NodePtr.h"
-#include "Tetris/GameStateComparator.h"
 #include <memory>
 
 
