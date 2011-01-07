@@ -33,9 +33,9 @@ Rect::Rect(int x, int y, int width, int height) :
 }
 
 
-AbstractWidget::AbstractWidget(int inUnitWidth, int inUnitHeight) :
-    mUnitWidth(inUnitWidth),
-    mUnitHeight(inUnitHeight),
+AbstractWidget::AbstractWidget(int inSquareWidth, int inSquareHeight) :
+    mSquareWidth(inSquareWidth),
+    mSquareHeight(inSquareHeight),
     mFrameCount(0),
     mFPS(0)
 {
@@ -81,8 +81,8 @@ void AbstractWidget::coordinateRepaint(const Game & inGame)
 
     // Paint active block
     const Block & activeBlock(inGame.activeBlock());
-    paintGrid(activeBlock.column() * mUnitWidth,
-              activeBlock.row() * mUnitHeight,
+    paintGrid(activeBlock.column() * mSquareWidth,
+              activeBlock.row() * mSquareHeight,
               activeBlock.grid());
 
     mFrameCount++;
@@ -105,10 +105,10 @@ void AbstractWidget::paintGrid(int x, int y, const Grid & inGrid)
             BlockType blockType = inGrid.get(r, c);
             if (blockType != BlockType_Nil)
             {
-                paintSquare(Rect(x + (c * mUnitWidth),
-                               y + (r * mUnitHeight),
-                               mUnitWidth,
-                               mUnitHeight),
+                paintSquare(Rect(x + (c * mSquareWidth),
+                               y + (r * mSquareHeight),
+                               mSquareWidth,
+                               mSquareHeight),
                           getColor(blockType));
             }
         }
@@ -135,7 +135,7 @@ void AbstractWidget::paintFutureBlocks(const Rect & inRect, int inSpacing, const
     {
         const Grid & grid(GetGrid(GetBlockIdentifier(inBlockTypes[i], 0)));
         paintGrid(inRect.x(), y, grid);
-        y += 3 * unitHeight();
+        y += 3 * squareHeight();
     }
 }
 

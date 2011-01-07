@@ -13,13 +13,13 @@ static const int cMargin = 4;
 using namespace Tetris;
 
 
-TetrisWidget::TetrisWidget(QWidget * inParent, int inUnitWidth, int inUnitHeight) :
+TetrisWidget::TetrisWidget(QWidget * inParent, int inSquareWidth, int inSquareHeight) :
     QWidget(inParent),
-    AbstractWidget(inUnitWidth, inUnitHeight),
+	AbstractWidget(inSquareWidth, inSquareHeight),
     mSimpleGame(0),
     mRowCount(20),
     mColCount(10),
-    mMinSize(14 * inUnitWidth, 20 * inUnitHeight),
+	mMinSize(14 * inSquareWidth, 20 * inSquareHeight),
     mPainter()
 {
     setUpdatesEnabled(true);
@@ -40,8 +40,8 @@ void TetrisWidget::setSimpleGame(SimpleGame * inSimpleGame)
 {
     mSimpleGame = inSimpleGame;
     mSimpleGame->getSize(mColCount, mRowCount);
-    mMinSize = QSize((mColCount + 4) * unitWidth() + cMargin,
-                     mRowCount * unitHeight());
+	mMinSize = QSize((mColCount + 4) * squareWidth() + cMargin,
+					 mRowCount * squareHeight());
 }
 
 
@@ -89,17 +89,17 @@ Tetris::Rect TetrisWidget::getGameRect() const
 {
     return Tetris::Rect(0,
                         0,
-                        mColCount * unitWidth(),
-                        mRowCount * unitHeight());
+						mColCount * squareWidth(),
+						mRowCount * squareHeight());
 }
 
 
 Tetris::Rect TetrisWidget::getFutureBlocksRect(unsigned int inFutureBlockCount) const
 {
-    int blockHeight = 3 * unitHeight();
-    return Tetris::Rect(mColCount * unitHeight() + cMargin,
+	int blockHeight = 3 * squareHeight();
+	return Tetris::Rect(mColCount * squareHeight() + cMargin,
                         0,
-                        4 * unitWidth(),
+						4 * squareWidth(),
                         inFutureBlockCount * blockHeight);
 }
 

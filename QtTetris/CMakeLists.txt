@@ -1,9 +1,7 @@
 cmake_minimum_required(VERSION 2.6) 
 project(QtTetris)
-FIND_PACKAGE(Qt4 REQUIRED)
-
-
 set(CMAKE_BUILD_TYPE Release)
+FIND_PACKAGE(Qt4 REQUIRED)
 
 
 if(WIN32)
@@ -16,10 +14,8 @@ else()
     string(REPLACE "\n" "" ARCH ${ARCH})
 endif()
 
-message("ARCH: ${ARCH}")
-set(CMAKE_OSX_ARCHITECTURES ${ARCH})
-
 set(EXECUTABLE QtTetris)
+set(CMAKE_OSX_ARCHITECTURES ${ARCH})
 set(SOLUTIONDIR "${QtTetris_SOURCE_DIR}/../")
 set(OUTDIR ${SOLUTIONDIR}Build/${PLATFORM}/${ARCH}/${CMAKE_BUILD_TYPE}/)
 set(BOOST ${SOLUTIONDIR}3rdParty/Boost_1_44_0/)
@@ -33,7 +29,7 @@ set(FINAL_COMPILE_FLAGS "${CXX_FLAGS_${CMAKE_BUILD_TYPE}}")
 include_directories(
     ${BOOST}
     ${POCO}Foundation/include
-    ${POCO}CppUnit/include
+    ${POCO}CppSquare/include
     ${SOLUTIONDIR}Tetris/include)
 
 
@@ -46,14 +42,18 @@ add_subdirectory(${SOLUTIONDIR}Tetris ${OUTDIR}Tetris)
 
 
 
-SET(QtTetris_SOURCES main.cpp MainWindow.cpp TetrisWidget.cpp)
-SET(QtTetris_HEADERS MainWindow.h TetrisWidget.h)
+set(QtTetris_SOURCES main.cpp MainWindow.cpp TetrisWidget.cpp)
+set(QtTetris_HEADERS MainWindow.h TetrisWidget.h)
+
+# Qt settings
 QT4_WRAP_CPP(QtTetris_HEADERS_MOC ${QtTetris_HEADERS})
-INCLUDE(${QT_USE_FILE})
-ADD_DEFINITIONS(${QT_DEFINITIONS})
-ADD_EXECUTABLE(${EXECUTABLE} ${QtTetris_SOURCES} ${QtTetris_HEADERS_MOC})
+include(${QT_USE_FILE})
+add_definitions(${QT_DEFINITIONS})
+
+
+add_executable(${EXECUTABLE} ${QtTetris_SOURCES} ${QtTetris_HEADERS_MOC})
 set(CONFIG  "${CONFIG} i386")
-TARGET_LINK_LIBRARIES(${EXECUTABLE}
+target_link_libraries(${EXECUTABLE}
     ${QT_LIBRARIES}
     Tetris
     PocoFoundation

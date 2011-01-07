@@ -14,13 +14,13 @@ int TetrisWidget_NumColumns()
 }
 
 
-int Tetris_GetUnitWidth()
+int Tetris_GetSquareWidth()
 {
     return 20;
 }
 
 
-int Tetris_GetUnitHeight()
+int Tetris_GetSquareHeight()
 {
     return 20;
 }
