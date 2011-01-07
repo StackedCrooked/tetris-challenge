@@ -19,7 +19,7 @@ class TetrisWidget : public QWidget,
 {
     Q_OBJECT
 public:
-    explicit TetrisWidget(QWidget * inParent, int inUnitWidth, int inUnitHeight);
+	explicit TetrisWidget(QWidget * inParent, int inSquareWidth, int inSquareHeight);
 
     ~TetrisWidget();
 

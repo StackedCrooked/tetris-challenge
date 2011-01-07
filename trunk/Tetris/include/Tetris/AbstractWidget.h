@@ -57,11 +57,11 @@ private:
 class AbstractWidget
 {
 public:
-    AbstractWidget(int inUnitWidth, int inUnitHeight);
+	AbstractWidget(int insquareWidth, int inSquareHeight);
 
-    inline int unitWidth() const { return mUnitWidth; }
+	inline int squareWidth() const { return mSquareWidth; }
 
-    inline int unitHeight() const { return mUnitHeight; }
+	inline int squareHeight() const { return mSquareHeight; }
 
     // The subclass may call this method in order to have the block repainted.
     void coordinateRepaint(const Game & inGame);
@@ -88,8 +88,8 @@ private:
     void paintGameGrid(const Grid & inGrid);
     void paintFutureBlocks(const Rect & inRect, int inSpacing, const std::vector<BlockType> & inBlockTypes);
 
-    int mUnitWidth;
-    int mUnitHeight;
+	int mSquareWidth;
+	int mSquareHeight;
     unsigned int mFrameCount;
     double mFPS;
 };

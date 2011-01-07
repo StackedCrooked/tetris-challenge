@@ -13,15 +13,15 @@ using namespace Tetris;
 //
 const int cRowCount(20);
 const int cColumnCount(10);
-const int cUnitWidth(20);
-const int cUnitHeight(20);
+const int cSquareWidth(20);
+const int cSquareHeight(20);
 
 
 MainWindow::MainWindow(QWidget *parent) :
     QWidget(parent),
     mSimpleGame(new Tetris::SimpleGame(cRowCount, cColumnCount))
 {
-    mTetrisWidget = new TetrisWidget(this, cUnitWidth, cUnitHeight);
+    mTetrisWidget = new TetrisWidget(this, cSquareWidth, cSquareHeight);
     mTetrisWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     mFPSLabel = new QLabel(this);
