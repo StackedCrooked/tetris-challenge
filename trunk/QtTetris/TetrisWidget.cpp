@@ -24,8 +24,6 @@ TetrisWidget::TetrisWidget(QWidget * inParent, int inSquareWidth, int inSquareHe
     mRowCount(20),
     mColCount(10),
     mMinSize(),
-    mRefreshFlag(), // Default contructor is fine.
-    mRefreshFlagMutex(),
     mPainter()
 {
     setUpdatesEnabled(true);
@@ -33,7 +31,7 @@ TetrisWidget::TetrisWidget(QWidget * inParent, int inSquareWidth, int inSquareHe
 
     QTimer * timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(checkRefreshFlag()));
-    timer->setInterval(20);
+    timer->setInterval(16);
     timer->start();
 }
 
@@ -45,17 +43,7 @@ TetrisWidget::~TetrisWidget()
 
 void TetrisWidget::checkRefreshFlag()
 {
-    bool doRefresh = false;
-    {
-        QMutexLocker locker(&mRefreshFlagMutex);
-        if (mRefreshFlag)
-        {
-            doRefresh = mRefreshFlag;
-            mRefreshFlag = false;
-        }
-    }
-
-    if (doRefresh)
+    if (getGame()->checkDirty())
     {
         update();
     }
@@ -104,13 +92,6 @@ void TetrisWidget::keyPressEvent(QKeyEvent * inEvent)
             break;
         }
     }
-}
-
-
-void TetrisWidget::scheduleRefresh()
-{
-    QMutexLocker lock(&mRefreshFlagMutex);
-    mRefreshFlag = true;
 }
 
 

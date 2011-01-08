@@ -22,7 +22,7 @@ MainWindow::MainWindow(QWidget *parent) :
     mTetrisWidget()
 {
     mTetrisWidget = new TetrisWidget(this, cSquareWidth, cSquareHeight);
-    mSimpleGame.reset(new SimpleGame(mTetrisWidget, cRowCount, cColumnCount));
+    mSimpleGame.reset(new SimpleGame(cRowCount, cColumnCount));
     mTetrisWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     mFPSLabel = new QLabel(this);

@@ -11,33 +11,24 @@
 namespace Tetris {
 
 
-struct SimpleGame::SimpleGameImpl : public Game::EventHandler
+struct SimpleGame::SimpleGameImpl
 {
-    SimpleGameImpl(SimpleGame::EventHandler * inSimpleGameEventHandler,
-                   size_t inRowCount,
+    SimpleGameImpl(size_t inRowCount,
                    size_t inColumnCount) :
-        mGame(Create<Game>(this, inRowCount, inColumnCount)),
+        mGame(Create<Game>(inRowCount, inColumnCount)),
         mGravity(new Gravity(mGame)),
-        mSimpleGameEventHandler(inSimpleGameEventHandler),
         mCenterColumn(static_cast<size_t>(0.5 + inColumnCount / 2.0))
     {
     }
 
-
-    virtual void onGameChanged()
-    {
-        mSimpleGameEventHandler->onSimpleGameChanged();
-    }
-
     ThreadSafe<Game> mGame;
     boost::scoped_ptr<Gravity> mGravity;
-    SimpleGame::EventHandler * mSimpleGameEventHandler;
     std::size_t mCenterColumn;
 };
 
 
-SimpleGame::SimpleGame(SimpleGame::EventHandler * inEventHandler, size_t inRowCount, size_t inColumnCount) :
-    mImpl(new SimpleGameImpl(inEventHandler, inRowCount, inColumnCount))
+SimpleGame::SimpleGame(size_t inRowCount, size_t inColumnCount) :
+    mImpl(new SimpleGameImpl(inRowCount, inColumnCount))
 {
 }
 
@@ -47,21 +38,31 @@ SimpleGame::~SimpleGame()
 }
 
 
+bool SimpleGame::checkDirty()
+{
+    ScopedReaderAndWriter<Game> game(mImpl->mGame);
+    return game->checkDirty();
+}
+
+
 bool SimpleGame::isGameOver() const
 {
-    return ScopedReader<Game>(mImpl->mGame)->isGameOver();
+    ScopedReader<Game> game(mImpl->mGame);
+    return game->isGameOver();
 }
 
 
 int SimpleGame::rowCount() const
 {
-    return ScopedReader<Game>(mImpl->mGame)->rowCount();
+    ScopedReader<Game> game(mImpl->mGame);
+    return game->rowCount();
 }
 
 
 int SimpleGame::columnCount() const
 {
-    return ScopedReader<Game>(mImpl->mGame)->columnCount();
+    ScopedReader<Game> game(mImpl->mGame);
+    return game->columnCount();
 }
 
 
