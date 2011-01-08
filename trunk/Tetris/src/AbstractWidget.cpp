@@ -8,11 +8,6 @@
 namespace Tetris {
 
 
-static const int cSpacing = 5;
-static const int cFutureBlockCount = 3;
-
-
-
 static Poco::Stopwatch sFPSStopwatch;
 
 
@@ -36,6 +31,8 @@ Rect::Rect(int x, int y, int width, int height) :
 AbstractWidget::AbstractWidget(int inSquareWidth, int inSquareHeight) :
     mSquareWidth(inSquareWidth),
     mSquareHeight(inSquareHeight),
+    mSpacing(5),
+    mFutureBlockCount(3),
     mFrameCount(0),
     mFPS(0)
 {
@@ -65,7 +62,7 @@ void AbstractWidget::coordinateRepaint(const Game & inGame)
     // Get the rects
     Rect gameRect(getGameRect());
     std::vector<BlockType> futureBlocks;
-    inGame.getFutureBlocksWithOffset(inGame.currentBlockIndex() + 1, cFutureBlockCount, futureBlocks);
+    inGame.getFutureBlocksWithOffset(inGame.currentBlockIndex() + 1, mFutureBlockCount, futureBlocks);
     Rect futureBlocksRect(getFutureBlocksRect(futureBlocks.size()));
 
     // Clear the rects
@@ -76,7 +73,7 @@ void AbstractWidget::coordinateRepaint(const Game & inGame)
     paintGameGrid(inGame.gameGrid());
 
     // Paint future blocks
-    paintFutureBlocks(futureBlocksRect, cSpacing, futureBlocks);
+    paintFutureBlocks(futureBlocksRect, mSpacing, futureBlocks);
 
 
     // Paint active block
@@ -85,14 +82,7 @@ void AbstractWidget::coordinateRepaint(const Game & inGame)
               activeBlock.row() * mSquareHeight,
               activeBlock.grid());
 
-    mFrameCount++;
-
-    if (sFPSStopwatch.elapsed() > 1000000)
-    {
-        mFPS = (1000.0 * 1000.0 * mFrameCount) / static_cast<double>(sFPSStopwatch.elapsed());
-        mFrameCount = 0;
-        sFPSStopwatch.restart();
-    }
+    recalculateFPS();
 }
 
 
@@ -136,6 +126,19 @@ void AbstractWidget::paintFutureBlocks(const Rect & inRect, int inSpacing, const
         const Grid & grid(GetGrid(GetBlockIdentifier(inBlockTypes[i], 0)));
         paintGrid(inRect.x(), y, grid);
         y += 3 * squareHeight();
+    }
+}
+
+
+void AbstractWidget::recalculateFPS()
+{
+    mFrameCount++;
+
+    if (sFPSStopwatch.elapsed() > 1000000)
+    {
+        mFPS = (1000.0 * 1000.0 * mFrameCount) / static_cast<double>(sFPSStopwatch.elapsed());
+        mFrameCount = 0;
+        sFPSStopwatch.restart();
     }
 }
 
