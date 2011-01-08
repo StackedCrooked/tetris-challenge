@@ -26,18 +26,17 @@ class Game;
 class SimpleGame
 {
 public:
-    SimpleGame(size_t inRowCount, size_t inColumnCount);
+    class EventHandler
+    {
+    public:
+        virtual void onSimpleGameChanged() = 0;
+    };
+
+    SimpleGame(EventHandler * inEventHandler, size_t inRowCount, size_t inColumnCount);
 
     ~SimpleGame();
 
-	// Get access to the game object.
-    ThreadSafe<Game> & getGame() { return mGame; }
-
-    const ThreadSafe<Game> & getGame() const { return mGame; }
-
     bool isGameOver() const;
-
-    void getSize(int & outColoumCount, int & outRowCount);
 
     int rowCount() const;
 
@@ -51,9 +50,6 @@ public:
 
     int level() const;
 
-    // Set to 0 to revert to default speed based on numer of lines made.
-    void setLevel(int inLevel);
-
     // Returns a copy to avoid race conditions.
     Block activeBlock() const;
 
@@ -61,13 +57,7 @@ public:
     Grid gameGrid() const;
 
     // Gets the currently active block and any blocks that follow.
-    std::vector<Block> getNextBlocks(size_t inCount) const;
-
-    void enableGravity(bool inEnabled);
-
-    void enableComputerPlayer(bool inEnabled);
-
-    void setComputerMoveSpeed(int inNumberOfMovesPerSecond);
+    Block getNextBlock() const;
 
 private:
     // non-copyable
@@ -76,8 +66,8 @@ private:
 
     ThreadSafe<Game> mGame;
     boost::scoped_ptr<Gravity> mGravity;
-    boost::scoped_ptr<ComputerPlayer> mComputerPlayer;
-    int mComputerMoveSpeed;
+    EventHandler * mEventHandler;
+    std::size_t mCenterColumn;
 };
 
 } // namespace Tetris

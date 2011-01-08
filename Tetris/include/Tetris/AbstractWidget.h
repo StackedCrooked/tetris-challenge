@@ -4,12 +4,13 @@
 
 #include "Tetris/BlockType.h"
 #include "Tetris/Grid.h"
+#include "Tetris/SimpleGame.h"
 
 
 namespace Tetris {
 
 
-class Game;
+class SimpleGame;
 
 
 class RGBColor
@@ -54,12 +55,22 @@ private:
 };
 
 
-class AbstractWidget
+class AbstractWidget : public SimpleGame::EventHandler
 {
 public:
     AbstractWidget(int insquareWidth, int inSquareHeight);
 
-    virtual ~AbstractWidget() {}
+    virtual ~AbstractWidget();
+
+    virtual void onSimpleGameChanged();
+
+    virtual void refresh() = 0;
+
+    void setGame(Tetris::SimpleGame * inSimpleGame);
+
+    const Tetris::SimpleGame * getGame() const;
+
+    Tetris::SimpleGame * getGame();
 
     int getFPS() const;
 
@@ -70,7 +81,8 @@ public:
     virtual const RGBColor & getColor(BlockType inBlockType) const;
 
 protected:
-    void coordinateRepaint(const Game & inGame);
+    virtual void setMinSize(int inWidth, int inHeight) = 0;
+    void coordinateRepaint(const SimpleGame & inGame);
     virtual void paintSquare(const Rect & inRect, const RGBColor & inColor) = 0;
     virtual void drawLine(int x1, int y1, int x2, int y2, int inPenWidth, const RGBColor & inColor) = 0;
     virtual Rect getGameRect() const = 0;
@@ -82,10 +94,11 @@ private:
     void paintFutureBlocks(const Rect & inRect, int inSpacing, const std::vector<BlockType> & inBlockTypes);
     void recalculateFPS();
 
+    Tetris::SimpleGame * mSimpleGame;
     int mSquareWidth;
     int mSquareHeight;
     int mSpacing;
-    int mFutureBlockCount;
+    int mMargin;
     unsigned int mFrameCount;
     double mFPS;
 };

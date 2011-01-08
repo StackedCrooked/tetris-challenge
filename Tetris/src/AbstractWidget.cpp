@@ -1,8 +1,9 @@
 #include "Tetris/Config.h"
 #include "Tetris/AbstractWidget.h"
 #include "Tetris/Block.h"
-#include "Tetris/Game.h"
+#include "Tetris/SimpleGame.h"
 #include "Poco/Stopwatch.h"
+#include <boost/bind.hpp>
 
 
 namespace Tetris {
@@ -47,14 +48,45 @@ Rect::Rect(int x, int y, int width, int height) :
 
 
 AbstractWidget::AbstractWidget(int inSquareWidth, int inSquareHeight) :
+    mSimpleGame(0),
     mSquareWidth(inSquareWidth),
     mSquareHeight(inSquareHeight),
     mSpacing(5),
-    mFutureBlockCount(3),
+    mMargin(4),
     mFrameCount(0),
     mFPS(0)
 {
     sFPSStopwatch.start();
+}
+
+
+AbstractWidget::~AbstractWidget()
+{
+}
+
+
+void AbstractWidget::onSimpleGameChanged()
+{
+    refresh();
+}
+
+
+void AbstractWidget::setGame(SimpleGame * inSimpleGame)
+{
+    mSimpleGame = inSimpleGame;
+    setMinSize((mSimpleGame->columnCount() + 4) * squareWidth() + mMargin, mSimpleGame->rowCount() * squareHeight());
+}
+
+
+const Tetris::SimpleGame * AbstractWidget::getGame() const
+{
+    return mSimpleGame;
+}
+
+
+Tetris::SimpleGame * AbstractWidget::getGame()
+{
+    return mSimpleGame;
 }
 
 
@@ -93,12 +125,13 @@ const RGBColor & AbstractWidget::getColor(BlockType inBlockType) const
 }
 
 
-void AbstractWidget::coordinateRepaint(const Game & inGame)
+void AbstractWidget::coordinateRepaint(const SimpleGame & inGame)
 {
     // Get the rects
     Rect gameRect(getGameRect());
     std::vector<BlockType> futureBlocks;
-    inGame.getFutureBlocksWithOffset(inGame.currentBlockIndex() + 1, mFutureBlockCount, futureBlocks);
+
+    futureBlocks.push_back(inGame.getNextBlock().type());
     Rect futureBlocksRect(getFutureBlocksRect(futureBlocks.size()));
 
     // Clear the rects
@@ -170,7 +203,7 @@ void AbstractWidget::recalculateFPS()
 {
     mFrameCount++;
 
-    if (sFPSStopwatch.elapsed() > 1000000)
+    if (sFPSStopwatch.elapsed() > 2 * 1000.0 * 1000.0)
     {
         mFPS = (1000.0 * 1000.0 * mFrameCount) / static_cast<double>(sFPSStopwatch.elapsed());
         mFrameCount = 0;

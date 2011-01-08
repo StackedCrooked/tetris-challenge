@@ -1,5 +1,7 @@
 #include "TetrisWidget.h"
+#include "Tetris/Game.h"
 #include "Tetris/SimpleGame.h"
+#include "Tetris/Threading.h"
 #include <QColor>
 #include <QTimer>
 #include <stdexcept>
@@ -15,19 +17,13 @@ using namespace Tetris;
 
 TetrisWidget::TetrisWidget(QWidget * inParent, int inSquareWidth, int inSquareHeight) :
     QWidget(inParent),
-	AbstractWidget(inSquareWidth, inSquareHeight),
-    mSimpleGame(0),
+    AbstractWidget(inSquareWidth, inSquareHeight),
     mRowCount(20),
     mColCount(10),
-	mMinSize(14 * inSquareWidth, 20 * inSquareHeight),
+    mMinSize(),
     mPainter()
 {
     setUpdatesEnabled(true);
-
-    QTimer *timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(update()));
-    timer->setInterval(20);
-    timer->start();
 }
 
 
@@ -36,12 +32,15 @@ TetrisWidget::~TetrisWidget()
 }
 
 
-void TetrisWidget::setSimpleGame(SimpleGame * inSimpleGame)
+void TetrisWidget::refresh()
 {
-    mSimpleGame = inSimpleGame;
-    mSimpleGame->getSize(mColCount, mRowCount);
-	mMinSize = QSize((mColCount + 4) * squareWidth() + cMargin,
-					 mRowCount * squareHeight());
+    update();
+}
+
+
+void TetrisWidget::setMinSize(int inWidth, int inHeight)
+{
+    mMinSize = QSize(inWidth, inHeight);
 }
 
 
@@ -89,32 +88,30 @@ Tetris::Rect TetrisWidget::getGameRect() const
 {
     return Tetris::Rect(0,
                         0,
-						mColCount * squareWidth(),
-						mRowCount * squareHeight());
+                        mColCount * squareWidth(),
+                        mRowCount * squareHeight());
 }
 
 
 Tetris::Rect TetrisWidget::getFutureBlocksRect(unsigned int inFutureBlockCount) const
 {
-	int blockHeight = 3 * squareHeight();
-	return Tetris::Rect(mColCount * squareHeight() + cMargin,
+    int blockHeight = 3 * squareHeight();
+    return Tetris::Rect(mColCount * squareHeight() + cMargin,
                         0,
-						4 * squareWidth(),
+                        4 * squareWidth(),
                         inFutureBlockCount * blockHeight);
 }
 
 
 void TetrisWidget::paintEvent(QPaintEvent * )
 {
-    if (!mSimpleGame)
+    if (!getGame())
     {
         return;
     }
 
     mPainter.reset(new QPainter(this));
-    ScopedReader<Game> gameReader(mSimpleGame->getGame());
-    const Game & game(*gameReader.get());
-    coordinateRepaint(game);
+    coordinateRepaint(*getGame());
     mPainter.reset();
 }
 
