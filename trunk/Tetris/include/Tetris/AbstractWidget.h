@@ -64,8 +64,6 @@ public:
 
     virtual void onSimpleGameChanged();
 
-    virtual void refresh() = 0;
-
     void setGame(Tetris::SimpleGame * inSimpleGame);
 
     const Tetris::SimpleGame * getGame() const;
@@ -81,6 +79,7 @@ public:
     virtual const RGBColor & getColor(BlockType inBlockType) const;
 
 protected:
+    virtual void scheduleRefresh() = 0;
     virtual void setMinSize(int inWidth, int inHeight) = 0;
     void coordinateRepaint(const SimpleGame & inGame);
     virtual void paintSquare(const Rect & inRect, const RGBColor & inColor) = 0;

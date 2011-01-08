@@ -67,7 +67,7 @@ AbstractWidget::~AbstractWidget()
 
 void AbstractWidget::onSimpleGameChanged()
 {
-    refresh();
+    scheduleRefresh();
 }
 
 

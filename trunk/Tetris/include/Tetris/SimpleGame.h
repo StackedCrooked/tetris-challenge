@@ -4,20 +4,12 @@
 
 #include "Tetris/Direction.h"
 #include "Tetris/Block.h"
-#include "Tetris/BlockType.h"
-#include "Tetris/ComputerPlayer.h"
-#include "Tetris/Gravity.h"
-#include "Tetris/Grid.h"
-#include "Tetris/Threading.h"
 #include <boost/scoped_ptr.hpp>
 #include <vector>
 #include <cstddef>
 
 
 namespace Tetris {
-
-
-class Game;
 
 
 /**
@@ -32,7 +24,7 @@ public:
         virtual void onSimpleGameChanged() = 0;
     };
 
-    SimpleGame(EventHandler * inEventHandler, size_t inRowCount, size_t inColumnCount);
+    SimpleGame(SimpleGame::EventHandler * inEventHandler, size_t inRowCount, size_t inColumnCount);
 
     ~SimpleGame();
 
@@ -64,10 +56,8 @@ private:
     SimpleGame(const SimpleGame & );
     SimpleGame & operator=(const SimpleGame&);
 
-    ThreadSafe<Game> mGame;
-    boost::scoped_ptr<Gravity> mGravity;
-    EventHandler * mEventHandler;
-    std::size_t mCenterColumn;
+    struct SimpleGameImpl;
+    SimpleGameImpl * mImpl;
 };
 
 } // namespace Tetris

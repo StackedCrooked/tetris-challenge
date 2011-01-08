@@ -2,7 +2,10 @@
 #include "Tetris/Game.h"
 #include "Tetris/SimpleGame.h"
 #include "Tetris/Threading.h"
+#include "Tetris/AutoPtrSupport.h"
+#include <QKeyEvent>
 #include <QColor>
+#include <QMutexLocker>
 #include <QTimer>
 #include <stdexcept>
 #include <iostream>
@@ -21,9 +24,17 @@ TetrisWidget::TetrisWidget(QWidget * inParent, int inSquareWidth, int inSquareHe
     mRowCount(20),
     mColCount(10),
     mMinSize(),
+    mRefreshFlag(), // Default contructor is fine.
+    mRefreshFlagMutex(),
     mPainter()
 {
     setUpdatesEnabled(true);
+    setFocusPolicy(Qt::StrongFocus);
+
+    QTimer * timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(checkRefreshFlag()));
+    timer->setInterval(20);
+    timer->start();
 }
 
 
@@ -32,9 +43,74 @@ TetrisWidget::~TetrisWidget()
 }
 
 
-void TetrisWidget::refresh()
+void TetrisWidget::checkRefreshFlag()
 {
-    update();
+    bool doRefresh = false;
+    {
+        QMutexLocker locker(&mRefreshFlagMutex);
+        if (mRefreshFlag)
+        {
+            doRefresh = mRefreshFlag;
+            mRefreshFlag = false;
+        }
+    }
+
+    if (doRefresh)
+    {
+        update();
+    }
+}
+
+
+void TetrisWidget::keyPressEvent(QKeyEvent * inEvent)
+{
+    if (!getGame() || getGame()->isGameOver())
+    {
+        QWidget::keyPressEvent(inEvent);
+        return;
+    }
+
+
+    switch (inEvent->key())
+    {
+        case Qt::Key_Left:
+        {
+            getGame()->move(Direction_Left);
+            break;
+        }
+        case Qt::Key_Right:
+        {
+            getGame()->move(Direction_Right);
+            break;
+        }
+        case Qt::Key_Down:
+        {
+            getGame()->move(Direction_Down);
+            break;
+        }
+        case Qt::Key_Up:
+        {
+            getGame()->rotate();
+            break;
+        }
+        case Qt::Key_Space:
+        {
+            getGame()->drop();
+            break;
+        }
+        default:
+        {
+            QWidget::keyPressEvent(inEvent);
+            break;
+        }
+    }
+}
+
+
+void TetrisWidget::scheduleRefresh()
+{
+    QMutexLocker lock(&mRefreshFlagMutex);
+    mRefreshFlag = true;
 }
 
 

@@ -18,7 +18,8 @@ namespace Tetris {
 extern const int cMaxLevel;
 
 
-Game::Game(size_t inNumRows, size_t inNumColumns) :
+Game::Game(EventHandler * inEventHandler, size_t inNumRows, size_t inNumColumns) :
+    mEventHandler(inEventHandler),
     mNumRows(inNumRows),
     mNumColumns(inNumColumns),
     mCurrentNode(GameStateNode::CreateRootNode(inNumRows, inNumColumns).release()),
@@ -46,8 +47,17 @@ std::auto_ptr<Block> Game::CreateDefaultBlock(BlockType inBlockType, size_t inNu
 }
 
 
+void Game::triggerGameChanged()
+{
+    if (mEventHandler)
+    {
+        mEventHandler->onGameChanged();
+    }
+}
+
+
 void Game::setCurrentNode(NodePtr inCurrentNode)
-{            
+{
     Assert(inCurrentNode->depth() == mCurrentNode->depth() + 1);
 
     mCurrentNode = inCurrentNode;
@@ -55,11 +65,12 @@ void Game::setCurrentNode(NodePtr inCurrentNode)
     supplyBlocks();
 
     mActiveBlock.reset(CreateDefaultBlock(mBlocks[mCurrentBlockIndex], mNumColumns).release());
+    triggerGameChanged();
 }
 
 
 void Game::supplyBlocks() const
-{            
+{
     if (!mBlockFactory && (mCurrentBlockIndex >= mBlocks.size()))
     {
         throw std::runtime_error("This is a cloned Game object and its number of future blocks is depleted.");
@@ -139,7 +150,7 @@ void Game::getFutureBlocks(size_t inCount, BlockTypes & outBlocks) const
 
 
 void Game::getFutureBlocksWithOffset(size_t inOffset, size_t inCount, BlockTypes & outBlocks) const
-{        
+{
     if (!mBlockFactory && (mBlocks.size() < inOffset + inCount))
     {
         throw std::runtime_error("This is a cloned Game object and its number of future blocks is depleted.");
@@ -212,6 +223,7 @@ bool Game::navigateNodeDown()
     NodePtr nextNode = *mCurrentNode->children().begin();
     Assert(nextNode->depth() == mCurrentNode->depth() + 1);
     setCurrentNode(nextNode);
+    triggerGameChanged();
     return true;
 }
 
@@ -270,6 +282,7 @@ bool Game::move(Direction inDirection)
     {
         block.setRow(newRow);
         block.setColumn(newCol);
+        triggerGameChanged();
         return true;
     }
 
@@ -311,6 +324,7 @@ bool Game::move(Direction inDirection)
                                     CreatePoly<Evaluator, Balanced>()));
     mCurrentNode->addChild(child);
     setCurrentNode(child);
+    triggerGameChanged();
     return false;
 }
 
@@ -330,6 +344,7 @@ bool Game::rotate()
         block.setRotation(oldRotation);
         return false;
     }
+    triggerGameChanged();
     return true;
 }
 
@@ -339,6 +354,7 @@ void Game::drop()
     while (move(Direction_Down))
     {
         // Keep going.
+        triggerGameChanged();
     }
 }
 
@@ -360,6 +376,7 @@ int Game::level() const
 void Game::setLevel(int inLevel)
 {
     mOverrideLevel = inLevel;
+    triggerGameChanged();
 }
 
 
