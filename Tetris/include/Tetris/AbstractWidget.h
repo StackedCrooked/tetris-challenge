@@ -57,22 +57,21 @@ private:
 class AbstractWidget
 {
 public:
-	AbstractWidget(int insquareWidth, int inSquareHeight);
+    AbstractWidget(int insquareWidth, int inSquareHeight);
 
-	inline int squareWidth() const { return mSquareWidth; }
+    virtual ~AbstractWidget() {}
 
-	inline int squareHeight() const { return mSquareHeight; }
+    int getFPS() const { return static_cast<int>(0.5 + mFPS); }
 
-    // The subclass may call this method in order to have the block repainted.
+    inline int squareWidth() const { return mSquareWidth; }
+
+    inline int squareHeight() const { return mSquareHeight; }
+
+    virtual const RGBColor & getColor(BlockType inBlockType) const;
+
+protected:
     void coordinateRepaint(const Game & inGame);
 
-    // This method returns the official color for each block.
-    // You are free to use your own colors however.
-    const RGBColor & getColor(BlockType inBlockType) const;
-
-    //
-    // These methods must be implemented by the subclass.
-    //
     virtual void paintSquare(const Rect & inRect, const RGBColor & inColor) = 0;
 
     virtual void drawLine(int x1, int y1, int x2, int y2, int inPenWidth, const RGBColor & inColor) = 0;
@@ -81,15 +80,16 @@ public:
 
     virtual Rect getFutureBlocksRect(unsigned int inFutureBlockCount) const = 0;
 
-    int getFPS() const { return static_cast<int>(0.5 + mFPS); }
-
 private:
     void paintGrid(int y, int x, const Grid & inGrid);
     void paintGameGrid(const Grid & inGrid);
     void paintFutureBlocks(const Rect & inRect, int inSpacing, const std::vector<BlockType> & inBlockTypes);
+    void recalculateFPS();
 
-	int mSquareWidth;
-	int mSquareHeight;
+    int mSquareWidth;
+    int mSquareHeight;
+    int mSpacing;
+    int mFutureBlockCount;
     unsigned int mFrameCount;
     double mFPS;
 };
