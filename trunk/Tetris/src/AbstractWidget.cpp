@@ -19,6 +19,24 @@ RGBColor::RGBColor(int red, int green, int blue) :
 }
 
 
+int RGBColor::red() const
+{
+    return mRed;
+}
+
+
+int RGBColor::green() const
+{
+    return mGreen;
+}
+
+
+int RGBColor::blue() const
+{
+    return mBlue;
+}
+
+
 Rect::Rect(int x, int y, int width, int height) :
     mX(x),
     mY(y),
@@ -37,6 +55,24 @@ AbstractWidget::AbstractWidget(int inSquareWidth, int inSquareHeight) :
     mFPS(0)
 {
     sFPSStopwatch.start();
+}
+
+
+int AbstractWidget::getFPS() const
+{
+    return static_cast<int>(0.5 + mFPS);
+}
+
+
+int AbstractWidget::squareWidth() const
+{
+    return mSquareWidth;
+}
+
+
+int AbstractWidget::squareHeight() const
+{
+    return mSquareHeight;
 }
 
 
