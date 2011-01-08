@@ -55,14 +55,12 @@ private:
 };
 
 
-class AbstractWidget : public SimpleGame::EventHandler
+class AbstractWidget
 {
 public:
     AbstractWidget(int insquareWidth, int inSquareHeight);
 
     virtual ~AbstractWidget();
-
-    virtual void onSimpleGameChanged();
 
     void setGame(Tetris::SimpleGame * inSimpleGame);
 
@@ -79,7 +77,6 @@ public:
     virtual const RGBColor & getColor(BlockType inBlockType) const;
 
 protected:
-    virtual void scheduleRefresh() = 0;
     virtual void setMinSize(int inWidth, int inHeight) = 0;
     void coordinateRepaint(const SimpleGame & inGame);
     virtual void paintSquare(const Rect & inRect, const RGBColor & inColor) = 0;

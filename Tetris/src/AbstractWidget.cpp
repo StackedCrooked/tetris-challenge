@@ -65,12 +65,6 @@ AbstractWidget::~AbstractWidget()
 }
 
 
-void AbstractWidget::onSimpleGameChanged()
-{
-    scheduleRefresh();
-}
-
-
 void AbstractWidget::setGame(SimpleGame * inSimpleGame)
 {
     mSimpleGame = inSimpleGame;

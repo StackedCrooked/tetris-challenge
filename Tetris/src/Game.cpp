@@ -18,8 +18,7 @@ namespace Tetris {
 extern const int cMaxLevel;
 
 
-Game::Game(EventHandler * inEventHandler, size_t inNumRows, size_t inNumColumns) :
-    mEventHandler(inEventHandler),
+Game::Game(size_t inNumRows, size_t inNumColumns) :
     mNumRows(inNumRows),
     mNumColumns(inNumColumns),
     mCurrentNode(GameStateNode::CreateRootNode(inNumRows, inNumColumns).release()),
@@ -27,7 +26,8 @@ Game::Game(EventHandler * inEventHandler, size_t inNumRows, size_t inNumColumns)
     mBlockFactory(new BlockFactory),
     mBlocks(),
     mCurrentBlockIndex(0),
-    mOverrideLevel(-1)
+    mOverrideLevel(-1),
+    mDirty(true)
 {
     if (mBlocks.empty())
     {
@@ -47,12 +47,22 @@ std::auto_ptr<Block> Game::CreateDefaultBlock(BlockType inBlockType, size_t inNu
 }
 
 
-void Game::triggerGameChanged()
+bool Game::checkDirty()
 {
-    if (mEventHandler)
+    boost::mutex::scoped_lock lock(mDirtyMutex);
+    if (mDirty)
     {
-        mEventHandler->onGameChanged();
+        mDirty = false;
+        return true;
     }
+    return false;
+}
+
+
+void Game::setDirty()
+{
+    boost::mutex::scoped_lock lock(mDirtyMutex);
+    mDirty = true;
 }
 
 
@@ -65,7 +75,7 @@ void Game::setCurrentNode(NodePtr inCurrentNode)
     supplyBlocks();
 
     mActiveBlock.reset(CreateDefaultBlock(mBlocks[mCurrentBlockIndex], mNumColumns).release());
-    triggerGameChanged();
+    setDirty();
 }
 
 
@@ -223,7 +233,7 @@ bool Game::navigateNodeDown()
     NodePtr nextNode = *mCurrentNode->children().begin();
     Assert(nextNode->depth() == mCurrentNode->depth() + 1);
     setCurrentNode(nextNode);
-    triggerGameChanged();
+    setDirty();
     return true;
 }
 
@@ -282,7 +292,7 @@ bool Game::move(Direction inDirection)
     {
         block.setRow(newRow);
         block.setColumn(newCol);
-        triggerGameChanged();
+        setDirty();
         return true;
     }
 
@@ -324,7 +334,7 @@ bool Game::move(Direction inDirection)
                                     CreatePoly<Evaluator, Balanced>()));
     mCurrentNode->addChild(child);
     setCurrentNode(child);
-    triggerGameChanged();
+    setDirty();
     return false;
 }
 
@@ -344,7 +354,7 @@ bool Game::rotate()
         block.setRotation(oldRotation);
         return false;
     }
-    triggerGameChanged();
+    setDirty();
     return true;
 }
 
@@ -354,7 +364,7 @@ void Game::drop()
     while (move(Direction_Down))
     {
         // Keep going.
-        triggerGameChanged();
+        setDirty();
     }
 }
 
@@ -376,7 +386,7 @@ int Game::level() const
 void Game::setLevel(int inLevel)
 {
     mOverrideLevel = inLevel;
-    triggerGameChanged();
+    setDirty();
 }
 
 

@@ -30,13 +30,11 @@ class GameImpl;
 class Game
 {
 public:
-    class EventHandler
-    {
-    public:
-        virtual void onGameChanged() = 0;
-    };
 
-    Game(EventHandler * inEventHandler, size_t inNumRows, size_t inNumColumns);
+    Game(size_t inNumRows, size_t inNumColumns);
+
+    // Indicates that a refresh is required in the higher layer view
+    bool checkDirty();
 
     bool isGameOver() const;
 
@@ -85,9 +83,8 @@ private:
     void reserveBlocks(size_t inCount);
     void setCurrentNode(NodePtr inCurrentNode);
     void supplyBlocks() const;
-    void triggerGameChanged();
+    void setDirty();
 
-    EventHandler * mEventHandler;
     size_t mNumRows;
     size_t mNumColumns;
     NodePtr mCurrentNode;
@@ -96,6 +93,9 @@ private:
     mutable BlockTypes mBlocks;
     size_t mCurrentBlockIndex;
     int mOverrideLevel;
+
+    mutable bool mDirty;
+    mutable boost::mutex mDirtyMutex;
 };
 
 

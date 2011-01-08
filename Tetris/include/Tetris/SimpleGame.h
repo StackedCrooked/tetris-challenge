@@ -18,15 +18,11 @@ namespace Tetris {
 class SimpleGame
 {
 public:
-    class EventHandler
-    {
-    public:
-        virtual void onSimpleGameChanged() = 0;
-    };
-
-    SimpleGame(SimpleGame::EventHandler * inEventHandler, size_t inRowCount, size_t inColumnCount);
+    SimpleGame(size_t inRowCount, size_t inColumnCount);
 
     ~SimpleGame();
+
+    bool checkDirty();
 
     bool isGameOver() const;
 
