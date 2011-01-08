@@ -3,6 +3,7 @@
 #include "Tetris/Evaluator.h"
 #include "Tetris/Game.h"
 #include "Tetris/Gravity.h"
+#include "Tetris/Threading.h"
 #include "Tetris/AutoPtrSupport.h"
 #include <stdexcept>
 
