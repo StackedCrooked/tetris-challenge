@@ -1,13 +1,12 @@
-cmake_minimum_required(VERSION 2.6) 
-project(TETRIS) 
+cmake_minimum_required(VERSION 2.6)
+project(TETRIS)
 
-
-set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_BUILD_TYPE $ENV{TETRIS_BUILD_CONFIGURATION})
 
 
 if(WIN32)
-	set(ARCH x86)
-	set(PLATFORM Windows)
+    set(ARCH x86)
+    set(PLATFORM Windows)
 else()
     execute_process(COMMAND uname OUTPUT_VARIABLE PLATFORM)
     string(REPLACE "\n" "" PLATFORM ${PLATFORM})
@@ -28,12 +27,12 @@ set(FINAL_COMPILE_FLAGS "${CXX_FLAGS_${CMAKE_BUILD_TYPE}}")
 
 
 include_directories(
-	${BOOST} ${POCO}/Foundation/include
-	${POCO}/CppUnit/include)
+    ${BOOST} ${POCO}/Foundation/include
+    ${POCO}/CppUnit/include)
 
 
 link_directories(
-	${BOOST}lib/${PLATFORM}/${ARCH}
+    ${BOOST}lib/${PLATFORM}/${ARCH}
     ${POCO}lib/${PLATFORM}/${ARCH})
 
 

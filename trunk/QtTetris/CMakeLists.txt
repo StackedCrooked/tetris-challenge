@@ -1,6 +1,7 @@
-cmake_minimum_required(VERSION 2.6) 
+cmake_minimum_required(VERSION 2.6)
 project(QtTetris)
-set(CMAKE_BUILD_TYPE Release)
+message("TETRIS_BUILD_CONFIGURATION: $ENV{TETRIS_BUILD_CONFIGURATION}")
+set(CMAKE_BUILD_TYPE $ENV{TETRIS_BUILD_CONFIGURATION})
 FIND_PACKAGE(Qt4 REQUIRED)
 
 
@@ -34,7 +35,7 @@ include_directories(
 
 
 link_directories(
-	${BOOST}lib/${PLATFORM}/${ARCH}
+    ${BOOST}lib/${PLATFORM}/${ARCH}
     ${POCO}lib/${PLATFORM}/${ARCH})
 
 
