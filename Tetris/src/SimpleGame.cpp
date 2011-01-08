@@ -1,23 +1,43 @@
 #include "Tetris/Config.h"
 #include "Tetris/SimpleGame.h"
-#include "Tetris/ComputerPlayer.h"
 #include "Tetris/Evaluator.h"
 #include "Tetris/Game.h"
+#include "Tetris/Gravity.h"
 #include "Tetris/AutoPtrSupport.h"
-#include <boost/bind.hpp>
 #include <stdexcept>
 
 
 namespace Tetris {
 
 
-SimpleGame::SimpleGame(EventHandler * inEventHandler, size_t inRowCount, size_t inColumnCount) :
-    mGame(Create<Game>(inRowCount, inColumnCount)),
-    mGravity(new Gravity(mGame)),
-    mEventHandler(inEventHandler),
-    mCenterColumn(static_cast<size_t>(0.5 + inColumnCount / 2.0))
+struct SimpleGame::SimpleGameImpl : public Game::EventHandler
 {
-    mGravity->setCallback(boost::bind(&EventHandler::onSimpleGameChanged, mEventHandler));
+    SimpleGameImpl(SimpleGame::EventHandler * inSimpleGameEventHandler,
+                   size_t inRowCount,
+                   size_t inColumnCount) :
+        mGame(Create<Game>(this, inRowCount, inColumnCount)),
+        mGravity(new Gravity(mGame)),
+        mSimpleGameEventHandler(inSimpleGameEventHandler),
+        mCenterColumn(static_cast<size_t>(0.5 + inColumnCount / 2.0))
+    {
+    }
+
+
+    virtual void onGameChanged()
+    {
+        mSimpleGameEventHandler->onSimpleGameChanged();
+    }
+
+    ThreadSafe<Game> mGame;
+    boost::scoped_ptr<Gravity> mGravity;
+    SimpleGame::EventHandler * mSimpleGameEventHandler;
+    std::size_t mCenterColumn;
+};
+
+
+SimpleGame::SimpleGame(SimpleGame::EventHandler * inEventHandler, size_t inRowCount, size_t inColumnCount) :
+    mImpl(new SimpleGameImpl(inEventHandler, inRowCount, inColumnCount))
+{
 }
 
 
@@ -28,58 +48,58 @@ SimpleGame::~SimpleGame()
 
 bool SimpleGame::isGameOver() const
 {
-    return ScopedReader<Game>(mGame)->isGameOver();
+    return ScopedReader<Game>(mImpl->mGame)->isGameOver();
 }
 
 
 int SimpleGame::rowCount() const
 {
-    return ScopedReader<Game>(mGame)->rowCount();
+    return ScopedReader<Game>(mImpl->mGame)->rowCount();
 }
 
 
 int SimpleGame::columnCount() const
 {
-    return ScopedReader<Game>(mGame)->columnCount();
+    return ScopedReader<Game>(mImpl->mGame)->columnCount();
 }
 
 
 void SimpleGame::move(Direction inDirection)
 {
-    ScopedReaderAndWriter<Game> game(mGame);
+    ScopedReaderAndWriter<Game> game(mImpl->mGame);
     game->move(inDirection);
 }
 
 
 void SimpleGame::rotate()
 {
-    ScopedReaderAndWriter<Game> game(mGame);
+    ScopedReaderAndWriter<Game> game(mImpl->mGame);
     game->rotate();
 }
 
 
 void SimpleGame::drop()
 {
-    ScopedReaderAndWriter<Game> game(mGame);
+    ScopedReaderAndWriter<Game> game(mImpl->mGame);
     game->drop();
 }
 
 
 int SimpleGame::level() const
 {
-    return ScopedReader<Game>(mGame)->level();
+    return ScopedReader<Game>(mImpl->mGame)->level();
 }
 
 
 Block SimpleGame::activeBlock() const
 {
-    return ScopedReader<Game>(mGame)->activeBlock();
+    return ScopedReader<Game>(mImpl->mGame)->activeBlock();
 }
 
 
 Grid SimpleGame::gameGrid() const
 {
-    return ScopedReader<Game>(mGame)->gameGrid();
+    return ScopedReader<Game>(mImpl->mGame)->gameGrid();
 }
 
 
@@ -87,7 +107,7 @@ Block SimpleGame::getNextBlock() const
 {
     std::vector<BlockType> blockTypes;
     {
-        ScopedReader<Game> game(mGame);
+        ScopedReader<Game> game(mImpl->mGame);
         game->getFutureBlocksWithOffset(1, 1, blockTypes);
     }
 
@@ -96,7 +116,7 @@ Block SimpleGame::getNextBlock() const
         throw std::logic_error("Failed to get the next block from the factory.");
     }
 
-    return Block(blockTypes[0], Rotation(0), Row(0), Column((columnCount() - mCenterColumn)/2));
+    return Block(blockTypes[0], Rotation(0), Row(0), Column((columnCount() - mImpl->mCenterColumn)/2));
 }
 
 

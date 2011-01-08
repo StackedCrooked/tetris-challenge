@@ -30,10 +30,6 @@ namespace Tetris
 
         ~Gravity();
 
-        // Receive notifications each time a block has been lowered.
-        // Allows the reciever to update the view etc..
-        void setCallback(const GravityCallback & inGravityCallback);
-
         // Number of rows per second
         double speed() const;
 
