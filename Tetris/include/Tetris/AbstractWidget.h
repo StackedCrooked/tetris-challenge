@@ -17,11 +17,11 @@ class RGBColor
 public:
     RGBColor(int red, int green, int blue);
 
-    inline int red() const { return mRed; }
+    int red() const;
 
-    inline int green() const { return mGreen; }
+    int green() const;
 
-    inline int blue() const { return mBlue; }
+    int blue() const;
 
 private:
     int mRed, mGreen, mBlue;
@@ -61,23 +61,19 @@ public:
 
     virtual ~AbstractWidget() {}
 
-    int getFPS() const { return static_cast<int>(0.5 + mFPS); }
+    int getFPS() const;
 
-    inline int squareWidth() const { return mSquareWidth; }
+    int squareWidth() const;
 
-    inline int squareHeight() const { return mSquareHeight; }
+    int squareHeight() const;
 
     virtual const RGBColor & getColor(BlockType inBlockType) const;
 
 protected:
     void coordinateRepaint(const Game & inGame);
-
     virtual void paintSquare(const Rect & inRect, const RGBColor & inColor) = 0;
-
     virtual void drawLine(int x1, int y1, int x2, int y2, int inPenWidth, const RGBColor & inColor) = 0;
-
     virtual Rect getGameRect() const = 0;
-
     virtual Rect getFutureBlocksRect(unsigned int inFutureBlockCount) const = 0;
 
 private:

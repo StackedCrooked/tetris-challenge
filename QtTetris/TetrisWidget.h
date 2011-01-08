@@ -25,23 +25,16 @@ public:
 
     void setSimpleGame(Tetris::SimpleGame * inSimpleGame);
 
-    virtual void paintEvent(QPaintEvent * event);
-
-    virtual QSize minimumSizeHint() const;
-
+protected:
     virtual void paintSquare(const Tetris::Rect & inRect, const Tetris::RGBColor & inColor);
-
     virtual void drawLine(int x1, int y1, int x2, int y2, int inPenWidth, const Tetris::RGBColor & inColor);
-
     virtual Tetris::Rect getGameRect() const;
-
     virtual Tetris::Rect getFutureBlocksRect(unsigned int inFutureBlockCount) const;
 
-signals:
-
-public slots:
-
 private:
+    virtual void paintEvent(QPaintEvent * event);
+    virtual QSize minimumSizeHint() const;
+
     Tetris::SimpleGame * mSimpleGame;
     int mRowCount;
     int mColCount;
