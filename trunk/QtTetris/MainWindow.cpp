@@ -1,5 +1,4 @@
 #include "MainWindow.h"
-#include "Tetris/SimpleGame.h"
 #include <QLayout>
 #include <QLabel>
 #include <iostream>
@@ -19,9 +18,11 @@ const int cSquareHeight(20);
 
 MainWindow::MainWindow(QWidget *parent) :
     QWidget(parent),
-    mSimpleGame(new Tetris::SimpleGame(cRowCount, cColumnCount))
+    mSimpleGame(),
+    mTetrisWidget()
 {
     mTetrisWidget = new TetrisWidget(this, cSquareWidth, cSquareHeight);
+    mSimpleGame.reset(new SimpleGame(mTetrisWidget, cRowCount, cColumnCount));
     mTetrisWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     mFPSLabel = new QLabel(this);
@@ -30,9 +31,7 @@ MainWindow::MainWindow(QWidget *parent) :
     vbox->addWidget(mTetrisWidget);
     vbox->addWidget(mFPSLabel);
 
-    mTetrisWidget->setSimpleGame(mSimpleGame);
-    mSimpleGame->enableGravity(true);
-    mSimpleGame->enableComputerPlayer(true);
+    mTetrisWidget->setGame(mSimpleGame.get());
 
 
     // Refresh the FPS
@@ -44,7 +43,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-    delete mSimpleGame;
 }
 
 

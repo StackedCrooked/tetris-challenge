@@ -61,7 +61,7 @@ namespace Tetris
 
 
     GravityImpl::GravityImpl(const ThreadSafe<Game> & inThreadSafeGame) :
-        mThreadSafeGame(inThreadSafeGame),        
+        mThreadSafeGame(inThreadSafeGame),
         mCallback(),
         mLevel(0),
         mTimer(),
@@ -135,14 +135,14 @@ namespace Tetris
     {
         return CalculateSpeed(mLevel);
     }
-    
-    
+
+
     double GravityImpl::CalculateSpeed(int inLevel)
     {
         return static_cast<double>(1000.0 / static_cast<double>(sIntervals[inLevel]));
     }
 
-    
+
     Gravity::Gravity(const ThreadSafe<Game> & inGame) :
         mImpl(new GravityImpl(inGame))
     {
@@ -161,13 +161,13 @@ namespace Tetris
         mImpl->setCallback(boost::bind(inGravityCallback, this));
     }
 
-    
+
     double Gravity::speed() const
     {
         return mImpl->speed();
     }
-    
-    
+
+
     double Gravity::CalculateSpeed(int inLevel)
     {
         return GravityImpl::CalculateSpeed(inLevel);

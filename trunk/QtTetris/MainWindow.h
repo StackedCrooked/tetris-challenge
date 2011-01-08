@@ -4,6 +4,7 @@
 
 #include <QtGui>
 #include "TetrisWidget.h"
+#include "Tetris/SimpleGame.h"
 #include <memory>
 
 
@@ -19,7 +20,7 @@ private slots:
     void onTimeout();
 
 private:
-    Tetris::SimpleGame * mSimpleGame;
+    std::auto_ptr<Tetris::SimpleGame> mSimpleGame;
     TetrisWidget * mTetrisWidget;
     QLabel * mFPSLabel;
 };

@@ -4,18 +4,20 @@
 #include "Tetris/Evaluator.h"
 #include "Tetris/Game.h"
 #include "Tetris/AutoPtrSupport.h"
+#include <boost/bind.hpp>
+#include <stdexcept>
 
 
 namespace Tetris {
 
 
-SimpleGame::SimpleGame(size_t inRowCount, size_t inColumnCount) :
+SimpleGame::SimpleGame(EventHandler * inEventHandler, size_t inRowCount, size_t inColumnCount) :
     mGame(Create<Game>(inRowCount, inColumnCount)),
-    mGravity(),
-    mComputerPlayer(),
-    mComputerMoveSpeed(0)
+    mGravity(new Gravity(mGame)),
+    mEventHandler(inEventHandler),
+    mCenterColumn(static_cast<size_t>(0.5 + inColumnCount / 2.0))
 {
-
+    mGravity->setCallback(boost::bind(&EventHandler::onSimpleGameChanged, mEventHandler));
 }
 
 
@@ -24,64 +26,9 @@ SimpleGame::~SimpleGame()
 }
 
 
-void SimpleGame::enableGravity(bool inEnabled)
-{
-    if (inEnabled)
-    {
-        if (!mGravity)
-        {
-            mGravity.reset(new Gravity(mGame));
-        }
-    }
-    else
-    {
-        mGravity.reset();
-    }
-}
-
-
-void SimpleGame::enableComputerPlayer(bool inEnabled)
-{
-    if (inEnabled)
-    {
-        if (!mComputerPlayer)
-        {
-            mComputerPlayer.reset(new ComputerPlayer(mGame, CreatePoly<Evaluator, MakeTetrises>(), 8, 5, 1));
-
-            if (mComputerMoveSpeed)
-            {
-                mComputerPlayer->setMoveSpeed(mComputerMoveSpeed);
-            }
-        }
-    }
-    else
-    {
-        mComputerPlayer.reset();
-    }
-}
-
-
-void SimpleGame::setComputerMoveSpeed(int inNumberOfMovesPerSecond)
-{
-    mComputerMoveSpeed = inNumberOfMovesPerSecond;
-    if (mComputerPlayer)
-    {
-        mComputerPlayer->setMoveSpeed(mComputerMoveSpeed);
-    }
-}
-
-
 bool SimpleGame::isGameOver() const
 {
     return ScopedReader<Game>(mGame)->isGameOver();
-}
-
-
-void SimpleGame::getSize(int & outColoumCount, int & outRowCount)
-{
-    ScopedReader<Game> game(mGame);
-    outColoumCount = game->columnCount();
-    outRowCount = game->rowCount();
 }
 
 
@@ -124,12 +71,6 @@ int SimpleGame::level() const
 }
 
 
-void SimpleGame::setLevel(int inLevel)
-{
-    return ScopedReaderAndWriter<Game>(mGame)->setLevel(inLevel);
-}
-
-
 Block SimpleGame::activeBlock() const
 {
     return ScopedReader<Game>(mGame)->activeBlock();
@@ -142,20 +83,20 @@ Grid SimpleGame::gameGrid() const
 }
 
 
-std::vector<Block> SimpleGame::getNextBlocks(size_t inCount) const
+Block SimpleGame::getNextBlock() const
 {
     std::vector<BlockType> blockTypes;
     {
         ScopedReader<Game> game(mGame);
-        game->getFutureBlocksWithOffset(1, inCount, blockTypes);
+        game->getFutureBlocksWithOffset(1, 1, blockTypes);
     }
 
-    std::vector<Block> result;
-    for (unsigned i = 0; i < blockTypes.size(); ++i)
+    if (blockTypes.empty())
     {
-        result.push_back(Block(blockTypes[i], Rotation(0), Row(0), Column(0)));
+        throw std::logic_error("Failed to get the next block from the factory.");
     }
-    return result;
+
+    return Block(blockTypes[0], Rotation(0), Row(0), Column((columnCount() - mCenterColumn)/2));
 }
 
 

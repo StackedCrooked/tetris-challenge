@@ -80,7 +80,7 @@ const T & GenericGrid<T, Allocator>::get(std::size_t inRow, std::size_t inColumn
 template<class T, template <class> class Allocator>
 void GenericGrid<T, Allocator>::set(std::size_t inRow, std::size_t inColumn, const T & inValue)
 {
-    assert(inRow < mRowCount && inColumn < mColumnCount);	
+    assert(inRow < mRowCount && inColumn < mColumnCount);
     Allocator<T>::get()[inRow * mColumnCount + inColumn] = inValue;
 }
 

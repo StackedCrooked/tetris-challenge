@@ -8,7 +8,6 @@
 
 
 namespace Tetris {
-class SimpleGame;
 class Rect;
 class RGBColor;
 }
@@ -23,9 +22,10 @@ public:
 
     ~TetrisWidget();
 
-    void setSimpleGame(Tetris::SimpleGame * inSimpleGame);
+    virtual void refresh();
 
 protected:
+    virtual void setMinSize(int inWidth, int inHeight);
     virtual void paintSquare(const Tetris::Rect & inRect, const Tetris::RGBColor & inColor);
     virtual void drawLine(int x1, int y1, int x2, int y2, int inPenWidth, const Tetris::RGBColor & inColor);
     virtual Tetris::Rect getGameRect() const;
@@ -34,8 +34,6 @@ protected:
 private:
     virtual void paintEvent(QPaintEvent * event);
     virtual QSize minimumSizeHint() const;
-
-    Tetris::SimpleGame * mSimpleGame;
     int mRowCount;
     int mColCount;
     QSize mMinSize;
