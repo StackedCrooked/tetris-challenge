@@ -116,7 +116,7 @@
      <valuelist key="GenericProjectManager.GenericMakeStep.MakeArguments" type="QVariantList">
       <value type="QString">VERBOSE=1</value>
       <value type="QString">-w</value>
-      <value type="QString">-j8</value>
+      <value type="QString">-j12</value>
      </valuelist>
      <value key="GenericProjectManager.GenericMakeStep.MakeCommand" type="QString"></value>
      <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString">Make</value>

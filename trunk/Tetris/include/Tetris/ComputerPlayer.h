@@ -8,9 +8,9 @@
 
 namespace Tetris
 {
-    
+
     class Evaluator;
-    class Game;
+    class ComputerGame;
     class GameState;
     template<class Variable> class ThreadSafe;
 
@@ -23,13 +23,13 @@ namespace Tetris
     public:
         typedef boost::function<std::auto_ptr<Evaluator>(const GameState &)> GetEvaluatorCallback;
 
-        ComputerPlayer(const ThreadSafe<Game> & inProtectedGame,
+        ComputerPlayer(const ThreadSafe<ComputerGame> & inProtectedGame,
                        std::auto_ptr<Evaluator> inEvaluator,
                        int inSearchDepth,
                        int inSearchWidth,
                        int inWorkerCount);
 
-        ComputerPlayer(const ThreadSafe<Game> & inProtectedGame,
+        ComputerPlayer(const ThreadSafe<ComputerGame> & inProtectedGame,
                        const GetEvaluatorCallback & inGetEvaluator,
                        int inSearchDepth,
                        int inSearchWidth,
@@ -54,7 +54,7 @@ namespace Tetris
 
         void setEvaluator(std::auto_ptr<Evaluator> inEvaluator);
 
-        const Evaluator & evaluator() const;        
+        const Evaluator & evaluator() const;
 
         // Enables you to have the Evaluator selected in a callback event.
         // This overrides the evaluator set in the constructor

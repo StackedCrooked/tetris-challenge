@@ -28,13 +28,13 @@ namespace Tetris
     class ComputerPlayerImpl
     {
     public:
-        ComputerPlayerImpl(const ThreadSafe<Game> & inProtectedGame,
+        ComputerPlayerImpl(const ThreadSafe<ComputerGame> & inProtectedGame,
                            std::auto_ptr<Evaluator> inEvaluator,
                            int inSearchDepth,
                            int inSearchWidth,
                            int inWorkerCount);
 
-        ComputerPlayerImpl(const ThreadSafe<Game> & inProtectedGame,
+        ComputerPlayerImpl(const ThreadSafe<ComputerGame> & inProtectedGame,
                            const ComputerPlayer::GetEvaluatorCallback & inGetEvaluator,
                            int inSearchDepth,
                            int inSearchWidth,
@@ -92,8 +92,8 @@ namespace Tetris
 
         void timerEvent();
 
-        int calculateRemainingTimeMs(const Game & game) const;
-        ThreadSafe<Game> mProtectedGame;
+        int calculateRemainingTimeMs(const ComputerGame & inComputerGame) const;
+        ThreadSafe<ComputerGame> mProtectedComputerGame;
         WorkerPool mWorkerPool;
         boost::scoped_ptr<NodeCalculator> mNodeCalculator;
         boost::scoped_ptr<Evaluator> mEvaluator;
@@ -120,16 +120,16 @@ namespace Tetris
     }
 
 
-    ComputerPlayerImpl::ComputerPlayerImpl(const ThreadSafe<Game> & inProtectedGame,
+    ComputerPlayerImpl::ComputerPlayerImpl(const ThreadSafe<ComputerGame> & inProtectedGame,
                                            std::auto_ptr<Evaluator> inEvaluator,
                                            int inSearchDepth,
                                            int inSearchWidth,
                                            int inWorkerCount) :
-        mProtectedGame(inProtectedGame),
+        mProtectedComputerGame(inProtectedGame),
         mWorkerPool("ComputerPlayer WorkerPool", inWorkerCount > 0 ? inWorkerCount : GetWorkerCount()),
         mEvaluator(inEvaluator.release()),
         mGetEvaluator(),
-        mBlockMover(new BlockMover(mProtectedGame)),
+        mBlockMover(new BlockMover(mProtectedComputerGame)),
         mTimer(10, 10),
         mSearchDepth(inSearchDepth),
         mSearchWidth(inSearchWidth),
@@ -141,16 +141,16 @@ namespace Tetris
     }
 
 
-    ComputerPlayerImpl::ComputerPlayerImpl(const ThreadSafe<Game> & inProtectedGame,
+    ComputerPlayerImpl::ComputerPlayerImpl(const ThreadSafe<ComputerGame> & inProtectedGame,
                                            const ComputerPlayer::GetEvaluatorCallback & inGetEvaluator,
                                            int inSearchDepth,
                                            int inSearchWidth,
                                            int inWorkerCount) :
-        mProtectedGame(inProtectedGame),
+        mProtectedComputerGame(inProtectedGame),
         mWorkerPool("ComputerPlayer WorkerPool", (inWorkerCount > 0) ? inWorkerCount : GetWorkerCount()),
         mEvaluator(),
         mGetEvaluator(inGetEvaluator),
-        mBlockMover(new BlockMover(mProtectedGame)),
+        mBlockMover(new BlockMover(mProtectedComputerGame)),
         mTimer(10, 10),
         mSearchDepth(inSearchDepth),
         mSearchWidth(inSearchWidth),
@@ -160,11 +160,11 @@ namespace Tetris
         LogInfo(MakeString() << "ComputerPlayer started with " << mWorkerPool.size() << " worker threads.");
         mTimer.start(Poco::TimerCallback<ComputerPlayerImpl>(*this, &ComputerPlayerImpl::onTimerEvent));
 
-        ScopedReader<Game> game(mProtectedGame);
+        ScopedReader<ComputerGame> game(mProtectedComputerGame);
         mEvaluator.reset(mGetEvaluator(game->currentNode()->state()).release());
     }
-        
-        
+
+
     const Evaluator & ComputerPlayerImpl::evaluator() const
     {
         Assert(mEvaluator);
@@ -172,11 +172,11 @@ namespace Tetris
     }
 
 
-    int ComputerPlayerImpl::calculateRemainingTimeMs(const Game & game) const
+    int ComputerPlayerImpl::calculateRemainingTimeMs(const ComputerGame & game) const
     {
         int firstOccupiedRow = game.currentNode()->state().firstOccupiedRow();
         int currentBlockRow = game.activeBlock().row();
-        int numBlockRows = std::max<int>(game.activeBlock().grid().rowCount(), game.activeBlock().grid().columnCount());        
+        int numBlockRows = std::max<int>(game.activeBlock().grid().rowCount(), game.activeBlock().grid().columnCount());
         int numRemainingRows = firstOccupiedRow - (currentBlockRow + numBlockRows);
         if (numRemainingRows <= 2)
         {
@@ -184,7 +184,7 @@ namespace Tetris
         }
 
         double numRowsPerSecond = Gravity::CalculateSpeed(game.level());
-        double remainingTime = 1000 * static_cast<double>(numRemainingRows) / numRowsPerSecond;        
+        double remainingTime = 1000 * static_cast<double>(numRemainingRows) / numRowsPerSecond;
         int maxRequiredMoves = game.activeBlock().numRotations() + (game.columnCount()/2);
         int moveSpeed = mBlockMover->speed();
         double timeRequiredForMove = 1000.0 * static_cast<double>(maxRequiredMoves) / static_cast<double>(moveSpeed);
@@ -214,7 +214,7 @@ namespace Tetris
         }
     }
 
-    
+
     void ComputerPlayerImpl::onTimerEvent(Poco::Timer & )
     {
         try
@@ -227,19 +227,19 @@ namespace Tetris
         }
     }
 
-    
+
     void ComputerPlayerImpl::timerEvent()
     {
         if (mNodeCalculator)
         {
             // Check if the computer player has finished.
             if (mNodeCalculator->status() != NodeCalculator::Status_Finished)
-            {    
+            {
                 int numPrecalculatedMoves = -1;
                 int remainingTime = -1;
                 {
-                    ScopedReader<Game> wgame(mProtectedGame);
-                    const Game & game(*wgame.get());
+                    ScopedReader<ComputerGame> wgame(mProtectedComputerGame);
+                    const ComputerGame & game(*wgame.get());
                     numPrecalculatedMoves = game.numPrecalculatedMoves();
                     if (numPrecalculatedMoves == 0)
                     {
@@ -249,8 +249,8 @@ namespace Tetris
 
                 if (numPrecalculatedMoves == 0)
                 {
-                    // Check if there is the danger of crashing the current block.  
-                    
+                    // Check if there is the danger of crashing the current block.
+
                     if (remainingTime <= 1000)
                     {
                         mNodeCalculator->stop();
@@ -259,13 +259,13 @@ namespace Tetris
                 // else: keep working.
             }
             else
-            {    
+            {
                 if (NodePtr resultNode = mNodeCalculator->result())
                 {
                     if (!resultNode->state().isGameOver())
                     {
-                        ScopedReaderAndWriter<Game> wgame(mProtectedGame);
-                        Game & game(*wgame.get());
+                        ScopedReaderAndWriter<ComputerGame> wgame(mProtectedComputerGame);
+                        ComputerGame & game(*wgame.get());
 
                         // The created node should follow the last precalculated one.
                         if (resultNode->depth() == game.lastPrecalculatedNode()->depth() + 1)
@@ -289,14 +289,14 @@ namespace Tetris
             }
         }
         else
-        {            
-            ScopedReader<Game> wgame(mProtectedGame);
-            const Game & game(*wgame.get());
+        {
+            ScopedReader<ComputerGame> wgame(mProtectedComputerGame);
+            const ComputerGame & game(*wgame.get());
             if (!game.lastPrecalculatedNode()->state().isGameOver())
             {
                 int numPrecalculated = game.lastPrecalculatedNode()->depth() - game.currentNode()->depth();
                 if (numPrecalculated < 8)
-                {                
+                {
                     Assert(!mNodeCalculator);
 
                     //
@@ -347,7 +347,7 @@ namespace Tetris
     }
 
 
-    ComputerPlayer::ComputerPlayer(const ThreadSafe<Game> & inProtectedGame,
+    ComputerPlayer::ComputerPlayer(const ThreadSafe<ComputerGame> & inProtectedGame,
                                    std::auto_ptr<Evaluator> inEvaluator,
                                    int inSearchDepth,
                                    int inSearchWidth,
@@ -357,7 +357,7 @@ namespace Tetris
     }
 
 
-    ComputerPlayer::ComputerPlayer(const ThreadSafe<Game> & inProtectedGame,
+    ComputerPlayer::ComputerPlayer(const ThreadSafe<ComputerGame> & inProtectedGame,
                                    const GetEvaluatorCallback & inGetEvaluator,
                                    int inSearchDepth,
                                    int inSearchWidth,
@@ -391,7 +391,7 @@ namespace Tetris
         return mImpl->currentSearchDepth();
     }
 
-    
+
     int ComputerPlayer::searchWidth() const
     {
         return mImpl->searchWidth();
@@ -403,7 +403,7 @@ namespace Tetris
         mImpl->setSearchWidth(inSearchWidth);
     }
 
-    
+
     int ComputerPlayer::moveSpeed() const
     {
         return mImpl->moveSpeed();
@@ -414,14 +414,14 @@ namespace Tetris
     {
         mImpl->setMoveSpeed(inMoveSpeed);
     }
-    
-    
+
+
     void ComputerPlayer::setEvaluator(std::auto_ptr<Evaluator> inEvaluator)
     {
         mImpl->setEvaluator(inEvaluator);
     }
-    
-    
+
+
     const Evaluator & ComputerPlayer::evaluator() const
     {
         return mImpl->evaluator();
@@ -438,14 +438,14 @@ namespace Tetris
     {
         mImpl->removeEvaluator();
     }
-    
-    
+
+
     int ComputerPlayer::workerCount() const
     {
         return mImpl->workerCount();
     }
 
-    
+
     void ComputerPlayer::setWorkerCount(int inWorkerCount)
     {
         mImpl->setWorkerCount(inWorkerCount);

@@ -10,7 +10,7 @@ namespace Tetris
 {
 
     template<class Variable> class ThreadSafe;
-    class Game;
+    class ComputerGame;
     class BlockMover;
     class BlockMoverImpl;
 
@@ -28,7 +28,7 @@ namespace Tetris
     class BlockMover
     {
     public:
-        BlockMover(const ThreadSafe<Game> & inGame);
+        BlockMover(const ThreadSafe<ComputerGame> & inComputerGame);
 
         ~BlockMover();
 

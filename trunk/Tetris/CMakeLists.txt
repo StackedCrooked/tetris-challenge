@@ -9,7 +9,6 @@ add_library(Tetris
     include/Tetris/AutoPtrSupport.h
     include/Tetris/Block.h
     include/Tetris/BlockFactory.h
-    include/Tetris/EvilBlockFactory.h
     include/Tetris/BlockMover.h
     include/Tetris/BlockType.h
     include/Tetris/BlockTypes.h
@@ -43,31 +42,30 @@ add_library(Tetris
     include/Tetris/Utilities.h
     include/Tetris/Worker.h
     include/Tetris/WorkerPool.h
-    src/AISupport.cpp 
-    src/AbstractWidget.cpp 
-    src/Allocator.cpp 
-    src/Block.cpp 
-    src/BlockFactory.cpp 
-    src/EvilBlockFactory.cpp 
-    src/BlockMover.cpp 
-    src/BlockType.cpp 
-    src/ComputerPlayer.cpp 
-    src/Game.cpp 
-    src/SimpleGame.cpp 
-    src/GenericGrid.cpp 
-    src/Evaluator.cpp 
-    src/GameState.cpp 
-    src/GameStateComparator.cpp 
-    src/GameStateNode.cpp 
-    src/Gravity.cpp 
-    src/Logger.cpp 
-    src/Logging.cpp 
-    src/MultiThreadedNodeCalculator.cpp 
-    src/NodeCalculator.cpp 
-    src/NodeCalculatorImpl.cpp 
-    src/SingleThreadedNodeCalculator.cpp 
-    src/Threading.cpp 
-    src/Unicode.cpp 
+    src/AISupport.cpp
+    src/AbstractWidget.cpp
+    src/Allocator.cpp
+    src/Block.cpp
+    src/BlockFactory.cpp
+    src/BlockMover.cpp
+    src/BlockType.cpp
+    src/ComputerPlayer.cpp
+    src/Game.cpp
+    src/SimpleGame.cpp
+    src/GenericGrid.cpp
+    src/Evaluator.cpp
+    src/GameState.cpp
+    src/GameStateComparator.cpp
+    src/GameStateNode.cpp
+    src/Gravity.cpp
+    src/Logger.cpp
+    src/Logging.cpp
+    src/MultiThreadedNodeCalculator.cpp
+    src/NodeCalculator.cpp
+    src/NodeCalculatorImpl.cpp
+    src/SingleThreadedNodeCalculator.cpp
+    src/Threading.cpp
+    src/Unicode.cpp
     src/Worker.cpp
     src/WorkerPool.cpp)
 

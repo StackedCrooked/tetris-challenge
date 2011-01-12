@@ -110,15 +110,15 @@ Block SimpleGame::getNextBlock() const
     std::vector<BlockType> blockTypes;
     {
         ScopedReader<Game> game(mImpl->mGame);
-        game->getFutureBlocksWithOffset(1, 1, blockTypes);
+        game->getFutureBlocks(2, blockTypes);
     }
 
-    if (blockTypes.empty())
+    if (blockTypes.size() != 2)
     {
         throw std::logic_error("Failed to get the next block from the factory.");
     }
 
-    return Block(blockTypes[0], Rotation(0), Row(0), Column((columnCount() - mImpl->mCenterColumn)/2));
+    return Block(blockTypes.back(), Rotation(0), Row(0), Column((columnCount() - mImpl->mCenterColumn)/2));
 }
 
 

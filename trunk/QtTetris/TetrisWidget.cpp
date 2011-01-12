@@ -43,7 +43,7 @@ TetrisWidget::~TetrisWidget()
 
 void TetrisWidget::checkRefreshFlag()
 {
-    if (getGame()->checkDirty())
+    if (getGame() && getGame()->checkDirty())
     {
         update();
     }
