@@ -13,7 +13,7 @@ namespace Tetris {
 
 
 /**
- * SimpleGame is an easy to use and thread-safe wrapper for the Game class.
+ * SimpleGame is an easy to use and thread-safe wrapper for the HumanGame class.
  */
 class SimpleGame
 {

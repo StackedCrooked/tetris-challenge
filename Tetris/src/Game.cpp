@@ -19,14 +19,14 @@ namespace Tetris {
 extern const int cMaxLevel;
 
 
-Game::Game(size_t inNumRows, size_t inNumCols) :
+HumanGame::HumanGame(size_t inNumRows, size_t inNumCols) :
     AbstractGame(inNumRows, inNumCols),
     mGameState(new GameState(inNumRows, inNumCols))
 {
 }
 
 
-GameState & Game::getGameState()
+GameState & HumanGame::getGameState()
 {
     if (!mGameState.get())
     {
@@ -36,7 +36,7 @@ GameState & Game::getGameState()
 }
 
 
-const GameState & Game::getGameState() const
+const GameState & HumanGame::getGameState() const
 {
     if (!mGameState.get())
     {
@@ -86,7 +86,7 @@ static int GetColumnDelta(Direction inDirection)
 }
 
 
-bool Game::move(Direction inDirection)
+bool HumanGame::move(Direction inDirection)
 {
     if (isGameOver())
     {
@@ -387,7 +387,7 @@ void AbstractGame::getFutureBlocksWithOffset(size_t inOffset, size_t inCount, Bl
 {
     if (!mBlockFactory && (mBlocks.size() < inOffset + inCount))
     {
-        throw std::runtime_error("This is a cloned Game object and its number of future blocks is depleted.");
+        throw std::runtime_error("This is a cloned HumanGame object and its number of future blocks is depleted.");
     }
 
 

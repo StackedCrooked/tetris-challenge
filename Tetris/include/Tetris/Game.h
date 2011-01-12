@@ -21,7 +21,7 @@ class GameImpl;
 
 
 /**
- * Game is a top-level class for the Tetris core. It manages the following things:
+ * HumanGame is a top-level class for the Tetris core. It manages the following things:
  *   - the currently active block
  *   - the list of future blocks
  *   - the root gamestate node
@@ -92,10 +92,10 @@ private:
 };
 
 
-class Game : public AbstractGame
+class HumanGame : public AbstractGame
 {
 public:
-    Game(size_t inNumRows, size_t inNumCols);
+    HumanGame(size_t inNumRows, size_t inNumCols);
 
     virtual bool move(Direction inDirection);
 

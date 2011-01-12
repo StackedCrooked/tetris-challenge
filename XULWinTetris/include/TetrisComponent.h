@@ -22,7 +22,7 @@
 namespace Tetris
 {
     class Block;
-    class Game;    
+    class HumanGame;    
 
 
     /**
