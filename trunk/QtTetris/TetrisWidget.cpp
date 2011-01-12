@@ -63,17 +63,17 @@ void TetrisWidget::keyPressEvent(QKeyEvent * inEvent)
     {
         case Qt::Key_Left:
         {
-            getGame()->move(Direction_Left);
+            getGame()->move(MoveDirection_Left);
             break;
         }
         case Qt::Key_Right:
         {
-            getGame()->move(Direction_Right);
+            getGame()->move(MoveDirection_Right);
             break;
         }
         case Qt::Key_Down:
         {
-            getGame()->move(Direction_Down);
+            getGame()->move(MoveDirection_Down);
             break;
         }
         case Qt::Key_Up:
@@ -86,12 +86,38 @@ void TetrisWidget::keyPressEvent(QKeyEvent * inEvent)
             getGame()->drop();
             break;
         }
+        case Qt::Key_C:
+        {
+            clearGameState();
+            break;
+        }
+        case Qt::Key_N:
+        {
+            toggleActiveBlock();
+            break;
+        }
         default:
         {
             QWidget::keyPressEvent(inEvent);
             break;
         }
     }
+}
+
+
+void TetrisWidget::clearGameState()
+{
+    getGame()->setGameGrid(Grid(mRowCount, mColCount));
+}
+
+
+void TetrisWidget::toggleActiveBlock()
+{
+    // First valid BlockType value starts at 1.
+    Block block = getGame()->activeBlock();
+    BlockType newType = static_cast<BlockType>(1 + (block.type() % cBlockTypeCount));
+    Block newBlock(newType, Rotation(block.rotation()), Row(block.row()), Column(block.column()));
+    getGame()->setActiveBlock(newBlock);
 }
 
 

@@ -5,13 +5,13 @@
 namespace Tetris
 {
 
-    enum Direction
+    enum MoveDirection
     {
-        Direction_Nil,
-        Direction_Up,
-        Direction_Down,
-        Direction_Left,
-        Direction_Right
+        MoveDirection_Nil,
+        MoveDirection_Up,
+        MoveDirection_Down,
+        MoveDirection_Left,
+        MoveDirection_Right
     };
 
 } // namespace Tetris

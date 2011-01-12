@@ -20,7 +20,7 @@ extern const int cMaxLevel;
 
 
 HumanGame::HumanGame(size_t inNumRows, size_t inNumCols) :
-    AbstractGame(inNumRows, inNumCols),
+    Game(inNumRows, inNumCols),
     mGameState(new GameState(inNumRows, inNumCols))
 {
 }
@@ -46,15 +46,22 @@ const GameState & HumanGame::getGameState() const
 }
 
 
-static int GetRowDelta(Direction inDirection)
+void HumanGame::setGrid(const Grid & inGrid)
+{
+    mGameState->setGrid(inGrid);
+    setDirty();
+}
+
+
+static int GetRowDelta(MoveDirection inDirection)
 {
     switch (inDirection)
     {
-        case Direction_Up:
+        case MoveDirection_Up:
         {
             return -1;
         }
-        case Direction_Down:
+        case MoveDirection_Down:
         {
             return 1;
         }
@@ -66,15 +73,15 @@ static int GetRowDelta(Direction inDirection)
 }
 
 
-static int GetColumnDelta(Direction inDirection)
+static int GetColumnDelta(MoveDirection inDirection)
 {
     switch (inDirection)
     {
-        case Direction_Left:
+        case MoveDirection_Left:
         {
             return -1;
         }
-        case Direction_Right:
+        case MoveDirection_Right:
         {
             return 1;
         }
@@ -86,7 +93,7 @@ static int GetColumnDelta(Direction inDirection)
 }
 
 
-bool HumanGame::move(Direction inDirection)
+bool HumanGame::move(MoveDirection inDirection)
 {
     if (isGameOver())
     {
@@ -104,7 +111,7 @@ bool HumanGame::move(Direction inDirection)
         return true;
     }
 
-    if (inDirection != Direction_Down)
+    if (inDirection != MoveDirection_Down)
     {
         // Do nothing
         return false;
@@ -122,7 +129,7 @@ bool HumanGame::move(Direction inDirection)
 
 
 ComputerGame::ComputerGame(size_t inNumRows, size_t inNumCols) :
-    AbstractGame(inNumRows, inNumCols),
+    Game(inNumRows, inNumCols),
     mCurrentNode(GameStateNode::CreateRootNode(inNumRows, inNumCols).release())
 {
 }
@@ -130,13 +137,20 @@ ComputerGame::ComputerGame(size_t inNumRows, size_t inNumCols) :
 
 GameState & ComputerGame::getGameState()
 {
-    return mCurrentNode->state();
+    return const_cast<GameState&>(mCurrentNode->gameState());
 }
 
 
 const GameState & ComputerGame::getGameState() const
 {
-    return mCurrentNode->state();
+    return mCurrentNode->gameState();
+}
+
+
+void ComputerGame::setGrid(const Grid & inGrid)
+{
+    mCurrentNode->setGrid(inGrid);
+    setDirty();
 }
 
 
@@ -205,7 +219,7 @@ bool ComputerGame::navigateNodeDown()
 }
 
 
-bool ComputerGame::move(Direction inDirection)
+bool ComputerGame::move(MoveDirection inDirection)
 {
     if (isGameOver())
     {
@@ -215,7 +229,7 @@ bool ComputerGame::move(Direction inDirection)
     Block & block = *mActiveBlock;
     size_t newRow = block.row() + GetRowDelta(inDirection);
     size_t newCol = block.column() + GetColumnDelta(inDirection);
-    if (mCurrentNode->state().checkPositionValid(block, newRow, newCol))
+    if (mCurrentNode->gameState().checkPositionValid(block, newRow, newCol))
     {
         block.setRow(newRow);
         block.setColumn(newCol);
@@ -223,7 +237,7 @@ bool ComputerGame::move(Direction inDirection)
         return true;
     }
 
-    if (inDirection != Direction_Down)
+    if (inDirection != MoveDirection_Down)
     {
         // Do nothing
         return false;
@@ -238,7 +252,7 @@ bool ComputerGame::move(Direction inDirection)
     if (!mCurrentNode->children().empty())
     {
         const GameStateNode & precalculatedChild = **mCurrentNode->children().begin();
-        const Block & nextBlock = precalculatedChild.state().originalBlock();
+        const Block & nextBlock = precalculatedChild.gameState().originalBlock();
         Assert(nextBlock.type() == block.type());
         if (block.column() == nextBlock.column() &&
                 block.rotation() == nextBlock.rotation())
@@ -257,7 +271,7 @@ bool ComputerGame::move(Direction inDirection)
 
     // Actually commit the block
     NodePtr child(new GameStateNode(mCurrentNode,
-                                    mCurrentNode->state().commit(block, GameOver(block.row() == 0)),
+                                    mCurrentNode->gameState().commit(block, GameOver(block.row() == 0)),
                                     CreatePoly<Evaluator, Balanced>()));
     mCurrentNode->addChild(child);
     setCurrentNode(child);
@@ -267,7 +281,7 @@ bool ComputerGame::move(Direction inDirection)
 
 
 
-AbstractGame::AbstractGame(size_t inNumRows, size_t inNumColumns) :
+Game::Game(size_t inNumRows, size_t inNumColumns) :
     mNumRows(inNumRows),
     mNumColumns(inNumColumns),
     mActiveBlock(),
@@ -285,12 +299,12 @@ AbstractGame::AbstractGame(size_t inNumRows, size_t inNumColumns) :
 }
 
 
-AbstractGame::~AbstractGame()
+Game::~Game()
 {
 }
 
 
-std::auto_ptr<Block> AbstractGame::CreateDefaultBlock(BlockType inBlockType, size_t inNumColumns)
+std::auto_ptr<Block> Game::CreateDefaultBlock(BlockType inBlockType, size_t inNumColumns)
 {
     return std::auto_ptr<Block>(
         new Block(inBlockType,
@@ -300,7 +314,17 @@ std::auto_ptr<Block> AbstractGame::CreateDefaultBlock(BlockType inBlockType, siz
 }
 
 
-bool AbstractGame::checkDirty()
+void Game::setActiveBlock(const Block & inBlock)
+{
+    if (getGameState().checkPositionValid(inBlock, inBlock.row(), inBlock.column()))
+    {
+        mActiveBlock.reset(new Block(inBlock));
+        setDirty();
+    }
+}
+
+
+bool Game::checkDirty()
 {
     boost::mutex::scoped_lock lock(mDirtyMutex);
     if (mDirty)
@@ -312,14 +336,14 @@ bool AbstractGame::checkDirty()
 }
 
 
-void AbstractGame::setDirty()
+void Game::setDirty()
 {
     boost::mutex::scoped_lock lock(mDirtyMutex);
     mDirty = true;
 }
 
 
-void AbstractGame::supplyBlocks() const
+void Game::supplyBlocks() const
 {
     while (mCurrentBlockIndex >= mBlocks.size())
     {
@@ -328,25 +352,25 @@ void AbstractGame::supplyBlocks() const
 }
 
 
-bool AbstractGame::isGameOver() const
+bool Game::isGameOver() const
 {
     return getGameState().isGameOver();
 }
 
 
-int AbstractGame::rowCount() const
+int Game::rowCount() const
 {
     return mNumRows;
 }
 
 
-int AbstractGame::columnCount() const
+int Game::columnCount() const
 {
     return mNumColumns;
 }
 
 
-void AbstractGame::reserveBlocks(size_t inCount)
+void Game::reserveBlocks(size_t inCount)
 {
     while (mBlocks.size() < inCount)
     {
@@ -355,20 +379,20 @@ void AbstractGame::reserveBlocks(size_t inCount)
 }
 
 
-const Block & AbstractGame::activeBlock() const
+const Block & Game::activeBlock() const
 {
     supplyBlocks();
     return *mActiveBlock;
 }
 
 
-const Grid & AbstractGame::gameGrid() const
+const Grid & Game::gameGrid() const
 {
     return getGameState().grid();
 }
 
 
-void AbstractGame::getFutureBlocks(size_t inCount, BlockTypes & outBlocks) const
+void Game::getFutureBlocks(size_t inCount, BlockTypes & outBlocks) const
 {
     // Make sure we have all blocks we need.
     while (mBlocks.size() < mCurrentBlockIndex + inCount)
@@ -383,7 +407,7 @@ void AbstractGame::getFutureBlocks(size_t inCount, BlockTypes & outBlocks) const
 }
 
 
-void AbstractGame::getFutureBlocksWithOffset(size_t inOffset, size_t inCount, BlockTypes & outBlocks) const
+void Game::getFutureBlocksWithOffset(size_t inOffset, size_t inCount, BlockTypes & outBlocks) const
 {
     if (!mBlockFactory && (mBlocks.size() < inOffset + inCount))
     {
@@ -404,13 +428,13 @@ void AbstractGame::getFutureBlocksWithOffset(size_t inOffset, size_t inCount, Bl
 }
 
 
-size_t AbstractGame::currentBlockIndex() const
+size_t Game::currentBlockIndex() const
 {
     return mCurrentBlockIndex;
 }
 
 
-bool AbstractGame::rotate()
+bool Game::rotate()
 {
     if (isGameOver())
     {
@@ -430,9 +454,9 @@ bool AbstractGame::rotate()
 }
 
 
-void AbstractGame::drop()
+void Game::drop()
 {
-    while (move(Direction_Down))
+    while (move(MoveDirection_Down))
     {
         // Keep going.
         setDirty();
@@ -440,7 +464,7 @@ void AbstractGame::drop()
 }
 
 
-int AbstractGame::level() const
+int Game::level() const
 {
     if (mOverrideLevel < 0)
     {
@@ -454,7 +478,7 @@ int AbstractGame::level() const
 }
 
 
-void AbstractGame::setLevel(int inLevel)
+void Game::setLevel(int inLevel)
 {
     mOverrideLevel = inLevel;
     setDirty();

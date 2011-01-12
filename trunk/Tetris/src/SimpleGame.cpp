@@ -15,13 +15,13 @@ struct SimpleGame::SimpleGameImpl
 {
     SimpleGameImpl(size_t inRowCount,
                    size_t inColumnCount) :
-        mGame(Create<HumanGame>(inRowCount, inColumnCount)),
+        mGame(new HumanGame(inRowCount, inColumnCount)),
         mGravity(new Gravity(mGame)),
         mCenterColumn(static_cast<size_t>(0.5 + inColumnCount / 2.0))
     {
     }
 
-    ThreadSafe<HumanGame> mGame;
+    ThreadSafe<Game> mGame;
     boost::scoped_ptr<Gravity> mGravity;
     std::size_t mCenterColumn;
 };
@@ -38,70 +38,85 @@ SimpleGame::~SimpleGame()
 }
 
 
+void SimpleGame::setActiveBlock(const Block & inBlock)
+{
+    ScopedReaderAndWriter<Game> rwgame(mImpl->mGame);
+    Game & game(*rwgame.get());
+    game.setActiveBlock(inBlock);
+}
+
+void SimpleGame::setGameGrid(const Grid & inGrid)
+{
+    ScopedReaderAndWriter<Game> rwgame(mImpl->mGame);
+    Game & game(*rwgame.get());
+    game.setGrid(inGrid);
+}
+
+
 bool SimpleGame::checkDirty()
 {
-    ScopedReaderAndWriter<HumanGame> game(mImpl->mGame);
+    ScopedReaderAndWriter<Game> game(mImpl->mGame);
     return game->checkDirty();
 }
 
 
 bool SimpleGame::isGameOver() const
 {
-    ScopedReader<HumanGame> game(mImpl->mGame);
+    ScopedReader<Game> game(mImpl->mGame);
     return game->isGameOver();
 }
 
 
 int SimpleGame::rowCount() const
 {
-    ScopedReader<HumanGame> game(mImpl->mGame);
+    ScopedReader<Game> game(mImpl->mGame);
     return game->rowCount();
 }
 
 
 int SimpleGame::columnCount() const
 {
-    ScopedReader<HumanGame> game(mImpl->mGame);
+    ScopedReader<Game> game(mImpl->mGame);
     return game->columnCount();
 }
 
 
-void SimpleGame::move(Direction inDirection)
+void SimpleGame::move(MoveDirection inDirection)
 {
-    ScopedReaderAndWriter<HumanGame> game(mImpl->mGame);
+    ScopedReaderAndWriter<Game> game(mImpl->mGame);
     game->move(inDirection);
 }
 
 
 void SimpleGame::rotate()
 {
-    ScopedReaderAndWriter<HumanGame> game(mImpl->mGame);
+    ScopedReaderAndWriter<Game> game(mImpl->mGame);
     game->rotate();
 }
 
 
 void SimpleGame::drop()
 {
-    ScopedReaderAndWriter<HumanGame> game(mImpl->mGame);
+    ScopedReaderAndWriter<Game> game(mImpl->mGame);
     game->drop();
 }
 
 
 int SimpleGame::level() const
 {
-    return ScopedReader<HumanGame>(mImpl->mGame)->level();
+    return ScopedReader<Game>(mImpl->mGame)->level();
 }
 
 
 Block SimpleGame::activeBlock() const
 {
-    return ScopedReader<HumanGame>(mImpl->mGame)->activeBlock();
+    return ScopedReader<Game>(mImpl->mGame)->activeBlock();
 }
 
 
 Grid SimpleGame::gameGrid() const
 {
-    return ScopedReader<HumanGame>(mImpl->mGame)->gameGrid();
+    return ScopedReader<Game>(mImpl->mGame)->gameGrid();
 }
 
 
@@ -109,7 +124,7 @@ Block SimpleGame::getNextBlock() const
 {
     std::vector<BlockType> blockTypes;
     {
-        ScopedReader<HumanGame> game(mImpl->mGame);
+        ScopedReader<Game> game(mImpl->mGame);
         game->getFutureBlocks(2, blockTypes);
     }
 

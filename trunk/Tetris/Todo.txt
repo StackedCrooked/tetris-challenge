@@ -3,6 +3,7 @@ Todo
 - Qt Playable game
 - Implement Human vs Computer modus.
 - Multiplayer
+v Differentiate between Human and Computer game objects.
 v Introduce ScopedReader and ScopedReaderAndWriter. Use read lock for the ScopedReader.
 v Rename TetrisCore to Tetris
 v Add checkbox: 'switch to Survive when height reaches xx%'

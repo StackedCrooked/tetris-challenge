@@ -24,8 +24,10 @@ private slots:
 private:
     void restart();
 
-    std::auto_ptr<Tetris::SimpleGame> mSimpleGame;
-    TetrisWidget * mTetrisWidget;
+    std::auto_ptr<Tetris::SimpleGame> mSimpleGame1;
+    std::auto_ptr<Tetris::SimpleGame> mSimpleGame2;
+    TetrisWidget * mTetrisWidget1;
+    TetrisWidget * mTetrisWidget2;
     QLabel * mFPSLabel;
     QPushButton * mRestartButton;
 };

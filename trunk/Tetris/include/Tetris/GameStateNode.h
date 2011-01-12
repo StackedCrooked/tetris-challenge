@@ -2,6 +2,7 @@
 #define TETRIS_GAMESTATENODE_H_INCLUDED
 
 
+#include "Tetris/Grid.h"
 #include "Tetris/NodePtr.h"
 #include <memory>
 
@@ -56,19 +57,19 @@ public:
 
     GameStateNode * endNode();
 
-    const GameState & state() const;
+    const GameState & gameState() const;
 
-    GameState & state();
+    void setGrid(const Grid & inGrid);
 
-	int quality() const;
+    int quality() const;
 
 private:
     friend class GameStateNodeImpl;
 
     // Constructor for creating a root node.
     GameStateNode(std::auto_ptr<GameState> inGameState, std::auto_ptr<Evaluator> inEvaluator);
-		
-	class GameStateNodeImpl;
+
+    class GameStateNodeImpl;
     GameStateNodeImpl * mImpl;
 };
 

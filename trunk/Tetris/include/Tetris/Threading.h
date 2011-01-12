@@ -18,6 +18,10 @@ namespace Tetris
             mVariable(inVariable.release())
         {
         }
+        WithMutex(Variable * inVariable) :
+            mVariable(inVariable)
+        {
+        }
 
         boost::scoped_ptr<Variable> mVariable;
         mutable boost::shared_mutex mMutex;
@@ -40,6 +44,10 @@ namespace Tetris
             mVariableWithMutex(new WithMutex<Variable>(inVariable))
         {
         }
+        ThreadSafe(Variable * inVariable) :
+            mVariableWithMutex(new WithMutex<Variable>(inVariable))
+        {
+        }
 
         // Default constructor can only be used if Variable has a default constructor.
         ThreadSafe() :
@@ -56,7 +64,7 @@ namespace Tetris
         boost::shared_ptr<WithMutex<Variable> > mVariableWithMutex;
     };
 
-    
+
     // Simple stopwatch class.
     // Helper for ScopedReaderAndWriter and ScopedReader.
     class StopwatchImpl;

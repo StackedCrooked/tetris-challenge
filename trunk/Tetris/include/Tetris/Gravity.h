@@ -11,7 +11,7 @@ namespace Tetris
 {
 
     template<class Variable> class ThreadSafe;
-    class HumanGame;
+    class Game;
     class Gravity;
     class GravityImpl;
     typedef boost::function<void(Gravity*)> GravityCallback;
@@ -26,7 +26,7 @@ namespace Tetris
     class Gravity
     {
     public:
-        Gravity(const ThreadSafe<HumanGame> & inGame);
+        Gravity(const ThreadSafe<Game> & inGame);
 
         ~Gravity();
 

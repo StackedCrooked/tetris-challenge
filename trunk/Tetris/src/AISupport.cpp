@@ -91,7 +91,7 @@ namespace Tetris
                            ChildNodes & outChildNodes)
     {
         Assert(outChildNodes.empty());
-        const GameState & gameState = inNode->state();
+        const GameState & gameState = inNode->gameState();
         const Grid & gameGrid = gameState.grid();
 
         // Is this a "game over" situation?

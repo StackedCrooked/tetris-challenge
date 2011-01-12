@@ -177,12 +177,12 @@ namespace Tetris
         {
             case VK_LEFT:
             {   
-                mController->move(this, Direction_Left);
+                mController->move(this, MoveDirection_Left);
                 break;
             }
             case VK_RIGHT:
             {
-                mController->move(this, Direction_Right);
+                mController->move(this, MoveDirection_Right);
                 break;
             }
             case VK_UP:
@@ -192,7 +192,7 @@ namespace Tetris
             }
             case VK_DOWN:
             {
-                mController->move(this, Direction_Down);
+                mController->move(this, MoveDirection_Down);
                 break;
             }
             case VK_SPACE:

@@ -12,6 +12,9 @@
 namespace Tetris {
 
 
+class GameState;
+
+
 /**
  * SimpleGame is an easy to use and thread-safe wrapper for the HumanGame class.
  */
@@ -30,7 +33,7 @@ public:
 
     int columnCount() const;
 
-    void move(Direction inDirection);
+    void move(MoveDirection inDirection);
 
     void rotate();
 
@@ -46,6 +49,10 @@ public:
 
     // Gets the currently active block and any blocks that follow.
     Block getNextBlock() const;
+
+    // For multiplayer crazyness.
+    void setActiveBlock(const Block & inBlock);
+    void setGameGrid(const Grid & inGrid);
 
 private:
     // non-copyable

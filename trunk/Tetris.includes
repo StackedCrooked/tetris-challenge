@@ -13,3 +13,4 @@ Tetris/include
 3rdParty/Poco/XML/include/Poco/XML
 3rdParty/Poco/XML/src
 /Library/Frameworks/QtGui.framework/Versions/4/Headers
+/Library/Frameworks/QtCore.framework/Versions/4/Headers

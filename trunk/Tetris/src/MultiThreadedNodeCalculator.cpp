@@ -27,8 +27,8 @@ namespace Tetris
         NodeCalculatorImpl(inNode, inBlockTypes, inWidths, inEvaluator, inWorkerPool)
     {
     }
-        
-        
+
+
     MultithreadedNodeCalculator::~MultithreadedNodeCalculator()
     {
         setQuitFlag();
@@ -76,7 +76,7 @@ namespace Tetris
         }
 
 
-        if (ioNode->state().isGameOver())
+        if (ioNode->gameState().isGameOver())
         {
             // HumanGame over state has no children.
             return;
@@ -98,11 +98,11 @@ namespace Tetris
                                             inIndex + 1,
                                             inWidths[inIndex]);
             mWorkerPool.schedule(task);
-            
+
             // End of recursion.
         }
         else
-        {            
+        {
             ChildNodes childNodes = ioNode->children();
             if (childNodes.empty())
             {
@@ -115,7 +115,7 @@ namespace Tetris
 
                 // Start recursion.
                 populateNodes(child, inBlockTypes, inWidths, inIndex + 1, inEndIndex);
-            }                
+            }
         }
     }
 
@@ -139,13 +139,13 @@ namespace Tetris
         }
         catch (const boost::thread_interrupted &)
         {
-            // Task was interrupted. Ok.		
+            // Task was interrupted. Ok.
         }
-		//
-		// catch: allow other exceptions pass to the parent handler
-		//
+        //
+        // catch: allow other exceptions pass to the parent handler
+        //
 
-		mWorkerPool.interruptAndClearQueue();
+        mWorkerPool.interruptAndClearQueue();
         mWorkerPool.wait();
     }
 
