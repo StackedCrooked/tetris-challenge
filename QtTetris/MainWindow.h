@@ -19,10 +19,15 @@ public:
 private slots:
     void onTimeout();
 
+    void onRestart();
+
 private:
+    void restart();
+
     std::auto_ptr<Tetris::SimpleGame> mSimpleGame;
     TetrisWidget * mTetrisWidget;
     QLabel * mFPSLabel;
+    QPushButton * mRestartButton;
 };
 
 

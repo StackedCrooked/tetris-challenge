@@ -19,7 +19,7 @@ namespace Tetris
     class BlockMoverImpl
     {
     public:
-        BlockMoverImpl(const ThreadSafe<Game> & inGame);
+        BlockMoverImpl(const ThreadSafe<ComputerGame> & inComputerGame);
 
         ~BlockMoverImpl();
 
@@ -40,7 +40,7 @@ namespace Tetris
         void onTimer(Poco::Timer & ioTimer);
         void move();
 
-        ThreadSafe<Game> mGame;
+        ThreadSafe<ComputerGame> mComputerGame;
         boost::function<void()> mCallback;
         boost::scoped_ptr<Poco::Timer> mTimer;
         Poco::Stopwatch mStopwatch;
@@ -49,8 +49,8 @@ namespace Tetris
 
 
 
-    BlockMoverImpl::BlockMoverImpl(const ThreadSafe<Game> & inGame) :
-        mGame(inGame),
+    BlockMoverImpl::BlockMoverImpl(const ThreadSafe<ComputerGame> & inComputerGame) :
+        mComputerGame(inComputerGame),
         mCallback(),
         mTimer(),
         mStopwatch(),
@@ -86,7 +86,7 @@ namespace Tetris
             mTimer->setPeriodicInterval(interval);
         }
     }
-    
+
 
     void BlockMoverImpl::setInterval(int inTimeBetweenMovesInMilliseconds)
     {
@@ -129,8 +129,8 @@ namespace Tetris
 
     void BlockMoverImpl::move()
     {
-        ScopedReaderAndWriter<Game> wgame(mGame);
-        Game & game = *wgame.get();
+        ScopedReaderAndWriter<ComputerGame> wComputerGame(mComputerGame);
+        ComputerGame & game = *wComputerGame.get();
 
         const ChildNodes & children = game.currentNode()->children();
         if (children.empty())
@@ -177,8 +177,8 @@ namespace Tetris
     }
 
 
-    BlockMover::BlockMover(const ThreadSafe<Game> & inGame) :
-        mImpl(new BlockMoverImpl(inGame))
+    BlockMover::BlockMover(const ThreadSafe<ComputerGame> & inComputerGame) :
+        mImpl(new BlockMoverImpl(inComputerGame))
     {
     }
 

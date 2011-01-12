@@ -5,6 +5,7 @@
 #include "Tetris/BlockFactory.h"
 #include "Tetris/BlockTypes.h"
 #include "Tetris/Direction.h"
+#include "Tetris/GameState.h"
 #include "Tetris/Grid.h"
 #include "Tetris/NodePtr.h"
 #include <boost/scoped_ptr.hpp>
@@ -20,18 +21,19 @@ class GameImpl;
 
 
 /**
-    * Game is a top-level class for the Tetris core. It manages the following things:
-    *   - the currently active block
-    *   - the list of future blocks
-    *   - the root gamestate node
-    *
-    * It is the class that needs to be exposed to the client.
-    */
-class Game
+ * Game is a top-level class for the Tetris core. It manages the following things:
+ *   - the currently active block
+ *   - the list of future blocks
+ *   - the root gamestate node
+ *
+ * It is the class that needs to be exposed to the client.
+ */
+class AbstractGame
 {
 public:
+    AbstractGame(size_t inNumRows, size_t inNumColumns);
 
-    Game(size_t inNumRows, size_t inNumColumns);
+    virtual ~AbstractGame();
 
     // Indicates that a refresh is required in the higher layer view
     bool checkDirty();
@@ -42,7 +44,7 @@ public:
 
     int columnCount() const;
 
-    bool move(Direction inDirection);
+    virtual bool move(Direction inDirection) = 0;
 
     bool rotate();
 
@@ -56,11 +58,63 @@ public:
 
     const Grid & gameGrid() const;
 
+    size_t currentBlockIndex() const;
+
     void getFutureBlocks(size_t inCount, BlockTypes & outBlocks) const;
 
     void getFutureBlocksWithOffset(size_t inOffset, size_t inCount, BlockTypes & outBlocks) const;
 
-    size_t currentBlockIndex() const;
+protected:
+    virtual GameState & getGameState() = 0;
+
+    virtual const GameState & getGameState() const = 0;
+
+    static std::auto_ptr<Block> CreateDefaultBlock(BlockType inBlockType, size_t inNumColumns);
+    void reserveBlocks(size_t inCount);
+    void supplyBlocks() const;
+    void setDirty();
+
+    size_t mNumRows;
+    size_t mNumColumns;
+    boost::scoped_ptr<Block> mActiveBlock;
+    boost::scoped_ptr<BlockFactory> mBlockFactory;
+    mutable BlockTypes mBlocks;
+    size_t mCurrentBlockIndex;
+    int mOverrideLevel;
+
+    mutable bool mDirty;
+    mutable boost::mutex mDirtyMutex;
+
+private:
+    // non-copyable
+    AbstractGame(const AbstractGame&);
+    AbstractGame& operator=(const AbstractGame&);
+};
+
+
+class Game : public AbstractGame
+{
+public:
+    Game(size_t inNumRows, size_t inNumCols);
+
+    virtual bool move(Direction inDirection);
+
+protected:
+    GameState & getGameState();
+
+    const GameState & getGameState() const;
+
+private:
+    boost::scoped_ptr<GameState> mGameState;
+};
+
+
+class ComputerGame : public AbstractGame
+{
+public:
+    ComputerGame(size_t inNumRows, size_t inNumCols);
+
+    virtual bool move(Direction inDirection);
 
     void appendPrecalculatedNode(NodePtr inNode);
 
@@ -74,28 +128,15 @@ public:
 
     void clearPrecalculatedNodes();
 
+protected:
+    GameState & getGameState();
+
+    const GameState & getGameState() const;
+
 private:
-    // non-copyable
-    Game(const Game&);
-    Game& operator=(const Game&);
-
-    static std::auto_ptr<Block> CreateDefaultBlock(BlockType inBlockType, size_t inNumColumns);
-    void reserveBlocks(size_t inCount);
     void setCurrentNode(NodePtr inCurrentNode);
-    void supplyBlocks() const;
-    void setDirty();
 
-    size_t mNumRows;
-    size_t mNumColumns;
     NodePtr mCurrentNode;
-    boost::scoped_ptr<Block> mActiveBlock;
-    boost::scoped_ptr<BlockFactory> mBlockFactory;
-    mutable BlockTypes mBlocks;
-    size_t mCurrentBlockIndex;
-    int mOverrideLevel;
-
-    mutable bool mDirty;
-    mutable boost::mutex mDirtyMutex;
 };
 
 

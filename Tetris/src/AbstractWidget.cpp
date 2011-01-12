@@ -68,7 +68,10 @@ AbstractWidget::~AbstractWidget()
 void AbstractWidget::setGame(SimpleGame * inSimpleGame)
 {
     mSimpleGame = inSimpleGame;
-    setMinSize((mSimpleGame->columnCount() + 4) * squareWidth() + mMargin, mSimpleGame->rowCount() * squareHeight());
+    if (mSimpleGame)
+    {
+        setMinSize((mSimpleGame->columnCount() + 4) * squareWidth() + mMargin, mSimpleGame->rowCount() * squareHeight());
+    }
 }
 
 
