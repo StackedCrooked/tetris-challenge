@@ -10,7 +10,7 @@
 namespace Tetris {
 
 
-EvilBlockFactory::EvilBlockFactory(ThreadSafe<Game> inGame) :
+EvilBlockFactory::EvilBlockFactory(ThreadSafe<HumanGame> inGame) :
     mGame(inGame),
     mWorkerPool("EvilBlockFactory", 4)
 {
@@ -34,8 +34,8 @@ BlockType EvilBlockFactory::getNext() const
     std::vector<boost::shared_ptr<NodeCalculator> > nodeCalculators;
     for (unsigned int i = 0; i < allBlockTypes.size(); ++i)
     {
-        ScopedReader<Game> gameReader(mGame);
-        const Game & game(*gameReader.get());
+        ScopedReader<HumanGame> gameReader(mGame);
+        const HumanGame & game(*gameReader.get());
         const BlockTypes & blockTypes(allBlockTypes[i]);
         std::vector<int> widths;
         widths.push_back(40);
@@ -73,7 +73,7 @@ BlockType EvilBlockFactory::getNext() const
     {
         NodeCalculator & nodeCalculator(*nodeCalculators[i]);
         NodePtr result = nodeCalculator.result();
-		results.insert(std::make_pair(result->quality(), allBlockTypes[i]));
+        results.insert(std::make_pair(result->quality(), allBlockTypes[i]));
     }
 
     BlockTypes & blockTypes = results.begin()->second;

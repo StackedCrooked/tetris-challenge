@@ -78,7 +78,7 @@ namespace Tetris
 
         if (ioNode->state().isGameOver())
         {
-            // Game over state has no children.
+            // HumanGame over state has no children.
             return;
         }
 

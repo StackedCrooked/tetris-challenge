@@ -15,13 +15,13 @@ struct SimpleGame::SimpleGameImpl
 {
     SimpleGameImpl(size_t inRowCount,
                    size_t inColumnCount) :
-        mGame(Create<Game>(inRowCount, inColumnCount)),
+        mGame(Create<HumanGame>(inRowCount, inColumnCount)),
         mGravity(new Gravity(mGame)),
         mCenterColumn(static_cast<size_t>(0.5 + inColumnCount / 2.0))
     {
     }
 
-    ThreadSafe<Game> mGame;
+    ThreadSafe<HumanGame> mGame;
     boost::scoped_ptr<Gravity> mGravity;
     std::size_t mCenterColumn;
 };
@@ -40,68 +40,68 @@ SimpleGame::~SimpleGame()
 
 bool SimpleGame::checkDirty()
 {
-    ScopedReaderAndWriter<Game> game(mImpl->mGame);
+    ScopedReaderAndWriter<HumanGame> game(mImpl->mGame);
     return game->checkDirty();
 }
 
 
 bool SimpleGame::isGameOver() const
 {
-    ScopedReader<Game> game(mImpl->mGame);
+    ScopedReader<HumanGame> game(mImpl->mGame);
     return game->isGameOver();
 }
 
 
 int SimpleGame::rowCount() const
 {
-    ScopedReader<Game> game(mImpl->mGame);
+    ScopedReader<HumanGame> game(mImpl->mGame);
     return game->rowCount();
 }
 
 
 int SimpleGame::columnCount() const
 {
-    ScopedReader<Game> game(mImpl->mGame);
+    ScopedReader<HumanGame> game(mImpl->mGame);
     return game->columnCount();
 }
 
 
 void SimpleGame::move(Direction inDirection)
 {
-    ScopedReaderAndWriter<Game> game(mImpl->mGame);
+    ScopedReaderAndWriter<HumanGame> game(mImpl->mGame);
     game->move(inDirection);
 }
 
 
 void SimpleGame::rotate()
 {
-    ScopedReaderAndWriter<Game> game(mImpl->mGame);
+    ScopedReaderAndWriter<HumanGame> game(mImpl->mGame);
     game->rotate();
 }
 
 
 void SimpleGame::drop()
 {
-    ScopedReaderAndWriter<Game> game(mImpl->mGame);
+    ScopedReaderAndWriter<HumanGame> game(mImpl->mGame);
     game->drop();
 }
 
 
 int SimpleGame::level() const
 {
-    return ScopedReader<Game>(mImpl->mGame)->level();
+    return ScopedReader<HumanGame>(mImpl->mGame)->level();
 }
 
 
 Block SimpleGame::activeBlock() const
 {
-    return ScopedReader<Game>(mImpl->mGame)->activeBlock();
+    return ScopedReader<HumanGame>(mImpl->mGame)->activeBlock();
 }
 
 
 Grid SimpleGame::gameGrid() const
 {
-    return ScopedReader<Game>(mImpl->mGame)->gameGrid();
+    return ScopedReader<HumanGame>(mImpl->mGame)->gameGrid();
 }
 
 
@@ -109,7 +109,7 @@ Block SimpleGame::getNextBlock() const
 {
     std::vector<BlockType> blockTypes;
     {
-        ScopedReader<Game> game(mImpl->mGame);
+        ScopedReader<HumanGame> game(mImpl->mGame);
         game->getFutureBlocks(2, blockTypes);
     }
 

@@ -119,7 +119,7 @@ namespace Tetris {
         }
 
         mTetrisComponent->setController(this);
-        mProtectedGame.reset(new ThreadSafe<Game>(std::auto_ptr<Game>(new Game(mTetrisComponent->getNumRows(), mTetrisComponent->getNumColumns()))));
+        mProtectedGame.reset(new ThreadSafe<HumanGame>(std::auto_ptr<HumanGame>(new HumanGame(mTetrisComponent->getNumRows(), mTetrisComponent->getNumColumns()))));
 
 
         mFPSTextBox = findComponentById<XULWin::TextBox>("fpsTextBox");
@@ -234,8 +234,8 @@ namespace Tetris {
 
     //    {
     //        mComputerPlayer.reset();
-    //        ScopedReaderAndWriter<Game> wgame(*mProtectedGame.get());
-    //        Game & game(*wgame.get());
+    //        ScopedReaderAndWriter<HumanGame> wgame(*mProtectedGame.get());
+    //        HumanGame & game(*wgame.get());
     //        game.clearPrecalculatedNodes();
 
     //        Grid & grid = const_cast<GameStateNode*>(game.currentNode())->state().grid();
@@ -303,7 +303,7 @@ namespace Tetris {
         mComputerPlayer.reset();
         mGravity.reset();
         mProtectedGame.reset();
-        mProtectedGame.reset(new ThreadSafe<Game>(std::auto_ptr<Game>(new Game(mTetrisComponent->getNumRows(), mTetrisComponent->getNumColumns()))));
+        mProtectedGame.reset(new ThreadSafe<HumanGame>(std::auto_ptr<HumanGame>(new HumanGame(mTetrisComponent->getNumRows(), mTetrisComponent->getNumColumns()))));
         mGravity.reset(new Gravity(*mProtectedGame));
         return XULWin::cHandled;
     }
@@ -374,7 +374,7 @@ namespace Tetris {
 
     LRESULT Controller::onClearPrecalculated(WPARAM wParam, LPARAM lParam)
     {
-        ScopedReaderAndWriter<Game> game(*mProtectedGame);
+        ScopedReaderAndWriter<HumanGame> game(*mProtectedGame);
         game->clearPrecalculatedNodes();
         return XULWin::cHandled;
     }
@@ -459,8 +459,8 @@ namespace Tetris {
     {
         if (tetrisComponent == mTetrisComponent)
         {
-            ScopedReader<Game> rgame(*mProtectedGame);
-            const Game & game = *rgame.get();
+            ScopedReader<HumanGame> rgame(*mProtectedGame);
+            const HumanGame & game = *rgame.get();
             outGrid = game.currentNode()->state().grid();
             outActiveBlock = game.activeBlock();
             game.getFutureBlocks(mTetrisComponent->getNumFutureBlocks() + 1, outFutureBlockTypes);
@@ -472,8 +472,8 @@ namespace Tetris {
     {
         if (mPlayerIsHuman->isSelected())
         {
-            ScopedReaderAndWriter<Game> wgame(*mProtectedGame);
-            Game & game = *wgame.get();
+            ScopedReaderAndWriter<HumanGame> wgame(*mProtectedGame);
+            HumanGame & game = *wgame.get();
             return game.move(inDirection);
         }
         return false;
@@ -484,8 +484,8 @@ namespace Tetris {
     {
         if (mPlayerIsHuman->isSelected())
         {
-            ScopedReaderAndWriter<Game> wgame(*mProtectedGame);
-            Game & game = *wgame.get();
+            ScopedReaderAndWriter<HumanGame> wgame(*mProtectedGame);
+            HumanGame & game = *wgame.get();
             game.drop();
         }
     }
@@ -495,15 +495,15 @@ namespace Tetris {
     {
         if (mPlayerIsHuman->isSelected())
         {
-            ScopedReaderAndWriter<Game> wgame(*mProtectedGame);
-            Game & game = *wgame.get();
+            ScopedReaderAndWriter<HumanGame> wgame(*mProtectedGame);
+            HumanGame & game = *wgame.get();
             return game.rotate();
         }
         return false;
     }
 
 
-    ThreadSafe<Game> & Controller::threadSafeGame()
+    ThreadSafe<HumanGame> & Controller::threadSafeGame()
     {
         return *mProtectedGame;
     }
@@ -548,8 +548,8 @@ namespace Tetris {
 		bool hasPrecalculatedNodes = false;
 		int numPrecalculatedMoves = 0;
 		{
-			ScopedReader<Game> gameReader(*mProtectedGame);
-			const Game & game(*gameReader.get());
+			ScopedReader<HumanGame> gameReader(*mProtectedGame);
+			const HumanGame & game(*gameReader.get());
 			gameState.reset(new GameState(game.currentNode()->state()));
 			blockCount = game.currentNode()->depth() + 1;
 			level = game.level();
