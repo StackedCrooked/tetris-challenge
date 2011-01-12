@@ -141,7 +141,7 @@ namespace Tetris
         GameStateNode & firstChild = **children.begin();
 
         const Block & block = game.activeBlock();
-        const Block & targetBlock = firstChild.state().originalBlock();
+        const Block & targetBlock = firstChild.gameState().originalBlock();
         Assert(block.type() == targetBlock.type());
         if (block.rotation() != targetBlock.rotation())
         {
@@ -154,7 +154,7 @@ namespace Tetris
         }
         else if (block.column() < targetBlock.column())
         {
-            if (!game.move(Direction_Right))
+            if (!game.move(MoveDirection_Right))
             {
                 // Damn we can't move this block anymore.
                 // Give up on this block.
@@ -163,7 +163,7 @@ namespace Tetris
         }
         else if (block.column() > targetBlock.column())
         {
-            if (!game.move(Direction_Left))
+            if (!game.move(MoveDirection_Left))
             {
                 // Damn we can't move this block anymore.
                 // Give up on this block.
@@ -172,7 +172,7 @@ namespace Tetris
         }
         else
         {
-            game.move(Direction_Down);
+            game.move(MoveDirection_Down);
         }
     }
 

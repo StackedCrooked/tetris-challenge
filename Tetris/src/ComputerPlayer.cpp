@@ -161,7 +161,7 @@ namespace Tetris
         mTimer.start(Poco::TimerCallback<ComputerPlayerImpl>(*this, &ComputerPlayerImpl::onTimerEvent));
 
         ScopedReader<ComputerGame> game(mProtectedComputerGame);
-        mEvaluator.reset(mGetEvaluator(game->currentNode()->state()).release());
+        mEvaluator.reset(mGetEvaluator(game->currentNode()->gameState()).release());
     }
 
 
@@ -174,7 +174,7 @@ namespace Tetris
 
     int ComputerPlayerImpl::calculateRemainingTimeMs(const ComputerGame & game) const
     {
-        int firstOccupiedRow = game.currentNode()->state().firstOccupiedRow();
+        int firstOccupiedRow = game.currentNode()->gameState().firstOccupiedRow();
         int currentBlockRow = game.activeBlock().row();
         int numBlockRows = std::max<int>(game.activeBlock().grid().rowCount(), game.activeBlock().grid().columnCount());
         int numRemainingRows = firstOccupiedRow - (currentBlockRow + numBlockRows);
@@ -262,7 +262,7 @@ namespace Tetris
             {
                 if (NodePtr resultNode = mNodeCalculator->result())
                 {
-                    if (!resultNode->state().isGameOver())
+                    if (!resultNode->gameState().isGameOver())
                     {
                         ScopedReaderAndWriter<ComputerGame> wgame(mProtectedComputerGame);
                         ComputerGame & game(*wgame.get());
@@ -292,7 +292,7 @@ namespace Tetris
         {
             ScopedReader<ComputerGame> wgame(mProtectedComputerGame);
             const ComputerGame & game(*wgame.get());
-            if (!game.lastPrecalculatedNode()->state().isGameOver())
+            if (!game.lastPrecalculatedNode()->gameState().isGameOver())
             {
                 int numPrecalculated = game.lastPrecalculatedNode()->depth() - game.currentNode()->depth();
                 if (numPrecalculated < 8)
@@ -336,7 +336,7 @@ namespace Tetris
 
                     if (mGetEvaluator)
                     {
-                        mEvaluator.reset(mGetEvaluator(game.currentNode()->state()).release());
+                        mEvaluator.reset(mGetEvaluator(game.currentNode()->gameState()).release());
                     }
                     mNodeCalculator.reset(new NodeCalculator(endNode, futureBlocks, widths, mEvaluator->clone(), mWorkerPool));
                     mNodeCalculator->start();

@@ -21,19 +21,17 @@ class GameImpl;
 
 
 /**
- * HumanGame is a top-level class for the Tetris core. It manages the following things:
+ * Game is a top-level class for the Tetris core. It manages the following things:
  *   - the currently active block
  *   - the list of future blocks
  *   - the root gamestate node
- *
- * It is the class that needs to be exposed to the client.
  */
-class AbstractGame
+class Game
 {
 public:
-    AbstractGame(size_t inNumRows, size_t inNumColumns);
+    Game(size_t inNumRows, size_t inNumColumns);
 
-    virtual ~AbstractGame();
+    virtual ~Game();
 
     // Indicates that a refresh is required in the higher layer view
     bool checkDirty();
@@ -44,7 +42,7 @@ public:
 
     int columnCount() const;
 
-    virtual bool move(Direction inDirection) = 0;
+    virtual bool move(MoveDirection inDirection) = 0;
 
     bool rotate();
 
@@ -64,10 +62,14 @@ public:
 
     void getFutureBlocksWithOffset(size_t inOffset, size_t inCount, BlockTypes & outBlocks) const;
 
+    virtual const GameState & getGameState() const = 0;
+
+    // For multiplayer crazyness
+    virtual void setActiveBlock(const Block & inBlock);
+    virtual void setGrid(const Grid & inGrid) = 0;
+
 protected:
     virtual GameState & getGameState() = 0;
-
-    virtual const GameState & getGameState() const = 0;
 
     static std::auto_ptr<Block> CreateDefaultBlock(BlockType inBlockType, size_t inNumColumns);
     void reserveBlocks(size_t inCount);
@@ -87,34 +89,36 @@ protected:
 
 private:
     // non-copyable
-    AbstractGame(const AbstractGame&);
-    AbstractGame& operator=(const AbstractGame&);
+    Game(const Game&);
+    Game& operator=(const Game&);
 };
 
 
-class HumanGame : public AbstractGame
+class HumanGame : public Game
 {
 public:
     HumanGame(size_t inNumRows, size_t inNumCols);
 
-    virtual bool move(Direction inDirection);
+    virtual bool move(MoveDirection inDirection);
+
+    const GameState & getGameState() const;
+
+    virtual void setGrid(const Grid & inGrid);
 
 protected:
     GameState & getGameState();
-
-    const GameState & getGameState() const;
 
 private:
     boost::scoped_ptr<GameState> mGameState;
 };
 
 
-class ComputerGame : public AbstractGame
+class ComputerGame : public Game
 {
 public:
     ComputerGame(size_t inNumRows, size_t inNumCols);
 
-    virtual bool move(Direction inDirection);
+    virtual bool move(MoveDirection inDirection);
 
     void appendPrecalculatedNode(NodePtr inNode);
 
@@ -128,10 +132,12 @@ public:
 
     void clearPrecalculatedNodes();
 
+    const GameState & getGameState() const;
+
+    virtual void setGrid(const Grid & inGrid);
+
 protected:
     GameState & getGameState();
-
-    const GameState & getGameState() const;
 
 private:
     void setCurrentNode(NodePtr inCurrentNode);

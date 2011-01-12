@@ -18,13 +18,18 @@ const int cSquareHeight(20);
 
 MainWindow::MainWindow(QWidget *parent) :
     QWidget(parent),
-    mSimpleGame(),
-    mTetrisWidget(),
+    mSimpleGame1(),
+    mSimpleGame2(),
+    mTetrisWidget1(),
+    mTetrisWidget2(),
     mFPSLabel(0),
     mRestartButton(0)
 {
-    mTetrisWidget = new TetrisWidget(this, cSquareWidth, cSquareHeight);
-    mTetrisWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    mTetrisWidget1 = new TetrisWidget(this, cSquareWidth, cSquareHeight);
+    mTetrisWidget1->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+    mTetrisWidget2 = new TetrisWidget(this, cSquareWidth, cSquareHeight);
+    mTetrisWidget2->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     mFPSLabel = new QLabel(this);
     mRestartButton = new QPushButton("Restart", this);
@@ -32,9 +37,15 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     QVBoxLayout * vbox = new QVBoxLayout(this);
-    vbox->addWidget(mTetrisWidget);
+    QHBoxLayout * hbox = new QHBoxLayout(this);
+    hbox->addWidget(mTetrisWidget1);
+    hbox->addWidget(mTetrisWidget2);
+
+    vbox->addItem(hbox);
+
+    vbox->addWidget(mRestartButton);
     vbox->addWidget(mFPSLabel);
-    vbox->addWidget(mRestartButton, 1);
+    vbox->addWidget(new QLabel("Press 'c' to clear the game."), 0);
 
     restart();
 
@@ -60,14 +71,18 @@ void MainWindow::restart()
 {
     // Make sure the previous game has been
     // deleted before creating a new one.
-    mTetrisWidget->setGame(0);
-    mSimpleGame.reset();
-    mSimpleGame.reset(new SimpleGame(cRowCount, cColumnCount));
-    mTetrisWidget->setGame(mSimpleGame.get());
+    mTetrisWidget1->setGame(0);
+    mTetrisWidget2->setGame(0);
+    mSimpleGame1.reset();
+    mSimpleGame2.reset();
+    mSimpleGame1.reset(new SimpleGame(cRowCount, cColumnCount));
+    mSimpleGame2.reset(new SimpleGame(cRowCount, cColumnCount));
+    mTetrisWidget1->setGame(mSimpleGame1.get());
+    mTetrisWidget2->setGame(mSimpleGame2.get());
 }
 
 
 void MainWindow::onTimeout()
 {
-    mFPSLabel->setText(QString("FPS: ") + QString::number(mTetrisWidget->getFPS()));
+    mFPSLabel->setText(QString("FPS: ") + QString::number(mTetrisWidget1->getFPS()));
 }

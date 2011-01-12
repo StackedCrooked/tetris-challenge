@@ -39,6 +39,10 @@ protected:
 private:
     virtual void paintEvent(QPaintEvent * event);
     virtual QSize minimumSizeHint() const;
+
+    void clearGameState();
+    void toggleActiveBlock();
+
     int mRowCount;
     int mColCount;
     QSize mMinSize;

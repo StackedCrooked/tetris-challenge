@@ -40,7 +40,7 @@ namespace Tetris
         mMainWorker("NodeCalculatorImpl"),
         mWorkerPool(inWorkerPool)
     {
-        Assert(!mNode->state().isGameOver());
+        Assert(!mNode->gameState().isGameOver());
         Assert(mNode->children().empty());
     }
 
@@ -90,12 +90,12 @@ namespace Tetris
         boost::mutex::scoped_lock lock(mStatusMutex);
         return mStatus;
     }
-	
-	
-	const std::string & NodeCalculatorImpl::errorMessage() const
-	{
-		return mErrorMessage;
-	}
+
+
+    const std::string & NodeCalculatorImpl::errorMessage() const
+    {
+        return mErrorMessage;
+    }
 
 
     void NodeCalculatorImpl::setStatus(int inStatus)
@@ -128,7 +128,7 @@ namespace Tetris
         }
 
 
-        if (ioNode->state().isGameOver())
+        if (ioNode->gameState().isGameOver())
         {
             // HumanGame over state has no children.
             return;
@@ -198,7 +198,7 @@ namespace Tetris
 
 
     void NodeCalculatorImpl::calculateResult() const
-    {        
+    {
         if (getQuitFlag())
         {
             return;
@@ -223,9 +223,9 @@ namespace Tetris
         NodePtr currentNode;
         NodePtr currentParent = mNode;
         while (!results.empty())
-        {            
+        {
             currentNode = results.top();
-            NodePtr copy(new GameStateNode(currentParent, Create<GameState>(currentNode->state()), currentNode->evaluator().clone()));
+            NodePtr copy(new GameStateNode(currentParent, Create<GameState>(currentNode->gameState()), currentNode->evaluator().clone()));
             if (!mResult)
             {
                 mResult = copy;
@@ -261,12 +261,12 @@ namespace Tetris
             setStatus(NodeCalculator::Status_Working);
             populate();
             calculateResult();
-			setStatus(NodeCalculator::Status_Finished);
+            setStatus(NodeCalculator::Status_Finished);
         }
         catch (const std::exception & inException)
         {
-			mErrorMessage = inException.what();
-			setStatus(NodeCalculator::Status_Error);
+            mErrorMessage = inException.what();
+            setStatus(NodeCalculator::Status_Error);
         }
     }
 

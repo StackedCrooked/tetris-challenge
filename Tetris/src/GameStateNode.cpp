@@ -20,35 +20,35 @@ static int GetIdentifier(const GameState & inGameState)
     return block.numRotations() * block.column() + block.rotation();
 }
 
-    
+
 class GameStateNode::GameStateNodeImpl
 {
 public:
-	GameStateNodeImpl(NodePtr inParent, std::auto_ptr<GameState> inGameState, std::auto_ptr<Evaluator> inEvaluator) :
-		mParent(inParent),
-		mIdentifier(GetIdentifier(*inGameState)),
-		mDepth(inParent->depth() + 1),
-		mEvaluatedGameState(inGameState, inEvaluator->evaluate(*inGameState)),
-		mEvaluator(inEvaluator.release()),
-		mChildren(GameStateComparator(mEvaluator->clone()))
-	{
-	}
+    GameStateNodeImpl(NodePtr inParent, std::auto_ptr<GameState> inGameState, std::auto_ptr<Evaluator> inEvaluator) :
+        mParent(inParent),
+        mIdentifier(GetIdentifier(*inGameState)),
+        mDepth(inParent->depth() + 1),
+        mEvaluatedGameState(new EvaluatedGameState(inGameState, inEvaluator->evaluate(*inGameState))),
+        mEvaluator(inEvaluator.release()),
+        mChildren(GameStateComparator(mEvaluator->clone()))
+    {
+    }
 
-	GameStateNodeImpl(std::auto_ptr<GameState> inGameState, std::auto_ptr<Evaluator> inEvaluator) :
-		mParent(),
-		mIdentifier(GetIdentifier(*inGameState)),
-		mDepth(0),
-		mEvaluatedGameState(inGameState, inEvaluator->evaluate(*inGameState)),
-		mEvaluator(inEvaluator.release()),
-		mChildren(GameStateComparator(mEvaluator->clone()))
-	{
-	}
+    GameStateNodeImpl(std::auto_ptr<GameState> inGameState, std::auto_ptr<Evaluator> inEvaluator) :
+        mParent(),
+        mIdentifier(GetIdentifier(*inGameState)),
+        mDepth(0),
+        mEvaluatedGameState(new EvaluatedGameState(inGameState, inEvaluator->evaluate(*inGameState))),
+        mEvaluator(inEvaluator.release()),
+        mChildren(GameStateComparator(mEvaluator->clone()))
+    {
+    }
 
 
     boost::weak_ptr<GameStateNode> mParent;
     int mIdentifier;
     int mDepth;
-    EvaluatedGameState mEvaluatedGameState;
+    boost::scoped_ptr<EvaluatedGameState> mEvaluatedGameState;
     boost::scoped_ptr<Evaluator> mEvaluator; // }
     ChildNodes mChildren;                    // } => Order matters!
 };
@@ -82,8 +82,8 @@ GameStateNode::~GameStateNode()
 std::auto_ptr<GameStateNode> GameStateNode::clone() const
 {
     NodePtr parent = mImpl->mParent.lock();
-	std::auto_ptr<GameStateNode> result(parent ? new GameStateNode(parent, Create<GameState>(mImpl->mEvaluatedGameState.gameState()), mImpl->mEvaluator->clone())
-                                               : new GameStateNode(Create<GameState>(mImpl->mEvaluatedGameState.gameState()), mImpl->mEvaluator->clone()));
+    std::auto_ptr<GameStateNode> result(parent ? new GameStateNode(parent, Create<GameState>(mImpl->mEvaluatedGameState->gameState()), mImpl->mEvaluator->clone())
+                                               : new GameStateNode(Create<GameState>(mImpl->mEvaluatedGameState->gameState()), mImpl->mEvaluator->clone()));
     result->mImpl->mDepth = mImpl->mDepth;
 
     ChildNodes::const_iterator it = mImpl->mChildren.begin(), end = mImpl->mChildren.end();
@@ -110,21 +110,26 @@ const Evaluator & GameStateNode::evaluator() const
 }
 
 
-const GameState & GameStateNode::state() const
+const GameState & GameStateNode::gameState() const
 {
-    return mImpl->mEvaluatedGameState.gameState();
+    return mImpl->mEvaluatedGameState->gameState();
 }
 
 
-GameState & GameStateNode::state()
+void GameStateNode::setGrid(const Grid & inGrid)
 {
-    return mImpl->mEvaluatedGameState.gameState();
+    clearChildren();
+    GameState copy = mImpl->mEvaluatedGameState->gameState();
+    copy.setGrid(inGrid);
+    int score = mImpl->mEvaluator->evaluate(copy);
+    mImpl->mIdentifier = GetIdentifier(copy);
+    mImpl->mEvaluatedGameState.reset(new EvaluatedGameState(Create<GameState>(copy), score));
 }
 
 
 int GameStateNode::quality() const
 {
-	return mImpl->mEvaluatedGameState.quality();
+    return mImpl->mEvaluatedGameState->quality();
 }
 
 
@@ -183,7 +188,7 @@ const GameStateNode * GameStateNode::endNode() const
     {
         return this;
     }
-	return (*mImpl->mChildren.begin())->endNode();
+    return (*mImpl->mChildren.begin())->endNode();
 }
 
 

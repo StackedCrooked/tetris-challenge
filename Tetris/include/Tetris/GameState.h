@@ -18,9 +18,11 @@ public:
     // Creates a new GameState
     GameState(size_t inNumRows, size_t inNumColumns);
 
+    GameState(const Grid & inGrid);
+
     const Grid & grid() const;
 
-    Grid & grid();
+    void setGrid(const Grid & inGrid);
 
     // The Block that was used in the commit(...) call.
     const Block & originalBlock() const;
@@ -34,49 +36,49 @@ public:
     // Creates a copy of the current gamestate with the given active block committed.
     // Use inGameOver = true to mark the new gamestate as "game over".
     std::auto_ptr<GameState> commit(const Block & inBlock, GameOver inGameOver) const;
-		
-	// Statistics
-	int numLines() const { return mNumLines; }
-	int numSingles() const { return mNumSingles; }
-	int numDoubles() const { return mNumDoubles; }
-	int numTriples() const { return mNumTriples; }
-	int numTetrises() const { return mNumTetrises; }
-	int score() const;
-	int firstOccupiedRow() const { return mFirstOccupiedRow; }
+
+    // Statistics
+    int numLines() const { return mNumLines; }
+    int numSingles() const { return mNumSingles; }
+    int numDoubles() const { return mNumDoubles; }
+    int numTriples() const { return mNumTriples; }
+    int numTetrises() const { return mNumTetrises; }
+    int score() const;
+    int firstOccupiedRow() const { return mFirstOccupiedRow; }
 
 private:
-    void solidifyBlock(const Block & inBlock);        
+    void solidifyBlock(const Block & inBlock);
     void clearLines();
 
     Grid mGrid;
     Block mOriginalBlock;
     bool mIsGameOver;
-	int mFirstOccupiedRow;
-	int mNumLines;
+    int mFirstOccupiedRow;
+    int mNumLines;
     int mNumSingles;
     int mNumDoubles;
     int mNumTriples;
     int mNumTetrises;
 };
 
-	
+
 class EvaluatedGameState
 {
 public:
-	EvaluatedGameState(std::auto_ptr<GameState> inGameState, int inQuality);
+    EvaluatedGameState(std::auto_ptr<GameState> inGameState, int inQuality);
 
-	const GameState & gameState() const;
+    const GameState & gameState() const;
 
-	GameState & gameState();
+    GameState & gameState();
 
-	int quality() const;
+    int quality() const;
 
 private:
-	EvaluatedGameState(const EvaluatedGameState &);
-	EvaluatedGameState& operator=(const EvaluatedGameState&);
+    EvaluatedGameState(const EvaluatedGameState &);
+    EvaluatedGameState& operator=(const EvaluatedGameState&);
 
-	std::auto_ptr<GameState> mGameState;
-	int mQuality;
+    std::auto_ptr<GameState> mGameState;
+    int mQuality;
 };
 
 

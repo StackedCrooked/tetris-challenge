@@ -32,7 +32,7 @@ namespace Tetris
     class GravityImpl
     {
     public:
-        GravityImpl(const ThreadSafe<HumanGame> & inGame);
+        GravityImpl(const ThreadSafe<Game> & inGame);
 
         ~GravityImpl();
 
@@ -50,20 +50,20 @@ namespace Tetris
 
         void onTimerEvent(Poco::Timer & inTimer);
 
-        ThreadSafe<HumanGame> mThreadSafeGame;
+        ThreadSafe<Game> mThreadSafeGame;
         int mLevel;
         Poco::Timer mTimer;
         Poco::Stopwatch mStopwatch;
     };
 
 
-    GravityImpl::GravityImpl(const ThreadSafe<HumanGame> & inThreadSafeGame) :
+    GravityImpl::GravityImpl(const ThreadSafe<Game> & inThreadSafeGame) :
         mThreadSafeGame(inThreadSafeGame),
         mLevel(0),
         mTimer(),
         mStopwatch()
     {
-        ScopedReader<HumanGame> rgame(mThreadSafeGame);
+        ScopedReader<Game> rgame(mThreadSafeGame);
         mTimer.start(Poco::TimerCallback<GravityImpl>(*this, &GravityImpl::onTimerEvent));
         mTimer.setPeriodicInterval(sIntervals[rgame->level()]);
         mStopwatch.start();
@@ -91,12 +91,12 @@ namespace Tetris
                 if (mStopwatch.elapsed() > 1000  * interval())
                 {
                     mStopwatch.restart();
-                    ScopedReaderAndWriter<HumanGame> game(mThreadSafeGame);
+                    ScopedReaderAndWriter<Game> game(mThreadSafeGame);
                     if (game->isGameOver())
                     {
                         return;
                     }
-                    game->move(Direction_Down);
+                    game->move(MoveDirection_Down);
                     int maxLevel = cMaxLevel;
                     mLevel = std::min<int>(maxLevel, game->level());
                 }
@@ -128,7 +128,7 @@ namespace Tetris
     }
 
 
-    Gravity::Gravity(const ThreadSafe<HumanGame> & inGame) :
+    Gravity::Gravity(const ThreadSafe<Game> & inGame) :
         mImpl(new GravityImpl(inGame))
     {
     }

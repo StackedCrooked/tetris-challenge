@@ -22,7 +22,7 @@
 namespace Tetris
 {
     class Block;
-    class HumanGame;    
+    class Game;    
 
 
     /**
@@ -132,7 +132,7 @@ namespace Tetris
         public:
             virtual void getGameState(TetrisComponent * tetrisComponent, Grid & grid, Block & activeBlock, BlockTypes & futureBlockTypes) = 0;
 
-            virtual bool move(TetrisComponent * tetrisComponent, Direction inDirection) = 0;
+            virtual bool move(TetrisComponent * tetrisComponent, MoveDirection inDirection) = 0;
 
             virtual bool rotate(TetrisComponent * tetrisComponent) = 0;
 

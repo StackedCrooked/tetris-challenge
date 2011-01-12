@@ -16,12 +16,26 @@ GameState::GameState(size_t inNumRows, size_t inNumColumns) :
     mGrid(inNumRows, inNumColumns, BlockType_Nil),
     mOriginalBlock(BlockType_L, Rotation(0), Row(0), Column(0)),
     mIsGameOver(false),
-	mFirstOccupiedRow(inNumRows),
-	mNumLines(0),
-	mNumSingles(0),
-	mNumDoubles(0),
-	mNumTriples(0),
-	mNumTetrises(0)
+    mFirstOccupiedRow(inNumRows),
+    mNumLines(0),
+    mNumSingles(0),
+    mNumDoubles(0),
+    mNumTriples(0),
+    mNumTetrises(0)
+{
+}
+
+
+GameState::GameState(const Grid & inGrid) :
+    mGrid(inGrid),
+    mOriginalBlock(BlockType_L, Rotation(0), Row(0), Column(0)),
+    mIsGameOver(false),
+    mFirstOccupiedRow(inGrid.rowCount()),
+    mNumLines(0),
+    mNumSingles(0),
+    mNumDoubles(0),
+    mNumTriples(0),
+    mNumTetrises(0)
 {
 }
 
@@ -87,7 +101,7 @@ void GameState::solidifyBlock(const Block & inBlock)
     }
 }
 
-    
+
 void GameState::clearLines()
 {
     int numLines = 0;
@@ -124,7 +138,7 @@ void GameState::clearLines()
         BlockType * gridBegin = const_cast<BlockType*>(&(mGrid.get(mFirstOccupiedRow, 0)));
         memset(&gridBegin[0], 0, numLines * mGrid.columnCount());
     }
-		
+
     Assert(mFirstOccupiedRow + numLines <= static_cast<int>(mGrid.rowCount()));
     mFirstOccupiedRow += numLines;
     mNumLines += numLines;
@@ -176,19 +190,19 @@ const Grid & GameState::grid() const
 }
 
 
-Grid & GameState::grid()
+void GameState::setGrid(const Grid & inGrid)
 {
-    return mGrid;
+    mGrid = inGrid;
 }
 
 
 int GameState::score() const
 {
-	// Same values as Tetris on the Gameboy.
-	return   40 * mNumSingles +
-		    100 * mNumDoubles +
-		    300 * mNumTriples +
-		   1200 * mNumTetrises;
+    // Same values as Tetris on the Gameboy.
+    return   40 * mNumSingles +
+            100 * mNumDoubles +
+            300 * mNumTriples +
+           1200 * mNumTetrises;
 }
 
 const Block & GameState::originalBlock() const
@@ -212,27 +226,27 @@ std::auto_ptr<GameState> GameState::commit(const Block & inBlock, GameOver inGam
 
 
 EvaluatedGameState::EvaluatedGameState(std::auto_ptr<GameState> inGameState, int inQuality) :
-	mGameState(inGameState),
-	mQuality(inQuality)
+    mGameState(inGameState),
+    mQuality(inQuality)
 {
 }
-	
+
 
 const GameState & EvaluatedGameState::gameState() const
 {
-	return *mGameState;
+    return *mGameState;
 }
 
 
 GameState & EvaluatedGameState::gameState()
 {
-	return *mGameState;
+    return *mGameState;
 }
 
 
 int EvaluatedGameState::quality() const
 {
-	return mQuality;
+    return mQuality;
 }
 
 

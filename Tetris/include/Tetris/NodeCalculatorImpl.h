@@ -40,7 +40,7 @@ namespace Tetris
 
         int status() const;
 
-		const std::string & errorMessage() const;
+        const std::string & errorMessage() const;
 
     protected:
         virtual void populate() = 0;
@@ -85,7 +85,7 @@ namespace Tetris
 
             void registerNode(NodePtr inNode)
             {
-                int score = mEvaluator->evaluate(inNode->state());
+                int score = mEvaluator->evaluate(inNode->gameState());
                 if (!mBestNode || score > mBestScore)
                 {
                     mBestNode = inNode;
@@ -95,7 +95,7 @@ namespace Tetris
             }
 
             inline void setFinished()
-            { 
+            {
                 Assert(!mFinished);
                 mFinished = true;
             }
@@ -203,7 +203,7 @@ namespace Tetris
 
         int mStatus;
         mutable boost::mutex mStatusMutex;
-		std::string mErrorMessage;
+        std::string mErrorMessage;
 
         Worker mMainWorker;
         WorkerPool & mWorkerPool;
