@@ -14,6 +14,14 @@ namespace Tetris
         MoveDirection_Right
     };
 
+
+    // TODO: use this.
+    enum RotationDirection
+    {
+        RotationDirection_Left,
+        RotationDirection_Right
+    };
+
 } // namespace Tetris
 
 
