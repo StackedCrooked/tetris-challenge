@@ -1,4 +1,5 @@
 #include "MainWindow.h"
+#include "Tetris/Game.h"
 #include <QLayout>
 #include <QLabel>
 #include <iostream>
@@ -23,6 +24,7 @@ MainWindow::MainWindow(QWidget *parent) :
     mTetrisWidget1(),
     mTetrisWidget2(),
     mFPSLabel(0),
+    mSwitchButton(0),
     mRestartButton(0)
 {
     mTetrisWidget1 = new TetrisWidget(this, cSquareWidth, cSquareHeight);
@@ -32,9 +34,12 @@ MainWindow::MainWindow(QWidget *parent) :
     mTetrisWidget2->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     mFPSLabel = new QLabel(this);
+
+    mSwitchButton = new QPushButton("Switch", this);
+    connect(mSwitchButton, SIGNAL(clicked()), this, SLOT(onRestart()));
+
     mRestartButton = new QPushButton("Restart", this);
     connect(mRestartButton, SIGNAL(clicked()), this, SLOT(onRestart()));
-
 
     QVBoxLayout * vbox = new QVBoxLayout(this);
     QHBoxLayout * hbox = new QHBoxLayout(this);
@@ -43,6 +48,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     vbox->addItem(hbox);
 
+    vbox->addWidget(mSwitchButton);
     vbox->addWidget(mRestartButton);
     vbox->addWidget(mFPSLabel);
     vbox->addWidget(new QLabel("Press 'c' to clear the game."), 0);
@@ -64,6 +70,27 @@ MainWindow::~MainWindow()
 void MainWindow::onRestart()
 {
     restart();
+}
+
+
+void MainWindow::onSwapFields()
+{
+    try
+    {
+        swapFields();
+    }
+    catch(const std::exception & inException)
+    {
+        QString msg = "Exception thrown: ";
+        msg += inException.what();
+        QMessageBox::critical(this, "Tetris", msg);
+    }
+}
+
+
+void MainWindow::swapFields()
+{
+    //mSimpleGame1->swap(mSimpleGame2);
 }
 
 

@@ -35,7 +35,7 @@ BlockType EvilBlockFactory::getNext() const
     for (unsigned int i = 0; i < allBlockTypes.size(); ++i)
     {
         ScopedReader<Game> gameReader(mGame);
-        const HumanGame & game(*gameReader.get());
+        const Game & game(*gameReader.get());
         const BlockTypes & blockTypes(allBlockTypes[i]);
         std::vector<int> widths;
         widths.push_back(40);
