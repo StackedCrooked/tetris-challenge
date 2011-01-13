@@ -18,17 +18,19 @@ public:
 
 private slots:
     void onTimeout();
-
+    void onSwapFields();
     void onRestart();
 
 private:
     void restart();
+    void swapFields();
 
     std::auto_ptr<Tetris::SimpleGame> mSimpleGame1;
     std::auto_ptr<Tetris::SimpleGame> mSimpleGame2;
     TetrisWidget * mTetrisWidget1;
     TetrisWidget * mTetrisWidget2;
     QLabel * mFPSLabel;
+    QPushButton * mSwitchButton;
     QPushButton * mRestartButton;
 };
 

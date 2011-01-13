@@ -32,7 +32,7 @@
 
 namespace Tetris {
 
-    
+
     extern const int cMaxLevel;
 
 
@@ -51,8 +51,8 @@ namespace Tetris {
         mPlayerIsComputer(0),
         mPlayerIsHuman(0),
         mActualPreset(0),
-		mAutoSelect(0),
-		mThreadCount(0),
+        mAutoSelect(0),
+        mThreadCount(0),
         mSearchDepth(0),
         mCurrentSearchDepth(0),
         mMovementSpeed(0),
@@ -108,8 +108,8 @@ namespace Tetris {
         boost::function<void(const std::string &)> logFunction = boost::bind(&Controller::log, this, _1);
         XULWin::ErrorReporter::Instance().setLogger(logFunction);
         Logger::Instance().setLogHandler(logFunction);
-        
-        
+
+
         //
         // Get the Tetris component.
         //
@@ -119,7 +119,7 @@ namespace Tetris {
         }
 
         mTetrisComponent->setController(this);
-        mProtectedGame.reset(new ThreadSafe<Game>(std::auto_ptr<HumanGame>(new HumanGame(mTetrisComponent->getNumRows(), mTetrisComponent->getNumColumns()))));
+        mProtectedGame.reset(new ThreadSafe<Game>(std::auto_ptr<Game>(new ComputerGame(mTetrisComponent->getNumRows(), mTetrisComponent->getNumColumns()))));
 
 
         mFPSTextBox = findComponentById<XULWin::TextBox>("fpsTextBox");
@@ -131,23 +131,23 @@ namespace Tetris {
 
         mScoreTextBox = findComponentById<XULWin::TextBox>("scoreTextBox");
         mTotalLinesTextBox = findComponentById<XULWin::TextBox>("totalLinesTextBox");
-		
-		mPlayerIsComputer = findComponentById<XULWin::Radio>("playerIsComputer");
+
+        mPlayerIsComputer = findComponentById<XULWin::Radio>("playerIsComputer");
         mScopedEventListener.connect(mPlayerIsComputer->el(), BM_SETSTATE, boost::bind(&Controller::onSelectComputerPlayer, this, _1, _2));
-		mPlayerIsHuman = findComponentById<XULWin::Radio>("playerIsHuman");
+        mPlayerIsHuman = findComponentById<XULWin::Radio>("playerIsHuman");
 
         // HACK! This textbox is used to prevent the arrow keys to
         // change the selected radio button during human play.
         mKeyboardSink = findComponentById<XULWin::TextBox>("keyboardSink");
 
-		mAutoSelect = findComponentById<XULWin::CheckBox>("autoSelect");
+        mAutoSelect = findComponentById<XULWin::CheckBox>("autoSelect");
 
         mActualPreset = findComponentById<XULWin::TextBox>("actualPreset");
 
-		if (mThreadCount = findComponentById<XULWin::SpinButton>("threadCount"))
-		{
-			XULWin::WinAPI::SpinButton_SetRange(mThreadCount->handle(), 0, 32);
-		}
+        if (mThreadCount = findComponentById<XULWin::SpinButton>("threadCount"))
+        {
+            XULWin::WinAPI::SpinButton_SetRange(mThreadCount->handle(), 0, 32);
+        }
 
         if (mSearchDepth = findComponentById<XULWin::SpinButton>("searchDepth"))
         {
@@ -173,7 +173,7 @@ namespace Tetris {
             mScopedEventListener.connect(mStrategiesMenuList->el(), boost::bind(&Controller::onStrategySelected, this, _1, _2));
         }
 
-		//mSplatterButton = findComponentById<XULWin::Button>("splatterButton");
+        //mSplatterButton = findComponentById<XULWin::Button>("splatterButton");
         //mScopedEventListener.connect(mSplatterButton->el(), boost::bind(&Controller::onSplatter, this, _1, _2));
 
         mGameHeightFactor = findComponentById<XULWin::SpinButton>("gameHeightFactor");
@@ -208,13 +208,13 @@ namespace Tetris {
         }
 
 
-        //mTetrisComponent->OnKeyboardPressed.connect(boost::bind(&Controller::processKey, this, _1));       
+        //mTetrisComponent->OnKeyboardPressed.connect(boost::bind(&Controller::processKey, this, _1));
         mGravity.reset(new Gravity(*mProtectedGame));
 
         mRefreshTimer.reset(new XULWin::WinAPI::Timer);
         mRefreshTimer->start(boost::bind(&Controller::onRefresh, this), 20);
 
-		// Main thread should have highest priority for responsiveness.
+        // Main thread should have highest priority for responsiveness.
         ::SetThreadPriority(::GetCurrentThread(), THREAD_PRIORITY_TIME_CRITICAL);
     }
 
@@ -226,22 +226,22 @@ namespace Tetris {
     }
 
 
-	//
-	// NOTE: this method is temporarily distabled. It required a hack to make it work. Needs cleanup/deletion.
-	//
+    //
+    // NOTE: this method is temporarily distabled. It required a hack to make it work. Needs cleanup/deletion.
+    //
     //LRESULT Controller::onSplatter(WPARAM wParam, LPARAM lParam)
     //{
 
     //    {
     //        mComputerPlayer.reset();
     //        ScopedReaderAndWriter<Game> wgame(*mProtectedGame.get());
-    //        HumanGame & game(*wgame.get());
+    //        Game & game(*wgame.get());
     //        game.clearPrecalculatedNodes();
 
     //        Grid & grid = const_cast<GameStateNode*>(game.currentNode())->state().grid();
 
     //        for (size_t rowIdx = 7; rowIdx != grid.rowCount(); ++rowIdx)
-    //        {            
+    //        {
     //            size_t count = 0;
     //            for (size_t colIdx = 0; colIdx != grid.columnCount(); ++colIdx)
     //            {
@@ -269,7 +269,7 @@ namespace Tetris {
 
     //        const_cast<GameStateNode*>(game.currentNode())->state().forceUpdateStats();
     //    }
-    //    
+    //
     //    mComputerPlayer.reset(
     //        new ComputerPlayer(
     //            *mProtectedGame,
@@ -280,8 +280,8 @@ namespace Tetris {
 
     //    return XULWin::cHandled;
     //}
-    
-        
+
+
     LRESULT Controller::onSelectComputerPlayer(WPARAM wParam, LPARAM lParam)
     {
         // HACK! This hack fixes the unwanted side-effect
@@ -303,7 +303,7 @@ namespace Tetris {
         mComputerPlayer.reset();
         mGravity.reset();
         mProtectedGame.reset();
-        mProtectedGame.reset(new ThreadSafe<Game>(std::auto_ptr<HumanGame>(new HumanGame(mTetrisComponent->getNumRows(), mTetrisComponent->getNumColumns()))));
+        mProtectedGame.reset(new ThreadSafe<Game>(std::auto_ptr<Game>(new ComputerGame(mTetrisComponent->getNumRows(), mTetrisComponent->getNumColumns()))));
         mGravity.reset(new Gravity(*mProtectedGame));
         return XULWin::cHandled;
     }
@@ -365,7 +365,7 @@ namespace Tetris {
             {
                 mEvaluatorType = it->second;
             }
-            
+
         }
         // Must return unhandled otherwise the popup menu stays.
         return XULWin::cUnhandled;
@@ -460,7 +460,7 @@ namespace Tetris {
         if (tetrisComponent == mTetrisComponent)
         {
             ScopedReader<Game> rgame(*mProtectedGame);
-            const HumanGame & game = *rgame.get();
+            const Game & game = *rgame.get();
             outGrid = game.currentNode()->state().grid();
             outActiveBlock = game.activeBlock();
             game.getFutureBlocks(mTetrisComponent->getNumFutureBlocks() + 1, outFutureBlockTypes);
@@ -473,7 +473,7 @@ namespace Tetris {
         if (mPlayerIsHuman->isSelected())
         {
             ScopedReaderAndWriter<Game> wgame(*mProtectedGame);
-            HumanGame & game = *wgame.get();
+            Game & game = *wgame.get();
             return game.move(inDirection);
         }
         return false;
@@ -485,7 +485,7 @@ namespace Tetris {
         if (mPlayerIsHuman->isSelected())
         {
             ScopedReaderAndWriter<Game> wgame(*mProtectedGame);
-            HumanGame & game = *wgame.get();
+            Game & game = *wgame.get();
             game.drop();
         }
     }
@@ -496,7 +496,7 @@ namespace Tetris {
         if (mPlayerIsHuman->isSelected())
         {
             ScopedReaderAndWriter<Game> wgame(*mProtectedGame);
-            HumanGame & game = *wgame.get();
+            Game & game = *wgame.get();
             return game.rotate();
         }
         return false;
@@ -542,20 +542,20 @@ namespace Tetris {
         // Flush the logger.
         Logger::Instance().flush();
 
-		boost::scoped_ptr<GameState> gameState;
-		int blockCount = 0;
-		int level = 0;
-		bool hasPrecalculatedNodes = false;
-		int numPrecalculatedMoves = 0;
-		{
-			ScopedReader<Game> gameReader(*mProtectedGame);
-			const HumanGame & game(*gameReader.get());
-			gameState.reset(new GameState(game.currentNode()->state()));
-			blockCount = game.currentNode()->depth() + 1;
-			level = game.level();
-			hasPrecalculatedNodes = game.currentNode()->children().empty();
-			numPrecalculatedMoves = game.lastPrecalculatedNode()->depth() - game.currentNode()->depth();
-		}
+        boost::scoped_ptr<GameState> gameState;
+        int blockCount = 0;
+        int level = 0;
+        bool hasPrecalculatedNodes = false;
+        int numPrecalculatedMoves = 0;
+        {
+            ScopedReader<Game> gameReader(*mProtectedGame);
+            const Game & game(*gameReader.get());
+            gameState.reset(new GameState(game.currentNode()->state()));
+            blockCount = game.currentNode()->depth() + 1;
+            level = game.level();
+            hasPrecalculatedNodes = game.currentNode()->children().empty();
+            numPrecalculatedMoves = game.lastPrecalculatedNode()->depth() - game.currentNode()->depth();
+        }
 
 
         if (mScoreTextBox)
@@ -588,13 +588,13 @@ namespace Tetris {
             setText(mBlockCountTextBox, MakeString() << blockCount);
         }
 
-		
-		//
-		// Update the line counters
-		//
-		setText(mLinesTextBoxes[0], MakeString() << gameState->numLines());
+
+        //
+        // Update the line counters
+        //
+        setText(mLinesTextBoxes[0], MakeString() << gameState->numLines());
         setText(mLinesTextBoxes[1], MakeString() << gameState->numDoubles());
-		setText(mLinesTextBoxes[2], MakeString() << gameState->numTriples());
+        setText(mLinesTextBoxes[2], MakeString() << gameState->numTriples());
         setText(mLinesTextBoxes[3], MakeString() << gameState->numTetrises());
 
 
@@ -615,7 +615,7 @@ namespace Tetris {
             {
                 setText(mMovesAheadTextBox, MakeString() << numPrecalculatedMoves);
             }
-            
+
             if (mCurrentSearchDepth)
             {
                 setText(mCurrentSearchDepth, MakeString() << mComputerPlayer->currentSearchDepth() << "/" << mComputerPlayer->searchDepth());
@@ -642,22 +642,22 @@ namespace Tetris {
             }
 
             if (mThreadCount && mAutoSelect)
-		    {
-			    mThreadCount->setDisabled(mAutoSelect->isChecked());
-			    if (mAutoSelect->isChecked())
-			    {
-				    mComputerPlayer->setWorkerCount(0);
-			    }
-			    else
-			    {
-				    mComputerPlayer->setWorkerCount(XULWin::String2Int(mThreadCount->getValue(), 0));
-			    }
-                
-				if (XULWin::String2Int(mThreadCount->getValue()) != mComputerPlayer->workerCount())
-				{
-					mThreadCount->setValue(XULWin::Int2String(mComputerPlayer->workerCount()));
-				}
-		    }
+            {
+                mThreadCount->setDisabled(mAutoSelect->isChecked());
+                if (mAutoSelect->isChecked())
+                {
+                    mComputerPlayer->setWorkerCount(0);
+                }
+                else
+                {
+                    mComputerPlayer->setWorkerCount(XULWin::String2Int(mThreadCount->getValue(), 0));
+                }
+
+                if (XULWin::String2Int(mThreadCount->getValue()) != mComputerPlayer->workerCount())
+                {
+                    mThreadCount->setValue(XULWin::Int2String(mComputerPlayer->workerCount()));
+                }
+            }
         }
         else if (mPlayerIsHuman->isSelected())
         {
@@ -673,8 +673,8 @@ namespace Tetris {
 
         if (mComputerPlayer
             && mStrategiesMenuList
-			&& !XULWin::WinAPI::ComboBox_IsOpen(mStrategiesMenuList->handle())
-			&& mGameHeightFactor
+            && !XULWin::WinAPI::ComboBox_IsOpen(mStrategiesMenuList->handle())
+            && mGameHeightFactor
             && mLastBlockHeightFactor
             && mNumHolesFactor
             && mNumLinesFactor
@@ -683,7 +683,7 @@ namespace Tetris {
             && mNumTriplesFactor
             && mNumTetrisesFactor)
         {
-			bool useCustomEvaluator = mStrategiesMenuList->getLabel() == "Custom";
+            bool useCustomEvaluator = mStrategiesMenuList->getLabel() == "Custom";
 
             // Enable/disable the spin buttons
             mSearchDepth->setDisabled(!useCustomEvaluator);

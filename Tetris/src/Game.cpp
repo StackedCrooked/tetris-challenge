@@ -26,6 +26,13 @@ HumanGame::HumanGame(size_t inNumRows, size_t inNumCols) :
 }
 
 
+HumanGame::HumanGame(const Game & inGame) :
+    Game(inGame.rowCount(), inGame.columnCount()),
+    mGameState(new GameState(inGame.getGameState()))
+{
+}
+
+
 GameState & HumanGame::getGameState()
 {
     if (!mGameState.get())
@@ -131,6 +138,13 @@ bool HumanGame::move(MoveDirection inDirection)
 ComputerGame::ComputerGame(size_t inNumRows, size_t inNumCols) :
     Game(inNumRows, inNumCols),
     mCurrentNode(GameStateNode::CreateRootNode(inNumRows, inNumCols).release())
+{
+}
+
+
+ComputerGame::ComputerGame(const Game & inGame) :
+    Game(inGame.rowCount(), inGame.columnCount()),
+    mCurrentNode(new GameStateNode(Create<GameState>(inGame.getGameState()), CreatePoly<Evaluator, Balanced>()))
 {
 }
 
@@ -304,6 +318,22 @@ Game::~Game()
 }
 
 
+void Game::swapGrid(Game & other)
+{
+    Grid g = other.gameGrid();
+    other.setGrid(gameGrid());
+    setGrid(g);
+}
+
+
+void Game::swapActiveBlock(Game & other)
+{
+    Block b = other.activeBlock();
+    other.setActiveBlock(activeBlock());
+    setActiveBlock(b);
+}
+
+
 std::auto_ptr<Block> Game::CreateDefaultBlock(BlockType inBlockType, size_t inNumColumns)
 {
     return std::auto_ptr<Block>(
@@ -409,12 +439,6 @@ void Game::getFutureBlocks(size_t inCount, BlockTypes & outBlocks) const
 
 void Game::getFutureBlocksWithOffset(size_t inOffset, size_t inCount, BlockTypes & outBlocks) const
 {
-    if (!mBlockFactory && (mBlocks.size() < inOffset + inCount))
-    {
-        throw std::runtime_error("This is a cloned HumanGame object and its number of future blocks is depleted.");
-    }
-
-
     // Make sure we have all blocks we need.
     while (mBlocks.size() < inOffset + inCount)
     {
