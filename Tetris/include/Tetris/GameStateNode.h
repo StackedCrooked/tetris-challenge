@@ -25,6 +25,8 @@ public:
 
     GameStateNode(NodePtr inParent, std::auto_ptr<GameState> inGameState, std::auto_ptr<Evaluator> inEvaluator);
 
+    GameStateNode(std::auto_ptr<GameState> inGameState, std::auto_ptr<Evaluator> inEvaluator);
+
     ~GameStateNode();
 
     // Creates a deep copy of this node and all child nodes.
@@ -65,9 +67,6 @@ public:
 
 private:
     friend class GameStateNodeImpl;
-
-    // Constructor for creating a root node.
-    GameStateNode(std::auto_ptr<GameState> inGameState, std::auto_ptr<Evaluator> inEvaluator);
 
     class GameStateNodeImpl;
     GameStateNodeImpl * mImpl;

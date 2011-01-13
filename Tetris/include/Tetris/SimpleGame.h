@@ -16,7 +16,7 @@ class GameState;
 
 
 /**
- * SimpleGame is an easy to use and thread-safe wrapper for the HumanGame class.
+ * SimpleGame is an easy to use and thread-safe wrapper for the Game class.
  */
 class SimpleGame
 {
