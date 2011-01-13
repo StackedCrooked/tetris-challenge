@@ -3492,7 +3492,6 @@ Tetris/include/Tetris/BlockTypes.h
 Tetris/include/Tetris/ComputerPlayer.h
 Tetris/include/Tetris/Config.h
 Tetris/include/Tetris/Direction.h
-Tetris/include/Tetris/Enum.h
 Tetris/include/Tetris/Evaluator.h
 Tetris/include/Tetris/EvilBlockFactory.h
 Tetris/include/Tetris/ForwardDeclarations.h
