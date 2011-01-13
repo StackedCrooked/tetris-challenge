@@ -67,6 +67,8 @@ public:
     // For multiplayer crazyness
     virtual void setActiveBlock(const Block & inBlock);
     virtual void setGrid(const Grid & inGrid) = 0;
+    void swapGrid(Game & other);
+    void swapActiveBlock(Game & other);
 
 protected:
     virtual GameState & getGameState() = 0;
@@ -99,6 +101,8 @@ class HumanGame : public Game
 public:
     HumanGame(size_t inNumRows, size_t inNumCols);
 
+    HumanGame(const Game & inGame);
+
     virtual bool move(MoveDirection inDirection);
 
     const GameState & getGameState() const;
@@ -117,6 +121,8 @@ class ComputerGame : public Game
 {
 public:
     ComputerGame(size_t inNumRows, size_t inNumCols);
+
+    ComputerGame(const Game & inGame);
 
     virtual bool move(MoveDirection inDirection);
 
