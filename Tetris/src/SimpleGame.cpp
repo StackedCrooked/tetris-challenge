@@ -5,31 +5,48 @@
 #include "Tetris/Gravity.h"
 #include "Tetris/Threading.h"
 #include "Tetris/AutoPtrSupport.h"
+#include <boost/bind.hpp>
 #include <stdexcept>
 
 
 namespace Tetris {
 
 
-struct SimpleGame::SimpleGameImpl
+struct SimpleGame::Impl
 {
-    SimpleGameImpl(size_t inRowCount,
+    Impl(size_t inRowCount,
                    size_t inColumnCount) :
         mGame(new HumanGame(inRowCount, inColumnCount)),
         mGravity(new Gravity(mGame)),
-        mCenterColumn(static_cast<size_t>(0.5 + inColumnCount / 2.0))
+        mCenterColumn(static_cast<size_t>(0.5 + inColumnCount / 2.0)),
+        mSimpleGame(0)
     {
+    }
+
+    void init(SimpleGame * inSimpleGame)
+    {
+        mSimpleGame = inSimpleGame;
+        ScopedReaderAndWriter<Game> rwgame(mGame);
+        Game & game(*rwgame.get());
+        game.OnChanged.connect(boost::bind(&SimpleGame::Impl::onChanged, this, _1));
+    }
+
+    void onChanged(Game & )
+    {
+        mSimpleGame->OnChanged(*mSimpleGame);
     }
 
     ThreadSafe<Game> mGame;
     boost::scoped_ptr<Gravity> mGravity;
     std::size_t mCenterColumn;
+    SimpleGame * mSimpleGame;
 };
 
 
 SimpleGame::SimpleGame(size_t inRowCount, size_t inColumnCount) :
-    mImpl(new SimpleGameImpl(inRowCount, inColumnCount))
+    mImpl(new Impl(inRowCount, inColumnCount))
 {
+    mImpl->init(this);
 }
 
 
@@ -50,13 +67,6 @@ void SimpleGame::setGameGrid(const Grid & inGrid)
     ScopedReaderAndWriter<Game> rwgame(mImpl->mGame);
     Game & game(*rwgame.get());
     game.setGrid(inGrid);
-}
-
-
-bool SimpleGame::checkDirty()
-{
-    ScopedReaderAndWriter<Game> game(mImpl->mGame);
-    return game->checkDirty();
 }
 
 

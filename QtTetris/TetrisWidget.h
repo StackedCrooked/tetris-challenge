@@ -26,8 +26,7 @@ public:
 
     virtual void keyPressEvent(QKeyEvent * inKeyEvent);
 
-public slots:
-    virtual void checkRefreshFlag();
+    virtual void refresh();
 
 protected:
     virtual void setMinSize(int inWidth, int inHeight);

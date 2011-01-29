@@ -76,6 +76,8 @@ public:
 
     virtual const RGBColor & getColor(BlockType inBlockType) const;
 
+    virtual void refresh() = 0;
+
 protected:
     virtual void setMinSize(int inWidth, int inHeight) = 0;
     void coordinateRepaint(const SimpleGame & inGame);

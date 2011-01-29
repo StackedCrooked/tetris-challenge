@@ -4,6 +4,7 @@
 
 #include "Tetris/Direction.h"
 #include "Tetris/Block.h"
+#include <boost/signals2.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <vector>
 #include <cstddef>
@@ -21,11 +22,11 @@ class GameState;
 class SimpleGame
 {
 public:
+    boost::signals2::signal<void(SimpleGame&)> OnChanged;
+
     SimpleGame(size_t inRowCount, size_t inColumnCount);
 
     ~SimpleGame();
-
-    bool checkDirty();
 
     bool isGameOver() const;
 
@@ -59,8 +60,8 @@ private:
     SimpleGame(const SimpleGame & );
     SimpleGame & operator=(const SimpleGame&);
 
-    struct SimpleGameImpl;
-    SimpleGameImpl * mImpl;
+    struct Impl;
+    Impl * mImpl;
 };
 
 } // namespace Tetris
