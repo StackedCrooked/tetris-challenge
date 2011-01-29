@@ -13,7 +13,9 @@
 namespace Tetris {
 
 
+class Game;
 class GameState;
+template<class Variable> class ThreadSafe;
 
 
 /**
@@ -22,11 +24,15 @@ class GameState;
 class SimpleGame
 {
 public:
-    boost::signals2::signal<void(SimpleGame&)> OnChanged;
+    boost::signals2::signal<void()> OnChanged;
+
+    boost::signals2::signal<void(int)> OnLinesCleared;
 
     SimpleGame(size_t inRowCount, size_t inColumnCount);
 
     ~SimpleGame();
+
+    const ThreadSafe<Game> & game() const;
 
     bool isGameOver() const;
 

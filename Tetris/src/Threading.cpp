@@ -4,8 +4,8 @@
 
 
 namespace Tetris {
-    
-    
+
+
     const int cMaximumLockDurationMs(1000);
 
 

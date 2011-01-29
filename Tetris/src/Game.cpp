@@ -124,7 +124,22 @@ bool HumanGame::move(MoveDirection inDirection)
         return false;
     }
 
+    // Remember the number of lines in the current game state.
+    int oldLineCount = mGameState->numLines();
+
+    // Commit the block. This returns a new GameState object
+    // where any full lines have already been cleared.
     mGameState.reset(mGameState->commit(block, GameOver(block.row() == 0)).release());
+
+    // Count the number of lines that were made in  the commit call.
+    int linesCleared = mGameState->numLines() - oldLineCount;
+    Assert(linesCleared >= 0);
+
+    // Notify the listeners.
+    if (linesCleared > 0)
+    {
+        OnLinesCleared(linesCleared);
+    }
 
     mCurrentBlockIndex++;
     supplyBlocks();
@@ -227,6 +242,14 @@ bool ComputerGame::navigateNodeDown()
 
     NodePtr nextNode = *mCurrentNode->children().begin();
     Assert(nextNode->depth() == mCurrentNode->depth() + 1);
+
+    int lineDifference = nextNode->gameState().numLines() - mCurrentNode->gameState().numLines();
+    Assert(lineDifference >= 0);
+    if (lineDifference > 0)
+    {
+        OnLinesCleared(lineDifference);
+    }
+
     setCurrentNode(nextNode);
     setDirty();
     return true;
@@ -317,6 +340,13 @@ Game::~Game()
 }
 
 
+void Game::onLinesCleared(int inLineCount)
+{
+    // Propagate the event.
+    OnLinesCleared(inLineCount);
+}
+
+
 void Game::swapGrid(Game & other)
 {
     Grid g = other.gameGrid();
@@ -356,7 +386,7 @@ void Game::setActiveBlock(const Block & inBlock)
 void Game::setDirty()
 {
     boost::mutex::scoped_lock lock(mChangedSignalMutex);
-    OnChanged(*this);
+    OnChanged();
 }
 
 

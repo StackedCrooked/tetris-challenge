@@ -5,6 +5,7 @@
 #include "Tetris/Block.h"
 #include "Tetris/GameOver.h"
 #include "Tetris/Grid.h"
+#include <boost/signals2.hpp>
 #include <memory>
 #include <stdexcept>
 
