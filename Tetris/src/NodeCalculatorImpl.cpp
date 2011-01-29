@@ -225,7 +225,7 @@ namespace Tetris
         while (!results.empty())
         {
             currentNode = results.top();
-            NodePtr copy(new GameStateNode(currentParent, Create<GameState>(currentNode->gameState()), currentNode->evaluator().clone()));
+            NodePtr copy(new GameStateNode(currentParent, new GameState(currentNode->gameState()), currentNode->evaluator().clone().release()));
             if (!mResult)
             {
                 mResult = copy;

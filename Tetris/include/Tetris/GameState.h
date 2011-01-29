@@ -35,7 +35,7 @@ public:
 
     // Creates a copy of the current gamestate with the given active block committed.
     // Use inGameOver = true to mark the new gamestate as "game over".
-    std::auto_ptr<GameState> commit(const Block & inBlock, GameOver inGameOver) const;
+    std::auto_ptr<GameState>  commit(const Block & inBlock, GameOver inGameOver) const;
 
     // Statistics
     int numLines() const { return mNumLines; }
@@ -65,7 +65,10 @@ private:
 class EvaluatedGameState
 {
 public:
-    EvaluatedGameState(std::auto_ptr<GameState> inGameState, int inQuality);
+    // Takes ownership of the GameState object
+    EvaluatedGameState(GameState *  inGameState, int inQuality);
+
+    ~EvaluatedGameState();
 
     const GameState & gameState() const;
 
@@ -77,7 +80,7 @@ private:
     EvaluatedGameState(const EvaluatedGameState &);
     EvaluatedGameState& operator=(const EvaluatedGameState&);
 
-    std::auto_ptr<GameState> mGameState;
+    GameState * mGameState;
     int mQuality;
 };
 

@@ -225,10 +225,16 @@ std::auto_ptr<GameState> GameState::commit(const Block & inBlock, GameOver inGam
 }
 
 
-EvaluatedGameState::EvaluatedGameState(std::auto_ptr<GameState> inGameState, int inQuality) :
+EvaluatedGameState::EvaluatedGameState(GameState * inGameState, int inQuality) :
     mGameState(inGameState),
     mQuality(inQuality)
 {
+}
+
+
+EvaluatedGameState::~EvaluatedGameState()
+{
+    delete mGameState;
 }
 
 

@@ -21,29 +21,27 @@ static int GetIdentifier(const GameState & inGameState)
 }
 
 
-class GameStateNode::GameStateNodeImpl
+struct GameStateNode::Impl
 {
-public:
-    GameStateNodeImpl(NodePtr inParent, std::auto_ptr<GameState> inGameState, std::auto_ptr<Evaluator> inEvaluator) :
+    Impl(NodePtr inParent, GameState *  inGameState, Evaluator *  inEvaluator) :
         mParent(inParent),
         mIdentifier(GetIdentifier(*inGameState)),
         mDepth(inParent->depth() + 1),
         mEvaluatedGameState(new EvaluatedGameState(inGameState, inEvaluator->evaluate(*inGameState))),
-        mEvaluator(inEvaluator.release()),
+        mEvaluator(inEvaluator),
         mChildren(GameStateComparator(mEvaluator->clone()))
     {
     }
 
-    GameStateNodeImpl(std::auto_ptr<GameState> inGameState, std::auto_ptr<Evaluator> inEvaluator) :
+    Impl(GameState *  inGameState, Evaluator * inEvaluator) :
         mParent(),
         mIdentifier(GetIdentifier(*inGameState)),
         mDepth(0),
         mEvaluatedGameState(new EvaluatedGameState(inGameState, inEvaluator->evaluate(*inGameState))),
-        mEvaluator(inEvaluator.release()),
+        mEvaluator(inEvaluator),
         mChildren(GameStateComparator(mEvaluator->clone()))
     {
     }
-
 
     boost::weak_ptr<GameStateNode> mParent;
     int mIdentifier;
@@ -56,18 +54,20 @@ public:
 
 std::auto_ptr<GameStateNode> GameStateNode::CreateRootNode(size_t inNumRows, size_t inNumColumns)
 {
-    return std::auto_ptr<GameStateNode>(new GameStateNode(Create<GameState>(inNumRows, inNumColumns), CreatePoly<Evaluator, Balanced>()));
+    return std::auto_ptr<GameStateNode>(new GameStateNode(
+        new GameState(inNumRows, inNumColumns),
+        new Balanced));
 }
 
 
-GameStateNode::GameStateNode(std::auto_ptr<GameState> inGameState, std::auto_ptr<Evaluator> inEvaluator) :
-    mImpl(new GameStateNodeImpl(inGameState, inEvaluator))
+GameStateNode::GameStateNode(GameState *  inGameState, Evaluator *  inEvaluator) :
+    mImpl(new Impl(inGameState, inEvaluator))
 {
 }
 
 
-GameStateNode::GameStateNode(NodePtr inParent, std::auto_ptr<GameState> inGameState, std::auto_ptr<Evaluator> inEvaluator) :
-    mImpl(new GameStateNodeImpl(inParent, inGameState, inEvaluator))
+GameStateNode::GameStateNode(NodePtr inParent, GameState *  inGameState, Evaluator *  inEvaluator) :
+    mImpl(new Impl(inParent, inGameState, inEvaluator))
 {
 }
 
@@ -82,8 +82,8 @@ GameStateNode::~GameStateNode()
 std::auto_ptr<GameStateNode> GameStateNode::clone() const
 {
     NodePtr parent = mImpl->mParent.lock();
-    std::auto_ptr<GameStateNode> result(parent ? new GameStateNode(parent, Create<GameState>(mImpl->mEvaluatedGameState->gameState()), mImpl->mEvaluator->clone())
-                                               : new GameStateNode(Create<GameState>(mImpl->mEvaluatedGameState->gameState()), mImpl->mEvaluator->clone()));
+    std::auto_ptr<GameStateNode> result(parent ? new GameStateNode(parent, new GameState(mImpl->mEvaluatedGameState->gameState()), mImpl->mEvaluator->clone().release())
+                                               : new GameStateNode(new GameState(mImpl->mEvaluatedGameState->gameState()), mImpl->mEvaluator->clone().release()));
     result->mImpl->mDepth = mImpl->mDepth;
 
     ChildNodes::const_iterator it = mImpl->mChildren.begin(), end = mImpl->mChildren.end();
@@ -123,7 +123,7 @@ void GameStateNode::setGrid(const Grid & inGrid)
     copy.setGrid(inGrid);
     int score = mImpl->mEvaluator->evaluate(copy);
     mImpl->mIdentifier = GetIdentifier(copy);
-    mImpl->mEvaluatedGameState.reset(new EvaluatedGameState(Create<GameState>(copy), score));
+    mImpl->mEvaluatedGameState.reset(new EvaluatedGameState(new GameState(copy), score));
 }
 
 

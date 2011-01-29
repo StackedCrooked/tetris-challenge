@@ -100,7 +100,7 @@ namespace Tetris
         {
             size_t initialColumn = DivideByTwo(gameGrid.columnCount() - GetGrid(GetBlockIdentifier(inBlockType, 0)).columnCount());
             std::auto_ptr<GameState> nextGameState = gameState.commit(Block(inBlockType, Rotation(0), Row(0), Column(initialColumn)), GameOver(true));
-            NodePtr childState(new GameStateNode(inNode, nextGameState, inEvaluator.clone()));
+            NodePtr childState(new GameStateNode(inNode, nextGameState.release(), inEvaluator.clone().release()));
             Assert(childState->depth() == (inNode->depth() + 1));
             outChildNodes.insert(childState);
             return;
@@ -121,9 +121,10 @@ namespace Tetris
                 if (row > 0)
                 {
                     block.setRow(row - 1);
+                    std::auto_ptr<GameState> nextGameState(gameState.commit(block, GameOver(false)));
                     NodePtr childState(new GameStateNode(inNode,
-                                                         gameState.commit(block, GameOver(false)),
-                                                         inEvaluator.clone()));
+                                                         nextGameState.release(),
+                                                         inEvaluator.clone().release()));
                     Assert(childState->depth() == inNode->depth() + 1);
                     outChildNodes.insert(childState);
                 }

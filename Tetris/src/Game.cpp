@@ -144,7 +144,7 @@ ComputerGame::ComputerGame(size_t inNumRows, size_t inNumCols) :
 
 ComputerGame::ComputerGame(const Game & inGame) :
     Game(inGame.rowCount(), inGame.columnCount()),
-    mCurrentNode(new GameStateNode(Create<GameState>(inGame.getGameState()), CreatePoly<Evaluator, Balanced>()))
+    mCurrentNode(new GameStateNode(new GameState(inGame.getGameState()), new Balanced))
 {
 }
 
@@ -285,8 +285,8 @@ bool ComputerGame::move(MoveDirection inDirection)
 
     // Actually commit the block
     NodePtr child(new GameStateNode(mCurrentNode,
-                                    mCurrentNode->gameState().commit(block, GameOver(block.row() == 0)),
-                                    CreatePoly<Evaluator, Balanced>()));
+                                    mCurrentNode->gameState().commit(block, GameOver(block.row() == 0)).release(),
+                                    new Balanced));
     mCurrentNode->addChild(child);
     setCurrentNode(child);
     setDirty();
