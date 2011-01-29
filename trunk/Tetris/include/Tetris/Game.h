@@ -31,7 +31,9 @@ class GameImpl;
 class Game
 {
 public:
-    boost::signals2::signal<void(Game&)> OnChanged;
+    boost::signals2::signal<void()> OnChanged;
+
+    boost::signals2::signal<void(int)> OnLinesCleared;
 
     Game(size_t inNumRows, size_t inNumColumns);
 
@@ -90,6 +92,8 @@ protected:
     mutable boost::mutex mChangedSignalMutex;
 
 private:
+    void onLinesCleared(int inLineCount);
+
     // non-copyable
     Game(const Game&);
     Game& operator=(const Game&);

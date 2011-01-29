@@ -580,3 +580,7 @@ Tetris/testsuite/src/WorkerPoolTest.h
 Tetris/testsuite/src/WorkerTest.cpp
 Tetris/testsuite/src/WorkerTest.h
 Tetris/Todo.txt
+Tetris/include/Tetris/Referee.h
+Tetris/include/Tetris/MultiplayerGame.h
+Tetris/src/MultiplayerGame.cpp
+Tetris/src/Referee.cpp

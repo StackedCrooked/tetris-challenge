@@ -15,7 +15,7 @@ namespace Tetris {
 struct SimpleGame::Impl
 {
     Impl(size_t inRowCount,
-                   size_t inColumnCount) :
+         size_t inColumnCount) :
         mGame(new HumanGame(inRowCount, inColumnCount)),
         mGravity(new Gravity(mGame)),
         mCenterColumn(static_cast<size_t>(0.5 + inColumnCount / 2.0)),
@@ -28,12 +28,20 @@ struct SimpleGame::Impl
         mSimpleGame = inSimpleGame;
         ScopedReaderAndWriter<Game> rwgame(mGame);
         Game & game(*rwgame.get());
-        game.OnChanged.connect(boost::bind(&SimpleGame::Impl::onChanged, this, _1));
+        game.OnChanged.connect(boost::bind(&SimpleGame::Impl::onChanged, this));
+        game.OnLinesCleared.connect(boost::bind(&SimpleGame::Impl::onLinesCleared, this, _1));
     }
 
-    void onChanged(Game & )
+    void onChanged()
     {
-        mSimpleGame->OnChanged(*mSimpleGame);
+        // Just forward to our listeners.
+        mSimpleGame->OnChanged();
+    }
+
+    void onLinesCleared(int inLineCount)
+    {
+        // Just forward to our listeners.
+        mSimpleGame->OnLinesCleared(inLineCount);
     }
 
     ThreadSafe<Game> mGame;
@@ -52,6 +60,12 @@ SimpleGame::SimpleGame(size_t inRowCount, size_t inColumnCount) :
 
 SimpleGame::~SimpleGame()
 {
+}
+
+
+const ThreadSafe<Game> & SimpleGame::game() const
+{
+    return mImpl->mGame;
 }
 
 

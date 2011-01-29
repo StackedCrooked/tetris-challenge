@@ -5,6 +5,7 @@
 #include "Tetris/Assert.h"
 #include <boost/thread.hpp>
 #include <boost/scoped_ptr.hpp>
+#include <boost/detail/atomic_count.hpp>
 #include <memory>
 
 
@@ -41,19 +42,29 @@ namespace Tetris
     {
     public:
         ThreadSafe(std::auto_ptr<Variable> inVariable) :
-            mVariableWithMutex(new WithMutex<Variable>(inVariable))
+            mVariableWithMutex(new WithMutex<Variable>(inVariable)),
+            mIdentifier(++sInstanceCount)
         {
         }
+
         ThreadSafe(Variable * inVariable) :
-            mVariableWithMutex(new WithMutex<Variable>(inVariable))
+            mVariableWithMutex(new WithMutex<Variable>(inVariable)),
+            mIdentifier(++sInstanceCount)
         {
         }
 
         // Default constructor can only be used if Variable has a default constructor.
         ThreadSafe() :
-            mVariableWithMutex(new WithMutex<Variable>(std::auto_ptr<Variable>(new Variable)))
+            mVariableWithMutex(new WithMutex<Variable>(std::auto_ptr<Variable>(new Variable))),
+            mIdentifier(++sInstanceCount)
         {
         }
+
+        bool operator== (const ThreadSafe<Variable> & rhs) const
+        { return id() == rhs.id(); }
+
+        size_t id() const
+        { return mIdentifier; }
 
         boost::timed_mutex & getMutex() const
         { return mVariableWithMutex->mMutex; }
@@ -62,7 +73,21 @@ namespace Tetris
         friend class ScopedReaderAndWriter<Variable>;
         friend class ScopedReader<Variable>;
         boost::shared_ptr<WithMutex<Variable> > mVariableWithMutex;
+        size_t mIdentifier;
+        static boost::detail::atomic_count sInstanceCount;
     };
+
+
+    // Static member initialization.
+    template<class Variable>
+    boost::detail::atomic_count ThreadSafe<Variable>::sInstanceCount(0);
+
+
+    template<class Variable>
+    bool operator< (const ThreadSafe<Variable> & lhs, const ThreadSafe<Variable> & rhs)
+    {
+        return lhs.id() < rhs.id();
+    }
 
 
     // Simple stopwatch class.

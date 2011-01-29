@@ -29,10 +29,12 @@ add_library(Tetris
     include/Tetris/Logger.h
     include/Tetris/Logging.h
     include/Tetris/MakeString.h
+    include/Tetris/MultiplayerGame.h
     include/Tetris/MultithreadedNodeCalculator.h
     include/Tetris/NodeCalculator.h
     include/Tetris/NodeCalculatorImpl.h
     include/Tetris/NodePtr.h
+    include/Tetris/Referee.h
     include/Tetris/SingleThreadedNodeCalculator.h
     include/Tetris/Tetris.h
     include/Tetris/Threading.h
@@ -59,9 +61,11 @@ add_library(Tetris
     src/Gravity.cpp
     src/Logger.cpp
     src/Logging.cpp
+    src/MultiplayerGame.cpp
     src/MultiThreadedNodeCalculator.cpp
     src/NodeCalculator.cpp
     src/NodeCalculatorImpl.cpp
+    src/Referee.cpp
     src/SingleThreadedNodeCalculator.cpp
     src/Threading.cpp
     src/Unicode.cpp
