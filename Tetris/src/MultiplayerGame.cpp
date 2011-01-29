@@ -14,8 +14,10 @@ namespace Tetris {
 
 struct MultiplayerGame::Impl : boost::noncopyable
 {
+    typedef MultiplayerGame::Players Players;
+
     boost::scoped_ptr<Referee> mReferee;
-    std::set<ThreadSafe<Game> > mPlayers;
+    Players mPlayers;
 };
 
 
@@ -32,17 +34,25 @@ MultiplayerGame::~MultiplayerGame()
 }
 
 
-void MultiplayerGame::join(const ThreadSafe<Game> & inGame)
+void MultiplayerGame::join(const Player & inPlayer)
 {
-    mImpl->mPlayers.insert(inGame);
+    mImpl->mPlayers.insert(inPlayer);
+    OnPlayerJoined(inPlayer);
 }
 
 
-void MultiplayerGame::leave(const ThreadSafe<Game> & inGame)
+void MultiplayerGame::leave(const Player & inPlayer)
 {
     // calling erase(..) on a vector is slow,
     // but that should not be an issue here
-    mImpl->mPlayers.erase(inGame);
+    mImpl->mPlayers.erase(inPlayer);
+    OnPlayerLeft(inPlayer);
+}
+
+
+const MultiplayerGame::Players & MultiplayerGame::players() const
+{
+    return mImpl->mPlayers;
 }
 
 

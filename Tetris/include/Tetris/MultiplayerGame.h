@@ -2,6 +2,10 @@
 #define TETRIS_MULTIPLAYERGAME_H_INCLUDED
 
 
+#include <boost/signals2/signal.hpp>
+#include <set>
+
+
 namespace Tetris {
 
 
@@ -12,13 +16,23 @@ template<class T> class ThreadSafe;
 class MultiplayerGame
 {
 public:
+    boost::signals2::signal<void(const ThreadSafe<Game> &)> OnPlayerJoined;
+
+    boost::signals2::signal<void(const ThreadSafe<Game> &)> OnPlayerLeft;
+
     MultiplayerGame();
 
     ~MultiplayerGame();
 
-    void join(const ThreadSafe<Game> & inGame);
+    typedef ThreadSafe<Game> Player;
 
-    void leave(const ThreadSafe<Game> & inGame);
+    typedef std::set<Player> Players;
+
+    void join(const Player & inPlayer);
+
+    void leave(const Player & inPlayer);
+
+    const Players & players() const;
 
 private:
     struct Impl;

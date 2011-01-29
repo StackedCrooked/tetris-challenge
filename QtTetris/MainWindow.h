@@ -5,7 +5,9 @@
 #include <QtGui>
 #include "TetrisWidget.h"
 #include "Tetris/SimpleGame.h"
-#include <memory>
+#include "Tetris/MultiplayerGame.h"
+#include <boost/scoped_ptr.hpp>
+#include <boost/shared_ptr.hpp>
 
 
 class MainWindow : public QWidget
@@ -17,19 +19,19 @@ public:
     ~MainWindow();
 
 private slots:
-    void onTimeout();
-    void onSwapFields();
     void onRestart();
 
 private:
     void restart();
-    void swapFields();
 
-    std::auto_ptr<Tetris::SimpleGame> mSimpleGame1;
-    std::auto_ptr<Tetris::SimpleGame> mSimpleGame2;
-    TetrisWidget * mTetrisWidget1;
-    TetrisWidget * mTetrisWidget2;
-    QLabel * mFPSLabel;
+    enum {
+        cPlayerCount = 2
+    };
+
+    Tetris::MultiplayerGame mMultiplayerGame;
+    typedef boost::shared_ptr<Tetris::SimpleGame> SimpleGamePtr;
+    std::vector<SimpleGamePtr> mTetrisPlayers;
+    std::vector<TetrisWidget *> mTetrisWidgets;
     QPushButton * mSwitchButton;
     QPushButton * mRestartButton;
 };
