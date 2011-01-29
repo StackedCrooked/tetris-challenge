@@ -66,7 +66,7 @@
     <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">GenericProjectManager.GenericBuildConfiguration</value>
    </valuemap>
    <valuemap key="ProjectExplorer.Target.BuildConfiguration.1" type="QVariantMap">
-    <value key="GenericProjectManager.GenericBuildConfiguration.BuildDirectory" type="QString">$HOME/svn/tetris-challenge</value>
+    <value key="GenericProjectManager.GenericBuildConfiguration.BuildDirectory" type="QString">/Users/francis/svn/tetris-challenge</value>
     <valuemap key="ProjectExplorer.BuildConfiguration.BuildStep.0" type="QVariantMap">
      <valuelist key="ProjectExplorer.ProcessStep.Arguments" type="QVariantList">
       <value type="QString">-p</value>
@@ -83,7 +83,7 @@
       <value type="QString">cmake</value>
       <value type="QString">../../QtTetris</value>
      </valuelist>
-     <value key="ProjectExplorer.ProcessStep.Command" type="QString">$HOME/bin/cmake</value>
+     <value key="ProjectExplorer.ProcessStep.Command" type="QString">/Users/francis/bin/cmake</value>
      <value key="ProjectExplorer.ProcessStep.Enabled" type="bool">true</value>
      <value key="ProjectExplorer.ProcessStep.WorkingDirectory" type="QString">$BUILDDIR/Build/QtCreator</value>
      <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString">Custom Process Step</value>
