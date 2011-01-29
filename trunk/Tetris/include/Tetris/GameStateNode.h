@@ -23,9 +23,9 @@ class GameStateNode
 public:
     static std::auto_ptr<GameStateNode> CreateRootNode(size_t inNumRows, size_t inNumColumns);
 
-    GameStateNode(NodePtr inParent, std::auto_ptr<GameState> inGameState, std::auto_ptr<Evaluator> inEvaluator);
+    GameStateNode(NodePtr inParent, GameState * inGameState, Evaluator * inEvaluator);
 
-    GameStateNode(std::auto_ptr<GameState> inGameState, std::auto_ptr<Evaluator> inEvaluator);
+    GameStateNode(GameState * inGameState, Evaluator * inEvaluator);
 
     ~GameStateNode();
 
@@ -66,10 +66,8 @@ public:
     int quality() const;
 
 private:
-    friend class GameStateNodeImpl;
-
-    class GameStateNodeImpl;
-    GameStateNodeImpl * mImpl;
+    struct Impl;
+    Impl * mImpl;
 };
 
 

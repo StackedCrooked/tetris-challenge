@@ -1,6 +1,7 @@
 :PHONY Darwin Xcode Linux Cygwin
 
-all: Darwin
+UNAME=$(shell uname)
+all: ${UNAME}
 
 Cygwin:
 	echo "Making Cygwin"
