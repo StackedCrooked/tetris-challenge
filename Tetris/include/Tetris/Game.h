@@ -15,6 +15,7 @@
 
 namespace Tetris {
 
+
 class Block;
 class GameStateNode;
 class GameImpl;

@@ -19,7 +19,6 @@ set(EXECUTABLE QtTetris)
 set(CMAKE_OSX_ARCHITECTURES ${ARCH})
 set(SOLUTIONDIR "${QtTetris_SOURCE_DIR}/../")
 set(OUTDIR ${SOLUTIONDIR}Build/${PLATFORM}/${ARCH}/${CMAKE_BUILD_TYPE}/)
-set(BOOST ${SOLUTIONDIR}3rdParty/Boost_1_44_0/)
 set(POCO ${SOLUTIONDIR}3rdParty/Poco/)
 set(WARNING_OPTIONS "-arch ${ARCH} -Wall -Werror -Wno-sign-compare")
 set(CXX_FLAGS_Release "${CXX_FLAGS} ${WARNING_OPTIONS} -O3 -DNDEBUG")
@@ -27,16 +26,22 @@ set(CXX_FLAGS_Debug   "${CXX_FLAGS} ${WARNING_OPTIONS} -ggdb3")
 set(FINAL_COMPILE_FLAGS "${CXX_FLAGS_${CMAKE_BUILD_TYPE}}")
 
 
-include_directories(
-    ${BOOST}
-    ${POCO}Foundation/include
-    ${POCO}CppSquare/include
-    ${SOLUTIONDIR}Tetris/include)
+# Poco dependency
+include_directories(${POCO}Foundation/include ${POCO}CppSquare/include ${SOLUTIONDIR}Tetris/include)
+link_directories(${POCO}lib/${PLATFORM}/${ARCH})
 
-
-link_directories(
-    ${BOOST}lib/${PLATFORM}/${ARCH}
-    ${POCO}lib/${PLATFORM}/${ARCH})
+# Boost dependency
+if(APPLE)
+message("Note: MacOSX build depends on boost library from MacPorts!")
+include_directories("/opt/local/include")
+link_directories("/opt/local/lib")
+set(LIB_BOOST_THREAD boost_thread-mt)
+else()
+set(BOOST ${SOLUTIONDIR}3rdParty/Boost_1_44_0/)
+include_directories(${BOOST})
+link_directories(${BOOST}lib/${PLATFORM}/${ARCH})
+set(LIB_BOOST_THREAD boost_thread)
+endif()
 
 
 add_subdirectory(${SOLUTIONDIR}Tetris ${OUTDIR}Tetris)
@@ -58,6 +63,6 @@ target_link_libraries(${EXECUTABLE}
     ${QT_LIBRARIES}
     Tetris
     PocoFoundation
-    boost_thread)
+    ${LIB_BOOST_THREAD})
 
 set_target_properties(${EXECUTABLE} PROPERTIES COMPILE_FLAGS ${FINAL_COMPILE_FLAGS})
