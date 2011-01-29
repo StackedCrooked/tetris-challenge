@@ -35,6 +35,8 @@ public:
 
     boost::signals2::signal<void(int)> OnLinesCleared;
 
+    boost::signals2::signal<void()> OnGameOver;
+
     Game(size_t inNumRows, size_t inNumColumns);
 
     virtual ~Game();
@@ -68,6 +70,7 @@ public:
     virtual const GameState & getGameState() const = 0;
 
     // For multiplayer crazyness
+    virtual void applyLinePenalty(int inNumberOfLinesMadeByOpponent);
     virtual void setActiveBlock(const Block & inBlock);
     virtual void setGrid(const Grid & inGrid) = 0;
     void swapGrid(Game & other);

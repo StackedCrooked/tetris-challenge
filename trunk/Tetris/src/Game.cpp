@@ -8,6 +8,8 @@
 #include "Tetris/Utilities.h"
 #include "Tetris/Logging.h"
 #include "Tetris/Assert.h"
+#include "Poco/Exception.h"
+#include "Poco/Random.h"
 #include <algorithm>
 #include <set>
 #include <stdexcept>
@@ -344,6 +346,58 @@ void Game::onLinesCleared(int inLineCount)
 {
     // Propagate the event.
     OnLinesCleared(inLineCount);
+}
+
+
+void Game::applyLinePenalty(int inLineCount)
+{
+    if (inLineCount < 2 || isGameOver())
+    {
+        return;
+    }
+
+
+    int lineIncrement = inLineCount < 4 ? (inLineCount - 1) : 4;
+    int newFirstRow = getGameState().firstOccupiedRow() - lineIncrement;
+    if (newFirstRow < 0)
+    {
+        newFirstRow = 0;
+    }
+    Grid grid = getGameState().grid();
+    int garbageStart = grid.rowCount() - lineIncrement;
+
+    for (int r = newFirstRow + lineIncrement; r < grid.rowCount(); ++r)
+    {
+        for (int c = 0; c < grid.columnCount(); ++c)
+        {
+            if (r < garbageStart)
+            {
+                grid.set(r - lineIncrement, c, grid.get(r, c));
+            }
+            else
+            {
+                // Garbage filler at the bottom.
+                static Poco::Random fRandom;
+                if (fRandom.nextBool())
+                {
+                    static BlockFactory fGarbageFactory;
+                    grid.set(r, c, fGarbageFactory.getNext());
+                }
+            }
+        }
+    }
+
+    // Set the grid
+    getGameState().setGrid(grid);
+
+    // Check if the active block has been caught in the penalty lines that were added.
+    // If yes then call drop() to normalize the situation.
+    const Block & block(activeBlock());
+    if (!getGameState().checkPositionValid(block, block.row(), block.column()))
+    {
+        drop();
+    }
+    setDirty();
 }
 
 

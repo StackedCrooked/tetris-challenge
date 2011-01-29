@@ -63,6 +63,9 @@ namespace Tetris
         bool operator== (const ThreadSafe<Variable> & rhs) const
         { return id() == rhs.id(); }
 
+        bool operator!= (const ThreadSafe<Variable> & rhs) const
+        { return !(*this == rhs); }
+
         size_t id() const
         { return mIdentifier; }
 

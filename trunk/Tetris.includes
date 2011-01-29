@@ -13,3 +13,5 @@ Tetris/include
 /Library/Frameworks/QtGui.framework/Versions/4/Headers
 /Library/Frameworks/QtCore.framework/Versions/4/Headers
 /opt/local/include
+/opt/local/include/boost
+/opt/local/include/boost/signals2

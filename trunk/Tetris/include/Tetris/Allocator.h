@@ -13,10 +13,10 @@ namespace Tetris {
 template<class T>
 inline void Allocator_FillBuffer(T * inBuffer, size_t inSize, const T & inInitialValue)
 {
-	for (size_t i = 0; i < inSize; ++i)
-	{
-		inBuffer[i] = inInitialValue;
-	}
+    for (size_t i = 0; i < inSize; ++i)
+    {
+        inBuffer[i] = inInitialValue;
+    }
 }
 
 
@@ -36,7 +36,7 @@ public:
     const T * get() const;
 
 private:
-	std::vector<T> mVector;
+    std::vector<T> mVector;
 };
 
 
@@ -51,7 +51,7 @@ public:
 
     Allocator_Malloc(size_t inSize, const T & inInitialValue);
 
-	~Allocator_Malloc();
+    ~Allocator_Malloc();
 
     T * get();
 
@@ -60,7 +60,7 @@ public:
 private:
     Allocator_Malloc(const Allocator_Malloc&);
     Allocator_Malloc& operator=(const Allocator_Malloc&);
-    
+
     T * mBuffer;
 };
 
@@ -76,7 +76,7 @@ public:
 
     Allocator_New(size_t inSize, const T & inInitialValue);
 
-	~Allocator_New();
+    ~Allocator_New();
 
     T * get();
 
@@ -85,7 +85,7 @@ public:
 private:
     Allocator_New(const Allocator_New&);
     Allocator_New& operator=(const Allocator_New&);
-    
+
     T * mBuffer;
 };
 
@@ -108,14 +108,14 @@ Allocator_Vector<T>::Allocator_Vector(size_t inSize, const T & inInitialValue) :
 template<class T>
 T * Allocator_Vector<T>::get()
 {
-	return &mVector[0];
+    return &mVector[0];
 }
 
 
 template<class T>
 const T * Allocator_Vector<T>::get() const
 {
-	return &mVector[0];
+    return &mVector[0];
 }
 
 
@@ -130,28 +130,28 @@ template<class T>
 Allocator_Malloc<T>::Allocator_Malloc(size_t inSize, const T & inInitialValue) :
     mBuffer(reinterpret_cast<T*>(malloc(sizeof(T) * inSize)))
 {
-	Allocator_FillBuffer(mBuffer, inSize, inInitialValue);
+    Allocator_FillBuffer(mBuffer, inSize, inInitialValue);
 }
 
 
 template<class T>
 Allocator_Malloc<T>::~Allocator_Malloc()
 {
-	free(mBuffer);
+    free(mBuffer);
 }
 
 
 template<class T>
 T * Allocator_Malloc<T>::get()
 {
-	return mBuffer;
+    return mBuffer;
 }
 
 
 template<class T>
 const T * Allocator_Malloc<T>::get() const
 {
-	return mBuffer;
+    return mBuffer;
 }
 
 
@@ -166,14 +166,14 @@ template<class T>
 Allocator_New<T>::Allocator_New(size_t inSize, const T & inInitialValue) :
     mBuffer(new T[inSize])
 {
-	Allocator_FillBuffer(mBuffer, inSize, inInitialValue);
+    Allocator_FillBuffer(mBuffer, inSize, inInitialValue);
 }
 
 
 template<class T>
 Allocator_New<T>::~Allocator_New()
 {
-	delete [] mBuffer;
+    delete [] mBuffer;
 }
 
 

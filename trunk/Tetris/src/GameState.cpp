@@ -193,6 +193,7 @@ const Grid & GameState::grid() const
 void GameState::setGrid(const Grid & inGrid)
 {
     mGrid = inGrid;
+
 }
 
 
