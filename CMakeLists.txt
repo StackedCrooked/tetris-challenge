@@ -2,7 +2,16 @@ cmake_minimum_required(VERSION 2.6)
 project(TETRIS)
 
 set(CMAKE_BUILD_TYPE $ENV{TETRIS_BUILD_CONFIGURATION})
+if ("${CMAKE_BUILD_TYPE}" STREQUAL "")
+    message("Defaulting to \"Release\" since the environment variable TETRIS_BUILD_CONFIGURATION was not set.")
+    set(CMAKE_BUILD_TYPE "Release")
+else()
+    message("Detected build configuration from environment variable TETRIS_BUILD_CONFIGURATION: ${CMAKE_BUILD_TYPE}.")
+endif()
 
+message("\n\n***")
+message("===> Build configuration is: ${CMAKE_BUILD_TYPE} <===")
+message("***\n\n")
 
 if(WIN32)
     set(ARCH x86)

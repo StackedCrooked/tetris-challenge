@@ -130,7 +130,7 @@ void NodeCalculatorTest::testInterrupt(Depth inDepth, Width inWidth, WorkerCount
     NodePtr resultPtr = nodeCalculator.result();
     GameStateNode & result(*resultPtr);
     Assert(result.depth() == rootNode->depth() + 1);
-    Assert(result.state().originalBlock().type() == blockTypes[0]);
+    Assert(result.gameState().originalBlock().type() == blockTypes[0]);
 
 	if (inDepth > 1)
 	{
