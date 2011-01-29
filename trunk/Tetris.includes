@@ -1,7 +1,5 @@
 QtTetris
 Tetris/include
-3rdParty/Boost_1_44_0
-3rdParty/Boost_1_44_0/boost/python/detail
 3rdParty/Poco/CppUnit/include/CppUnit
 3rdParty/Poco/Foundation/include/Poco
 3rdParty/Poco/Foundation/include
@@ -14,3 +12,4 @@ Tetris/include
 3rdParty/Poco/XML/src
 /Library/Frameworks/QtGui.framework/Versions/4/Headers
 /Library/Frameworks/QtCore.framework/Versions/4/Headers
+/opt/local/include

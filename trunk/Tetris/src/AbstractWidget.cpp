@@ -71,6 +71,7 @@ void AbstractWidget::setGame(SimpleGame * inSimpleGame)
     if (mSimpleGame)
     {
         setMinSize((mSimpleGame->columnCount() + 4) * squareWidth() + mMargin, mSimpleGame->rowCount() * squareHeight());
+        mSimpleGame->OnChanged.connect(boost::bind(&AbstractWidget::refresh, this));
     }
 }
 

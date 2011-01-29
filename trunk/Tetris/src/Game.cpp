@@ -302,8 +302,7 @@ Game::Game(size_t inNumRows, size_t inNumColumns) :
     mBlockFactory(new BlockFactory),
     mBlocks(),
     mCurrentBlockIndex(0),
-    mOverrideLevel(-1),
-    mDirty(true)
+    mOverrideLevel(-1)
 {
     if (mBlocks.empty())
     {
@@ -354,22 +353,10 @@ void Game::setActiveBlock(const Block & inBlock)
 }
 
 
-bool Game::checkDirty()
-{
-    boost::mutex::scoped_lock lock(mDirtyMutex);
-    if (mDirty)
-    {
-        mDirty = false;
-        return true;
-    }
-    return false;
-}
-
-
 void Game::setDirty()
 {
-    boost::mutex::scoped_lock lock(mDirtyMutex);
-    mDirty = true;
+    boost::mutex::scoped_lock lock(mChangedSignalMutex);
+    OnChanged(*this);
 }
 
 

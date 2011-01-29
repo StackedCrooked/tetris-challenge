@@ -28,11 +28,6 @@ TetrisWidget::TetrisWidget(QWidget * inParent, int inSquareWidth, int inSquareHe
 {
     setUpdatesEnabled(true);
     setFocusPolicy(Qt::StrongFocus);
-
-    QTimer * timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(checkRefreshFlag()));
-    timer->setInterval(16);
-    timer->start();
 }
 
 
@@ -41,12 +36,9 @@ TetrisWidget::~TetrisWidget()
 }
 
 
-void TetrisWidget::checkRefreshFlag()
+void TetrisWidget::refresh()
 {
-    if (getGame() && getGame()->checkDirty())
-    {
-        update();
-    }
+    update();
 }
 
 

@@ -8,6 +8,7 @@
 #include "Tetris/GameState.h"
 #include "Tetris/Grid.h"
 #include "Tetris/NodePtr.h"
+#include <boost/signals2.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread.hpp>
 #include <memory>
@@ -30,12 +31,11 @@ class GameImpl;
 class Game
 {
 public:
+    boost::signals2::signal<void(Game&)> OnChanged;
+
     Game(size_t inNumRows, size_t inNumColumns);
 
     virtual ~Game();
-
-    // Indicates that a refresh is required in the higher layer view
-    bool checkDirty();
 
     bool isGameOver() const;
 
@@ -87,8 +87,7 @@ protected:
     size_t mCurrentBlockIndex;
     int mOverrideLevel;
 
-    mutable bool mDirty;
-    mutable boost::mutex mDirtyMutex;
+    mutable boost::mutex mChangedSignalMutex;
 
 private:
     // non-copyable
