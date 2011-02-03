@@ -7,6 +7,7 @@
 #include "Tetris/Block.h"
 #include "Tetris/Utilities.h"
 #include "Tetris/Logging.h"
+#include "Tetris/Threading.h"
 #include "Tetris/Assert.h"
 #include "Poco/Exception.h"
 #include "Poco/Random.h"
@@ -58,7 +59,7 @@ const GameState & HumanGame::getGameState() const
 void HumanGame::setGrid(const Grid & inGrid)
 {
     mGameState->setGrid(inGrid);
-    setDirty();
+    onChanged();
 }
 
 
@@ -116,7 +117,7 @@ bool HumanGame::move(MoveDirection inDirection)
     {
         block.setRow(newRow);
         block.setColumn(newCol);
-        setDirty();
+        onChanged();
         return true;
     }
 
@@ -140,14 +141,14 @@ bool HumanGame::move(MoveDirection inDirection)
     // Notify the listeners.
     if (linesCleared > 0)
     {
-        OnLinesCleared(linesCleared);
+        onLinesCleared(linesCleared);
     }
 
     mCurrentBlockIndex++;
     supplyBlocks();
     mActiveBlock.reset(CreateDefaultBlock(mBlocks[mCurrentBlockIndex], mNumColumns).release());
 
-    setDirty();
+    onChanged();
     return false;
 }
 
@@ -181,7 +182,7 @@ const GameState & ComputerGame::getGameState() const
 void ComputerGame::setGrid(const Grid & inGrid)
 {
     mCurrentNode->setGrid(inGrid);
-    setDirty();
+    onChanged();
 }
 
 
@@ -194,7 +195,7 @@ void ComputerGame::setCurrentNode(NodePtr inCurrentNode)
     supplyBlocks();
 
     mActiveBlock.reset(CreateDefaultBlock(mBlocks[mCurrentBlockIndex], mNumColumns).release());
-    setDirty();
+    onChanged();
 }
 
 
@@ -249,11 +250,11 @@ bool ComputerGame::navigateNodeDown()
     Assert(lineDifference >= 0);
     if (lineDifference > 0)
     {
-        OnLinesCleared(lineDifference);
+        onLinesCleared(lineDifference);
     }
 
     setCurrentNode(nextNode);
-    setDirty();
+    onChanged();
     return true;
 }
 
@@ -272,7 +273,7 @@ bool ComputerGame::move(MoveDirection inDirection)
     {
         block.setRow(newRow);
         block.setColumn(newCol);
-        setDirty();
+        onChanged();
         return true;
     }
 
@@ -314,7 +315,7 @@ bool ComputerGame::move(MoveDirection inDirection)
                                     new Balanced));
     mCurrentNode->addChild(child);
     setCurrentNode(child);
-    setDirty();
+    onChanged();
     return false;
 }
 
@@ -342,10 +343,52 @@ Game::~Game()
 }
 
 
+void Game::registerEventHandler(EventHandler * inEventHandler)
+{
+    mEventHandlers.push_back(inEventHandler);
+}
+
+
+void Game::unregisterEventHandler(EventHandler * inEventHandler)
+{
+    mEventHandlers.erase(
+        std::remove(mEventHandlers.begin(),
+                    mEventHandlers.end(),
+                    inEventHandler));
+}
+
+
+void Game::onChanged()
+{
+    // Invoke on main tread
+    InvokeLater(boost::bind(&Game::onChangedImpl, this));
+}
+
+
+void Game::onChangedImpl()
+{
+    for (size_t idx = 0; idx < mEventHandlers.size(); ++idx)
+    {
+        Game::EventHandler * eventHandler(mEventHandlers[idx]);
+        eventHandler->onGameStateChanged(this);
+    }
+}
+
+
 void Game::onLinesCleared(int inLineCount)
 {
-    // Propagate the event.
-    OnLinesCleared(inLineCount);
+    // Invoke on main thread
+    InvokeLater(boost::bind(&Game::onLinesClearedImpl, this, inLineCount));
+}
+
+
+void Game::onLinesClearedImpl(int inLineCount)
+{
+    for (size_t idx = 0; idx < mEventHandlers.size(); ++idx)
+    {
+        Game::EventHandler * eventHandler(mEventHandlers[idx]);
+        eventHandler->onLinesCleared(this, inLineCount);
+    }
 }
 
 
@@ -368,6 +411,7 @@ void Game::applyLinePenalty(int inLineCount)
 
     for (int r = newFirstRow + lineIncrement; r < grid.rowCount(); ++r)
     {
+        int garbage = 0;
         for (int c = 0; c < grid.columnCount(); ++c)
         {
             if (r < garbageStart)
@@ -380,8 +424,29 @@ void Game::applyLinePenalty(int inLineCount)
                 static Poco::Random fRandom;
                 if (fRandom.nextBool())
                 {
-                    static BlockFactory fGarbageFactory;
-                    grid.set(r, c, fGarbageFactory.getNext());
+                    if (garbage <= grid.columnCount()/2)
+                    {
+                        static BlockFactory fGarbageFactory;
+                        grid.set(r, c, fGarbageFactory.getNext());
+                        garbage++;
+                    }
+                    else
+                    {
+                        grid.set(r, c, BlockType_Nil);
+                    }
+                }
+                else
+                {
+                    if (c > grid.columnCount() / 2 && garbage < grid.columnCount() / 2)
+                    {
+                        static BlockFactory fGarbageFactory;
+                        grid.set(r, c, fGarbageFactory.getNext());
+                        garbage++;
+                    }
+                    else
+                    {
+                        grid.set(r, c, BlockType_Nil);
+                    }
                 }
             }
         }
@@ -397,7 +462,7 @@ void Game::applyLinePenalty(int inLineCount)
     {
         drop();
     }
-    setDirty();
+    onChanged();
 }
 
 
@@ -432,15 +497,8 @@ void Game::setActiveBlock(const Block & inBlock)
     if (getGameState().checkPositionValid(inBlock, inBlock.row(), inBlock.column()))
     {
         mActiveBlock.reset(new Block(inBlock));
-        setDirty();
+        onChanged();
     }
-}
-
-
-void Game::setDirty()
-{
-    boost::mutex::scoped_lock lock(mChangedSignalMutex);
-    OnChanged();
 }
 
 
@@ -544,7 +602,7 @@ bool Game::rotate()
         block.setRotation(oldRotation);
         return false;
     }
-    setDirty();
+    onChanged();
     return true;
 }
 
@@ -554,7 +612,7 @@ void Game::drop()
     while (move(MoveDirection_Down))
     {
         // Keep going.
-        setDirty();
+        onChanged();
     }
 }
 
@@ -576,7 +634,7 @@ int Game::level() const
 void Game::setLevel(int inLevel)
 {
     mOverrideLevel = inLevel;
-    setDirty();
+    onChanged();
 }
 
 

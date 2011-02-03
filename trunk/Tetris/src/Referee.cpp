@@ -1,77 +1,54 @@
-#include "Tetris/Referee.h"
-#include "Tetris/Game.h"
-#include "Tetris/MultiplayerGame.h"
-#include "Tetris/Threading.h"
-#include <boost/bind.hpp>
-#include <boost/noncopyable.hpp>
+//#include "Tetris/Referee.h"
+//#include "Tetris/Game.h"
+//#include "Tetris/MultiplayerGame.h"
+//#include "Tetris/Threading.h"
+//#include <boost/bind.hpp>
+//#include <boost/noncopyable.hpp>
 
 
-namespace Tetris {
+//namespace Tetris {
 
 
-struct Referee::Impl : boost::noncopyable
-{
-    typedef MultiplayerGame::Players Players;
-    typedef MultiplayerGame::Player Player;
+//struct Referee::Impl : boost::noncopyable,
+//                       public Game::EventHandler
 
-    Impl(MultiplayerGame & inMultiplayerGame) :
-        mMultiplayerGame(inMultiplayerGame)
-    {
-    }
+//{
+//    typedef MultiplayerGame::Players Players;
+//    typedef MultiplayerGame::Player Player;
 
-    void onPlayerJoined(const ThreadSafe<Game> & inPlayer)
-    {
-        // Make a (shallow) copy to make the const go away.
-        ThreadSafe<Game> copy(inPlayer);
-        ScopedReaderAndWriter<Game> rwgame(copy);
-        Game & game(*rwgame.get());
-        game.OnLinesCleared.connect(
-            boost::bind(&Referee::Impl::onLinesCleared, this, inPlayer, _1));
-    }
+//    Impl(MultiplayerGame & inMultiplayerGame) :
+//        mMultiplayerGame(inMultiplayerGame)
+//    {
+//        const MultiplayerGame::Players & players = inMultiplayerGame.players();
+//        Players::const_iterator it = players.begin(), end = players.end();
+//        for (; it != end; ++it)
+//        {
+//            const MultiplayerGame::Player & player(*it);
+//            const ThreadSafe<Game> & game(player);
+//            ScopedReader<Game> rgame(game);
+//            const Game * pGame(rgame.get());
+//            pGame->registerEventHandler(this);
+//        }
+//    }
 
-    void onPlayerLeft(const ThreadSafe<Game> & )
-    {
-    }
+//    ~Impl()
+//    {
+//    }
 
-    void onLinesCleared(ThreadSafe<Game> & inPlayer, int inLines);
-
-    MultiplayerGame & mMultiplayerGame;
-};
-
-
-Referee::Referee(MultiplayerGame & inMultiplayerGame) :
-    mImpl(new Impl(inMultiplayerGame))
-{
-    mImpl->mMultiplayerGame.OnPlayerJoined.connect(
-        boost::bind(&Referee::Impl::onPlayerJoined, mImpl, _1));
-}
+//    MultiplayerGame & mMultiplayerGame;
+//};
 
 
-Referee::~Referee()
-{
-    delete mImpl;
-}
+//Referee::Referee(MultiplayerGame & inMultiplayerGame) :
+//    mImpl(new Impl(inMultiplayerGame))
+//{
+//}
 
 
-void Referee::Impl::onLinesCleared(ThreadSafe<Game> & inPlayer, int inLines)
-{
-    // If number of lines >= 2 then apply a line penalty to each non-allied player.
-    // Note: we currently assume that all other players are non-allied.
-
-    // Take a copy, it's ok.
-    Players players = mMultiplayerGame.players();
-    Players::iterator it = players.begin(), end = players.end();
-    for (; it != end; ++it)
-    {
-        Player player(*it);
-        if (player != inPlayer)
-        {
-            ScopedReaderAndWriter<Game> rwgame(player);
-            Game & game(*rwgame.get());
-            game.applyLinePenalty(inLines);
-        }
-    }
-}
+//Referee::~Referee()
+//{
+//    delete mImpl;
+//}
 
 
-} // namespace Tetris
+//} // namespace Tetris

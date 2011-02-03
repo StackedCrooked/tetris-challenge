@@ -2,7 +2,6 @@
 #define TETRIS_MULTIPLAYERGAME_H_INCLUDED
 
 
-#include <boost/signals2/signal.hpp>
 #include <set>
 
 
@@ -16,23 +15,17 @@ template<class T> class ThreadSafe;
 class MultiplayerGame
 {
 public:
-    boost::signals2::signal<void(const ThreadSafe<Game> &)> OnPlayerJoined;
-
-    boost::signals2::signal<void(const ThreadSafe<Game> &)> OnPlayerLeft;
-
     MultiplayerGame();
 
     ~MultiplayerGame();
 
-    typedef ThreadSafe<Game> Player;
+    typedef std::set< ThreadSafe<Game> > Games;
 
-    typedef std::set<Player> Players;
+    void join(ThreadSafe<Game> inGame);
 
-    void join(const Player & inPlayer);
+    void leave(ThreadSafe<Game> inGame);
 
-    void leave(const Player & inPlayer);
-
-    const Players & players() const;
+    const Games & games() const;
 
 private:
     struct Impl;

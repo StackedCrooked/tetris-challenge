@@ -8,7 +8,6 @@
 #include "Tetris/GameState.h"
 #include "Tetris/Grid.h"
 #include "Tetris/NodePtr.h"
-#include <boost/signals2.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread.hpp>
 #include <memory>
@@ -31,15 +30,27 @@ class GameImpl;
 class Game
 {
 public:
-    boost::signals2::signal<void()> OnChanged;
+    class EventHandler
+    {
+    public:
+        EventHandler() {}
 
-    boost::signals2::signal<void(int)> OnLinesCleared;
+        virtual void onGameStateChanged(Game * inGame) = 0;
 
-    boost::signals2::signal<void()> OnGameOver;
+        virtual void onLinesCleared(Game * inGame, int inLineCount) = 0;
+
+    private:
+        EventHandler(const EventHandler&);
+        EventHandler& operator=(const EventHandler&);
+    };
 
     Game(size_t inNumRows, size_t inNumColumns);
 
     virtual ~Game();
+
+    void registerEventHandler(EventHandler * inEventHandler);
+
+    void unregisterEventHandler(EventHandler * inEventHandler);
 
     bool isGameOver() const;
 
@@ -79,10 +90,15 @@ public:
 protected:
     virtual GameState & getGameState() = 0;
 
+    void onChanged();
+    void onChangedImpl();
+
+    void onLinesCleared(int inLineCount);
+    void onLinesClearedImpl(int inLineCount);
+
     static std::auto_ptr<Block> CreateDefaultBlock(BlockType inBlockType, size_t inNumColumns);
     void reserveBlocks(size_t inCount);
     void supplyBlocks() const;
-    void setDirty();
 
     size_t mNumRows;
     size_t mNumColumns;
@@ -91,12 +107,12 @@ protected:
     mutable BlockTypes mBlocks;
     size_t mCurrentBlockIndex;
     int mOverrideLevel;
-
     mutable boost::mutex mChangedSignalMutex;
 
-private:
-    void onLinesCleared(int inLineCount);
+    typedef std::vector<EventHandler*> EventHandlers;
+    EventHandlers mEventHandlers;
 
+private:
     // non-copyable
     Game(const Game&);
     Game& operator=(const Game&);

@@ -24,15 +24,29 @@ template<class Variable> class ThreadSafe;
 class SimpleGame
 {
 public:
-    boost::signals2::signal<void()> OnChanged;
+    class EventHandler
+    {
+    public:
+        EventHandler() {}
 
-    boost::signals2::signal<void(int)> OnLinesCleared;
+        virtual void onGameStateChanged(SimpleGame * inGame) = 0;
+
+        virtual void onLinesCleared(SimpleGame * inGame, int inLineCount) = 0;
+
+    private:
+        EventHandler(const EventHandler&);
+        EventHandler& operator=(const EventHandler&);
+    };
 
     SimpleGame(size_t inRowCount, size_t inColumnCount);
 
     ~SimpleGame();
 
-    const ThreadSafe<Game> & game() const;
+    void registerEventHandler(EventHandler * inEventHandler);
+
+    void unregisterEventHandler(EventHandler * inEventHandler);
+
+    ThreadSafe<Game> game() const;
 
     bool isGameOver() const;
 

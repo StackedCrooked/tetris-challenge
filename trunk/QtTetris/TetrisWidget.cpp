@@ -3,6 +3,7 @@
 #include "Tetris/SimpleGame.h"
 #include "Tetris/Threading.h"
 #include "Tetris/AutoPtrSupport.h"
+#include <QtGui/QApplication>
 #include <QKeyEvent>
 #include <QColor>
 #include <QMutexLocker>
@@ -11,11 +12,15 @@
 #include <iostream>
 
 
+using namespace Tetris;
+
+
 // Margin between the game rect and the future blocks rect.
 static const int cMargin = 4;
 
 
-using namespace Tetris;
+
+std::set<TetrisWidget*> TetrisWidget::sInstances;
 
 
 TetrisWidget::TetrisWidget(QWidget * inParent, int inSquareWidth, int inSquareHeight) :
@@ -28,11 +33,13 @@ TetrisWidget::TetrisWidget(QWidget * inParent, int inSquareWidth, int inSquareHe
 {
     setUpdatesEnabled(true);
     setFocusPolicy(Qt::StrongFocus);
+    sInstances.insert(this);
 }
 
 
 TetrisWidget::~TetrisWidget()
 {
+    sInstances.erase(this);
 }
 
 
