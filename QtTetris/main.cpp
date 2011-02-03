@@ -1,5 +1,6 @@
 #include <QtGui/QApplication>
 #include "MainWindow.h"
+#include "Tetris/MainThread.h"
 
 
 int TetrisWidget_NumRows()
@@ -28,6 +29,7 @@ int Tetris_GetSquareHeight()
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+    Tetris::MainThread::Initializer scopedInit;
     MainWindow w;
     w.show();
 

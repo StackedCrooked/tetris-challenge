@@ -2,6 +2,7 @@
 #define TETRIS_LOGGING_H_INCLUDED
 
 
+#include "Tetris/MakeString.h"
 #include <string>
 
 

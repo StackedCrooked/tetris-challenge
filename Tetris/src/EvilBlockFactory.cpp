@@ -1,3 +1,6 @@
+#if 0 // File disabled
+
+
 #include "Tetris/Config.h"
 #include "Tetris/EvilBlockFactory.h"
 #include "Tetris/BlockType.h"
@@ -82,3 +85,6 @@ BlockType EvilBlockFactory::getNext() const
 
 
 } // namespace Tetris
+
+
+#endif // File disabled

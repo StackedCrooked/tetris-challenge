@@ -1,9 +1,9 @@
-include_directories(include)
+include_directories(include .)
 
 
 add_library(Tetris
-    include/Tetris/AISupport.h
     include/Tetris/AbstractWidget.h
+    include/Tetris/AISupport.h
     include/Tetris/Allocator.h
     include/Tetris/Assert.h
     include/Tetris/AutoPtrSupport.h
@@ -16,9 +16,9 @@ add_library(Tetris
     include/Tetris/Config.h
     include/Tetris/Direction.h
     include/Tetris/Evaluator.h
+    include/Tetris/EvilBlockFactory.h
     include/Tetris/ForwardDeclarations.h
     include/Tetris/Game.h
-    include/Tetris/SimpleGame.h
     include/Tetris/GameOver.h
     include/Tetris/GameState.h
     include/Tetris/GameStateComparator.h
@@ -28,13 +28,14 @@ add_library(Tetris
     include/Tetris/Grid.h
     include/Tetris/Logger.h
     include/Tetris/Logging.h
+    include/Tetris/MainThread.h
     include/Tetris/MakeString.h
     include/Tetris/MultiplayerGame.h
     include/Tetris/MultithreadedNodeCalculator.h
     include/Tetris/NodeCalculator.h
     include/Tetris/NodeCalculatorImpl.h
     include/Tetris/NodePtr.h
-    include/Tetris/Referee.h
+    include/Tetris/SimpleGame.h
     include/Tetris/SingleThreadedNodeCalculator.h
     include/Tetris/Tetris.h
     include/Tetris/Threading.h
@@ -43,29 +44,31 @@ add_library(Tetris
     include/Tetris/Utilities.h
     include/Tetris/Worker.h
     include/Tetris/WorkerPool.h
-    src/AISupport.cpp
     src/AbstractWidget.cpp
+    src/AISupport.cpp
     src/Allocator.cpp
     src/Block.cpp
     src/BlockFactory.cpp
     src/BlockMover.cpp
     src/BlockType.cpp
     src/ComputerPlayer.cpp
-    src/Game.cpp
-    src/SimpleGame.cpp
-    src/GenericGrid.cpp
     src/Evaluator.cpp
+    src/EvilBlockFactory.cpp
+    src/Game.cpp
     src/GameState.cpp
     src/GameStateComparator.cpp
     src/GameStateNode.cpp
+    src/GenericGrid.cpp
     src/Gravity.cpp
     src/Logger.cpp
     src/Logging.cpp
+    src/MainThread.cpp
+    src/MainThread_QT.cpp
     src/MultiplayerGame.cpp
     src/MultiThreadedNodeCalculator.cpp
     src/NodeCalculator.cpp
     src/NodeCalculatorImpl.cpp
-    src/Referee.cpp
+    src/SimpleGame.cpp
     src/SingleThreadedNodeCalculator.cpp
     src/Threading.cpp
     src/Unicode.cpp

@@ -21,6 +21,7 @@ set(SOLUTIONDIR "${QtTetris_SOURCE_DIR}/../")
 set(OUTDIR ${SOLUTIONDIR}Build/${PLATFORM}/${ARCH}/${CMAKE_BUILD_TYPE}/)
 set(POCO ${SOLUTIONDIR}3rdParty/Poco/)
 set(WARNING_OPTIONS "-arch ${ARCH} -Wall -Werror -Wno-sign-compare")
+set(CXX_FLAGS         "${CXX_FLAGS} -DTETRIS_QT=1")
 set(CXX_FLAGS_Release "${CXX_FLAGS} ${WARNING_OPTIONS} -O3 -DNDEBUG")
 set(CXX_FLAGS_Debug   "${CXX_FLAGS} ${WARNING_OPTIONS} -ggdb3")
 set(FINAL_COMPILE_FLAGS "${CXX_FLAGS_${CMAKE_BUILD_TYPE}}")
@@ -48,8 +49,16 @@ add_subdirectory(${SOLUTIONDIR}Tetris ${OUTDIR}Tetris)
 
 
 
-set(QtTetris_SOURCES main.cpp MainWindow.cpp TetrisWidget.cpp)
-set(QtTetris_HEADERS MainWindow.h TetrisWidget.h)
+set(QtTetris_SOURCES
+    main.cpp
+    MainWindow.cpp
+    TetrisWidget.cpp
+    QtMainThread.cpp)
+
+set(QtTetris_HEADERS
+    MainWindow.h
+    TetrisWidget.h
+    QtMainThread.h)
 
 # Qt settings
 QT4_WRAP_CPP(QtTetris_HEADERS_MOC ${QtTetris_HEADERS})

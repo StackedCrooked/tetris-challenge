@@ -1,7 +1,7 @@
 #include "Tetris/MultiplayerGame.h"
-#include "Tetris/Referee.h"
-#include "Tetris/Threading.h"
 #include "Tetris/Game.h"
+#include "Tetris/Logging.h"
+#include "Tetris/Threading.h"
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <algorithm>
@@ -35,6 +35,7 @@ struct MultiplayerGame::Impl : boost::noncopyable,
             ScopedReaderAndWriter<Game> rwgame(threadSafeGame);
             if (rwgame.get() != inGame)
             {
+                LogInfo(MakeString() << "Penalty given to player. (Lines made: " << inLineCount << ")");
                 rwgame.get()->applyLinePenalty(inLineCount);
             }
             gameIndex++;
