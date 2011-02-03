@@ -54,7 +54,7 @@ namespace Tetris
         items.reserve(100);
 
 
-        // Since the logging can be a slow operation we don't keep the Game object locked here.
+        // Since the logging can be a slow operation we don't keep the Game object locked heere.
         // We just copy the items, and log them afterwards.
         {
             ScopedReaderAndWriter<Queue> queue(mProtectedQueue);

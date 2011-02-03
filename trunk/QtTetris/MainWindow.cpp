@@ -1,12 +1,13 @@
 #include "MainWindow.h"
 #include "Tetris/Game.h"
+#include "Tetris/Logger.h"
 #include <QLayout>
 #include <QLabel>
 #include <algorithm>
 #include <iostream>
 
 
-namespace Tetris {
+using namespace Tetris;
 
 
 typedef boost::shared_ptr<Tetris::SimpleGame> SimpleGamePtr;
@@ -43,49 +44,6 @@ private:
 };
 
 
-class ActionEvent : public QEvent
-{
-public:
-    static const int cEventNumber = QEvent::User + 1908;
-
-    ActionEvent(const Action & inAction) :
-        QEvent(static_cast<QEvent::Type>(cEventNumber)),
-        mAction(inAction),
-        mAlreadyInvoked(false)
-    {
-    }
-
-    void invokeAction()
-    {
-        if (!mAlreadyInvoked)
-        {
-            mAction();
-        }
-        mAlreadyInvoked = true;
-    }
-
-    virtual ~ActionEvent() {}
-
-private:
-    Action mAction;
-    bool mAlreadyInvoked;
-};
-
-
-void InvokeLater(const Action & inAction)
-{
-    if (MainWindow::GetInstance())
-    {
-        qApp->postEvent(MainWindow::GetInstance(), new ActionEvent(inAction));
-    }
-}
-
-
-} // namespace Tetris
-
-
-using namespace Tetris;
-
 
 //
 // Configuration
@@ -109,7 +67,8 @@ MainWindow::MainWindow(QWidget *parent) :
     QWidget(parent),
     mTetrisWidgets(),
     mSwitchButton(0),
-    mRestartButton(0)
+    mRestartButton(0),
+    mLogField(0)
 {
     sInstance = this;
 
@@ -125,6 +84,9 @@ MainWindow::MainWindow(QWidget *parent) :
     mRestartButton = new QPushButton("Restart", this);
     connect(mRestartButton, SIGNAL(clicked()), this, SLOT(onRestart()));
 
+    mLogField = new QTextEdit(this);
+    mLogField->setReadOnly(true);
+
 
     QVBoxLayout * vbox = new QVBoxLayout(this);
     QHBoxLayout * hbox = new QHBoxLayout;
@@ -136,6 +98,10 @@ MainWindow::MainWindow(QWidget *parent) :
     vbox->addWidget(mSwitchButton);
     vbox->addWidget(mRestartButton);
     vbox->addWidget(new QLabel("Press 'c' to clear the game."), 0);
+    vbox->addWidget(mLogField, 1);
+
+
+    Logger::Instance().setLogHandler(boost::bind(&MainWindow::logMessage, this, _1));
 
     restart();
 }
@@ -143,16 +109,24 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    typedef boost::function<void(const std::string &)> DummyFunction;
+    DummyFunction dummy;
+    Logger::Instance().setLogHandler(dummy);
     sInstance = 0;
+}
+
+
+void MainWindow::logMessage(const std::string & inMessage)
+{
+    mLogField->append(inMessage.c_str());
 }
 
 
 bool MainWindow::event(QEvent * inEvent)
 {
-    if (Tetris::ActionEvent * actionEvent = dynamic_cast<Tetris::ActionEvent*>(inEvent))
+    if (inEvent->type() == QEvent::Paint)
     {
-        actionEvent->invokeAction();
-        return true;
+        Logger::Instance().flush();
     }
     return QWidget::event(inEvent);
 }

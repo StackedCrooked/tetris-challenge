@@ -14,7 +14,6 @@ SOURCES += \
     MainWindow.cpp \
     main.cpp \
     TetrisWidget.cpp \
-    ../Tetris/src/Game.cpp \
     ../Tetris/src/AbstractWidget.cpp \
     ../Tetris/src/AISupport.cpp \
     ../Tetris/src/Allocator.cpp \
@@ -24,6 +23,8 @@ SOURCES += \
     ../Tetris/src/BlockType.cpp \
     ../Tetris/src/ComputerPlayer.cpp \
     ../Tetris/src/Evaluator.cpp \
+    ../Tetris/src/EvilBlockFactory.cpp \
+    ../Tetris/src/Game.cpp \
     ../Tetris/src/GameState.cpp \
     ../Tetris/src/GameStateComparator.cpp \
     ../Tetris/src/GameStateNode.cpp \
@@ -31,12 +32,14 @@ SOURCES += \
     ../Tetris/src/Gravity.cpp \
     ../Tetris/src/Logger.cpp \
     ../Tetris/src/Logging.cpp \
+    ../Tetris/src/MainThread.cpp \
+    ../Tetris/src/MultiplayerGame.cpp \
     ../Tetris/src/MultiThreadedNodeCalculator.cpp \
     ../Tetris/src/NodeCalculator.cpp \
     ../Tetris/src/NodeCalculatorImpl.cpp \
+    ../Tetris/src/SimpleGame.cpp \
     ../Tetris/src/SingleThreadedNodeCalculator.cpp \
     ../Tetris/src/Threading.cpp \
-    ../Tetris/src/SimpleGame.cpp \
     ../Tetris/src/Unicode.cpp \
     ../Tetris/src/Worker.cpp \
     ../Tetris/src/WorkerPool.cpp
@@ -49,6 +52,7 @@ HEADERS += \
     ../Tetris/include/Tetris/Allocator.h \
     ../Tetris/include/Tetris/Assert.h \
     ../Tetris/include/Tetris/AutoPtrSupport.h \
+    ../Tetris/include/Tetris/Block.h \
     ../Tetris/include/Tetris/BlockFactory.h \
     ../Tetris/include/Tetris/BlockMover.h \
     ../Tetris/include/Tetris/BlockType.h \
@@ -56,35 +60,36 @@ HEADERS += \
     ../Tetris/include/Tetris/ComputerPlayer.h \
     ../Tetris/include/Tetris/Config.h \
     ../Tetris/include/Tetris/Direction.h \
-    ../Tetris/include/Tetris/Enum.h \
     ../Tetris/include/Tetris/Evaluator.h \
+    ../Tetris/include/Tetris/EvilBlockFactory.h \
     ../Tetris/include/Tetris/ForwardDeclarations.h \
+    ../Tetris/include/Tetris/Game.h \
     ../Tetris/include/Tetris/GameOver.h \
     ../Tetris/include/Tetris/GameState.h \
     ../Tetris/include/Tetris/GameStateComparator.h \
     ../Tetris/include/Tetris/GameStateNode.h \
     ../Tetris/include/Tetris/GenericGrid.h \
-    ../Tetris/include/Tetris/GenericGrid2.h \
+    ../Tetris/include/Tetris/Gravity.h \
+    ../Tetris/include/Tetris/Grid.h \
     ../Tetris/include/Tetris/Logger.h \
     ../Tetris/include/Tetris/Logging.h \
+    ../Tetris/include/Tetris/MainThread.h \
     ../Tetris/include/Tetris/MakeString.h \
+    ../Tetris/include/Tetris/MultiplayerGame.h \
     ../Tetris/include/Tetris/MultithreadedNodeCalculator.h \
     ../Tetris/include/Tetris/NodeCalculator.h \
     ../Tetris/include/Tetris/NodeCalculatorImpl.h \
     ../Tetris/include/Tetris/NodePtr.h \
+    ../Tetris/include/Tetris/SimpleGame.h \
     ../Tetris/include/Tetris/SingleThreadedNodeCalculator.h \
+    ../Tetris/include/Tetris/Tetris.h \
+    ../Tetris/include/Tetris/Threading.h \
     ../Tetris/include/Tetris/TypedWrapper.h \
     ../Tetris/include/Tetris/Unicode.h \
     ../Tetris/include/Tetris/Utilities.h \
     ../Tetris/include/Tetris/Worker.h \
-    ../Tetris/include/Tetris/WorkerPool.h \
-    ../Tetris/include/Tetris/SimpleGame.h \
-    ../Tetris/include/Tetris/Threading.h \
-    ../Tetris/include/Tetris/Grid.h \
-    ../Tetris/include/Tetris/Game.h \
-    ../Tetris/include/Tetris/Tetris.h \
-    ../Tetris/include/Tetris/Block.h \
-    ../Tetris/include/Tetris/Gravity.h
+    ../Tetris/include/Tetris/WorkerPool.h
+
 
 OTHER_FILES += \
     CMakeLists.txt

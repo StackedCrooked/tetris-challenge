@@ -3,7 +3,7 @@
 
 
 #include "Tetris/Assert.h"
-#include <boost/function.hpp>
+#include "Tetris/MainThread.h"
 #include <boost/thread.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/detail/atomic_count.hpp>
@@ -11,10 +11,6 @@
 
 
 namespace Tetris {
-
-
-typedef boost::function<void()> Action;
-void InvokeLater(const Action & inAction);
 
 
 template<class Variable>

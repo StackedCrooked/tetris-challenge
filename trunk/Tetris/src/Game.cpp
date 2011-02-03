@@ -420,6 +420,8 @@ void Game::applyLinePenalty(int inLineCount)
             }
             else
             {
+                // TODO: USE SHUFFLE SYSTEM TO CREATE RANDOM LINE
+
                 // Garbage filler at the bottom.
                 static Poco::Random fRandom;
                 if (fRandom.nextBool())
@@ -612,7 +614,6 @@ void Game::drop()
     while (move(MoveDirection_Down))
     {
         // Keep going.
-        onChanged();
     }
 }
 
