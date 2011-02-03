@@ -584,3 +584,4 @@ Tetris/include/Tetris/Referee.h
 Tetris/include/Tetris/MultiplayerGame.h
 Tetris/src/MultiplayerGame.cpp
 Tetris/src/Referee.cpp
+Tetris/include/Tetris/Events.h

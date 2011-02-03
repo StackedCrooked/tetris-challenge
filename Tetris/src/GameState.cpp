@@ -193,7 +193,24 @@ const Grid & GameState::grid() const
 void GameState::setGrid(const Grid & inGrid)
 {
     mGrid = inGrid;
+    updateCache();
+}
 
+
+void GameState::updateCache()
+{
+    mFirstOccupiedRow = mGrid.rowCount();
+    for (size_t r = 0; r != mGrid.rowCount(); ++r)
+    {
+        for (size_t c = 0; c != mGrid.columnCount(); ++c)
+        {
+            if (mGrid.get(r, c) != BlockType_Nil)
+            {
+                mFirstOccupiedRow = r;
+                return;
+            }
+        }
+    }
 }
 
 

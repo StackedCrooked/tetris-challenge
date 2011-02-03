@@ -62,16 +62,37 @@ AbstractWidget::AbstractWidget(int inSquareWidth, int inSquareHeight) :
 
 AbstractWidget::~AbstractWidget()
 {
+    if (mSimpleGame)
+    {
+        mSimpleGame->unregisterEventHandler(this);
+    }
+}
+
+
+void AbstractWidget::onGameStateChanged(SimpleGame * )
+{
+    refresh();
+}
+
+
+void AbstractWidget::onLinesCleared(SimpleGame * , int )
+{
+    refresh();
 }
 
 
 void AbstractWidget::setGame(SimpleGame * inSimpleGame)
 {
+    if (mSimpleGame)
+    {
+        mSimpleGame->unregisterEventHandler(this);
+    }
+
     mSimpleGame = inSimpleGame;
     if (mSimpleGame)
     {
         setMinSize((mSimpleGame->columnCount() + 4) * squareWidth() + mMargin, mSimpleGame->rowCount() * squareHeight());
-        mSimpleGame->OnChanged.connect(boost::bind(&AbstractWidget::refresh, this));
+        mSimpleGame->registerEventHandler(this);
     }
 }
 

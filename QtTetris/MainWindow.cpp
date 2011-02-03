@@ -6,6 +6,84 @@
 #include <iostream>
 
 
+namespace Tetris {
+
+
+typedef boost::shared_ptr<Tetris::SimpleGame> SimpleGamePtr;
+
+
+enum
+{
+    cPlayerCount = 2
+};
+
+
+class Model
+{
+public:
+    static Model & Instance()
+    {
+        static Model fModel;
+        return fModel;
+    }
+
+    std::vector<SimpleGamePtr> mTetrisGames;
+    Tetris::MultiplayerGame mMultiplayerGame;
+
+
+private:
+    Model() :
+        mTetrisGames(cPlayerCount),
+        mMultiplayerGame()
+    {
+    }
+
+    Model(const Model &);
+    Model& operator=(const Model&);
+};
+
+
+class ActionEvent : public QEvent
+{
+public:
+    static const int cEventNumber = QEvent::User + 1908;
+
+    ActionEvent(const Action & inAction) :
+        QEvent(static_cast<QEvent::Type>(cEventNumber)),
+        mAction(inAction),
+        mAlreadyInvoked(false)
+    {
+    }
+
+    void invokeAction()
+    {
+        if (!mAlreadyInvoked)
+        {
+            mAction();
+        }
+        mAlreadyInvoked = true;
+    }
+
+    virtual ~ActionEvent() {}
+
+private:
+    Action mAction;
+    bool mAlreadyInvoked;
+};
+
+
+void InvokeLater(const Action & inAction)
+{
+    if (MainWindow::GetInstance())
+    {
+        qApp->postEvent(MainWindow::GetInstance(), new ActionEvent(inAction));
+    }
+}
+
+
+} // namespace Tetris
+
+
 using namespace Tetris;
 
 
@@ -18,13 +96,22 @@ const int cSquareWidth(20);
 const int cSquareHeight(20);
 
 
+MainWindow * MainWindow::sInstance(0);
+
+
+MainWindow * MainWindow::GetInstance()
+{
+    return sInstance;
+}
+
+
 MainWindow::MainWindow(QWidget *parent) :
     QWidget(parent),
-    mTetrisPlayers(cPlayerCount),
     mTetrisWidgets(),
     mSwitchButton(0),
     mRestartButton(0)
 {
+    sInstance = this;
 
     for (size_t idx = 0; idx < cPlayerCount; ++idx)
     {
@@ -56,6 +143,18 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    sInstance = 0;
+}
+
+
+bool MainWindow::event(QEvent * inEvent)
+{
+    if (Tetris::ActionEvent * actionEvent = dynamic_cast<Tetris::ActionEvent*>(inEvent))
+    {
+        actionEvent->invokeAction();
+        return true;
+    }
+    return QWidget::event(inEvent);
 }
 
 
@@ -67,15 +166,28 @@ void MainWindow::onRestart()
 
 void MainWindow::restart()
 {
-    // Make sure the previous game has been
-    // deleted before creating a new one.
-    mTetrisPlayers.clear();
-    for (size_t idx = 0; idx < cPlayerCount; ++idx)
+    assert(Model::Instance().mTetrisGames.size() == mTetrisWidgets.size());
+    std::vector<SimpleGamePtr> & theTetrisGames = Model::Instance().mTetrisGames;
+
+    for (size_t idx = 0; idx < theTetrisGames.size(); ++idx)
     {
+        SimpleGamePtr oldSimpleGamePtr(theTetrisGames[idx]);
+        if (oldSimpleGamePtr)
+        {
+            SimpleGame & oldSimpleGame(*oldSimpleGamePtr);
+            ThreadSafe<Game> threadSafeGame(oldSimpleGame.game());
+            Model::Instance().mMultiplayerGame.leave(threadSafeGame);
+        }
+
+        // Forces unregistration of the event handlers.
         mTetrisWidgets[idx]->setGame(0);
+
+        // Make sure the previous game has been deleted before creating a new one.
+        theTetrisGames[idx].reset();
+
         SimpleGamePtr simpleGamePtr(new SimpleGame(cRowCount, cColumnCount));
-        mTetrisPlayers.push_back(simpleGamePtr);
-        mMultiplayerGame.join(simpleGamePtr->game());
+        theTetrisGames[idx] = simpleGamePtr;
+        Model::Instance().mMultiplayerGame.join(simpleGamePtr->game());
         mTetrisWidgets[idx]->setGame(simpleGamePtr.get());
     }
 }

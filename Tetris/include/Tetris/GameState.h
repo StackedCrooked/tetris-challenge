@@ -5,7 +5,6 @@
 #include "Tetris/Block.h"
 #include "Tetris/GameOver.h"
 #include "Tetris/Grid.h"
-#include <boost/signals2.hpp>
 #include <memory>
 #include <stdexcept>
 
@@ -46,6 +45,8 @@ public:
     int numTetrises() const { return mNumTetrises; }
     int score() const;
     int firstOccupiedRow() const { return mFirstOccupiedRow; }
+
+    void updateCache();
 
 private:
     void solidifyBlock(const Block & inBlock);

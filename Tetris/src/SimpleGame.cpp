@@ -6,13 +6,14 @@
 #include "Tetris/Threading.h"
 #include "Tetris/AutoPtrSupport.h"
 #include <boost/bind.hpp>
+#include <set>
 #include <stdexcept>
 
 
 namespace Tetris {
 
 
-struct SimpleGame::Impl
+struct SimpleGame::Impl : public Game::EventHandler
 {
     Impl(size_t inRowCount,
          size_t inColumnCount) :
@@ -23,31 +24,48 @@ struct SimpleGame::Impl
     {
     }
 
+    ~Impl()
+    {
+        ScopedReaderAndWriter<Game> rwgame(mGame);
+        Game & game(*rwgame.get());
+        game.unregisterEventHandler(this);
+    }
+
     void init(SimpleGame * inSimpleGame)
     {
         mSimpleGame = inSimpleGame;
         ScopedReaderAndWriter<Game> rwgame(mGame);
         Game & game(*rwgame.get());
-        game.OnChanged.connect(boost::bind(&SimpleGame::Impl::onChanged, this));
-        game.OnLinesCleared.connect(boost::bind(&SimpleGame::Impl::onLinesCleared, this, _1));
+        game.registerEventHandler(this);
     }
 
-    void onChanged()
+    virtual void onGameStateChanged(Game * )
     {
-        // Just forward to our listeners.
-        mSimpleGame->OnChanged();
+        EventHandlers::iterator it = mEventHandlers.begin(), end = mEventHandlers.end();
+        for (; it != end; ++it)
+        {
+            SimpleGame::EventHandler * eventHandler(*it);
+            eventHandler->onGameStateChanged(mSimpleGame);
+        }
     }
 
-    void onLinesCleared(int inLineCount)
+    virtual void onLinesCleared(Game * , int inLineCount)
     {
-        // Just forward to our listeners.
-        mSimpleGame->OnLinesCleared(inLineCount);
+        EventHandlers::iterator it = mEventHandlers.begin(), end = mEventHandlers.end();
+        for (; it != end; ++it)
+        {
+            SimpleGame::EventHandler * eventHandler(*it);
+            eventHandler->onLinesCleared(mSimpleGame, inLineCount);
+        }
     }
 
     ThreadSafe<Game> mGame;
     boost::scoped_ptr<Gravity> mGravity;
     std::size_t mCenterColumn;
     SimpleGame * mSimpleGame;
+
+    typedef std::set<SimpleGame::EventHandler*> EventHandlers;
+    EventHandlers mEventHandlers;
 };
 
 
@@ -60,10 +78,23 @@ SimpleGame::SimpleGame(size_t inRowCount, size_t inColumnCount) :
 
 SimpleGame::~SimpleGame()
 {
+    delete mImpl;
 }
 
 
-const ThreadSafe<Game> & SimpleGame::game() const
+void SimpleGame::registerEventHandler(EventHandler * inEventHandler)
+{
+    mImpl->mEventHandlers.insert(inEventHandler);
+}
+
+
+void SimpleGame::unregisterEventHandler(EventHandler * inEventHandler)
+{
+    mImpl->mEventHandlers.erase(inEventHandler);
+}
+
+
+ThreadSafe<Game> SimpleGame::game() const
 {
     return mImpl->mGame;
 }

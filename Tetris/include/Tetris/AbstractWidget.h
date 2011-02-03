@@ -55,12 +55,16 @@ private:
 };
 
 
-class AbstractWidget
+class AbstractWidget : public SimpleGame::EventHandler
 {
 public:
     AbstractWidget(int insquareWidth, int inSquareHeight);
 
     virtual ~AbstractWidget();
+
+    virtual void onGameStateChanged(SimpleGame * inGame);
+
+    virtual void onLinesCleared(SimpleGame * inGame, int inLineCount);
 
     void setGame(Tetris::SimpleGame * inSimpleGame);
 

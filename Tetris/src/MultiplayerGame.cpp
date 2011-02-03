@@ -12,19 +12,43 @@
 namespace Tetris {
 
 
-struct MultiplayerGame::Impl : boost::noncopyable
+struct MultiplayerGame::Impl : boost::noncopyable,
+                               public Game::EventHandler
 {
-    typedef MultiplayerGame::Players Players;
+    typedef MultiplayerGame::Games Games;
 
-    boost::scoped_ptr<Referee> mReferee;
-    Players mPlayers;
+    virtual void onGameStateChanged(Game * )
+    {
+        // Not interested.
+    }
+
+    virtual void onLinesCleared(Game * inGame, int inLineCount)
+    {
+        // If number of lines >= 2 then apply a line penalty to each non-allied player.
+        // Note: we currently assume that all other players are non-allied.
+        int numGames = mGames.size();
+        int gameIndex = 0;
+        Games::iterator it = mGames.begin(), end = mGames.end();
+        for (; it != end; ++it)
+        {
+            ThreadSafe<Game> threadSafeGame(*it);
+            ScopedReaderAndWriter<Game> rwgame(threadSafeGame);
+            if (rwgame.get() != inGame)
+            {
+                rwgame.get()->applyLinePenalty(inLineCount);
+            }
+            gameIndex++;
+        }
+        assert(gameIndex == numGames);
+    }
+
+    Games mGames;
 };
 
 
 MultiplayerGame::MultiplayerGame() :
     mImpl(new Impl)
 {
-    mImpl->mReferee.reset(new Referee(*this));
 }
 
 
@@ -34,25 +58,29 @@ MultiplayerGame::~MultiplayerGame()
 }
 
 
-void MultiplayerGame::join(const Player & inPlayer)
+void MultiplayerGame::join(ThreadSafe<Game> inGame)
 {
-    mImpl->mPlayers.insert(inPlayer);
-    OnPlayerJoined(inPlayer);
+    mImpl->mGames.insert(inGame);
+
+    ScopedReaderAndWriter<Game> rwgame(inGame);
+    rwgame->registerEventHandler(mImpl);
 }
 
 
-void MultiplayerGame::leave(const Player & inPlayer)
+void MultiplayerGame::leave(ThreadSafe<Game> inGame)
 {
     // calling erase(..) on a vector is slow,
     // but that should not be an issue here
-    mImpl->mPlayers.erase(inPlayer);
-    OnPlayerLeft(inPlayer);
+    mImpl->mGames.erase(inGame);
+
+    ScopedReaderAndWriter<Game> rwgame(inGame);
+    rwgame->unregisterEventHandler(mImpl);
 }
 
 
-const MultiplayerGame::Players & MultiplayerGame::players() const
+const MultiplayerGame::Games & MultiplayerGame::games() const
 {
-    return mImpl->mPlayers;
+    return mImpl->mGames;
 }
 
 
