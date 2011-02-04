@@ -142,9 +142,7 @@ void MainWindow::restart()
         SimpleGamePtr oldSimpleGamePtr(theTetrisGames[idx]);
         if (oldSimpleGamePtr)
         {
-            SimpleGame & oldSimpleGame(*oldSimpleGamePtr);
-            ThreadSafe<Game> threadSafeGame(oldSimpleGame.game());
-            Model::Instance().mMultiplayerGame.leave(threadSafeGame);
+            Model::Instance().mMultiplayerGame.leave(*oldSimpleGamePtr);
         }
 
         // Forces unregistration of the event handlers.
@@ -155,16 +153,16 @@ void MainWindow::restart()
 
 
         SimpleGamePtr simpleGamePtr;
-        if (idx == 0)
-        {
-            simpleGamePtr.reset(new SimpleGame(cRowCount, cColumnCount, PlayerType_Human));
-        }
-        else
+//        if (idx == 0)
+//        {
+//            simpleGamePtr.reset(new SimpleGame(cRowCount, cColumnCount, PlayerType_Human));
+//        }
+//        else
         {
             simpleGamePtr.reset(new SimpleGame(cRowCount, cColumnCount, PlayerType_Computer));
         }
         theTetrisGames[idx] = simpleGamePtr;
-        Model::Instance().mMultiplayerGame.join(simpleGamePtr->game());
+        Model::Instance().mMultiplayerGame.join(*simpleGamePtr);
         mTetrisWidgets[idx]->setGame(simpleGamePtr.get());
     }
 }

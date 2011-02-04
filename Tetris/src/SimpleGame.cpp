@@ -16,6 +16,7 @@ namespace Tetris {
 struct SimpleGame::Impl : public Game::EventHandler,
                           public ComputerPlayer::Tweaker
 {
+    typedef SimpleGame::BackReference BackReference;
 
     static std::auto_ptr<Game> CreateGame(size_t inRowCount, size_t inColumnCount, PlayerType inPlayerType)
     {
@@ -38,13 +39,15 @@ struct SimpleGame::Impl : public Game::EventHandler,
         mComputerPlayer(),
         mGravity(new Gravity(mGame)),
         mCenterColumn(static_cast<size_t>(0.5 + inColumnCount / 2.0)),
-        mSimpleGame(0)
+        mSimpleGame(0),
+        mBackReference(0)
     {
         if (inPlayerType == PlayerType_Computer)
         {
             std::auto_ptr<Evaluator> evaluator(CreatePoly<Evaluator, MakeTetrises>());
-            mComputerPlayer.reset(new ComputerPlayer(mGame, evaluator, 7, 4, 4));
+            mComputerPlayer.reset(new ComputerPlayer(mGame, evaluator, 8, 5, 12));
             mComputerPlayer->setTweaker(this);
+            mComputerPlayer->setMoveSpeed(100);
         }
     }
 
@@ -64,7 +67,7 @@ struct SimpleGame::Impl : public Game::EventHandler,
         if (firstRow > rowCount / 2)
         {
             outSearchDepth = 8;
-            outSearchWidth = 5;
+            outSearchWidth = 4;
             return CreatePoly<Evaluator, MakeTetrises>();
         }
         else if (firstRow > rowCount / 3)
@@ -115,6 +118,7 @@ struct SimpleGame::Impl : public Game::EventHandler,
     boost::scoped_ptr<Gravity> mGravity;
     std::size_t mCenterColumn;
     SimpleGame * mSimpleGame;
+    BackReference * mBackReference;
     typedef std::set<SimpleGame::EventHandler*> EventHandlers;
     EventHandlers mEventHandlers;
 };
@@ -130,6 +134,24 @@ SimpleGame::SimpleGame(size_t inRowCount, size_t inColumnCount, PlayerType inPla
 SimpleGame::~SimpleGame()
 {
     delete mImpl;
+}
+
+
+void SimpleGame::setBackReference(BackReference * inBackReference)
+{
+    mImpl->mBackReference = inBackReference;
+}
+
+
+SimpleGame::BackReference * SimpleGame::getBackReference()
+{
+    return mImpl->mBackReference;
+}
+
+
+const SimpleGame::BackReference * SimpleGame::getBackReference() const
+{
+    return mImpl->mBackReference;
 }
 
 

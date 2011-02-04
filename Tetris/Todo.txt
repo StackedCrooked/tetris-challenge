@@ -1,5 +1,9 @@
 Todo
 ----
+- Teams
+- Show GUI counters & score
+- Sometimes penalty appears on the top of the grid. (Usually when game was already high, and tetris penalty.)
+- Sometimes AI seems to be dead. It just doesn't do anything anymore, letting all blocks slowly drop to the floor.
 - Qt Playable game
 - Implement Human vs Computer modus.
 - Multiplayer

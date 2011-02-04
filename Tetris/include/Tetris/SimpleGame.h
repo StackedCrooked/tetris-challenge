@@ -6,8 +6,9 @@
 #include "Tetris/Block.h"
 #include <boost/signals2.hpp>
 #include <boost/scoped_ptr.hpp>
-#include <vector>
 #include <cstddef>
+#include <stdexcept>
+#include <vector>
 
 
 namespace Tetris {
@@ -45,9 +46,41 @@ public:
         EventHandler& operator=(const EventHandler&);
     };
 
+    class BackReference
+    {
+    public:
+        virtual ~BackReference() {}
+    };
+
     SimpleGame(size_t inRowCount, size_t inColumnCount, PlayerType inPlayerType);
 
     ~SimpleGame();
+
+    void setBackReference(BackReference * inBackReference);
+
+    template<class SubType>
+    SubType & backReference()
+    {
+        if (!getBackReference())
+        {
+            throw std::logic_error("BackReference is null");
+        }
+        return dynamic_cast<SubType&>(*this);
+    }
+
+    template<class SubType>
+    const SubType & backReference() const
+    {
+        if (!getBackReference())
+        {
+            throw std::logic_error("BackReference is null");
+        }
+        return dynamic_cast<const SubType&>(*this);
+    }
+
+    BackReference * getBackReference();
+
+    const BackReference * getBackReference() const;
 
     PlayerType playerType() const;
 
