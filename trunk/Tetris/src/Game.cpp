@@ -12,6 +12,7 @@
 #include "Poco/Exception.h"
 #include "Poco/Random.h"
 #include <algorithm>
+#include <ctime>
 #include <set>
 #include <stdexcept>
 
@@ -181,7 +182,11 @@ const GameState & ComputerGame::getGameState() const
 
 void ComputerGame::setGrid(const Grid & inGrid)
 {
-    mCurrentNode->setGrid(inGrid);
+    clearPrecalculatedNodes();
+    NodePtr newNode(new GameStateNode(mCurrentNode, new GameState(inGrid), mCurrentNode->evaluator().clone().release()));
+    mCurrentNode->addChild(newNode);
+    navigateNodeDown();
+    getGameState().updateCache();
     onChanged();
 }
 
@@ -392,6 +397,36 @@ void Game::onLinesClearedImpl(int inLineCount)
 }
 
 
+std::vector<BlockType> Game::getGarbageRow() const
+{
+    std::vector<BlockType> result(mNumColumns, BlockType_Nil);
+
+    static Poco::UInt32 fSeed(time(0));
+    fSeed = (fSeed + 1) % Poco::UInt32(-1);
+    Poco::Random rand;
+    rand.seed(fSeed);
+    BlockFactory blockFactory(2);
+
+    size_t count = 0;
+    while (count < 2)
+    {
+        for (size_t idx = 0; idx < mNumColumns; ++idx)
+        {
+            if (rand.nextBool())
+            {
+                result[idx] = blockFactory.getNext();
+                count++;
+            }
+            if (count >= 8)
+            {
+                break;
+            }
+        }
+    }
+    return result;
+}
+
+
 void Game::applyLinePenalty(int inLineCount)
 {
     if (inLineCount < 2 || isGameOver())
@@ -401,61 +436,41 @@ void Game::applyLinePenalty(int inLineCount)
 
 
     int lineIncrement = inLineCount < 4 ? (inLineCount - 1) : 4;
+    LogInfo(MakeString() << "Line increment: " << lineIncrement);
+
     int newFirstRow = getGameState().firstOccupiedRow() - lineIncrement;
     if (newFirstRow < 0)
     {
         newFirstRow = 0;
     }
-    Grid grid = getGameState().grid();
-    int garbageStart = grid.rowCount() - lineIncrement;
+    LogInfo(MakeString() << "New first row: " << newFirstRow);
 
-    for (int r = newFirstRow + lineIncrement; r < grid.rowCount(); ++r)
+    Grid grid = getGameState().grid();
+
+    int garbageStart = grid.rowCount() - lineIncrement;
+    LogInfo(MakeString() << "Garbage starts at: " << garbageStart);
+
+
+    std::vector<BlockType> garbageRow(getGarbageRow());
+    int r = std::max<int>(0, newFirstRow - lineIncrement);
+    for (; r < grid.rowCount(); ++r)
     {
-        int garbage = 0;
+        if (r >= garbageStart)
+        {
+            garbageRow = getGarbageRow();
+        }
         for (int c = 0; c < grid.columnCount(); ++c)
         {
-            if (r < garbageStart)
+            if (r > lineIncrement)
             {
                 grid.set(r - lineIncrement, c, grid.get(r, c));
             }
-            else
-            {
-                // TODO: USE SHUFFLE SYSTEM TO CREATE RANDOM LINE
-
-                // Garbage filler at the bottom.
-                static Poco::Random fRandom;
-                if (fRandom.nextBool())
-                {
-                    if (garbage <= grid.columnCount()/2)
-                    {
-                        static BlockFactory fGarbageFactory;
-                        grid.set(r, c, fGarbageFactory.getNext());
-                        garbage++;
-                    }
-                    else
-                    {
-                        grid.set(r, c, BlockType_Nil);
-                    }
-                }
-                else
-                {
-                    if (c > grid.columnCount() / 2 && garbage < grid.columnCount() / 2)
-                    {
-                        static BlockFactory fGarbageFactory;
-                        grid.set(r, c, fGarbageFactory.getNext());
-                        garbage++;
-                    }
-                    else
-                    {
-                        grid.set(r, c, BlockType_Nil);
-                    }
-                }
-            }
+            grid.set(r, c, garbageRow[c]);
         }
     }
 
     // Set the grid
-    getGameState().setGrid(grid);
+    setGrid(grid);
 
     // Check if the active block has been caught in the penalty lines that were added.
     // If yes then call drop() to normalize the situation.

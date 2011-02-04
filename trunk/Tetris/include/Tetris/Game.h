@@ -100,6 +100,8 @@ protected:
     void reserveBlocks(size_t inCount);
     void supplyBlocks() const;
 
+    std::vector<BlockType> getGarbageRow() const;
+
     size_t mNumRows;
     size_t mNumColumns;
     boost::scoped_ptr<Block> mActiveBlock;

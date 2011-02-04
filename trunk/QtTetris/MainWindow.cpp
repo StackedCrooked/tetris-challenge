@@ -66,7 +66,6 @@ MainWindow * MainWindow::GetInstance()
 MainWindow::MainWindow(QWidget *parent) :
     QWidget(parent),
     mTetrisWidgets(),
-    mSwitchButton(0),
     mRestartButton(0),
     mLogField(0)
 {
@@ -77,9 +76,6 @@ MainWindow::MainWindow(QWidget *parent) :
         mTetrisWidgets.push_back(new TetrisWidget(this, cSquareWidth, cSquareHeight));
         mTetrisWidgets.back()->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     }
-
-    mSwitchButton = new QPushButton("Switch", this);
-    connect(mSwitchButton, SIGNAL(clicked()), this, SLOT(onRestart()));
 
     mRestartButton = new QPushButton("Restart", this);
     connect(mRestartButton, SIGNAL(clicked()), this, SLOT(onRestart()));
@@ -95,7 +91,6 @@ MainWindow::MainWindow(QWidget *parent) :
         hbox->addWidget(mTetrisWidgets[idx]);
     }
     vbox->addItem(hbox);
-    vbox->addWidget(mSwitchButton);
     vbox->addWidget(mRestartButton);
     vbox->addWidget(new QLabel("Press 'c' to clear the game."), 0);
     vbox->addWidget(mLogField, 1);
@@ -137,7 +132,6 @@ void MainWindow::onRestart()
     restart();
 }
 
-
 void MainWindow::restart()
 {
     assert(Model::Instance().mTetrisGames.size() == mTetrisWidgets.size());
@@ -159,9 +153,28 @@ void MainWindow::restart()
         // Make sure the previous game has been deleted before creating a new one.
         theTetrisGames[idx].reset();
 
-        SimpleGamePtr simpleGamePtr(new SimpleGame(cRowCount, cColumnCount, PlayerType_Computer));
+
+        SimpleGamePtr simpleGamePtr;
+        if (idx == 0)
+        {
+            simpleGamePtr.reset(new SimpleGame(cRowCount, cColumnCount, PlayerType_Human));
+        }
+        else
+        {
+            simpleGamePtr.reset(new SimpleGame(cRowCount, cColumnCount, PlayerType_Computer));
+        }
         theTetrisGames[idx] = simpleGamePtr;
         Model::Instance().mMultiplayerGame.join(simpleGamePtr->game());
         mTetrisWidgets[idx]->setGame(simpleGamePtr.get());
     }
 }
+
+
+//void MainWindow::onPenalize()
+//{
+//    SimpleGame & simpleGame = *Model::Instance().mTetrisGames.at(0);
+//    ScopedReaderAndWriter<Game> rwgame(simpleGame.game());
+//    Game & game = *rwgame.get();
+//    game.applyLinePenalty(4);
+//}
+

@@ -10,6 +10,7 @@ namespace Tetris
 {
 
     class Evaluator;
+    class Game;
     class ComputerGame;
     class GameState;
     template<class Variable> class ThreadSafe;
@@ -21,21 +22,28 @@ namespace Tetris
     class ComputerPlayer
     {
     public:
-        typedef boost::function<std::auto_ptr<Evaluator>(const GameState &)> GetEvaluatorCallback;
+        class Tweaker
+        {
+        public:
+            virtual std::auto_ptr<Evaluator> updateInfo(const GameState & inGameState,
+                                                        int & outSearchDepth,
+                                                        int & outSearchWidth) = 0;
+        };
 
-        ComputerPlayer(const ThreadSafe<ComputerGame> & inProtectedGame,
+        ComputerPlayer(const ThreadSafe<Game> & inProtectedGame,
                        std::auto_ptr<Evaluator> inEvaluator,
                        int inSearchDepth,
                        int inSearchWidth,
                        int inWorkerCount);
 
-        ComputerPlayer(const ThreadSafe<ComputerGame> & inProtectedGame,
-                       const GetEvaluatorCallback & inGetEvaluator,
+        ComputerPlayer(const ThreadSafe<Game> & inProtectedGame,
                        int inSearchDepth,
                        int inSearchWidth,
                        int inWorkerCount);
 
         ~ComputerPlayer();
+
+        void setTweaker(Tweaker * inTweaker);
 
         int searchDepth() const;
 
@@ -55,15 +63,6 @@ namespace Tetris
         void setEvaluator(std::auto_ptr<Evaluator> inEvaluator);
 
         const Evaluator & evaluator() const;
-
-        // Enables you to have the Evaluator selected in a callback event.
-        // This overrides the evaluator set in the constructor
-        // or in the last call to setEvaluator.
-        void setDelayedEvaluator(const GetEvaluatorCallback & inGetEvaluatorCallback);
-
-        // Removes the delayed evaluator. Falls back to the regular evaluator from the
-        // constructor or last call to setEvaluator().
-        void removeDelayedEvaluator();
 
         int workerCount() const;
 
