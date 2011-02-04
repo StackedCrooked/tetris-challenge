@@ -43,6 +43,7 @@ MainThread & MainThread::Instance()
 }
 
 
+// This function must be defined in platform-specific code (Qt, Win32, Mac OS X, etc...)
 std::auto_ptr<MainThreadImpl> CreateMainThreadImpl();
 
 
