@@ -55,7 +55,8 @@ private:
 };
 
 
-class AbstractWidget : public SimpleGame::EventHandler
+class AbstractWidget : public SimpleGame::EventHandler,
+                       public SimpleGame::BackReference
 {
 public:
     AbstractWidget(int insquareWidth, int inSquareHeight);

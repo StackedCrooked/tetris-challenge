@@ -86,6 +86,7 @@ void AbstractWidget::setGame(SimpleGame * inSimpleGame)
     if (mSimpleGame)
     {
         mSimpleGame->unregisterEventHandler(this);
+        mSimpleGame->setBackReference(0);
     }
 
     mSimpleGame = inSimpleGame;
@@ -93,6 +94,7 @@ void AbstractWidget::setGame(SimpleGame * inSimpleGame)
     {
         setMinSize((mSimpleGame->columnCount() + 4) * squareWidth() + mMargin, mSimpleGame->rowCount() * squareHeight());
         mSimpleGame->registerEventHandler(this);
+        mSimpleGame->setBackReference(this);
     }
 }
 

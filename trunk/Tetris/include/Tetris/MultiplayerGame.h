@@ -2,13 +2,14 @@
 #define TETRIS_MULTIPLAYERGAME_H_INCLUDED
 
 
+#include "Tetris/SimpleGame.h"
 #include <set>
 
 
 namespace Tetris {
 
 
-class Game;
+class SimpleGame;
 template<class T> class ThreadSafe;
 
 
@@ -19,11 +20,11 @@ public:
 
     ~MultiplayerGame();
 
-    typedef std::set< ThreadSafe<Game> > Games;
+    typedef std::set<SimpleGame*> Games;
 
-    void join(ThreadSafe<Game> inGame);
+    void join(SimpleGame & inGame);
 
-    void leave(ThreadSafe<Game> inGame);
+    void leave(SimpleGame & inGame);
 
     const Games & games() const;
 

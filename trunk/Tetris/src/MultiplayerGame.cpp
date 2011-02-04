@@ -12,8 +12,8 @@
 namespace Tetris {
 
 
-struct MultiplayerGame::Impl : boost::noncopyable,
-                               public Game::EventHandler
+struct MultiplayerGame::Impl : public Game::EventHandler,
+                               boost::noncopyable
 {
     typedef MultiplayerGame::Games Games;
 
@@ -31,7 +31,8 @@ struct MultiplayerGame::Impl : boost::noncopyable,
         Games::iterator it = mGames.begin(), end = mGames.end();
         for (; it != end; ++it)
         {
-            ThreadSafe<Game> threadSafeGame(*it);
+            const SimpleGame & simpleGame(**it);
+            ThreadSafe<Game> threadSafeGame(simpleGame.game());
             ScopedReaderAndWriter<Game> rwgame(threadSafeGame);
             if (rwgame.get() != inGame)
             {
@@ -59,22 +60,22 @@ MultiplayerGame::~MultiplayerGame()
 }
 
 
-void MultiplayerGame::join(ThreadSafe<Game> inGame)
+void MultiplayerGame::join(SimpleGame & inGame)
 {
-    mImpl->mGames.insert(inGame);
+    mImpl->mGames.insert(&inGame);
 
-    ScopedReaderAndWriter<Game> rwgame(inGame);
+    ScopedReaderAndWriter<Game> rwgame(inGame.game());
     rwgame->registerEventHandler(mImpl);
 }
 
 
-void MultiplayerGame::leave(ThreadSafe<Game> inGame)
+void MultiplayerGame::leave(SimpleGame & inGame)
 {
     // calling erase(..) on a vector is slow,
     // but that should not be an issue here
-    mImpl->mGames.erase(inGame);
+    mImpl->mGames.erase(&inGame);
 
-    ScopedReaderAndWriter<Game> rwgame(inGame);
+    ScopedReaderAndWriter<Game> rwgame(inGame.game());
     rwgame->unregisterEventHandler(mImpl);
 }
 
