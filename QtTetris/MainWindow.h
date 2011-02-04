@@ -36,7 +36,6 @@ private:
 
     std::vector<TetrisWidget *> mTetrisWidgets;
 
-    QPushButton * mSwitchButton;
     QPushButton * mRestartButton;
     QTextEdit * mLogField;
 };

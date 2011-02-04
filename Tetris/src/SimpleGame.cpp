@@ -1,4 +1,5 @@
 #include "Tetris/Config.h"
+#include "Tetris/ComputerPlayer.h"
 #include "Tetris/SimpleGame.h"
 #include "Tetris/Evaluator.h"
 #include "Tetris/Game.h"
@@ -12,8 +13,8 @@
 
 namespace Tetris {
 
-
-struct SimpleGame::Impl : public Game::EventHandler
+struct SimpleGame::Impl : public Game::EventHandler,
+                          public ComputerPlayer::Tweaker
 {
 
     static std::auto_ptr<Game> CreateGame(size_t inRowCount, size_t inColumnCount, PlayerType inPlayerType)
@@ -34,10 +35,17 @@ struct SimpleGame::Impl : public Game::EventHandler
          PlayerType inPlayerType) :
         mGame(CreateGame(inRowCount, inColumnCount, inPlayerType)),
         mPlayerType(inPlayerType),
+        mComputerPlayer(),
         mGravity(new Gravity(mGame)),
         mCenterColumn(static_cast<size_t>(0.5 + inColumnCount / 2.0)),
         mSimpleGame(0)
     {
+        if (inPlayerType == PlayerType_Computer)
+        {
+            std::auto_ptr<Evaluator> evaluator(CreatePoly<Evaluator, MakeTetrises>());
+            mComputerPlayer.reset(new ComputerPlayer(mGame, evaluator, 7, 4, 4));
+            mComputerPlayer->setTweaker(this);
+        }
     }
 
     ~Impl()
@@ -45,6 +53,32 @@ struct SimpleGame::Impl : public Game::EventHandler
         ScopedReaderAndWriter<Game> rwgame(mGame);
         Game & game(*rwgame.get());
         game.unregisterEventHandler(this);
+    }
+
+    virtual std::auto_ptr<Evaluator> updateInfo(const GameState & inGameState,
+                                                int & outSearchDepth,
+                                                int & outSearchWidth)
+    {
+        int firstRow = inGameState.firstOccupiedRow();
+        int rowCount = inGameState.grid().rowCount();
+        if (firstRow > rowCount / 2)
+        {
+            outSearchDepth = 8;
+            outSearchWidth = 5;
+            return CreatePoly<Evaluator, MakeTetrises>();
+        }
+        else if (firstRow > rowCount / 3)
+        {
+            outSearchDepth = 6;
+            outSearchWidth = 6;
+            return CreatePoly<Evaluator, Balanced>();
+        }
+        else
+        {
+            outSearchDepth = 4;
+            outSearchWidth = 4;
+            return CreatePoly<Evaluator, Survival>();
+        }
     }
 
     void init(SimpleGame * inSimpleGame)
@@ -77,6 +111,7 @@ struct SimpleGame::Impl : public Game::EventHandler
 
     ThreadSafe<Game> mGame;
     PlayerType mPlayerType;
+    boost::scoped_ptr<ComputerPlayer> mComputerPlayer;
     boost::scoped_ptr<Gravity> mGravity;
     std::size_t mCenterColumn;
     SimpleGame * mSimpleGame;
