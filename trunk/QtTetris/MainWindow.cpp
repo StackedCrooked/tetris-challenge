@@ -159,7 +159,7 @@ void MainWindow::restart()
         // Make sure the previous game has been deleted before creating a new one.
         theTetrisGames[idx].reset();
 
-        SimpleGamePtr simpleGamePtr(new SimpleGame(cRowCount, cColumnCount));
+        SimpleGamePtr simpleGamePtr(new SimpleGame(cRowCount, cColumnCount, PlayerType_Computer));
         theTetrisGames[idx] = simpleGamePtr;
         Model::Instance().mMultiplayerGame.join(simpleGamePtr->game());
         mTetrisWidgets[idx]->setGame(simpleGamePtr.get());

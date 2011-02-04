@@ -15,13 +15,16 @@ typedef boost::function<void()> Action;
 
 
 /**
- * Invokelater provides a quick way to let schedule an action to be executed in the main thread.
- * This function can be called from any worker thread.
+ * Invokelater provides a quick way to let schedule a functor to be invoked in the main thread.
+ * This is achieved by pushing a (platform specific) "post message" on the main message loop.
+ * This can be called from any worker thread.
  */
 void InvokeLater(const Action & inAction);
 
 
 class MainThreadImpl;
+
+
 class MainThread
 {
 public:

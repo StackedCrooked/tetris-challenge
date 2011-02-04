@@ -15,9 +15,25 @@ namespace Tetris {
 
 struct SimpleGame::Impl : public Game::EventHandler
 {
+
+    static std::auto_ptr<Game> CreateGame(size_t inRowCount, size_t inColumnCount, PlayerType inPlayerType)
+    {
+        if (inPlayerType == PlayerType_Human)
+        {
+            return CreatePoly<Game, HumanGame>(inRowCount, inColumnCount);
+        }
+        else if (inPlayerType == PlayerType_Computer)
+        {
+            return CreatePoly<Game, ComputerGame>(inRowCount, inColumnCount);
+        }
+        throw std::logic_error("Invalid enum value for PlayerType.");
+    }
+
     Impl(size_t inRowCount,
-         size_t inColumnCount) :
-        mGame(new HumanGame(inRowCount, inColumnCount)),
+         size_t inColumnCount,
+         PlayerType inPlayerType) :
+        mGame(CreateGame(inRowCount, inColumnCount, inPlayerType)),
+        mPlayerType(inPlayerType),
         mGravity(new Gravity(mGame)),
         mCenterColumn(static_cast<size_t>(0.5 + inColumnCount / 2.0)),
         mSimpleGame(0)
@@ -60,17 +76,17 @@ struct SimpleGame::Impl : public Game::EventHandler
     }
 
     ThreadSafe<Game> mGame;
+    PlayerType mPlayerType;
     boost::scoped_ptr<Gravity> mGravity;
     std::size_t mCenterColumn;
     SimpleGame * mSimpleGame;
-
     typedef std::set<SimpleGame::EventHandler*> EventHandlers;
     EventHandlers mEventHandlers;
 };
 
 
-SimpleGame::SimpleGame(size_t inRowCount, size_t inColumnCount) :
-    mImpl(new Impl(inRowCount, inColumnCount))
+SimpleGame::SimpleGame(size_t inRowCount, size_t inColumnCount, PlayerType inPlayerType) :
+    mImpl(new Impl(inRowCount, inColumnCount, inPlayerType))
 {
     mImpl->init(this);
 }
@@ -79,6 +95,12 @@ SimpleGame::SimpleGame(size_t inRowCount, size_t inColumnCount) :
 SimpleGame::~SimpleGame()
 {
     delete mImpl;
+}
+
+
+PlayerType SimpleGame::playerType() const
+{
+    return mImpl->mPlayerType;
 }
 
 

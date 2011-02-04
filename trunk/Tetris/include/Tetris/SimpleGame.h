@@ -18,6 +18,13 @@ class GameState;
 template<class Variable> class ThreadSafe;
 
 
+enum PlayerType
+{
+    PlayerType_Human,
+    PlayerType_Computer
+};
+
+
 /**
  * SimpleGame is an easy to use and thread-safe wrapper for the Game class.
  */
@@ -38,9 +45,11 @@ public:
         EventHandler& operator=(const EventHandler&);
     };
 
-    SimpleGame(size_t inRowCount, size_t inColumnCount);
+    SimpleGame(size_t inRowCount, size_t inColumnCount, PlayerType inPlayerType);
 
     ~SimpleGame();
+
+    PlayerType playerType() const;
 
     void registerEventHandler(EventHandler * inEventHandler);
 
