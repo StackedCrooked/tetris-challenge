@@ -168,13 +168,3 @@ void MainWindow::restart()
         mTetrisWidgets[idx]->setGame(simpleGamePtr.get());
     }
 }
-
-
-//void MainWindow::onPenalize()
-//{
-//    SimpleGame & simpleGame = *Model::Instance().mTetrisGames.at(0);
-//    ScopedReaderAndWriter<Game> rwgame(simpleGame.game());
-//    Game & game = *rwgame.get();
-//    game.applyLinePenalty(4);
-//}
-
