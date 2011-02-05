@@ -46,11 +46,11 @@ namespace Tetris
         mRecommendedSearchDepth(rhs.mRecommendedSearchDepth),
         mRecommendedSearchWidth(rhs.mRecommendedSearchWidth),
         mMutex()
-        
+
     {
     }
 
-        
+
     Evaluator& Evaluator::operator=(const Evaluator& rhs)
     {
 
@@ -237,7 +237,7 @@ namespace Tetris
     Survival::Survival() :
         Evaluator("Survival",
                   GameHeightFactor(-2),
-                  LastBlockHeightFactor(-6),
+                  LastBlockHeightFactor(-1),
                   NumHolesFactor(-3),
                   NumSinglesFactor(1),
                   NumDoublesFactor(2),
@@ -267,7 +267,7 @@ namespace Tetris
     int MakeTetrises::evaluate(const GameState & inGameState) const
     {
         const Grid & grid = inGameState.grid();
-    
+
         size_t c = grid.columnCount() - 1;
         if (grid.rowCount() >= 4)
         {

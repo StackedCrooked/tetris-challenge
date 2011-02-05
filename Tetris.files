@@ -365,3 +365,4 @@ QtTetris/QtTetris.pro
 Tetris/include/Tetris/MainThreadImpl.h
 QtTetris/QtMainThread.h
 QtTetris/QtMainThread.cpp
+Tetris/include/Tetris/GameStateStats.h

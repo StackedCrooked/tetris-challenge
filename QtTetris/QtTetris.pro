@@ -68,6 +68,7 @@ HEADERS += \
     ../Tetris/include/Tetris/GameState.h \
     ../Tetris/include/Tetris/GameStateComparator.h \
     ../Tetris/include/Tetris/GameStateNode.h \
+    ../Tetris/include/Tetris/GameStateStats.h \
     ../Tetris/include/Tetris/GenericGrid.h \
     ../Tetris/include/Tetris/Gravity.h \
     ../Tetris/include/Tetris/Grid.h \

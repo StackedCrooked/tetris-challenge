@@ -37,6 +37,7 @@ public:
     // Use inGameOver = true to mark the new gamestate as "game over".
     std::auto_ptr<GameState>  commit(const Block & inBlock, GameOver inGameOver) const;
 
+
     // Statistics
     int numLines() const { return mNumLines; }
     int numSingles() const { return mNumSingles; }

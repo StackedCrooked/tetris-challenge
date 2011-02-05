@@ -1,6 +1,7 @@
 #include "Tetris/Config.h"
 #include "Tetris/AbstractWidget.h"
 #include "Tetris/Block.h"
+#include "Tetris/MakeString.h"
 #include "Tetris/SimpleGame.h"
 #include "Poco/Stopwatch.h"
 #include <boost/bind.hpp>
@@ -92,7 +93,8 @@ void AbstractWidget::setGame(SimpleGame * inSimpleGame)
     mSimpleGame = inSimpleGame;
     if (mSimpleGame)
     {
-        setMinSize((mSimpleGame->columnCount() + 4) * squareWidth() + mMargin, mSimpleGame->rowCount() * squareHeight());
+        setMinSize((mSimpleGame->columnCount() + 4) * squareWidth() + mMargin,
+                   getGameRect().height() + getStatsRect().height());
         mSimpleGame->registerEventHandler(this);
         mSimpleGame->setBackReference(this);
     }
@@ -165,6 +167,11 @@ void AbstractWidget::coordinateRepaint(const SimpleGame & inGame)
     // Paint future blocks
     paintFutureBlocks(futureBlocksRect, mSpacing, futureBlocks);
 
+    GameStateStats stats = inGame.stats();
+
+    Rect statsRect(getStatsRect());
+    paintStats(statsRect, stats);
+
 
     // Paint active block
     const Block & activeBlock(inGame.activeBlock());
@@ -200,6 +207,27 @@ void AbstractWidget::paintGameGrid(const Grid & inGrid)
 {
     Rect gameRect = getGameRect();
     paintGrid(gameRect.x(), gameRect.y(), inGrid);
+}
+
+
+void AbstractWidget::paintStats(const Rect & inRect, const GameStateStats & inStats)
+{
+    int x = inRect.left();
+    int y = inRect.top();
+
+    drawText(x, y, MakeString() << "Total lines: " << inStats.numLines());
+    y += squareHeight();
+
+    drawText(x, y, MakeString() << "Lines x1: " << inStats.numSingles());
+    y += squareHeight();
+
+    drawText(x, y, MakeString() << "Lines x2: " << inStats.numDoubles());
+    y += squareHeight();
+
+    drawText(x, y, MakeString() << "Lines x3: " << inStats.numTriples());
+    y += squareHeight();
+
+    drawText(x, y, MakeString() << "Lines x4: " << inStats.numTetrises());
 }
 
 

@@ -4,6 +4,7 @@
 
 #include "Tetris/Direction.h"
 #include "Tetris/Block.h"
+#include "Tetris/GameStateStats.h"
 #include <boost/signals2.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <cstddef>
@@ -88,6 +89,8 @@ public:
 
     void unregisterEventHandler(EventHandler * inEventHandler);
 
+    GameStateStats stats() const;
+
     ThreadSafe<Game> game() const;
 
     bool isGameOver() const;
@@ -112,6 +115,8 @@ public:
 
     // Gets the currently active block and any blocks that follow.
     Block getNextBlock() const;
+
+
 
     // For multiplayer crazyness.
     void setActiveBlock(const Block & inBlock);
