@@ -88,12 +88,15 @@ protected:
     void coordinateRepaint(const SimpleGame & inGame);
     virtual void paintSquare(const Rect & inRect, const RGBColor & inColor) = 0;
     virtual void drawLine(int x1, int y1, int x2, int y2, int inPenWidth, const RGBColor & inColor) = 0;
+    virtual void drawText(int x, int y, const std::string & inText) = 0;
     virtual Rect getGameRect() const = 0;
+    virtual Rect getStatsRect() const = 0;
     virtual Rect getFutureBlocksRect(unsigned int inFutureBlockCount) const = 0;
 
 private:
     void paintGrid(int y, int x, const Grid & inGrid);
     void paintGameGrid(const Grid & inGrid);
+    void paintStats(const Rect & inRect, const GameStateStats & inStats);
     void paintFutureBlocks(const Rect & inRect, int inSpacing, const std::vector<BlockType> & inBlockTypes);
     void recalculateFPS();
 

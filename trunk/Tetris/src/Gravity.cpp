@@ -87,25 +87,23 @@ namespace Tetris
         try
         {
             int oldLevel = mLevel;
+            if (mStopwatch.elapsed() > 1000  * interval())
             {
-                if (mStopwatch.elapsed() > 1000  * interval())
+                mStopwatch.restart();
+                ScopedReaderAndWriter<Game> game(mThreadSafeGame);
+                if (game->isGameOver())
                 {
-                    mStopwatch.restart();
-                    ScopedReaderAndWriter<Game> game(mThreadSafeGame);
-                    if (game->isGameOver())
-                    {
-                        return;
-                    }
-                    game->move(MoveDirection_Down);
-                    int maxLevel = cMaxLevel;
-                    mLevel = std::min<int>(maxLevel, game->level());
+                    return;
                 }
+                game->move(MoveDirection_Down);
+                int maxLevel = cMaxLevel;
+                mLevel = std::min<int>(maxLevel, game->level());
             }
             if (mLevel != oldLevel)
             {
                 Assert(mLevel < cIntervalCount);
                 int newLevel = sIntervals[mLevel];
-                LogInfo(MakeString() << "Set level to " << newLevel << ".");
+                LogInfo(MakeString() << "Set level to " << mLevel << ".");
                 mTimer.setPeriodicInterval(newLevel);
             }
         }

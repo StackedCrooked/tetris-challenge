@@ -36,7 +36,10 @@ struct MultiplayerGame::Impl : public Game::EventHandler,
             ScopedReaderAndWriter<Game> rwgame(threadSafeGame);
             if (rwgame.get() != inGame)
             {
-                LogInfo(MakeString() << "Penalty given to player. (Lines made: " << inLineCount << ")");
+                if (inLineCount > 1)
+                {
+                    LogInfo(MakeString() << "Penalty given to player. (Lines made: " << inLineCount << ")");
+                }
                 rwgame.get()->applyLinePenalty(inLineCount);
             }
             gameIndex++;

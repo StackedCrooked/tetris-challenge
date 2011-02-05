@@ -36,7 +36,9 @@ protected:
     virtual void setMinSize(int inWidth, int inHeight);
     virtual void paintSquare(const Tetris::Rect & inRect, const Tetris::RGBColor & inColor);
     virtual void drawLine(int x1, int y1, int x2, int y2, int inPenWidth, const Tetris::RGBColor & inColor);
+    virtual void drawText(int x, int y, const std::string & inText);
     virtual Tetris::Rect getGameRect() const;
+    virtual Tetris::Rect getStatsRect() const;
     virtual Tetris::Rect getFutureBlocksRect(unsigned int inFutureBlockCount) const;
 
 private:

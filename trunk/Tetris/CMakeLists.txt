@@ -23,6 +23,7 @@ add_library(Tetris
     include/Tetris/GameState.h
     include/Tetris/GameStateComparator.h
     include/Tetris/GameStateNode.h
+    include/Tetris/GameStateStats.h
     include/Tetris/GenericGrid.h
     include/Tetris/Gravity.h
     include/Tetris/Grid.h

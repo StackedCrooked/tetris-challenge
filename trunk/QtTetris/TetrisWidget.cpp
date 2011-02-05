@@ -7,6 +7,7 @@
 #include <QKeyEvent>
 #include <QColor>
 #include <QMutexLocker>
+#include <QPainter>
 #include <QTimer>
 #include <stdexcept>
 #include <iostream>
@@ -152,8 +153,6 @@ void TetrisWidget::paintSquare(const Rect & inRect, const RGBColor & inColor)
 }
 
 
-
-
 void TetrisWidget::drawLine(int x1, int y1, int x2, int y2, int inPenWidth, const RGBColor & inColor)
 {
     if (!mPainter.get())
@@ -166,12 +165,33 @@ void TetrisWidget::drawLine(int x1, int y1, int x2, int y2, int inPenWidth, cons
 }
 
 
+void TetrisWidget::drawText(int x, int y, const std::string & inText)
+{
+    if (!mPainter.get())
+    {
+        throw std::logic_error("Painter is not set.");
+    }
+
+    QPainter & painter(*mPainter);
+    painter.drawText(QRect(x, y, mColCount * squareWidth(), squareHeight()), inText.c_str());
+}
+
+
 Tetris::Rect TetrisWidget::getGameRect() const
 {
     return Tetris::Rect(0,
                         0,
                         mColCount * squareWidth(),
                         mRowCount * squareHeight());
+}
+
+
+Tetris::Rect TetrisWidget::getStatsRect() const
+{
+    return Tetris::Rect(0,
+                        mRowCount * squareHeight(),
+                        mColCount * squareWidth(),
+                        6 * squareHeight());
 }
 
 

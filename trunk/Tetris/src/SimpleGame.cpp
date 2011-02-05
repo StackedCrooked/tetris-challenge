@@ -45,7 +45,7 @@ struct SimpleGame::Impl : public Game::EventHandler,
         if (inPlayerType == PlayerType_Computer)
         {
             std::auto_ptr<Evaluator> evaluator(CreatePoly<Evaluator, MakeTetrises>());
-            mComputerPlayer.reset(new ComputerPlayer(mGame, evaluator, 8, 5, 12));
+            mComputerPlayer.reset(new ComputerPlayer(mGame, evaluator, 8, 5, 8));
             mComputerPlayer->setTweaker(this);
             mComputerPlayer->setMoveSpeed(100);
         }
@@ -67,7 +67,7 @@ struct SimpleGame::Impl : public Game::EventHandler,
         if (firstRow > rowCount / 2)
         {
             outSearchDepth = 8;
-            outSearchWidth = 4;
+            outSearchWidth = 5;
             return CreatePoly<Evaluator, MakeTetrises>();
         }
         else if (firstRow > rowCount / 3)
@@ -176,6 +176,18 @@ void SimpleGame::unregisterEventHandler(EventHandler * inEventHandler)
 ThreadSafe<Game> SimpleGame::game() const
 {
     return mImpl->mGame;
+}
+
+
+GameStateStats SimpleGame::stats() const
+{
+    ScopedReader<Game> rgame(mImpl->mGame);
+    const GameState & gameState(rgame->getGameState());
+    return GameStateStats(gameState.numLines(),
+                          gameState.numSingles(),
+                          gameState.numDoubles(),
+                          gameState.numTriples(),
+                          gameState.numTetrises());
 }
 
 
