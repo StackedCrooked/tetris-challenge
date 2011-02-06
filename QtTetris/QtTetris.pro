@@ -83,6 +83,7 @@ HEADERS += \
     ../Tetris/include/Tetris/NodeCalculatorImpl.h \
     ../Tetris/include/Tetris/NodePtr.h \
     ../Tetris/include/Tetris/Player.h \
+    ../Tetris/include/Tetris/PlayerType.h \
     ../Tetris/include/Tetris/SimpleGame.h \
     ../Tetris/include/Tetris/SingleThreadedNodeCalculator.h \
     ../Tetris/include/Tetris/Tetris.h \

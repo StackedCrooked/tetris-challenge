@@ -1,6 +1,8 @@
 #include "MainWindow.h"
+#include "Tetris/Assert.h"
 #include "Tetris/Game.h"
 #include "Tetris/Logger.h"
+#include "Tetris/MakeString.h"
 #include <QLayout>
 #include <QLabel>
 #include <algorithm>
@@ -15,7 +17,7 @@ typedef boost::shared_ptr<Tetris::SimpleGame> SimpleGamePtr;
 
 enum
 {
-    cPlayerCount = 4
+    cPlayerCount = 1
 };
 
 
@@ -28,15 +30,24 @@ public:
         return fModel;
     }
 
-    std::vector<SimpleGamePtr> mTetrisGames;
+    Players mPlayers;
     Tetris::MultiplayerGame mMultiplayerGame;
-
-
 private:
     Model() :
-        mTetrisGames(cPlayerCount),
+        mPlayers(),
         mMultiplayerGame()
     {
+        // Assemble Team A
+        for (size_t idx = 0; idx < cPlayerCount/2; ++idx)
+        {
+            mPlayers.push_back(Player(PlayerType_Computer, TeamName("Team A"), PlayerName(MakeString() << "A" << (idx + 1))));
+        }
+
+        // Assemble Team B
+        for (size_t idx = cPlayerCount/2; idx < cPlayerCount; ++idx)
+        {
+            mPlayers.push_back(Player(PlayerType_Computer, TeamName("Team B"), PlayerName(MakeString() << "B" << (idx + 1))));
+        }
     }
 
     Model(const Model &);
@@ -132,35 +143,41 @@ void MainWindow::onRestart()
     restart();
 }
 
+
 void MainWindow::restart()
 {
-    assert(Model::Instance().mTetrisGames.size() == mTetrisWidgets.size());
-    std::vector<SimpleGamePtr> & theTetrisGames = Model::Instance().mTetrisGames;
+    Assert(Model::Instance().mPlayers.size() == mTetrisWidgets.size());
 
-    // Unregister all.
-    for (size_t idx = 0; idx < theTetrisGames.size(); ++idx)
+    Players & players = Model::Instance().mPlayers;
+
+
+    // Unregister all
+    for (size_t idx = 0; idx < cPlayerCount; ++idx)
     {
-        // Forces unregistration of the event handlers.
+        Player player(players[idx]);
         mTetrisWidgets[idx]->setGame(0);
-
-        SimpleGamePtr oldSimpleGamePtr(theTetrisGames[idx]);
-        if (oldSimpleGamePtr)
-        {
-            Model::Instance().mMultiplayerGame.leave(*oldSimpleGamePtr);
-        }
-
-        // Make sure the previous game has been deleted before creating a new one.
-        theTetrisGames[idx].reset();
+        Model::Instance().mMultiplayerGame.leave(player);
     }
 
-    for (size_t idx = 0; idx < theTetrisGames.size(); ++idx)
+    players.clear(); // deadlock, yay!!
+
+    // Assemble Team A
+    for (size_t idx = 0; idx < cPlayerCount/2; ++idx)
     {
-        SimpleGamePtr simpleGamePtr(new SimpleGame(cRowCount, cColumnCount, PlayerType_Computer));
+        players.push_back(Player(PlayerType_Computer, TeamName("Team A"), PlayerName(MakeString() << "A" << (idx + 1))));
+    }
 
-        theTetrisGames[idx] = simpleGamePtr;
+    // Assemble Team B
+    for (size_t idx = cPlayerCount/2; idx < cPlayerCount; ++idx)
+    {
+        players.push_back(Player(PlayerType_Computer, TeamName("Team B"), PlayerName(MakeString() << "B" << (idx + 1))));
+    }
 
-        Model::Instance().mMultiplayerGame.join(*simpleGamePtr);
 
-        mTetrisWidgets[idx]->setGame(simpleGamePtr.get());
+    for (size_t idx = 0; idx < cPlayerCount; ++idx)
+    {
+        Player player(players[idx]);
+        mTetrisWidgets[idx]->setGame(&player.simpleGame());
+        Model::Instance().mMultiplayerGame.join(player);
     }
 }

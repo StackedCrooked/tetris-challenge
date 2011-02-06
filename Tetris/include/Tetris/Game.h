@@ -110,7 +110,6 @@ protected:
     mutable BlockTypes mBlocks;
     size_t mCurrentBlockIndex;
     int mOverrideLevel;
-    mutable boost::mutex mChangedSignalMutex;
 
     typedef std::set<EventHandler*> EventHandlers;
     EventHandlers mEventHandlers;

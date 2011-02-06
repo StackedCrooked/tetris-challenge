@@ -6,6 +6,7 @@
 #include "TetrisWidget.h"
 #include "Tetris/SimpleGame.h"
 #include "Tetris/MultiplayerGame.h"
+#include "Tetris/Player.h"
 #include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
 

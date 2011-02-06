@@ -382,3 +382,4 @@ Tetris/testsuite/src/WorkerPoolTest.h
 Tetris/testsuite/src/WorkerTest.cpp
 Tetris/testsuite/src/WorkerTest.h
 Tetris/testsuite/CMakeLists.txt
+Tetris/include/Tetris/PlayerType.h
