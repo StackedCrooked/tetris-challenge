@@ -20,6 +20,7 @@ struct WithMutex
         mVariable(inVariable.release())
     {
     }
+
     WithMutex(Variable * inVariable) :
         mVariable(inVariable)
     {

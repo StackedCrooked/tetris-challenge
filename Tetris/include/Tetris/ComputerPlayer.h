@@ -2,21 +2,21 @@
 #define TETRIS_COMPUTERPLAYER_H_INCLUDED
 
 
-#include <memory>
-#include <boost/function.hpp>
+#include "Tetris/AutoPtrSupport.h"
+#include "Tetris/Evaluator.h"
+#include "Tetris/Threading.h"
+
+
+namespace Poco {
+class Timer;
+}
 
 
 namespace Tetris
 {
 
-    class Evaluator;
     class Game;
-    class ComputerGame;
     class GameState;
-    template<class Variable> class ThreadSafe;
-
-
-    class ComputerPlayerImpl;
 
 
     class ComputerPlayer
@@ -34,12 +34,7 @@ namespace Tetris
                        std::auto_ptr<Evaluator> inEvaluator,
                        int inSearchDepth,
                        int inSearchWidth,
-                       int inWorkerCount);
-
-        ComputerPlayer(const ThreadSafe<Game> & inProtectedGame,
-                       int inSearchDepth,
-                       int inSearchWidth,
-                       int inWorkerCount);
+                       int inWorkerCount = 0);
 
         ~ComputerPlayer();
 
@@ -62,7 +57,7 @@ namespace Tetris
 
         void setEvaluator(std::auto_ptr<Evaluator> inEvaluator);
 
-        const Evaluator & evaluator() const;
+        //const Evaluator & evaluator() const;
 
         int workerCount() const;
 
@@ -73,7 +68,10 @@ namespace Tetris
         ComputerPlayer(const ComputerPlayer &);
         ComputerPlayer & operator= (const ComputerPlayer&);
 
-        ComputerPlayerImpl * mImpl;
+        void onTimerEvent(Poco::Timer & );
+
+        struct Impl;
+        Impl * mImpl;
     };
 
 } // namespace Tetris

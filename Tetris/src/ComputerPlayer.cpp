@@ -18,424 +18,360 @@
 #include "Tetris/Assert.h"
 #include "Poco/Environment.h"
 #include "Poco/Timer.h"
-#include <set>
 #include <boost/bind.hpp>
+#include <boost/noncopyable.hpp>
+#include <set>
 
 
-namespace Tetris
+namespace Tetris {
+
+
+// Use roughly 75% of all available CPUs.
+static unsigned int GetWorkerCount()
 {
-
-    class ComputerPlayerImpl
+    int cpuCount = Poco::Environment::processorCount();
+    Assert(cpuCount >= 1);
+    if (cpuCount > 1)
     {
-    public:
-        typedef ComputerPlayer::Tweaker Tweaker;
-
-        ComputerPlayerImpl(const ThreadSafe<Game> & inProtectedGame,
-                           std::auto_ptr<Evaluator> inEvaluator,
-                           int inSearchDepth,
-                           int inSearchWidth,
-                           int inWorkerCount);
-
-        ComputerPlayerImpl(const ThreadSafe<Game> & inProtectedGame,
-                           int inSearchDepth,
-                           int inSearchWidth,
-                           int inWorkerCount);
-
-        ~ComputerPlayerImpl()
-        {
-            if (mNodeCalculator)
-            {
-                mNodeCalculator->stop();
-            }
-        }
-
-        inline int searchDepth() const
-        { return mSearchDepth; }
-
-        inline void setSearchDepth(int inSearchDepth)
-        { mSearchDepth = inSearchDepth; }
-
-        inline int searchWidth() const
-        { return mSearchWidth; }
-
-        inline void setSearchWidth(int inSearchWidth)
-        { mSearchWidth = inSearchWidth; }
-
-        inline int moveSpeed() const
-        { return mBlockMover->speed(); }
-
-        inline void setMoveSpeed(int inMoveSpeed)
-        { mBlockMover->setSpeed(inMoveSpeed); }
-
-        int currentSearchDepth() const;
-
-        void setEvaluator(std::auto_ptr<Evaluator> inEvaluator)
-        { mEvaluator.reset(inEvaluator.release()); }
-
-        const Evaluator & evaluator() const;
-
-        int workerCount() const
-        { return mWorkerCount; }
-
-        void setWorkerCount(int inWorkerCount);
-
-        ComputerPlayerImpl(const ComputerPlayerImpl&);
-        ComputerPlayerImpl& operator=(const ComputerPlayerImpl&);
-
-        void onTimerEvent(Poco::Timer & inTimer);
-
-        void timerEvent();
-
-        int calculateRemainingTimeMs(const Game & inGame) const;
-        Tweaker * mTweaker;
-        ThreadSafe<Game> mProtectedGame;
-        WorkerPool mWorkerPool;
-        boost::scoped_ptr<NodeCalculator> mNodeCalculator;
-        boost::scoped_ptr<Evaluator> mEvaluator;
-        boost::scoped_ptr<BlockMover> mBlockMover;
-        Poco::Timer mTimer;
-        int mSearchDepth;
-        int mSearchWidth;
-        int mMoveSpeed;
-        int mWorkerCount;
-    };
-
-
-    // Use roughly 75% of all available CPUs.
-    static unsigned int GetWorkerCount()
-    {
-        int cpuCount = Poco::Environment::processorCount();
-        Assert(cpuCount >= 1);
-        if (cpuCount > 1)
-        {
-            cpuCount = static_cast<int>(0.5 + (0.75 * static_cast<double>(cpuCount)));
-        }
-        return cpuCount;
+        cpuCount = static_cast<int>(0.5 + (0.75 * static_cast<double>(cpuCount)));
     }
+    return cpuCount;
+}
 
 
-    ComputerPlayerImpl::ComputerPlayerImpl(const ThreadSafe<Game> & inProtectedGame,
-                                           std::auto_ptr<Evaluator> inEvaluator,
-                                           int inSearchDepth,
-                                           int inSearchWidth,
-                                           int inWorkerCount) :
+struct ComputerPlayer::Impl : boost::noncopyable
+{
+public:
+    typedef ComputerPlayer::Tweaker Tweaker;
+
+    Impl(const ThreadSafe<Game> & inProtectedGame,
+         std::auto_ptr<Evaluator> inEvaluator,
+         int inSearchDepth,
+         int inSearchWidth,
+         int inWorkerCount) :
         mTweaker(0),
         mProtectedGame(inProtectedGame),
         mWorkerPool("ComputerPlayer WorkerPool", inWorkerCount > 0 ? inWorkerCount : GetWorkerCount()),
         mEvaluator(inEvaluator.release()),
         mBlockMover(new BlockMover(mProtectedGame)),
-        mTimer(10, 10),
         mSearchDepth(inSearchDepth),
         mSearchWidth(inSearchWidth),
-        mMoveSpeed(20),
-        mWorkerCount(inWorkerCount)
+        mWorkerCount(inWorkerCount),
+        mQuitFlag(false),
+        mTimer(10, 10)
     {
-        LogInfo(MakeString() << "ComputerPlayer started with " << mWorkerPool.size() << " worker threads.");
-        mTimer.start(Poco::TimerCallback<ComputerPlayerImpl>(*this, &ComputerPlayerImpl::onTimerEvent));
     }
 
-
-    ComputerPlayerImpl::ComputerPlayerImpl(const ThreadSafe<Game> & inProtectedGame,
-                                           int inSearchDepth,
-                                           int inSearchWidth,
-                                           int inWorkerCount) :
-        mTweaker(0),
-        mProtectedGame(inProtectedGame),
-        mWorkerPool("ComputerPlayer WorkerPool", (inWorkerCount > 0) ? inWorkerCount : GetWorkerCount()),
-        mEvaluator(),
-        mBlockMover(new BlockMover(mProtectedGame)),
-        mTimer(10, 10),
-        mSearchDepth(inSearchDepth),
-        mSearchWidth(inSearchWidth),
-        mMoveSpeed(20),
-        mWorkerCount(inWorkerCount)
+    ~Impl()
     {
-        LogInfo(MakeString() << "ComputerPlayer started with " << mWorkerPool.size() << " worker threads.");
-        mTimer.start(Poco::TimerCallback<ComputerPlayerImpl>(*this, &ComputerPlayerImpl::onTimerEvent));
     }
 
+    void timerEvent();
 
-    void ComputerPlayer::setTweaker(Tweaker *inTweaker)
+    int calculateRemainingTimeMs(const Game & inGame) const;
+
+    Tweaker * mTweaker;
+    ThreadSafe<Game> mProtectedGame;
+    WorkerPool mWorkerPool;
+    boost::scoped_ptr<NodeCalculator> mNodeCalculator;
+    boost::scoped_ptr<Evaluator> mEvaluator;
+    boost::scoped_ptr<BlockMover> mBlockMover;
+    int mSearchDepth;
+    int mSearchWidth;
+    int mWorkerCount;
+    bool mQuitFlag;
+    boost::mutex mMutex;
+    Poco::Timer mTimer;
+};
+
+
+ComputerPlayer::ComputerPlayer(const ThreadSafe<Game> & inProtectedGame,
+                               std::auto_ptr<Evaluator> inEvaluator,
+                               int inSearchDepth,
+                               int inSearchWidth,
+                               int inWorkerCount) :
+    mImpl(new Impl(inProtectedGame, inEvaluator, inSearchDepth, inSearchWidth, inWorkerCount))
+{
+    mImpl->mTimer.start(Poco::TimerCallback<ComputerPlayer>(*this, &ComputerPlayer::onTimerEvent));
+}
+
+
+ComputerPlayer::~ComputerPlayer()
+{
     {
-        mImpl->mTweaker = inTweaker;
+        boost::mutex::scoped_lock lock(mImpl->mMutex);
+        mImpl->mQuitFlag = true;
     }
+    mImpl->mTimer.stop();
+    delete mImpl;
+}
 
 
-    const Evaluator & ComputerPlayerImpl::evaluator() const
+void ComputerPlayer::onTimerEvent(Poco::Timer & )
+{
+    try
     {
-        Assert(mEvaluator);
-        return *mEvaluator;
-    }
-
-
-    int ComputerPlayerImpl::calculateRemainingTimeMs(const Game & inGame) const
-    {
-        const ComputerGame & game(dynamic_cast<const ComputerGame&>(inGame));
-
-        int firstOccupiedRow = game.currentNode()->gameState().firstOccupiedRow();
-        int currentBlockRow = game.activeBlock().row();
-        int numBlockRows = std::max<int>(game.activeBlock().grid().rowCount(), game.activeBlock().grid().columnCount());
-        int numRemainingRows = firstOccupiedRow - (currentBlockRow + numBlockRows);
-        if (numRemainingRows <= 2)
+        boost::mutex::scoped_lock lock(mImpl->mMutex);
+        if (!mImpl->mQuitFlag)
         {
-            return 0;
+            mImpl->timerEvent();
         }
-
-        double numRowsPerSecond = Gravity::CalculateSpeed(game.level());
-        double remainingTime = 1000 * static_cast<double>(numRemainingRows) / numRowsPerSecond;
-        int maxRequiredMoves = game.activeBlock().numRotations() + (game.columnCount()/2);
-        int moveSpeed = mBlockMover->speed();
-        double timeRequiredForMove = 1000.0 * static_cast<double>(maxRequiredMoves) / static_cast<double>(moveSpeed);
-        return static_cast<int>(0.5 + remainingTime - timeRequiredForMove);
     }
-
-
-    int ComputerPlayerImpl::currentSearchDepth() const
+    catch (const std::exception & exc)
     {
-        if (mNodeCalculator)
-        {
-            return mNodeCalculator->getCurrentSearchDepth();
-        }
+        LogError(MakeString() << "Exception caught during ComputerPlayer timerEvent. Details: " << exc.what());
+    }
+}
+
+
+void ComputerPlayer::setTweaker(Tweaker *inTweaker)
+{
+    boost::mutex::scoped_lock lock(mImpl->mMutex);
+    mImpl->mTweaker = inTweaker;
+}
+
+
+int ComputerPlayer::searchDepth() const
+{
+    boost::mutex::scoped_lock lock(mImpl->mMutex);
+    return mImpl->mSearchDepth;
+}
+
+
+void ComputerPlayer::setSearchDepth(int inSearchDepth)
+{
+    boost::mutex::scoped_lock lock(mImpl->mMutex);
+    mImpl->mSearchDepth = inSearchDepth;
+}
+
+
+int ComputerPlayer::searchWidth() const
+{
+    boost::mutex::scoped_lock lock(mImpl->mMutex);
+    return mImpl->mSearchWidth;
+}
+
+
+void ComputerPlayer::setSearchWidth(int inSearchWidth)
+{
+    boost::mutex::scoped_lock lock(mImpl->mMutex);
+    mImpl->mSearchWidth = inSearchWidth;
+}
+
+
+int ComputerPlayer::currentSearchDepth() const
+{
+    boost::mutex::scoped_lock lock(mImpl->mMutex);
+    if (mImpl->mNodeCalculator)
+    {
+        return mImpl->mNodeCalculator->getCurrentSearchDepth();
+    }
+    return 0;
+}
+
+
+int ComputerPlayer::moveSpeed() const
+{
+    boost::mutex::scoped_lock lock(mImpl->mMutex);
+    return mImpl->mBlockMover->speed();
+}
+
+
+void ComputerPlayer::setMoveSpeed(int inMoveSpeed)
+{
+    boost::mutex::scoped_lock lock(mImpl->mMutex);
+    mImpl->mBlockMover->setSpeed(inMoveSpeed);
+}
+
+
+void ComputerPlayer::setEvaluator(std::auto_ptr<Evaluator> inEvaluator)
+{
+    boost::mutex::scoped_lock lock(mImpl->mMutex);
+    mImpl->mEvaluator.reset(inEvaluator.release());
+}
+
+
+int ComputerPlayer::workerCount() const
+{
+    boost::mutex::scoped_lock lock(mImpl->mMutex);
+    return mImpl->mWorkerCount;
+}
+
+
+void ComputerPlayer::setWorkerCount(int inWorkerCount)
+{
+    boost::mutex::scoped_lock lock(mImpl->mMutex);
+    if (inWorkerCount == 0)
+    {
+        mImpl->mWorkerCount = GetWorkerCount();
+    }
+    else
+    {
+        mImpl->mWorkerCount = inWorkerCount;
+    }
+}
+
+
+int ComputerPlayer::Impl::calculateRemainingTimeMs(const Game & inGame) const
+{
+    // Already locked.
+
+    const ComputerGame & game(dynamic_cast<const ComputerGame&>(inGame));
+
+    int firstOccupiedRow = game.currentNode()->gameState().firstOccupiedRow();
+    int currentBlockRow = game.activeBlock().row();
+    int numBlockRows = std::max<int>(game.activeBlock().grid().rowCount(), game.activeBlock().grid().columnCount());
+    int numRemainingRows = firstOccupiedRow - (currentBlockRow + numBlockRows);
+    if (numRemainingRows <= 2)
+    {
         return 0;
     }
 
+    double numRowsPerSecond = Gravity::CalculateSpeed(game.level());
+    double remainingTime = 1000 * static_cast<double>(numRemainingRows) / numRowsPerSecond;
+    int maxRequiredMoves = game.activeBlock().numRotations() + (game.columnCount()/2);
+    int moveSpeed = mBlockMover->speed();
+    double timeRequiredForMove = 1000.0 * static_cast<double>(maxRequiredMoves) / static_cast<double>(moveSpeed);
+    return static_cast<int>(0.5 + remainingTime - timeRequiredForMove);
+}
 
-    void ComputerPlayerImpl::setWorkerCount(int inWorkerCount)
+
+void ComputerPlayer::Impl::timerEvent()
+{
+    // Already locked.
+
+    if (mNodeCalculator)
     {
-        if (inWorkerCount == 0)
+        // Apparently an error has occured, which has been logged by the NodeCalculator object.
+        // All we can do at this point is reset the pointer so that a new object will be created
+        // at the next timer event.
+        if (mNodeCalculator->status() == NodeCalculator::Status_Error)
         {
-            mWorkerCount = GetWorkerCount();
+            mNodeCalculator.reset();
+            return;
+        }
+
+        // Check if the computer player has finished.
+        if (mNodeCalculator->status() != NodeCalculator::Status_Finished)
+        {
+            int numPrecalculatedMoves = -1;
+            int remainingTime = -1;
+            {
+                ScopedReader<Game> wgame(mProtectedGame);
+                const ComputerGame & game(dynamic_cast<const ComputerGame&>(*wgame.get()));
+                numPrecalculatedMoves = game.numPrecalculatedMoves();
+                if (numPrecalculatedMoves == 0)
+                {
+                    remainingTime = calculateRemainingTimeMs(game);
+                }
+            }
+
+            if (numPrecalculatedMoves == 0)
+            {
+                // Check if there is the danger of crashing the current block.
+
+                if (remainingTime <= 1000)
+                {
+                    mNodeCalculator->stop();
+                }
+            }
+            // else: keep working.
         }
         else
         {
-            mWorkerCount = inWorkerCount;
-        }
-    }
-
-
-    void ComputerPlayerImpl::onTimerEvent(Poco::Timer & )
-    {
-        try
-        {
-            timerEvent();
-        }
-        catch (const std::exception & exc)
-        {
-            LogError(MakeString() << "ComputerPlayerImpl::onTimerEvent: " << exc.what());
-        }
-    }
-
-
-    void ComputerPlayerImpl::timerEvent()
-    {
-        if (mNodeCalculator)
-        {
-            // Check if the computer player has finished.
-            if (mNodeCalculator->status() != NodeCalculator::Status_Finished)
+            if (NodePtr resultNode = mNodeCalculator->result())
             {
-                int numPrecalculatedMoves = -1;
-                int remainingTime = -1;
+                if (!resultNode->gameState().isGameOver())
                 {
-                    ScopedReader<Game> wgame(mProtectedGame);
-                    const ComputerGame & game(dynamic_cast<const ComputerGame&>(*wgame.get()));
-                    numPrecalculatedMoves = game.numPrecalculatedMoves();
-                    if (numPrecalculatedMoves == 0)
+                    ScopedReaderAndWriter<Game> wgame(mProtectedGame);
+                    ComputerGame & game(dynamic_cast<ComputerGame&>(*wgame.get()));
+
+                    // The created node should follow the last precalculated one.
+                    if (resultNode->depth() == game.lastPrecalculatedNode()->depth() + 1)
                     {
-                        remainingTime = calculateRemainingTimeMs(game);
+                        game.appendPrecalculatedNode(resultNode);
+
+                    }
+                    else
+                    {
+                        LogWarning("Computer is TOO SLOW!!");
                     }
                 }
-
-                if (numPrecalculatedMoves == 0)
-                {
-                    // Check if there is the danger of crashing the current block.
-
-                    if (remainingTime <= 1000)
-                    {
-                        mNodeCalculator->stop();
-                    }
-                }
-                // else: keep working.
             }
             else
             {
-                if (NodePtr resultNode = mNodeCalculator->result())
-                {
-                    if (!resultNode->gameState().isGameOver())
-                    {
-                        ScopedReaderAndWriter<Game> wgame(mProtectedGame);
-                        ComputerGame & game(dynamic_cast<ComputerGame&>(*wgame.get()));
-
-                        // The created node should follow the last precalculated one.
-                        if (resultNode->depth() == game.lastPrecalculatedNode()->depth() + 1)
-                        {
-                            game.appendPrecalculatedNode(resultNode);
-
-                        }
-                        else
-                        {
-                            LogWarning("Computer is TOO SLOW!!");
-                        }
-                    }
-                }
-                else
-                {
-                    LogError("NodeCalculator did not create any results.");
-                }
-
-                // Once the computer has finished it's job we destroy the object.
-                mNodeCalculator.reset();
+                LogError("NodeCalculator did not create any results.");
             }
+
+            // Once the computer has finished it's job we destroy the object.
+            mNodeCalculator.reset();
         }
-        else
+    }
+    else
+    {
+        ScopedReader<Game> wgame(mProtectedGame);
+        const ComputerGame & game(dynamic_cast<const ComputerGame&>(*wgame.get()));
+        if (!game.lastPrecalculatedNode()->gameState().isGameOver())
         {
-            ScopedReader<Game> wgame(mProtectedGame);
-            const ComputerGame & game(dynamic_cast<const ComputerGame&>(*wgame.get()));
-            if (!game.lastPrecalculatedNode()->gameState().isGameOver())
+            int numPrecalculated = game.lastPrecalculatedNode()->depth() - game.currentNode()->depth();
+            if (numPrecalculated < 8)
             {
-                int numPrecalculated = game.lastPrecalculatedNode()->depth() - game.currentNode()->depth();
-                if (numPrecalculated < 8)
+                Assert(!mNodeCalculator);
+
+                //
+                // Clone the starting node
+                //
+                std::auto_ptr<GameStateNode> endNode = game.lastPrecalculatedNode()->clone();
+                Assert(endNode->children().empty());
+                Assert(endNode->depth() >= game.currentNode()->depth());
+
+
+                //
+                // Create the list of future blocks
+                //
+                BlockTypes futureBlocks;
+                game.getFutureBlocksWithOffset(endNode->depth(), mSearchDepth, futureBlocks);
+
+
+                //
+                // Fill list of search widths (using the same width for each level).
+                //
+                std::vector<int> widths;
+                for (size_t idx = 0; idx != futureBlocks.size(); ++idx)
                 {
-                    Assert(!mNodeCalculator);
-
-                    //
-                    // Clone the starting node
-                    //
-                    std::auto_ptr<GameStateNode> endNode = game.lastPrecalculatedNode()->clone();
-                    Assert(endNode->children().empty());
-                    Assert(endNode->depth() >= game.currentNode()->depth());
-
-
-                    //
-                    // Create the list of future blocks
-                    //
-                    BlockTypes futureBlocks;
-                    game.getFutureBlocksWithOffset(endNode->depth(), mSearchDepth, futureBlocks);
-
-
-                    //
-                    // Fill the std::vector<int> vector (use the same width for each level).
-                    //
-                    std::vector<int> widths;
-                    for (size_t idx = 0; idx != futureBlocks.size(); ++idx)
-                    {
-                        widths.push_back(mSearchWidth);
-                    }
-
-
-                    //
-                    // Create and start the NodeCalculator.
-                    //
-                    Assert(mWorkerPool.getActiveWorkerCount() == 0);
-                    if (mWorkerCount == 0)
-                    {
-                        mWorkerCount = GetWorkerCount();
-                    }
-                    mWorkerPool.resize(mWorkerCount);
-
-                    if (mTweaker)
-                    {
-                        mEvaluator.reset(mTweaker->updateInfo(game.getGameState(),
-                                                              mSearchDepth,
-                                                              mSearchWidth).release());
-                    }
-                    mNodeCalculator.reset(new NodeCalculator(endNode, futureBlocks, widths, mEvaluator->clone(), mWorkerPool));
-                    mNodeCalculator->start();
+                    widths.push_back(mSearchWidth);
                 }
-                // else: we have plenty of precalculated nodes. Do nothing for know.
+
+
+                //
+                // Create and start the NodeCalculator object.
+                //
+                Assert(mWorkerPool.getActiveWorkerCount() == 0);
+                if (mWorkerCount == 0)
+                {
+                    mWorkerCount = GetWorkerCount();
+                }
+                mWorkerPool.resize(mWorkerCount);
+
+                if (mTweaker)
+                {
+                    mEvaluator.reset(
+                        mTweaker->updateInfo(game.getGameState(),
+                                             mSearchDepth,
+                                             mSearchWidth).release());
+                }
+                mNodeCalculator.reset(new NodeCalculator(endNode,
+                                                         futureBlocks,
+                                                         widths,
+                                                         mEvaluator->clone(),
+                                                         mWorkerPool));
+
+                mNodeCalculator->start();
             }
+            // else: we have plenty of precalculated nodes. Do nothing for know.
         }
     }
+}
 
-
-    ComputerPlayer::ComputerPlayer(const ThreadSafe<Game> & inProtectedGame,
-                                   std::auto_ptr<Evaluator> inEvaluator,
-                                   int inSearchDepth,
-                                   int inSearchWidth,
-                                   int inWorkerCount) :
-        mImpl(new ComputerPlayerImpl(inProtectedGame, inEvaluator, inSearchDepth, inSearchWidth, inWorkerCount))
-    {
-    }
-
-
-    ComputerPlayer::ComputerPlayer(const ThreadSafe<Game> & inProtectedGame,
-                                   int inSearchDepth,
-                                   int inSearchWidth,
-                                   int inWorkerCount) :
-        mImpl(new ComputerPlayerImpl(inProtectedGame, inSearchDepth, inSearchWidth, inWorkerCount))
-    {
-    }
-
-
-    ComputerPlayer::~ComputerPlayer()
-    {
-        delete mImpl;
-        mImpl = 0;
-    }
-
-
-    int ComputerPlayer::searchDepth() const
-    {
-        return mImpl->searchDepth();
-    }
-
-
-    void ComputerPlayer::setSearchDepth(int inSearchDepth)
-    {
-        mImpl->setSearchDepth(inSearchDepth);
-    }
-
-
-    int ComputerPlayer::currentSearchDepth() const
-    {
-        return mImpl->currentSearchDepth();
-    }
-
-
-    int ComputerPlayer::searchWidth() const
-    {
-        return mImpl->searchWidth();
-    }
-
-
-    void ComputerPlayer::setSearchWidth(int inSearchWidth)
-    {
-        mImpl->setSearchWidth(inSearchWidth);
-    }
-
-
-    int ComputerPlayer::moveSpeed() const
-    {
-        return mImpl->moveSpeed();
-    }
-
-
-    void ComputerPlayer::setMoveSpeed(int inMoveSpeed)
-    {
-        mImpl->setMoveSpeed(inMoveSpeed);
-    }
-
-
-    void ComputerPlayer::setEvaluator(std::auto_ptr<Evaluator> inEvaluator)
-    {
-        mImpl->setEvaluator(inEvaluator);
-    }
-
-
-    const Evaluator & ComputerPlayer::evaluator() const
-    {
-        return mImpl->evaluator();
-    }
-
-
-    int ComputerPlayer::workerCount() const
-    {
-        return mImpl->workerCount();
-    }
-
-
-    void ComputerPlayer::setWorkerCount(int inWorkerCount)
-    {
-        mImpl->setWorkerCount(inWorkerCount);
-    }
 
 } // namespace Tetris
