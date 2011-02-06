@@ -39,6 +39,8 @@ public:
 
     SimpleGame & simpleGame();
 
+    void resetGame();
+
 private:
     friend bool operator==(const Player & lhs, const Player & rhs);
     friend bool operator<(const Player & lhs, const Player & rhs);

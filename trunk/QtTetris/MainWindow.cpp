@@ -17,7 +17,7 @@ typedef boost::shared_ptr<Tetris::SimpleGame> SimpleGamePtr;
 
 enum
 {
-    cPlayerCount = 1
+    cPlayerCount = 4
 };
 
 
@@ -109,7 +109,13 @@ MainWindow::MainWindow(QWidget *parent) :
 
     Logger::Instance().setLogHandler(boost::bind(&MainWindow::logMessage, this, _1));
 
-    restart();
+    Players & players = Model::Instance().mPlayers;
+    for (size_t idx = 0; idx < cPlayerCount; ++idx)
+    {
+        Player player(players[idx]);
+        mTetrisWidgets[idx]->setGame(&player.simpleGame());
+        Model::Instance().mMultiplayerGame.join(player);
+    }
 }
 
 
@@ -157,9 +163,10 @@ void MainWindow::restart()
         Player player(players[idx]);
         mTetrisWidgets[idx]->setGame(0);
         Model::Instance().mMultiplayerGame.leave(player);
+        player.resetGame();
     }
 
-    players.clear(); // deadlock, yay!!
+    players.clear();
 
     // Assemble Team A
     for (size_t idx = 0; idx < cPlayerCount/2; ++idx)

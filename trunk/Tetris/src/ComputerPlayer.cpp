@@ -64,6 +64,12 @@ public:
 
     ~Impl()
     {
+        boost::mutex::scoped_lock lock(mMutex);
+        if (mNodeCalculator)
+        {
+            mNodeCalculator->stop();
+        }
+        mWorkerPool.interruptAndClearQueue();
     }
 
     void timerEvent();
