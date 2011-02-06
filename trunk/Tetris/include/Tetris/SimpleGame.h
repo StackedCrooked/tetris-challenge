@@ -5,7 +5,7 @@
 #include "Tetris/Direction.h"
 #include "Tetris/Block.h"
 #include "Tetris/GameStateStats.h"
-#include <boost/signals2.hpp>
+#include "Tetris/PlayerType.h"
 #include <boost/scoped_ptr.hpp>
 #include <cstddef>
 #include <stdexcept>
@@ -18,13 +18,6 @@ namespace Tetris {
 class Game;
 class GameState;
 template<class Variable> class ThreadSafe;
-
-
-enum PlayerType
-{
-    PlayerType_Human,
-    PlayerType_Computer
-};
 
 
 /**
@@ -119,6 +112,7 @@ public:
 
 
     // For multiplayer crazyness.
+    void applyLinePenalty(int inNumberOfLinesMadeByOpponent);
     void setActiveBlock(const Block & inBlock);
     void setGameGrid(const Grid & inGrid);
 
@@ -130,6 +124,7 @@ private:
     struct Impl;
     Impl * mImpl;
 };
+
 
 } // namespace Tetris
 

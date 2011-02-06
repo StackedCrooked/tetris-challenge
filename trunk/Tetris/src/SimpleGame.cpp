@@ -163,13 +163,21 @@ PlayerType SimpleGame::playerType() const
 
 void SimpleGame::registerEventHandler(EventHandler * inEventHandler)
 {
-    mImpl->mEventHandlers.insert(inEventHandler);
+    Impl::EventHandlers::iterator it = mImpl->mEventHandlers.find(inEventHandler);
+    if (it == mImpl->mEventHandlers.end())
+    {
+        mImpl->mEventHandlers.insert(inEventHandler);
+    }
 }
 
 
 void SimpleGame::unregisterEventHandler(EventHandler * inEventHandler)
 {
-    mImpl->mEventHandlers.erase(inEventHandler);
+    Impl::EventHandlers::iterator it = mImpl->mEventHandlers.find(inEventHandler);
+    if (it != mImpl->mEventHandlers.end())
+    {
+        mImpl->mEventHandlers.erase(it);
+    }
 }
 
 
@@ -188,6 +196,13 @@ GameStateStats SimpleGame::stats() const
                           gameState.numDoubles(),
                           gameState.numTriples(),
                           gameState.numTetrises());
+}
+
+
+void SimpleGame::applyLinePenalty(int inNumberOfLinesMadeByOpponent)
+{
+    ScopedReaderAndWriter<Game> rwgame(mImpl->mGame);
+    rwgame->applyLinePenalty(inNumberOfLinesMadeByOpponent);
 }
 
 

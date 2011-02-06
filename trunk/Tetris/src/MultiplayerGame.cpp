@@ -12,42 +12,47 @@
 namespace Tetris {
 
 
-struct MultiplayerGame::Impl : public Game::EventHandler,
+struct MultiplayerGame::Impl : public SimpleGame::EventHandler,
                                boost::noncopyable
 {
-    typedef MultiplayerGame::Games Games;
+    typedef MultiplayerGame::Players Players;
 
-    virtual void onGameStateChanged(Game * )
+    virtual void onGameStateChanged(SimpleGame * )
     {
         // Not interested.
     }
 
-    virtual void onLinesCleared(Game * inGame, int inLineCount)
+    Player findPlayer(SimpleGame * inSimpleGame) const
     {
-        // If number of lines >= 2 then apply a line penalty to each non-allied player.
-        // Note: we currently assume that all other players are non-allied.
-        int numGames = mGames.size();
-        int gameIndex = 0;
-        Games::iterator it = mGames.begin(), end = mGames.end();
+        Players::const_iterator it = mPlayers.begin(), end = mPlayers.end();
         for (; it != end; ++it)
         {
-            const SimpleGame & simpleGame(**it);
-            ThreadSafe<Game> threadSafeGame(simpleGame.game());
-            ScopedReaderAndWriter<Game> rwgame(threadSafeGame);
-            if (rwgame.get() != inGame)
+            Player player(*it);
+            if (&player.simpleGame() == inSimpleGame)
             {
-                if (inLineCount > 1)
-                {
-                    LogInfo(MakeString() << "Penalty given to player. (Lines made: " << inLineCount << ")");
-                }
-                rwgame.get()->applyLinePenalty(inLineCount);
+                return player;
             }
-            gameIndex++;
         }
-        assert(gameIndex == numGames);
+        throw std::runtime_error("Player not found!");
     }
 
-    Games mGames;
+    virtual void onLinesCleared(SimpleGame * inSimpleGame, int inLineCount)
+    {
+        // If number of lines >= 2 then apply a line penalty to each non-allied player.
+        Player activePlayer(findPlayer(inSimpleGame));
+
+        Players::iterator it = mPlayers.begin(), end = mPlayers.end();
+        for (; it != end; ++it)
+        {
+            Player player(*it);
+            if (player.teamName() != activePlayer.teamName())
+            {
+                player.simpleGame().applyLinePenalty(inLineCount);
+            }
+        }
+    }
+
+    Players mPlayers;
 };
 
 
@@ -63,31 +68,23 @@ MultiplayerGame::~MultiplayerGame()
 }
 
 
-void MultiplayerGame::join(SimpleGame & inGame)
+void MultiplayerGame::join(Player inPlayer)
 {
-    mImpl->mGames.insert(&inGame);
-
-    ScopedReaderAndWriter<Game> rwgame(inGame.game());
-    rwgame->registerEventHandler(mImpl);
+    mImpl->mPlayers.insert(inPlayer);
+    inPlayer.simpleGame().registerEventHandler(mImpl);
 }
 
 
-void MultiplayerGame::leave(SimpleGame & inGame)
+void MultiplayerGame::leave(Player inPlayer)
 {
-    {
-        ScopedReaderAndWriter<Game> rwgame(inGame.game());
-        rwgame->unregisterEventHandler(mImpl);
-    }
-    // calling erase(..) on a vector is slow,
-    // but that should not be an issue here
-    mImpl->mGames.erase(&inGame);
-
+    inPlayer.simpleGame().unregisterEventHandler(mImpl);
+    mImpl->mPlayers.erase(inPlayer);
 }
 
 
-const MultiplayerGame::Games & MultiplayerGame::games() const
+const MultiplayerGame::Players & MultiplayerGame::players() const
 {
-    return mImpl->mGames;
+    return mImpl->mPlayers;
 }
 
 
