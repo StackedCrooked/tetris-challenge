@@ -28,13 +28,17 @@ set(EXECUTABLE testsuite)
 set(SOLUTIONDIR ${TETRIS_SOURCE_DIR}/)
 set(OUTDIR ${SOLUTIONDIR}Build/${PLATFORM}/${ARCH}/${CMAKE_BUILD_TYPE}/)
 set(POCO ${SOLUTIONDIR}3rdParty/Poco/)
-set(WARNING_OPTIONS "-Wall -Werror -Wno-sign-compare")
+set(WARNING_OPTIONS "-Wall -Wno-sign-compare")
 set(CXX_FLAGS_Release "${CXX_FLAGS} ${WARNING_OPTIONS} -O3 -DNDEBUG")
 set(CXX_FLAGS_Debug   "${CXX_FLAGS} ${WARNING_OPTIONS} -ggdb3")
 set(FINAL_COMPILE_FLAGS "${CXX_FLAGS_${CMAKE_BUILD_TYPE}}")
 
 
-# APPLE uses the Boost version installed with MacPorts.
+# Add Poco dependency before boost to avoid including Poco from /opt/local/include
+include_directories(${POCO}/Foundation/include ${POCO}/CppUnit/include)
+link_directories(${POCO}lib/${PLATFORM}/${ARCH})
+
+# Boost dependency
 if(APPLE)
 message("==> APPLE uses Boost from MacPorts <===")
 include_directories("/opt/local/include")
@@ -45,10 +49,6 @@ set(BOOST ${SOLUTIONDIR}3rdParty/Boost_1_44_0/)
 include_directories(${BOOST} )
 link_directories(${BOOST}lib/${PLATFORM}/${ARCH})
 endif()
-
-
-include_directories(${POCO}/Foundation/include ${POCO}/CppUnit/include)
-link_directories(${POCO}lib/${PLATFORM}/${ARCH})
 
 
 add_subdirectory(${SOLUTIONDIR}Tetris ${OUTDIR}Tetris)
