@@ -350,16 +350,13 @@ Game::~Game()
 
 void Game::registerEventHandler(EventHandler * inEventHandler)
 {
-    mEventHandlers.push_back(inEventHandler);
+    mEventHandlers.insert(inEventHandler);
 }
 
 
 void Game::unregisterEventHandler(EventHandler * inEventHandler)
 {
-    mEventHandlers.erase(
-        std::remove(mEventHandlers.begin(),
-                    mEventHandlers.end(),
-                    inEventHandler));
+    mEventHandlers.erase(inEventHandler);
 }
 
 
@@ -372,9 +369,10 @@ void Game::onChanged()
 
 void Game::onChangedImpl()
 {
-    for (size_t idx = 0; idx < mEventHandlers.size(); ++idx)
+    EventHandlers::iterator it = mEventHandlers.begin(), end = mEventHandlers.end();
+    for (; it != end; ++it)
     {
-        Game::EventHandler * eventHandler(mEventHandlers[idx]);
+        Game::EventHandler * eventHandler(*it);
         eventHandler->onGameStateChanged(this);
     }
 }
@@ -389,9 +387,10 @@ void Game::onLinesCleared(int inLineCount)
 
 void Game::onLinesClearedImpl(int inLineCount)
 {
-    for (size_t idx = 0; idx < mEventHandlers.size(); ++idx)
+    EventHandlers::iterator it = mEventHandlers.begin(), end = mEventHandlers.end();
+    for (; it != end; ++it)
     {
-        Game::EventHandler * eventHandler(mEventHandlers[idx]);
+        Game::EventHandler * eventHandler(*it);
         eventHandler->onLinesCleared(this, inLineCount);
     }
 }

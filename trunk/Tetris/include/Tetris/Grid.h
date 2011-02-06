@@ -9,7 +9,7 @@
 namespace Tetris
 {
 
-    typedef GenericGrid<BlockType, Allocator_Vector> Grid;
+    typedef GenericGrid<BlockType, Allocator_Malloc> Grid;
 
 } // namespace Tetris
 

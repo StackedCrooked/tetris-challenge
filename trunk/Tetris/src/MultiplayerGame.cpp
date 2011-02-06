@@ -74,12 +74,14 @@ void MultiplayerGame::join(SimpleGame & inGame)
 
 void MultiplayerGame::leave(SimpleGame & inGame)
 {
+    {
+        ScopedReaderAndWriter<Game> rwgame(inGame.game());
+        rwgame->unregisterEventHandler(mImpl);
+    }
     // calling erase(..) on a vector is slow,
     // but that should not be an issue here
     mImpl->mGames.erase(&inGame);
 
-    ScopedReaderAndWriter<Game> rwgame(inGame.game());
-    rwgame->unregisterEventHandler(mImpl);
 }
 
 

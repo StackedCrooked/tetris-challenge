@@ -11,6 +11,7 @@
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread.hpp>
 #include <memory>
+#include <set>
 
 
 namespace Tetris {
@@ -111,7 +112,7 @@ protected:
     int mOverrideLevel;
     mutable boost::mutex mChangedSignalMutex;
 
-    typedef std::vector<EventHandler*> EventHandlers;
+    typedef std::set<EventHandler*> EventHandlers;
     EventHandlers mEventHandlers;
 
 private:
