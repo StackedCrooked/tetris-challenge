@@ -2,6 +2,7 @@
 #define TETRIS_ALLOCATOR_H_INCLUDED
 
 
+#include "Tetris/Assert.h"
 #include <cstddef>
 #include <cstdlib>
 #include <vector>
@@ -51,17 +52,21 @@ public:
 
     Allocator_Malloc(size_t inSize, const T & inInitialValue);
 
-    ~Allocator_Malloc();
-
-    T * get();
-
-    const T * get() const;
-
-private:
     Allocator_Malloc(const Allocator_Malloc&);
+
     Allocator_Malloc& operator=(const Allocator_Malloc&);
 
+    ~Allocator_Malloc();
+
+    T & get(size_t inIndex);
+
+    const T & get(size_t inIndex) const;
+
+    void set(size_t inIndex, const T & inValue);
+
+private:
     T * mBuffer;
+    size_t mSize;
 };
 
 
@@ -121,16 +126,41 @@ const T * Allocator_Vector<T>::get() const
 
 template<class T>
 Allocator_Malloc<T>::Allocator_Malloc(size_t inSize) :
-    mBuffer(malloc(sizeof(T) * inSize))
+    mBuffer(reinterpret_cast<T*>(malloc(sizeof(T) * inSize))),
+    mSize(inSize)
 {
 }
 
 
 template<class T>
 Allocator_Malloc<T>::Allocator_Malloc(size_t inSize, const T & inInitialValue) :
-    mBuffer(reinterpret_cast<T*>(malloc(sizeof(T) * inSize)))
+    mBuffer(reinterpret_cast<T*>(malloc(sizeof(T) * inSize))),
+    mSize(inSize)
 {
     Allocator_FillBuffer(mBuffer, inSize, inInitialValue);
+}
+
+
+template<class T>
+Allocator_Malloc<T>::Allocator_Malloc(const Allocator_Malloc & rhs) :
+    mBuffer(reinterpret_cast<T*>(malloc(sizeof(T) * rhs.mSize))),
+    mSize(rhs.mSize)
+{
+    std::copy(rhs.mBuffer, rhs.mBuffer + rhs.mSize, mBuffer);
+}
+
+
+template<class T>
+Allocator_Malloc<T> & Allocator_Malloc<T>::operator=(const Allocator_Malloc & rhs)
+{
+    if (mBuffer != rhs.mBuffer)
+    {
+        free(mBuffer);
+        mBuffer = reinterpret_cast<T*>(malloc(sizeof(T) * rhs.mSize));
+        mSize = rhs.mSize;
+        std::copy(rhs.mBuffer, rhs.mBuffer + rhs.mSize, mBuffer);
+    }
+    return *this;
 }
 
 
@@ -142,16 +172,26 @@ Allocator_Malloc<T>::~Allocator_Malloc()
 
 
 template<class T>
-T * Allocator_Malloc<T>::get()
+T & Allocator_Malloc<T>::get(size_t inIndex)
 {
-    return mBuffer;
+    Assert(inIndex <= mSize);
+    return mBuffer[inIndex];
 }
 
 
 template<class T>
-const T * Allocator_Malloc<T>::get() const
+const T & Allocator_Malloc<T>::get(size_t inIndex) const
 {
-    return mBuffer;
+    Assert(inIndex <= inIndex);
+    return mBuffer[inIndex];
+}
+
+
+template<class T>
+void Allocator_Malloc<T>::set(size_t inIndex, const T & inValue)
+{
+    Assert(inIndex <= inIndex);
+    mBuffer[inIndex] = inValue;
 }
 
 

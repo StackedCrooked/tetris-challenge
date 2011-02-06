@@ -137,32 +137,30 @@ void MainWindow::restart()
     assert(Model::Instance().mTetrisGames.size() == mTetrisWidgets.size());
     std::vector<SimpleGamePtr> & theTetrisGames = Model::Instance().mTetrisGames;
 
+    // Unregister all.
     for (size_t idx = 0; idx < theTetrisGames.size(); ++idx)
     {
+        // Forces unregistration of the event handlers.
+        mTetrisWidgets[idx]->setGame(0);
+
         SimpleGamePtr oldSimpleGamePtr(theTetrisGames[idx]);
         if (oldSimpleGamePtr)
         {
             Model::Instance().mMultiplayerGame.leave(*oldSimpleGamePtr);
         }
 
-        // Forces unregistration of the event handlers.
-        mTetrisWidgets[idx]->setGame(0);
-
         // Make sure the previous game has been deleted before creating a new one.
         theTetrisGames[idx].reset();
+    }
 
+    for (size_t idx = 0; idx < theTetrisGames.size(); ++idx)
+    {
+        SimpleGamePtr simpleGamePtr(new SimpleGame(cRowCount, cColumnCount, PlayerType_Computer));
 
-        SimpleGamePtr simpleGamePtr;
-//        if (idx == 0)
-//        {
-//            simpleGamePtr.reset(new SimpleGame(cRowCount, cColumnCount, PlayerType_Human));
-//        }
-//        else
-        {
-            simpleGamePtr.reset(new SimpleGame(cRowCount, cColumnCount, PlayerType_Computer));
-        }
         theTetrisGames[idx] = simpleGamePtr;
+
         Model::Instance().mMultiplayerGame.join(*simpleGamePtr);
+
         mTetrisWidgets[idx]->setGame(simpleGamePtr.get());
     }
 }
