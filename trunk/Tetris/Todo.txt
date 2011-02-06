@@ -1,12 +1,14 @@
 Todo
 ----
+- Fix unittest build.
 - Teams
-- Show GUI counters & score
+- Online multiplayer
 - Sometimes penalty appears on the top of the grid. (Usually when game was already high, and tetris penalty.)
 - Sometimes AI seems to be dead. It just doesn't do anything anymore, letting all blocks slowly drop to the floor.
 - Qt Playable game
 - Implement Human vs Computer modus.
 - Multiplayer
+v QtTetris: paint stats
 v Differentiate between Human and Computer game objects.
 v Introduce ScopedReader and ScopedReaderAndWriter. Use read lock for the ScopedReader.
 v Rename TetrisCore to Tetris

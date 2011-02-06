@@ -37,6 +37,7 @@ SOURCES += \
     ../Tetris/src/MultiThreadedNodeCalculator.cpp \
     ../Tetris/src/NodeCalculator.cpp \
     ../Tetris/src/NodeCalculatorImpl.cpp \
+    ../Tetris/src/Player.cpp \
     ../Tetris/src/SimpleGame.cpp \
     ../Tetris/src/SingleThreadedNodeCalculator.cpp \
     ../Tetris/src/Threading.cpp \
@@ -81,6 +82,7 @@ HEADERS += \
     ../Tetris/include/Tetris/NodeCalculator.h \
     ../Tetris/include/Tetris/NodeCalculatorImpl.h \
     ../Tetris/include/Tetris/NodePtr.h \
+    ../Tetris/include/Tetris/Player.h \
     ../Tetris/include/Tetris/SimpleGame.h \
     ../Tetris/include/Tetris/SingleThreadedNodeCalculator.h \
     ../Tetris/include/Tetris/Tetris.h \

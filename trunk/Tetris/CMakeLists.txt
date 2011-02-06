@@ -36,6 +36,7 @@ add_library(Tetris
     include/Tetris/NodeCalculator.h
     include/Tetris/NodeCalculatorImpl.h
     include/Tetris/NodePtr.h
+    include/Tetris/Player.h
     include/Tetris/SimpleGame.h
     include/Tetris/SingleThreadedNodeCalculator.h
     include/Tetris/Tetris.h
@@ -69,6 +70,7 @@ add_library(Tetris
     src/MultiThreadedNodeCalculator.cpp
     src/NodeCalculator.cpp
     src/NodeCalculatorImpl.cpp
+    src/Player.cpp
     src/SimpleGame.cpp
     src/SingleThreadedNodeCalculator.cpp
     src/Threading.cpp
