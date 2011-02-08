@@ -57,6 +57,7 @@ public:
         mSearchDepth(inSearchDepth),
         mSearchWidth(inSearchWidth),
         mWorkerCount(inWorkerCount),
+        mGameDepth(0),
         mQuitFlag(false),
         mTimer(10, 10)
     {
@@ -85,6 +86,7 @@ public:
     int mSearchDepth;
     int mSearchWidth;
     int mWorkerCount;
+    int mGameDepth;
     bool mQuitFlag;
     boost::mutex mMutex;
     Poco::Timer mTimer;
@@ -265,6 +267,21 @@ void ComputerPlayer::Impl::timerEvent()
             {
                 ScopedReader<Game> wgame(mProtectedGame);
                 const ComputerGame & game(dynamic_cast<const ComputerGame&>(*wgame.get()));
+
+                //
+                // Check if the game state has not been changed while calculating the next move
+                //
+                Assert(mGameDepth <= game.lastPrecalculatedNode()->depth());
+                if (mGameDepth < game.lastPrecalculatedNode()->depth())
+                {
+                    LogInfo("AAARGGHH All our work is for naught");
+
+                    // Game state has change, so all calculations up until now become invalid.
+                    // Reset the node calculator and so that it will be be restarted in the next iteration.
+                    mNodeCalculator.reset();
+                    return;
+                }
+
                 numPrecalculatedMoves = game.numPrecalculatedMoves();
                 if (numPrecalculatedMoves == 0)
                 {
@@ -319,7 +336,8 @@ void ComputerPlayer::Impl::timerEvent()
         const ComputerGame & game(dynamic_cast<const ComputerGame&>(*wgame.get()));
         if (!game.lastPrecalculatedNode()->gameState().isGameOver())
         {
-            int numPrecalculated = game.lastPrecalculatedNode()->depth() - game.currentNode()->depth();
+            mGameDepth = game.lastPrecalculatedNode()->depth();
+            int numPrecalculated = mGameDepth - game.currentNode()->depth();
             if (numPrecalculated < 8)
             {
                 Assert(!mNodeCalculator);
