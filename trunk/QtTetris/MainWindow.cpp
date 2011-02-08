@@ -50,6 +50,7 @@ public:
     void reset()
     {
         LogInfo(MakeString() << "RESET!!!");
+        mMultiplayerGame.reset();
         mMultiplayerGame.reset(new MultiplayerGame);
         for (size_t idx = 0; idx < cPlayerCount; ++idx)
         {
