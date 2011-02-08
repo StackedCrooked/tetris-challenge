@@ -23,309 +23,6 @@ namespace Tetris {
 extern const int cMaxLevel;
 
 
-HumanGame::HumanGame(size_t inNumRows, size_t inNumCols) :
-    Game(inNumRows, inNumCols),
-    mGameState(new GameState(inNumRows, inNumCols))
-{
-}
-
-
-HumanGame::HumanGame(const Game & inGame) :
-    Game(inGame.rowCount(), inGame.columnCount()),
-    mGameState(new GameState(inGame.getGameState()))
-{
-}
-
-
-GameState & HumanGame::getGameState()
-{
-    if (!mGameState.get())
-    {
-        throw std::logic_error("Null pointer deref: mGameState");
-    }
-    return *mGameState;
-}
-
-
-const GameState & HumanGame::getGameState() const
-{
-    if (!mGameState.get())
-    {
-        throw std::logic_error("Null pointer deref: mGameState");
-    }
-    return *mGameState;
-}
-
-
-void HumanGame::setGrid(const Grid & inGrid)
-{
-    mGameState->setGrid(inGrid);
-    onChanged();
-}
-
-
-static int GetRowDelta(MoveDirection inDirection)
-{
-    switch (inDirection)
-    {
-        case MoveDirection_Up:
-        {
-            return -1;
-        }
-        case MoveDirection_Down:
-        {
-            return 1;
-        }
-        default:
-        {
-            return 0;
-        }
-    }
-}
-
-
-static int GetColumnDelta(MoveDirection inDirection)
-{
-    switch (inDirection)
-    {
-        case MoveDirection_Left:
-        {
-            return -1;
-        }
-        case MoveDirection_Right:
-        {
-            return 1;
-        }
-        default:
-        {
-            return 0;
-        }
-    }
-}
-
-
-bool HumanGame::move(MoveDirection inDirection)
-{
-    if (isGameOver())
-    {
-        return false;
-    }
-
-    Block & block = *mActiveBlock;
-    size_t newRow = block.row() + GetRowDelta(inDirection);
-    size_t newCol = block.column() + GetColumnDelta(inDirection);
-    if (getGameState().checkPositionValid(block, newRow, newCol))
-    {
-        block.setRow(newRow);
-        block.setColumn(newCol);
-        onChanged();
-        return true;
-    }
-
-    if (inDirection != MoveDirection_Down)
-    {
-        // Do nothing
-        return false;
-    }
-
-    // Remember the number of lines in the current game state.
-    int oldLineCount = mGameState->numLines();
-
-    // Commit the block. This returns a new GameState object
-    // where any full lines have already been cleared.
-    mGameState.reset(mGameState->commit(block, GameOver(block.row() == 0)).release());
-
-    // Count the number of lines that were made in  the commit call.
-    int linesCleared = mGameState->numLines() - oldLineCount;
-    Assert(linesCleared >= 0);
-
-    // Notify the listeners.
-    if (linesCleared > 0)
-    {
-        onLinesCleared(linesCleared);
-    }
-
-    mCurrentBlockIndex++;
-    supplyBlocks();
-    mActiveBlock.reset(CreateDefaultBlock(mBlocks[mCurrentBlockIndex], mNumColumns).release());
-
-    onChanged();
-    return false;
-}
-
-
-ComputerGame::ComputerGame(size_t inNumRows, size_t inNumCols) :
-    Game(inNumRows, inNumCols),
-    mCurrentNode(GameStateNode::CreateRootNode(inNumRows, inNumCols).release())
-{
-}
-
-
-ComputerGame::ComputerGame(const Game & inGame) :
-    Game(inGame.rowCount(), inGame.columnCount()),
-    mCurrentNode(new GameStateNode(new GameState(inGame.getGameState()), new Balanced))
-{
-}
-
-
-GameState & ComputerGame::getGameState()
-{
-    return const_cast<GameState&>(mCurrentNode->gameState());
-}
-
-
-const GameState & ComputerGame::getGameState() const
-{
-    return mCurrentNode->gameState();
-}
-
-
-void ComputerGame::setGrid(const Grid & inGrid)
-{
-    clearPrecalculatedNodes();
-
-    NodePtr newNode(new GameStateNode(mCurrentNode, new GameState(inGrid), mCurrentNode->evaluator().clone().release()));
-    mCurrentNode->addChild(newNode);
-    Block oldActiveBlock(activeBlock());
-    navigateNodeDown();
-    setActiveBlock(oldActiveBlock);
-    getGameState().updateCache();
-    onChanged();
-}
-
-
-void ComputerGame::setCurrentNode(NodePtr inCurrentNode)
-{
-    Assert(inCurrentNode->depth() == mCurrentNode->depth() + 1);
-
-    mCurrentNode = inCurrentNode;
-    mCurrentBlockIndex = mCurrentNode->depth();
-    supplyBlocks();
-
-    mActiveBlock.reset(CreateDefaultBlock(mBlocks[mCurrentBlockIndex], mNumColumns).release());
-    onChanged();
-}
-
-
-size_t ComputerGame::numPrecalculatedMoves() const
-{
-    size_t countMovesAhead = 0;
-    const GameStateNode * tmp = mCurrentNode.get();
-    while (!tmp->children().empty())
-    {
-        tmp = tmp->children().begin()->get();
-        countMovesAhead++;
-    }
-    return countMovesAhead;
-}
-
-
-void ComputerGame::clearPrecalculatedNodes()
-{
-    mCurrentNode->children().clear();
-}
-
-
-const GameStateNode * ComputerGame::currentNode() const
-{
-    return mCurrentNode.get();
-}
-
-
-const GameStateNode * ComputerGame::lastPrecalculatedNode() const
-{
-    return mCurrentNode->endNode();
-}
-
-
-void ComputerGame::appendPrecalculatedNode(NodePtr inNode)
-{
-    mCurrentNode->endNode()->addChild(inNode);
-}
-
-
-bool ComputerGame::navigateNodeDown()
-{
-    if (mCurrentNode->children().empty())
-    {
-        return false;
-    }
-
-    NodePtr nextNode = *mCurrentNode->children().begin();
-    Assert(nextNode->depth() == mCurrentNode->depth() + 1);
-
-    int lineDifference = nextNode->gameState().numLines() - mCurrentNode->gameState().numLines();
-    Assert(lineDifference >= 0);
-    if (lineDifference > 0)
-    {
-        onLinesCleared(lineDifference);
-    }
-
-    setCurrentNode(nextNode);
-    onChanged();
-    return true;
-}
-
-
-bool ComputerGame::move(MoveDirection inDirection)
-{
-    if (isGameOver())
-    {
-        return false;
-    }
-
-    Block & block = *mActiveBlock;
-    size_t newRow = block.row() + GetRowDelta(inDirection);
-    size_t newCol = block.column() + GetColumnDelta(inDirection);
-    if (mCurrentNode->gameState().checkPositionValid(block, newRow, newCol))
-    {
-        block.setRow(newRow);
-        block.setColumn(newCol);
-        onChanged();
-        return true;
-    }
-
-    if (inDirection != MoveDirection_Down)
-    {
-        // Do nothing
-        return false;
-    }
-
-
-    //
-    // We can't move the block down any further => we hit the bottom => commit the block
-    //
-
-    // First check if we already have a matching precalculated block.
-    if (!mCurrentNode->children().empty())
-    {
-        const GameStateNode & precalculatedChild = **mCurrentNode->children().begin();
-        const Block & nextBlock = precalculatedChild.gameState().originalBlock();
-        Assert(nextBlock.type() == block.type());
-        if (block.column() == nextBlock.column() &&
-                block.rotation() == nextBlock.rotation())
-        {
-            return navigateNodeDown();
-        }
-    }
-
-    // We don't have a matching precalculating block.
-    // => Erase any existing children (should not happen)
-    if (!mCurrentNode->children().empty())
-    {
-        LogWarning("Existing children when commiting a block. They will be deleted.");
-        mCurrentNode->children().clear();
-    }
-
-    // Actually commit the block
-    NodePtr child(new GameStateNode(mCurrentNode,
-                                    mCurrentNode->gameState().commit(block, GameOver(block.row() == 0)).release(),
-                                    new Balanced));
-    mCurrentNode->addChild(child);
-    setCurrentNode(child);
-    onChanged();
-    return false;
-}
 Game::EventHandler::Instances Game::EventHandler::sInstances;
 
 
@@ -702,6 +399,311 @@ void Game::setLevel(int inLevel)
 {
     mOverrideLevel = inLevel;
     onChanged();
+}
+
+
+HumanGame::HumanGame(size_t inNumRows, size_t inNumCols) :
+    Game(inNumRows, inNumCols),
+    mGameState(new GameState(inNumRows, inNumCols))
+{
+}
+
+
+HumanGame::HumanGame(const Game & inGame) :
+    Game(inGame.rowCount(), inGame.columnCount()),
+    mGameState(new GameState(inGame.getGameState()))
+{
+}
+
+
+GameState & HumanGame::getGameState()
+{
+    if (!mGameState.get())
+    {
+        throw std::logic_error("Null pointer deref: mGameState");
+    }
+    return *mGameState;
+}
+
+
+const GameState & HumanGame::getGameState() const
+{
+    if (!mGameState.get())
+    {
+        throw std::logic_error("Null pointer deref: mGameState");
+    }
+    return *mGameState;
+}
+
+
+void HumanGame::setGrid(const Grid & inGrid)
+{
+    mGameState->setGrid(inGrid);
+    onChanged();
+}
+
+
+static int GetRowDelta(MoveDirection inDirection)
+{
+    switch (inDirection)
+    {
+        case MoveDirection_Up:
+        {
+            return -1;
+        }
+        case MoveDirection_Down:
+        {
+            return 1;
+        }
+        default:
+        {
+            return 0;
+        }
+    }
+}
+
+
+static int GetColumnDelta(MoveDirection inDirection)
+{
+    switch (inDirection)
+    {
+        case MoveDirection_Left:
+        {
+            return -1;
+        }
+        case MoveDirection_Right:
+        {
+            return 1;
+        }
+        default:
+        {
+            return 0;
+        }
+    }
+}
+
+
+bool HumanGame::move(MoveDirection inDirection)
+{
+    if (isGameOver())
+    {
+        return false;
+    }
+
+    Block & block = *mActiveBlock;
+    size_t newRow = block.row() + GetRowDelta(inDirection);
+    size_t newCol = block.column() + GetColumnDelta(inDirection);
+    if (getGameState().checkPositionValid(block, newRow, newCol))
+    {
+        block.setRow(newRow);
+        block.setColumn(newCol);
+        onChanged();
+        return true;
+    }
+
+    if (inDirection != MoveDirection_Down)
+    {
+        // Do nothing
+        return false;
+    }
+
+    // Remember the number of lines in the current game state.
+    int oldLineCount = mGameState->numLines();
+
+    // Commit the block. This returns a new GameState object
+    // where any full lines have already been cleared.
+    mGameState.reset(mGameState->commit(block, GameOver(block.row() == 0)).release());
+
+    // Count the number of lines that were made in  the commit call.
+    int linesCleared = mGameState->numLines() - oldLineCount;
+    Assert(linesCleared >= 0);
+
+    // Notify the listeners.
+    if (linesCleared > 0)
+    {
+        onLinesCleared(linesCleared);
+    }
+
+    mCurrentBlockIndex++;
+    supplyBlocks();
+    mActiveBlock.reset(CreateDefaultBlock(mBlocks[mCurrentBlockIndex], mNumColumns).release());
+
+    onChanged();
+    return false;
+}
+
+
+ComputerGame::ComputerGame(size_t inNumRows, size_t inNumCols) :
+    Game(inNumRows, inNumCols),
+    mCurrentNode(GameStateNode::CreateRootNode(inNumRows, inNumCols).release())
+{
+}
+
+
+ComputerGame::ComputerGame(const Game & inGame) :
+    Game(inGame.rowCount(), inGame.columnCount()),
+    mCurrentNode(new GameStateNode(new GameState(inGame.getGameState()), new Balanced))
+{
+}
+
+
+GameState & ComputerGame::getGameState()
+{
+    return const_cast<GameState&>(mCurrentNode->gameState());
+}
+
+
+const GameState & ComputerGame::getGameState() const
+{
+    return mCurrentNode->gameState();
+}
+
+
+void ComputerGame::setGrid(const Grid & inGrid)
+{
+    clearPrecalculatedNodes();
+
+    NodePtr newNode(new GameStateNode(mCurrentNode, new GameState(inGrid), mCurrentNode->evaluator().clone().release()));
+    mCurrentNode->addChild(newNode);
+    Block oldActiveBlock(activeBlock());
+    navigateNodeDown();
+    setActiveBlock(oldActiveBlock);
+    getGameState().updateCache();
+    onChanged();
+}
+
+
+void ComputerGame::setCurrentNode(NodePtr inCurrentNode)
+{
+    Assert(inCurrentNode->depth() == mCurrentNode->depth() + 1);
+
+    mCurrentNode = inCurrentNode;
+    mCurrentBlockIndex = mCurrentNode->depth();
+    supplyBlocks();
+
+    mActiveBlock.reset(CreateDefaultBlock(mBlocks[mCurrentBlockIndex], mNumColumns).release());
+    onChanged();
+}
+
+
+size_t ComputerGame::numPrecalculatedMoves() const
+{
+    size_t countMovesAhead = 0;
+    const GameStateNode * tmp = mCurrentNode.get();
+    while (!tmp->children().empty())
+    {
+        tmp = tmp->children().begin()->get();
+        countMovesAhead++;
+    }
+    return countMovesAhead;
+}
+
+
+void ComputerGame::clearPrecalculatedNodes()
+{
+    mCurrentNode->children().clear();
+}
+
+
+const GameStateNode * ComputerGame::currentNode() const
+{
+    return mCurrentNode.get();
+}
+
+
+const GameStateNode * ComputerGame::lastPrecalculatedNode() const
+{
+    return mCurrentNode->endNode();
+}
+
+
+void ComputerGame::appendPrecalculatedNode(NodePtr inNode)
+{
+    mCurrentNode->endNode()->addChild(inNode);
+}
+
+
+bool ComputerGame::navigateNodeDown()
+{
+    if (mCurrentNode->children().empty())
+    {
+        return false;
+    }
+
+    NodePtr nextNode = *mCurrentNode->children().begin();
+    Assert(nextNode->depth() == mCurrentNode->depth() + 1);
+
+    int lineDifference = nextNode->gameState().numLines() - mCurrentNode->gameState().numLines();
+    Assert(lineDifference >= 0);
+    if (lineDifference > 0)
+    {
+        onLinesCleared(lineDifference);
+    }
+
+    setCurrentNode(nextNode);
+    onChanged();
+    return true;
+}
+
+
+bool ComputerGame::move(MoveDirection inDirection)
+{
+    if (isGameOver())
+    {
+        return false;
+    }
+
+    Block & block = *mActiveBlock;
+    size_t newRow = block.row() + GetRowDelta(inDirection);
+    size_t newCol = block.column() + GetColumnDelta(inDirection);
+    if (mCurrentNode->gameState().checkPositionValid(block, newRow, newCol))
+    {
+        block.setRow(newRow);
+        block.setColumn(newCol);
+        onChanged();
+        return true;
+    }
+
+    if (inDirection != MoveDirection_Down)
+    {
+        // Do nothing
+        return false;
+    }
+
+
+    //
+    // We can't move the block down any further => we hit the bottom => commit the block
+    //
+
+    // First check if we already have a matching precalculated block.
+    if (!mCurrentNode->children().empty())
+    {
+        const GameStateNode & precalculatedChild = **mCurrentNode->children().begin();
+        const Block & nextBlock = precalculatedChild.gameState().originalBlock();
+        Assert(nextBlock.type() == block.type());
+        if (block.column() == nextBlock.column() &&
+                block.rotation() == nextBlock.rotation())
+        {
+            return navigateNodeDown();
+        }
+    }
+
+    // We don't have a matching precalculating block.
+    // => Erase any existing children (should not happen)
+    if (!mCurrentNode->children().empty())
+    {
+        LogWarning("Existing children when commiting a block. They will be deleted.");
+        mCurrentNode->children().clear();
+    }
+
+    // Actually commit the block
+    NodePtr child(new GameStateNode(mCurrentNode,
+                                    mCurrentNode->gameState().commit(block, GameOver(block.row() == 0)).release(),
+                                    new Balanced));
+    mCurrentNode->addChild(child);
+    setCurrentNode(child);
+    onChanged();
+    return false;
 }
 
 
