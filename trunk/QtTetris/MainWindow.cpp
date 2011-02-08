@@ -19,7 +19,7 @@ typedef boost::shared_ptr<Tetris::SimpleGame> SimpleGamePtr;
 
 enum
 {
-    cPlayerCount = 2
+    cPlayerCount = 4
 };
 
 
