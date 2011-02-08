@@ -8,6 +8,7 @@
 #include "Tetris/GameState.h"
 #include "Tetris/Grid.h"
 #include "Tetris/NodePtr.h"
+#include "Tetris/Threading.h"
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread.hpp>
 #include <memory>
@@ -34,7 +35,12 @@ public:
     class EventHandler
     {
     public:
-        EventHandler() {}
+        EventHandler();
+
+        virtual ~EventHandler();
+
+        // Check if the give EventHandler object still exists
+        static bool Exists(EventHandler * inEventHandler);
 
         virtual void onGameStateChanged(Game * inGame) = 0;
 
@@ -43,15 +49,18 @@ public:
     private:
         EventHandler(const EventHandler&);
         EventHandler& operator=(const EventHandler&);
+
+        typedef std::set<EventHandler*> Instances;
+        static Instances sInstances;
     };
 
     Game(size_t inNumRows, size_t inNumColumns);
 
     virtual ~Game();
 
-    void registerEventHandler(EventHandler * inEventHandler);
+    static void RegisterEventHandler(ThreadSafe<Game> inGame, EventHandler * inEventHandler);
 
-    void unregisterEventHandler(EventHandler * inEventHandler);
+    static void UnregisterEventHandler(ThreadSafe<Game> inGame, EventHandler * inEventHandler);
 
     bool isGameOver() const;
 
@@ -118,6 +127,9 @@ private:
     // non-copyable
     Game(const Game&);
     Game& operator=(const Game&);
+
+    typedef std::set<Game*> Instances;
+    static Instances sInstances;
 };
 
 

@@ -183,9 +183,12 @@ const GameState & ComputerGame::getGameState() const
 void ComputerGame::setGrid(const Grid & inGrid)
 {
     clearPrecalculatedNodes();
+
     NodePtr newNode(new GameStateNode(mCurrentNode, new GameState(inGrid), mCurrentNode->evaluator().clone().release()));
     mCurrentNode->addChild(newNode);
+    Block oldActiveBlock(activeBlock());
     navigateNodeDown();
+    setActiveBlock(oldActiveBlock);
     getGameState().updateCache();
     onChanged();
 }
@@ -323,7 +326,28 @@ bool ComputerGame::move(MoveDirection inDirection)
     onChanged();
     return false;
 }
+Game::EventHandler::Instances Game::EventHandler::sInstances;
 
+
+Game::EventHandler::EventHandler()
+{
+    sInstances.insert(this);
+}
+
+
+Game::EventHandler::~EventHandler()
+{
+    sInstances.erase(this);
+}
+
+
+bool Game::EventHandler::Exists(Game::EventHandler * inEventHandler)
+{
+    return sInstances.find(inEventHandler) != sInstances.end();
+}
+
+
+Game::Instances Game::sInstances;
 
 
 Game::Game(size_t inNumRows, size_t inNumColumns) :
@@ -340,23 +364,42 @@ Game::Game(size_t inNumRows, size_t inNumColumns) :
         mBlocks.push_back(mBlockFactory->getNext());
     }
     mActiveBlock.reset(CreateDefaultBlock(mBlocks.front(), inNumColumns).release());
+
+    sInstances.insert(this);
 }
 
 
 Game::~Game()
 {
+    sInstances.erase(this);
 }
 
 
-void Game::registerEventHandler(EventHandler * inEventHandler)
+void Game::RegisterEventHandler(ThreadSafe<Game> inGame, EventHandler * inEventHandler)
 {
-    mEventHandlers.insert(inEventHandler);
+    ScopedReaderAndWriter<Game> rwgame(inGame);
+    Game * game(rwgame.get());
+    if (sInstances.find(game) == sInstances.end())
+    {
+        LogWarning("Game::RegisterEventHandler: This game object does not exist!");
+        return;
+    }
+
+    game->mEventHandlers.insert(inEventHandler);
 }
 
 
-void Game::unregisterEventHandler(EventHandler * inEventHandler)
+void Game::UnregisterEventHandler(ThreadSafe<Game> inGame, EventHandler * inEventHandler)
 {
-    mEventHandlers.erase(inEventHandler);
+    ScopedReaderAndWriter<Game> rwgame(inGame);
+    Game * game(rwgame.get());
+    if (sInstances.find(game) == sInstances.end())
+    {
+        LogWarning("Game::UnregisterEventHandler: The game object no longer exists!");
+        return;
+    }
+
+    game->mEventHandlers.erase(inEventHandler);
 }
 
 
@@ -373,6 +416,11 @@ void Game::onChangedImpl()
     for (; it != end; ++it)
     {
         Game::EventHandler * eventHandler(*it);
+        if (!EventHandler::Exists(eventHandler))
+        {
+            throw std::runtime_error("This event handler no longer exists.");
+        }
+
         eventHandler->onGameStateChanged(this);
     }
 }
@@ -391,6 +439,10 @@ void Game::onLinesClearedImpl(int inLineCount)
     for (; it != end; ++it)
     {
         Game::EventHandler * eventHandler(*it);
+        if (!EventHandler::Exists(eventHandler))
+        {
+            throw std::runtime_error("This event handler no longer exists.");
+        }
         eventHandler->onLinesCleared(this, inLineCount);
     }
 }

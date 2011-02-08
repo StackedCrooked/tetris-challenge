@@ -15,8 +15,6 @@ namespace Tetris {
 struct MultiplayerGame::Impl : public SimpleGame::EventHandler,
                                boost::noncopyable
 {
-    typedef MultiplayerGame::Players Players;
-
     virtual void onGameStateChanged(SimpleGame * )
     {
         // Not interested.
@@ -27,8 +25,8 @@ struct MultiplayerGame::Impl : public SimpleGame::EventHandler,
         Players::const_iterator it = mPlayers.begin(), end = mPlayers.end();
         for (; it != end; ++it)
         {
-            Player player(*it);
-            if (&player.simpleGame() == inSimpleGame)
+            Player player(**it);
+            if (player.simpleGame() == inSimpleGame)
             {
                 return player;
             }
@@ -44,10 +42,10 @@ struct MultiplayerGame::Impl : public SimpleGame::EventHandler,
         Players::iterator it = mPlayers.begin(), end = mPlayers.end();
         for (; it != end; ++it)
         {
-            Player player(*it);
+            Player player(**it);
             if (player.teamName() != activePlayer.teamName())
             {
-                player.simpleGame().applyLinePenalty(inLineCount);
+                player.simpleGame()->applyLinePenalty(inLineCount);
             }
         }
     }
@@ -68,23 +66,41 @@ MultiplayerGame::~MultiplayerGame()
 }
 
 
-void MultiplayerGame::join(Player inPlayer)
+Player * MultiplayerGame::join(std::auto_ptr<Player> inPlayer)
 {
-    mImpl->mPlayers.insert(inPlayer);
-    inPlayer.simpleGame().registerEventHandler(mImpl);
+    mImpl->mPlayers.push_back(inPlayer.release());
+    SimpleGame::RegisterEventHandler(mImpl->mPlayers.back()->simpleGame(), mImpl);
+    return mImpl->mPlayers.back();
 }
 
 
-void MultiplayerGame::leave(Player inPlayer)
+void MultiplayerGame::leave(Player * inPlayer)
 {
-    inPlayer.simpleGame().unregisterEventHandler(mImpl);
-    mImpl->mPlayers.erase(inPlayer);
+    SimpleGame::UnregisterEventHandler(inPlayer->simpleGame(), mImpl);
+    Players::iterator it = std::find(mImpl->mPlayers.begin(), mImpl->mPlayers.end(), inPlayer);
+    if (it == mImpl->mPlayers.end())
+    {
+        throw std::runtime_error("This Player was not found in the list of players.");
+    }
+    mImpl->mPlayers.erase(it);
 }
 
 
-const MultiplayerGame::Players & MultiplayerGame::players() const
+size_t MultiplayerGame::playerCount() const
 {
-    return mImpl->mPlayers;
+    return mImpl->mPlayers.size();
+}
+
+
+const Player * MultiplayerGame::getPlayer(size_t inIndex) const
+{
+    return mImpl->mPlayers[inIndex];
+}
+
+
+Player * MultiplayerGame::getPlayer(size_t inIndex)
+{
+    return mImpl->mPlayers[inIndex];
 }
 
 

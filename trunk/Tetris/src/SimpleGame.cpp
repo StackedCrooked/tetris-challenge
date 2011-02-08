@@ -4,6 +4,7 @@
 #include "Tetris/Evaluator.h"
 #include "Tetris/Game.h"
 #include "Tetris/Gravity.h"
+#include "Tetris/Logging.h"
 #include "Tetris/Threading.h"
 #include "Tetris/AutoPtrSupport.h"
 #include <boost/bind.hpp>
@@ -45,7 +46,7 @@ struct SimpleGame::Impl : public Game::EventHandler,
         if (inPlayerType == PlayerType_Computer)
         {
             std::auto_ptr<Evaluator> evaluator(CreatePoly<Evaluator, MakeTetrises>());
-            mComputerPlayer.reset(new ComputerPlayer(mGame, evaluator, 8, 5, 1));
+            mComputerPlayer.reset(new ComputerPlayer(mGame, evaluator, 8, 5, 8));
             mComputerPlayer->setTweaker(this);
             mComputerPlayer->setMoveSpeed(100);
         }
@@ -53,9 +54,7 @@ struct SimpleGame::Impl : public Game::EventHandler,
 
     ~Impl()
     {
-        ScopedReaderAndWriter<Game> rwgame(mGame);
-        Game & game(*rwgame.get());
-        game.unregisterEventHandler(this);
+        Game::UnregisterEventHandler(mGame, this);
     }
 
     virtual std::auto_ptr<Evaluator> updateInfo(const GameState & inGameState,
@@ -87,9 +86,7 @@ struct SimpleGame::Impl : public Game::EventHandler,
     void init(SimpleGame * inSimpleGame)
     {
         mSimpleGame = inSimpleGame;
-        ScopedReaderAndWriter<Game> rwgame(mGame);
-        Game & game(*rwgame.get());
-        game.registerEventHandler(this);
+        Game::RegisterEventHandler(mGame, this);
     }
 
     virtual void onGameStateChanged(Game * )
@@ -124,15 +121,20 @@ struct SimpleGame::Impl : public Game::EventHandler,
 };
 
 
+SimpleGame::Instances SimpleGame::sInstances;
+
+
 SimpleGame::SimpleGame(size_t inRowCount, size_t inColumnCount, PlayerType inPlayerType) :
     mImpl(new Impl(inRowCount, inColumnCount, inPlayerType))
 {
     mImpl->init(this);
+    sInstances.insert(this);
 }
 
 
 SimpleGame::~SimpleGame()
 {
+    sInstances.erase(this);
     delete mImpl;
 }
 
@@ -161,23 +163,33 @@ PlayerType SimpleGame::playerType() const
 }
 
 
-void SimpleGame::registerEventHandler(EventHandler * inEventHandler)
+void SimpleGame::RegisterEventHandler(SimpleGame * inSimpleGame, EventHandler * inEventHandler)
 {
-    Impl::EventHandlers::iterator it = mImpl->mEventHandlers.find(inEventHandler);
-    if (it == mImpl->mEventHandlers.end())
+    if (sInstances.find(inSimpleGame) == sInstances.end())
     {
-        mImpl->mEventHandlers.insert(inEventHandler);
+        LogWarning("SimpleGame::RegisterEventHandler: The SimpleGame object does not exist!");
+        return;
     }
+
+    inSimpleGame->mImpl->mEventHandlers.insert(inEventHandler);
 }
 
 
-void SimpleGame::unregisterEventHandler(EventHandler * inEventHandler)
+void SimpleGame::UnregisterEventHandler(SimpleGame * inSimpleGame, EventHandler * inEventHandler)
 {
-    Impl::EventHandlers::iterator it = mImpl->mEventHandlers.find(inEventHandler);
-    if (it != mImpl->mEventHandlers.end())
+    if (sInstances.find(inSimpleGame) == sInstances.end())
     {
-        mImpl->mEventHandlers.erase(it);
+        LogWarning("SimpleGame::UnregisterEventHandler: The SimpleGame no longer exists!");
+        return;
     }
+
+    inSimpleGame->mImpl->mEventHandlers.erase(inEventHandler);
+}
+
+
+bool SimpleGame::Exists(SimpleGame * inSimpleGame)
+{
+    return sInstances.find(inSimpleGame) != sInstances.end();
 }
 
 

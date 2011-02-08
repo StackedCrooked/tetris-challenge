@@ -11,12 +11,6 @@
         #include <stdexcept>
         #define Assert(condition) if (!(condition)) { throw std::logic_error(Tetris::MakeString() << __FILE__ << __LINE__ << ": Assert failed."); }
     #endif
-
-    // Change assert(..) calls into Assert(...) calls.
-    #ifdef assert
-    #undef assert
-    #define assert Assert
-    #endif
 #else
     #define Assert(...)
 #endif
