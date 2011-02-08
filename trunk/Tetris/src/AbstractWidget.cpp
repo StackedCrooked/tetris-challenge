@@ -63,22 +63,41 @@ AbstractWidget::AbstractWidget(int inSquareWidth, int inSquareHeight) :
 
 AbstractWidget::~AbstractWidget()
 {
-    if (SimpleGame::Exists(mSimpleGame))
+    SimpleGame::UnregisterEventHandler(mSimpleGame, this);
+}
+
+
+void AbstractWidget::onGameStateChanged(SimpleGame * inSimpleGame)
+{
+    if (inSimpleGame != mSimpleGame)
     {
-        SimpleGame::UnregisterEventHandler(mSimpleGame, this);
+        throw std::logic_error("AbstractWidget::onDestroy: inGame != mGame");
     }
-}
 
-
-void AbstractWidget::onGameStateChanged(SimpleGame * )
-{
     refresh();
 }
 
 
-void AbstractWidget::onLinesCleared(SimpleGame * , int )
+void AbstractWidget::onLinesCleared(SimpleGame * inSimpleGame, int )
 {
+    if (inSimpleGame != mSimpleGame)
+    {
+        throw std::logic_error("AbstractWidget::onDestroy: inGame != mGame");
+    }
+
     refresh();
+}
+
+
+void AbstractWidget::onDestroy(SimpleGame * inSimpleGame)
+{
+    if (inSimpleGame != mSimpleGame)
+    {
+        throw std::logic_error("AbstractWidget::onDestroy: inGame != mGame");
+    }
+
+    SimpleGame::UnregisterEventHandler(mSimpleGame, this);
+    mSimpleGame = 0;
 }
 
 

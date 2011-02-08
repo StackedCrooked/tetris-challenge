@@ -103,22 +103,40 @@ void Game::UnregisterEventHandler(ThreadSafe<Game> inGame, EventHandler * inEven
 void Game::onChanged()
 {
     // Invoke on main tread
-    InvokeLater(boost::bind(&Game::onChangedImpl, this));
+    InvokeLater(boost::bind(&Game::OnChangedImpl, this));
 }
 
 
-void Game::onChangedImpl()
+bool Game::Exists(Game * inGame)
 {
-    EventHandlers::iterator it = mEventHandlers.begin(), end = mEventHandlers.end();
+    return sInstances.find(inGame) != sInstances.end();
+}
+
+
+void Game::OnChangedImpl(Game * inGame)
+{
+    //
+    // This code runs in the main thread.
+    // No synchronization should be required.
+    //
+
+    if (!Exists(inGame))
+    {
+        LogWarning("Game::OnChangedImpl: The game object no longer exists!");
+        return;
+    }
+
+    EventHandlers::iterator it = inGame->mEventHandlers.begin(), end = inGame->mEventHandlers.end();
     for (; it != end; ++it)
     {
         Game::EventHandler * eventHandler(*it);
         if (!EventHandler::Exists(eventHandler))
         {
-            throw std::runtime_error("This event handler no longer exists.");
+            LogWarning("Game::OnChangedImpl: This event handler no longer exists.");
+            return;
         }
 
-        eventHandler->onGameStateChanged(this);
+        eventHandler->onGameStateChanged(inGame);
     }
 }
 
@@ -126,21 +144,33 @@ void Game::onChangedImpl()
 void Game::onLinesCleared(int inLineCount)
 {
     // Invoke on main thread
-    InvokeLater(boost::bind(&Game::onLinesClearedImpl, this, inLineCount));
+    InvokeLater(boost::bind(&Game::OnLinesClearedImpl, this, inLineCount));
 }
 
 
-void Game::onLinesClearedImpl(int inLineCount)
+void Game::OnLinesClearedImpl(Game * inGame, int inLineCount)
 {
-    EventHandlers::iterator it = mEventHandlers.begin(), end = mEventHandlers.end();
+    //
+    // This code runs in the main thread.
+    // No synchronization should be required.
+    //
+
+    if (!Exists(inGame))
+    {
+        LogWarning("Game::OnLinesCleared: The game object no longer exists!");
+        return;
+    }
+
+    EventHandlers::iterator it = inGame->mEventHandlers.begin(), end = inGame->mEventHandlers.end();
     for (; it != end; ++it)
     {
         Game::EventHandler * eventHandler(*it);
         if (!EventHandler::Exists(eventHandler))
         {
-            throw std::runtime_error("This event handler no longer exists.");
+            LogWarning("OnLinesClearedImpl: This event handler no longer exists.");
+            return;
         }
-        eventHandler->onLinesCleared(this, inLineCount);
+        eventHandler->onLinesCleared(inGame, inLineCount);
     }
 }
 

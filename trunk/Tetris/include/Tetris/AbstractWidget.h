@@ -67,6 +67,8 @@ public:
 
     virtual void onLinesCleared(SimpleGame * inGame, int inLineCount);
 
+    virtual void onDestroy(SimpleGame * inGame);
+
     void setGame(Tetris::SimpleGame * inSimpleGame);
 
     const Tetris::SimpleGame * getGame() const;

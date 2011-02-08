@@ -47,7 +47,7 @@ struct SimpleGame::Impl : public Game::EventHandler,
         if (inPlayerType == PlayerType_Computer)
         {
             std::auto_ptr<Evaluator> evaluator(CreatePoly<Evaluator, MakeTetrises>());
-            mComputerPlayer.reset(new ComputerPlayer(mGame, evaluator, 8, 5, 8));
+            mComputerPlayer.reset(new ComputerPlayer(mGame, evaluator, 8, 5, 1));
             mComputerPlayer->setTweaker(this);
             mComputerPlayer->setMoveSpeed(100);
         }
