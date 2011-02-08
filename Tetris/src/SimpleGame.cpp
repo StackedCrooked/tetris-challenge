@@ -14,6 +14,7 @@
 
 namespace Tetris {
 
+
 struct SimpleGame::Impl : public Game::EventHandler,
                           public ComputerPlayer::Tweaker
 {

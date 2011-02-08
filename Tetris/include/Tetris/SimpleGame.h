@@ -112,8 +112,6 @@ public:
     // Gets the currently active block and any blocks that follow.
     Block getNextBlock() const;
 
-
-
     // For multiplayer crazyness.
     void applyLinePenalty(int inNumberOfLinesMadeByOpponent);
     void setActiveBlock(const Block & inBlock);
