@@ -36,9 +36,9 @@ private:
     void restart();
 
     std::vector<TetrisWidget *> mTetrisWidgets;
-
     QPushButton * mRestartButton;
     QTextEdit * mLogField;
+    bool mRestartFlag;
 };
 
 

@@ -20,12 +20,17 @@ struct MultiplayerGame::Impl : public SimpleGame::EventHandler,
         // Not interested.
     }
 
-    Player findPlayer(SimpleGame * inSimpleGame) const
+    virtual void onDestroy(SimpleGame * )
+    {
+        LogInfo("MultiplayerGame::Impl::onDestroy");
+    }
+
+    Player & findPlayer(SimpleGame * inSimpleGame) const
     {
         Players::const_iterator it = mPlayers.begin(), end = mPlayers.end();
         for (; it != end; ++it)
         {
-            Player player(**it);
+            Player & player(**it);
             if (player.simpleGame() == inSimpleGame)
             {
                 return player;
@@ -37,12 +42,12 @@ struct MultiplayerGame::Impl : public SimpleGame::EventHandler,
     virtual void onLinesCleared(SimpleGame * inSimpleGame, int inLineCount)
     {
         // If number of lines >= 2 then apply a line penalty to each non-allied player.
-        Player activePlayer(findPlayer(inSimpleGame));
+        Player & activePlayer(findPlayer(inSimpleGame));
 
         Players::iterator it = mPlayers.begin(), end = mPlayers.end();
         for (; it != end; ++it)
         {
-            Player player(**it);
+            Player & player(**it);
             if (player.teamName() != activePlayer.teamName())
             {
                 player.simpleGame()->applyLinePenalty(inLineCount);

@@ -101,10 +101,11 @@ protected:
     virtual GameState & getGameState() = 0;
 
     void onChanged();
-    void onChangedImpl();
-
     void onLinesCleared(int inLineCount);
-    void onLinesClearedImpl(int inLineCount);
+
+    static bool Exists(Game * inGame);
+    static void OnChangedImpl(Game * inGame);
+    static void OnLinesClearedImpl(Game * inGame, int inLineCount);
 
     static std::auto_ptr<Block> CreateDefaultBlock(BlockType inBlockType, size_t inNumColumns);
     void reserveBlocks(size_t inCount);

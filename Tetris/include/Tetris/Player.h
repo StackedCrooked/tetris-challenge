@@ -108,10 +108,6 @@ public:
 
     ~Player();
 
-    Player(const Player & rhs);
-
-    Player & operator=(const Player & rhs);
-
     const std::string & teamName() const;
 
     const std::string & playerName() const;
@@ -123,18 +119,18 @@ public:
     void resetGame();
 
 private:
+    Player(const Player&);
+    Player& operator=(const Player&);
+
     friend bool operator==(const Player & lhs, const Player & rhs);
     friend bool operator<(const Player & lhs, const Player & rhs);
 
     struct Impl;
-    Impl * mImpl; // ref-counted
+    Impl * mImpl;
 };
 
+
 typedef Array<Player> Players;
-
-bool operator==(const Player & lhs, const Player & rhs);
-
-bool operator<(const Player & lhs, const Player & rhs);
 
 
 } // namespace Tetris

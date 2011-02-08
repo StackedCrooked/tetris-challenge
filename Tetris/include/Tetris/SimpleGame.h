@@ -36,6 +36,8 @@ public:
 
         virtual void onLinesCleared(SimpleGame * inGame, int inLineCount) = 0;
 
+        virtual void onDestroy(SimpleGame * inGame) = 0;
+
     private:
         EventHandler(const EventHandler&);
         EventHandler& operator=(const EventHandler&);
