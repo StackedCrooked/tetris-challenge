@@ -1,7 +1,9 @@
 #include "MainWindow.h"
 #include "Tetris/Assert.h"
+#include "Tetris/AutoPtrSupport.h"
 #include "Tetris/Game.h"
 #include "Tetris/Logger.h"
+#include "Tetris/Logging.h"
 #include "Tetris/MakeString.h"
 #include <QLayout>
 #include <QLabel>
@@ -17,7 +19,7 @@ typedef boost::shared_ptr<Tetris::SimpleGame> SimpleGamePtr;
 
 enum
 {
-    cPlayerCount = 4
+    cPlayerCount = 2
 };
 
 
@@ -30,30 +32,56 @@ public:
         return fModel;
     }
 
-    Players mPlayers;
-    Tetris::MultiplayerGame mMultiplayerGame;
-private:
-    Model() :
-        mPlayers(),
-        mMultiplayerGame()
+    Player * getPlayer(size_t inIndex)
     {
-        // Assemble Team A
-        for (size_t idx = 0; idx < cPlayerCount/2; ++idx)
-        {
-            mPlayers.push_back(Player(PlayerType_Computer, TeamName("Team A"), PlayerName(MakeString() << "A" << (idx + 1))));
-        }
+        return mMultiplayerGame->getPlayer(inIndex);
+    }
 
-        // Assemble Team B
-        for (size_t idx = cPlayerCount/2; idx < cPlayerCount; ++idx)
+    const MultiplayerGame & multiplayerGame() const
+    {
+        return *mMultiplayerGame;
+    }
+
+    MultiplayerGame & multiplayerGame()
+    {
+        return *mMultiplayerGame;
+    }
+
+    void reset()
+    {
+        LogInfo(MakeString() << "RESET!!!");
+        mMultiplayerGame.reset(new MultiplayerGame);
+        for (size_t idx = 0; idx < cPlayerCount; ++idx)
         {
-            mPlayers.push_back(Player(PlayerType_Computer, TeamName("Team B"), PlayerName(MakeString() << "B" << (idx + 1))));
+            LogInfo(MakeString() << "Adding player " << idx);
+            mMultiplayerGame->join(
+                Create<Player>(PlayerType_Computer,
+                               TeamName(GetTeamName(idx)),
+                               PlayerName(GetPlayerName(idx))));
         }
+    }
+
+private:
+    Model()
+    {
+        LogInfo(__PRETTY_FUNCTION__);
+    }
+
+    static std::string GetTeamName(size_t inIndex)
+    {
+        return std::string(inIndex < cPlayerCount/2 ? "A" : "B");
+    }
+
+    static std::string GetPlayerName(size_t inIndex)
+    {
+        return std::string(MakeString() << (inIndex < cPlayerCount/2 ? "A" : "B") << inIndex);
     }
 
     Model(const Model &);
     Model& operator=(const Model&);
-};
 
+    boost::scoped_ptr<Tetris::MultiplayerGame> mMultiplayerGame;
+};
 
 
 //
@@ -108,14 +136,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     Logger::Instance().setLogHandler(boost::bind(&MainWindow::logMessage, this, _1));
-
-    Players & players = Model::Instance().mPlayers;
-    for (size_t idx = 0; idx < cPlayerCount; ++idx)
-    {
-        Player player(players[idx]);
-        mTetrisWidgets[idx]->setGame(&player.simpleGame());
-        Model::Instance().mMultiplayerGame.join(player);
-    }
+    LogInfo("Test Logger.");
+    restart();
 }
 
 
@@ -152,39 +174,25 @@ void MainWindow::onRestart()
 
 void MainWindow::restart()
 {
-    Assert(Model::Instance().mPlayers.size() == mTetrisWidgets.size());
+    LogInfo(__PRETTY_FUNCTION__);
+    Model::Instance().reset();
+    MultiplayerGame & mgame = Model::Instance().multiplayerGame();
+    LogInfo(MakeString() << "Player count: " << mgame.playerCount());
+    LogInfo(MakeString() << "mTetrisWidgets.size(): " << mTetrisWidgets.size());
+    Assert(mgame.playerCount() == mTetrisWidgets.size());
 
-    Players & players = Model::Instance().mPlayers;
-
-
-    // Unregister all
-    for (size_t idx = 0; idx < cPlayerCount; ++idx)
+    for (size_t idx = 0; idx < mgame.playerCount(); ++idx)
     {
-        Player player(players[idx]);
-        mTetrisWidgets[idx]->setGame(0);
-        Model::Instance().mMultiplayerGame.leave(player);
-        player.resetGame();
-    }
-
-    players.clear();
-
-    // Assemble Team A
-    for (size_t idx = 0; idx < cPlayerCount/2; ++idx)
-    {
-        players.push_back(Player(PlayerType_Computer, TeamName("Team A"), PlayerName(MakeString() << "A" << (idx + 1))));
-    }
-
-    // Assemble Team B
-    for (size_t idx = cPlayerCount/2; idx < cPlayerCount; ++idx)
-    {
-        players.push_back(Player(PlayerType_Computer, TeamName("Team B"), PlayerName(MakeString() << "B" << (idx + 1))));
-    }
-
-
-    for (size_t idx = 0; idx < cPlayerCount; ++idx)
-    {
-        Player player(players[idx]);
-        mTetrisWidgets[idx]->setGame(&player.simpleGame());
-        Model::Instance().mMultiplayerGame.join(player);
+        LogInfo(MakeString() << "Setting player " << idx);
+        Player * player = mgame.getPlayer(idx);
+        mTetrisWidgets[idx]->setGame(player->simpleGame());
     }
 }
+
+
+
+
+
+
+
+

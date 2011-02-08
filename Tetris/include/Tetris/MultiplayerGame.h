@@ -3,6 +3,7 @@
 
 
 #include "Tetris/Player.h"
+#include <memory>
 #include <set>
 
 
@@ -16,13 +17,16 @@ public:
 
     ~MultiplayerGame();
 
-    typedef std::set<Player> Players;
+    // Takes ownership!
+    Player * join(std::auto_ptr<Player> inPlayer);
 
-    void join(Player inPlayer);
+    void leave(Player * inPlayer);
 
-    void leave(Player inPlayer);
+    size_t playerCount() const;
 
-    const Players & players() const;
+    const Player * getPlayer(size_t inIndex) const;
+
+    Player * getPlayer(size_t inIndex);
 
 private:
     MultiplayerGame(const MultiplayerGame&);

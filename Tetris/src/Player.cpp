@@ -115,15 +115,15 @@ const std::string & Player::playerName() const
 }
 
 
-const SimpleGame & Player::simpleGame() const
+const SimpleGame * Player::simpleGame() const
 {
-    return *mImpl->mSimpleGame;
+    return mImpl->mSimpleGame.get();
 }
 
 
-SimpleGame & Player::simpleGame()
+SimpleGame * Player::simpleGame()
 {
-    return *mImpl->mSimpleGame;
+    return mImpl->mSimpleGame.get();
 }
 
 

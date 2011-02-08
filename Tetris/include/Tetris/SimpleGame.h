@@ -8,6 +8,7 @@
 #include "Tetris/PlayerType.h"
 #include <boost/scoped_ptr.hpp>
 #include <cstddef>
+#include <set>
 #include <stdexcept>
 #include <vector>
 
@@ -78,9 +79,11 @@ public:
 
     PlayerType playerType() const;
 
-    void registerEventHandler(EventHandler * inEventHandler);
+    static void RegisterEventHandler(SimpleGame * inSimpleGame, EventHandler * inEventHandler);
 
-    void unregisterEventHandler(EventHandler * inEventHandler);
+    static void UnregisterEventHandler(SimpleGame * inSimpleGame, EventHandler * inEventHandler);
+
+    static bool Exists(SimpleGame * inSimpleGame);
 
     GameStateStats stats() const;
 
@@ -123,6 +126,9 @@ private:
 
     struct Impl;
     Impl * mImpl;
+
+    typedef std::set<SimpleGame*> Instances;
+    static Instances sInstances;
 };
 
 

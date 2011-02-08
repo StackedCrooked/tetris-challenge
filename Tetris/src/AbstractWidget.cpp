@@ -63,9 +63,9 @@ AbstractWidget::AbstractWidget(int inSquareWidth, int inSquareHeight) :
 
 AbstractWidget::~AbstractWidget()
 {
-    if (mSimpleGame)
+    if (SimpleGame::Exists(mSimpleGame))
     {
-        mSimpleGame->unregisterEventHandler(this);
+        SimpleGame::UnregisterEventHandler(mSimpleGame, this);
     }
 }
 
@@ -84,18 +84,19 @@ void AbstractWidget::onLinesCleared(SimpleGame * , int )
 
 void AbstractWidget::setGame(SimpleGame * inSimpleGame)
 {
-    if (mSimpleGame)
+    if (SimpleGame::Exists(mSimpleGame))
     {
-        mSimpleGame->unregisterEventHandler(this);
+        SimpleGame::UnregisterEventHandler(mSimpleGame, this);
         mSimpleGame->setBackReference(0);
     }
 
     mSimpleGame = inSimpleGame;
-    if (mSimpleGame)
+    if (SimpleGame::Exists(mSimpleGame))
     {
         setMinSize((mSimpleGame->columnCount() + 4) * squareWidth() + mMargin,
                    getGameRect().height() + getStatsRect().height());
-        mSimpleGame->registerEventHandler(this);
+
+        SimpleGame::RegisterEventHandler(mSimpleGame, this);
         mSimpleGame->setBackReference(this);
     }
 }
