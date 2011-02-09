@@ -48,6 +48,7 @@ add_library(Tetris
     include/Tetris/Worker.h
     include/Tetris/WorkerPool.h
     src/AbstractWidget.cpp
+    src/Assert.cpp
     src/AISupport.cpp
     src/Allocator.cpp
     src/Block.cpp

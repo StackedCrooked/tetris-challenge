@@ -17,6 +17,7 @@ SOURCES += \
     ../Tetris/src/AbstractWidget.cpp \
     ../Tetris/src/AISupport.cpp \
     ../Tetris/src/Allocator.cpp \
+    ../Tetris/src/Assert.cpp \
     ../Tetris/src/Block.cpp \
     ../Tetris/src/BlockFactory.cpp \
     ../Tetris/src/BlockMover.cpp \
