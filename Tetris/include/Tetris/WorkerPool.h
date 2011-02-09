@@ -2,7 +2,8 @@
 #define TETRIS_WORKERPOOL_H_INCLUDED
 
 
-#include "Worker.h"
+#include "Tetris/Array.h"
+#include "Tetris/Worker.h"
 #include <vector>
 #include <boost/shared_ptr.hpp>
 
@@ -35,7 +36,7 @@ namespace Tetris
 
         // Wait until all Workers have finished their queue
         void wait();
-        
+
         // Interrupts all workers.
         void interruptAndClearQueue();
 
@@ -47,7 +48,7 @@ namespace Tetris
         void interruptRange(size_t inBegin, size_t inCount);
 
         std::string mName;
-        typedef std::vector<WorkerPtr> Workers;
+        typedef Array<Worker> Workers;
         mutable size_t mRotation;
 
         Workers mWorkers;

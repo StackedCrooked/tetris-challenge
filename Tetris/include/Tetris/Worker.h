@@ -13,9 +13,8 @@ namespace Tetris
 {
 
     class Worker;
-    typedef boost::shared_ptr<Worker> WorkerPtr;
     class WorkerPool;
-    
+
 
     /**
      * Worker starts a background thread that runs in a loop processing tasks from a queue.
