@@ -32,9 +32,11 @@ public:
 
     Allocator_Vector(size_t inSize, const T & inInitialValue);
 
-    T * get();
+    T & get(size_t inIndex);
 
-    const T * get() const;
+    const T & get(size_t inIndex) const;
+
+    void set(size_t inIndex, const T & inValue);
 
 private:
     std::vector<T> mVector;
@@ -83,9 +85,11 @@ public:
 
     ~Allocator_New();
 
-    T * get();
+    T & get(size_t inIndex);
 
-    const T * get() const;
+    const T & get(size_t inIndex) const;
+
+    void set(size_t inIndex, const T & inValue);
 
 private:
     Allocator_New(const Allocator_New&);
@@ -111,16 +115,24 @@ Allocator_Vector<T>::Allocator_Vector(size_t inSize, const T & inInitialValue) :
 
 
 template<class T>
-T * Allocator_Vector<T>::get()
+T & Allocator_Vector<T>::get(size_t inIndex)
 {
-    return &mVector[0];
+    return mVector[inIndex];
 }
 
 
 template<class T>
-const T * Allocator_Vector<T>::get() const
+const T & Allocator_Vector<T>::get(size_t inIndex) const
 {
-    return &mVector[0];
+    return mVector[inIndex];
+}
+
+
+template<class T>
+void Allocator_Vector<T>::set(size_t inIndex, const T & inValue)
+{
+    Assert(inIndex <= inIndex);
+    mVector[inIndex] = inValue;
 }
 
 
@@ -218,16 +230,24 @@ Allocator_New<T>::~Allocator_New()
 
 
 template<class T>
-T * Allocator_New<T>::get()
+T & Allocator_New<T>::get(size_t inIndex)
 {
-    return &mBuffer[0];
+    return mBuffer[inIndex];
 }
 
 
 template<class T>
-const T * Allocator_New<T>::get() const
+const T & Allocator_New<T>::get(size_t inIndex) const
 {
-    return &mBuffer[0];
+    return mBuffer[inIndex];
+}
+
+
+template<class T>
+void Allocator_New<T>::set(size_t inIndex, const T & inValue)
+{
+    Assert(inIndex <= inIndex);
+    mBuffer[inIndex] = inValue;
 }
 
 

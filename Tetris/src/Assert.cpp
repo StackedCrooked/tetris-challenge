@@ -4,11 +4,7 @@
 namespace Tetris {
 
 
-void DebugBreak(const std::string & inFile, int inLine)
-{
-    std::string msg(MakeString() << inFile << ":" << inLine << " Assertion failed.");
-    throw std::logic_error(msg.c_str());
-}
+// There used to be something here.
 
 
 } // namespace Tetris

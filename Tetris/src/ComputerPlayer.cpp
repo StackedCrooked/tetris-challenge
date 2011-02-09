@@ -271,7 +271,6 @@ void ComputerPlayer::Impl::timerEvent()
                 //
                 // Check if the game state has not been changed while calculating the next move
                 //
-                Assert(mGameDepth <= game.lastPrecalculatedNode()->depth());
                 if (mGameDepth < game.lastPrecalculatedNode()->depth())
                 {
                     LogInfo("AAARGGHH All our work is for naught");

@@ -8,15 +8,6 @@
 #include <string>
 
 
-namespace Tetris {
-
-
-void DebugBreak(const std::string & inFile, int inLine);
-
-
-} // namespace Tetris
-
-
 #if not defined(NDEBUG) || defined(TETRIS_ALWAYS_ASSERT)
     #ifdef _WIN32
         #include <windows.h>
@@ -24,7 +15,7 @@ void DebugBreak(const std::string & inFile, int inLine);
     #else
         #include "Tetris/MakeString.h"
         #include <stdexcept>
-        #define Assert(condition) if (!(condition)) { Tetris::DebugBreak(__FILE__, __LINE__); }
+        #define Assert(condition) if (!(condition)) { __builtin_trap(); }
     #endif
 #else
     #define Assert(...)

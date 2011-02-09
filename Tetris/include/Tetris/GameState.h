@@ -18,8 +18,6 @@ public:
     // Creates a new GameState
     GameState(size_t inNumRows, size_t inNumColumns);
 
-    GameState(const Grid & inGrid);
-
     const Grid & grid() const;
 
     void setGrid(const Grid & inGrid);
