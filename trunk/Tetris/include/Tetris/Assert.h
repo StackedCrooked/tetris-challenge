@@ -2,14 +2,29 @@
 #define TETRIS_ASSERT_H_INCLUDED
 
 
-#if defined(_DEBUG) || defined(TETRIS_ALWAYS_ASSERT)
+#include "Tetris/Logging.h"
+#include "Tetris/MakeString.h"
+#include <stdexcept>
+#include <string>
+
+
+namespace Tetris {
+
+
+void DebugBreak(const std::string & inFile, int inLine);
+
+
+} // namespace Tetris
+
+
+#if not defined(NDEBUG) || defined(TETRIS_ALWAYS_ASSERT)
     #ifdef _WIN32
         #include <windows.h>
         #define Assert(condition) if (!(condition)) { ::DebugBreak(); }
     #else
         #include "Tetris/MakeString.h"
         #include <stdexcept>
-        #define Assert(condition) if (!(condition)) { throw std::logic_error(Tetris::MakeString() << __FILE__ << __LINE__ << ": Assert failed."); }
+        #define Assert(condition) if (!(condition)) { Tetris::DebugBreak(__FILE__, __LINE__); }
     #endif
 #else
     #define Assert(...)
