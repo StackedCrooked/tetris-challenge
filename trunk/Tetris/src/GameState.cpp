@@ -26,20 +26,6 @@ GameState::GameState(size_t inNumRows, size_t inNumColumns) :
 }
 
 
-GameState::GameState(const Grid & inGrid) :
-    mGrid(inGrid),
-    mOriginalBlock(BlockType_L, Rotation(0), Row(0), Column(0)),
-    mIsGameOver(false),
-    mFirstOccupiedRow(inGrid.rowCount()),
-    mNumLines(0),
-    mNumSingles(0),
-    mNumDoubles(0),
-    mNumTriples(0),
-    mNumTetrises(0)
-{
-}
-
-
 bool GameState::checkPositionValid(const Block & inBlock, size_t inRowIdx, size_t inColIdx) const
 {
     const Grid & blockGrid(inBlock.grid());

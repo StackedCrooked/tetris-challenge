@@ -591,14 +591,7 @@ const GameState & ComputerGame::getGameState() const
 
 void ComputerGame::setGrid(const Grid & inGrid)
 {
-    clearPrecalculatedNodes();
-
-    NodePtr newNode(new GameStateNode(mCurrentNode, new GameState(inGrid), mCurrentNode->evaluator().clone().release()));
-    mCurrentNode->addChild(newNode);
-    Block oldActiveBlock(activeBlock());
-    navigateNodeDown();
-    setActiveBlock(oldActiveBlock);
-    getGameState().updateCache();
+    mCurrentNode->setGrid(inGrid);
     onChanged();
 }
 
