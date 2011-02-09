@@ -5,6 +5,7 @@ add_library(Tetris
     include/Tetris/AbstractWidget.h
     include/Tetris/AISupport.h
     include/Tetris/Allocator.h
+    include/Tetris/Array.h
     include/Tetris/Assert.h
     include/Tetris/AutoPtrSupport.h
     include/Tetris/Block.h

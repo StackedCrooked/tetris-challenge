@@ -45,7 +45,7 @@
 
 namespace Tetris
 {
-    
+
     std::string ToString(Worker::Status inStatus)
     {
         switch (inStatus)
@@ -136,8 +136,8 @@ namespace Tetris
     {
         waitForStatus(Status_Waiting);
     }
-    
-    
+
+
     void Worker::waitForStatus(Status inStatus)
     {
         boost::mutex::scoped_lock lock(mStatusMutex);
@@ -219,13 +219,13 @@ namespace Tetris
         catch (const boost::thread_interrupted &)
         {
             // Task was interrupted. Ok.
-        }        
+        }
         setStatus(Status_FinishedOne);
     }
 
 
     void Worker::run()
-    {        
+    {
         // Wrap entire thread in try/catch block.
         try
         {

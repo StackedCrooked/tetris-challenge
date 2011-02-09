@@ -298,6 +298,7 @@ Tetris/Todo.txt
 Tetris/include/Tetris/AISupport.h
 Tetris/include/Tetris/AbstractWidget.h
 Tetris/include/Tetris/Allocator.h
+Tetris/include/Tetris/Array.h
 Tetris/include/Tetris/Assert.h
 Tetris/include/Tetris/AutoPtrSupport.h
 Tetris/include/Tetris/Block.h
@@ -342,6 +343,7 @@ Tetris/include/Tetris/Worker.h
 Tetris/include/Tetris/WorkerPool.h
 Tetris/src/AISupport.cpp
 Tetris/src/AbstractWidget.cpp
+Tetris/src/Assert.cpp
 Tetris/src/Allocator.cpp
 Tetris/src/Block.cpp
 Tetris/src/BlockFactory.cpp
@@ -383,4 +385,4 @@ Tetris/testsuite/src/WorkerTest.cpp
 Tetris/testsuite/src/WorkerTest.h
 Tetris/testsuite/CMakeLists.txt
 Tetris/include/Tetris/PlayerType.h
-Tetris/src/Assert.cpp
+
