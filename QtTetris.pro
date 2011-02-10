@@ -24,7 +24,6 @@ SOURCES += \
     Tetris/src/BlockType.cpp \
     Tetris/src/ComputerPlayer.cpp \
     Tetris/src/Evaluator.cpp \
-    Tetris/src/EvilBlockFactory.cpp \
     Tetris/src/Game.cpp \
     Tetris/src/GameState.cpp \
     Tetris/src/GameStateComparator.cpp \
@@ -67,7 +66,6 @@ HEADERS += \
     Tetris/include/Tetris/Config.h \
     Tetris/include/Tetris/Direction.h \
     Tetris/include/Tetris/Evaluator.h \
-    Tetris/include/Tetris/EvilBlockFactory.h \
     Tetris/include/Tetris/ForwardDeclarations.h \
     Tetris/include/Tetris/Game.h \
     Tetris/include/Tetris/GameOver.h \

@@ -32,8 +32,18 @@ message("TETRIS_BUILD_CONFIGURATION: $ENV{TETRIS_BUILD_CONFIGURATION}")
 set(EXECUTABLE TetrisTestSuite)
 set(CMAKE_OSX_ARCHITECTURES ${ARCH})
 set(SOLUTIONDIR "${TetrisTestSuite_SOURCE_DIR}/../../")
-set(OUTDIR ${SOLUTIONDIR}Build/TetrisTestSuite/${PLATFORM}/${ARCH}/${CMAKE_BUILD_TYPE}/)
 set(POCO ${SOLUTIONDIR}3rdParty/Poco/)
+
+
+#
+# Set output directory
+#
+# Note:
+# If you want to build multiple platforms/architetures from the same
+# location then you need to use the second definition below.
+#
+set(OUTDIR ${SOLUTIONDIR}Build/)
+#set(OUTDIR ${SOLUTIONDIR}Build/${PLATFORM}/${ARCH}/${CMAKE_BUILD_TYPE}/)
 
 
 #
