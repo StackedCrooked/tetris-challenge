@@ -1,5 +1,7 @@
 Todo
 ----
+- Release a simple Qt game: single player, player vs computer, computer vs computer.
+- Use a single shared timer.
 - Teams
 - Online multiplayer
 - Sometimes penalty appears on the top of the grid. (Usually when game was already high, and tetris penalty.)
