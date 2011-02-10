@@ -59,12 +59,10 @@ add_library(Tetris
     src/GameState.cpp
     src/GameStateComparator.cpp
     src/GameStateNode.cpp
-    src/GenericGrid.cpp
     src/Gravity.cpp
     src/Logger.cpp
     src/Logging.cpp
     src/MainThread.cpp
-    src/MainThread_QT.cpp
     src/MultiplayerGame.cpp
     src/MultiThreadedNodeCalculator.cpp
     src/NodeCalculator.cpp
