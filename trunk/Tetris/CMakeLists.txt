@@ -17,7 +17,6 @@ add_library(Tetris
     include/Tetris/Config.h
     include/Tetris/Direction.h
     include/Tetris/Evaluator.h
-    include/Tetris/EvilBlockFactory.h
     include/Tetris/ForwardDeclarations.h
     include/Tetris/Game.h
     include/Tetris/GameOver.h
@@ -49,16 +48,13 @@ add_library(Tetris
     include/Tetris/Worker.h
     include/Tetris/WorkerPool.h
     src/AbstractWidget.cpp
-    src/Assert.cpp
     src/AISupport.cpp
-    src/Allocator.cpp
     src/Block.cpp
     src/BlockFactory.cpp
     src/BlockMover.cpp
     src/BlockType.cpp
     src/ComputerPlayer.cpp
     src/Evaluator.cpp
-    src/EvilBlockFactory.cpp
     src/Game.cpp
     src/GameState.cpp
     src/GameStateComparator.cpp
