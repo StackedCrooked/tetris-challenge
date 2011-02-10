@@ -28,12 +28,10 @@ SOURCES += \
     Tetris/src/GameState.cpp \
     Tetris/src/GameStateComparator.cpp \
     Tetris/src/GameStateNode.cpp \
-    Tetris/src/GenericGrid.cpp \
     Tetris/src/Gravity.cpp \
     Tetris/src/Logger.cpp \
     Tetris/src/Logging.cpp \
     Tetris/src/MainThread.cpp \
-    Tetris/src/MainThread_QT.cpp \
     Tetris/src/MultiplayerGame.cpp \
     Tetris/src/MultiThreadedNodeCalculator.cpp \
     Tetris/src/NodeCalculator.cpp \
@@ -101,6 +99,5 @@ HEADERS += \
 
 
 OTHER_FILES += \
-    CMakeLists.txt \
     QtTetris/CMakeLists.txt \
     Tetris/CMakeLists.txt

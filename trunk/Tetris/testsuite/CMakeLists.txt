@@ -42,16 +42,22 @@ set(POCO ${SOLUTIONDIR}3rdParty/Poco/)
 # If you want to build multiple platforms/architetures from the same
 # location then you need to use the second definition below.
 #
-set(OUTDIR ${SOLUTIONDIR}Build/)
+set(OUTDIR ${SOLUTIONDIR}Build/${CMAKE_BUILD_TYPE}/)
 #set(OUTDIR ${SOLUTIONDIR}Build/${PLATFORM}/${ARCH}/${CMAKE_BUILD_TYPE}/)
+
+
+#
+# Now we can set the CMAKE vars
+#
+set(LIBRARY_OUTPUT_PATH ${OUTDIR}lib/)
+set(EXECUTABLE_OUTPUT_PATH ${OUTDIR}bin/)
 
 
 #
 # Compile Flags
 #
-set(WARNING_OPTIONS         "-arch ${ARCH} -Wall -Wno-sign-compare")
-set(WARNING_OPTIONS_Debug   "${WARNING_OPTIONS} -arch ${ARCH} -Werror ")
-set(WARNING_OPTIONS_Release "${WARNING_OPTIONS} -arch ${ARCH} ")
+set(WARNING_OPTIONS         "-arch ${ARCH} ")
+set(WARNING_OPTIONS_Debug   "${WARNING_OPTIONS} -Wall -Werror -Wno-sign-compare")
 set(CXX_FLAGS         "${CXX_FLAGS} -DTETRIS_QT=1")
 set(CXX_FLAGS_Debug   "${CXX_FLAGS} ${WARNING_OPTIONS_Debug} -ggdb3")
 set(CXX_FLAGS_Release "${CXX_FLAGS} ${WARNING_OPTIONS_Release} -O3 -DNDEBUG")
@@ -84,7 +90,7 @@ endif()
 #
 # Tetris dependency
 #
-add_subdirectory(${SOLUTIONDIR}Tetris ${OUTDIR}Tetris)
+add_subdirectory(${SOLUTIONDIR}Tetris ${LIBRARY_OUTPUT_PATH})
 
 
 #
@@ -113,7 +119,7 @@ set(TetrisTestSuite_HEADERS
 #
 # Special settings to make CMake and Qt work together
 #
-QT4_WRAP_CPP(TetrisTestSuite_HEADERS_MOC ${TetrisTestSuite_HEADERS})
+#QT4_WRAP_CPP(TetrisTestSuite_HEADERS_MOC ${TetrisTestSuite_HEADERS})
 include(${QT_USE_FILE})
 add_definitions(${QT_DEFINITIONS})
 
