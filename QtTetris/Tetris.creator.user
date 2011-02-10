@@ -26,7 +26,7 @@
     <valuemap key="ProjectExplorer.BuildConfiguration.BuildStep.0" type="QVariantMap">
      <valuelist key="ProjectExplorer.ProcessStep.Arguments" type="QVariantList">
       <value type="QString">-p</value>
-      <value type="QString">Build/QtCreator</value>
+      <value type="QString">Build/QtTetris</value>
      </valuelist>
      <value key="ProjectExplorer.ProcessStep.Command" type="QString">/bin/mkdir</value>
      <value key="ProjectExplorer.ProcessStep.Enabled" type="bool">true</value>
@@ -41,7 +41,7 @@
      </valuelist>
      <value key="ProjectExplorer.ProcessStep.Command" type="QString">/Users/francis/bin/cmake</value>
      <value key="ProjectExplorer.ProcessStep.Enabled" type="bool">true</value>
-     <value key="ProjectExplorer.ProcessStep.WorkingDirectory" type="QString">$BUILDDIR/Build/QtCreator</value>
+     <value key="ProjectExplorer.ProcessStep.WorkingDirectory" type="QString">$BUILDDIR/Build/QtTetris</value>
      <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString">Run CMake</value>
      <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">ProjectExplorer.ProcessStep</value>
     </valuemap>
@@ -49,7 +49,7 @@
     <valuemap key="ProjectExplorer.BuildConfiguration.CleanStep.0" type="QVariantMap">
      <valuelist key="ProjectExplorer.ProcessStep.Arguments" type="QVariantList">
       <value type="QString">-rf</value>
-      <value type="QString">Build/QtCreator</value>
+      <value type="QString">Build/QtTetris</value>
      </valuelist>
      <value key="ProjectExplorer.ProcessStep.Command" type="QString">/bin/rm</value>
      <value key="ProjectExplorer.ProcessStep.Enabled" type="bool">true</value>
@@ -110,7 +110,7 @@
     <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">GenericProjectManager.GenericBuildConfiguration</value>
    </valuemap>
    <valuemap key="ProjectExplorer.Target.BuildConfiguration.2" type="QVariantMap">
-    <value key="GenericProjectManager.GenericBuildConfiguration.BuildDirectory" type="QString">/Users/francis/svn/tetris-challenge/Build/QtCreator</value>
+    <value key="GenericProjectManager.GenericBuildConfiguration.BuildDirectory" type="QString">/Users/francis/svn/tetris-challenge/Build/QtTetris</value>
     <valuemap key="ProjectExplorer.BuildConfiguration.BuildStep.0" type="QVariantMap">
      <valuelist key="GenericProjectManager.GenericMakeStep.BuildTargets" type="QVariantList"/>
      <valuelist key="GenericProjectManager.GenericMakeStep.MakeArguments" type="QVariantList">
