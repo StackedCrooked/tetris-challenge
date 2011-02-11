@@ -1,3 +1,4 @@
+#include "Poco/Foundation.h"
 #include "Tetris/Config.h"
 #include "Tetris/ComputerPlayer.h"
 #include "Tetris/NodeCalculator.h"
