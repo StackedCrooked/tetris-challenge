@@ -15,7 +15,7 @@
   <valuemap type="QVariantMap">
    <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString">Desktop</value>
    <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">Qt4ProjectManager.Target.DesktopTarget</value>
-   <value key="ProjectExplorer.Target.ActiveBuildConfiguration" type="int">2</value>
+   <value key="ProjectExplorer.Target.ActiveBuildConfiguration" type="int">0</value>
    <value key="ProjectExplorer.Target.ActiveRunConfiguration" type="int">0</value>
    <valuemap key="ProjectExplorer.Target.BuildConfiguration.0" type="QVariantMap">
     <valuemap key="ProjectExplorer.BuildConfiguration.BuildStep.0" type="QVariantMap">
@@ -23,7 +23,7 @@
       <value type="QString">-p</value>
       <value type="QString">Build/QtTetris</value>
      </valuelist>
-     <value key="ProjectExplorer.ProcessStep.Command" type="QString">/bin/mkdir</value>
+     <value key="ProjectExplorer.ProcessStep.Command" type="QString">C:\cygwin\bin\mkdir.exe</value>
      <value key="ProjectExplorer.ProcessStep.Enabled" type="bool">true</value>
      <value key="ProjectExplorer.ProcessStep.WorkingDirectory" type="QString">$BUILDDIR</value>
      <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString">Custom Process Step</value>
@@ -33,9 +33,9 @@
      <valuelist key="ProjectExplorer.ProcessStep.Arguments" type="QVariantList">
       <value type="QString">../../QtTetris</value>
      </valuelist>
-     <value key="ProjectExplorer.ProcessStep.Command" type="QString">/opt/local/bin/cmake</value>
+     <value key="ProjectExplorer.ProcessStep.Command" type="QString">C:\cygwin\bin\cmake.exe</value>
      <value key="ProjectExplorer.ProcessStep.Enabled" type="bool">true</value>
-     <value key="ProjectExplorer.ProcessStep.WorkingDirectory" type="QString">$BUILDDIR/Build/QtTetris</value>
+     <value key="ProjectExplorer.ProcessStep.WorkingDirectory" type="QString">$BUILDDIR\Build\QtTetris</value>
      <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString">Custom Process Step</value>
      <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">ProjectExplorer.ProcessStep</value>
     </valuemap>
@@ -45,7 +45,7 @@
       <value type="QString">-rf</value>
       <value type="QString">Build/QtTetris</value>
      </valuelist>
-     <value key="ProjectExplorer.ProcessStep.Command" type="QString">/bin/rm</value>
+     <value key="ProjectExplorer.ProcessStep.Command" type="QString">C:\cygwin\bin\rm.exe</value>
      <value key="ProjectExplorer.ProcessStep.Enabled" type="bool">true</value>
      <value key="ProjectExplorer.ProcessStep.WorkingDirectory" type="QString">$BUILDDIR</value>
      <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString">Custom Process Step</value>
@@ -59,9 +59,9 @@
     <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString">Configure Debug</value>
     <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">Qt4ProjectManager.Qt4BuildConfiguration</value>
     <value key="Qt4ProjectManager.Qt4BuildConfiguration.BuildConfiguration" type="int">2</value>
-    <value key="Qt4ProjectManager.Qt4BuildConfiguration.BuildDirectory" type="QString">/Users/francis/svn/tetris-challenge</value>
+    <value key="Qt4ProjectManager.Qt4BuildConfiguration.BuildDirectory" type="QString">C:/svn/tetris-challenge</value>
     <value key="Qt4ProjectManager.Qt4BuildConfiguration.QtVersionId" type="int">2</value>
-    <value key="Qt4ProjectManager.Qt4BuildConfiguration.ToolChain" type="int">0</value>
+    <value key="Qt4ProjectManager.Qt4BuildConfiguration.ToolChain" type="int">2</value>
     <value key="Qt4ProjectManager.Qt4BuildConfiguration.UseShadowBuild" type="bool">true</value>
    </valuemap>
    <valuemap key="ProjectExplorer.Target.BuildConfiguration.1" type="QVariantMap">
@@ -108,7 +108,7 @@
     <value key="Qt4ProjectManager.Qt4BuildConfiguration.BuildConfiguration" type="int">2</value>
     <value key="Qt4ProjectManager.Qt4BuildConfiguration.BuildDirectory" type="QString">/Users/francis/svn/tetris-challenge</value>
     <value key="Qt4ProjectManager.Qt4BuildConfiguration.QtVersionId" type="int">2</value>
-    <value key="Qt4ProjectManager.Qt4BuildConfiguration.ToolChain" type="int">0</value>
+    <value key="Qt4ProjectManager.Qt4BuildConfiguration.ToolChain" type="int">2</value>
     <value key="Qt4ProjectManager.Qt4BuildConfiguration.UseShadowBuild" type="bool">true</value>
    </valuemap>
    <valuemap key="ProjectExplorer.Target.BuildConfiguration.2" type="QVariantMap">
@@ -135,7 +135,7 @@
      <valuelist key="ProjectExplorer.ProcessStep.Arguments" type="QVariantList">
       <value type="QString">Done!</value>
      </valuelist>
-     <value key="ProjectExplorer.ProcessStep.Command" type="QString">/bin/echo</value>
+     <value key="ProjectExplorer.ProcessStep.Command" type="QString">\bin\echo</value>
      <value key="ProjectExplorer.ProcessStep.Enabled" type="bool">false</value>
      <value key="ProjectExplorer.ProcessStep.WorkingDirectory" type="QString">$BUILDDIR</value>
      <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString">Custom Process Step</value>
@@ -147,9 +147,9 @@
     <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString">Make</value>
     <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">Qt4ProjectManager.Qt4BuildConfiguration</value>
     <value key="Qt4ProjectManager.Qt4BuildConfiguration.BuildConfiguration" type="int">2</value>
-    <value key="Qt4ProjectManager.Qt4BuildConfiguration.BuildDirectory" type="QString">/Users/francis/svn/tetris-challenge/Build/QtTetris</value>
+    <value key="Qt4ProjectManager.Qt4BuildConfiguration.BuildDirectory" type="QString">C:/svn/tetris-challenge/Build/QtTetris</value>
     <value key="Qt4ProjectManager.Qt4BuildConfiguration.QtVersionId" type="int">2</value>
-    <value key="Qt4ProjectManager.Qt4BuildConfiguration.ToolChain" type="int">0</value>
+    <value key="Qt4ProjectManager.Qt4BuildConfiguration.ToolChain" type="int">2</value>
     <value key="Qt4ProjectManager.Qt4BuildConfiguration.UseShadowBuild" type="bool">true</value>
    </valuemap>
    <value key="ProjectExplorer.Target.BuildConfigurationCount" type="int">3</value>

@@ -48,7 +48,7 @@
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
-				DebugInformationFormat="4"
+				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -149,11 +149,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\src\AISupport.cpp"
+				RelativePath=".\src\AbstractWidget.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\src\Allocator.cpp"
+				RelativePath=".\src\AISupport.cpp"
 				>
 			</File>
 			<File
@@ -197,10 +197,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\GenericGrid.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\src\Gravity.cpp"
 				>
 			</File>
@@ -213,6 +209,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\MainThread.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\MultiplayerGame.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\src\MultiThreadedNodeCalculator.cpp"
 				>
 			</File>
@@ -222,6 +226,14 @@
 			</File>
 			<File
 				RelativePath=".\src\NodeCalculatorImpl.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\Player.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\SimpleGame.cpp"
 				>
 			</File>
 			<File
@@ -251,11 +263,19 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath=".\include\Tetris\AbstractWidget.h"
+				>
+			</File>
+			<File
 				RelativePath=".\include\Tetris\AISupport.h"
 				>
 			</File>
 			<File
 				RelativePath=".\include\Tetris\Allocator.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\Tetris\Array.h"
 				>
 			</File>
 			<File
@@ -299,10 +319,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\Tetris\Enum.h"
-				>
-			</File>
-			<File
 				RelativePath=".\include\Tetris\Evaluator.h"
 				>
 			</File>
@@ -331,6 +347,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\include\Tetris\GameStateStats.h"
+				>
+			</File>
+			<File
 				RelativePath=".\include\Tetris\GenericGrid.h"
 				>
 			</File>
@@ -351,7 +371,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\include\Tetris\MainThread.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\Tetris\MainThreadImpl.h"
+				>
+			</File>
+			<File
 				RelativePath=".\include\Tetris\MakeString.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\Tetris\MultiplayerGame.h"
 				>
 			</File>
 			<File
@@ -368,6 +400,18 @@
 			</File>
 			<File
 				RelativePath=".\include\Tetris\NodePtr.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\Tetris\Player.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\Tetris\PlayerType.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\Tetris\SimpleGame.h"
 				>
 			</File>
 			<File
