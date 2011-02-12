@@ -94,7 +94,7 @@ void NodeCalculatorTest::testInterrupt(Depth inDepth, Width inWidth, WorkerCount
     Assert(blockTypes.size() == widths.size());
     Assert(nodeCalculator.getMaxSearchDepth() == blockTypes.size());
     Assert(nodeCalculator.status() == NodeCalculator::Status_Nil);
-    
+
     nodeCalculator.start();
 
     Assert(nodeCalculator.status() == NodeCalculator::Status_Started);
@@ -132,15 +132,15 @@ void NodeCalculatorTest::testInterrupt(Depth inDepth, Width inWidth, WorkerCount
     Assert(result.depth() == rootNode->depth() + 1);
     Assert(result.gameState().originalBlock().type() == blockTypes[0]);
 
-	if (inDepth > 1)
-	{
-		Assert(result.children().size() == 1);
-	}
-	else
-	{
-		Assert(result.children().empty());
-	}
-    
+    if (inDepth > 1)
+    {
+        Assert(result.children().size() == 1);
+    }
+    else
+    {
+        Assert(result.children().empty());
+    }
+
     Assert(result.endNode()->children().empty());
 }
 
@@ -167,12 +167,12 @@ void NodeCalculatorTest::testDestroy(WorkerPool & inWorkerPool)
     Assert(blockTypes.size() == widths.size());
     Assert(nodeCalculator.getMaxSearchDepth() == blockTypes.size());
     Assert(nodeCalculator.status() == NodeCalculator::Status_Nil);
-    
+
     nodeCalculator.start();
 
     Assert(nodeCalculator.status() >= NodeCalculator::Status_Started);
     Poco::Thread::sleep(10);
-	Assert(nodeCalculator.status() != NodeCalculator::Status_Error);
+    Assert(nodeCalculator.status() != NodeCalculator::Status_Error);
 }
 
 
@@ -189,6 +189,6 @@ void NodeCalculatorTest::tearDown()
 CppUnit::Test * NodeCalculatorTest::suite()
 {
     CppUnit::TestSuite * suite(new CppUnit::TestSuite("NodeCalculatorTest"));
-	CppUnit_addTest(suite, NodeCalculatorTest, testNodeCalculator);
-	return suite;
+    CppUnit_addTest(suite, NodeCalculatorTest, testNodeCalculator);
+    return suite;
 }
