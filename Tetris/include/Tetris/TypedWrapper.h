@@ -6,7 +6,7 @@
  * Macro Tetris_TypedWrapper
  *
  * This macro generates simple class wrapper for a given type.
- * Accidental mix-ups will result in compile errors instead of 
+ * Accidental mix-ups will result in compile errors instead of
  * runtime-errors.
  *
  * Example:
@@ -15,12 +15,12 @@
  *     Tetris_TypedWrapper(Height, int);
  *
  *     Width width = 800;
- *     Width height = 600;
+ *     Height height = 600;
  *
  *     // Signature is: 'SetSize(Width width, Height height);'
  *     SetSize(height, width); // => compiler error
  */
-#define Tetris_TypedWrapper(ClassName, WrappedType)                                  \
+#define Tetris_TypedWrapper(ClassName, WrappedType)                           \
     class ClassName                                                           \
     {                                                                         \
     public:                                                                   \
