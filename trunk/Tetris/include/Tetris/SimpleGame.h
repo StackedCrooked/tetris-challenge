@@ -91,6 +91,10 @@ public:
 
     ThreadSafe<Game> game() const;
 
+    void setPaused(bool inPaused);
+
+    bool isPaused() const;
+
     bool isGameOver() const;
 
     int rowCount() const;

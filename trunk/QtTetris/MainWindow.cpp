@@ -192,6 +192,7 @@ void MainWindow::restart()
     {
         LogInfo(MakeString() << "Setting player " << idx);
         Player * player = mgame.getPlayer(idx);
+        player->simpleGame()->setPaused(true);
         mTetrisWidgets[idx]->setGame(player->simpleGame());
     }
 
