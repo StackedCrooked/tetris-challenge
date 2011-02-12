@@ -16,7 +16,8 @@ static const int cMargin = 2000;
 
 
 WorkerPoolTest::WorkerPoolTest(const std::string & inName):
-    CppUnit::TestCase(inName)
+    CppUnit::TestCase(inName),
+    mIterationCount(10)
 {
 }
 
@@ -30,13 +31,28 @@ void WorkerPoolTest::BeBusy()
 {
     while (true)
     {
+        bool interruptRequest = boost::this_thread::interruption_requested();
         boost::this_thread::interruption_point();
+        if (interruptRequest)
+        {
+            throw std::runtime_error("Interrupt requested!");
+        }
         Poco::Thread::sleep(cSleepTime);
     }
 }
 
 
 void WorkerPoolTest::testWorkerPool()
+{
+    for (size_t idx = 0; idx < mIterationCount; ++idx)
+    {
+        std::cout << "Test workerpool iteration " << idx << std::flush << std::endl;
+        testWorkerPoolImpl();
+    }
+}
+
+
+void WorkerPoolTest::testWorkerPoolImpl()
 {
     const size_t cPoolSize[] = {1, 2, 4, 8, 16};
     const size_t cPoolSizeCount = sizeof(cPoolSize) / sizeof(cPoolSize[0]);
@@ -126,6 +142,6 @@ void WorkerPoolTest::tearDown()
 CppUnit::Test * WorkerPoolTest::suite()
 {
     CppUnit::TestSuite * suite(new CppUnit::TestSuite("WorkerPoolTest"));
-	CppUnit_addTest(suite, WorkerPoolTest, testWorkerPool);
-	return suite;
+    CppUnit_addTest(suite, WorkerPoolTest, testWorkerPool);
+    return suite;
 }

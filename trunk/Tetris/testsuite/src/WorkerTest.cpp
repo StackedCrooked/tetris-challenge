@@ -18,7 +18,7 @@ static const int cSleepTimeMs = 100;
 WorkerTest::WorkerTest(const std::string & inName):
     CppUnit::TestCase(inName),
     mStopwatch(),
-    mRepeat(1)
+    mRepeat(10)
 {
 }
 
@@ -42,6 +42,7 @@ void WorkerTest::testWorker()
 {
     for (size_t idx = 0; idx != mRepeat; ++idx)
     {
+        std::cout << "Test worker iteration " << idx << std::flush << std::endl;
         testWorkerImpl();
     }
 }
@@ -101,7 +102,7 @@ void WorkerTest::testWorkerImpl()
 
     // Interrupt twice should not crash.
     worker.interrupt();
-    worker.interrupt();   
+    worker.interrupt();
     worker.interruptAndClearQueue();
     worker.interruptAndClearQueue();
 }
@@ -120,6 +121,6 @@ void WorkerTest::tearDown()
 CppUnit::Test * WorkerTest::suite()
 {
     CppUnit::TestSuite * suite(new CppUnit::TestSuite("WorkerTest"));
-	CppUnit_addTest(suite, WorkerTest, testWorker);
-	return suite;
+    CppUnit_addTest(suite, WorkerTest, testWorker);
+    return suite;
 }

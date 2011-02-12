@@ -10,12 +10,12 @@
 class WorkerPoolTest: public CppUnit::TestCase
 {
 public:
-	WorkerPoolTest(const std::string & name);
-	~WorkerPoolTest();
+    WorkerPoolTest(const std::string & name);
+    ~WorkerPoolTest();
 
     static void BeBusy();
 
-	void testWorkerPool();
+    void testWorkerPool();
 
     void setUp();
 
@@ -24,7 +24,10 @@ public:
     static CppUnit::Test* suite();
 
 private:
+    void testWorkerPoolImpl();
+
     Poco::Stopwatch mStopwatch;
+    size_t mIterationCount;
 };
 
 
