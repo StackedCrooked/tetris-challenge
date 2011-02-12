@@ -143,6 +143,7 @@ public:
 
     Variable * operator->()
     { return mVariable; }
+
 private:
     ScopedReaderAndWriter(const ScopedReaderAndWriter&);
     ScopedReaderAndWriter& operator=(const ScopedReaderAndWriter&);
@@ -178,6 +179,7 @@ public:
 
     const Variable * operator->() const
     { return mVariable; }
+
 private:
     ScopedReader(const ScopedReader&);
     ScopedReader& operator=(const ScopedReader&);
