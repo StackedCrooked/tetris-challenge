@@ -23,8 +23,8 @@ public:
     Player(PlayerType inPlayerType,
            const TeamName & inTeamName,
            const PlayerName & inPlayerName,
-           size_t inRowCount = 20,
-           size_t inColumnCount = 10);
+           size_t inRowCount,
+           size_t inColumnCount);
 
     ~Player();
 

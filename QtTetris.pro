@@ -43,7 +43,8 @@ SOURCES += \
     Tetris/src/Threading.cpp \
     Tetris/src/Unicode.cpp \
     Tetris/src/Worker.cpp \
-    Tetris/src/WorkerPool.cpp
+    Tetris/src/WorkerPool.cpp \
+    QtTetris/TetrisWidget.cpp
 
 
 HEADERS += \

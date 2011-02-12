@@ -15,7 +15,8 @@ WorkerPool::WorkerPool(const std::string & inName, size_t inSize) :
 {
     for (size_t idx = 0; idx != inSize; ++idx)
     {
-        mWorkers.push_back(new Worker(MakeString() << inName << mWorkers.size()));
+        WorkerPtr workerPtr(new Worker(MakeString() << inName << mWorkers.size()));
+        mWorkers.push_back(workerPtr);
     }
 }
 
@@ -48,7 +49,8 @@ void WorkerPool::resize(size_t inSize)
     {
         while (mWorkers.size() < inSize)
         {
-            mWorkers.push_back(new Worker(MakeString() << mName << mWorkers.size()));
+            WorkerPtr workerPtr(new Worker(MakeString() << mName << mWorkers.size()));
+            mWorkers.push_back(workerPtr);
         }
     }
     else if (inSize < mWorkers.size()) // Deletes a few workers

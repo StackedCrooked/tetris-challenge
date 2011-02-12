@@ -48,8 +48,6 @@ private:
     void clearGameState();
     void toggleActiveBlock();
 
-    int mRowCount;
-    int mColCount;
     QSize mMinSize;
     std::auto_ptr<QPainter> mPainter;
 

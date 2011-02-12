@@ -11,15 +11,21 @@
 #include <iostream>
 
 
-using namespace Tetris;
+int Tetris_RowCount();
+int Tetris_ColumnCount();
+int Tetris_GetSquareWidth();
+int Tetris_GetSquareHeight();
 
 
 typedef boost::shared_ptr<Tetris::SimpleGame> SimpleGamePtr;
 
 
+using namespace Tetris;
+
+
 enum
 {
-    cPlayerCount = 4
+    cPlayerCount = 1
 };
 
 
@@ -47,7 +53,7 @@ public:
         return *mMultiplayerGame;
     }
 
-    void reset()
+    void reset(size_t inRowCount, size_t inColCount)
     {
         LogInfo(MakeString() << "RESET!!!");
         mMultiplayerGame.reset();
@@ -58,7 +64,10 @@ public:
             mMultiplayerGame->join(
                 Create<Player>(PlayerType_Computer,
                                TeamName(GetTeamName(idx)),
-                               PlayerName(GetPlayerName(idx))));
+                               PlayerName(GetPlayerName(idx)),
+                               inRowCount,
+                               inColCount
+                               ));
         }
     }
 
@@ -85,15 +94,6 @@ private:
 };
 
 
-//
-// Configuration
-//
-const int cRowCount(20);
-const int cColumnCount(10);
-const int cSquareWidth(20);
-const int cSquareHeight(20);
-
-
 MainWindow * MainWindow::sInstance(0);
 
 
@@ -112,10 +112,11 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     sInstance = this;
 
+
     QWidget * theCentralWidget(new QWidget);
     for (size_t idx = 0; idx < cPlayerCount; ++idx)
     {
-        mTetrisWidgets.push_back(new TetrisWidget(theCentralWidget, cSquareWidth, cSquareHeight));
+        mTetrisWidgets.push_back(new TetrisWidget(theCentralWidget, Tetris_GetSquareWidth(), Tetris_GetSquareHeight()));
         mTetrisWidgets.back()->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     }
 
@@ -202,7 +203,7 @@ void MainWindow::onPaused()
 void MainWindow::restart()
 {
     LogInfo(__PRETTY_FUNCTION__);
-    Model::Instance().reset();
+    Model::Instance().reset(Tetris_RowCount(), Tetris_ColumnCount());
     MultiplayerGame & mgame = Model::Instance().multiplayerGame();
     LogInfo(MakeString() << "Player count: " << mgame.playerCount());
     LogInfo(MakeString() << "mTetrisWidgets.size(): " << mTetrisWidgets.size());
@@ -214,6 +215,7 @@ void MainWindow::restart()
         Player * player = mgame.getPlayer(idx);
         player->simpleGame()->setLevel(6);
         mTetrisWidgets[idx]->setGame(player->simpleGame());
+        player->simpleGame()->applyLinePenalty(10);
     }
 
 }

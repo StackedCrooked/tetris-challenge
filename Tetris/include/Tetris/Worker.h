@@ -18,9 +18,8 @@ namespace Tetris
 
     /**
      * Worker starts a background thread that runs in a loop processing tasks from a queue.
-     * When the queue is empty the Worker goes into waiting mode.
      */
-    class Worker : boost::noncopyable
+    class Worker
     {
     public:
         // Creates a new thread and starts waiting for tasks.
@@ -79,6 +78,8 @@ namespace Tetris
         void interruptAndClearQueue();
 
     private:
+        Worker(const Worker&);
+        Worker& operator=(const Worker&);
 
         friend class WorkerPool;
         void setQuitFlag();
