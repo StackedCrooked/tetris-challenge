@@ -104,37 +104,51 @@ MainWindow * MainWindow::GetInstance()
 
 
 MainWindow::MainWindow(QWidget *parent) :
-    QWidget(parent),
+    QMainWindow(parent),
     mTetrisWidgets(),
     mRestartButton(0),
+    mPauseButton(0),
     mLogField(0)
 {
     sInstance = this;
 
+    QWidget * theCentralWidget(new QWidget);
     for (size_t idx = 0; idx < cPlayerCount; ++idx)
     {
-        mTetrisWidgets.push_back(new TetrisWidget(this, cSquareWidth, cSquareHeight));
+        mTetrisWidgets.push_back(new TetrisWidget(theCentralWidget, cSquareWidth, cSquareHeight));
         mTetrisWidgets.back()->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     }
 
-    mRestartButton = new QPushButton("Restart", this);
+    QAction * newGame = menuBar()->addMenu("Tetris")->addAction("New");
+    connect(newGame, SIGNAL(triggered()), this, SLOT(onRestart()));
+
+    mRestartButton = new QPushButton("Restart", theCentralWidget);
     connect(mRestartButton, SIGNAL(clicked()), this, SLOT(onRestart()));
 
-    mLogField = new QTextEdit(this);
+    mPauseButton = new QPushButton("Pause", theCentralWidget);
+    connect(mPauseButton, SIGNAL(clicked()), this, SLOT(onPaused()));
+
+    mLogField = new QTextEdit(theCentralWidget);
     mLogField->setReadOnly(true);
 
 
-    QVBoxLayout * vbox = new QVBoxLayout(this);
+    QVBoxLayout * vbox = new QVBoxLayout(theCentralWidget);
     QHBoxLayout * hbox = new QHBoxLayout;
     for (size_t idx = 0; idx < cPlayerCount; ++idx)
     {
         hbox->addWidget(mTetrisWidgets[idx]);
     }
     vbox->addItem(hbox);
-    vbox->addWidget(mRestartButton);
+
+    QHBoxLayout * buttonsHBox = new QHBoxLayout;
+    buttonsHBox->addWidget(mPauseButton);
+    buttonsHBox->addWidget(mRestartButton);
+
+    vbox->addItem(buttonsHBox);
     vbox->addWidget(new QLabel("Press 'c' to clear the game."), 0);
     vbox->addWidget(mLogField, 1);
 
+    setCentralWidget(theCentralWidget);
 
     Logger::Instance().setLogHandler(boost::bind(&MainWindow::logMessage, this, _1));
     LogInfo("Test Logger.");
@@ -169,7 +183,19 @@ bool MainWindow::event(QEvent * inEvent)
 
 void MainWindow::onRestart()
 {
-    InvokeLater(boost::bind(&MainWindow::restart, this));
+    restart();
+}
+
+
+void MainWindow::onPaused()
+{
+    MultiplayerGame & mgame = Model::Instance().multiplayerGame();
+    for (size_t idx = 0; idx < mgame.playerCount(); ++idx)
+    {
+        Player * player = mgame.getPlayer(idx);
+        bool isPaused = player->simpleGame()->isPaused();
+        player->simpleGame()->setPaused(!isPaused);
+    }
 }
 
 
@@ -186,9 +212,10 @@ void MainWindow::restart()
     {
         LogInfo(MakeString() << "Setting player " << idx);
         Player * player = mgame.getPlayer(idx);
-        player->simpleGame()->setPaused(true);
+        player->simpleGame()->setLevel(6);
         mTetrisWidgets[idx]->setGame(player->simpleGame());
     }
+
 }
 
 

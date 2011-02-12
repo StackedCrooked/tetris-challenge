@@ -107,6 +107,8 @@ public:
 
     void drop();
 
+    void setLevel(int inLevel);
+
     int level() const;
 
     // Returns a copy to avoid race conditions.

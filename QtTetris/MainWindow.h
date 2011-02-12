@@ -11,7 +11,7 @@
 #include <boost/shared_ptr.hpp>
 
 
-class MainWindow : public QWidget
+class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
@@ -29,6 +29,8 @@ public:
 private slots:
     void onRestart();
 
+    void onPaused();
+
 private:
     static MainWindow * sInstance;
 
@@ -37,6 +39,7 @@ private:
 
     std::vector<TetrisWidget *> mTetrisWidgets;
     QPushButton * mRestartButton;
+    QPushButton * mPauseButton;
     QTextEdit * mLogField;
 };
 
