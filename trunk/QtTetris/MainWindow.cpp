@@ -107,8 +107,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QWidget(parent),
     mTetrisWidgets(),
     mRestartButton(0),
-    mLogField(0),
-    mRestartFlag(false)
+    mLogField(0)
 {
     sInstance = this;
 
@@ -170,11 +169,6 @@ bool MainWindow::event(QEvent * inEvent)
 
 void MainWindow::onRestart()
 {
-    if (mRestartFlag)
-    {
-        throw std::logic_error("MainWindow::onRestart: mRestartFlag is already true!");
-    }
-    mRestartFlag = true;
     InvokeLater(boost::bind(&MainWindow::restart, this));
 }
 
@@ -195,9 +189,6 @@ void MainWindow::restart()
         player->simpleGame()->setPaused(true);
         mTetrisWidgets[idx]->setGame(player->simpleGame());
     }
-
-    // Ok, we're done.
-    mRestartFlag = false;
 }
 
 
