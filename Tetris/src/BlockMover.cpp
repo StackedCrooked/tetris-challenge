@@ -132,6 +132,10 @@ namespace Tetris
     {
         ScopedReaderAndWriter<Game> wGame(mGame);
         ComputerGame & game = dynamic_cast<ComputerGame&>(*wGame.get());
+        if (game.isPaused())
+        {
+            return;
+        }
 
         const ChildNodes & children = game.currentNode()->children();
         if (children.empty())

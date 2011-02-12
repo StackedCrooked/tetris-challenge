@@ -54,7 +54,8 @@ Game::Game(size_t inNumRows, size_t inNumColumns) :
     mBlockFactory(new BlockFactory),
     mBlocks(),
     mCurrentBlockIndex(0),
-    mOverrideLevel(-1)
+    mOverrideLevel(-1),
+    mPaused(false)
 {
     if (mBlocks.empty())
     {
@@ -303,6 +304,19 @@ void Game::supplyBlocks() const
     {
         mBlocks.push_back(mBlockFactory->getNext());
     }
+}
+
+
+void Game::setPaused(bool inPaused)
+{
+    LogInfo(MakeString() << "Game::setPaused: " << inPaused);
+    mPaused = inPaused;
+}
+
+
+bool Game::isPaused() const
+{
+    return mPaused;
 }
 
 

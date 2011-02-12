@@ -62,6 +62,10 @@ public:
 
     static void UnregisterEventHandler(ThreadSafe<Game> inGame, EventHandler * inEventHandler);
 
+    void setPaused(bool inPause);
+
+    bool isPaused() const;
+
     bool isGameOver() const;
 
     int rowCount() const;
@@ -120,6 +124,7 @@ protected:
     mutable BlockTypes mBlocks;
     size_t mCurrentBlockIndex;
     int mOverrideLevel;
+    bool mPaused;
 
     typedef std::set<EventHandler*> EventHandlers;
     EventHandlers mEventHandlers;

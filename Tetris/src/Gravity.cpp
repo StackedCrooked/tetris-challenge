@@ -92,7 +92,7 @@ namespace Tetris
             {
                 mStopwatch.restart();
                 ScopedReaderAndWriter<Game> game(mThreadSafeGame);
-                if (game->isGameOver())
+                if (game->isGameOver() || game->isPaused())
                 {
                     return;
                 }

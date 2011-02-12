@@ -200,6 +200,21 @@ ThreadSafe<Game> SimpleGame::game() const
 }
 
 
+void SimpleGame::setPaused(bool inPaused)
+{
+    LogInfo(MakeString() << "SimpleGame::setPaused: " << inPaused);
+    ScopedReaderAndWriter<Game> rwgame(mImpl->mGame);
+    return rwgame->setPaused(inPaused);
+}
+
+
+bool SimpleGame::isPaused() const
+{
+    ScopedReader<Game> rgame(mImpl->mGame);
+    return rgame->isPaused();
+}
+
+
 GameStateStats SimpleGame::stats() const
 {
     ScopedReader<Game> rgame(mImpl->mGame);
