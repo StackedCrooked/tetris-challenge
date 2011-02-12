@@ -67,17 +67,10 @@ link_directories(${POCO}lib/${PLATFORM}/${ARCH})
 #
 # Boost dependency
 #
-if(APPLE)
-message("Note: MacOSX build depends on boost library from MacPorts!")
-include_directories("/opt/local/include")
-link_directories("/opt/local/lib")
-set(LIB_BOOST_THREAD boost_thread-mt)
-else()
 set(BOOST ${SOLUTIONDIR}3rdParty/Boost_1_44_0/)
 include_directories(${BOOST})
 link_directories(${BOOST}lib/${PLATFORM}/${ARCH})
 set(LIB_BOOST_THREAD boost_thread)
-endif()
 
 
 #
