@@ -151,7 +151,7 @@
     <valuelist key="ProjectExplorer.CustomExecutableRunConfiguration.UserEnvironmentChanges" type="QVariantList"/>
     <value key="ProjectExplorer.CustomExecutableRunConfiguration.UserName" type="QString">TetrisTestSuite Binary</value>
     <value key="ProjectExplorer.CustomExecutableRunConfiguration.UserSetName" type="bool">true</value>
-    <value key="ProjectExplorer.CustomExecutableRunConfiguration.WorkingDirectory" type="QString">$BUILDDIR</value>
+    <value key="ProjectExplorer.CustomExecutableRunConfiguration.WorkingDirectory" type="QString">$BUILDDIR/../Debug/bin</value>
     <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString">TetrisTestSuite Binary</value>
     <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">ProjectExplorer.CustomExecutableRunConfiguration</value>
    </valuemap>
