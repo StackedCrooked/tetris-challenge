@@ -12,7 +12,7 @@ namespace Tetris
 {
 
     /**
-     * WorkerPool manages a pool of WorkerThreads
+     * WorkerPool manages a pool of Worker objects.
      */
     class WorkerPool
     {
@@ -48,10 +48,12 @@ namespace Tetris
         void interruptRange(size_t inBegin, size_t inCount);
 
         std::string mName;
-        typedef Array<Worker> Workers;
         mutable size_t mRotation;
 
+        typedef boost::shared_ptr<Worker> WorkerPtr;
+        typedef std::vector<WorkerPtr> Workers;
         Workers mWorkers;
+
         mutable boost::mutex mMutex;
     };
 

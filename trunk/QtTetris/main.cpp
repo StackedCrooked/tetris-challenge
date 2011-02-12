@@ -3,13 +3,13 @@
 #include "Tetris/MainThread.h"
 
 
-int TetrisWidget_NumRows()
+int Tetris_RowCount()
 {
     return 20;
 }
 
 
-int TetrisWidget_NumColumns()
+int Tetris_ColumnCount()
 {
     return 10;
 }

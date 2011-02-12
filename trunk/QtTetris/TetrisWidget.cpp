@@ -27,8 +27,6 @@ std::set<TetrisWidget*> TetrisWidget::sInstances;
 TetrisWidget::TetrisWidget(QWidget * inParent, int inSquareWidth, int inSquareHeight) :
     QWidget(inParent),
     AbstractWidget(inSquareWidth, inSquareHeight),
-    mRowCount(20),
-    mColCount(10),
     mMinSize(),
     mPainter()
 {
@@ -107,7 +105,8 @@ void TetrisWidget::keyPressEvent(QKeyEvent * inEvent)
 
 void TetrisWidget::clearGameState()
 {
-    getGame()->setGameGrid(Grid(mRowCount, mColCount));
+    Grid grid = getGame()->gameGrid();
+    getGame()->setGameGrid(Grid(grid.rowCount(), grid.rowCount()));
 }
 
 
@@ -173,7 +172,7 @@ void TetrisWidget::drawText(int x, int y, const std::string & inText)
     }
 
     QPainter & painter(*mPainter);
-    painter.drawText(QRect(x, y, mColCount * squareWidth(), squareHeight()), inText.c_str());
+    painter.drawText(QRect(x, y, getGame()->gameGrid().columnCount() * squareWidth(), squareHeight()), inText.c_str());
 }
 
 
@@ -181,16 +180,16 @@ Tetris::Rect TetrisWidget::getGameRect() const
 {
     return Tetris::Rect(0,
                         0,
-                        mColCount * squareWidth(),
-                        mRowCount * squareHeight());
+                        getGame()->gameGrid().columnCount() * squareWidth(),
+                        getGame()->gameGrid().rowCount() * squareHeight());
 }
 
 
 Tetris::Rect TetrisWidget::getStatsRect() const
 {
     return Tetris::Rect(0,
-                        mRowCount * squareHeight(),
-                        mColCount * squareWidth(),
+                        getGame()->gameGrid().rowCount() * squareHeight(),
+                        getGame()->gameGrid().columnCount() * squareWidth(),
                         6 * squareHeight());
 }
 
@@ -198,7 +197,7 @@ Tetris::Rect TetrisWidget::getStatsRect() const
 Tetris::Rect TetrisWidget::getFutureBlocksRect(unsigned int inFutureBlockCount) const
 {
     int blockHeight = 3 * squareHeight();
-    return Tetris::Rect(mColCount * squareHeight() + cMargin,
+    return Tetris::Rect(getGame()->gameGrid().columnCount() * squareHeight() + cMargin,
                         0,
                         4 * squareWidth(),
                         inFutureBlockCount * blockHeight);
