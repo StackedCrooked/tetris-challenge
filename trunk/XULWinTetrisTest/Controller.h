@@ -58,7 +58,7 @@ namespace Tetris
         void run();
 
         // TetrisComponent::Controller methods
-        void getGameState(TetrisComponent * tetrisComponent, Grid & grid, Block & activeBlock, BlockTypes & futureBlockTypes);
+        void gameState(TetrisComponent * tetrisComponent, Grid & grid, Block & activeBlock, BlockTypes & futureBlockTypes);
 
         bool move(TetrisComponent * tetrisComponent, MoveDirection inDirection);
 

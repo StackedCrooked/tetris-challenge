@@ -259,7 +259,7 @@ namespace Tetris
         Grid grid(mNumRows, mNumColumns);
         Block activeBlock(BlockType_Begin, Rotation(0), Row(0), Column(0));
         BlockTypes futureBlockTypes;
-        mController->getGameState(this, grid, activeBlock, futureBlockTypes);
+        mController->gameState(this, grid, activeBlock, futureBlockTypes);
 
         PaintGrid(g, grid, 0, 0, true);
         PaintGrid(g, activeBlock.grid(), activeBlock.column() * cUnitWidth, activeBlock.row() * cUnitHeight, false);

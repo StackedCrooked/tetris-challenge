@@ -92,7 +92,7 @@ public:
 
     void getFutureBlocksWithOffset(size_t inOffset, size_t inCount, BlockTypes & outBlocks) const;
 
-    virtual const GameState & getGameState() const = 0;
+    virtual const GameState & gameState() const = 0;
 
     // For multiplayer crazyness
     virtual void applyLinePenalty(int inNumberOfLinesMadeByOpponent);
@@ -102,7 +102,7 @@ public:
     void swapActiveBlock(Game & other);
 
 protected:
-    virtual GameState & getGameState() = 0;
+    virtual GameState & gameState() = 0;
 
     void onChanged();
     void onLinesCleared(int inLineCount);
@@ -148,12 +148,12 @@ public:
 
     virtual bool move(MoveDirection inDirection);
 
-    const GameState & getGameState() const;
+    const GameState & gameState() const;
 
     virtual void setGrid(const Grid & inGrid);
 
 protected:
-    GameState & getGameState();
+    GameState & gameState();
 
 private:
     boost::scoped_ptr<GameState> mGameState;
@@ -181,12 +181,12 @@ public:
 
     void clearPrecalculatedNodes();
 
-    const GameState & getGameState() const;
+    const GameState & gameState() const;
 
     virtual void setGrid(const Grid & inGrid);
 
 protected:
-    GameState & getGameState();
+    GameState & gameState();
 
 private:
     void setCurrentNode(NodePtr inCurrentNode);

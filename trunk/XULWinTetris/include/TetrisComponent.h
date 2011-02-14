@@ -130,7 +130,7 @@ namespace Tetris
         class Controller
         {
         public:
-            virtual void getGameState(TetrisComponent * tetrisComponent, Grid & grid, Block & activeBlock, BlockTypes & futureBlockTypes) = 0;
+            virtual void gameState(TetrisComponent * tetrisComponent, Grid & grid, Block & activeBlock, BlockTypes & futureBlockTypes) = 0;
 
             virtual bool move(TetrisComponent * tetrisComponent, MoveDirection inDirection) = 0;
 
@@ -147,7 +147,7 @@ namespace Tetris
 
         void setController(Controller * inController);
 
-        inline int getFPS() const { return mFPS; }
+        inline int fps() const { return mFPS; }
 
         virtual bool initAttributeControllers();
 

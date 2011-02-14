@@ -62,20 +62,15 @@ struct SimpleGame::Impl : public Game::EventHandler,
                                                 int & outSearchDepth,
                                                 int & outSearchWidth)
     {
-
-            outSearchDepth = 6;
-            outSearchWidth = 6;
-            return CreatePoly<Evaluator, Balanced>();
-
-//        int firstRow = inGameState.firstOccupiedRow();
-//        int rowCount = inGameState.grid().rowCount();
-//        if (float(firstRow) > (0.6 * rowCount))
+        int firstRow = inGameState.firstOccupiedRow();
+        int rowCount = inGameState.grid().rowCount();
+//        if (0.5 * rowCount < float(firstRow))
 //        {
-//            outSearchDepth = 8;
-//            outSearchWidth = 5;
-//            return CreatePoly<Evaluator, MakeTetrises>();
+            outSearchDepth = 8;
+            outSearchWidth = 5;
+            return CreatePoly<Evaluator, MakeTetrises>();
 //        }
-//        else if (float(firstRow) > (0.5 * rowCount))
+//        else if (0.6 * rowCount < float(firstRow))
 //        {
 //            outSearchDepth = 5;
 //            outSearchWidth = 5;
@@ -223,7 +218,7 @@ bool SimpleGame::isPaused() const
 GameStateStats SimpleGame::stats() const
 {
     ScopedReader<Game> rgame(mImpl->mGame);
-    const GameState & gameState(rgame->getGameState());
+    const GameState & gameState(rgame->gameState());
     return GameStateStats(gameState.numLines(),
                           gameState.numSingles(),
                           gameState.numDoubles(),

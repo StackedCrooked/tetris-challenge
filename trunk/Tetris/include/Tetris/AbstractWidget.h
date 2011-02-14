@@ -71,11 +71,11 @@ public:
 
     void setGame(Tetris::SimpleGame * inSimpleGame);
 
-    const Tetris::SimpleGame * getGame() const;
+    const Tetris::SimpleGame * game() const;
 
-    Tetris::SimpleGame * getGame();
+    Tetris::SimpleGame * game();
 
-    int getFPS() const;
+    int fps() const;
 
     int squareWidth() const;
 
@@ -91,9 +91,9 @@ protected:
     virtual void paintSquare(const Rect & inRect, const RGBColor & inColor) = 0;
     virtual void drawLine(int x1, int y1, int x2, int y2, int inPenWidth, const RGBColor & inColor) = 0;
     virtual void drawText(int x, int y, const std::string & inText) = 0;
-    virtual Rect getGameRect() const = 0;
-    virtual Rect getStatsRect() const = 0;
-    virtual Rect getFutureBlocksRect(unsigned int inFutureBlockCount) const = 0;
+    virtual Rect gameRect() const = 0;
+    virtual Rect statsRect() const = 0;
+    virtual Rect futureBlocksRect(unsigned int inFutureBlockCount) const = 0;
 
 private:
     void paintGrid(int y, int x, const Grid & inGrid);

@@ -113,7 +113,7 @@ void AbstractWidget::setGame(SimpleGame * inSimpleGame)
     if (SimpleGame::Exists(mSimpleGame))
     {
         setMinSize((mSimpleGame->columnCount() + 4) * squareWidth() + mMargin,
-                   getGameRect().height() + getStatsRect().height());
+                   gameRect().height() + statsRect().height());
 
         SimpleGame::RegisterEventHandler(mSimpleGame, this);
         mSimpleGame->setBackReference(this);
@@ -121,19 +121,19 @@ void AbstractWidget::setGame(SimpleGame * inSimpleGame)
 }
 
 
-const Tetris::SimpleGame * AbstractWidget::getGame() const
+const Tetris::SimpleGame * AbstractWidget::game() const
 {
     return mSimpleGame;
 }
 
 
-Tetris::SimpleGame * AbstractWidget::getGame()
+Tetris::SimpleGame * AbstractWidget::game()
 {
     return mSimpleGame;
 }
 
 
-int AbstractWidget::getFPS() const
+int AbstractWidget::fps() const
 {
     return static_cast<int>(0.5 + mFPS);
 }
@@ -171,26 +171,26 @@ const RGBColor & AbstractWidget::getColor(BlockType inBlockType) const
 void AbstractWidget::coordinateRepaint(const SimpleGame & inGame)
 {
     // Get the rects
-    Rect gameRect(getGameRect());
+    Rect theGameRect(gameRect());
     std::vector<BlockType> futureBlocks;
 
     futureBlocks.push_back(inGame.getNextBlock().type());
-    Rect futureBlocksRect(getFutureBlocksRect(futureBlocks.size()));
+    Rect theFutureBlocksRect(futureBlocksRect(futureBlocks.size()));
 
     // Clear the rects
-    paintSquare(gameRect, RGBColor(255, 255, 255));
-    paintSquare(futureBlocksRect, RGBColor(255, 255, 255));
+    paintSquare(theGameRect, RGBColor(255, 255, 255));
+    paintSquare(theFutureBlocksRect, RGBColor(255, 255, 255));
 
     // Paint the game
     paintGameGrid(inGame.gameGrid());
 
     // Paint future blocks
-    paintFutureBlocks(futureBlocksRect, mSpacing, futureBlocks);
+    paintFutureBlocks(theFutureBlocksRect, mSpacing, futureBlocks);
 
     GameStateStats stats = inGame.stats();
 
-    Rect statsRect(getStatsRect());
-    paintStats(statsRect, stats);
+    Rect theStatsRect(statsRect());
+    paintStats(theStatsRect, stats);
 
 
     // Paint active block
@@ -225,8 +225,8 @@ void AbstractWidget::paintGrid(int x, int y, const Grid & inGrid)
 
 void AbstractWidget::paintGameGrid(const Grid & inGrid)
 {
-    Rect gameRect = getGameRect();
-    paintGrid(gameRect.x(), gameRect.y(), inGrid);
+    Rect theGameRect = gameRect();
+    paintGrid(theGameRect.x(), theGameRect.y(), inGrid);
 }
 
 
