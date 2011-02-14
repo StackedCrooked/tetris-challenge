@@ -452,7 +452,7 @@ namespace Tetris {
     }
 
 
-    void Controller::getGameState(TetrisComponent * tetrisComponent,
+    void Controller::gameState(TetrisComponent * tetrisComponent,
                                   Grid & outGrid,
                                   Block & outActiveBlock,
                                   BlockTypes & outFutureBlockTypes)
@@ -738,7 +738,7 @@ namespace Tetris {
 
         if (mFPSTextBox)
         {
-            setText(mFPSTextBox, MakeString() << mTetrisComponent->getFPS());
+            setText(mFPSTextBox, MakeString() << mTetrisComponent->fps());
         }
     }
 

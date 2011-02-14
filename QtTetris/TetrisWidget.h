@@ -37,9 +37,9 @@ protected:
     virtual void paintSquare(const Tetris::Rect & inRect, const Tetris::RGBColor & inColor);
     virtual void drawLine(int x1, int y1, int x2, int y2, int inPenWidth, const Tetris::RGBColor & inColor);
     virtual void drawText(int x, int y, const std::string & inText);
-    virtual Tetris::Rect getGameRect() const;
-    virtual Tetris::Rect getStatsRect() const;
-    virtual Tetris::Rect getFutureBlocksRect(unsigned int inFutureBlockCount) const;
+    virtual Tetris::Rect gameRect() const;
+    virtual Tetris::Rect statsRect() const;
+    virtual Tetris::Rect futureBlocksRect(unsigned int inFutureBlockCount) const;
 
 private:
     virtual void paintEvent(QPaintEvent * event);

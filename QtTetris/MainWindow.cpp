@@ -215,9 +215,7 @@ void MainWindow::restart()
         Player * player = mgame.getPlayer(idx);
         player->simpleGame()->setLevel(6);
         mTetrisWidgets[idx]->setGame(player->simpleGame());
-        player->simpleGame()->applyLinePenalty(10);
     }
-
 }
 
 

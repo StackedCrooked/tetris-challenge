@@ -50,7 +50,7 @@ void TetrisWidget::refresh()
 
 void TetrisWidget::keyPressEvent(QKeyEvent * inEvent)
 {
-    if (!getGame() || getGame()->isGameOver())
+    if (!game() || game()->isGameOver())
     {
         QWidget::keyPressEvent(inEvent);
         return;
@@ -61,27 +61,27 @@ void TetrisWidget::keyPressEvent(QKeyEvent * inEvent)
     {
         case Qt::Key_Left:
         {
-            getGame()->move(MoveDirection_Left);
+            game()->move(MoveDirection_Left);
             break;
         }
         case Qt::Key_Right:
         {
-            getGame()->move(MoveDirection_Right);
+            game()->move(MoveDirection_Right);
             break;
         }
         case Qt::Key_Down:
         {
-            getGame()->move(MoveDirection_Down);
+            game()->move(MoveDirection_Down);
             break;
         }
         case Qt::Key_Up:
         {
-            getGame()->rotate();
+            game()->rotate();
             break;
         }
         case Qt::Key_Space:
         {
-            getGame()->drop();
+            game()->drop();
             break;
         }
         case Qt::Key_C:
@@ -105,18 +105,18 @@ void TetrisWidget::keyPressEvent(QKeyEvent * inEvent)
 
 void TetrisWidget::clearGameState()
 {
-    Grid grid = getGame()->gameGrid();
-    getGame()->setGameGrid(Grid(grid.rowCount(), grid.rowCount()));
+    Grid grid = game()->gameGrid();
+    game()->setGameGrid(Grid(grid.rowCount(), grid.rowCount()));
 }
 
 
 void TetrisWidget::toggleActiveBlock()
 {
     // First valid BlockType value starts at 1.
-    Block block = getGame()->activeBlock();
+    Block block = game()->activeBlock();
     BlockType newType = static_cast<BlockType>(1 + (block.type() % cBlockTypeCount));
     Block newBlock(newType, Rotation(block.rotation()), Row(block.row()), Column(block.column()));
-    getGame()->setActiveBlock(newBlock);
+    game()->setActiveBlock(newBlock);
 }
 
 
@@ -172,32 +172,32 @@ void TetrisWidget::drawText(int x, int y, const std::string & inText)
     }
 
     QPainter & painter(*mPainter);
-    painter.drawText(QRect(x, y, getGame()->gameGrid().columnCount() * squareWidth(), squareHeight()), inText.c_str());
+    painter.drawText(QRect(x, y, game()->gameGrid().columnCount() * squareWidth(), squareHeight()), inText.c_str());
 }
 
 
-Tetris::Rect TetrisWidget::getGameRect() const
+Tetris::Rect TetrisWidget::gameRect() const
 {
     return Tetris::Rect(0,
                         0,
-                        getGame()->gameGrid().columnCount() * squareWidth(),
-                        getGame()->gameGrid().rowCount() * squareHeight());
+                        game()->gameGrid().columnCount() * squareWidth(),
+                        game()->gameGrid().rowCount() * squareHeight());
 }
 
 
-Tetris::Rect TetrisWidget::getStatsRect() const
+Tetris::Rect TetrisWidget::statsRect() const
 {
     return Tetris::Rect(0,
-                        getGame()->gameGrid().rowCount() * squareHeight(),
-                        getGame()->gameGrid().columnCount() * squareWidth(),
+                        game()->gameGrid().rowCount() * squareHeight(),
+                        game()->gameGrid().columnCount() * squareWidth(),
                         6 * squareHeight());
 }
 
 
-Tetris::Rect TetrisWidget::getFutureBlocksRect(unsigned int inFutureBlockCount) const
+Tetris::Rect TetrisWidget::futureBlocksRect(unsigned int inFutureBlockCount) const
 {
     int blockHeight = 3 * squareHeight();
-    return Tetris::Rect(getGame()->gameGrid().columnCount() * squareHeight() + cMargin,
+    return Tetris::Rect(game()->gameGrid().columnCount() * squareHeight() + cMargin,
                         0,
                         4 * squareWidth(),
                         inFutureBlockCount * blockHeight);
@@ -206,13 +206,13 @@ Tetris::Rect TetrisWidget::getFutureBlocksRect(unsigned int inFutureBlockCount) 
 
 void TetrisWidget::paintEvent(QPaintEvent * )
 {
-    if (!getGame())
+    if (!game())
     {
         return;
     }
 
     mPainter.reset(new QPainter(this));
-    coordinateRepaint(*getGame());
+    coordinateRepaint(*game());
     mPainter.reset();
 }
 

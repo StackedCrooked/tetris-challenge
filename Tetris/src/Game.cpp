@@ -217,14 +217,14 @@ void Game::applyLinePenalty(int inLineCount)
     int lineIncrement = inLineCount < 4 ? (inLineCount - 1) : inLineCount;
     LogInfo(MakeString() << "Line increment: " << lineIncrement);
 
-    int newFirstRow = getGameState().firstOccupiedRow() - lineIncrement;
+    int newFirstRow = gameState().firstOccupiedRow() - lineIncrement;
     if (newFirstRow < 0)
     {
         newFirstRow = 0;
     }
     LogInfo(MakeString() << "New first row: " << newFirstRow);
 
-    Grid grid = getGameState().grid();
+    Grid grid = gameState().grid();
 
     int garbageStart = grid.rowCount() - lineIncrement;
     LogInfo(MakeString() << "Garbage starts at: " << garbageStart);
@@ -258,7 +258,7 @@ void Game::applyLinePenalty(int inLineCount)
     // Check if the active block has been caught in the penalty lines that were added.
     // If yes then call drop() to normalize the situation.
     const Block & block(activeBlock());
-    if (!getGameState().checkPositionValid(block, block.row(), block.column()))
+    if (!gameState().checkPositionValid(block, block.row(), block.column()))
     {
         drop();
     }
@@ -294,7 +294,7 @@ std::auto_ptr<Block> Game::CreateDefaultBlock(BlockType inBlockType, size_t inNu
 
 void Game::setActiveBlock(const Block & inBlock)
 {
-    if (getGameState().checkPositionValid(inBlock, inBlock.row(), inBlock.column()))
+    if (gameState().checkPositionValid(inBlock, inBlock.row(), inBlock.column()))
     {
         mActiveBlock.reset(new Block(inBlock));
         onChanged();
@@ -326,7 +326,7 @@ bool Game::isPaused() const
 
 bool Game::isGameOver() const
 {
-    return getGameState().isGameOver();
+    return gameState().isGameOver();
 }
 
 
@@ -360,7 +360,7 @@ const Block & Game::activeBlock() const
 
 const Grid & Game::gameGrid() const
 {
-    return getGameState().grid();
+    return gameState().grid();
 }
 
 
@@ -410,7 +410,7 @@ bool Game::rotate()
     Block & block = *mActiveBlock;
     size_t oldRotation = block.rotation();
     block.rotate();
-    if (!getGameState().checkPositionValid(block, block.row(), block.column()))
+    if (!gameState().checkPositionValid(block, block.row(), block.column()))
     {
         block.setRotation(oldRotation);
         return false;
@@ -433,7 +433,7 @@ int Game::level() const
 {
     if (mOverrideLevel < 0)
     {
-        int level = getGameState().numLines() / 10;
+        int level = gameState().numLines() / 10;
         return std::min<int>(level, cMaxLevel);
     }
     else
@@ -459,12 +459,12 @@ HumanGame::HumanGame(size_t inNumRows, size_t inNumCols) :
 
 HumanGame::HumanGame(const Game & inGame) :
     Game(inGame.rowCount(), inGame.columnCount()),
-    mGameState(new GameState(inGame.getGameState()))
+    mGameState(new GameState(inGame.gameState()))
 {
 }
 
 
-GameState & HumanGame::getGameState()
+GameState & HumanGame::gameState()
 {
     if (!mGameState.get())
     {
@@ -474,7 +474,7 @@ GameState & HumanGame::getGameState()
 }
 
 
-const GameState & HumanGame::getGameState() const
+const GameState & HumanGame::gameState() const
 {
     if (!mGameState.get())
     {
@@ -541,7 +541,7 @@ bool HumanGame::move(MoveDirection inDirection)
     Block & block = *mActiveBlock;
     size_t newRow = block.row() + GetRowDelta(inDirection);
     size_t newCol = block.column() + GetColumnDelta(inDirection);
-    if (getGameState().checkPositionValid(block, newRow, newCol))
+    if (gameState().checkPositionValid(block, newRow, newCol))
     {
         block.setRow(newRow);
         block.setColumn(newCol);
@@ -590,18 +590,18 @@ ComputerGame::ComputerGame(size_t inNumRows, size_t inNumCols) :
 
 ComputerGame::ComputerGame(const Game & inGame) :
     Game(inGame.rowCount(), inGame.columnCount()),
-    mCurrentNode(new GameStateNode(new GameState(inGame.getGameState()), new Balanced))
+    mCurrentNode(new GameStateNode(new GameState(inGame.gameState()), new Balanced))
 {
 }
 
 
-GameState & ComputerGame::getGameState()
+GameState & ComputerGame::gameState()
 {
     return const_cast<GameState&>(mCurrentNode->gameState());
 }
 
 
-const GameState & ComputerGame::getGameState() const
+const GameState & ComputerGame::gameState() const
 {
     return mCurrentNode->gameState();
 }

@@ -380,7 +380,7 @@ void ComputerPlayer::Impl::timerEvent()
                 if (mTweaker)
                 {
                     mEvaluator.reset(
-                        mTweaker->updateInfo(game.getGameState(),
+                        mTweaker->updateInfo(game.gameState(),
                                              mSearchDepth,
                                              mSearchWidth).release());
                 }
