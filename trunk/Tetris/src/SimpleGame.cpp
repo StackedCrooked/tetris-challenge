@@ -47,7 +47,7 @@ struct SimpleGame::Impl : public Game::EventHandler,
         if (inPlayerType == PlayerType_Computer)
         {
             std::auto_ptr<Evaluator> evaluator(CreatePoly<Evaluator, MakeTetrises>());
-            mComputerPlayer.reset(new ComputerPlayer(mGame, evaluator, 6, 6, 8));
+            mComputerPlayer.reset(new ComputerPlayer(mGame, evaluator, 8, 5, 8));
             mComputerPlayer->setTweaker(this);
             mComputerPlayer->setMoveSpeed(100);
         }
@@ -64,24 +64,24 @@ struct SimpleGame::Impl : public Game::EventHandler,
     {
         int firstRow = inGameState.firstOccupiedRow();
         int rowCount = inGameState.grid().rowCount();
-//        if (0.5 * rowCount < float(firstRow))
-//        {
+        if (0.5 * rowCount < float(firstRow))
+        {
             outSearchDepth = 8;
             outSearchWidth = 5;
             return CreatePoly<Evaluator, MakeTetrises>();
-//        }
-//        else if (0.6 * rowCount < float(firstRow))
-//        {
-//            outSearchDepth = 5;
-//            outSearchWidth = 5;
-//            return CreatePoly<Evaluator, Balanced>();
-//        }
-//        else
-//        {
-//            outSearchDepth = 4;
-//            outSearchWidth = 4;
-//            return CreatePoly<Evaluator, Survival>();
-//        }
+        }
+        else if (0.6 * rowCount < float(firstRow))
+        {
+            outSearchDepth = 5;
+            outSearchWidth = 5;
+            return CreatePoly<Evaluator, Balanced>();
+        }
+        else
+        {
+            outSearchDepth = 4;
+            outSearchWidth = 4;
+            return CreatePoly<Evaluator, Survival>();
+        }
     }
 
     void init(SimpleGame * inSimpleGame)
