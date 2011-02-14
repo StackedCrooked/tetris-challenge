@@ -211,7 +211,7 @@ namespace Tetris
 
         boost::mutex::scoped_lock lock(mNodeMutex);
 
-        // Get the results in the correct order by pushing the parents on a stack.
+        // Backtrack the best end-node to its starting node.
         std::stack<NodePtr> results;
         NodePtr endNode = mTreeRowInfos.bestNode();
         while (endNode->depth() > mNode->depth())
