@@ -2,6 +2,8 @@
 #include "Tetris/WorkerPool.h"
 #include "Tetris/Logging.h"
 #include "Tetris/MakeString.h"
+#include "Tetris/Threading.h"
+#include <boost/noncopyable.hpp>
 
 
 namespace Tetris {
@@ -74,8 +76,7 @@ void WorkerPool::wait()
 
 void WorkerPool::interruptRange(size_t inBegin, size_t inCount)
 {
-    std::vector<boost::shared_ptr<boost::mutex::scoped_lock> > queueLocks(mWorkers.size());
-    std::vector<boost::shared_ptr<boost::mutex::scoped_lock> > statusLocks(mWorkers.size());
+    LockMany<boost::mutex> locker;
 
     //
     // Lock all workers' queue and status.
@@ -83,9 +84,7 @@ void WorkerPool::interruptRange(size_t inBegin, size_t inCount)
     for (size_t idx = inBegin; idx != inBegin + inCount; ++idx)
     {
         Worker & worker = *mWorkers[idx];
-        queueLocks[idx].reset(new boost::mutex::scoped_lock(worker.mQueueMutex));
-        statusLocks[idx].reset(new boost::mutex::scoped_lock(worker.mStatusMutex));
-        worker.mQueue.clear();
+        locker.lock(worker.mQueueMutex);        worker.mQueue.clear();
     }
 
     //
@@ -98,15 +97,16 @@ void WorkerPool::interruptRange(size_t inBegin, size_t inCount)
     }
 
     //
-    // Wait for Status_Waiting or Status_FinishedOne on all workers.
+    // Wait until all workers are ready.
     //
     for (size_t idx = inBegin; idx != inBegin + inCount; ++idx)
     {
         Worker & worker = *mWorkers[idx];
-
+        boost::mutex::scoped_lock statusLock(worker.mStatusMutex);
         if (worker.mStatus == Worker::Status_Working)
         {
-            worker.mStatusCondition.wait(*statusLocks[idx]);
+            worker.mStatusCondition.wait(statusLock);
+            Assert(worker.mStatus == Worker::Status_FinishedOne);
         }
     }
 }

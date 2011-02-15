@@ -4,6 +4,7 @@
 
 #include "Tetris/Assert.h"
 #include "Tetris/MainThread.h"
+#include <boost/noncopyable.hpp>
 #include <boost/thread.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/detail/atomic_count.hpp>
@@ -188,6 +189,97 @@ private:
     const Variable * mVariable;
     Stopwatch mStopwatch;
 };
+
+
+template<class MutexType>
+class LockMany : boost::noncopyable
+{
+public:
+    typedef std::vector<MutexType*> Mutexes;
+    typedef typename Mutexes::size_type size_type;
+
+    LockMany();
+
+    ~LockMany();
+
+    void lock(MutexType & inMutexType);
+
+    void unlockAll();
+
+    const MutexType & get(size_type inIndex) const;
+
+    MutexType & get(size_type inIndex);
+
+    size_type size() const;
+
+private:
+    Mutexes mMutexes;
+};
+
+
+inline void LockMutex(boost::mutex & inMutex)
+{
+    inMutex.lock();
+}
+
+
+inline void UnlockMutex(boost::mutex & inMutex)
+{
+    inMutex.unlock();
+}
+
+
+template<class MutexType>
+LockMany<MutexType>::LockMany()
+{
+}
+
+
+template<class MutexType>
+LockMany<MutexType>::~LockMany()
+{
+    unlockAll();
+}
+
+
+template<class MutexType>
+void LockMany<MutexType>::lock(MutexType & inMutexType)
+{
+    LockMutex(inMutexType);
+    mMutexes.push_back(&inMutexType);
+}
+
+
+template<class MutexType>
+void LockMany<MutexType>::unlockAll()
+{
+    while (!mMutexes.empty())
+    {
+        UnlockMutex(*mMutexes.back());
+        mMutexes.pop_back();
+    }
+}
+
+
+template<class MutexType>
+const MutexType & LockMany<MutexType>::get(size_type inIndex) const
+{
+    return mMutexes[inIndex];
+}
+
+
+template<class MutexType>
+MutexType & LockMany<MutexType>::get(size_type inIndex)
+{
+    return mMutexes[inIndex];
+}
+
+
+template<class MutexType>
+typename LockMany<MutexType>::size_type LockMany<MutexType>::size() const
+{
+    return mMutexes.size();
+}
 
 
 } // namespace Tetris

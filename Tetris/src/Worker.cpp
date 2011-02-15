@@ -158,8 +158,11 @@ namespace Tetris
     void Worker::interrupt()
     {
         boost::mutex::scoped_lock statusLock(mStatusMutex);
-        mThread->interrupt();
-        mStatusCondition.wait(statusLock);
+        if (mStatus == Status_Working)
+        {
+            mThread->interrupt();
+            mStatusCondition.wait(statusLock);
+        }
     }
 
 

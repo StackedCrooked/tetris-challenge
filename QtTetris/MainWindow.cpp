@@ -213,7 +213,7 @@ void MainWindow::restart()
     {
         LogInfo(MakeString() << "Setting player " << idx);
         Player * player = mgame.getPlayer(idx);
-        player->simpleGame()->setLevel(6);
+        player->simpleGame()->setLevel(10);
         mTetrisWidgets[idx]->setGame(player->simpleGame());
     }
 }
