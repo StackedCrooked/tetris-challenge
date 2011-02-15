@@ -6,54 +6,53 @@
 namespace Tetris {
 
 
-    const int cMaximumLockDurationMs(1000);
+const int cMaximumLockDurationMs(1000);
 
 
-    class StopwatchImpl
+class StopwatchImpl
+{
+public:
+    StopwatchImpl()
     {
-    public:
-        StopwatchImpl()
-        {
-            mStopwatch.start();
-        }
-
-
-        ~StopwatchImpl()
-        {
-        }
-
-
-        int elapsedTimeMs() const
-        {
-            return static_cast<int>(0.5 + static_cast<double>(mStopwatch.elapsed()) / 1000.0);
-        }
-
-    private:
-        StopwatchImpl(const StopwatchImpl&);
-        StopwatchImpl& operator=(const StopwatchImpl&);
-
-        Poco::Stopwatch mStopwatch;
-    };
-
-
-    Stopwatch::Stopwatch() :
-        mImpl(new StopwatchImpl)
-    {
-
+        mStopwatch.start();
     }
 
 
-    Stopwatch::~Stopwatch()
+    ~StopwatchImpl()
     {
-        delete mImpl;
-        mImpl = 0;
     }
 
 
-    int Stopwatch::elapsedTimeMs() const
+    int elapsedTimeMs() const
     {
-        return mImpl->elapsedTimeMs();
+        return static_cast<int>(0.5 + static_cast<double>(mStopwatch.elapsed()) / 1000.0);
     }
+
+private:
+    StopwatchImpl(const StopwatchImpl&);
+    StopwatchImpl& operator=(const StopwatchImpl&);
+
+    Poco::Stopwatch mStopwatch;
+};
+
+
+Stopwatch::Stopwatch() :
+    mImpl(new StopwatchImpl)
+{
+}
+
+
+Stopwatch::~Stopwatch()
+{
+    delete mImpl;
+    mImpl = 0;
+}
+
+
+int Stopwatch::elapsedTimeMs() const
+{
+    return mImpl->elapsedTimeMs();
+}
 
 
 } // namespace Tetris

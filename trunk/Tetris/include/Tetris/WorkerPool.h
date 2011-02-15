@@ -8,54 +8,55 @@
 #include <boost/shared_ptr.hpp>
 
 
-namespace Tetris
+namespace Tetris {
+
+
+/**
+ * WorkerPool manages a pool of Worker objects.
+ */
+class WorkerPool
 {
+public:
+    WorkerPool(const std::string & inName, size_t inSize);
 
-    /**
-     * WorkerPool manages a pool of Worker objects.
-     */
-    class WorkerPool
-    {
-    public:
-        WorkerPool(const std::string & inName, size_t inSize);
+    ~WorkerPool();
 
-        ~WorkerPool();
+    const std::string & name() const { return mName; }
 
-        const std::string & name() const { return mName; }
+    void schedule(const Worker::Task & inTask);
 
-        void schedule(const Worker::Task & inTask);
+    // Returns the number of workers.
+    size_t size() const;
 
-        // Returns the number of workers.
-        size_t size() const;
+    int getActiveWorkerCount() const;
 
-        int getActiveWorkerCount() const;
+    // Change the number of workers in the pool.
+    // Setting a smaller size when there are workers active is safe, but interrupts their task.
+    void resize(size_t inSize);
 
-        // Change the number of workers in the pool.
-        // Setting a smaller size when there are workers active is safe, but interrupts their task.
-        void resize(size_t inSize);
+    // Wait until all Workers have finished their queue
+    void wait();
 
-        // Wait until all Workers have finished their queue
-        void wait();
+    // Interrupts all workers.
+    void interruptAndClearQueue();
 
-        // Interrupts all workers.
-        void interruptAndClearQueue();
+private:
+    // non-coyable
+    WorkerPool(const WorkerPool&);
+    WorkerPool& operator=(const WorkerPool&);
 
-    private:
-        // non-coyable
-        WorkerPool(const WorkerPool&);
-        WorkerPool& operator=(const WorkerPool&);
+    void interruptRange(size_t inBegin, size_t inCount);
 
-        void interruptRange(size_t inBegin, size_t inCount);
+    std::string mName;
+    mutable size_t mRotation;
 
-        std::string mName;
-        mutable size_t mRotation;
+    typedef boost::shared_ptr<Worker> WorkerPtr;
+    typedef std::vector<WorkerPtr> Workers;
+    Workers mWorkers;
 
-        typedef boost::shared_ptr<Worker> WorkerPtr;
-        typedef std::vector<WorkerPtr> Workers;
-        Workers mWorkers;
+    mutable boost::mutex mMutex;
+};
 
-        mutable boost::mutex mMutex;
-    };
 
 } // namespace Tetris
 

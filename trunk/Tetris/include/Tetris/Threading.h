@@ -191,24 +191,27 @@ private:
 };
 
 
-template<class MutexType>
+/**
+ * LockMany is similar to a scoped_lock. It can however lock multiple mutexes.
+ */
+template<class Mutex>
 class LockMany : boost::noncopyable
 {
 public:
-    typedef std::vector<MutexType*> Mutexes;
+    typedef std::vector<Mutex*> Mutexes;
     typedef typename Mutexes::size_type size_type;
 
     LockMany();
 
     ~LockMany();
 
-    void lock(MutexType & inMutexType);
+    void lock(Mutex & inMutex);
 
     void unlockAll();
 
-    const MutexType & get(size_type inIndex) const;
+    const Mutex & get(size_type inIndex) const;
 
-    MutexType & get(size_type inIndex);
+    Mutex & get(size_type inIndex);
 
     size_type size() const;
 
@@ -229,29 +232,29 @@ inline void UnlockMutex(boost::mutex & inMutex)
 }
 
 
-template<class MutexType>
-LockMany<MutexType>::LockMany()
+template<class Mutex>
+LockMany<Mutex>::LockMany()
 {
 }
 
 
-template<class MutexType>
-LockMany<MutexType>::~LockMany()
+template<class Mutex>
+LockMany<Mutex>::~LockMany()
 {
     unlockAll();
 }
 
 
-template<class MutexType>
-void LockMany<MutexType>::lock(MutexType & inMutexType)
+template<class Mutex>
+void LockMany<Mutex>::lock(Mutex & inMutex)
 {
-    LockMutex(inMutexType);
-    mMutexes.push_back(&inMutexType);
+    LockMutex(inMutex);
+    mMutexes.push_back(&inMutex);
 }
 
 
-template<class MutexType>
-void LockMany<MutexType>::unlockAll()
+template<class Mutex>
+void LockMany<Mutex>::unlockAll()
 {
     while (!mMutexes.empty())
     {
@@ -261,22 +264,22 @@ void LockMany<MutexType>::unlockAll()
 }
 
 
-template<class MutexType>
-const MutexType & LockMany<MutexType>::get(size_type inIndex) const
+template<class Mutex>
+const Mutex & LockMany<Mutex>::get(size_type inIndex) const
 {
     return mMutexes[inIndex];
 }
 
 
-template<class MutexType>
-MutexType & LockMany<MutexType>::get(size_type inIndex)
+template<class Mutex>
+Mutex & LockMany<Mutex>::get(size_type inIndex)
 {
     return mMutexes[inIndex];
 }
 
 
-template<class MutexType>
-typename LockMany<MutexType>::size_type LockMany<MutexType>::size() const
+template<class Mutex>
+typename LockMany<Mutex>::size_type LockMany<Mutex>::size() const
 {
     return mMutexes.size();
 }

@@ -84,7 +84,8 @@ void WorkerPool::interruptRange(size_t inBegin, size_t inCount)
     for (size_t idx = inBegin; idx != inBegin + inCount; ++idx)
     {
         Worker & worker = *mWorkers[idx];
-        locker.lock(worker.mQueueMutex);        worker.mQueue.clear();
+        locker.lock(worker.mQueueMutex);
+        worker.mQueue.clear();
     }
 
     //
@@ -93,7 +94,7 @@ void WorkerPool::interruptRange(size_t inBegin, size_t inCount)
     for (size_t idx = inBegin; idx != inBegin + inCount; ++idx)
     {
         Worker & worker = *mWorkers[idx];
-        worker.mThread->interrupt();
+        worker.interrupt(Worker::InterruptOption_DontWait);
     }
 
     //
@@ -106,7 +107,6 @@ void WorkerPool::interruptRange(size_t inBegin, size_t inCount)
         if (worker.mStatus == Worker::Status_Working)
         {
             worker.mStatusCondition.wait(statusLock);
-            Assert(worker.mStatus == Worker::Status_FinishedOne);
         }
     }
 }
