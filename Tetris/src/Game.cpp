@@ -642,7 +642,7 @@ size_t ComputerGame::numPrecalculatedMoves() const
 
 void ComputerGame::clearPrecalculatedNodes()
 {
-    mCurrentNode->children().clear();
+    mCurrentNode->clearChildren();
 }
 
 
@@ -734,7 +734,7 @@ bool ComputerGame::move(MoveDirection inDirection)
     if (!mCurrentNode->children().empty())
     {
         LogWarning("Existing children when commiting a block. They will be deleted.");
-        mCurrentNode->children().clear();
+        mCurrentNode->clearChildren();
     }
 
     // Actually commit the block

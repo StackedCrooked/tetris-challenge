@@ -11,241 +11,248 @@
 //
 #ifdef _WIN32
 #include <windows.h>
-    void SetThreadName(DWORD inThreadId, const std::string & inThreadName)
+void SetThreadName(DWORD inThreadId, const std::string & inThreadName)
+{
+    #pragma pack(push,8)
+    typedef struct tagTHREADNAME_INFO
     {
-        #pragma pack(push,8)
-        typedef struct tagTHREADNAME_INFO
-        {
-            DWORD dwType; // Must be 0x1000.
-            LPCSTR szName; // Pointer to name (in user addr space).
-            DWORD inThreadId; // Thread ID (-1=caller thread).
-            DWORD dwFlags; // Reserved for future use, must be zero.
-        } THREADNAME_INFO;
-        #pragma pack(pop)
+        DWORD dwType; // Must be 0x1000.
+        LPCSTR szName; // Pointer to name (in user addr space).
+        DWORD inThreadId; // Thread ID (-1=caller thread).
+        DWORD dwFlags; // Reserved for future use, must be zero.
+    } THREADNAME_INFO;
+    #pragma pack(pop)
 
-        THREADNAME_INFO info;
-        info.dwType = 0x1000;
-        info.szName = inThreadName.c_str();
-        info.inThreadId = inThreadId;
-        info.dwFlags = 0;
+    THREADNAME_INFO info;
+    info.dwType = 0x1000;
+    info.szName = inThreadName.c_str();
+    info.inThreadId = inThreadId;
+    info.dwFlags = 0;
 
-        __try
-        {
-            const DWORD MS_VC_EXCEPTION=0x406D1388;
-            RaiseException( MS_VC_EXCEPTION, 0, sizeof(info)/sizeof(ULONG_PTR), (ULONG_PTR*)&info);
-        }
-        __except(EXCEPTION_EXECUTE_HANDLER)
-        {
-        }
+    __try
+    {
+        const DWORD MS_VC_EXCEPTION=0x406D1388;
+        RaiseException( MS_VC_EXCEPTION, 0, sizeof(info)/sizeof(ULONG_PTR), (ULONG_PTR*)&info);
     }
+    __except(EXCEPTION_EXECUTE_HANDLER)
+    {
+    }
+}
 #else
-    #define SetThreadName(...)
+#define SetThreadName(...)
 #endif
 
 
-namespace Tetris
+namespace Tetris {
+
+
+std::string ToString(Worker::Status inStatus)
 {
-
-    std::string ToString(Worker::Status inStatus)
+    switch (inStatus)
     {
-        switch (inStatus)
+        case Worker::Status_Initial:
         {
-            case Worker::Status_Initial:
-            {
-                return "Initial";
-            }
-            case Worker::Status_Scheduled:
-            {
-                return "Scheduled";
-            }
-            case Worker::Status_Waiting:
-            {
-                return "Waiting";
-            }
-            case Worker::Status_Working:
-            {
-                return "Working";
-            }
-            case Worker::Status_FinishedOne:
-            {
-                return "FinishedOne";
-            }
-            default:
-            {
-                throw std::logic_error("Invalid enum value for Worker::Status.");
-            }
+            return "Initial";
+        }
+        case Worker::Status_Scheduled:
+        {
+            return "Scheduled";
+        }
+        case Worker::Status_Waiting:
+        {
+            return "Waiting";
+        }
+        case Worker::Status_Working:
+        {
+            return "Working";
+        }
+        case Worker::Status_FinishedOne:
+        {
+            return "FinishedOne";
+        }
+        default:
+        {
+            throw std::logic_error("Invalid enum value for Worker::Status.");
         }
     }
+}
 
 
-    Worker::Worker(const std::string & inName) :
-        mName(inName),
-        mStatus(Status_Initial),
-        mQuitFlag(false)
+Worker::Worker(const std::string & inName) :
+    mName(inName),
+    mStatus(Status_Initial),
+    mQuitFlag(false)
+{
+    mThread.reset(new boost::thread(boost::bind(&Worker::run, this)));
+}
+
+
+Worker::~Worker()
+{
     {
-        mThread.reset(new boost::thread(boost::bind(&Worker::run, this)));
-    }
-
-
-    Worker::~Worker()
-    {
-        {
-            setQuitFlag();
-            boost::mutex::scoped_lock queueLock(mQueueMutex);
-            boost::mutex::scoped_lock statusLock(mStatusMutex);
-            mQueue.clear();
-            mThread->interrupt();
-            mQueueCondition.notify_all();
-            mStatusCondition.notify_all();
-        }
-        mThread->join();
-        mThread.reset();
-    }
-
-
-    void Worker::setQuitFlag()
-    {
-        boost::mutex::scoped_lock lock(mQuitFlagMutex);
-        mQuitFlag = true;
-    }
-
-
-    bool Worker::getQuitFlag() const
-    {
-        boost::mutex::scoped_lock lock(mQuitFlagMutex);
-        return mQuitFlag;
-    }
-
-
-    void Worker::setStatus(Status inStatus)
-    {
-        boost::mutex::scoped_lock lock(mStatusMutex);
-        mStatus = inStatus;
+        setQuitFlag();
+        boost::mutex::scoped_lock queueLock(mQueueMutex);
+        boost::mutex::scoped_lock statusLock(mStatusMutex);
+        mQueue.clear();
+        mThread->interrupt();
+        mQueueCondition.notify_all();
         mStatusCondition.notify_all();
     }
+    mThread->join();
+    mThread.reset();
+}
 
 
-    Worker::Status Worker::status() const
+void Worker::setQuitFlag()
+{
+    boost::mutex::scoped_lock lock(mQuitFlagMutex);
+    mQuitFlag = true;
+}
+
+
+bool Worker::getQuitFlag() const
+{
+    boost::mutex::scoped_lock lock(mQuitFlagMutex);
+    return mQuitFlag;
+}
+
+
+void Worker::setStatus(Status inStatus)
+{
+    boost::mutex::scoped_lock lock(mStatusMutex);
+    mStatus = inStatus;
+    mStatusCondition.notify_all();
+}
+
+
+Worker::Status Worker::status() const
+{
+    boost::mutex::scoped_lock lock(mStatusMutex);
+    return mStatus;
+}
+
+
+void Worker::wait()
+{
+    waitForStatus(Status_Waiting);
+}
+
+
+void Worker::waitForStatus(Status inStatus)
+{
+    boost::mutex::scoped_lock lock(mStatusMutex);
+    while (mStatus != inStatus)
     {
-        boost::mutex::scoped_lock lock(mStatusMutex);
-        return mStatus;
+        mStatusCondition.wait(lock);
     }
+}
 
 
-    void Worker::wait()
+size_t Worker::size() const
+{
+    boost::mutex::scoped_lock lock(mQueueMutex);
+    return mQueue.size();
+}
+
+
+void Worker::interrupt(InterruptOption inInterruptOption)
+{
+    boost::mutex::scoped_lock statusLock(mStatusMutex);
+    if (mStatus == Status_Working)
     {
-        waitForStatus(Status_Waiting);
-    }
-
-
-    void Worker::waitForStatus(Status inStatus)
-    {
-        boost::mutex::scoped_lock lock(mStatusMutex);
-        while (mStatus != inStatus)
+        mThread->interrupt();
+        if (inInterruptOption == InterruptOption_Wait)
         {
-            mStatusCondition.wait(lock);
-        }
-    }
-
-
-    size_t Worker::size() const
-    {
-        boost::mutex::scoped_lock lock(mQueueMutex);
-        return mQueue.size();
-    }
-
-
-    void Worker::interrupt()
-    {
-        boost::mutex::scoped_lock statusLock(mStatusMutex);
-        if (mStatus == Status_Working)
-        {
-            mThread->interrupt();
             mStatusCondition.wait(statusLock);
         }
     }
+}
 
 
-    void Worker::interruptAndClearQueue()
+void Worker::interruptAndClearQueue(InterruptOption inInterruptOption)
+{
+    boost::mutex::scoped_lock queueLock(mQueueMutex);
+    mQueue.clear();
+    boost::mutex::scoped_lock statusLock(mStatusMutex);
+    mThread->interrupt();
+    mQueueCondition.notify_all();
+    queueLock.unlock();
+    if (inInterruptOption == InterruptOption_Wait)
     {
-        boost::mutex::scoped_lock queueLock(mQueueMutex);
-        mQueue.clear();
-        boost::mutex::scoped_lock statusLock(mStatusMutex);
-        mThread->interrupt();
-        mQueueCondition.notify_all();
-        queueLock.unlock();
         mStatusCondition.wait(statusLock);
     }
+}
 
 
-    void Worker::schedule(const Worker::Task & inTask)
+void Worker::schedule(const Worker::Task & inTask)
+{
+    boost::mutex::scoped_lock lock(mQueueMutex);
+    mQueue.push_back(inTask);
     {
-        boost::mutex::scoped_lock lock(mQueueMutex);
-        mQueue.push_back(inTask);
+        boost::mutex::scoped_lock statusLock(mStatusMutex);
+        if (mStatus <= Status_Waiting)
         {
-            boost::mutex::scoped_lock statusLock(mStatusMutex);
-            if (mStatus <= Status_Waiting)
-            {
-                mStatus = Status_Scheduled;
-            }
-        }
-        mQueueCondition.notify_all();
-    }
-
-
-    Worker::Task Worker::nextTask()
-    {
-        boost::mutex::scoped_lock lock(mQueueMutex);
-        while (mQueue.empty())
-        {
-            setStatus(Status_Waiting);
-            mQueueCondition.wait(lock);
-            boost::this_thread::interruption_point();
-        }
-        Task task = mQueue.front();
-        mQueue.erase(mQueue.begin());
-        return task;
-    }
-
-
-    void Worker::processTask()
-    {
-        try
-        {
-            // Get the next task.
-            Task task = nextTask();
-
-            // Run the task.
-            setStatus(Status_Working);
-            task();
-        }
-        catch (const boost::thread_interrupted &)
-        {
-            // Task was interrupted. Ok.
-        }
-        setStatus(Status_FinishedOne);
-    }
-
-
-    void Worker::run()
-    {
-        // Wrap entire thread in try/catch block.
-        try
-        {
-            SetThreadName(::GetCurrentThreadId(), mName);
-            while (!getQuitFlag())
-            {
-                processTask();
-            }
-        }
-        catch (const std::exception & inExc)
-        {
-            LogError(MakeString() << "Exception caught in Worker::run. Detail: " << inExc.what());
-        }
-        catch (...)
-        {
-            LogError("Unknown exception caught in Worker::run.");
+            mStatus = Status_Scheduled;
         }
     }
+    mQueueCondition.notify_all();
+}
+
+
+Worker::Task Worker::nextTask()
+{
+    boost::mutex::scoped_lock lock(mQueueMutex);
+    while (mQueue.empty())
+    {
+        setStatus(Status_Waiting);
+        mQueueCondition.wait(lock);
+        boost::this_thread::interruption_point();
+    }
+    Task task = mQueue.front();
+    mQueue.erase(mQueue.begin());
+    return task;
+}
+
+
+void Worker::processTask()
+{
+    try
+    {
+        // Get the next task.
+        Task task = nextTask();
+
+        // Run the task.
+        setStatus(Status_Working);
+        task();
+    }
+    catch (const boost::thread_interrupted &)
+    {
+        // Task was interrupted. Ok.
+    }
+    setStatus(Status_FinishedOne);
+}
+
+
+void Worker::run()
+{
+    // Wrap entire thread in try/catch block.
+    try
+    {
+        SetThreadName(::GetCurrentThreadId(), mName);
+        while (!getQuitFlag())
+        {
+            processTask();
+        }
+    }
+    catch (const std::exception & inExc)
+    {
+        LogError(MakeString() << "Exception caught in Worker::run. Detail: " << inExc.what());
+    }
+    catch (...)
+    {
+        LogError("Unknown exception caught in Worker::run.");
+    }
+}
+
 
 } // namespace Tetris
