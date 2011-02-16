@@ -3,6 +3,7 @@
 
 
 #include "Tetris/BlockType.h"
+#include "Tetris/BlockTypes.h"
 #include "Tetris/Grid.h"
 #include "Tetris/SimpleGame.h"
 
@@ -81,22 +82,33 @@ public:
 
     int squareHeight() const;
 
+    int margin() const;
+
+    int statsItemHeight() const;
+
+    int statsItemCount() const;
+
     virtual const RGBColor & getColor(BlockType inBlockType) const;
 
     virtual void refresh() = 0;
+
+    virtual Rect gameRect() const;
+
+    virtual Rect statsRect() const;
+
+    virtual Rect futureBlocksRect() const;
 
 protected:
     virtual void setMinSize(int inWidth, int inHeight) = 0;
     void coordinateRepaint(const SimpleGame & inGame);
     virtual void paintSquare(const Rect & inRect, const RGBColor & inColor) = 0;
+    virtual void paintStatItem(const Tetris::Rect & inRect, const std::string & inName, const std::string & inValue) = 0;
+    virtual void fillRect(const Rect & inRect, const RGBColor & inColor) = 0;
     virtual void drawLine(int x1, int y1, int x2, int y2, int inPenWidth, const RGBColor & inColor) = 0;
     virtual void drawText(int x, int y, const std::string & inText) = 0;
-    virtual Rect gameRect() const = 0;
-    virtual Rect statsRect() const = 0;
-    virtual Rect futureBlocksRect(unsigned int inFutureBlockCount) const = 0;
 
 private:
-    void paintGrid(int y, int x, const Grid & inGrid);
+    void paintGrid(int x, int y, const Grid & inGrid);
     void paintGameGrid(const Grid & inGrid);
     void paintStats(const Rect & inRect, const GameStateStats & inStats);
     void paintFutureBlocks(const Rect & inRect, int inSpacing, const std::vector<BlockType> & inBlockTypes);
@@ -105,6 +117,7 @@ private:
     Tetris::SimpleGame * mSimpleGame;
     int mSquareWidth;
     int mSquareHeight;
+    int mStatItemHeight;
     int mSpacing;
     int mMargin;
     unsigned int mFrameCount;

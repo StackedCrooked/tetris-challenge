@@ -25,7 +25,7 @@ using namespace Tetris;
 
 enum
 {
-    cPlayerCount = 1
+    cPlayerCount = 2
 };
 
 
@@ -137,6 +137,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QHBoxLayout * hbox = new QHBoxLayout;
     for (size_t idx = 0; idx < cPlayerCount; ++idx)
     {
+        hbox->setSpacing(20);
         hbox->addWidget(mTetrisWidgets[idx]);
     }
     vbox->addItem(hbox);

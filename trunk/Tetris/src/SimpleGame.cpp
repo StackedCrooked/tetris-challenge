@@ -49,7 +49,7 @@ struct SimpleGame::Impl : public Game::EventHandler,
             std::auto_ptr<Evaluator> evaluator(CreatePoly<Evaluator, MakeTetrises>());
             mComputerPlayer.reset(new ComputerPlayer(mGame, evaluator, 8, 5, 8));
             mComputerPlayer->setTweaker(this);
-            mComputerPlayer->setMoveSpeed(100);
+            mComputerPlayer->setMoveSpeed(20);
         }
     }
 
@@ -330,6 +330,38 @@ Block SimpleGame::getNextBlock() const
     }
 
     return Block(blockTypes.back(), Rotation(0), Row(0), Column((columnCount() - mImpl->mCenterColumn)/2));
+}
+
+
+std::vector<Block> SimpleGame::getNextBlocks() const
+{
+    std::vector<BlockType> blockTypes;
+    int numFutureBlocks = futureBlocksCount();
+    {
+        ScopedReader<Game> game(mImpl->mGame);
+        game->getFutureBlocks(1 + numFutureBlocks, blockTypes);
+    }
+
+    if (blockTypes.size() != (1 + numFutureBlocks))
+    {
+        throw std::logic_error("Failed to get the next block from the factory.");
+    }
+
+    std::vector<Block> result;
+    for (std::vector<BlockType>::size_type idx = 1; idx < blockTypes.size(); ++idx)
+    {
+        result.push_back(Block(blockTypes[idx],
+                               Rotation(0),
+                               Row(0),
+                               Column((columnCount() - mImpl->mCenterColumn)/2)));
+    }
+    return result;
+}
+
+
+int SimpleGame::futureBlocksCount() const
+{
+    return ScopedReader<Game>(mImpl->mGame)->futureBlocksCount();
 }
 
 

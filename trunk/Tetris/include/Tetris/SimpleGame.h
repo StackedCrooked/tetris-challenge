@@ -120,6 +120,11 @@ public:
     // Gets the currently active block and any blocks that follow.
     Block getNextBlock() const;
 
+    // Gets the next blocks. The length of the resulting vector is the same as futureBlocksCount().
+    std::vector<Block> getNextBlocks() const;
+
+    int futureBlocksCount() const;
+
     // For multiplayer crazyness.
     void applyLinePenalty(int inNumberOfLinesMadeByOpponent);
     void setActiveBlock(const Block & inBlock);
