@@ -249,8 +249,8 @@ void AbstractWidget::coordinateRepaint(const SimpleGame & inGame)
 
     // Paint active block
     const Block & activeBlock(inGame.activeBlock());
-    paintGrid(activeBlock.column() * mSquareWidth,
-              activeBlock.row() * mSquareHeight,
+    paintGrid(margin() + activeBlock.column() * mSquareWidth,
+              margin() + activeBlock.row() * mSquareHeight,
               activeBlock.grid());
 
     recalculateFPS();
