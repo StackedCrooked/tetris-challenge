@@ -36,6 +36,14 @@ public:
     inline int numTetrises() const
     { return mNumTetrises; }
 
+    inline int score() const
+    {
+        return   40 * mNumSingles +
+                100 * mNumDoubles +
+                300 * mNumTriples +
+               1200 * mNumTetrises;
+    }
+
 private:
     int mNumLines;
     int mNumSingles;

@@ -88,6 +88,10 @@ public:
 
     size_t currentBlockIndex() const;
 
+    int futureBlocksCount() const;
+
+    void setFutureBlocksCount(int inFutureBlocksCount);
+
     void getFutureBlocks(size_t inCount, BlockTypes & outBlocks) const;
 
     void getFutureBlocksWithOffset(size_t inOffset, size_t inCount, BlockTypes & outBlocks) const;
@@ -122,6 +126,7 @@ protected:
     boost::scoped_ptr<Block> mActiveBlock;
     boost::scoped_ptr<BlockFactory> mBlockFactory;
     mutable BlockTypes mBlocks;
+    int mFutureBlocksCount;
     size_t mCurrentBlockIndex;
     int mOverrideLevel;
     bool mPaused;

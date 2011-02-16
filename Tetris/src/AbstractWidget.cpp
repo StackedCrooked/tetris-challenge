@@ -52,6 +52,7 @@ AbstractWidget::AbstractWidget(int inSquareWidth, int inSquareHeight) :
     mSimpleGame(0),
     mSquareWidth(inSquareWidth),
     mSquareHeight(inSquareHeight),
+    mStatItemHeight(45),
     mSpacing(5),
     mMargin(4),
     mFrameCount(0),
@@ -112,8 +113,8 @@ void AbstractWidget::setGame(SimpleGame * inSimpleGame)
     mSimpleGame = inSimpleGame;
     if (SimpleGame::Exists(mSimpleGame))
     {
-        setMinSize((mSimpleGame->columnCount() + 4) * squareWidth() + mMargin,
-                   gameRect().height() + statsRect().height());
+        setMinSize(margin() + gameRect().width() + margin() + futureBlocksRect().width() + margin(),
+                   margin() + gameRect().height() + margin());
 
         SimpleGame::RegisterEventHandler(mSimpleGame, this);
         mSimpleGame->setBackReference(this);
@@ -151,6 +152,24 @@ int AbstractWidget::squareHeight() const
 }
 
 
+int AbstractWidget::margin() const
+{
+    return mMargin;
+}
+
+
+int AbstractWidget::statsItemHeight() const
+{
+    return mStatItemHeight;
+}
+
+
+int AbstractWidget::statsItemCount() const
+{
+    return 3; // Score, Level and Lines.
+}
+
+
 const RGBColor & AbstractWidget::getColor(BlockType inBlockType) const
 {
     static const RGBColor fColors[] =
@@ -168,30 +187,65 @@ const RGBColor & AbstractWidget::getColor(BlockType inBlockType) const
 }
 
 
+Rect AbstractWidget::gameRect() const
+{
+    // This rect is relative to the Widget rect.
+    return Rect(margin(),
+                margin(),
+                game()->gameGrid().columnCount() * squareWidth(),
+                game()->gameGrid().rowCount() * squareHeight());
+}
+
+
+Rect AbstractWidget::futureBlocksRect() const
+{
+    int numFutureBlocks = game()->futureBlocksCount();
+    int blockHeight = 2 * squareHeight();
+    int totalHeight = 2 * margin() + numFutureBlocks * blockHeight;
+    if (numFutureBlocks > 1)
+    {
+        totalHeight += (numFutureBlocks - 1) * squareHeight();
+    }
+    return Rect(gameRect().right() + margin(),
+                margin(),
+                4 * squareWidth() + 2 * margin(),
+                totalHeight);
+}
+
+
+Rect AbstractWidget::statsRect() const
+{
+    int requiredHeight = statsItemCount() * statsItemHeight();
+    if (statsItemCount() > 1)
+    {
+        requiredHeight += (statsItemCount() - 1) * margin();
+    }
+
+    Rect theGameRect(gameRect());
+    Tetris::Rect theFutureBlocksRect = futureBlocksRect();
+
+    int x = theFutureBlocksRect.left();
+    int y = theGameRect.bottom() - requiredHeight;
+    return Tetris::Rect(x, y, theFutureBlocksRect.width(), requiredHeight);
+}
+
+
 void AbstractWidget::coordinateRepaint(const SimpleGame & inGame)
 {
-    // Get the rects
-    Rect theGameRect(gameRect());
-    std::vector<BlockType> futureBlocks;
-
-    futureBlocks.push_back(inGame.getNextBlock().type());
-    Rect theFutureBlocksRect(futureBlocksRect(futureBlocks.size()));
-
-    // Clear the rects
-    paintSquare(theGameRect, RGBColor(255, 255, 255));
-    paintSquare(theFutureBlocksRect, RGBColor(255, 255, 255));
-
     // Paint the game
     paintGameGrid(inGame.gameGrid());
 
     // Paint future blocks
-    paintFutureBlocks(theFutureBlocksRect, mSpacing, futureBlocks);
+    std::vector<Block> futureBlocks(inGame.getNextBlocks());
+    std::vector<BlockType> blockTypes;
+    for (std::vector<Block>::size_type idx = 0; idx < futureBlocks.size(); ++idx)
+    {
+        blockTypes.push_back(futureBlocks[idx].type());
+    }
+    paintFutureBlocks(futureBlocksRect(), mSpacing, blockTypes);
 
-    GameStateStats stats = inGame.stats();
-
-    Rect theStatsRect(statsRect());
-    paintStats(theStatsRect, stats);
-
+    // Paint the stats
+    paintStats(statsRect(), inGame.stats());
 
     // Paint active block
     const Block & activeBlock(inGame.activeBlock());
@@ -226,44 +280,42 @@ void AbstractWidget::paintGrid(int x, int y, const Grid & inGrid)
 void AbstractWidget::paintGameGrid(const Grid & inGrid)
 {
     Rect theGameRect = gameRect();
+    fillRect(theGameRect, RGBColor(255, 255, 255));
     paintGrid(theGameRect.x(), theGameRect.y(), inGrid);
 }
 
 
 void AbstractWidget::paintStats(const Rect & inRect, const GameStateStats & inStats)
 {
-    int x = inRect.left();
-    int y = inRect.top();
+    Rect rect = Rect(inRect.x(), inRect.y(), inRect.width(), mStatItemHeight);
+    fillRect(rect, RGBColor(255, 255, 255));
+    paintStatItem(rect, "Score", MakeString() << inStats.score());
 
-    drawText(x, y, MakeString() << "Total lines: " << inStats.numLines());
-    y += squareHeight();
+    rect = Rect(rect.left(), rect.bottom() + margin(), rect.width(), rect.height());
+    fillRect(rect, RGBColor(255, 255, 255));
+    paintStatItem(rect, "Level", MakeString() << game()->level());
 
-    drawText(x, y, MakeString() << "Lines x1: " << inStats.numSingles());
-    y += squareHeight();
-
-    drawText(x, y, MakeString() << "Lines x2: " << inStats.numDoubles());
-    y += squareHeight();
-
-    drawText(x, y, MakeString() << "Lines x3: " << inStats.numTriples());
-    y += squareHeight();
-
-    drawText(x, y, MakeString() << "Lines x4: " << inStats.numTetrises());
+    rect = Rect(rect.left(), rect.bottom() + margin(), rect.width(), rect.height());
+    fillRect(rect, RGBColor(255, 255, 255));
+    paintStatItem(rect, "Lines", MakeString() << inStats.numLines());
 }
 
 
-void AbstractWidget::paintFutureBlocks(const Rect & inRect, int inSpacing, const std::vector<BlockType> & inBlockTypes)
+void AbstractWidget::paintFutureBlocks(const Rect & inRect, int inSpacing, const BlockTypes & inBlockTypes)
 {
     if (inBlockTypes.empty())
     {
         return;
     }
 
-    int y = inRect.y();
-    for (unsigned int i = 0; i < inBlockTypes.size(); ++i)
+    fillRect(inRect, RGBColor(255, 255, 255));
+
+    for (BlockTypes::size_type i = 0; i < inBlockTypes.size(); ++i)
     {
         const Grid & grid(GetGrid(GetBlockIdentifier(inBlockTypes[i], 0)));
-        paintGrid(inRect.x(), y, grid);
-        y += 3 * squareHeight();
+        int x = inRect.left() + (inRect.width() - (grid.columnCount() * squareWidth()))/2;
+        int y = margin() + inRect.top() + (i * 3 * squareHeight());
+        paintGrid(x, y, grid);
     }
 }
 

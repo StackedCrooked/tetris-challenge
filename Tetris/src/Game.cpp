@@ -53,6 +53,7 @@ Game::Game(size_t inNumRows, size_t inNumColumns) :
     mActiveBlock(),
     mBlockFactory(new BlockFactory),
     mBlocks(),
+    mFutureBlocksCount(3),
     mCurrentBlockIndex(0),
     mOverrideLevel(-1),
     mPaused(false)
@@ -217,22 +218,18 @@ void Game::applyLinePenalty(int inLineCount)
     int lineIncrement = inLineCount < 4 ? (inLineCount - 1) : inLineCount;
     LogInfo(MakeString() << "Line increment: " << lineIncrement);
 
-    int newFirstRow = gameState().firstOccupiedRow() - lineIncrement;
-    if (newFirstRow < 0)
+    int newFirstOccupiedRow = gameState().firstOccupiedRow() - lineIncrement;
+    if (newFirstOccupiedRow < 0)
     {
-        newFirstRow = 0;
+        newFirstOccupiedRow = 0;
     }
-    LogInfo(MakeString() << "New first row: " << newFirstRow);
 
     Grid grid = gameState().grid();
-
     int garbageStart = grid.rowCount() - lineIncrement;
-    LogInfo(MakeString() << "Garbage starts at: " << garbageStart);
-
 
     std::vector<BlockType> garbageRow(getGarbageRow());
-    int r = std::max<int>(0, newFirstRow);
-    for (; r < grid.rowCount(); ++r)
+    
+    for (int r = newFirstOccupiedRow; r < grid.rowCount(); ++r)
     {
         if (r >= garbageStart)
         {
@@ -243,7 +240,11 @@ void Game::applyLinePenalty(int inLineCount)
             if (r < garbageStart)
             {
                 int ri = r - lineIncrement;
-                grid.set(ri, c, grid.get(r, c));
+                if (ri >= 0)
+                {
+                    grid.set(ri, c, grid.get(r, c));
+                }
+                // else: should be game-over real soon!
             }
             else
             {
@@ -397,6 +398,18 @@ void Game::getFutureBlocksWithOffset(size_t inOffset, size_t inCount, BlockTypes
 size_t Game::currentBlockIndex() const
 {
     return mCurrentBlockIndex;
+}
+
+
+int Game::futureBlocksCount() const
+{
+    return mFutureBlocksCount;
+}
+
+
+void Game::setFutureBlocksCount(int inFutureBlocksCount)
+{
+    mFutureBlocksCount = inFutureBlocksCount;
 }
 
 

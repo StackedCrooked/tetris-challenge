@@ -16,11 +16,6 @@
 using namespace Tetris;
 
 
-// Margin between the game rect and the future blocks rect.
-static const int cMargin = 4;
-
-
-
 std::set<TetrisWidget*> TetrisWidget::sInstances;
 
 
@@ -126,6 +121,23 @@ void TetrisWidget::setMinSize(int inWidth, int inHeight)
 }
 
 
+void TetrisWidget::fillRect(const Tetris::Rect & inRect, const Tetris::RGBColor & inColor)
+{
+    if (!mPainter.get())
+    {
+        throw std::logic_error("Painter is not set.");
+    }
+
+    QColor color(inColor.red(), inColor.green(), inColor.blue());
+    int x = inRect.x();
+    int y = inRect.y();
+    int width = inRect.width();
+    int height = inRect.height();
+
+    mPainter->fillRect(x + 1, y + 1, width - 2, height - 2, color);
+}
+
+
 void TetrisWidget::paintSquare(const Rect & inRect, const RGBColor & inColor)
 {
     if (!mPainter.get())
@@ -152,6 +164,39 @@ void TetrisWidget::paintSquare(const Rect & inRect, const RGBColor & inColor)
 }
 
 
+void TetrisWidget::paintStatItem(const Tetris::Rect & inRect, const std::string & inName, const std::string & inValue)
+{
+    if (!mPainter.get())
+    {
+        throw std::logic_error("Painter is not set.");
+    }
+
+    QPainter & painter(*mPainter);
+    QFont oldFont(painter.font());
+
+    // Paint the stats title
+    QFont titleFont(oldFont);
+    titleFont.setBold(true);
+    titleFont.setWeight(QFont::Black);
+    painter.setFont(titleFont);
+
+    int nameX = inRect.left() + (inRect.width() - painter.fontMetrics().width(inName.c_str()))/2;
+    int nameY = inRect.top() + margin();
+    drawText(nameX, nameY, inName);
+
+    // Paint the stats value
+    QFont valueFont(oldFont);
+    valueFont.setWeight(QFont::Bold);
+    painter.setFont(valueFont);
+
+    int valueRectY = nameY + painter.fontMetrics().height();
+    int valueRectHeight = inRect.bottom() - valueRectY;
+    int valueX = inRect.left() + (inRect.width() - painter.fontMetrics().width(inValue.c_str()))/2;
+    int valueY = valueRectY + (valueRectHeight - painter.fontMetrics().height())/2;
+    drawText(valueX, valueY, inValue);
+}
+
+
 void TetrisWidget::drawLine(int x1, int y1, int x2, int y2, int inPenWidth, const RGBColor & inColor)
 {
     if (!mPainter.get())
@@ -172,36 +217,45 @@ void TetrisWidget::drawText(int x, int y, const std::string & inText)
     }
 
     QPainter & painter(*mPainter);
+    painter.setPen(QColor(0, 0, 0));
     painter.drawText(QRect(x, y, game()->gameGrid().columnCount() * squareWidth(), squareHeight()), inText.c_str());
 }
 
 
-Tetris::Rect TetrisWidget::gameRect() const
-{
-    return Tetris::Rect(0,
-                        0,
-                        game()->gameGrid().columnCount() * squareWidth(),
-                        game()->gameGrid().rowCount() * squareHeight());
-}
+//Tetris::Rect TetrisWidget::gameRect() const
+//{
+//    return Tetris::Rect(0,
+//                        0,
+//                        game()->gameGrid().columnCount() * squareWidth(),
+//                        game()->gameGrid().rowCount() * squareHeight());
+//}
 
 
-Tetris::Rect TetrisWidget::statsRect() const
-{
-    return Tetris::Rect(0,
-                        game()->gameGrid().rowCount() * squareHeight(),
-                        game()->gameGrid().columnCount() * squareWidth(),
-                        6 * squareHeight());
-}
+//Tetris::Rect TetrisWidget::futureBlocksRect() const
+//{
+//    int blockHeight = 3 * squareHeight();
+//    return Tetris::Rect(gameRect().right() + margin(),
+//                        0,
+//                        4 * squareWidth() + 2 * margin(),
+//                        game()->futureBlocksCount() * (blockHeight + margin()));
+//}
 
 
-Tetris::Rect TetrisWidget::futureBlocksRect(unsigned int inFutureBlockCount) const
-{
-    int blockHeight = 3 * squareHeight();
-    return Tetris::Rect(game()->gameGrid().columnCount() * squareHeight() + cMargin,
-                        0,
-                        4 * squareWidth(),
-                        inFutureBlockCount * blockHeight);
-}
+//Tetris::Rect TetrisWidget::statsRect() const
+//{
+//    int requiredHeight = statsItemCount() * statsItemHeight();
+//    if (statsItemCount() > 1)
+//    {
+//        requiredHeight += (statsItemCount() - 1) * margin();
+//    }
+
+//    Rect theGameRect(gameRect());
+//    Tetris::Rect theFutureBlocksRect = futureBlocksRect();
+
+//    int x = theFutureBlocksRect.left();
+//    int y = theGameRect.bottom() - requiredHeight;
+//    return Tetris::Rect(x, y, theFutureBlocksRect.width(), requiredHeight);
+//}
 
 
 void TetrisWidget::paintEvent(QPaintEvent * )
