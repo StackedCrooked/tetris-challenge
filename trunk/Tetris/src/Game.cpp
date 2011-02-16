@@ -214,7 +214,6 @@ void Game::applyLinePenalty(int inLineCount)
         return;
     }
 
-
     int lineIncrement = inLineCount < 4 ? (inLineCount - 1) : inLineCount;
     LogInfo(MakeString() << "Line increment: " << lineIncrement);
 
@@ -224,11 +223,11 @@ void Game::applyLinePenalty(int inLineCount)
         newFirstOccupiedRow = 0;
     }
 
-    Grid grid = gameState().grid();
+    Grid grid = gameGrid();
     int garbageStart = grid.rowCount() - lineIncrement;
 
     std::vector<BlockType> garbageRow(getGarbageRow());
-    
+
     for (int r = newFirstOccupiedRow; r < grid.rowCount(); ++r)
     {
         if (r >= garbageStart)
@@ -239,12 +238,7 @@ void Game::applyLinePenalty(int inLineCount)
         {
             if (r < garbageStart)
             {
-                int ri = r - lineIncrement;
-                if (ri >= 0)
-                {
-                    grid.set(ri, c, grid.get(r, c));
-                }
-                // else: should be game-over real soon!
+                grid.set(r, c, grid.get(r, c));
             }
             else
             {

@@ -69,6 +69,7 @@ bool GameState::checkPositionValid(const Block & inBlock, size_t inRowIdx, size_
 void GameState::solidifyBlock(const Block & inBlock)
 {
     const Grid & grid = inBlock.grid();
+    mFirstOccupiedRow = grid.rowCount();
     for (size_t r = 0; r != grid.rowCount(); ++r)
     {
         for (size_t c = 0; c != grid.columnCount(); ++c)

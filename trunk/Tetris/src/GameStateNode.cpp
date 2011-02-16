@@ -121,6 +121,7 @@ void GameStateNode::setGrid(const Grid & inGrid)
     clearChildren();
     GameState copy = mImpl->mEvaluatedGameState->gameState();
     copy.setGrid(inGrid);
+    copy.updateCache();
     int score = mImpl->mEvaluator->evaluate(copy);
     mImpl->mIdentifier = GetIdentifier(copy);
     mImpl->mEvaluatedGameState.reset(new EvaluatedGameState(new GameState(copy), score));
