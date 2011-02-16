@@ -31,6 +31,8 @@ private slots:
 
     void onPaused();
 
+    void onPenalty();
+
 private:
     static MainWindow * sInstance;
 
@@ -40,6 +42,7 @@ private:
     std::vector<TetrisWidget *> mTetrisWidgets;
     QPushButton * mRestartButton;
     QPushButton * mPauseButton;
+    QPushButton * mPenaltyButton;
     QTextEdit * mLogField;
 };
 
