@@ -108,6 +108,7 @@ MainWindow::MainWindow(QWidget *parent) :
     mTetrisWidgets(),
     mRestartButton(0),
     mPauseButton(0),
+    mPenaltyButton(0),
     mLogField(0)
 {
     sInstance = this;
@@ -129,6 +130,9 @@ MainWindow::MainWindow(QWidget *parent) :
     mPauseButton = new QPushButton("Pause", theCentralWidget);
     connect(mPauseButton, SIGNAL(clicked()), this, SLOT(onPaused()));
 
+    mPenaltyButton = new QPushButton("Penalty (4)", theCentralWidget);
+    connect(mPenaltyButton, SIGNAL(clicked()), this, SLOT(onPenalty()));
+
     mLogField = new QTextEdit(theCentralWidget);
     mLogField->setReadOnly(true);
 
@@ -144,6 +148,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QHBoxLayout * buttonsHBox = new QHBoxLayout;
     buttonsHBox->addWidget(mPauseButton);
+    buttonsHBox->addWidget(mPenaltyButton);
     buttonsHBox->addWidget(mRestartButton);
 
     vbox->addItem(buttonsHBox);
@@ -201,6 +206,18 @@ void MainWindow::onPaused()
 }
 
 
+void MainWindow::onPenalty()
+{
+    MultiplayerGame & mgame = Model::Instance().multiplayerGame();
+    for (size_t idx = 0; idx < mgame.playerCount(); ++idx)
+    {
+        Player * player = mgame.getPlayer(idx);
+        player->simpleGame()->applyLinePenalty(4);
+        break;
+    }
+}
+
+
 void MainWindow::restart()
 {
     LogInfo(__PRETTY_FUNCTION__);
@@ -214,7 +231,7 @@ void MainWindow::restart()
     {
         LogInfo(MakeString() << "Setting player " << idx);
         Player * player = mgame.getPlayer(idx);
-        player->simpleGame()->setLevel(10);
+        player->simpleGame()->setLevel(6);
         mTetrisWidgets[idx]->setGame(player->simpleGame());
     }
 }

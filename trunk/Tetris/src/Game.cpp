@@ -179,27 +179,28 @@ void Game::OnLinesClearedImpl(Game * inGame, int inLineCount)
 
 std::vector<BlockType> Game::getGarbageRow() const
 {
-    std::vector<BlockType> result(mNumColumns, BlockType_Nil);
+    BlockTypes result(mNumColumns, BlockType_Nil);
 
     static Poco::UInt32 fSeed(time(0));
     fSeed = (fSeed + 1) % Poco::UInt32(-1);
     Poco::Random rand;
     rand.seed(fSeed);
-    BlockFactory blockFactory(2);
+    BlockFactory blockFactory(1);
 
-    size_t count = 0;
-    while (count < 2)
+    static const int cMinCount = 4;
+    static const int cMaxCount = 8;
+    int count = 0;
+    while (count < cMinCount)
     {
         for (size_t idx = 0; idx < mNumColumns; ++idx)
         {
-            if (rand.nextBool())
+            if (result[idx] == BlockType_Nil && rand.nextBool())
             {
                 result[idx] = blockFactory.getNext();
-                count++;
-            }
-            if (count >= 8)
-            {
-                break;
+                if (++count >= cMaxCount)
+                {
+                    break;
+                }
             }
         }
     }
@@ -238,7 +239,7 @@ void Game::applyLinePenalty(int inLineCount)
         {
             if (r < garbageStart)
             {
-                grid.set(r, c, grid.get(r, c));
+                grid.set(r, c, grid.get(r + lineIncrement, c));
             }
             else
             {
@@ -616,7 +617,24 @@ const GameState & ComputerGame::gameState() const
 
 void ComputerGame::setGrid(const Grid & inGrid)
 {
-    mCurrentNode->setGrid(inGrid);
+    mCurrentNode->clearChildren();
+
+    std::auto_ptr<GameState> gameStateCopy(new GameState(gameState()));
+    gameStateCopy->setGrid(inGrid);
+
+    std::auto_ptr<Evaluator> evaluatorCopy(mCurrentNode->evaluator().clone());
+
+    NodePtr childNode(new GameStateNode(mCurrentNode, gameStateCopy.release(), evaluatorCopy.release()));
+    mCurrentNode->addChild(childNode);
+
+    // Duplicate the current block in the blocks history. This keeps
+    // the blocks history in alignment with the gamestate history.
+    mBlocks.insert(mBlocks.begin() + mCurrentBlockIndex, mActiveBlock->type());
+
+    int backupActiveRow = mActiveBlock->row();
+    navigateNodeDown();
+    mActiveBlock->setRow(backupActiveRow);
+
     onChanged();
 }
 

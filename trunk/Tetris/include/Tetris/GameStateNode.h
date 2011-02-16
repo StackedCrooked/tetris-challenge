@@ -61,8 +61,6 @@ public:
 
     const GameState & gameState() const;
 
-    void setGrid(const Grid & inGrid);
-
     int quality() const;
 
 private:
