@@ -16,9 +16,6 @@ class RGBColor;
 }
 
 
-class ActionEvent;
-
-
 class TetrisWidget : public QWidget,
                      public Tetris::AbstractWidget
 {
@@ -51,7 +48,6 @@ private:
     QSize mMinSize;
     std::auto_ptr<QPainter> mPainter;
 
-    friend class ActionEvent;
     friend void Tetris::InvokeLater(const Tetris::Action &);
 
     typedef std::set<TetrisWidget*> Instances;
