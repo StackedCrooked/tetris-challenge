@@ -140,24 +140,6 @@ SimpleGame::~SimpleGame()
 }
 
 
-void SimpleGame::setBackReference(BackReference * inBackReference)
-{
-    mImpl->mBackReference = inBackReference;
-}
-
-
-SimpleGame::BackReference * SimpleGame::getBackReference()
-{
-    return mImpl->mBackReference;
-}
-
-
-const SimpleGame::BackReference * SimpleGame::getBackReference() const
-{
-    return mImpl->mBackReference;
-}
-
-
 PlayerType SimpleGame::playerType() const
 {
     return mImpl->mPlayerType;
