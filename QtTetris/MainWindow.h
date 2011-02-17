@@ -39,7 +39,8 @@ private:
 private:
     void restart();
 
-    std::vector<TetrisWidget *> mTetrisWidgets;
+    typedef std::vector<TetrisWidget *> TetrisWidgets;
+    TetrisWidgets mTetrisWidgets;
     QPushButton * mRestartButton;
     QPushButton * mPauseButton;
     QPushButton * mPenaltyButton;
