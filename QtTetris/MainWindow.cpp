@@ -9,6 +9,7 @@
 #include <QLabel>
 #include <algorithm>
 #include <iostream>
+#include <sstream>
 
 
 int Tetris_RowCount();
@@ -21,12 +22,6 @@ typedef boost::shared_ptr<Tetris::SimpleGame> SimpleGamePtr;
 
 
 using namespace Tetris;
-
-
-enum
-{
-    cPlayerCount = 2
-};
 
 
 class Model
@@ -53,44 +48,60 @@ public:
         return *mMultiplayerGame;
     }
 
-    void reset(size_t inRowCount, size_t inColCount)
+
+    void reset(const PlayerTypes & inPlayerTypes, size_t inRowCount, size_t inColCount)
     {
-        LogInfo(MakeString() << "RESET!!!");
         mMultiplayerGame.reset();
         mMultiplayerGame.reset(new MultiplayerGame);
-        for (size_t idx = 0; idx < cPlayerCount; ++idx)
+        for (PlayerTypes::size_type idx = 0; idx < inPlayerTypes.size(); ++idx)
         {
-            LogInfo(MakeString() << "Adding player " << idx);
-            mMultiplayerGame->join(
-                Create<Player>(PlayerType_Computer,
-                               TeamName(GetTeamName(idx)),
-                               PlayerName(GetPlayerName(idx)),
+            Player * player = mMultiplayerGame->join(
+                Create<Player>(inPlayerTypes[idx],
+                               TeamName(GetTeamName(inPlayerTypes[idx], idx + 1)),
+                               PlayerName(GetPlayerName(inPlayerTypes[idx], idx/2)),
                                inRowCount,
-                               inColCount
-                               ));
+                               inColCount));
+            if (inPlayerTypes[idx] == PlayerType_Computer && mStartingLevelComputer != 0)
+            {
+                player->simpleGame()->setLevel(mStartingLevelComputer);
+            }
         }
     }
 
 private:
-    Model()
+    Model() :
+        mStartingLevelHuman(0),
+        mStartingLevelComputer(6)
     {
-        LogInfo(__PRETTY_FUNCTION__);
     }
 
-    static std::string GetTeamName(size_t inIndex)
+    static std::string GetTeamName(PlayerType inPlayerType, size_t inIndex)
     {
-        return std::string(inIndex < cPlayerCount/2 ? "Pirates" : "Marines");
+        std::stringstream ss;
+        if (inPlayerType == PlayerType_Human)
+        {
+            ss << "Pirates";
+        }
+        else
+        {
+            ss << "Marines";
+        }
+         ss << " " << inIndex;
+         return ss.str();
     }
 
-    static std::string GetPlayerName(size_t inIndex)
+    static std::string GetPlayerName(PlayerType inPlayerType, size_t inIndex)
     {
         typedef const char * CharPtr;
+
         static const CharPtr cPirates[] = {
             "Luffy",
             "Zoro",
             "Nami",
             "Sanji"
         };
+        static const int cPirateCount = sizeof(cPirates) / sizeof(cPirates[0]);
+        static int cPirateIndex = 0;
 
         static const CharPtr cMarines[] = {
             "Smoker",
@@ -98,14 +109,16 @@ private:
             "Fullbody",
             "Hina"
         };
+        static const int cMarineCount = sizeof(cMarines) / sizeof(cMarines[0]);
+        static int cMarineIndex = 0;
 
-        if (inIndex < cPlayerCount / 2)
+        if (inPlayerType == PlayerType_Human)
         {
-            return cPirates[inIndex];
+            return cPirates[cPirateIndex++ % cPirateCount];
         }
         else
         {
-            return cMarines[inIndex % (cPlayerCount / 2)];
+            return cMarines[cMarineIndex++ % cMarineCount] + std::string(" (Computer)");
         }
     }
 
@@ -113,6 +126,8 @@ private:
     Model& operator=(const Model&);
 
     boost::scoped_ptr<Tetris::MultiplayerGame> mMultiplayerGame;
+    int mStartingLevelHuman;
+    int mStartingLevelComputer;
 };
 
 
@@ -127,61 +142,48 @@ MainWindow * MainWindow::GetInstance()
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
+    mTetrisWidgetHolder(0),
     mTetrisWidgets(),
-    mRestartButton(0),
-    mPauseButton(0),
-    mPenaltyButton(0),
-    mLogField(0)
+    mSpacing(12),
+    mLogField(0),
+    mShowLog(false)
 {
     sInstance = this;
 
+    setWindowTitle("Piratris");
+
 
     QWidget * theCentralWidget(new QWidget);
-    for (size_t idx = 0; idx < cPlayerCount; ++idx)
-    {
-        mTetrisWidgets.push_back(new TetrisWidget(theCentralWidget, Tetris_GetSquareWidth(), Tetris_GetSquareHeight()));
-        mTetrisWidgets.back()->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    }
 
-    QAction * newGame = menuBar()->addMenu("Tetris")->addAction("New");
-    connect(newGame, SIGNAL(triggered()), this, SLOT(onRestart()));
+    QMenu * tetrisMenu = menuBar()->addMenu("Tetris");
 
-    mRestartButton = new QPushButton("Restart", theCentralWidget);
-    connect(mRestartButton, SIGNAL(clicked()), this, SLOT(onRestart()));
+    QAction * newSinglePlayerGame = tetrisMenu->addAction("New Single Player Game");
+    connect(newSinglePlayerGame, SIGNAL(triggered()), this, SLOT(onNewSinglePlayerGame()));
 
-    mPauseButton = new QPushButton("Pause", theCentralWidget);
-    connect(mPauseButton, SIGNAL(clicked()), this, SLOT(onPaused()));
+    QAction * newHumanVsComputerGame = tetrisMenu->addAction("New Human vs Computer Game");
+    connect(newHumanVsComputerGame, SIGNAL(triggered()), this, SLOT(onNewHumanVsComputerGame()));
 
-    mPenaltyButton = new QPushButton("Penalty (4)", theCentralWidget);
-    connect(mPenaltyButton, SIGNAL(clicked()), this, SLOT(onPenalty()));
+    QAction * newComputerVsComputerGame = tetrisMenu->addAction("New Computer vs Computer Game");
+    connect(newComputerVsComputerGame, SIGNAL(triggered()), this, SLOT(onNewHumanVsComputerGame()));
 
-    mLogField = new QTextEdit(theCentralWidget);
-    mLogField->setReadOnly(true);
-
+    QAction * pauseGame = tetrisMenu->addAction("Pause");
+    connect(pauseGame, SIGNAL(triggered()), this, SLOT(onPaused()));
 
     QVBoxLayout * vbox = new QVBoxLayout(theCentralWidget);
-    QHBoxLayout * hbox = new QHBoxLayout;
-    for (size_t idx = 0; idx < cPlayerCount; ++idx)
+    mTetrisWidgetHolder = new QHBoxLayout;
+    vbox->addItem(mTetrisWidgetHolder);
+    mTetrisWidgetHolder->setSpacing(mSpacing);
+
+    if (mShowLog)
     {
-        hbox->setSpacing(20);
-        hbox->addWidget(mTetrisWidgets[idx]);
+        mLogField = new QTextEdit(theCentralWidget);
+        mLogField->setReadOnly(true);
+        vbox->addWidget(mLogField, 1);
+        Logger::Instance().setLogHandler(boost::bind(&MainWindow::logMessage, this, _1));
     }
-    vbox->addItem(hbox);
-
-    QHBoxLayout * buttonsHBox = new QHBoxLayout;
-    buttonsHBox->addWidget(mPauseButton);
-    buttonsHBox->addWidget(mPenaltyButton);
-    buttonsHBox->addWidget(mRestartButton);
-
-    vbox->addItem(buttonsHBox);
-    vbox->addWidget(new QLabel("Press 'c' to clear the game."), 0);
-    vbox->addWidget(mLogField, 1);
 
     setCentralWidget(theCentralWidget);
-
-    Logger::Instance().setLogHandler(boost::bind(&MainWindow::logMessage, this, _1));
-    LogInfo("Test Logger.");
-    restart();
+    onNewComputerVsComputerGame();
 }
 
 
@@ -196,7 +198,10 @@ MainWindow::~MainWindow()
 
 void MainWindow::logMessage(const std::string & inMessage)
 {
-    mLogField->append(inMessage.c_str());
+    if (mLogField)
+    {
+        mLogField->append(inMessage.c_str());
+    }
 }
 
 
@@ -210,9 +215,70 @@ bool MainWindow::event(QEvent * inEvent)
 }
 
 
-void MainWindow::onRestart()
+void MainWindow::onNewGame(const PlayerTypes & inPlayerTypes)
 {
-    restart();
+    // Unset all widgets.
+    for (TetrisWidgets::size_type idx = 0; idx < mTetrisWidgets.size(); ++idx)
+    {
+        mTetrisWidgets[idx]->setPlayer(0);
+    }
+
+    // Ensure that we have widget for each player.
+    while (mTetrisWidgets.size() < inPlayerTypes.size())
+    {
+        mTetrisWidgets.push_back(new TetrisWidget(centralWidget(), Tetris_GetSquareWidth(), Tetris_GetSquareHeight()));
+    }
+
+    // Add the new tetris widgets to the layout
+    for (TetrisWidgets::size_type idx = mTetrisWidgetHolder->children().size(); idx < inPlayerTypes.size(); ++idx)
+    {
+        mTetrisWidgetHolder->addWidget(mTetrisWidgets[idx]);
+    }
+
+    // Remove surplus widgets from layout.
+    for (PlayerTypes::size_type idx = inPlayerTypes.size(); idx < mTetrisWidgets.size(); ++idx)
+    {
+        mTetrisWidgetHolder->removeWidget(mTetrisWidgets[idx]);
+    }
+
+    // Reset the game.
+    Model::Instance().reset(inPlayerTypes, Tetris_RowCount(), Tetris_ColumnCount());
+
+    // Add the players.
+    MultiplayerGame & mgame = Model::Instance().multiplayerGame();
+    for (size_t idx = 0; idx < mgame.playerCount(); ++idx)
+    {
+        Player * player = mgame.getPlayer(idx);
+        mTetrisWidgets[idx]->setPlayer(player);
+    }
+
+    adjustSize();
+}
+
+
+void MainWindow::onNewSinglePlayerGame()
+{
+    PlayerTypes playerTypes;
+    playerTypes.push_back(PlayerType_Human);
+    onNewGame(playerTypes);
+}
+
+
+void MainWindow::onNewHumanVsComputerGame()
+{
+    PlayerTypes playerTypes;
+    playerTypes.push_back(PlayerType_Human);
+    playerTypes.push_back(PlayerType_Computer);
+    onNewGame(playerTypes);
+}
+
+
+void MainWindow::onNewComputerVsComputerGame()
+{
+    PlayerTypes playerTypes;
+    playerTypes.push_back(PlayerType_Computer);
+    playerTypes.push_back(PlayerType_Computer);
+    onNewGame(playerTypes);
 }
 
 
@@ -236,29 +302,6 @@ void MainWindow::onPenalty()
         Player * player = mgame.getPlayer(idx);
         player->simpleGame()->applyLinePenalty(4);
         break;
-    }
-}
-
-
-void MainWindow::restart()
-{
-    // Unset all tetris widgets
-    for (TetrisWidgets::size_type idx = 0; idx < mTetrisWidgets.size(); ++idx)
-    {
-        mTetrisWidgets[idx]->setPlayer(0);
-    }
-
-    // Delete all players
-    Model::Instance().reset(Tetris_RowCount(), Tetris_ColumnCount());
-
-    // Add new players
-    MultiplayerGame & mgame = Model::Instance().multiplayerGame();
-    for (size_t idx = 0; idx < mgame.playerCount(); ++idx)
-    {
-        LogInfo(MakeString() << "Setting player " << idx);
-        Player * player = mgame.getPlayer(idx);
-        player->simpleGame()->setLevel(6);
-        mTetrisWidgets[idx]->setPlayer(player);
     }
 }
 

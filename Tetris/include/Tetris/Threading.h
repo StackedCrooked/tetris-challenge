@@ -133,7 +133,7 @@ public:
 
     ~ScopedReaderAndWriter()
     {
-        Assert(mStopwatch.elapsedTimeMs() < cMaximumLockDurationMs);
+        //Assert(mStopwatch.elapsedTimeMs() < cMaximumLockDurationMs);
     }
 
     Variable & operator *()
@@ -169,7 +169,7 @@ public:
 
     ~ScopedReader()
     {
-        Assert(mStopwatch.elapsedTimeMs() < cMaximumLockDurationMs);
+        //Assert(mStopwatch.elapsedTimeMs() < cMaximumLockDurationMs);
     }
 
     const Variable & operator *() const

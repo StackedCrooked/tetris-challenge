@@ -4,6 +4,8 @@
 #include "Tetris/Block.h"
 #include "Tetris/BlockType.h"
 #include "Tetris/Grid.h"
+#include "Tetris/Logging.h"
+#include "Tetris/MakeString.h"
 #include "Tetris/Assert.h"
 #include <algorithm>
 #include <vector>
@@ -69,7 +71,6 @@ bool GameState::checkPositionValid(const Block & inBlock, size_t inRowIdx, size_
 void GameState::solidifyBlock(const Block & inBlock)
 {
     const Grid & grid = inBlock.grid();
-    mFirstOccupiedRow = grid.rowCount();
     for (size_t r = 0; r != grid.rowCount(); ++r)
     {
         for (size_t c = 0; c != grid.columnCount(); ++c)
@@ -193,7 +194,8 @@ void GameState::updateCache()
         {
             if (mGrid.get(r, c) != BlockType_Nil)
             {
-                mFirstOccupiedRow = mGrid.rowCount() - r;
+                mFirstOccupiedRow = r;
+                LogInfo(MakeString() << "mFirstOccupiedRow is now " << mFirstOccupiedRow);
                 return;
             }
         }
