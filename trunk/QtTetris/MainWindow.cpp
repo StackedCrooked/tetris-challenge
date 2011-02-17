@@ -55,23 +55,19 @@ public:
         mMultiplayerGame.reset(new MultiplayerGame);
         for (PlayerTypes::size_type idx = 0; idx < inPlayerTypes.size(); ++idx)
         {
-            Player * player = mMultiplayerGame->join(
+            mMultiplayerGame->join(
                 Create<Player>(inPlayerTypes[idx],
                                TeamName(GetTeamName(inPlayerTypes[idx], idx + 1)),
                                PlayerName(GetPlayerName(inPlayerTypes[idx], idx/2)),
                                inRowCount,
                                inColCount));
-            if (inPlayerTypes[idx] == PlayerType_Computer && mStartingLevelComputer != 0)
-            {
-                player->simpleGame()->setLevel(mStartingLevelComputer);
-            }
         }
     }
 
 private:
     Model() :
         mStartingLevelHuman(0),
-        mStartingLevelComputer(6)
+        mStartingLevelComputer(0)
     {
     }
 
@@ -164,7 +160,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(newHumanVsComputerGame, SIGNAL(triggered()), this, SLOT(onNewHumanVsComputerGame()));
 
     QAction * newComputerVsComputerGame = tetrisMenu->addAction("New Computer vs Computer Game");
-    connect(newComputerVsComputerGame, SIGNAL(triggered()), this, SLOT(onNewHumanVsComputerGame()));
+    connect(newComputerVsComputerGame, SIGNAL(triggered()), this, SLOT(onNewComputerVsComputerGame()));
 
     QAction * pauseGame = tetrisMenu->addAction("Pause");
     connect(pauseGame, SIGNAL(triggered()), this, SLOT(onPaused()));

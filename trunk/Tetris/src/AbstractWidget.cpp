@@ -360,8 +360,13 @@ void AbstractWidget::paintGrid(int x, int y, const Grid & inGrid, const RGBColor
 void AbstractWidget::paintCaption()
 {
     Rect theCaptionRect = captionRect();
-    fillRect(theCaptionRect, RGBColor(100, 100, 200));
-    drawTextCentered(theCaptionRect, player()->playerName(), 14, RGBColor(255, 255, 0));
+    RGBColor captionColor(100, 150, 255);
+    if (player()->simpleGame()->playerType() == PlayerType_Human)
+    {
+        captionColor = RGBColor(25, 200, 50);
+    }
+    fillRect(theCaptionRect, captionColor);
+    drawTextCentered(theCaptionRect, player()->playerName(), 14, RGBColor(0, 255, 255));
 }
 
 
