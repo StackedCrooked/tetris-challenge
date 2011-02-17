@@ -134,7 +134,25 @@ void TetrisWidget::fillRect(const Tetris::Rect & inRect, const Tetris::RGBColor 
     int width = inRect.width();
     int height = inRect.height();
 
-    mPainter->fillRect(x + 1, y + 1, width - 2, height - 2, color);
+    mPainter->fillRect(x, y, width, height, color);
+}
+
+
+void TetrisWidget::drawRect(const Tetris::Rect & inRect, const Tetris::RGBColor & inColor)
+{
+    if (!mPainter.get())
+    {
+        throw std::logic_error("Painter is not set.");
+    }
+
+    QColor color(inColor.red(), inColor.green(), inColor.blue());
+    int x = inRect.x();
+    int y = inRect.y();
+    int width = inRect.width();
+    int height = inRect.height();
+
+    mPainter->setPen(color);
+    mPainter->drawRect(x, y, width, height);
 }
 
 

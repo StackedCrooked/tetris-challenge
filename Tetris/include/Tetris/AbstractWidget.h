@@ -103,13 +103,16 @@ protected:
     void coordinateRepaint(const SimpleGame & inGame);
     virtual void paintSquare(const Rect & inRect, const RGBColor & inColor) = 0;
     virtual void paintStatItem(const Tetris::Rect & inRect, const std::string & inName, const std::string & inValue) = 0;
+    virtual void drawRect(const Rect & inRect, const RGBColor & inColor) = 0;
     virtual void fillRect(const Rect & inRect, const RGBColor & inColor) = 0;
     virtual void drawLine(int x1, int y1, int x2, int y2, int inPenWidth, const RGBColor & inColor) = 0;
     virtual void drawText(int x, int y, const std::string & inText) = 0;
 
 private:
     void paintGrid(int x, int y, const Grid & inGrid);
+    void paintGrid(int x, int y, const Grid & inGrid, const RGBColor & inColor);
     void paintGameGrid(const Grid & inGrid);
+    void paintActiveBlockShadow(const SimpleGame & inSimpleGame);
     void paintStats(const Rect & inRect, const GameStateStats & inStats);
     void paintFutureBlocks(const Rect & inRect, int inSpacing, const std::vector<BlockType> & inBlockTypes);
     void recalculateFPS();
