@@ -30,7 +30,8 @@ public:
     virtual void refresh();
 
 protected:
-    virtual void setMinSize(int inWidth, int inHeight);
+    virtual void setMinSize(const Tetris::Size & inSize);
+    virtual Tetris::Size getMinSize() const;
     virtual void fillRect(const Tetris::Rect & inRect, const Tetris::RGBColor & inColor);
     virtual void drawRect(const Tetris::Rect & inRect, const Tetris::RGBColor & inColor);
     virtual void drawLine(int x1, int y1, int x2, int y2, int inPenWidth, const Tetris::RGBColor & inColor);

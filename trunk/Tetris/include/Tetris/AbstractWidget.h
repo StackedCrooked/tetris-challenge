@@ -5,6 +5,7 @@
 #include "Tetris/BlockType.h"
 #include "Tetris/BlockTypes.h"
 #include "Tetris/Grid.h"
+#include "Tetris/Player.h"
 #include "Tetris/SimpleGame.h"
 
 
@@ -56,6 +57,20 @@ private:
 };
 
 
+class Size
+{
+public:
+    Size(int width, int height);
+
+    inline int width() const { return mWidth; }
+
+    inline int height() const { return mHeight; }
+
+private:
+    int mWidth, mHeight;
+};
+
+
 class AbstractWidget : public SimpleGame::EventHandler,
                        public SimpleGame::BackReference
 {
@@ -70,11 +85,15 @@ public:
 
     virtual void onDestroy(SimpleGame * inGame);
 
-    void setGame(Tetris::SimpleGame * inSimpleGame);
+    void setPlayer(Player * inPlayer);
 
-    const Tetris::SimpleGame * game() const;
+    const SimpleGame * simpleGame() const;
 
-    Tetris::SimpleGame * game();
+    SimpleGame * simpleGame();
+
+    const Player * player() const;
+
+    Player * player();
 
     int fps() const;
 
@@ -92,6 +111,8 @@ public:
 
     virtual void refresh() = 0;
 
+    virtual Rect captionRect() const;
+
     virtual Rect gameRect() const;
 
     virtual Rect statsRect() const;
@@ -99,7 +120,9 @@ public:
     virtual Rect futureBlocksRect() const;
 
 protected:
-    virtual void setMinSize(int inWidth, int inHeight) = 0;
+    virtual void setMinSize(const Size & inMinSize) = 0;
+    virtual Size getMinSize() const = 0;
+
     void coordinateRepaint(const SimpleGame & inGame);
     virtual void paintSquare(const Rect & inRect, const RGBColor & inColor) = 0;
     virtual void paintStatItem(const Tetris::Rect & inRect, const std::string & inName, const std::string & inValue) = 0;
@@ -111,18 +134,21 @@ protected:
 private:
     void paintGrid(int x, int y, const Grid & inGrid);
     void paintGrid(int x, int y, const Grid & inGrid, const RGBColor & inColor);
+    void paintCaption();
     void paintGameGrid(const Grid & inGrid);
     void paintActiveBlockShadow(const SimpleGame & inSimpleGame);
     void paintStats(const Rect & inRect, const GameStateStats & inStats);
     void paintFutureBlocks(const Rect & inRect, int inSpacing, const std::vector<BlockType> & inBlockTypes);
     void recalculateFPS();
 
-    Tetris::SimpleGame * mSimpleGame;
+    Tetris::Player * mPlayer;
     int mSquareWidth;
     int mSquareHeight;
     int mStatItemHeight;
+    int mCaptionRectHeight;
     int mSpacing;
     int mMargin;
+    bool mPaintActiveBlockShadow;
     unsigned int mFrameCount;
     double mFPS;
 };

@@ -53,32 +53,6 @@ public:
 
     ~SimpleGame();
 
-    void setBackReference(BackReference * inBackReference);
-
-    template<class SubType>
-    SubType & backReference()
-    {
-        if (!getBackReference())
-        {
-            throw std::logic_error("BackReference is null");
-        }
-        return dynamic_cast<SubType&>(*this);
-    }
-
-    template<class SubType>
-    const SubType & backReference() const
-    {
-        if (!getBackReference())
-        {
-            throw std::logic_error("BackReference is null");
-        }
-        return dynamic_cast<const SubType&>(*this);
-    }
-
-    BackReference * getBackReference();
-
-    const BackReference * getBackReference() const;
-
     PlayerType playerType() const;
 
     static void RegisterEventHandler(SimpleGame * inSimpleGame, EventHandler * inEventHandler);
