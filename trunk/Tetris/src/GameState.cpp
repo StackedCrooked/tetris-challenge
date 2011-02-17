@@ -193,7 +193,7 @@ void GameState::updateCache()
         {
             if (mGrid.get(r, c) != BlockType_Nil)
             {
-                mFirstOccupiedRow = r;
+                mFirstOccupiedRow = mGrid.rowCount() - r;
                 return;
             }
         }
