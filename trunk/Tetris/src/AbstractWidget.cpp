@@ -118,13 +118,17 @@ void AbstractWidget::onDestroy(SimpleGame * inSimpleGame)
 
 void AbstractWidget::setPlayer(Player * inPlayer)
 {
+    // Stop listing to the events from the old player.
     if (mPlayer && SimpleGame::Exists(mPlayer->simpleGame()))
     {
         SimpleGame::UnregisterEventHandler(mPlayer->simpleGame(), this);
     }
 
+    // Set the new player.
     mPlayer = inPlayer;
-    if (SimpleGame::Exists(mPlayer->simpleGame()))
+
+    // Start listening to the events from the new player.
+    if (mPlayer && SimpleGame::Exists(mPlayer->simpleGame()))
     {
         setMinSize(Size(2 * margin() + futureBlocksRect().right() - gameRect().left(),
                         2 * margin() + gameRect().bottom() - captionRect().top()));
@@ -349,7 +353,7 @@ void AbstractWidget::paintCaption()
 {
     Rect theCaptionRect = captionRect();
     fillRect(theCaptionRect, RGBColor(100, 100, 200));
-
+    drawTextCentered(theCaptionRect, player()->playerName(), 14, RGBColor(255, 255, 0));
 }
 
 
@@ -391,8 +395,7 @@ void AbstractWidget::paintActiveBlockShadow(const SimpleGame & inSimpleGame)
         }
     }
 
-    int borderColor = 231;
-    int fillColor = 245;
+
     Grid & grid = *gridPtr;
 
     Rect theGameRect(gameRect());

@@ -130,6 +130,8 @@ protected:
     virtual void fillRect(const Rect & inRect, const RGBColor & inColor) = 0;
     virtual void drawLine(int x1, int y1, int x2, int y2, int inPenWidth, const RGBColor & inColor) = 0;
     virtual void drawText(int x, int y, const std::string & inText) = 0;
+    virtual void drawTextCentered(const Rect & inRect, const std::string & inText, int inFontSize, const RGBColor & inColor) = 0;
+
 
 private:
     void paintGrid(int x, int y, const Grid & inGrid);

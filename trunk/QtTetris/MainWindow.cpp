@@ -79,12 +79,34 @@ private:
 
     static std::string GetTeamName(size_t inIndex)
     {
-        return std::string(inIndex < cPlayerCount/2 ? "A" : "B");
+        return std::string(inIndex < cPlayerCount/2 ? "Pirates" : "Marines");
     }
 
     static std::string GetPlayerName(size_t inIndex)
     {
-        return std::string(MakeString() << (inIndex < cPlayerCount/2 ? "A" : "B") << inIndex);
+        typedef const char * CharPtr;
+        static const CharPtr cPirates[] = {
+            "Luffy",
+            "Zoro",
+            "Nami",
+            "Sanji"
+        };
+
+        static const CharPtr cMarines[] = {
+            "Smoker",
+            "Tashigi",
+            "Fullbody",
+            "Hina"
+        };
+
+        if (inIndex < cPlayerCount / 2)
+        {
+            return cPirates[inIndex];
+        }
+        else
+        {
+            return cMarines[inIndex % (cPlayerCount / 2)];
+        }
     }
 
     Model(const Model &);
@@ -220,13 +242,17 @@ void MainWindow::onPenalty()
 
 void MainWindow::restart()
 {
-    LogInfo(__PRETTY_FUNCTION__);
-    Model::Instance().reset(Tetris_RowCount(), Tetris_ColumnCount());
-    MultiplayerGame & mgame = Model::Instance().multiplayerGame();
-    LogInfo(MakeString() << "Player count: " << mgame.playerCount());
-    LogInfo(MakeString() << "mTetrisWidgets.size(): " << mTetrisWidgets.size());
-    Assert(mgame.playerCount() == mTetrisWidgets.size());
+    // Unset all tetris widgets
+    for (TetrisWidgets::size_type idx = 0; idx < mTetrisWidgets.size(); ++idx)
+    {
+        mTetrisWidgets[idx]->setPlayer(0);
+    }
 
+    // Delete all players
+    Model::Instance().reset(Tetris_RowCount(), Tetris_ColumnCount());
+
+    // Add new players
+    MultiplayerGame & mgame = Model::Instance().multiplayerGame();
     for (size_t idx = 0; idx < mgame.playerCount(); ++idx)
     {
         LogInfo(MakeString() << "Setting player " << idx);
