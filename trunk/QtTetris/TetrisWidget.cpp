@@ -45,12 +45,11 @@ void TetrisWidget::refresh()
 
 void TetrisWidget::keyPressEvent(QKeyEvent * inEvent)
 {
-    if (!simpleGame() || simpleGame()->isGameOver())
+    if (!simpleGame() || simpleGame()->isGameOver() || simpleGame()->playerType() == PlayerType_Computer)
     {
         QWidget::keyPressEvent(inEvent);
         return;
     }
-
 
     switch (inEvent->key())
     {
@@ -79,39 +78,12 @@ void TetrisWidget::keyPressEvent(QKeyEvent * inEvent)
             simpleGame()->drop();
             break;
         }
-        case Qt::Key_C:
-        {
-            clearGameState();
-            break;
-        }
-        case Qt::Key_N:
-        {
-            toggleActiveBlock();
-            break;
-        }
         default:
         {
             QWidget::keyPressEvent(inEvent);
             break;
         }
     }
-}
-
-
-void TetrisWidget::clearGameState()
-{
-    Grid grid = simpleGame()->gameGrid();
-    simpleGame()->setGameGrid(Grid(grid.rowCount(), grid.rowCount()));
-}
-
-
-void TetrisWidget::toggleActiveBlock()
-{
-    // First valid BlockType value starts at 1.
-    Block block = simpleGame()->activeBlock();
-    BlockType newType = static_cast<BlockType>(1 + (block.type() % cBlockTypeCount));
-    Block newBlock(newType, Rotation(block.rotation()), Row(block.row()), Column(block.column()));
-    simpleGame()->setActiveBlock(newBlock);
 }
 
 

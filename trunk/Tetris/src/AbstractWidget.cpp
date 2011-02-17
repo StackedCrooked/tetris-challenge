@@ -140,12 +140,20 @@ void AbstractWidget::setPlayer(Player * inPlayer)
 
 const SimpleGame * AbstractWidget::simpleGame() const
 {
+    if (!mPlayer)
+    {
+        return NULL;
+    }
     return mPlayer->simpleGame();
 }
 
 
 SimpleGame * AbstractWidget::simpleGame()
 {
+    if (!mPlayer)
+    {
+        return NULL;
+    }
     return mPlayer->simpleGame();
 }
 

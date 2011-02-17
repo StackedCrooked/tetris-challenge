@@ -7,6 +7,7 @@
 #include "Tetris/SimpleGame.h"
 #include "Tetris/MultiplayerGame.h"
 #include "Tetris/Player.h"
+#include "Tetris/PlayerType.h"
 #include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
 
@@ -27,24 +28,28 @@ public:
     void logMessage(const std::string & inMessage);
 
 private slots:
-    void onRestart();
+    void onNewSinglePlayerGame();
+
+    void onNewHumanVsComputerGame();
+
+    void onNewComputerVsComputerGame();
 
     void onPaused();
 
     void onPenalty();
 
 private:
+    void onNewGame(const Tetris::PlayerTypes & inPlayerTypes);
+
     static MainWindow * sInstance;
 
 private:
-    void restart();
-
     typedef std::vector<TetrisWidget *> TetrisWidgets;
+    QHBoxLayout * mTetrisWidgetHolder;
     TetrisWidgets mTetrisWidgets;
-    QPushButton * mRestartButton;
-    QPushButton * mPauseButton;
-    QPushButton * mPenaltyButton;
+    int mSpacing;
     QTextEdit * mLogField;
+    bool mShowLog;
 };
 
 

@@ -94,7 +94,6 @@ void Game::UnregisterEventHandler(ThreadSafe<Game> inGame, EventHandler * inEven
     Game * game(rwgame.get());
     if (sInstances.find(game) == sInstances.end())
     {
-        LogWarning("Game::UnregisterEventHandler: The game object no longer exists!");
         return;
     }
 
@@ -124,7 +123,6 @@ void Game::OnChangedImpl(Game * inGame)
 
     if (!Exists(inGame))
     {
-        LogWarning("Game::OnChangedImpl: The game object no longer exists!");
         return;
     }
 
@@ -134,7 +132,6 @@ void Game::OnChangedImpl(Game * inGame)
         Game::EventHandler * eventHandler(*it);
         if (!EventHandler::Exists(eventHandler))
         {
-            LogWarning("Game::OnChangedImpl: This event handler no longer exists.");
             return;
         }
 
@@ -216,7 +213,6 @@ void Game::applyLinePenalty(int inLineCount)
     }
 
     int lineIncrement = inLineCount < 4 ? (inLineCount - 1) : inLineCount;
-    LogInfo(MakeString() << "Line increment: " << lineIncrement);
 
     int newFirstOccupiedRow = gameState().firstOccupiedRow() - lineIncrement;
     if (newFirstOccupiedRow < 0)

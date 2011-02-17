@@ -44,9 +44,6 @@ private:
     virtual void paintEvent(QPaintEvent * event);
     virtual QSize minimumSizeHint() const;
 
-    void clearGameState();
-    void toggleActiveBlock();
-
     QSize mMinSize;
     std::auto_ptr<QPainter> mPainter;
 
