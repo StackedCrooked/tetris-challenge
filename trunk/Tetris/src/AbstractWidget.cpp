@@ -1,8 +1,10 @@
 #include "Tetris/Config.h"
 #include "Tetris/AbstractWidget.h"
 #include "Tetris/Block.h"
+#include "Tetris/Game.h"
 #include "Tetris/MakeString.h"
 #include "Tetris/SimpleGame.h"
+#include "Tetris/Threading.h"
 #include "Poco/Stopwatch.h"
 #include <boost/bind.hpp>
 
@@ -235,6 +237,9 @@ void AbstractWidget::coordinateRepaint(const SimpleGame & inGame)
     // Paint the game
     paintGameGrid(inGame.gameGrid());
 
+    // Paint shadow
+    paintActiveBlockShadow(inGame);
+
     // Paint future blocks
     std::vector<Block> futureBlocks(inGame.getNextBlocks());
     std::vector<BlockType> blockTypes;
@@ -259,18 +264,38 @@ void AbstractWidget::coordinateRepaint(const SimpleGame & inGame)
 
 void AbstractWidget::paintGrid(int x, int y, const Grid & inGrid)
 {
-    for (unsigned int c = 0; c < inGrid.columnCount(); ++c)
+    for (size_t c = 0; c < inGrid.columnCount(); ++c)
     {
-        for (unsigned int r = 0; r < inGrid.rowCount(); ++r)
+        for (size_t r = 0; r < inGrid.rowCount(); ++r)
         {
             BlockType blockType = inGrid.get(r, c);
             if (blockType != BlockType_Nil)
             {
                 paintSquare(Rect(x + (c * mSquareWidth),
-                               y + (r * mSquareHeight),
-                               mSquareWidth,
-                               mSquareHeight),
-                          getColor(blockType));
+                                 y + (r * mSquareHeight),
+                                 mSquareWidth,
+                                 mSquareHeight),
+                            getColor(blockType));
+            }
+        }
+    }
+}
+
+
+void AbstractWidget::paintGrid(int x, int y, const Grid & inGrid, const RGBColor & inColor)
+{
+    for (size_t c = 0; c < inGrid.columnCount(); ++c)
+    {
+        for (size_t r = 0; r < inGrid.rowCount(); ++r)
+        {
+            BlockType blockType = inGrid.get(r, c);
+            if (blockType != BlockType_Nil)
+            {
+                paintSquare(Rect(x + (c * mSquareWidth),
+                                 y + (r * mSquareHeight),
+                                 mSquareWidth,
+                                 mSquareHeight),
+                            inColor);
             }
         }
     }
@@ -282,6 +307,65 @@ void AbstractWidget::paintGameGrid(const Grid & inGrid)
     Rect theGameRect = gameRect();
     fillRect(theGameRect, RGBColor(255, 255, 255));
     paintGrid(theGameRect.x(), theGameRect.y(), inGrid);
+}
+
+
+void AbstractWidget::paintActiveBlockShadow(const SimpleGame & inSimpleGame)
+{
+    size_t colIdx(0);
+    size_t rowIdx(0);
+    boost::scoped_ptr<Grid> gridPtr;
+
+    // Critical section. Minimize scope.
+    {
+        ScopedReader<Game> rgame(inSimpleGame.game());
+        const Game & game = *rgame.get();
+        const Block & block = game.activeBlock();
+        const GameState & gameState = game.gameState();
+
+        colIdx = block.column();
+        gridPtr.reset(new Grid(block.grid()));
+        for (; rowIdx < game.rowCount(); ++rowIdx)
+        {
+            if (!gameState.checkPositionValid(block, rowIdx, colIdx))
+            {
+                if (rowIdx == 0)
+                {
+                    return; // This game is over.
+                }
+
+                rowIdx--;
+                break;
+            }
+        }
+    }
+
+    int borderColor = 231;
+    int fillColor = 245;
+    Grid & grid = *gridPtr;
+
+    for (size_t c = 0; c < grid.columnCount(); ++c)
+    {
+        for (size_t r = 0; r < grid.rowCount(); ++r)
+        {
+            BlockType blockType = grid.get(r, c);
+            if (blockType != BlockType_Nil)
+            {
+                int x = margin() + colIdx * mSquareWidth;
+                int y = margin() + rowIdx * mSquareHeight;
+                fillRect(Rect(x + (c * mSquareWidth),
+                              y + (r * mSquareHeight),
+                              mSquareWidth,
+                              mSquareHeight),
+                         RGBColor(fillColor, fillColor, fillColor));
+                drawRect(Rect(x + (c * mSquareWidth),
+                              y + (r * mSquareHeight),
+                              mSquareWidth,
+                              mSquareHeight),
+                         RGBColor(borderColor, borderColor, borderColor));
+            }
+        }
+    }
 }
 
 
