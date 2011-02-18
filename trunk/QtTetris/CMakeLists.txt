@@ -113,10 +113,10 @@ add_executable(${EXECUTABLE} ${QtTetris_SOURCES} ${QtTetris_HEADERS_MOC})
 #
 # Post build step: make a symbolic link to the last build directory
 #
-add_custom_command(TARGET               ${EXECUTABLE}
+add_custom_command(TARGET ${EXECUTABLE}
                    POST_BUILD
-                   COMMAND              /bin/ln
-                   ARGS                 -fs ${OUTDIR} ${BUILD_ROOT}LastBuild
+                   COMMAND /bin/rm ARGS -f ${BUILD_ROOT}LastBuild
+                   COMMAND /bin/ln ARGS -s ${OUTDIR} ${BUILD_ROOT}LastBuild
                    WORKING_DIRECTORY    ${BUILD_ROOT})
 
 
