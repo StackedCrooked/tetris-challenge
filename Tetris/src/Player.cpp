@@ -14,7 +14,7 @@ struct Player::Impl
         mRowCount(inRowCount),
         mColumnCount(inColumnCount),
         mPlayerType(inPlayerType),
-        mSimpleGame(new SimpleGame(inRowCount, inColumnCount, inPlayerType)),
+        mSimpleGame(new SimpleGame(inPlayerName, inRowCount, inColumnCount, inPlayerType)),
         mTeamName(inTeamName.get()),
         mPlayerName(inPlayerName.get())
     {
@@ -91,7 +91,7 @@ void Player::resetGame()
 {
     mImpl->mSimpleGame.reset();
     mImpl->mSimpleGame.reset(
-        new SimpleGame(mImpl->mRowCount, mImpl->mColumnCount, mImpl->mPlayerType));
+        new SimpleGame(mImpl->mPlayerName, mImpl->mRowCount, mImpl->mColumnCount, mImpl->mPlayerType));
 }
 
 

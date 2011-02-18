@@ -12,67 +12,68 @@ class Timer;
 }
 
 
-namespace Tetris
+namespace Tetris {
+
+
+class Game;
+class GameState;
+
+
+class ComputerPlayer
 {
-
-    class Game;
-    class GameState;
-
-
-    class ComputerPlayer
+public:
+    class Tweaker
     {
     public:
-        class Tweaker
-        {
-        public:
-            virtual std::auto_ptr<Evaluator> updateInfo(const GameState & inGameState,
-                                                        int & outSearchDepth,
-                                                        int & outSearchWidth) = 0;
-        };
-
-        ComputerPlayer(const ThreadSafe<Game> & inProtectedGame,
-                       std::auto_ptr<Evaluator> inEvaluator,
-                       int inSearchDepth,
-                       int inSearchWidth,
-                       int inWorkerCount = 0);
-
-        ~ComputerPlayer();
-
-        void setTweaker(Tweaker * inTweaker);
-
-        int searchDepth() const;
-
-        void setSearchDepth(int inSearchDepth);
-
-        // Get progress
-        int currentSearchDepth() const;
-
-        int searchWidth() const;
-
-        void setSearchWidth(int inSearchWidth);
-
-        int moveSpeed() const;
-
-        void setMoveSpeed(int inMoveSpeed);
-
-        void setEvaluator(std::auto_ptr<Evaluator> inEvaluator);
-
-        //const Evaluator & evaluator() const;
-
-        int workerCount() const;
-
-        // Set to 0 to auto-select (75% of CPU count)
-        void setWorkerCount(int inWorkerCount);
-
-    private:
-        ComputerPlayer(const ComputerPlayer &);
-        ComputerPlayer & operator= (const ComputerPlayer&);
-
-        void onTimerEvent(Poco::Timer & );
-
-        struct Impl;
-        Impl * mImpl;
+        virtual std::auto_ptr<Evaluator> updateAIParameters(const GameState & inGameState,
+                                                            int & outSearchDepth,
+                                                            int & outSearchWidth,
+                                                            int & outWorkerCount) = 0;
     };
+
+    ComputerPlayer(const std::string & inName,
+                   const ThreadSafe<Game> & inProtectedGame,
+                   std::auto_ptr<Evaluator> inEvaluator);
+
+    ~ComputerPlayer();
+
+    const std::string & name() const;
+
+    void setTweaker(Tweaker * inTweaker);
+
+    int searchDepth() const;
+
+    void setSearchDepth(int inSearchDepth);
+
+    // Get progress
+    int currentSearchDepth() const;
+
+    int searchWidth() const;
+
+    void setSearchWidth(int inSearchWidth);
+
+    int moveSpeed() const;
+
+    void setMoveSpeed(int inMoveSpeed);
+
+    void setEvaluator(std::auto_ptr<Evaluator> inEvaluator);
+
+    //const Evaluator & evaluator() const;
+
+    int workerCount() const;
+
+    // Set to 0 to auto-select (75% of CPU count)
+    void setWorkerCount(int inWorkerCount);
+
+private:
+    ComputerPlayer(const ComputerPlayer &);
+    ComputerPlayer & operator= (const ComputerPlayer&);
+
+    void onTimerEvent(Poco::Timer & );
+
+    struct Impl;
+    Impl * mImpl;
+};
 
 } // namespace Tetris
 
