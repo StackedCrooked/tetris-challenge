@@ -4,10 +4,10 @@
 
 #include "Tetris/Assert.h"
 #include "Tetris/MainThread.h"
+#include "Poco/AtomicCounter.h"
 #include <boost/noncopyable.hpp>
 #include <boost/thread.hpp>
 #include <boost/scoped_ptr.hpp>
-#include <boost/detail/atomic_count.hpp>
 #include <boost/noncopyable.hpp>
 #include <memory>
 #include <set>
@@ -94,13 +94,13 @@ private:
     friend class ScopedReader<Variable>;
     boost::shared_ptr<WithMutex<Variable> > mVariableWithMutex;
     size_t mIdentifier;
-    static boost::detail::atomic_count sInstanceCount;
+    static Poco::AtomicCounter sInstanceCount;
 };
 
 
 // Static member initialization.
 template<class Variable>
-boost::detail::atomic_count ThreadSafe<Variable>::sInstanceCount(0);
+Poco::AtomicCounter ThreadSafe<Variable>::sInstanceCount(0);
 
 
 template<class Variable>
