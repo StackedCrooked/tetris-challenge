@@ -101,4 +101,5 @@ HEADERS += \
 
 OTHER_FILES += \
     QtTetris/CMakeLists.txt \
-    Tetris/CMakeLists.txt
+    Tetris/CMakeLists.txt \
+    Tetris/Todo.txt
