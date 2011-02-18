@@ -109,6 +109,10 @@ add_definitions(${QT_DEFINITIONS})
 #
 add_executable(${EXECUTABLE} ${QtTetris_SOURCES} ${QtTetris_HEADERS_MOC})
 
+
+#
+# Post build step: make a symbolic link to the last build directory
+#
 add_custom_command(TARGET               ${EXECUTABLE}
                    POST_BUILD
                    COMMAND              /bin/ln
