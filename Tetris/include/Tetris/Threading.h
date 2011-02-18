@@ -17,7 +17,7 @@ namespace Tetris {
 
 
 template<class Variable>
-struct WithMutex
+struct WithMutex : boost::noncopyable
 {
     WithMutex(std::auto_ptr<Variable> inVariable) :
         mVariable(inVariable.release())
@@ -29,7 +29,12 @@ struct WithMutex
     {
     }
 
-    boost::scoped_ptr<Variable> mVariable;
+    ~WithMutex()
+    {
+        delete mVariable;
+    }
+
+    Variable * mVariable;
     mutable boost::shared_mutex mMutex;
 };
 
@@ -62,7 +67,7 @@ public:
 
     // Default constructor can only be used if Variable has a default constructor.
     ThreadSafe() :
-        mVariableWithMutex(new WithMutex<Variable>(std::auto_ptr<Variable>(new Variable))),
+        mVariableWithMutex(new WithMutex<Variable>(new Variable)),
         mIdentifier(++sInstanceCount)
     {
     }
@@ -135,7 +140,7 @@ public:
     ScopedReaderAndWriter(ThreadSafe<Variable> inProtectedVariable) :
         mSharedLock(inProtectedVariable.mVariableWithMutex->mMutex),
         mUpgradeLock(mSharedLock),
-        mVariable(inProtectedVariable.mVariableWithMutex->mVariable.get())
+        mVariable(inProtectedVariable.mVariableWithMutex->mVariable)
     {
 
     }
@@ -146,7 +151,7 @@ public:
     }
 
     Variable & operator *()
-    { return mVariable; }
+    { return *mVariable; }
 
     Variable * get()
     { return mVariable; }
@@ -172,7 +177,7 @@ class ScopedReader
 public:
     ScopedReader(const ThreadSafe<Variable> & inProtectedVariable) :
         mSharedLock(inProtectedVariable.mVariableWithMutex->mMutex),
-        mVariable(inProtectedVariable.mVariableWithMutex->mVariable.get())
+        mVariable(inProtectedVariable.mVariableWithMutex->mVariable)
     {
     }
 
@@ -182,7 +187,7 @@ public:
     }
 
     const Variable & operator *() const
-    { return mVariable; }
+    { return *mVariable; }
 
     const Variable * get() const
     { return mVariable; }
@@ -200,17 +205,17 @@ private:
 };
 
 
-template<class SubType>
+template<class Instance>
 class InstanceTracker : boost::noncopyable
 {
 public:
-    typedef std::set<SubType*> Instances;
+    typedef std::set<Instance*> Instances;
     typedef ThreadSafe<Instances> ThreadedInstances;
 
     InstanceTracker()
     {
         ScopedReaderAndWriter<Instances> rwInstances(sInstances);
-        rwInstances.insert(static_cast<SubType*>(this));
+        rwInstances.insert(static_cast<Instance*>(this));
     }
 
     virtual ~InstanceTracker()
@@ -219,7 +224,7 @@ public:
         rwInstances.erase(this);
     }
 
-    static bool HasInstance(SubType * inInstance)
+    static bool HasInstance(Instance * inInstance)
     {
         ScopedReader<Instances> rInstances(sInstances);
         return rInstances.find(inInstance) != rInstances.end();
@@ -230,8 +235,8 @@ private:
 };
 
 
-template<class SubType>
-typename InstanceTracker<SubType>::ThreadedInstances InstanceTracker<SubType>::sInstances;
+template<class Instance>
+typename InstanceTracker<Instance>::ThreadedInstances InstanceTracker<Instance>::sInstances;
 
 
 /**
