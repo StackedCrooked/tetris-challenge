@@ -25,6 +25,7 @@ endif()
 set(EXECUTABLE QtTetris)
 set(CMAKE_OSX_ARCHITECTURES ${ARCH})
 set(SOLUTIONDIR "${QtTetris_SOURCE_DIR}/../")
+set(BUILD_ROOT ${SOLUTIONDIR}Build/)
 set(POCO ${SOLUTIONDIR}3rdParty/Poco/)
 
 
@@ -35,8 +36,7 @@ set(POCO ${SOLUTIONDIR}3rdParty/Poco/)
 # - OUTDIR is a user-variable
 # - use the second definition for more flexibility.
 #
-set(OUTDIR ${SOLUTIONDIR}Build/${CMAKE_BUILD_TYPE}/)
-#set(OUTDIR ${SOLUTIONDIR}Build/${PLATFORM}/${ARCH}/${CMAKE_BUILD_TYPE}/)
+set(OUTDIR ${BUILD_ROOT}${CMAKE_BUILD_TYPE}/${PLATFORM}/${ARCH}/)
 
 
 #
@@ -44,7 +44,6 @@ set(OUTDIR ${SOLUTIONDIR}Build/${CMAKE_BUILD_TYPE}/)
 #
 set(LIBRARY_OUTPUT_PATH ${OUTDIR}lib/)
 set(EXECUTABLE_OUTPUT_PATH ${OUTDIR}bin/)
-
 
 #
 # Compile flags
@@ -109,6 +108,12 @@ add_definitions(${QT_DEFINITIONS})
 # Set the executable
 #
 add_executable(${EXECUTABLE} ${QtTetris_SOURCES} ${QtTetris_HEADERS_MOC})
+
+add_custom_command(TARGET               ${EXECUTABLE}
+                   POST_BUILD
+                   COMMAND              /bin/ln
+                   ARGS                 -fs ${OUTDIR} ${BUILD_ROOT}LastBuild
+                   WORKING_DIRECTORY    ${BUILD_ROOT})
 
 
 #
