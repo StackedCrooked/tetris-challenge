@@ -15,8 +15,7 @@
 namespace Tetris {
 
 
-struct SimpleGame::Impl : public Game::EventHandler,
-                          public ComputerPlayer::Tweaker
+struct SimpleGame::Impl : public Game::EventHandler
 {
     typedef SimpleGame::BackReference BackReference;
 
@@ -33,9 +32,11 @@ struct SimpleGame::Impl : public Game::EventHandler,
         throw std::logic_error("Invalid enum value for PlayerType.");
     }
 
-    Impl(size_t inRowCount,
+    Impl(const std::string & inName,
+         size_t inRowCount,
          size_t inColumnCount,
          PlayerType inPlayerType) :
+        mName(inName),
         mGame(CreateGame(inRowCount, inColumnCount, inPlayerType)),
         mPlayerType(inPlayerType),
         mComputerPlayer(),
@@ -47,41 +48,13 @@ struct SimpleGame::Impl : public Game::EventHandler,
         if (inPlayerType == PlayerType_Computer)
         {
             std::auto_ptr<Evaluator> evaluator(CreatePoly<Evaluator, MakeTetrises>());
-            mComputerPlayer.reset(new ComputerPlayer(mGame, evaluator, 6, 4, 4));
-            mComputerPlayer->setTweaker(this);
-            mComputerPlayer->setMoveSpeed(20);
+            mComputerPlayer.reset(new ComputerPlayer(mName, mGame, evaluator));
         }
     }
 
     ~Impl()
     {
         Game::UnregisterEventHandler(mGame, this);
-    }
-
-    virtual std::auto_ptr<Evaluator> updateInfo(const GameState & inGameState,
-                                                int & outSearchDepth,
-                                                int & outSearchWidth)
-    {
-        int firstRow = inGameState.firstOccupiedRow();
-        int rowCount = inGameState.grid().rowCount();
-        if (0.5 * rowCount < float(firstRow))
-        {
-            outSearchDepth = 6;
-            outSearchWidth = 4;
-            return CreatePoly<Evaluator, MakeTetrises>();
-        }
-        else if (0.6 * rowCount < float(firstRow))
-        {
-            outSearchDepth = 5;
-            outSearchWidth = 4;
-            return CreatePoly<Evaluator, Balanced>();
-        }
-        else
-        {
-            outSearchDepth = 4;
-            outSearchWidth = 4;
-            return CreatePoly<Evaluator, Survival>();
-        }
     }
 
     void init(SimpleGame * inSimpleGame)
@@ -110,6 +83,7 @@ struct SimpleGame::Impl : public Game::EventHandler,
         }
     }
 
+    std::string mName;
     ThreadSafe<Game> mGame;
     PlayerType mPlayerType;
     boost::scoped_ptr<ComputerPlayer> mComputerPlayer;
@@ -125,8 +99,8 @@ struct SimpleGame::Impl : public Game::EventHandler,
 SimpleGame::Instances SimpleGame::sInstances;
 
 
-SimpleGame::SimpleGame(size_t inRowCount, size_t inColumnCount, PlayerType inPlayerType) :
-    mImpl(new Impl(inRowCount, inColumnCount, inPlayerType))
+SimpleGame::SimpleGame(const std::string & inName, size_t inRowCount, size_t inColumnCount, PlayerType inPlayerType) :
+    mImpl(new Impl(inName, inRowCount, inColumnCount, inPlayerType))
 {
     mImpl->init(this);
     sInstances.insert(this);
@@ -173,6 +147,21 @@ void SimpleGame::UnregisterEventHandler(SimpleGame * inSimpleGame, EventHandler 
 bool SimpleGame::Exists(SimpleGame * inSimpleGame)
 {
     return sInstances.find(inSimpleGame) != sInstances.end();
+}
+
+
+void SimpleGame::setAITweaker(ComputerPlayer::Tweaker * inTweaker)
+{
+    if (mImpl->mPlayerType != PlayerType_Computer)
+    {
+        throw std::runtime_error("You can only set a tweaker on computer players.");
+    }
+
+    Assert(mImpl->mComputerPlayer);
+    if (mImpl->mComputerPlayer)
+    {
+        mImpl->mComputerPlayer->setTweaker(inTweaker);
+    }
 }
 
 

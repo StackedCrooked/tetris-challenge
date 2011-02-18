@@ -27,37 +27,26 @@
 namespace Tetris {
 
 
-// Use roughly 75% of all available CPUs.
-static unsigned int GetWorkerCount()
-{
-    int cpuCount = Poco::Environment::processorCount();
-    Assert(cpuCount >= 1);
-    if (cpuCount > 1)
-    {
-        cpuCount = static_cast<int>(0.5 + (0.75 * static_cast<double>(cpuCount)));
-    }
-    return cpuCount;
-}
-
-
 struct ComputerPlayer::Impl : boost::noncopyable
 {
 public:
+    static const int cDefaultSearchDepth = 3;
+    static const int cDefaultSearchWidth = 8;
+
     typedef ComputerPlayer::Tweaker Tweaker;
 
-    Impl(const ThreadSafe<Game> & inProtectedGame,
-         std::auto_ptr<Evaluator> inEvaluator,
-         int inSearchDepth,
-         int inSearchWidth,
-         int inWorkerCount) :
+    Impl(const std::string & inName,
+         const ThreadSafe<Game> & inProtectedGame,
+         std::auto_ptr<Evaluator> inEvaluator) :
         mTweaker(0),
+        mName(inName),
         mProtectedGame(inProtectedGame),
-        mWorkerPool("ComputerPlayer WorkerPool", inWorkerCount > 0 ? inWorkerCount : GetWorkerCount()),
+        mWorkerPool("ComputerPlayer WorkerPool", Poco::Environment::processorCount()),
         mEvaluator(inEvaluator.release()),
         mBlockMover(new BlockMover(mProtectedGame)),
-        mSearchDepth(inSearchDepth),
-        mSearchWidth(inSearchWidth),
-        mWorkerCount(inWorkerCount),
+        mSearchDepth(cDefaultSearchDepth),
+        mSearchWidth(cDefaultSearchWidth),
+        mWorkerCount(Poco::Environment::processorCount()),
         mGameDepth(0),
         mQuitFlag(false),
         mTimer(10, 10)
@@ -79,6 +68,7 @@ public:
     int calculateRemainingTimeMs(const Game & inGame) const;
 
     Tweaker * mTweaker;
+    std::string mName;
     ThreadSafe<Game> mProtectedGame;
     WorkerPool mWorkerPool;
     boost::scoped_ptr<NodeCalculator> mNodeCalculator;
@@ -94,12 +84,10 @@ public:
 };
 
 
-ComputerPlayer::ComputerPlayer(const ThreadSafe<Game> & inProtectedGame,
-                               std::auto_ptr<Evaluator> inEvaluator,
-                               int inSearchDepth,
-                               int inSearchWidth,
-                               int inWorkerCount) :
-    mImpl(new Impl(inProtectedGame, inEvaluator, inSearchDepth, inSearchWidth, inWorkerCount))
+ComputerPlayer::ComputerPlayer(const std::string & inName,
+                               const ThreadSafe<Game> & inProtectedGame,
+                               std::auto_ptr<Evaluator> inEvaluator) :
+    mImpl(new Impl(inName, inProtectedGame, inEvaluator))
 {
     mImpl->mTimer.start(Poco::TimerCallback<ComputerPlayer>(*this, &ComputerPlayer::onTimerEvent));
 }
@@ -113,6 +101,12 @@ ComputerPlayer::~ComputerPlayer()
     }
     mImpl->mTimer.stop();
     delete mImpl;
+}
+
+
+const std::string & ComputerPlayer::name() const
+{
+    return mImpl->mName;
 }
 
 
@@ -212,7 +206,7 @@ void ComputerPlayer::setWorkerCount(int inWorkerCount)
     boost::mutex::scoped_lock lock(mImpl->mMutex);
     if (inWorkerCount == 0)
     {
-        mImpl->mWorkerCount = GetWorkerCount();
+        mImpl->mWorkerCount = Poco::Environment::processorCount();
     }
     else
     {
@@ -373,16 +367,17 @@ void ComputerPlayer::Impl::timerEvent()
                 Assert(mWorkerPool.getActiveWorkerCount() == 0);
                 if (mWorkerCount == 0)
                 {
-                    mWorkerCount = GetWorkerCount();
+                    mWorkerCount = Poco::Environment::processorCount();
                 }
                 mWorkerPool.resize(mWorkerCount);
 
                 if (mTweaker)
                 {
                     mEvaluator.reset(
-                        mTweaker->updateInfo(game.gameState(),
-                                             mSearchDepth,
-                                             mSearchWidth).release());
+                        mTweaker->updateAIParameters(game.gameState(),
+                                                     mSearchDepth,
+                                                     mSearchWidth,
+                                                     mWorkerCount).release());
                 }
                 mNodeCalculator.reset(new NodeCalculator(endNode,
                                                          futureBlocks,

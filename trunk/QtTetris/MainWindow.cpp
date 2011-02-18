@@ -1,6 +1,7 @@
 #include "MainWindow.h"
 #include "Tetris/Assert.h"
 #include "Tetris/AutoPtrSupport.h"
+#include "Tetris/ComputerPlayer.h"
 #include "Tetris/Game.h"
 #include "Tetris/Logger.h"
 #include "Tetris/Logging.h"
@@ -24,7 +25,7 @@ typedef boost::shared_ptr<Tetris::SimpleGame> SimpleGamePtr;
 using namespace Tetris;
 
 
-class Model
+class Model : public ComputerPlayer::Tweaker
 {
 public:
     static Model & Instance()
@@ -48,6 +49,34 @@ public:
         return *mMultiplayerGame;
     }
 
+    virtual std::auto_ptr<Evaluator> updateAIParameters(const GameState & inGameState,
+                                                        int & outSearchDepth,
+                                                        int & outSearchWidth,
+                                                        int & /*outWorkerCount*/)
+    {
+        int firstRow = inGameState.firstOccupiedRow();
+        int rowCount = inGameState.grid().rowCount();
+        if (0.5 * rowCount < float(firstRow))
+        {
+            outSearchDepth = 8;
+            outSearchWidth = 5;
+
+            return CreatePoly<Evaluator, MakeTetrises>();
+        }
+        else if (0.6 * rowCount < float(firstRow))
+        {
+            outSearchDepth = 6;
+            outSearchWidth = 6;
+            return CreatePoly<Evaluator, Balanced>();
+        }
+        else
+        {
+            outSearchDepth = 4;
+            outSearchWidth = 4;
+            return CreatePoly<Evaluator, Survival>();
+        }
+    }
+
 
     void reset(const PlayerTypes & inPlayerTypes, size_t inRowCount, size_t inColCount)
     {
@@ -55,12 +84,16 @@ public:
         mMultiplayerGame.reset(new MultiplayerGame);
         for (PlayerTypes::size_type idx = 0; idx < inPlayerTypes.size(); ++idx)
         {
-            mMultiplayerGame->join(
+            Player * player = mMultiplayerGame->join(
                 Create<Player>(inPlayerTypes[idx],
                                TeamName(GetTeamName(inPlayerTypes[idx], idx + 1)),
                                PlayerName(GetPlayerName(inPlayerTypes[idx], idx/2)),
                                inRowCount,
                                inColCount));
+            if (inPlayerTypes[idx] == PlayerType_Computer)
+            {
+                player->simpleGame()->setAITweaker(&Model::Instance());
+            }
         }
     }
 

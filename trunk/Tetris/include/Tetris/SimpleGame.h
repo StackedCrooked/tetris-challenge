@@ -4,6 +4,7 @@
 
 #include "Tetris/Direction.h"
 #include "Tetris/Block.h"
+#include "Tetris/ComputerPlayer.h"
 #include "Tetris/GameStateStats.h"
 #include "Tetris/PlayerType.h"
 #include <boost/scoped_ptr.hpp>
@@ -49,17 +50,19 @@ public:
         virtual ~BackReference() {}
     };
 
-    SimpleGame(size_t inRowCount, size_t inColumnCount, PlayerType inPlayerType);
+    SimpleGame(const std::string & inName, size_t inRowCount, size_t inColumnCount, PlayerType inPlayerType);
 
     ~SimpleGame();
-
-    PlayerType playerType() const;
 
     static void RegisterEventHandler(SimpleGame * inSimpleGame, EventHandler * inEventHandler);
 
     static void UnregisterEventHandler(SimpleGame * inSimpleGame, EventHandler * inEventHandler);
 
     static bool Exists(SimpleGame * inSimpleGame);
+
+    void setAITweaker(ComputerPlayer::Tweaker * inTweaker);
+
+    PlayerType playerType() const;
 
     GameStateStats stats() const;
 
