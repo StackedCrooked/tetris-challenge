@@ -9,9 +9,39 @@
 #include <boost/scoped_ptr.hpp>
 #include <boost/detail/atomic_count.hpp>
 #include <memory>
+#include <set>
 
 
 namespace Tetris {
+
+
+template<class SubType>
+class InstanceTracker
+{
+public:
+    InstanceTracker()
+    {
+        sInstances.insert(static_cast<SubType*>(this));
+    }
+
+    virtual ~InstanceTracker()
+    {
+        sInstances.erase(this);
+    }
+
+    static bool Exists(SubType * inInstance)
+    {
+        return sInstances.find(inInstance) != sInstances.end();
+    }
+
+private:
+    typedef std::set<SubType*> Instances;
+    static Instances sInstances;
+};
+
+
+template<class SubType>
+typename InstanceTracker<SubType>::Instances InstanceTracker<SubType>::sInstances;
 
 
 template<class Variable>
@@ -68,6 +98,11 @@ public:
 
     bool operator!= (const ThreadSafe<Variable> & rhs) const
     { return !(*this == rhs); }
+
+    operator bool() const
+    {
+        return mVariableWithMutex.get() != 0;
+    }
 
     size_t id() const
     { return mIdentifier; }
