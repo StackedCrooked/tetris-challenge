@@ -8,40 +8,12 @@
 #include <boost/thread.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/detail/atomic_count.hpp>
+#include <boost/noncopyable.hpp>
 #include <memory>
 #include <set>
 
 
 namespace Tetris {
-
-
-template<class SubType>
-class InstanceTracker
-{
-public:
-    InstanceTracker()
-    {
-        sInstances.insert(static_cast<SubType*>(this));
-    }
-
-    virtual ~InstanceTracker()
-    {
-        sInstances.erase(this);
-    }
-
-    static bool Exists(SubType * inInstance)
-    {
-        return sInstances.find(inInstance) != sInstances.end();
-    }
-
-private:
-    typedef std::set<SubType*> Instances;
-    static Instances sInstances;
-};
-
-
-template<class SubType>
-typename InstanceTracker<SubType>::Instances InstanceTracker<SubType>::sInstances;
 
 
 template<class Variable>
@@ -61,9 +33,11 @@ struct WithMutex
     mutable boost::shared_mutex mMutex;
 };
 
+
 // Forward declaration.
 template<class Variable>
 class ScopedReader;
+
 
 // Forward declaration.
 template<class Variable>
@@ -224,6 +198,40 @@ private:
     const Variable * mVariable;
     Stopwatch mStopwatch;
 };
+
+
+template<class SubType>
+class InstanceTracker : boost::noncopyable
+{
+public:
+    typedef std::set<SubType*> Instances;
+    typedef ThreadSafe<Instances> ThreadedInstances;
+
+    InstanceTracker()
+    {
+        ScopedReaderAndWriter<Instances> rwInstances(sInstances);
+        rwInstances.insert(static_cast<SubType*>(this));
+    }
+
+    virtual ~InstanceTracker()
+    {
+        ScopedReaderAndWriter<Instances> rwInstances(sInstances);
+        rwInstances.erase(this);
+    }
+
+    static bool HasInstance(SubType * inInstance)
+    {
+        ScopedReader<Instances> rInstances(sInstances);
+        return rInstances.find(inInstance) != rInstances.end();
+    }
+
+private:
+    static ThreadedInstances sInstances;
+};
+
+
+template<class SubType>
+typename InstanceTracker<SubType>::ThreadedInstances InstanceTracker<SubType>::sInstances;
 
 
 /**
