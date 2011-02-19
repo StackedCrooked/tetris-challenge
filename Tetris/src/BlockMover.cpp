@@ -12,212 +12,151 @@
 #include "Tetris/Assert.h"
 #include "Poco/Stopwatch.h"
 #include "Poco/Timer.h"
+#include <boost/bind.hpp>
 
 
-namespace Tetris
+namespace Tetris {
+
+
+struct BlockMover::Impl
 {
-
-    class BlockMoverImpl
-    {
-    public:
-        BlockMoverImpl(const ThreadSafe<Game> & inGame);
-
-        ~BlockMoverImpl();
-
-        void setSpeed(int inNumMovesPerSecond);
-
-        int speed() const;
-
-        void setInterval(int inTimeBetweenMovesInMilliseconds);
-
-        int interval() const;
-
-        void setCallback(const boost::function<void()> & inCallback);
-
-    private:
-        BlockMoverImpl(const BlockMoverImpl &);
-        BlockMoverImpl & operator=(const BlockMoverImpl&);
-
-        void onTimer(Poco::Timer & ioTimer);
-        void move();
-
-        ThreadSafe<Game> mGame;
-        boost::function<void()> mCallback;
-        boost::scoped_ptr<Poco::Timer> mTimer;
-        Poco::Stopwatch mStopwatch;
-        double mIntervalMs;
-    };
-
-
-
-    BlockMoverImpl::BlockMoverImpl(const ThreadSafe<Game> & inGame) :
+    Impl(ThreadSafe<Game> inGame) :
         mGame(inGame),
-        mCallback(),
         mTimer(),
         mStopwatch(),
-        mIntervalMs(50)
+        mNumMovesPerSecond(1)
     {
-        int interval = std::min<int>(10, int(mIntervalMs/3));
-        mTimer.reset(new Poco::Timer(0, interval));
-        Poco::TimerCallback<BlockMoverImpl> callback(*this, &BlockMoverImpl::onTimer);
-        mTimer->start(callback);
-        mStopwatch.start();
     }
 
-
-    BlockMoverImpl::~BlockMoverImpl()
+    ~Impl()
     {
         mTimer->stop();
         mTimer.reset();
     }
 
+    void onTimer(Poco::Timer & inTimer);
 
-    int BlockMoverImpl::speed() const
+    int periodicInterval() const
     {
-        return static_cast<int>(0.5 + (1000.0 / mIntervalMs));
+        Assert(mNumMovesPerSecond != 0);
+        return static_cast<int>(0.5 + 1000.0 / static_cast<double>(mNumMovesPerSecond));
     }
 
 
-    void BlockMoverImpl::setSpeed(int inNumMovesPerSecond)
+    void move();
+
+    ThreadSafe<Game> mGame;
+    boost::scoped_ptr<Poco::Timer> mTimer;
+    Poco::Stopwatch mStopwatch;
+    int mNumMovesPerSecond;
+};
+
+
+BlockMover::BlockMover(ThreadSafe<Game> inGame) :
+    mImpl(new Impl(inGame))
+{
+    mImpl->mTimer.reset(new Poco::Timer(10, 10));
+    Poco::TimerCallback<Impl> timerCallback(*mImpl, &Impl::onTimer);
+    mImpl->mTimer->start(timerCallback);
+    mImpl->mStopwatch.start();
+}
+
+
+BlockMover::~BlockMover()
+{
+    delete mImpl;
+    mImpl = 0;
+}
+
+
+void BlockMover::Impl::onTimer(Poco::Timer &)
+{
+    try
     {
-        mIntervalMs = 1000.0 / static_cast<double>(inNumMovesPerSecond);
-        if (mTimer)
+        move();
+    }
+    catch (const std::exception & inException)
+    {
+        LogError(MakeString() << "Unanticipated exception thrown in Impl::move(). Details: " << inException.what());
+    }
+}
+
+
+int BlockMover::speed() const
+{
+    return mImpl->mNumMovesPerSecond;
+}
+
+
+void BlockMover::setSpeed(int inNumMovesPerSecond)
+{
+    if (inNumMovesPerSecond == 0)
+    {
+        throw std::invalid_argument("Number of moves per second must be different from 0.");
+    }
+
+    mImpl->mNumMovesPerSecond = inNumMovesPerSecond;
+    if (mImpl->mTimer)
+    {
+        mImpl->mTimer->setPeriodicInterval(mImpl->periodicInterval());
+    }
+}
+
+
+void BlockMover::Impl::move()
+{
+    ScopedReaderAndWriter<Game> wGame(mGame);
+    ComputerGame & game = dynamic_cast<ComputerGame&>(*wGame.get());
+    if (game.isPaused())
+    {
+        return;
+    }
+
+    const ChildNodes & children = game.currentNode()->children();
+    if (children.empty())
+    {
+        return;
+    }
+
+    GameStateNode & firstChild = **children.begin();
+
+    const Block & block = game.activeBlock();
+    const Block & targetBlock = firstChild.gameState().originalBlock();
+
+    Assert(block.type() == targetBlock.type());
+
+    if (block.rotation() != targetBlock.rotation())
+    {
+        if (!game.rotate())
         {
-            int interval = std::min<int>(10, int(mIntervalMs/3));
-            mTimer->setPeriodicInterval(interval);
+            // Damn we can't rotate.
+            // Give up on this block.
+            game.drop();
         }
     }
-
-
-    void BlockMoverImpl::setInterval(int inTimeBetweenMovesInMilliseconds)
+    else if (block.column() < targetBlock.column())
     {
-        mIntervalMs = static_cast<double>(inTimeBetweenMovesInMilliseconds);
-    }
-
-
-    int BlockMoverImpl::interval() const
-    {
-        return static_cast<int>(0.5 + mIntervalMs);
-    }
-
-
-    void BlockMoverImpl::setCallback(const boost::function<void()> & inCallback)
-    {
-        mCallback = inCallback;
-    }
-
-
-    void BlockMoverImpl::onTimer(Poco::Timer &)
-    {
-        try
+        if (!game.move(MoveDirection_Right))
         {
-            if (mStopwatch.elapsed() > 1000 * mIntervalMs)
-            {
-                mStopwatch.restart();
-                move();
-                if (mCallback)
-                {
-                    mCallback();
-                }
-            }
-        }
-        catch (const std::exception & inException)
-        {
-            LogError(MakeString() << "Unanticipated exception thrown in BlockMoverImpl::move(). Details: " << inException.what());
+            // Damn we can't move this block anymore.
+            // Give up on this block.
+            game.drop();
         }
     }
-
-
-    void BlockMoverImpl::move()
+    else if (block.column() > targetBlock.column())
     {
-        ScopedReaderAndWriter<Game> wGame(mGame);
-        ComputerGame & game = dynamic_cast<ComputerGame&>(*wGame.get());
-        if (game.isPaused())
+        if (!game.move(MoveDirection_Left))
         {
-            return;
-        }
-
-        const ChildNodes & children = game.currentNode()->children();
-        if (children.empty())
-        {
-            return;
-        }
-
-        GameStateNode & firstChild = **children.begin();
-
-        const Block & block = game.activeBlock();
-        const Block & targetBlock = firstChild.gameState().originalBlock();
-
-        Assert(block.type() == targetBlock.type());
-
-        if (block.rotation() != targetBlock.rotation())
-        {
-            if (!game.rotate())
-            {
-                // Damn we can't rotate.
-                // Give up on this block.
-                game.drop();
-            }
-        }
-        else if (block.column() < targetBlock.column())
-        {
-            if (!game.move(MoveDirection_Right))
-            {
-                // Damn we can't move this block anymore.
-                // Give up on this block.
-                game.drop();
-            }
-        }
-        else if (block.column() > targetBlock.column())
-        {
-            if (!game.move(MoveDirection_Left))
-            {
-                // Damn we can't move this block anymore.
-                // Give up on this block.
-                game.drop();
-            }
-        }
-        else
-        {
-            game.move(MoveDirection_Down);
+            // Damn we can't move this block anymore.
+            // Give up on this block.
+            game.drop();
         }
     }
-
-
-    BlockMover::BlockMover(const ThreadSafe<Game> & inGame) :
-        mImpl(new BlockMoverImpl(inGame))
+    else
     {
+        game.move(MoveDirection_Down);
     }
+}
 
-
-    BlockMover::~BlockMover()
-    {
-        delete mImpl;
-        mImpl = 0;
-    }
-
-
-    int BlockMover::speed() const
-    {
-        return mImpl->speed();
-    }
-
-
-    void BlockMover::setSpeed(int inNumMovesPerSecond)
-    {
-        mImpl->setSpeed(inNumMovesPerSecond);
-    }
-
-
-    int BlockMover::interval() const
-    {
-        return mImpl->interval();
-    }
-
-
-    void BlockMover::setCallback(const BlockMoverCallback & inBlockMoverCallback)
-    {
-        mImpl->setCallback(boost::bind(inBlockMoverCallback, this));
-    }
 
 } // namespace Tetris

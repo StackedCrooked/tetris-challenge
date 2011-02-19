@@ -6,48 +6,43 @@
 #include <boost/function.hpp>
 
 
-namespace Tetris
+namespace Tetris {
+
+
+template<class Variable> class ThreadSafe;
+class Game;
+class BlockMover;
+
+typedef boost::function<void(BlockMover *)> BlockMoverCallback;
+
+
+/**
+ * BlockMover
+ *
+ * A BlockMove object will peridically move the current tetris block
+ * one square closer to the next precalculated block (from the AI).
+ *
+ * If no precalculated blocks are available then it will enter a waiting state.
+ */
+class BlockMover
 {
+public:
+    BlockMover(ThreadSafe<Game> inGame);
 
-    template<class Variable> class ThreadSafe;
-    class Game;
-    class BlockMover;
-    class BlockMoverImpl;
+    ~BlockMover();
 
-    typedef boost::function<void(BlockMover *)> BlockMoverCallback;
+    void setSpeed(int inNumMovesPerSecond);
 
+    int speed() const;
 
-    /**
-     * BlockMover
-     *
-     * A BlockMove object will peridically move the current tetris block
-     * one square closer to the next precalculated block (from the AI).
-     *
-     * If no precalculated blocks are available then it will enter a waiting state.
-     */
-    class BlockMover
-    {
-    public:
-        BlockMover(const ThreadSafe<Game> & inGame);
+private:
+    BlockMover(const BlockMover &);
+    BlockMover & operator=(const BlockMover&);
 
-        ~BlockMover();
+    struct Impl;
+    Impl * mImpl;
+};
 
-        void setSpeed(int inNumMovesPerSecond);
-
-        int speed() const;
-
-        void setInterval(int inTimeBetweenMovesInMilliseconds);
-
-        int interval() const;
-
-        void setCallback(const BlockMoverCallback & inBlockMoverCallback);
-
-    private:
-        BlockMover(const BlockMover &);
-        BlockMover & operator=(const BlockMover&);
-
-        BlockMoverImpl * mImpl;
-    };
 
 } // namespace Tetris
 

@@ -206,38 +206,33 @@ private:
 };
 
 
-template<class Instance>
 class InstanceTracker : boost::noncopyable
 {
 public:
-    typedef std::set<Instance*> Instances;
+    typedef std::set<InstanceTracker*> Instances;
     typedef ThreadSafe<Instances> ThreadedInstances;
 
     InstanceTracker()
     {
         ScopedReaderAndWriter<Instances> rwInstances(sInstances);
-        rwInstances.insert(static_cast<Instance*>(this));
+        rwInstances->insert(this);
     }
 
     virtual ~InstanceTracker()
     {
         ScopedReaderAndWriter<Instances> rwInstances(sInstances);
-        rwInstances.erase(this);
+        rwInstances->erase(this);
     }
 
-    static bool HasInstance(Instance * inInstance)
+    static bool HasInstance(InstanceTracker * inInstance)
     {
         ScopedReader<Instances> rInstances(sInstances);
-        return rInstances.find(inInstance) != rInstances.end();
+        return rInstances->find(inInstance) != rInstances->end();
     }
 
 private:
     static ThreadedInstances sInstances;
 };
-
-
-template<class Instance>
-typename InstanceTracker<Instance>::ThreadedInstances InstanceTracker<Instance>::sInstances;
 
 
 /**
