@@ -34,6 +34,8 @@ private slots:
 
     void onNewComputerVsComputerGame();
 
+    void on2v2Game();
+
     void onPaused();
 
     void onPenalty();
