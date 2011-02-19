@@ -4,6 +4,7 @@
 
 #include "Tetris/Assert.h"
 #include "Tetris/MainThread.h"
+#include "Tetris/Logging.h"
 #include "Poco/AtomicCounter.h"
 #include <boost/noncopyable.hpp>
 #include <boost/thread.hpp>
@@ -147,7 +148,7 @@ public:
 
     ~ScopedReaderAndWriter()
     {
-        Assert(mStopwatch.elapsedTimeMs() < cMaximumLockDurationMs);
+        Assert(mStopwatch.elapsedTimeMs() <= cMaximumLockDurationMs);
     }
 
     Variable & operator *()
@@ -183,7 +184,7 @@ public:
 
     ~ScopedReader()
     {
-        //Assert(mStopwatch.elapsedTimeMs() < cMaximumLockDurationMs);
+        Assert(mStopwatch.elapsedTimeMs() < cMaximumLockDurationMs);
     }
 
     const Variable & operator *() const

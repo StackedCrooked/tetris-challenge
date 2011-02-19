@@ -48,9 +48,10 @@ public:
         mSearchWidth(cDefaultSearchWidth),
         mWorkerCount(Poco::Environment::processorCount()),
         mGameDepth(0),
+        mStop(false),
         mReset(false),
         mQuitFlag(false),
-        mTimer(10, 10)
+        mTimer(15, 15)
     {
     }
 
@@ -86,6 +87,7 @@ public:
     int mSearchWidth;
     int mWorkerCount;
     int mGameDepth;
+    bool mStop;
     bool mReset;
     bool mQuitFlag;
     boost::mutex mMutex;
@@ -259,6 +261,13 @@ void ComputerPlayer::Impl::timerEvent()
         return;
     }
 
+    if (mStop)
+    {
+        mStop = false;
+        mNodeCalculator->stop();
+        return;
+    }
+
     if (!mNodeCalculator)
     {
         startNodeCalculator();
@@ -284,7 +293,6 @@ void ComputerPlayer::Impl::timerEvent()
         }
         case NodeCalculator::Status_Stopped:
         {
-            LogInfo(mName + " NodeCalculator has stopped.");
             onStopped();
             return;
         }
@@ -387,15 +395,13 @@ void ComputerPlayer::Impl::onWorking()
     if (mGameDepth < game.endNode()->depth())
     {
         // The calculated results have become invalid. Start over.
-        LogInfo(mName + "'s work is for naught!");
         mReset = true;
         return;
     }
 
     if (game.numPrecalculatedMoves() == 0 && calculateRemainingTimeMs(game) < 1000)
     {
-        LogInfo(mName + " is hurrying!");
-        mNodeCalculator->stop();
+        mStop = true;
         return;
     }
 
@@ -412,10 +418,10 @@ void ComputerPlayer::Impl::onStopped()
 void ComputerPlayer::Impl::onFinished()
 {
     mReset = true;
+
     NodePtr resultNode = mNodeCalculator->result();
     if (!resultNode || resultNode->gameState().isGameOver())
     {
-        LogInfo(mName + "'s calculations are finished, but alas, the game was already over.");
         return;
     }
 
@@ -425,14 +431,11 @@ void ComputerPlayer::Impl::onFinished()
     // Check for sync problems.
     if (resultNode->depth() != game.endNode()->depth() + 1)
     {
-        LogInfo(mName + "'s calculations are finished,...and thrown away. Murphy strikes again.");
         return;
     }
 
     // Ok, store the results.
     game.appendPrecalculatedNode(resultNode);
-
-    LogInfo(mName + "'s work has completed succesfully. On to the next job!");
 }
 
 
