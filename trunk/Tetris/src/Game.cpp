@@ -426,10 +426,22 @@ bool Game::rotate()
 
 void Game::drop()
 {
-    while (move(MoveDirection_Down))
+    if (isGameOver())
     {
-        // Keep going.
+        return;
     }
+
+    Block & block = *mActiveBlock;
+    const Grid & grid = gameGrid();
+    const GameState & state = gameState();
+    for (int r = block.row(); r < grid.rowCount(); ++r)
+    {
+        if (state.checkPositionValid(block, r, block.column()))
+        {
+            block.setRow(r);
+        }
+    }
+    move(MoveDirection_Down);
 }
 
 

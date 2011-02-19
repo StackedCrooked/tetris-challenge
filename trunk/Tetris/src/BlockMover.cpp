@@ -42,7 +42,6 @@ struct BlockMover::Impl
         return static_cast<int>(0.5 + 1000.0 / static_cast<double>(mNumMovesPerSecond));
     }
 
-
     void move();
 
     ThreadSafe<Game> mGame;
@@ -69,19 +68,6 @@ BlockMover::~BlockMover()
 }
 
 
-void BlockMover::Impl::onTimer(Poco::Timer &)
-{
-    try
-    {
-        move();
-    }
-    catch (const std::exception & inException)
-    {
-        LogError(MakeString() << "Unanticipated exception thrown in Impl::move(). Details: " << inException.what());
-    }
-}
-
-
 int BlockMover::speed() const
 {
     return mImpl->mNumMovesPerSecond;
@@ -99,6 +85,19 @@ void BlockMover::setSpeed(int inNumMovesPerSecond)
     if (mImpl->mTimer)
     {
         mImpl->mTimer->setPeriodicInterval(mImpl->periodicInterval());
+    }
+}
+
+
+void BlockMover::Impl::onTimer(Poco::Timer &)
+{
+    try
+    {
+        move();
+    }
+    catch (const std::exception & inException)
+    {
+        LogError(MakeString() << "Unanticipated exception thrown in Impl::move(). Details: " << inException.what());
     }
 }
 
@@ -154,7 +153,7 @@ void BlockMover::Impl::move()
     }
     else
     {
-        game.move(MoveDirection_Down);
+        game.drop();
     }
 }
 
