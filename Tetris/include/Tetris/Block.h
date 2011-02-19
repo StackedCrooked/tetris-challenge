@@ -7,74 +7,76 @@
 #include <memory>
 
 
-namespace Tetris
+namespace Tetris {
+
+
+// Generate the typesafe wrapper classes
+Tetris_TypedWrapper(Rotation, size_t);
+Tetris_TypedWrapper(Row, size_t);
+Tetris_TypedWrapper(Column, size_t);
+
+
+// Forward declarations.
+class BlockImpl;
+typedef char BlockType;
+
+
+/**
+ * Represents a Tetris block.
+ */
+class Block
 {
+public:
+    Block(BlockType inType, Rotation inRotation, Row inRow, Column inColumn);
 
-    // Generate the typesafe wrapper classes
-    Tetris_TypedWrapper(Rotation, size_t);
-    Tetris_TypedWrapper(Row, size_t);
-    Tetris_TypedWrapper(Column, size_t);
+    Block(const Block & inBlock);
 
+    Block & operator=(const Block & inBlock);
 
-    // Forward declarations.
-    class BlockImpl;
-    typedef char BlockType;
+    ~Block();
 
+    int identification() const;
 
-    /**
-     * Represents a Tetris block.
-     */
-    class Block
-    {
-    public:
-        Block(BlockType inType, Rotation inRotation, Row inRow, Column inColumn);
+    BlockType type() const;
 
-        Block(const Block & inBlock);
+    // Get the grid associated with this block
+    const Grid & grid() const;
 
-        Block & operator=(const Block & inBlock);
+    size_t row() const;
 
-        ~Block();
+    size_t rowCount() const;
 
-        BlockType type() const;
+    size_t column() const;
 
-        // Get the grid associated with this block
-        const Grid & grid() const;
+    size_t columnCount() const;
 
-        size_t row() const;
+    size_t rotation() const;
 
-        size_t rowCount() const;
+    size_t numRotations() const;
 
-        size_t column() const;
+    void rotate();
 
-        size_t columnCount() const;
+    void setRow(size_t inRow);
 
-        size_t rotation() const;
+    void setColumn(size_t inColumn);
 
-        size_t numRotations() const;
+    void setRotation(size_t inRotation);
 
-        void rotate();
-
-        void setRow(size_t inRow);
-
-        void setColumn(size_t inColumn);
-
-        void setRotation(size_t inRotation);
-
-    private:
-        BlockImpl * mImpl;
-    };
+private:
+    BlockImpl * mImpl;
+};
 
 
-    size_t GetBlockRotationCount(BlockType inType);
+size_t GetBlockRotationCount(BlockType inType);
 
-    // Returns the number possible combinations of rotations and position to
-    // place a certain block in a grid that has a given a number of columns.
-    size_t GetBlockPositionCount(BlockType inType, size_t inNumColumns);
+// Returns the number possible combinations of rotations and position to
+// place a certain block in a grid that has a given a number of columns.
+size_t GetBlockPositionCount(BlockType inType, size_t inNumColumns);
 
-    size_t GetBlockIdentifier(BlockType inType, size_t inRotation);
+int GetBlockIdentifier(BlockType inType, int inRotation);
 
-    // Gets the Grid object that is associated with a block identifier
-    const Grid & GetGrid(int inBlockIdentifier);
+// Gets the Grid object that is associated with a block identifier
+const Grid & GetGrid(int inBlockIdentifier);
 
 
 } // namespace Tetris
