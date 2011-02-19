@@ -55,15 +55,14 @@ public:
                                                         int & /*outWorkerCount*/)
     {
         int firstRow = inGameState.firstOccupiedRow();
-        int rowCount = inGameState.grid().rowCount();
-        if (0.5 * rowCount < float(firstRow))
+        if (firstRow >= 15)
         {
             outSearchDepth = 8;
             outSearchWidth = 5;
 
             return CreatePoly<Evaluator, MakeTetrises>();
         }
-        else if (0.6 * rowCount < float(firstRow))
+        else if (firstRow >= 10)
         {
             outSearchDepth = 6;
             outSearchWidth = 6;
@@ -71,8 +70,8 @@ public:
         }
         else
         {
-            outSearchDepth = 4;
-            outSearchWidth = 4;
+            outSearchDepth = 5;
+            outSearchWidth = 5;
             return CreatePoly<Evaluator, Survival>();
         }
     }
@@ -93,8 +92,8 @@ public:
             if (inPlayerTypes[idx] == PlayerType_Computer)
             {
                 player->simpleGame()->setAITweaker(&Model::Instance());
-                player->simpleGame()->setLevel(10);
-                player->simpleGame()->setComputerMoveSpeed(100);
+                player->simpleGame()->setStartingLevel(7);
+                player->simpleGame()->setComputerMoveSpeed(40);
             }
         }
     }

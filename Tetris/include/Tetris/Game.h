@@ -80,7 +80,7 @@ public:
 
     int level() const;
 
-    void setLevel(int inLevel);
+    void setStartingLevel(int inLevel);
 
     const Block & activeBlock() const;
 
@@ -100,10 +100,10 @@ public:
 
     // For multiplayer crazyness
     virtual void applyLinePenalty(int inNumberOfLinesMadeByOpponent);
-    virtual void setActiveBlock(const Block & inBlock);
+    //virtual void setActiveBlock(const Block & inBlock);
     virtual void setGrid(const Grid & inGrid) = 0;
-    void swapGrid(Game & other);
-    void swapActiveBlock(Game & other);
+    //void swapGrid(Game & other);
+    //void swapActiveBlock(Game & other);
 
 protected:
     virtual GameState & gameState() = 0;
@@ -128,7 +128,7 @@ protected:
     mutable BlockTypes mBlocks;
     int mFutureBlocksCount;
     size_t mCurrentBlockIndex;
-    int mOverrideLevel;
+    int mStartingLevel;
     bool mPaused;
 
     typedef std::set<EventHandler*> EventHandlers;

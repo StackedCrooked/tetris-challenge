@@ -97,8 +97,11 @@ namespace Tetris
                     return;
                 }
                 game->move(MoveDirection_Down);
-                int maxLevel = cMaxLevel;
-                mLevel = std::min<int>(maxLevel, game->level());
+                mLevel = game->level();
+                if (mLevel > cMaxLevel)
+                {
+                    mLevel = cMaxLevel;
+                }
             }
             if (mLevel != oldLevel)
             {

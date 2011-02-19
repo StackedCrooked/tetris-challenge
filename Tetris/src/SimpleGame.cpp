@@ -220,19 +220,20 @@ void SimpleGame::applyLinePenalty(int inNumberOfLinesMadeByOpponent)
 }
 
 
-void SimpleGame::setActiveBlock(const Block & inBlock)
-{
-    ScopedReaderAndWriter<Game> rwgame(mImpl->mGame);
-    Game & game(*rwgame.get());
-    game.setActiveBlock(inBlock);
-}
+//void SimpleGame::setActiveBlock(const Block & inBlock)
+//{
+//    ScopedReaderAndWriter<Game> rwgame(mImpl->mGame);
+//    Game & game(*rwgame.get());
+//    game.setActiveBlock(inBlock);
+//}
 
-void SimpleGame::setGameGrid(const Grid & inGrid)
-{
-    ScopedReaderAndWriter<Game> rwgame(mImpl->mGame);
-    Game & game(*rwgame.get());
-    game.setGrid(inGrid);
-}
+
+//void SimpleGame::setGameGrid(const Grid & inGrid)
+//{
+//    ScopedReaderAndWriter<Game> rwgame(mImpl->mGame);
+//    Game & game(*rwgame.get());
+//    game.setGrid(inGrid);
+//}
 
 
 bool SimpleGame::isGameOver() const
@@ -277,10 +278,10 @@ void SimpleGame::drop()
 }
 
 
-void SimpleGame::setLevel(int inLevel)
+void SimpleGame::setStartingLevel(int inLevel)
 {
     ScopedReaderAndWriter<Game> rwgame(mImpl->mGame);
-    rwgame->setLevel(inLevel);
+    rwgame->setStartingLevel(inLevel);
 }
 
 

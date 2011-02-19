@@ -20,7 +20,12 @@ public:
 
     const Grid & grid() const;
 
+    // Modifies the grid bypassing Tetris laws of nature.
+    // This is required to enable multiplayer penalties.
     void setGrid(const Grid & inGrid);
+
+    // Returns true if setGrid() has been called.
+    bool tainted() const;
 
     // The Block that was used in the commit(...) call.
     const Block & originalBlock() const;
@@ -60,6 +65,7 @@ private:
     int mNumDoubles;
     int mNumTriples;
     int mNumTetrises;
+    bool mTainted;
 };
 
 
