@@ -86,7 +86,7 @@ public:
 
     void drop();
 
-    void setLevel(int inLevel);
+    void setStartingLevel(int inLevel);
 
     int level() const;
 
@@ -106,8 +106,8 @@ public:
 
     // For multiplayer crazyness.
     void applyLinePenalty(int inNumberOfLinesMadeByOpponent);
-    void setActiveBlock(const Block & inBlock);
-    void setGameGrid(const Grid & inGrid);
+    //void setActiveBlock(const Block & inBlock);
+    //void setGameGrid(const Grid & inGrid);
 
 private:
     // non-copyable

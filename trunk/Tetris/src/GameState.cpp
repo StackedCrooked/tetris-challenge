@@ -23,7 +23,8 @@ GameState::GameState(size_t inNumRows, size_t inNumColumns) :
     mNumSingles(0),
     mNumDoubles(0),
     mNumTriples(0),
-    mNumTetrises(0)
+    mNumTetrises(0),
+    mTainted(false)
 {
 }
 
@@ -180,8 +181,16 @@ const Grid & GameState::grid() const
 
 void GameState::setGrid(const Grid & inGrid)
 {
+    Assert(mGrid.rowCount() == inGrid.rowCount() && mGrid.columnCount() == inGrid.columnCount());
     mGrid = inGrid;
+    mTainted = true;
     updateCache();
+}
+
+
+bool GameState::tainted() const
+{
+    return mTainted;
 }
 
 
@@ -221,6 +230,7 @@ std::auto_ptr<GameState> GameState::commit(const Block & inBlock, GameOver inGam
 {
     std::auto_ptr<GameState> result(new GameState(*this));
     result->mIsGameOver = inGameOver.get();
+    result->mTainted = false; // a new generation, a new start
     if (!inGameOver.get())
     {
         result->solidifyBlock(inBlock);

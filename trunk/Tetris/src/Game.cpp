@@ -55,7 +55,7 @@ Game::Game(size_t inNumRows, size_t inNumColumns) :
     mBlocks(),
     mFutureBlocksCount(3),
     mCurrentBlockIndex(0),
-    mOverrideLevel(-1),
+    mStartingLevel(-1),
     mPaused(false)
 {
     if (mBlocks.empty())
@@ -258,20 +258,30 @@ void Game::applyLinePenalty(int inLineCount)
 }
 
 
-void Game::swapGrid(Game & other)
-{
-    Grid g = other.gameGrid();
-    other.setGrid(gameGrid());
-    setGrid(g);
-}
+//void Game::swapGrid(Game & other)
+//{
+//    Grid g = other.gameGrid();
+//    other.setGrid(gameGrid());
+//    setGrid(g);
+//}
 
 
-void Game::swapActiveBlock(Game & other)
-{
-    Block b = other.activeBlock();
-    other.setActiveBlock(activeBlock());
-    setActiveBlock(b);
-}
+//void Game::swapActiveBlock(Game & other)
+//{
+//    Block b = other.activeBlock();
+//    other.setActiveBlock(activeBlock());
+//    setActiveBlock(b);
+//}
+
+
+//void Game::setActiveBlock(const Block & inBlock)
+//{
+//    if (gameState().checkPositionValid(inBlock, inBlock.row(), inBlock.column()))
+//    {
+//        mActiveBlock.reset(new Block(inBlock));
+//        onChanged();
+//    }
+//}
 
 
 std::auto_ptr<Block> Game::CreateDefaultBlock(BlockType inBlockType, size_t inNumColumns)
@@ -281,16 +291,6 @@ std::auto_ptr<Block> Game::CreateDefaultBlock(BlockType inBlockType, size_t inNu
                     Rotation(0),
                     Row(0),
                     Column(DivideByTwo(inNumColumns - GetGrid(GetBlockIdentifier(inBlockType, 0)).columnCount()))));
-}
-
-
-void Game::setActiveBlock(const Block & inBlock)
-{
-    if (gameState().checkPositionValid(inBlock, inBlock.row(), inBlock.column()))
-    {
-        mActiveBlock.reset(new Block(inBlock));
-        onChanged();
-    }
 }
 
 
@@ -435,21 +435,13 @@ void Game::drop()
 
 int Game::level() const
 {
-    if (mOverrideLevel < 0)
-    {
-        int level = gameState().numLines() / 10;
-        return std::min<int>(level, cMaxLevel);
-    }
-    else
-    {
-        return mOverrideLevel;
-    }
+    return std::max<int>(gameState().numLines() / 10, mStartingLevel);
 }
 
 
-void Game::setLevel(int inLevel)
+void Game::setStartingLevel(int inLevel)
 {
-    mOverrideLevel = inLevel;
+    mStartingLevel = inLevel;
     onChanged();
 }
 
@@ -729,18 +721,28 @@ bool ComputerGame::move(MoveDirection inDirection)
         const GameStateNode & precalculatedChild = **mCurrentNode->children().begin();
         const Block & nextBlock = precalculatedChild.gameState().originalBlock();
 
-        if (block.column() == nextBlock.column() &&
-            nextBlock.identification() == block.identification())
+
+        if (!currentNode()->gameState().tainted())
         {
-            // We don't actually commit the block. Instead we swap the current gamestate with
-            // the next precalculated one.
-            return navigateNodeDown();
+            // The game is untainted. Good, now check if the blocks line up correctly.
+            if (block.column() == nextBlock.column() && nextBlock.identification() == block.identification())
+            {
+                // We don't actually commit the block. Instead we swap the current gamestate with
+                // the next precalculated one.
+                return navigateNodeDown();
+            }
+            else
+            {
+                LogError("This current game state has been dirtied by unknown forces.");
+                mCurrentNode->clearChildren();
+            }
         }
         else
         {
-            // All our work is for naught. We calculated several moves ahead, but due to
-            // unfortunate circumstances one block didn't fall right. This invalidates all
-            // blocks after that.
+            // The game is 'tainted'. Meaning that the gamestate was force changed by
+            // an outsider force. Usually this is some multiplayer penalty or something.
+            // Anyway, it means that all our work is for naught because our precalculated
+            // blocks are no longer correct.
             mCurrentNode->clearChildren();
         }
     }
