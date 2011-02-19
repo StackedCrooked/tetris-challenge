@@ -93,6 +93,7 @@ public:
             if (inPlayerTypes[idx] == PlayerType_Computer)
             {
                 player->simpleGame()->setAITweaker(&Model::Instance());
+                player->simpleGame()->setLevel(8);
             }
         }
     }
@@ -175,7 +176,7 @@ MainWindow::MainWindow(QWidget *parent) :
     mTetrisWidgets(),
     mSpacing(12),
     mLogField(0),
-    mShowLog(false)
+    mShowLog(true)
 {
     sInstance = this;
 
