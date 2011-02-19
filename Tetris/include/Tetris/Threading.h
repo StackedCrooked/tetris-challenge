@@ -236,7 +236,7 @@ private:
 
 
 /**
- * LockMany is similar to a scoped_lock. It can however lock multiple mutexes.
+ * LockMany is a scoped mutex locker that can lock an arbitrary number of mutexes.
  */
 template<class Mutex>
 class LockMany : boost::noncopyable

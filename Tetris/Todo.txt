@@ -7,8 +7,8 @@ Todo
 - Teams
 - Online multiplayer
 - Qt Playable game
-- Implement Human vs Computer modus.
 - Multiplayer
+v Implement Human vs Computer modus.
 v Sometimes penalty appears on the top of the grid. (Usually when game was already high, and tetris penalty.)
 v Sometimes AI seems to be dead. It just doesn't do anything anymore, letting all blocks slowly drop to the floor.
 v Fix random seeds.
