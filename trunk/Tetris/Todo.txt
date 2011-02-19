@@ -1,5 +1,6 @@
 Todo
 ----
+- Icon
 - Add a toolbar
 - Release a simple Qt game: single player, player vs computer, computer vs computer.
 - Use a single shared timer.
@@ -7,6 +8,7 @@ Todo
 - Online multiplayer
 - Qt Playable game
 - Multiplayer
+v Mac Bundle
 v Computer drop should also work.
 v Show FPS
 v Implement Human vs Computer modus.
