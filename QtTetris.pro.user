@@ -15,59 +15,14 @@
   <valuemap type="QVariantMap">
    <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString">Desktop</value>
    <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">Qt4ProjectManager.Target.DesktopTarget</value>
-   <value key="ProjectExplorer.Target.ActiveBuildConfiguration" type="int">1</value>
+   <value key="ProjectExplorer.Target.ActiveBuildConfiguration" type="int">2</value>
    <value key="ProjectExplorer.Target.ActiveRunConfiguration" type="int">0</value>
    <valuemap key="ProjectExplorer.Target.BuildConfiguration.0" type="QVariantMap">
     <valuemap key="ProjectExplorer.BuildConfiguration.BuildStep.0" type="QVariantMap">
      <valuelist key="ProjectExplorer.ProcessStep.Arguments" type="QVariantList">
-      <value type="QString">-p</value>
-      <value type="QString">Build/CMake/QtTetris</value>
+      <value type="QString">configure</value>
      </valuelist>
-     <value key="ProjectExplorer.ProcessStep.Command" type="QString">/bin/mkdir</value>
-     <value key="ProjectExplorer.ProcessStep.Enabled" type="bool">true</value>
-     <value key="ProjectExplorer.ProcessStep.WorkingDirectory" type="QString">$BUILDDIR</value>
-     <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString">Custom Process Step</value>
-     <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">ProjectExplorer.ProcessStep</value>
-    </valuemap>
-    <valuemap key="ProjectExplorer.BuildConfiguration.BuildStep.1" type="QVariantMap">
-     <valuelist key="ProjectExplorer.ProcessStep.Arguments" type="QVariantList">
-      <value type="QString">../../../QtTetris</value>
-     </valuelist>
-     <value key="ProjectExplorer.ProcessStep.Command" type="QString">/opt/local/bin/cmake</value>
-     <value key="ProjectExplorer.ProcessStep.Enabled" type="bool">true</value>
-     <value key="ProjectExplorer.ProcessStep.WorkingDirectory" type="QString">$BUILDDIR/Build/CMake/QtTetris</value>
-     <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString">Custom Process Step</value>
-     <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">ProjectExplorer.ProcessStep</value>
-    </valuemap>
-    <value key="ProjectExplorer.BuildConfiguration.BuildStepsCount" type="int">2</value>
-    <valuemap key="ProjectExplorer.BuildConfiguration.CleanStep.0" type="QVariantMap">
-     <valuelist key="ProjectExplorer.ProcessStep.Arguments" type="QVariantList">
-      <value type="QString">-rf</value>
-      <value type="QString">Build</value>
-     </valuelist>
-     <value key="ProjectExplorer.ProcessStep.Command" type="QString">/bin/rm</value>
-     <value key="ProjectExplorer.ProcessStep.Enabled" type="bool">true</value>
-     <value key="ProjectExplorer.ProcessStep.WorkingDirectory" type="QString">$BUILDDIR</value>
-     <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString">Custom Process Step</value>
-     <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">ProjectExplorer.ProcessStep</value>
-    </valuemap>
-    <value key="ProjectExplorer.BuildConfiguration.CleanStepsCount" type="int">1</value>
-    <value key="ProjectExplorer.BuildConfiguration.ClearSystemEnvironment" type="bool">false</value>
-    <valuelist key="ProjectExplorer.BuildConfiguration.UserEnvironmentChanges" type="QVariantList">
-     <value type="QString">TETRIS_BUILD_CONFIGURATION=Debug</value>
-    </valuelist>
-    <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString">Configure Debug</value>
-    <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">Qt4ProjectManager.Qt4BuildConfiguration</value>
-    <value key="Qt4ProjectManager.Qt4BuildConfiguration.BuildConfiguration" type="int">2</value>
-    <value key="Qt4ProjectManager.Qt4BuildConfiguration.BuildDirectory" type="QString">/Users/francis/svn/tetris-challenge</value>
-    <value key="Qt4ProjectManager.Qt4BuildConfiguration.QtVersionId" type="int">2</value>
-    <value key="Qt4ProjectManager.Qt4BuildConfiguration.ToolChain" type="int">0</value>
-    <value key="Qt4ProjectManager.Qt4BuildConfiguration.UseShadowBuild" type="bool">true</value>
-   </valuemap>
-   <valuemap key="ProjectExplorer.Target.BuildConfiguration.1" type="QVariantMap">
-    <valuemap key="ProjectExplorer.BuildConfiguration.BuildStep.0" type="QVariantMap">
-     <valuelist key="ProjectExplorer.ProcessStep.Arguments" type="QVariantList"/>
-     <value key="ProjectExplorer.ProcessStep.Command" type="QString">configure</value>
+     <value key="ProjectExplorer.ProcessStep.Command" type="QString">/bin/sh</value>
      <value key="ProjectExplorer.ProcessStep.Enabled" type="bool">true</value>
      <value key="ProjectExplorer.ProcessStep.WorkingDirectory" type="QString">$BUILDDIR</value>
      <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString">./configure</value>
@@ -86,9 +41,47 @@
      <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">ProjectExplorer.ProcessStep</value>
     </valuemap>
     <value key="ProjectExplorer.BuildConfiguration.CleanStepsCount" type="int">1</value>
-    <value key="ProjectExplorer.BuildConfiguration.ClearSystemEnvironment" type="bool">false</value>
+    <value key="ProjectExplorer.BuildConfiguration.ClearSystemEnvironment" type="bool">true</value>
     <valuelist key="ProjectExplorer.BuildConfiguration.UserEnvironmentChanges" type="QVariantList">
-     <value type="QString">TETRIS_BUILD_CONFIGURATION=Release</value>
+     <value type="QString">TETRIS_BUILD_TYPE=Debug</value>
+     <value type="QString">PATH=$HOME/bin:/Developer/Tools/Qt:/opt/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</value>
+    </valuelist>
+    <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString">Configure Debug</value>
+    <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">Qt4ProjectManager.Qt4BuildConfiguration</value>
+    <value key="Qt4ProjectManager.Qt4BuildConfiguration.BuildConfiguration" type="int">2</value>
+    <value key="Qt4ProjectManager.Qt4BuildConfiguration.BuildDirectory" type="QString">/Users/francis/svn/tetris-challenge</value>
+    <value key="Qt4ProjectManager.Qt4BuildConfiguration.QtVersionId" type="int">2</value>
+    <value key="Qt4ProjectManager.Qt4BuildConfiguration.ToolChain" type="int">0</value>
+    <value key="Qt4ProjectManager.Qt4BuildConfiguration.UseShadowBuild" type="bool">true</value>
+   </valuemap>
+   <valuemap key="ProjectExplorer.Target.BuildConfiguration.1" type="QVariantMap">
+    <valuemap key="ProjectExplorer.BuildConfiguration.BuildStep.0" type="QVariantMap">
+     <valuelist key="ProjectExplorer.ProcessStep.Arguments" type="QVariantList">
+      <value type="QString">configure</value>
+     </valuelist>
+     <value key="ProjectExplorer.ProcessStep.Command" type="QString">/bin/sh</value>
+     <value key="ProjectExplorer.ProcessStep.Enabled" type="bool">true</value>
+     <value key="ProjectExplorer.ProcessStep.WorkingDirectory" type="QString">$BUILDDIR</value>
+     <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString">Run Configure Script</value>
+     <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">ProjectExplorer.ProcessStep</value>
+    </valuemap>
+    <value key="ProjectExplorer.BuildConfiguration.BuildStepsCount" type="int">1</value>
+    <valuemap key="ProjectExplorer.BuildConfiguration.CleanStep.0" type="QVariantMap">
+     <valuelist key="ProjectExplorer.ProcessStep.Arguments" type="QVariantList">
+      <value type="QString">-rf</value>
+      <value type="QString">Build</value>
+     </valuelist>
+     <value key="ProjectExplorer.ProcessStep.Command" type="QString">/bin/rm</value>
+     <value key="ProjectExplorer.ProcessStep.Enabled" type="bool">true</value>
+     <value key="ProjectExplorer.ProcessStep.WorkingDirectory" type="QString">$BUILDDIR</value>
+     <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString">Custom Process Step</value>
+     <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">ProjectExplorer.ProcessStep</value>
+    </valuemap>
+    <value key="ProjectExplorer.BuildConfiguration.CleanStepsCount" type="int">1</value>
+    <value key="ProjectExplorer.BuildConfiguration.ClearSystemEnvironment" type="bool">true</value>
+    <valuelist key="ProjectExplorer.BuildConfiguration.UserEnvironmentChanges" type="QVariantList">
+     <value type="QString">TETRIS_BUILD_TYPE=Release</value>
+     <value type="QString">PATH=$HOME/bin:/Developer/Tools/Qt:/opt/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</value>
     </valuelist>
     <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString">Configure Release</value>
     <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">Qt4ProjectManager.Qt4BuildConfiguration</value>
@@ -122,7 +115,9 @@
     </valuemap>
     <value key="ProjectExplorer.BuildConfiguration.CleanStepsCount" type="int">1</value>
     <value key="ProjectExplorer.BuildConfiguration.ClearSystemEnvironment" type="bool">false</value>
-    <valuelist key="ProjectExplorer.BuildConfiguration.UserEnvironmentChanges" type="QVariantList"/>
+    <valuelist key="ProjectExplorer.BuildConfiguration.UserEnvironmentChanges" type="QVariantList">
+     <value type="QString">PATH=$HOME/bin:/Developer/Tools/Qt:/opt/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</value>
+    </valuelist>
     <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString">Make</value>
     <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">Qt4ProjectManager.Qt4BuildConfiguration</value>
     <value key="Qt4ProjectManager.Qt4BuildConfiguration.BuildConfiguration" type="int">2</value>
