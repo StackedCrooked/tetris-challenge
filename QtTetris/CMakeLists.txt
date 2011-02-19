@@ -104,10 +104,21 @@ include(${QT_USE_FILE})
 add_definitions(${QT_DEFINITIONS})
 
 
+
 #
-# Set the executable
+# Platform specific options for the creation of the executable
 #
-add_executable(${EXECUTABLE} ${QtTetris_SOURCES} ${QtTetris_HEADERS_MOC})
+if(APPLE)
+    set(EXECUTABLE_OPTIONS MACOSX_BUNDLE)
+else()
+    set(EXECUTABLE_OPTIONS "")
+endif()
+
+
+#
+# Set the executable. On Mac we want a bundle.
+#
+add_executable(${EXECUTABLE} ${EXECUTABLE_OPTIONS} ${QtTetris_SOURCES} ${QtTetris_HEADERS_MOC})
 
 
 #
@@ -118,6 +129,17 @@ add_custom_command(TARGET ${EXECUTABLE}
                    COMMAND /bin/rm ARGS -f ${BUILD_ROOT}LastBuild
                    COMMAND /bin/ln ARGS -s ${OUTDIR} ${BUILD_ROOT}LastBuild
                    WORKING_DIRECTORY    ${BUILD_ROOT})
+
+
+#
+# APPLE-specific post-build step: make a self-contained bundle (Qt libs included)
+#
+if(APPLE)
+add_custom_command(TARGET ${EXECUTABLE}
+                   POST_BUILD
+                   COMMAND /usr/bin/macdeployqt ARGS ${EXECUTABLE_OUTPUT_PATH}QtTetris.app
+                   WORKING_DIRECTORY    ${BUILD_ROOT})
+endif()
 
 
 #

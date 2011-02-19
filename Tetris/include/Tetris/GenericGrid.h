@@ -3,7 +3,6 @@
 
 
 #include "Tetris/Allocator.h"
-#include <cassert>
 #include <cstring>
 #include <vector>
 #include <memory>
@@ -72,7 +71,6 @@ std::size_t GenericGrid<T, Allocator>::columnCount() const
 template<class T, template <class> class Allocator>
 const T & GenericGrid<T, Allocator>::get(std::size_t inRow, std::size_t inColumn) const
 {
-    assert(inRow < mRowCount && inColumn < mColumnCount);
     return Allocator<T>::get(inRow * mColumnCount + inColumn);
 }
 
@@ -80,7 +78,6 @@ const T & GenericGrid<T, Allocator>::get(std::size_t inRow, std::size_t inColumn
 template<class T, template <class> class Allocator>
 void GenericGrid<T, Allocator>::set(std::size_t inRow, std::size_t inColumn, const T & inValue)
 {
-    assert(inRow < mRowCount && inColumn < mColumnCount);
     Allocator<T>::set(inRow * mColumnCount + inColumn, inValue);
 }
 

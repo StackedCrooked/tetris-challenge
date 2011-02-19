@@ -91,8 +91,9 @@ public:
             if (inPlayerTypes[idx] == PlayerType_Computer)
             {
                 player->simpleGame()->setAITweaker(&Model::Instance());
-                player->simpleGame()->setStartingLevel(14);
-                player->simpleGame()->setComputerMoveSpeed(50);
+                player->simpleGame()->setStartingLevel(8);
+                player->simpleGame()->setComputerMoveSpeed(20);
+                //player->simpleGame()->setPaused(true);
             }
         }
     }
@@ -175,7 +176,7 @@ MainWindow::MainWindow(QWidget *parent) :
     mTetrisWidgets(),
     mSpacing(12),
     mLogField(0),
-    mShowLog(true)
+    mShowLog(false)
 {
     sInstance = this;
 
