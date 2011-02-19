@@ -42,8 +42,8 @@ set(OUTDIR ${BUILD_ROOT}${CMAKE_BUILD_TYPE}/${PLATFORM}/${ARCH}/)
 #
 # Now we can set the CMAKE vars
 #
-set(LIBRARY_OUTPUT_PATH ${OUTDIR}lib/)
-set(EXECUTABLE_OUTPUT_PATH ${OUTDIR}bin/)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${OUTDIR}lib/)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OUTDIR}bin/)
 
 #
 # Compile flags
@@ -75,7 +75,7 @@ set(LIB_BOOST_THREAD boost_thread)
 #
 # Tetris dependency
 #
-add_subdirectory(${SOLUTIONDIR}Tetris ${LIBRARY_OUTPUT_PATH})
+add_subdirectory(${SOLUTIONDIR}Tetris ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 
 
 #
@@ -138,10 +138,10 @@ add_custom_command(TARGET ${EXECUTABLE}
 #  - Register this icon in the Info.plist using the PlistBuddy utility.
 #
 if(APPLE)
-set(BUNDLE "${EXECUTABLE_OUTPUT_PATH}QtTetris.app")
+set(BUNDLE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}QtTetris.app")
 add_custom_command(TARGET ${EXECUTABLE}
                    POST_BUILD
-                   COMMAND /usr/bin/macdeployqt     ARGS  "${EXECUTABLE_OUTPUT_PATH}QtTetris.app"
+                   COMMAND /usr/bin/macdeployqt     ARGS  "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}QtTetris.app"
                    COMMAND /bin/cp                  ARGS  "${SOLUTIONDIR}Tetris/res/Tetris.icns" "${BUNDLE}/Contents/Resources/Tetris.icns"
                    COMMAND /usr/libexec/PlistBuddy  ARGS  "-c" \"Set :CFBundleIconFile Tetris\" "${BUNDLE}/Contents/Info.plist"
                    WORKING_DIRECTORY  ${BUILD_ROOT})
