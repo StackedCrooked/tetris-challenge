@@ -85,11 +85,8 @@ namespace Tetris
 
     void Logger::log(LogLevel inLogLevel, const std::string & inMessage)
     {
-        // Critical section: add the log message to the buffer
-        {
-            ScopedReaderAndWriter<Queue> queue(mProtectedQueue);
-            queue->push_back(GetMessage(inLogLevel, inMessage));
-        }
+        ScopedReaderAndWriter<Queue> queue(mProtectedQueue);
+        queue->push_back(GetMessage(inLogLevel, inMessage));
     }
 
 } // namespace Tetris

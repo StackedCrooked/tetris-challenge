@@ -6,6 +6,7 @@
 namespace Tetris {
 
 
+InstanceTracker::ThreadedInstances InstanceTracker::sInstances;
 const int cMaximumLockDurationMs(32);
 
 
