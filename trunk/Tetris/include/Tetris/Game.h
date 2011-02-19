@@ -86,7 +86,7 @@ public:
 
     const Grid & gameGrid() const;
 
-    size_t currentBlockIndex() const;
+    BlockTypes::size_type currentBlockIndex() const;
 
     int futureBlocksCount() const;
 
@@ -116,18 +116,27 @@ protected:
     static void OnLinesClearedImpl(Game * inGame, int inLineCount);
 
     static std::auto_ptr<Block> CreateDefaultBlock(BlockType inBlockType, size_t inNumColumns);
-    void reserveBlocks(size_t inCount);
-    void supplyBlocks() const;
 
     std::vector<BlockType> getGarbageRow() const;
+
+    struct BlockInfo;
+    void supplyBlocks(BlockInfo & blocks) const;
+    void reserveBlocks(BlockInfo & blocks, size_t inCount) const;
+    BlockType nextBlockType() const;
 
     size_t mNumRows;
     size_t mNumColumns;
     boost::scoped_ptr<Block> mActiveBlock;
-    boost::scoped_ptr<BlockFactory> mBlockFactory;
-    mutable BlockTypes mBlocks;
+
+    struct BlockInfo
+    {
+        BlockTypes mBlocks;
+        BlockTypes::size_type mCurrentBlockIndex;
+        BlockFactory mBlockFactory;
+    };
+    mutable ThreadSafe<BlockInfo> mBlockInfo;
+
     int mFutureBlocksCount;
-    size_t mCurrentBlockIndex;
     int mOverrideLevel;
     bool mPaused;
 

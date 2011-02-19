@@ -21,7 +21,7 @@ public:
     virtual ~AbstractBlockFactory() = 0;
 
     // Returns a random block type.
-    virtual BlockType getNext() const = 0;
+    virtual BlockType getNext() = 0;
 
 private:
     AbstractBlockFactory(const AbstractBlockFactory &);
@@ -39,7 +39,7 @@ public:
     virtual ~BlockFactory();
 
     // Returns a random block type.
-    virtual BlockType getNext() const;
+    virtual BlockType getNext();
 
 private:
     BlockFactory(const BlockFactory &);
