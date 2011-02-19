@@ -165,6 +165,21 @@ void SimpleGame::setAITweaker(ComputerPlayer::Tweaker * inTweaker)
 }
 
 
+void SimpleGame::setComputerMoveSpeed(int inMovesPerSecond)
+{
+    if (mImpl->mPlayerType != PlayerType_Computer)
+    {
+        throw std::runtime_error("Computer move speed only applies to computer players.");
+    }
+
+    Assert(mImpl->mComputerPlayer);
+    if (mImpl->mComputerPlayer)
+    {
+        mImpl->mComputerPlayer->setMoveSpeed(inMovesPerSecond);
+    }
+}
+
+
 ThreadSafe<Game> SimpleGame::game() const
 {
     return mImpl->mGame;

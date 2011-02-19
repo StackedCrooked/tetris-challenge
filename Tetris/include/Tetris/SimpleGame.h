@@ -62,6 +62,8 @@ public:
 
     void setAITweaker(ComputerPlayer::Tweaker * inTweaker);
 
+    void setComputerMoveSpeed(int inMovesPerSecond);
+
     PlayerType playerType() const;
 
     GameStateStats stats() const;
