@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# These environment variables will be read by CMake
+export TETRIS_BUILD_TYPE=Release
+export TETRIS_DEPLOY_DMG=Yes
+
+# First clean the previous builds
+rm -rf Build
+
+# Start CMake
+CMAKE_DIR=Build/CMake/QtTetris
+mkdir -p $CMAKE_DIR
+cd $CMAKE_DIR
+cmake ../../../QtTetris
+
+echo "\nTo build QtTetris:"
+echo "  cd $CMAKE_DIR"
+echo "  make VERBOSE=1"
