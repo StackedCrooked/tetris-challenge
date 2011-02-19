@@ -98,7 +98,7 @@ public:
             {
                 player->simpleGame()->setAITweaker(&Model::Instance());
                 player->simpleGame()->setStartingLevel(allComputer ? 9 : 0);
-                player->simpleGame()->setComputerMoveSpeed(allComputer ? 100 : 20);
+                player->simpleGame()->setComputerMoveSpeed(allComputer ? 100 : 5);
             }
         }
     }
@@ -239,7 +239,7 @@ MainWindow::MainWindow(QWidget *parent) :
     }
 
     setCentralWidget(theCentralWidget);
-    onNewComputerVsComputerGame();
+    onNewHumanVsComputerGame();
 }
 
 
