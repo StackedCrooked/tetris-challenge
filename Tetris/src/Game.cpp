@@ -51,19 +51,18 @@ Game::Game(size_t inNumRows, size_t inNumColumns) :
     mNumRows(inNumRows),
     mNumColumns(inNumColumns),
     mActiveBlock(),
-    mBlockInfo(),
+    mBlockFactory(new BlockFactory),
+    mBlocks(),
     mFutureBlocksCount(3),
+    mCurrentBlockIndex(0),
     mOverrideLevel(-1),
     mPaused(false)
 {
-
-    // Critical section: supply one block
+    if (mBlocks.empty())
     {
-        ScopedReaderAndWriter<BlockInfo> rwBlockInfo(mBlockInfo);
-        BlockInfo & blockInfo = *rwBlockInfo;
-        blockInfo.mBlocks.push_back(blockInfo.mBlockFactory.getNext());
-        mActiveBlock.reset(CreateDefaultBlock(blockInfo.mBlocks.front(), inNumColumns).release());
+        mBlocks.push_back(mBlockFactory->getNext());
     }
+    mActiveBlock.reset(CreateDefaultBlock(mBlocks.front(), inNumColumns).release());
 
     sInstances.insert(this);
 }
@@ -295,6 +294,15 @@ void Game::setActiveBlock(const Block & inBlock)
 }
 
 
+void Game::supplyBlocks() const
+{
+    while (mCurrentBlockIndex >= mBlocks.size())
+    {
+        mBlocks.push_back(mBlockFactory->getNext());
+    }
+}
+
+
 void Game::setPaused(bool inPaused)
 {
     LogInfo(MakeString() << "Game::setPaused: " << inPaused);
@@ -326,36 +334,18 @@ int Game::columnCount() const
 }
 
 
-void Game::supplyBlocks(BlockInfo & ioBlockInfo) const
+void Game::reserveBlocks(size_t inCount)
 {
-    while (ioBlockInfo.mCurrentBlockIndex >= ioBlockInfo.mBlocks.size())
+    while (mBlocks.size() < inCount)
     {
-        ioBlockInfo.mBlocks.push_back(ioBlockInfo.mBlockFactory.getNext());
+        mBlocks.push_back(mBlockFactory->getNext());
     }
-}
-
-
-void Game::reserveBlocks(BlockInfo & ioBlockInfo, size_t inCount) const
-{
-    while (ioBlockInfo.mBlocks.size() < inCount)
-    {
-        ioBlockInfo.mBlocks.push_back(ioBlockInfo.mBlockFactory.getNext());
-    }
-}
-
-
-BlockType Game::nextBlockType() const
-{
-    ScopedReaderAndWriter<BlockInfo> rwBlockInfo(mBlockInfo);
-    BlockInfo & blockInfo(*rwBlockInfo);
-    blockInfo.mCurrentBlockIndex++;
-    supplyBlocks(blockInfo);
-    return blockInfo.mBlocks[blockInfo.mCurrentBlockIndex];
 }
 
 
 const Block & Game::activeBlock() const
 {
+    supplyBlocks();
     return *mActiveBlock;
 }
 
@@ -368,32 +358,37 @@ const Grid & Game::gameGrid() const
 
 void Game::getFutureBlocks(size_t inCount, BlockTypes & outBlocks) const
 {
-    ScopedReaderAndWriter<BlockInfo> rwBlocks(mBlockInfo);
-    BlockInfo & blockInfo(*rwBlocks);
-    reserveBlocks(blockInfo, blockInfo.mCurrentBlockIndex + inCount);
-
-    for (BlockTypes::size_type idx = blockInfo.mCurrentBlockIndex; idx < (blockInfo.mCurrentBlockIndex + inCount); ++idx)
+    // Make sure we have all blocks we need.
+    while (mBlocks.size() < mCurrentBlockIndex + inCount)
     {
-        outBlocks.push_back(blockInfo.mBlocks[idx]);
+        mBlocks.push_back(mBlockFactory->getNext());
+    }
+
+    for (size_t idx = 0; idx < inCount; ++idx)
+    {
+        outBlocks.push_back(mBlocks[mCurrentBlockIndex + idx]);
     }
 }
 
 
 void Game::getFutureBlocksWithOffset(size_t inOffset, size_t inCount, BlockTypes & outBlocks) const
 {
-    ScopedReaderAndWriter<BlockInfo> rwBlocks(mBlockInfo);
-    BlockInfo & blockInfo(*rwBlocks);
-    reserveBlocks(blockInfo, inOffset + inCount);
-    for (BlockTypes::size_type idx = inOffset; idx < (inOffset + inCount); ++idx)
+    // Make sure we have all blocks we need.
+    while (mBlocks.size() < inOffset + inCount)
     {
-        outBlocks.push_back(blockInfo.mBlocks[idx]);
+        mBlocks.push_back(mBlockFactory->getNext());
+    }
+
+    for (size_t idx = 0; idx < inCount; ++idx)
+    {
+        outBlocks.push_back(mBlocks[inOffset + idx]);
     }
 }
 
 
-BlockTypes::size_type Game::currentBlockIndex() const
+size_t Game::currentBlockIndex() const
 {
-    return ScopedReader<BlockInfo>(mBlockInfo)->mCurrentBlockIndex;
+    return mCurrentBlockIndex;
 }
 
 
@@ -581,7 +576,9 @@ bool HumanGame::move(MoveDirection inDirection)
         onLinesCleared(linesCleared);
     }
 
-    mActiveBlock.reset(CreateDefaultBlock(nextBlockType(), mNumColumns).release());
+    mCurrentBlockIndex++;
+    supplyBlocks();
+    mActiveBlock.reset(CreateDefaultBlock(mBlocks[mCurrentBlockIndex], mNumColumns).release());
 
     onChanged();
     return false;
@@ -600,6 +597,7 @@ ComputerGame::ComputerGame(const Game & inGame) :
     mCurrentNode(new GameStateNode(new GameState(inGame.gameState()), new Balanced))
 {
 }
+
 
 GameState & ComputerGame::gameState()
 {
@@ -624,19 +622,12 @@ void ComputerGame::setGrid(const Grid & inGrid)
 void ComputerGame::setCurrentNode(NodePtr inCurrentNode)
 {
     Assert(inCurrentNode->depth() == mCurrentNode->depth() + 1);
+
     mCurrentNode = inCurrentNode;
-    BlockType newBlockType = BlockType_Nil;
+    mCurrentBlockIndex = mCurrentNode->depth();
+    supplyBlocks();
 
-    // Critical section: update the blocks info
-    {
-        ScopedReaderAndWriter<BlockInfo> rwBlockInfo(mBlockInfo);
-        BlockInfo & blockInfo(*rwBlockInfo);
-        blockInfo.mCurrentBlockIndex = mCurrentNode->depth();
-        supplyBlocks(blockInfo);
-        newBlockType = blockInfo.mBlocks[blockInfo.mCurrentBlockIndex];
-    }
-
-    mActiveBlock.reset(CreateDefaultBlock(newBlockType, mNumColumns).release());
+    mActiveBlock.reset(CreateDefaultBlock(mBlocks[mCurrentBlockIndex], mNumColumns).release());
     onChanged();
 }
 

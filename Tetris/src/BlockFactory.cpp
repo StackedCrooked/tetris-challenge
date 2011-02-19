@@ -24,12 +24,12 @@ class BlockFactoryImpl
 public:
     BlockFactoryImpl(int inBagSize);
 
-    BlockType getNext();
+    BlockType getNext() const;
 
 private:
     size_t mBagSize;
-    size_t mCurrentIndex;
-    BlockTypes mBag;
+    mutable size_t mCurrentIndex;
+    mutable BlockTypes mBag;
 };
 
 
@@ -51,7 +51,7 @@ BlockFactoryImpl::BlockFactoryImpl(int inBagSize) :
 }
 
 
-BlockType BlockFactoryImpl::getNext()
+BlockType BlockFactoryImpl::getNext() const
 {
     if (mCurrentIndex >= mBag.size())
     {
@@ -77,7 +77,7 @@ BlockFactory::~BlockFactory()
 }
 
 
-BlockType BlockFactory::getNext()
+BlockType BlockFactory::getNext() const
 {
     return mImpl->getNext();
 }
