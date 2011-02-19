@@ -132,13 +132,19 @@ add_custom_command(TARGET ${EXECUTABLE}
 
 
 #
-# APPLE-specific post-build step: make a self-contained bundle (Qt libs included)
+# APPLE-specific post-build steps:
+#  - Make a self-contained (Qt libs included) application bundle using the macdeployqt utility
+#  - Copy the Tetris.icns icon to the application Resoures directory
+#  - Register this icon in the Info.plist using the PlistBuddy utility.
 #
 if(APPLE)
+set(BUNDLE "${EXECUTABLE_OUTPUT_PATH}QtTetris.app")
 add_custom_command(TARGET ${EXECUTABLE}
                    POST_BUILD
-                   COMMAND /usr/bin/macdeployqt ARGS ${EXECUTABLE_OUTPUT_PATH}QtTetris.app
-                   WORKING_DIRECTORY    ${BUILD_ROOT})
+                   COMMAND /usr/bin/macdeployqt     ARGS  "${EXECUTABLE_OUTPUT_PATH}QtTetris.app"
+                   COMMAND /bin/cp                  ARGS  "${SOLUTIONDIR}Tetris/res/Tetris.icns" "${BUNDLE}/Contents/Resources/Tetris.icns"
+                   COMMAND /usr/libexec/PlistBuddy  ARGS  "-c" \"Set :CFBundleIconFile Tetris\" "${BUNDLE}/Contents/Info.plist"
+                   WORKING_DIRECTORY  ${BUILD_ROOT})
 endif()
 
 
