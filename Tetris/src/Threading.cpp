@@ -6,7 +6,7 @@
 namespace Tetris {
 
 
-const int cMaximumLockDurationMs(1000);
+const int cMaximumLockDurationMs(4);
 
 
 class StopwatchImpl
