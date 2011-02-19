@@ -6,6 +6,7 @@
 #include "Tetris/Logger.h"
 #include "Tetris/Logging.h"
 #include "Tetris/MakeString.h"
+#include "Poco/Environment.h"
 #include <QLayout>
 #include <QLabel>
 #include <algorithm>
@@ -52,25 +53,20 @@ public:
     virtual std::auto_ptr<Evaluator> updateAIParameters(const GameState & inGameState,
                                                         int & outSearchDepth,
                                                         int & outSearchWidth,
-                                                        int & /*outWorkerCount*/)
+                                                        int & outWorkerCount)
     {
+        outWorkerCount = std::max<int>(1, Poco::Environment::processorCount() / 2);
         int firstRow = inGameState.firstOccupiedRow();
-        if (firstRow >= 15)
+        if (firstRow > 10)
         {
             outSearchDepth = 8;
             outSearchWidth = 5;
             return CreatePoly<Evaluator, MakeTetrises>();
         }
-        else if (firstRow >= 10)
-        {
-            outSearchDepth = 6;
-            outSearchWidth = 6;
-            return CreatePoly<Evaluator, Balanced>();
-        }
         else
         {
-            outSearchDepth = 5;
-            outSearchWidth = 5;
+            outSearchDepth = 4;
+            outSearchWidth = 4;
             return CreatePoly<Evaluator, Survival>();
         }
     }
@@ -80,84 +76,94 @@ public:
     {
         mMultiplayerGame.reset();
         mMultiplayerGame.reset(new MultiplayerGame);
+        bool allComputer = true;
+        for (PlayerTypes::size_type idx = 0; idx < inPlayerTypes.size(); ++idx)
+        {
+            if (inPlayerTypes[idx] != PlayerType_Computer)
+            {
+                allComputer = false;
+                break;
+            }
+        }
+
         for (PlayerTypes::size_type idx = 0; idx < inPlayerTypes.size(); ++idx)
         {
             Player * player = mMultiplayerGame->join(
                 Create<Player>(inPlayerTypes[idx],
-                               TeamName(GetTeamName(inPlayerTypes[idx], idx + 1)),
-                               PlayerName(GetPlayerName(inPlayerTypes[idx], idx/2)),
+                               TeamName(GetTeamName(inPlayerTypes[idx])),
+                               PlayerName(GetPlayerName(inPlayerTypes[idx])),
                                inRowCount,
                                inColCount));
             if (inPlayerTypes[idx] == PlayerType_Computer)
             {
                 player->simpleGame()->setAITweaker(&Model::Instance());
-                player->simpleGame()->setStartingLevel(8);
-                player->simpleGame()->setComputerMoveSpeed(20);
-                //player->simpleGame()->setPaused(true);
+                player->simpleGame()->setStartingLevel(allComputer ? 9 : 0);
+                player->simpleGame()->setComputerMoveSpeed(allComputer ? 100 : 20);
             }
         }
     }
 
 private:
     Model() :
-        mStartingLevelHuman(0),
-        mStartingLevelComputer(0)
+        mPirates(),
+        mPiratesIndex(0),
+        mMarines(),
+        mMarinesIndex(0)
     {
+        mPirates.push_back("Luffy");
+        mPirates.push_back("Zoro");
+        mPirates.push_back("Nami");
+        mPirates.push_back("Sanji");
+        mPirates.push_back("Vivi");
+
+        mMarines.push_back("Smoker");
+        mMarines.push_back("Tashigi");
+        mMarines.push_back("Coby");
+        mMarines.push_back("Jango");
     }
 
-    static std::string GetTeamName(PlayerType inPlayerType, size_t inIndex)
+    static std::string GetTeamName(PlayerType inPlayerType)
     {
-        std::stringstream ss;
         if (inPlayerType == PlayerType_Human)
         {
-            ss << "Pirates";
+            return "Pirates";
         }
         else
         {
-            ss << "Marines";
+            std::stringstream ss;
+            static int counter = 1;
+            ss << "Marines " << counter++;
+            return ss.str();
         }
-         ss << " " << inIndex;
-         return ss.str();
     }
 
-    static std::string GetPlayerName(PlayerType inPlayerType, size_t inIndex)
+    std::string GetPlayerName(PlayerType inPlayerType)
     {
-        typedef const char * CharPtr;
-
-        static const CharPtr cPirates[] = {
-            "Luffy",
-            "Zoro",
-            "Nami",
-            "Sanji"
-        };
-        static const int cPirateCount = sizeof(cPirates) / sizeof(cPirates[0]);
-        static int cPirateIndex = 0;
-
-        static const CharPtr cMarines[] = {
-            "Smoker",
-            "Tashigi",
-            "Fullbody",
-            "Hina"
-        };
-        static const int cMarineCount = sizeof(cMarines) / sizeof(cMarines[0]);
-        static int cMarineIndex = 0;
-
+        std::string result;
         if (inPlayerType == PlayerType_Human)
         {
-            return cPirates[cPirateIndex++ % cPirateCount];
+            result = mPirates[mPiratesIndex];
+            mPiratesIndex = (mPiratesIndex + 1) % mPirates.size();
         }
         else
         {
-            return cMarines[cMarineIndex++ % cMarineCount] + std::string(" (Computer)");
+            result = mMarines[mMarinesIndex];
+            mMarinesIndex = (mMarinesIndex + 1) % mMarines.size();
         }
+        return result;
     }
 
     Model(const Model &);
     Model& operator=(const Model&);
 
     boost::scoped_ptr<Tetris::MultiplayerGame> mMultiplayerGame;
-    int mStartingLevelHuman;
-    int mStartingLevelComputer;
+
+    typedef std::vector<std::string> Names;
+    Names mPirates;
+    Names::size_type mPiratesIndex;
+
+    Names mMarines;
+    Names::size_type mMarinesIndex;
 };
 
 
@@ -183,6 +189,20 @@ MainWindow::MainWindow(QWidget *parent) :
     setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum));
 
     setWindowTitle("Piratris");
+
+    QToolBar * toolBar = addToolBar("Tetris");
+    toolBar->setMovable(false);
+    QAction * pauseAction = toolBar->addAction("Pause");
+    connect(pauseAction, SIGNAL(triggered()), this, SLOT(onPaused()));
+
+    QAction * tbNewSinglePlayerGame = toolBar->addAction("Single Player");
+    connect(tbNewSinglePlayerGame, SIGNAL(triggered()), this, SLOT(onNewSinglePlayerGame()));
+
+    QAction * tbNewHumanVsComputerGame = toolBar->addAction("Human vs Computer");
+    connect(tbNewHumanVsComputerGame, SIGNAL(triggered()), this, SLOT(onNewHumanVsComputerGame()));
+
+    QAction * tbNewComputerVsComputerGame = toolBar->addAction("Computer vs Computer");
+    connect(tbNewComputerVsComputerGame, SIGNAL(triggered()), this, SLOT(onNewComputerVsComputerGame()));
 
 
     QWidget * theCentralWidget(new QWidget);
