@@ -147,7 +147,10 @@ namespace Tetris
 
         const Block & block = game.activeBlock();
         const Block & targetBlock = firstChild.gameState().originalBlock();
+
+
         Assert(block.type() == targetBlock.type());
+
         if (block.rotation() != targetBlock.rotation())
         {
             if (!game.rotate())

@@ -178,7 +178,7 @@ public:
 
     const GameStateNode * currentNode() const;
 
-    const GameStateNode * lastPrecalculatedNode() const;
+    const GameStateNode * endNode() const;
 
     bool navigateNodeDown();
 

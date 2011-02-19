@@ -673,7 +673,7 @@ const GameStateNode * ComputerGame::currentNode() const
 }
 
 
-const GameStateNode * ComputerGame::lastPrecalculatedNode() const
+const GameStateNode * ComputerGame::endNode() const
 {
     return mCurrentNode->endNode();
 }

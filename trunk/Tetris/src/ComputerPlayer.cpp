@@ -48,6 +48,7 @@ public:
         mSearchWidth(cDefaultSearchWidth),
         mWorkerCount(Poco::Environment::processorCount()),
         mGameDepth(0),
+        mReset(false),
         mQuitFlag(false),
         mTimer(10, 10)
     {
@@ -67,6 +68,13 @@ public:
 
     int calculateRemainingTimeMs(const Game & inGame) const;
 
+    void startNodeCalculator();
+    void onStarted();
+    void onWorking();
+    void onStopped();
+    void onFinished();
+    void onError();
+
     Tweaker * mTweaker;
     std::string mName;
     ThreadSafe<Game> mProtectedGame;
@@ -78,6 +86,7 @@ public:
     int mSearchWidth;
     int mWorkerCount;
     int mGameDepth;
+    bool mReset;
     bool mQuitFlag;
     boost::mutex mMutex;
     Poco::Timer mTimer;
@@ -243,153 +252,194 @@ void ComputerPlayer::Impl::timerEvent()
 {
     // Already locked.
 
-    if (mNodeCalculator)
+    if (mReset)
     {
-        // Apparently an error has occured, which has been logged by the NodeCalculator object.
-        // All we can do at this point is reset the pointer so that a new object will be created
-        // at the next timer event.
-        if (mNodeCalculator->status() == NodeCalculator::Status_Error)
+        mReset = false;
+        mNodeCalculator.reset();
+        return;
+    }
+
+    if (!mNodeCalculator)
+    {
+        startNodeCalculator();
+        return;
+    }
+
+
+    switch (mNodeCalculator->status())
+    {
+        case NodeCalculator::Status_Nil:
         {
-            mNodeCalculator.reset();
+            throw std::logic_error("Status should be Status_Started or higher.");
+        }
+        case NodeCalculator::Status_Started:
+        {
+            onStarted();
             return;
         }
-
-        // Check if the computer player has finished.
-        if (mNodeCalculator->status() != NodeCalculator::Status_Finished)
+        case NodeCalculator::Status_Working:
         {
-            int numPrecalculatedMoves = -1;
-            int remainingTime = -1;
-            {
-                ScopedReader<Game> wgame(mProtectedGame);
-                const ComputerGame & game(dynamic_cast<const ComputerGame&>(*wgame.get()));
-
-                //
-                // Check if the game state has not been changed while calculating the next move
-                //
-                if (mGameDepth < game.lastPrecalculatedNode()->depth())
-                {
-                    LogInfo("AAARGGHH All our work is for naught");
-
-                    // Game state has change, so all calculations up until now become invalid.
-                    // Reset the node calculator and so that it will be be restarted in the next iteration.
-                    mNodeCalculator.reset();
-                    return;
-                }
-
-                numPrecalculatedMoves = game.numPrecalculatedMoves();
-                if (numPrecalculatedMoves == 0)
-                {
-                    remainingTime = calculateRemainingTimeMs(game);
-                }
-            }
-
-            if (numPrecalculatedMoves == 0)
-            {
-                // Check if there is the danger of crashing the current block.
-
-                if (remainingTime <= 1000)
-                {
-                    mNodeCalculator->stop();
-                }
-            }
-            // else: keep working.
+            onWorking();
+            return;
         }
-        else
+        case NodeCalculator::Status_Stopped:
         {
-            if (NodePtr resultNode = mNodeCalculator->result())
-            {
-                if (!resultNode->gameState().isGameOver())
-                {
-                    ScopedReaderAndWriter<Game> wgame(mProtectedGame);
-                    ComputerGame & game(dynamic_cast<ComputerGame&>(*wgame.get()));
-
-                    // The created node should follow the last precalculated one.
-                    if (resultNode->depth() == game.lastPrecalculatedNode()->depth() + 1)
-                    {
-                        game.appendPrecalculatedNode(resultNode);
-
-                    }
-                    else
-                    {
-                        LogWarning("Computer is TOO SLOW!!");
-                    }
-                }
-            }
-            else
-            {
-                LogError("NodeCalculator did not create any results.");
-            }
-
-            // Once the computer has finished it's job we destroy the object.
-            mNodeCalculator.reset();
+            LogInfo(mName + " NodeCalculator has stopped.");
+            onStopped();
+            return;
+        }
+        case NodeCalculator::Status_Finished:
+        {
+            onFinished();
+            return;
+        }
+        case NodeCalculator::Status_Error:
+        {
+            onError();
+            return;
+        }
+        default:
+        {
+            throw std::invalid_argument("Invalid enum value for NodeCalculator::Status.");
         }
     }
-    else
+}
+
+
+void ComputerPlayer::Impl::startNodeCalculator()
+{
+    ScopedReader<Game> wgame(mProtectedGame);
+    const ComputerGame & game(dynamic_cast<const ComputerGame&>(*wgame.get()));
+
+    //
+    // Clone the starting node
+    //
+    const GameStateNode * gameEndNode = game.endNode();
+    if (gameEndNode->gameState().isGameOver())
     {
-        ScopedReader<Game> wgame(mProtectedGame);
-        const ComputerGame & game(dynamic_cast<const ComputerGame&>(*wgame.get()));
-        if (!game.lastPrecalculatedNode()->gameState().isGameOver())
-        {
-            mGameDepth = game.lastPrecalculatedNode()->depth();
-            int numPrecalculated = mGameDepth - game.currentNode()->depth();
-            if (numPrecalculated < 8)
-            {
-                Assert(!mNodeCalculator);
-
-                //
-                // Clone the starting node
-                //
-                std::auto_ptr<GameStateNode> endNode = game.lastPrecalculatedNode()->clone();
-                Assert(endNode->children().empty());
-                Assert(endNode->depth() >= game.currentNode()->depth());
-
-
-                //
-                // Create the list of future blocks
-                //
-                BlockTypes futureBlocks;
-                game.getFutureBlocksWithOffset(endNode->depth(), mSearchDepth, futureBlocks);
-
-
-                //
-                // Fill list of search widths (using the same width for each level).
-                //
-                std::vector<int> widths;
-                for (size_t idx = 0; idx != futureBlocks.size(); ++idx)
-                {
-                    widths.push_back(mSearchWidth);
-                }
-
-
-                //
-                // Create and start the NodeCalculator object.
-                //
-                Assert(mWorkerPool.getActiveWorkerCount() == 0);
-                if (mWorkerCount == 0)
-                {
-                    mWorkerCount = Poco::Environment::processorCount();
-                }
-                mWorkerPool.resize(mWorkerCount);
-
-                if (mTweaker)
-                {
-                    mEvaluator.reset(
-                        mTweaker->updateAIParameters(game.gameState(),
-                                                     mSearchDepth,
-                                                     mSearchWidth,
-                                                     mWorkerCount).release());
-                }
-                mNodeCalculator.reset(new NodeCalculator(endNode,
-                                                         futureBlocks,
-                                                         widths,
-                                                         mEvaluator->clone(),
-                                                         mWorkerPool));
-
-                mNodeCalculator->start();
-            }
-            // else: we have plenty of precalculated nodes. Do nothing for know.
-        }
+        return;
     }
+
+    std::auto_ptr<GameStateNode> endNode = gameEndNode->clone();
+
+    mGameDepth = endNode->depth();
+    Assert(endNode->children().empty());
+    Assert(endNode->depth() >= game.currentNode()->depth());
+
+
+    //
+    // Create the list of future blocks
+    //
+    BlockTypes futureBlocks;
+    game.getFutureBlocksWithOffset(endNode->depth(), mSearchDepth, futureBlocks);
+
+
+    //
+    // Fill list of search widths (using the same width for each level).
+    //
+    std::vector<int> widths;
+    for (size_t idx = 0; idx != futureBlocks.size(); ++idx)
+    {
+        widths.push_back(mSearchWidth);
+    }
+
+
+    //
+    // Create and start the NodeCalculator object.
+    //
+    Assert(mWorkerPool.getActiveWorkerCount() == 0);
+    if (mWorkerCount == 0)
+    {
+        mWorkerCount = Poco::Environment::processorCount();
+    }
+    mWorkerPool.resize(mWorkerCount);
+
+    if (mTweaker)
+    {
+        mEvaluator.reset(
+            mTweaker->updateAIParameters(game.gameState(),
+                                         mSearchDepth,
+                                         mSearchWidth,
+                                         mWorkerCount).release());
+    }
+    mNodeCalculator.reset(new NodeCalculator(endNode,
+                                             futureBlocks,
+                                             widths,
+                                             mEvaluator->clone(),
+                                             mWorkerPool));
+
+    mNodeCalculator->start();
+}
+
+
+
+void ComputerPlayer::Impl::onStarted()
+{
+    // Good.
+}
+
+
+void ComputerPlayer::Impl::onWorking()
+{
+    ScopedReader<Game> wgame(mProtectedGame);
+    const ComputerGame & game(dynamic_cast<const ComputerGame&>(*wgame.get()));
+
+    if (mGameDepth < game.endNode()->depth())
+    {
+        // The calculated results have become invalid. Start over.
+        LogInfo(mName + "'s work is for naught!");
+        mReset = true;
+        return;
+    }
+
+    if (game.numPrecalculatedMoves() == 0 && calculateRemainingTimeMs(game) < 1000)
+    {
+        LogInfo(mName + " is hurrying!");
+        mNodeCalculator->stop();
+        return;
+    }
+
+    // Keep working
+}
+
+
+void ComputerPlayer::Impl::onStopped()
+{
+    // Good. Now wait until onFinished.
+}
+
+
+void ComputerPlayer::Impl::onFinished()
+{
+    mReset = true;
+    NodePtr resultNode = mNodeCalculator->result();
+    if (!resultNode || resultNode->gameState().isGameOver())
+    {
+        LogInfo(mName + "'s calculations are finished, but alas, the game was already over.");
+        return;
+    }
+
+    ScopedReaderAndWriter<Game> wgame(mProtectedGame);
+    ComputerGame & game(dynamic_cast<ComputerGame&>(*wgame.get()));
+
+    // Check for sync problems.
+    if (resultNode->depth() != game.endNode()->depth() + 1)
+    {
+        LogInfo(mName + "'s calculations are finished,...and thrown away. Murphy strikes again.");
+        return;
+    }
+
+    // Ok, store the results.
+    game.appendPrecalculatedNode(resultNode);
+
+    LogInfo(mName + "'s work has completed succesfully. On to the next job!");
+}
+
+
+void ComputerPlayer::Impl::onError()
+{
+    mReset = true;
+    LogError(mName + " " + mNodeCalculator->errorMessage());
 }
 
 
