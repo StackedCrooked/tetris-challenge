@@ -325,6 +325,13 @@ void ComputerPlayer::Impl::startNodeCalculator()
         ScopedReader<Game> wgame(mProtectedGame);
         const ComputerGame & game(dynamic_cast<const ComputerGame&>(*wgame.get()));
 
+
+        if (game.numPrecalculatedMoves() > 8)
+        {
+            // We're fine for now.
+            return;
+        }
+
         // Consult the Tweaker for improved settings
         if (mTweaker)
         {
