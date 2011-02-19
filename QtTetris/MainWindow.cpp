@@ -179,7 +179,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     sInstance = this;
 
-    setSizePolicy(QSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum));
+    setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum));
 
     setWindowTitle("Piratris");
 
@@ -213,11 +213,6 @@ MainWindow::MainWindow(QWidget *parent) :
         vbox->addWidget(mLogField, 1);
         Logger::Instance().setLogHandler(boost::bind(&MainWindow::logMessage, this, _1));
     }
-
-
-    QHBoxLayout * mainLayout = new QHBoxLayout(this);
-    mainLayout->addWidget(theCentralWidget, 0);
-    setLayout(mainLayout);
 
     setCentralWidget(theCentralWidget);
     onNewComputerVsComputerGame();
