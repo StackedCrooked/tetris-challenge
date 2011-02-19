@@ -316,30 +316,43 @@ void ComputerPlayer::Impl::timerEvent()
 
 void ComputerPlayer::Impl::startNodeCalculator()
 {
-    ScopedReader<Game> wgame(mProtectedGame);
-    const ComputerGame & game(dynamic_cast<const ComputerGame&>(*wgame.get()));
 
-    //
-    // Clone the starting node
-    //
-    const GameStateNode * gameEndNode = game.endNode();
-    if (gameEndNode->gameState().isGameOver())
-    {
-        return;
-    }
-
-    std::auto_ptr<GameStateNode> endNode = gameEndNode->clone();
-
-    mGameDepth = endNode->depth();
-    Assert(endNode->children().empty());
-    Assert(endNode->depth() >= game.currentNode()->depth());
-
-
-    //
-    // Create the list of future blocks
-    //
     BlockTypes futureBlocks;
-    game.getFutureBlocksWithOffset(endNode->depth(), mSearchDepth, futureBlocks);
+    std::auto_ptr<GameStateNode> endNode;
+
+    // Critical section
+    {
+        ScopedReader<Game> wgame(mProtectedGame);
+        const ComputerGame & game(dynamic_cast<const ComputerGame&>(*wgame.get()));
+
+        // Consult the Tweaker for improved settings
+        if (mTweaker)
+        {
+            mEvaluator.reset(
+                mTweaker->updateAIParameters(game.gameState(),
+                                             mSearchDepth,
+                                             mSearchWidth,
+                                             mWorkerCount).release());
+        }
+
+        // Clone the starting node
+        // The end node becomes the new start node. It's like... a vantage point!
+        endNode = game.endNode()->clone();
+        if (endNode->gameState().isGameOver())
+        {
+            return;
+        }
+
+        mGameDepth = endNode->depth();
+        Assert(endNode->children().empty());
+        Assert(endNode->depth() >= game.currentNode()->depth());
+
+
+        //
+        // Create the list of future blocks
+        //
+        game.getFutureBlocksWithOffset(endNode->depth(), mSearchDepth, futureBlocks);
+    }
 
 
     //
@@ -361,15 +374,6 @@ void ComputerPlayer::Impl::startNodeCalculator()
         mWorkerCount = Poco::Environment::processorCount();
     }
     mWorkerPool.resize(mWorkerCount);
-
-    if (mTweaker)
-    {
-        mEvaluator.reset(
-            mTweaker->updateAIParameters(game.gameState(),
-                                         mSearchDepth,
-                                         mSearchWidth,
-                                         mWorkerCount).release());
-    }
     mNodeCalculator.reset(new NodeCalculator(endNode,
                                              futureBlocks,
                                              widths,
