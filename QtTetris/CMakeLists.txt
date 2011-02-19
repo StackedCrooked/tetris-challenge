@@ -1,8 +1,31 @@
 cmake_minimum_required(VERSION 2.6)
 project(QtTetris)
-message("TETRIS_BUILD_CONFIGURATION: $ENV{TETRIS_BUILD_CONFIGURATION}")
-set(CMAKE_BUILD_TYPE $ENV{TETRIS_BUILD_CONFIGURATION})
 FIND_PACKAGE(Qt4 REQUIRED)
+
+
+#
+# Check TETRIS_BUILD_TYPE environment variable
+#
+set(CMAKE_BUILD_TYPE $ENV{TETRIS_BUILD_TYPE})
+if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "Release")
+message("CMAKE_BUILD_TYPE is ${CMAKE_BUILD_TYPE}")
+else()
+message(FATAL_ERROR "TETRIS_BUILD_TYPE is \"${TETRIS_BUILD_TYPE}\". Should be \"Debug\" or \"Release\"")
+else()
+endif()
+
+
+#
+# Check Apple specific argument: TETRIS_DEPLOY_DMG.
+#
+if(APPLE)
+set(TETRIS_DEPLOY_DMG $ENV{TETRIS_DEPLOY_DMG})
+if(TETRIS_DEPLOY_DMG STREQUAL "Yes" OR TETRIS_DEPLOY_DMG STREQUAL "No")
+message("TETRIS_DEPLOY_DMG is ${TETRIS_DEPLOY_DMG}")
+else()
+message(FATAL_ERROR "TETRIS_DEPLOY_DMG is \"${TETRIS_DEPLOY_DMG}\". Should be \"Yes\" or \"No\"")
+endif()
+endif(APPLE)
 
 
 #
@@ -139,15 +162,21 @@ add_custom_command(TARGET ${EXECUTABLE}
 #
 if(APPLE)
 set(BUNDLE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}QtTetris.app")
+if(TETRIS_DEPLOY_DMG STREQUAL "Yes")
+set(MACDEPLOYQT_OPTIONS "-dmg")
+else()
+set(MACDEPLOYQT_OPTIONS "")
+endif()
 add_custom_command(TARGET ${EXECUTABLE}
                    POST_BUILD
                    COMMAND /bin/rm                  ARGS  "-rf" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}QtTetris.app/Contents/Plugins"
                    COMMAND /bin/rm                  ARGS  "-f" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}QtTetris.app/Contents/Resources/qt.conf"
-                   COMMAND /usr/bin/macdeployqt     ARGS  "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}QtTetris.app"
+                   COMMAND /bin/mkdir               ARGS  "-p" "${BUNDLE}/Contents/Resources"
                    COMMAND /bin/cp                  ARGS  "${SOLUTIONDIR}Tetris/res/Tetris.icns" "${BUNDLE}/Contents/Resources/Tetris.icns"
                    COMMAND /usr/libexec/PlistBuddy  ARGS  "-c" \"Set :CFBundleIconFile Tetris\" "${BUNDLE}/Contents/Info.plist"
+                   COMMAND /usr/bin/macdeployqt     ARGS  "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}QtTetris.app" "${MACDEPLOYQT_OPTIONS}"
                    WORKING_DIRECTORY  ${BUILD_ROOT})
-endif()
+endif(APPLE)
 
 
 #

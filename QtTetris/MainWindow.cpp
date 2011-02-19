@@ -191,7 +191,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum));
 
-    setWindowTitle("Piratris");
+    setWindowTitle("QtTetris");
 
     QToolBar * toolBar = addToolBar("Tetris");
     toolBar->setMovable(false);
