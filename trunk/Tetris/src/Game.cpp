@@ -614,23 +614,7 @@ const GameState & ComputerGame::gameState() const
 void ComputerGame::setGrid(const Grid & inGrid)
 {
     mCurrentNode->clearChildren();
-
-    std::auto_ptr<GameState> gameStateCopy(new GameState(gameState()));
-    gameStateCopy->setGrid(inGrid);
-
-    std::auto_ptr<Evaluator> evaluatorCopy(mCurrentNode->evaluator().clone());
-
-    NodePtr childNode(new GameStateNode(mCurrentNode, gameStateCopy.release(), evaluatorCopy.release()));
-    mCurrentNode->addChild(childNode);
-
-    // Duplicate the current block in the blocks history. This keeps
-    // the blocks history in alignment with the gamestate history.
-    mBlocks.insert(mBlocks.begin() + mCurrentBlockIndex, mActiveBlock->type());
-
-    int backupActiveRow = mActiveBlock->row();
-    navigateNodeDown();
-    mActiveBlock->setRow(backupActiveRow);
-
+    gameState().setGrid(inGrid);
     onChanged();
 }
 

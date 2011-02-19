@@ -93,7 +93,7 @@ public:
             if (inPlayerTypes[idx] == PlayerType_Computer)
             {
                 player->simpleGame()->setAITweaker(&Model::Instance());
-                player->simpleGame()->setLevel(8);
+                player->simpleGame()->setLevel(10);
             }
         }
     }
