@@ -1,12 +1,12 @@
 Todo
 ----
-- Computer drop should also work.
 - Release a simple Qt game: single player, player vs computer, computer vs computer.
 - Use a single shared timer.
 - Teams
 - Online multiplayer
 - Qt Playable game
 - Multiplayer
+v Computer drop should also work.
 v Show FPS
 v Implement Human vs Computer modus.
 v Sometimes penalty appears on the top of the grid. (Usually when game was already high, and tetris penalty.)
