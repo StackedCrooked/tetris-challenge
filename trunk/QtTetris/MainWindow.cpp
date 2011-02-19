@@ -55,7 +55,7 @@ public:
                                                         int & outSearchWidth,
                                                         int & outWorkerCount)
     {
-        outWorkerCount = std::max<int>(1, Poco::Environment::processorCount() / 2);
+        outWorkerCount = std::max<int>(1, mCPUCount / 2);
         int firstRow = inGameState.firstOccupiedRow();
         if (firstRow > 10)
         {
@@ -108,7 +108,8 @@ private:
         mPirates(),
         mPiratesIndex(0),
         mMarines(),
-        mMarinesIndex(0)
+        mMarinesIndex(0),
+        mCPUCount(Poco::Environment::processorCount())
     {
         mPirates.push_back("Luffy");
         mPirates.push_back("Zoro");
@@ -164,6 +165,8 @@ private:
 
     Names mMarines;
     Names::size_type mMarinesIndex;
+
+    int mCPUCount;
 };
 
 
