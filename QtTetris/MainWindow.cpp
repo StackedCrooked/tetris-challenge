@@ -179,6 +179,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     sInstance = this;
 
+    setSizePolicy(QSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum));
+
     setWindowTitle("Piratris");
 
 
@@ -201,6 +203,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QVBoxLayout * vbox = new QVBoxLayout(theCentralWidget);
     mTetrisWidgetHolder = new QHBoxLayout;
     vbox->addItem(mTetrisWidgetHolder);
+    vbox->setAlignment(mTetrisWidgetHolder, Qt::AlignHCenter);
     mTetrisWidgetHolder->setSpacing(mSpacing);
 
     if (mShowLog)
@@ -210,6 +213,11 @@ MainWindow::MainWindow(QWidget *parent) :
         vbox->addWidget(mLogField, 1);
         Logger::Instance().setLogHandler(boost::bind(&MainWindow::logMessage, this, _1));
     }
+
+
+    QHBoxLayout * mainLayout = new QHBoxLayout(this);
+    mainLayout->addWidget(theCentralWidget, 0);
+    setLayout(mainLayout);
 
     setCentralWidget(theCentralWidget);
     onNewComputerVsComputerGame();
@@ -261,12 +269,14 @@ void MainWindow::onNewGame(const PlayerTypes & inPlayerTypes)
     // Add the new tetris widgets to the layout
     for (TetrisWidgets::size_type idx = mTetrisWidgetHolder->children().size(); idx < inPlayerTypes.size(); ++idx)
     {
-        mTetrisWidgetHolder->addWidget(mTetrisWidgets[idx]);
+        mTetrisWidgetHolder->addWidget(mTetrisWidgets[idx], 0);
+        mTetrisWidgets[idx]->show();
     }
 
     // Remove surplus widgets from layout.
     for (PlayerTypes::size_type idx = inPlayerTypes.size(); idx < mTetrisWidgets.size(); ++idx)
     {
+        mTetrisWidgets[idx]->hide();
         mTetrisWidgetHolder->removeWidget(mTetrisWidgets[idx]);
     }
 
@@ -280,8 +290,6 @@ void MainWindow::onNewGame(const PlayerTypes & inPlayerTypes)
         Player * player = mgame.getPlayer(idx);
         mTetrisWidgets[idx]->setPlayer(player);
     }
-
-    adjustSize();
 }
 
 
