@@ -25,6 +25,7 @@ public:
     class Tweaker
     {
     public:
+        // WARNING: This callback will be received in a worker thread!
         virtual std::auto_ptr<Evaluator> updateAIParameters(const GameState & inGameState,
                                                             int & outSearchDepth,
                                                             int & outSearchWidth,

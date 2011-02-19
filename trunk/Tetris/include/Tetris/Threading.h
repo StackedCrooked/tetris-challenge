@@ -148,7 +148,7 @@ public:
 
     ~ScopedReaderAndWriter()
     {
-        Assert(mStopwatch.elapsedTimeMs() <= cMaximumLockDurationMs);
+        Assert(mStopwatch.elapsedTimeMs() < cMaximumLockDurationMs);
     }
 
     Variable & operator *()
