@@ -5,14 +5,10 @@
 #include "Tetris/MakeString.h"
 #include "Tetris/SimpleGame.h"
 #include "Tetris/Threading.h"
-#include "Poco/Stopwatch.h"
 #include <boost/bind.hpp>
 
 
 namespace Tetris {
-
-
-static Poco::Stopwatch sFPSStopwatch;
 
 
 RGBColor::RGBColor(int red, int green, int blue) :
@@ -69,7 +65,7 @@ AbstractWidget::AbstractWidget(int inSquareWidth, int inSquareHeight) :
     mFrameCount(0),
     mFPS(0)
 {
-    sFPSStopwatch.start();
+    mFPSStopwatch.start();
 }
 
 
@@ -202,7 +198,7 @@ int AbstractWidget::statsItemHeight() const
 
 int AbstractWidget::statsItemCount() const
 {
-    return 3; // Score, Level and Lines.
+    return 4; // Score, Level, Line and Fps.
 }
 
 
@@ -434,6 +430,11 @@ void AbstractWidget::paintStats(const Rect & inRect, const GameStateStats & inSt
     rect = Rect(rect.left(), rect.bottom() + margin(), rect.width(), rect.height());
     fillRect(rect, RGBColor(255, 255, 255));
     paintStatItem(rect, "Lines", MakeString() << inStats.numLines());
+
+    rect = Rect(rect.left(), rect.bottom() + margin(), rect.width(), rect.height());
+    fillRect(rect, RGBColor(255, 255, 255));
+
+    paintStatItem(rect, "Fps", MakeString() << static_cast<int>(0.5 + mFPS));
 }
 
 
@@ -460,11 +461,11 @@ void AbstractWidget::recalculateFPS()
 {
     mFrameCount++;
 
-    if (sFPSStopwatch.elapsed() > 2 * 1000.0 * 1000.0)
+    if (mFPSStopwatch.elapsed() > 1 * 1000.0 * 1000.0)
     {
-        mFPS = (1000.0 * 1000.0 * mFrameCount) / static_cast<double>(sFPSStopwatch.elapsed());
+        mFPS = (1000.0 * 1000.0 * mFrameCount) / static_cast<double>(mFPSStopwatch.elapsed());
         mFrameCount = 0;
-        sFPSStopwatch.restart();
+        mFPSStopwatch.restart();
     }
 }
 
