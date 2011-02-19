@@ -40,6 +40,8 @@ private slots:
 
     void onPenalty();
 
+    void onTimerEvent();
+
 private:
     void onNewGame(const Tetris::PlayerTypes & inPlayerTypes);
 
@@ -52,6 +54,7 @@ private:
     int mSpacing;
     QTextEdit * mLogField;
     bool mShowLog;
+    bool mGameOver;
 };
 
 

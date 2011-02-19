@@ -9,6 +9,7 @@
 #include "Poco/Environment.h"
 #include <QLayout>
 #include <QLabel>
+#include <QTimer>
 #include <algorithm>
 #include <iostream>
 #include <sstream>
@@ -33,6 +34,19 @@ public:
     {
         static Model fModel;
         return fModel;
+    }
+
+    bool IsGameOver()
+    {
+        for (size_t idx = 0; idx < mMultiplayerGame->playerCount(); ++idx)
+        {
+            Player * player = mMultiplayerGame->getPlayer(idx);
+            if (player->simpleGame()->isGameOver())
+            {
+                mGameOver = true;
+            }
+        }
+        return mGameOver;
     }
 
     Player * getPlayer(size_t inIndex)
@@ -76,6 +90,7 @@ public:
     {
         mMultiplayerGame.reset();
         mMultiplayerGame.reset(new MultiplayerGame);
+        mGameOver = false;
         bool allComputer = true;
         for (PlayerTypes::size_type idx = 0; idx < inPlayerTypes.size(); ++idx)
         {
@@ -104,7 +119,7 @@ public:
             {
                 player->simpleGame()->setAITweaker(&Model::Instance());
                 player->simpleGame()->setStartingLevel(allComputer ? 9 : 0);
-                player->simpleGame()->setComputerMoveSpeed(allComputer ? 100 : 5);
+                player->simpleGame()->setComputerMoveSpeed(allComputer ? 100 : 20);
             }
         }
     }
@@ -114,7 +129,8 @@ private:
         mNames(),
         mNamesIndex(0),
         mHumanName(),
-        mCPUCount(Poco::Environment::processorCount())
+        mCPUCount(Poco::Environment::processorCount()),
+        mGameOver(false)
     {
         mNames.push_back("Zoro");
         mNames.push_back("Nami");
@@ -169,9 +185,54 @@ private:
     Names::size_type mNamesIndex;
 
     std::string mHumanName;
-
     int mCPUCount;
+    bool mGameOver;
 };
+
+
+void MainWindow::onTimerEvent()
+{
+    // We already know about the GameOver event.
+    // No longer interested.
+    if (mGameOver)
+    {
+        return;
+    }
+
+
+    if (Model::Instance().IsGameOver())
+    {
+        mGameOver = true;
+
+        MultiplayerGame & mgame = Model::Instance().multiplayerGame();
+        if (mgame.playerCount() == 1)
+        {
+            QMessageBox msgBox;
+            msgBox.setWindowTitle("QtTetris");
+            std::string text = "And the winner is: Gravity!";
+            msgBox.setText(text.c_str());
+            msgBox.exec();
+            return;
+        }
+
+
+        for (size_t idx = 0; idx < mgame.playerCount(); ++idx)
+        {
+            Player * player(mgame.getPlayer(idx));
+            if (!player->simpleGame()->isGameOver())
+            {
+                player->simpleGame()->setPaused(true);
+                QMessageBox msgBox;
+                msgBox.setWindowTitle("QtTetris");
+                std::string text = "And the winner is: " + player->playerName() + "!";
+                msgBox.setText(text.c_str());
+                msgBox.exec();
+                return;
+            }
+        }
+    }
+
+}
 
 
 MainWindow * MainWindow::sInstance(0);
@@ -189,7 +250,8 @@ MainWindow::MainWindow(QWidget *parent) :
     mTetrisWidgets(),
     mSpacing(12),
     mLogField(0),
-    mShowLog(false)
+    mShowLog(false),
+    mGameOver(false)
 {
     sInstance = this;
 
@@ -246,6 +308,12 @@ MainWindow::MainWindow(QWidget *parent) :
     }
 
     setCentralWidget(theCentralWidget);
+
+    QTimer * timer(new QTimer(this));
+    connect(timer, SIGNAL(timeout()), this, SLOT(onTimerEvent()));
+    timer->start(500);
+
+
     onNewHumanVsComputerGame();
 }
 
@@ -280,6 +348,9 @@ bool MainWindow::event(QEvent * inEvent)
 
 void MainWindow::onNewGame(const PlayerTypes & inPlayerTypes)
 {
+    // Unset the GameOver state.
+    mGameOver = false;
+
     // Unset all widgets.
     for (TetrisWidgets::size_type idx = 0; idx < mTetrisWidgets.size(); ++idx)
     {
