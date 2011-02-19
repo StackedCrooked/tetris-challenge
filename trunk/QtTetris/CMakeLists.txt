@@ -141,6 +141,8 @@ if(APPLE)
 set(BUNDLE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}QtTetris.app")
 add_custom_command(TARGET ${EXECUTABLE}
                    POST_BUILD
+                   COMMAND /bin/rm                  ARGS  "-rf" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}QtTetris.app/Contents/Plugins"
+                   COMMAND /bin/rm                  ARGS  "-f" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}QtTetris.app/Contents/Resources/qt.conf"
                    COMMAND /usr/bin/macdeployqt     ARGS  "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}QtTetris.app"
                    COMMAND /bin/cp                  ARGS  "${SOLUTIONDIR}Tetris/res/Tetris.icns" "${BUNDLE}/Contents/Resources/Tetris.icns"
                    COMMAND /usr/libexec/PlistBuddy  ARGS  "-c" \"Set :CFBundleIconFile Tetris\" "${BUNDLE}/Contents/Info.plist"
