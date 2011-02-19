@@ -94,6 +94,7 @@ public:
             {
                 player->simpleGame()->setAITweaker(&Model::Instance());
                 player->simpleGame()->setLevel(10);
+                player->simpleGame()->setComputerMoveSpeed(100);
             }
         }
     }

@@ -195,7 +195,6 @@ void GameState::updateCache()
             if (mGrid.get(r, c) != BlockType_Nil)
             {
                 mFirstOccupiedRow = r;
-                LogInfo(MakeString() << "mFirstOccupiedRow is now " << mFirstOccupiedRow);
                 return;
             }
         }
