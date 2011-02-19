@@ -59,7 +59,6 @@ public:
         {
             outSearchDepth = 8;
             outSearchWidth = 5;
-
             return CreatePoly<Evaluator, MakeTetrises>();
         }
         else if (firstRow >= 10)
@@ -93,7 +92,7 @@ public:
             {
                 player->simpleGame()->setAITweaker(&Model::Instance());
                 player->simpleGame()->setStartingLevel(4);
-                player->simpleGame()->setComputerMoveSpeed(20);
+                player->simpleGame()->setComputerMoveSpeed(50);
             }
         }
     }

@@ -153,7 +153,7 @@ void BlockMover::Impl::move()
     }
     else
     {
-        game.drop();
+        game.move(MoveDirection_Down);
     }
 }
 
