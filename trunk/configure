@@ -1,0 +1,11 @@
+#!/bin/sh
+CONFIG=Release
+CMAKE_DIR=Build/CMake/QtTetris
+mkdir -p $CMAKE_DIR
+cd $CMAKE_DIR
+TETRIS_BUILD_CONFIGURATION=$CONFIG cmake ../../../QtTetris
+
+echo
+echo "To build QtTetris:"
+echo "  cd $CMAKE_DIR"
+echo "  make VERBOSE=1"
