@@ -29,6 +29,8 @@ int Tetris_GetSquareHeight()
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+    a.setApplicationName("Piratris");
+    a.setApplicationVersion("0.0 alpha");
     Tetris::MainThread::Initializer scopedInit;
     MainWindow w;
     w.show();
