@@ -362,7 +362,7 @@ void AbstractWidget::paintCaption()
         captionColor = RGBColor(25, 200, 50);
     }
     fillRect(theCaptionRect, captionColor);
-    drawTextCentered(theCaptionRect, player()->playerName(), 14, RGBColor(0, 255, 255));
+    drawTextCentered(theCaptionRect, player()->teamName() + ": " + player()->playerName(), 14, RGBColor(0, 255, 255));
 }
 
 

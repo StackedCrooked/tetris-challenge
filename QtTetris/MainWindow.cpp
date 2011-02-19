@@ -86,11 +86,17 @@ public:
             }
         }
 
+        std::string teamName = "Team 1";
         for (PlayerTypes::size_type idx = 0; idx < inPlayerTypes.size(); ++idx)
         {
+            if (idx >= inPlayerTypes.size() / 2)
+            {
+                teamName = "Team 2";
+            }
+
             Player * player = mMultiplayerGame->join(
                 Create<Player>(inPlayerTypes[idx],
-                               TeamName(GetTeamName(inPlayerTypes[idx])),
+                               TeamName(teamName),
                                PlayerName(GetPlayerName(inPlayerTypes[idx])),
                                inRowCount,
                                inColCount));
@@ -105,53 +111,52 @@ public:
 
 private:
     Model() :
-        mPirates(),
-        mPiratesIndex(0),
-        mMarines(),
-        mMarinesIndex(0),
+        mNames(),
+        mNamesIndex(0),
+        mHumanName(),
         mCPUCount(Poco::Environment::processorCount())
     {
-        mPirates.push_back("Luffy");
-        mPirates.push_back("Zoro");
-        mPirates.push_back("Nami");
-        mPirates.push_back("Sanji");
-        mPirates.push_back("Vivi");
-
-        mMarines.push_back("Smoker");
-        mMarines.push_back("Tashigi");
-        mMarines.push_back("Coby");
-        mMarines.push_back("Jango");
+        mNames.push_back("Zoro");
+        mNames.push_back("Nami");
+        mNames.push_back("Sanji");
+        mNames.push_back("Vivi");
     }
 
-    static std::string GetTeamName(PlayerType inPlayerType)
+    std::string GetHumanPlayerName()
     {
-        if (inPlayerType == PlayerType_Human)
+        bool ok = false;
+        QString text = QInputDialog::getText(NULL,
+                                             "QtTetris",
+                                             "Player name:",
+                                             QLineEdit::Normal,
+                                             QString(),
+                                             &ok);
+        if (ok)
         {
-            return "Pirates";
+            return text.toUtf8().data();
         }
         else
         {
-            std::stringstream ss;
-            static int counter = 1;
-            ss << "Marines " << counter++;
-            return ss.str();
+            QMessageBox::information(NULL, "QtTetris", "Your name shall be: Luffy!", QMessageBox::Ok);
+            return "Luffy";
         }
     }
 
     std::string GetPlayerName(PlayerType inPlayerType)
     {
-        std::string result;
         if (inPlayerType == PlayerType_Human)
         {
-            result = mPirates[mPiratesIndex];
-            mPiratesIndex = (mPiratesIndex + 1) % mPirates.size();
+            if (mHumanName.empty())
+            {
+                mHumanName = GetHumanPlayerName();
+            }
+            return mHumanName;
         }
         else
         {
-            result = mMarines[mMarinesIndex];
-            mMarinesIndex = (mMarinesIndex + 1) % mMarines.size();
+            mNamesIndex = (mNamesIndex + 1) % mNames.size();
+            return mNames[mNamesIndex];
         }
-        return result;
     }
 
     Model(const Model &);
@@ -160,11 +165,10 @@ private:
     boost::scoped_ptr<Tetris::MultiplayerGame> mMultiplayerGame;
 
     typedef std::vector<std::string> Names;
-    Names mPirates;
-    Names::size_type mPiratesIndex;
+    Names mNames;
+    Names::size_type mNamesIndex;
 
-    Names mMarines;
-    Names::size_type mMarinesIndex;
+    std::string mHumanName;
 
     int mCPUCount;
 };
@@ -206,6 +210,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QAction * tbNewComputerVsComputerGame = toolBar->addAction("Computer vs Computer");
     connect(tbNewComputerVsComputerGame, SIGNAL(triggered()), this, SLOT(onNewComputerVsComputerGame()));
+
+//    QAction * tbNewHumanComputervsComputerComputerGame = toolBar->addAction("2v2");
+//    connect(tbNewHumanComputervsComputerComputerGame, SIGNAL(triggered()), this, SLOT(on2v2Game()));
 
 
     QWidget * theCentralWidget(new QWidget);
@@ -286,7 +293,7 @@ void MainWindow::onNewGame(const PlayerTypes & inPlayerTypes)
     }
 
     // Add the new tetris widgets to the layout
-    for (TetrisWidgets::size_type idx = mTetrisWidgetHolder->children().size(); idx < inPlayerTypes.size(); ++idx)
+    for (TetrisWidgets::size_type idx = mTetrisWidgetHolder->children().size(); idx < mTetrisWidgets.size(); ++idx)
     {
         mTetrisWidgetHolder->addWidget(mTetrisWidgets[idx], 0);
         mTetrisWidgets[idx]->show();
@@ -335,6 +342,18 @@ void MainWindow::onNewComputerVsComputerGame()
     playerTypes.push_back(PlayerType_Computer);
     playerTypes.push_back(PlayerType_Computer);
     onNewGame(playerTypes);
+}
+
+
+void MainWindow::on2v2Game()
+{
+    PlayerTypes playerTypes;
+    playerTypes.push_back(PlayerType_Human);
+    playerTypes.push_back(PlayerType_Computer);
+    playerTypes.push_back(PlayerType_Computer);
+    playerTypes.push_back(PlayerType_Computer);
+    onNewGame(playerTypes);
+
 }
 
 
