@@ -138,7 +138,7 @@ template<class Variable>
 class ScopedReaderAndWriter
 {
 public:
-    ScopedReaderAndWriter(ThreadSafe<Variable> inProtectedVariable) :
+    ScopedReaderAndWriter(ThreadSafe<Variable> & inProtectedVariable) :
         mSharedLock(inProtectedVariable.mVariableWithMutex->mMutex),
         mUpgradeLock(mSharedLock),
         mVariable(inProtectedVariable.mVariableWithMutex->mVariable)

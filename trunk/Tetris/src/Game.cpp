@@ -721,26 +721,30 @@ bool ComputerGame::move(MoveDirection inDirection)
     // We can't move the block down any further => we hit the bottom => commit the block
     //
 
-    // First check if we already have a matching precalculated block.
+    // Hitting the bottom isn't always a good thing. Especially if you fall in a place
+    // you didn't plan for. Here we check if the location we're falling to is the location
+    // we planned.
     if (!mCurrentNode->children().empty())
     {
         const GameStateNode & precalculatedChild = **mCurrentNode->children().begin();
         const Block & nextBlock = precalculatedChild.gameState().originalBlock();
-        Assert(nextBlock.type() == block.type());
+
         if (block.column() == nextBlock.column() &&
-                block.rotation() == nextBlock.rotation())
+            nextBlock.identification() == block.identification())
         {
+            // We don't actually commit the block. Instead we swap the current gamestate with
+            // the next precalculated one.
             return navigateNodeDown();
+        }
+        else
+        {
+            // All our work is for naught. We calculated several moves ahead, but due to
+            // unfortunate circumstances one block didn't fall right. This invalidates all
+            // blocks after that.
+            mCurrentNode->clearChildren();
         }
     }
 
-    // We don't have a matching precalculating block.
-    // => Erase any existing children (should not happen)
-    if (!mCurrentNode->children().empty())
-    {
-        LogWarning("Existing children when commiting a block. They will be deleted.");
-        mCurrentNode->clearChildren();
-    }
 
     // Actually commit the block
     NodePtr child(new GameStateNode(mCurrentNode,

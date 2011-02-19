@@ -2,6 +2,8 @@
 #include "Tetris/BlockFactory.h"
 #include "Tetris/BlockType.h"
 #include "Tetris/BlockTypes.h"
+#include "Poco/Timestamp.h"
+#include <boost/noncopyable.hpp>
 #include <algorithm>
 #include <ctime>
 
@@ -19,67 +21,92 @@ AbstractBlockFactory::~AbstractBlockFactory()
 }
 
 
-class BlockFactoryImpl
+class RandomSeed
 {
 public:
-    BlockFactoryImpl(int inBagSize);
+    typedef unsigned seed_t;
+    static const seed_t cMaxSeed = 1000000; // I don't need that many
 
-    BlockType getNext() const;
+    RandomSeed() :
+        mSeed(0)
+    {
+        Poco::Timestamp ts;
+        Poco::Timestamp::TimeVal max(cMaxSeed);
+        mSeed = static_cast<seed_t>(ts.epochMicroseconds() % max);
+    }
+
+    seed_t get()
+    {
+        mSeed = (mSeed + 1) % cMaxSeed;
+        return mSeed;
+    }
+
+    static seed_t GetRandomSeed()
+    {
+        static boost::mutex fMutex;
+        boost::mutex::scoped_lock lock(fMutex);
+        static RandomSeed fRandomSeed;
+        return fRandomSeed.get();
+    }
 
 private:
-    size_t mBagSize;
-    mutable size_t mCurrentIndex;
-    mutable BlockTypes mBag;
+    seed_t mSeed;
 };
 
 
-BlockFactoryImpl::BlockFactoryImpl(int inBagSize) :
-    mBagSize(inBagSize),
-    mCurrentIndex(0)
+struct BlockFactory::Impl : boost::noncopyable
 {
-    // Pick a new seed.
-    srand(static_cast<unsigned int>(time(NULL)));
-
-    size_t totalSize = mBagSize * cBlockTypeCount;
-    mBag.reserve(totalSize);
-    for (size_t idx = 0; idx != totalSize; ++idx)
+    Impl(int inBagSize) :
+        mBagSize(inBagSize),
+        mCurrentIndex(0)
     {
-        BlockType blockType = static_cast<BlockType>(1 + (idx % cBlockTypeCount));
-        mBag.push_back(blockType);
     }
-    std::random_shuffle(mBag.begin(), mBag.end());
-}
 
-
-BlockType BlockFactoryImpl::getNext() const
-{
-    if (mCurrentIndex >= mBag.size())
+    ~Impl()
     {
-        // Reshuffle the bag.
-        std::random_shuffle(mBag.begin(), mBag.end());
-        mCurrentIndex = 0;
     }
-    return mBag[mCurrentIndex++];
-}
+
+    BlockTypes::size_type mBagSize;
+    size_t mCurrentIndex;
+    BlockTypes mBag;
+};
 
 
 BlockFactory::BlockFactory(int inBagSize) :
     AbstractBlockFactory(),
-    mImpl(new BlockFactoryImpl(inBagSize))
+    mThreadSafeImpl(new Impl(inBagSize))
 {
+    ScopedReaderAndWriter<Impl> rwImpl(mThreadSafeImpl);
+    Impl * mImpl(rwImpl.get());
+    srand(RandomSeed::GetRandomSeed());
+
+    size_t totalSize = mImpl->mBagSize * cBlockTypeCount;
+    mImpl->mBag.reserve(totalSize);
+    for (size_t idx = 0; idx != totalSize; ++idx)
+    {
+        BlockType blockType = static_cast<BlockType>(1 + (idx % cBlockTypeCount));
+        mImpl->mBag.push_back(blockType);
+    }
+    std::random_shuffle(mImpl->mBag.begin(), mImpl->mBag.end());
 }
 
 
 BlockFactory::~BlockFactory()
 {
-    delete mImpl;
-    mImpl = 0;
 }
 
 
 BlockType BlockFactory::getNext() const
 {
-    return mImpl->getNext();
+    ScopedReaderAndWriter<Impl> rwImpl(mThreadSafeImpl);
+    Impl * mImpl(rwImpl.get());
+    if (mImpl->mCurrentIndex >= mImpl->mBag.size())
+    {
+        // Reshuffle the bag.
+        std::random_shuffle(mImpl->mBag.begin(), mImpl->mBag.end());
+        mImpl->mCurrentIndex = 0;
+    }
+    return mImpl->mBag[mImpl->mCurrentIndex++];
 }
 
 

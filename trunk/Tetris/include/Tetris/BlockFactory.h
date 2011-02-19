@@ -2,6 +2,8 @@
 #define TETRIS_BLOCKFACTORY_H_INCLUDED
 
 
+#include "Tetris/BlockTypes.h"
+#include "Tetris/Threading.h"
 #include <memory>
 
 
@@ -9,8 +11,6 @@ namespace Tetris {
 
 
 class Block;
-class BlockFactoryImpl;
-typedef char BlockType;
 
 
 class AbstractBlockFactory
@@ -45,7 +45,8 @@ private:
     BlockFactory(const BlockFactory &);
     BlockFactory& operator=(const BlockFactory&);
 
-    BlockFactoryImpl * mImpl;
+    struct Impl;
+    mutable ThreadSafe<Impl> mThreadSafeImpl;
 };
 
 
