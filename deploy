@@ -13,6 +13,6 @@ mkdir -p $CMAKE_DIR
 cd $CMAKE_DIR
 cmake ../../../QtTetris
 
-echo "\nTo build QtTetris:"
-echo "  cd $CMAKE_DIR"
-echo "  make VERBOSE=1"
+cd Build/CMake/QtTetris
+make VERBOSE=1 -w -j8
+
