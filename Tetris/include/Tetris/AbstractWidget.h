@@ -118,6 +118,8 @@ public:
 
     virtual Rect statsRect() const;
 
+    virtual Rect avatarRect() const;
+
     virtual Rect futureBlocksRect() const;
 
 protected:
