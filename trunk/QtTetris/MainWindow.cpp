@@ -147,7 +147,7 @@ private:
                                              QLineEdit::Normal,
                                              QString(),
                                              &ok);
-        if (ok)
+        if (ok && !text.isEmpty())
         {
             return text.toUtf8().data();
         }
