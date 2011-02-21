@@ -1,5 +1,9 @@
 Todo
 ----
+- Startup screen
+- Gameover screen
+- Associate computer names with strategies.
+- Use computer avatars
 - Online highscores
 - Animate falling blocks to reduce jitter?
 - Add a toolbar

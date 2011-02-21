@@ -58,7 +58,7 @@ AbstractWidget::AbstractWidget(int inSquareWidth, int inSquareHeight) :
     mSquareWidth(inSquareWidth),
     mSquareHeight(inSquareHeight),
     mStatItemHeight(45),
-    mCaptionRectHeight(40),
+    mCaptionRectHeight(4 * inSquareHeight),
     mSpacing(5),
     mMargin(2),
     mPaintActiveBlockShadow(false),
@@ -223,7 +223,7 @@ Rect AbstractWidget::captionRect() const
 {
     int x = margin();
     int y = margin();
-    int width = getMinSize().width() - 2 * margin();
+    int width = simpleGame()->gameGrid().columnCount() * squareWidth();
     int height = mCaptionRectHeight;
     return Rect(x, y, width, height);
 }
@@ -231,11 +231,22 @@ Rect AbstractWidget::captionRect() const
 
 Rect AbstractWidget::gameRect() const
 {
-    // This rect is relative to the Widget rect.
-    return Rect(margin(),
-                margin() + mCaptionRectHeight + margin(),
-                simpleGame()->gameGrid().columnCount() * squareWidth(),
-                simpleGame()->gameGrid().rowCount() * squareHeight());
+    int x = margin();
+    int y = margin() + mCaptionRectHeight + margin();
+    int w = simpleGame()->gameGrid().columnCount() * squareWidth();
+    int h = simpleGame()->gameGrid().rowCount() * squareHeight();
+    return Rect(x, y, w, h);
+}
+
+
+Rect AbstractWidget::avatarRect() const
+{
+    Rect theCaptionRect = captionRect();
+    int x = theCaptionRect.right() + margin();
+    int y = theCaptionRect.top();
+    int width = mCaptionRectHeight;
+    int height = mCaptionRectHeight;
+    return Rect(x, y, width, height);
 }
 
 
@@ -248,28 +259,27 @@ Rect AbstractWidget::futureBlocksRect() const
     {
         totalHeight += (numFutureBlocks - 1) * squareHeight();
     }
-    Rect theGameRect = gameRect();
-    return Rect(theGameRect.right() + margin(),
-                theGameRect.top(),
-                4 * squareWidth(),
-                totalHeight);
+    Rect theAvatarRect = avatarRect();
+    int x = theAvatarRect.x();
+    int y = theAvatarRect.bottom() + margin();
+    int w = theAvatarRect.width();
+    int h = totalHeight;
+    return Rect(x, y, w, h);
 }
 
 
 Rect AbstractWidget::statsRect() const
 {
-    int requiredHeight = statsItemCount() * statsItemHeight();
+    Rect theFutureBlocksRect = futureBlocksRect();
+    int x = theFutureBlocksRect.x();
+    int y = theFutureBlocksRect.bottom() + margin();
+    int w = theFutureBlocksRect.width();
+    int h = statsItemCount() * statsItemHeight();
     if (statsItemCount() > 1)
     {
-        requiredHeight += (statsItemCount() - 1) * margin();
+        h += (statsItemCount() - 1) * margin();
     }
-
-    Rect theGameRect(gameRect());
-    Tetris::Rect theFutureBlocksRect = futureBlocksRect();
-
-    int x = theFutureBlocksRect.left();
-    int y = theGameRect.bottom() - requiredHeight;
-    return Tetris::Rect(x, y, theFutureBlocksRect.width(), requiredHeight);
+    return Rect(x, y, w, h);
 }
 
 
