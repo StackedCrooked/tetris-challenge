@@ -9,7 +9,6 @@
 #include "Tetris/Player.h"
 #include "Tetris/PlayerType.h"
 #include <boost/scoped_ptr.hpp>
-#include <boost/shared_ptr.hpp>
 
 
 class MainWindow : public QMainWindow

@@ -6,6 +6,7 @@
 #include "Tetris/Logger.h"
 #include "Tetris/Logging.h"
 #include "Tetris/MakeString.h"
+#include "Tetris/Utilities.h"
 #include "Poco/Environment.h"
 #include <QLayout>
 #include <QLabel>
@@ -21,7 +22,7 @@ int Tetris_GetSquareWidth();
 int Tetris_GetSquareHeight();
 
 
-typedef boost::shared_ptr<Tetris::SimpleGame> SimpleGamePtr;
+typedef Tetris::shared_ptr<Tetris::SimpleGame> SimpleGamePtr;
 
 
 using namespace Tetris;
@@ -121,6 +122,7 @@ public:
                 player->simpleGame()->setStartingLevel(allComputer ? 6 : 0);
                 player->simpleGame()->setComputerMoveSpeed(allComputer ? 40 : 20);
             }
+            player->simpleGame()->setPaused(true);
         }
     }
 
@@ -140,22 +142,23 @@ private:
 
     std::string GetHumanPlayerName()
     {
-        bool ok = false;
-        QString text = QInputDialog::getText(NULL,
-                                             "QtTetris",
-                                             "Player name:",
-                                             QLineEdit::Normal,
-                                             QString(),
-                                             &ok);
-        if (ok && !text.isEmpty())
-        {
-            return text.toUtf8().data();
-        }
-        else
-        {
-            QMessageBox::information(NULL, "QtTetris", "Your name shall be: Luffy!", QMessageBox::Ok);
-            return "Luffy";
-        }
+        return "Luffy";
+//        bool ok = false;
+//        QString text = QInputDialog::getText(NULL,
+//                                             "QtTetris",
+//                                             "Player name:",
+//                                             QLineEdit::Normal,
+//                                             QString(),
+//                                             &ok);
+//        if (ok && !text.isEmpty())
+//        {
+//            return text.toUtf8().data();
+//        }
+//        else
+//        {
+//            QMessageBox::information(NULL, "QtTetris", "Your name shall be: Luffy!", QMessageBox::Ok);
+//            return "Luffy";
+//        }
     }
 
     std::string GetPlayerName(PlayerType inPlayerType)
