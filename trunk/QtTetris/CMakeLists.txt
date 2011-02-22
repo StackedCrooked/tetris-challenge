@@ -151,6 +151,7 @@ add_custom_command(TARGET ${EXECUTABLE}
                    POST_BUILD
                    COMMAND /bin/rm ARGS -f ${BUILD_ROOT}LastBuild
                    COMMAND /bin/ln ARGS -s ${OUTDIR} ${BUILD_ROOT}LastBuild
+                   COMMAND /bin/cp ARGS "${SOLUTIONDIR}Tetris/res/avatar/*.gif" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
                    WORKING_DIRECTORY    ${BUILD_ROOT})
 
 
