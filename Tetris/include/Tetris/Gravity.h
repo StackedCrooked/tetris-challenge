@@ -2,45 +2,42 @@
 #define TETRIS_GRAVITY_H_INCLUDED
 
 
-#include "Tetris/Utilities.h"
-#include <memory>
-#include <boost/function.hpp>
+#include "Tetris/Threading.h"
 
 
-namespace Tetris
+namespace Tetris {
+
+
+class Game;
+class Gravity;
+
+
+/**
+ * Gravity
+ *
+ * Adds gravity to the game causing the blocks to fall down.
+ * The speed at which they fall depends on the game level.
+ */
+class Gravity
 {
+public:
+    Gravity(const ThreadSafe<Game> & inGame);
 
-    template<class Variable> class ThreadSafe;
-    class Game;
-    class Gravity;
-    class GravityImpl;
-    typedef boost::function<void(Gravity*)> GravityCallback;
+    ~Gravity();
 
+    // Number of rows per second
+    double speed() const;
 
-    /**
-     * Gravity
-     *
-     * Adds gravity to the game causing the blocks to fall down.
-     * The speed at which they fall depends on the game level.
-     */
-    class Gravity
-    {
-    public:
-        Gravity(const ThreadSafe<Game> & inGame);
+    static double CalculateSpeed(int inLevel);
 
-        ~Gravity();
+private:
+    Gravity(const Gravity &);
+    Gravity & operator=(const Gravity &);
 
-        // Number of rows per second
-        double speed() const;
+    struct Impl;
+    Impl * mImpl;
+};
 
-        static double CalculateSpeed(int inLevel);
-
-    private:
-        Gravity(const Gravity &);
-        Gravity & operator=(const Gravity &);
-
-        GravityImpl * mImpl;
-    };
 
 } // namespace Tetris
 
