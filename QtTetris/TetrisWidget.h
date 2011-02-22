@@ -39,6 +39,7 @@ protected:
     virtual void drawTextCentered(const Tetris::Rect & inRect, const std::string & inText, int inFontSize, const Tetris::RGBColor & inColor);
     virtual void paintSquare(const Tetris::Rect & inRect, const Tetris::RGBColor & inColor);
     virtual void paintStatItem(const Tetris::Rect & inRect, const std::string & inName, const std::string & inValue);
+    virtual void paintImage(const Tetris::Rect & inRect, const std::string & inFileName);
 
 private:
     virtual void paintEvent(QPaintEvent * event);
@@ -51,6 +52,9 @@ private:
 
     typedef std::set<TetrisWidget*> Instances;
     static Instances sInstances;
+
+    boost::scoped_ptr<QImage> mImage;
+    std::string mImageFileName;
 };
 
 

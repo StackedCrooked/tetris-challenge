@@ -286,7 +286,7 @@ Rect AbstractWidget::statsRect() const
 void AbstractWidget::coordinateRepaint(const SimpleGame & inGame)
 {
     Tetris::Size minSize = getMinSize();
-    fillRect(Rect(0, 0, minSize.width(), minSize.height()), RGBColor(100, 0, 100));
+    fillRect(Rect(0, 0, minSize.width(), minSize.height()), RGBColor(0, 0, 0));
 
     // Paint the caption
     paintCaption();
@@ -318,6 +318,8 @@ void AbstractWidget::coordinateRepaint(const SimpleGame & inGame)
     {
         paintActiveBlockShadow(inGame);
     }
+
+    paintAvatar(inGame);
 
     recalculateFPS();
 }
@@ -381,6 +383,13 @@ void AbstractWidget::paintGameGrid(const Grid & inGrid)
     Rect theGameRect = gameRect();
     fillRect(theGameRect, RGBColor(255, 255, 255));
     paintGrid(theGameRect.x(), theGameRect.y(), inGrid);
+}
+
+
+void AbstractWidget::paintAvatar(const SimpleGame & inSimpleGame)
+{
+    Rect theAvatarRect = avatarRect();
+    paintImage(theAvatarRect, player()->playerName() + "_80.gif");
 }
 
 

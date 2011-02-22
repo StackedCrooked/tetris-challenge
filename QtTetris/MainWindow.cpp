@@ -6,6 +6,7 @@
 #include "Tetris/Logger.h"
 #include "Tetris/Logging.h"
 #include "Tetris/MakeString.h"
+#include "Poco/Path.h"
 #include "Tetris/Utilities.h"
 #include "Poco/Environment.h"
 #include <QLayout>
@@ -134,10 +135,11 @@ private:
         mCPUCount(Poco::Environment::processorCount()),
         mGameOver(false)
     {
+        mNames.push_back("Luffy");
         mNames.push_back("Zoro");
         mNames.push_back("Nami");
         mNames.push_back("Sanji");
-        mNames.push_back("Vivi");
+        mNames.push_back("Chopper");
     }
 
     std::string GetHumanPlayerName()
@@ -253,7 +255,7 @@ MainWindow::MainWindow(QWidget *parent) :
     mTetrisWidgets(),
     mSpacing(12),
     mLogField(0),
-    mShowLog(false),
+    mShowLog(true),
     mGameOver(false)
 {
     sInstance = this;
@@ -308,6 +310,7 @@ MainWindow::MainWindow(QWidget *parent) :
         mLogField->setReadOnly(true);
         vbox->addWidget(mLogField, 1);
         Logger::Instance().setLogHandler(boost::bind(&MainWindow::logMessage, this, _1));
+        LogInfo(Poco::Path::current());
     }
 
     setCentralWidget(theCentralWidget);

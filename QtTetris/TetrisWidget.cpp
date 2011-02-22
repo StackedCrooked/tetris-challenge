@@ -193,6 +193,24 @@ void TetrisWidget::paintStatItem(const Tetris::Rect & inRect, const std::string 
 }
 
 
+void TetrisWidget::paintImage(const Tetris::Rect & inRect, const std::string & inFileName)
+{
+    if (!mImage || mImageFileName != inFileName)
+    {
+        mImageFileName = inFileName;
+        mImage.reset(new QImage(inFileName.c_str()));
+    }
+
+    if (!mImage->isNull())
+    {
+        QPainter & painter(*mPainter);
+        QRectF rectF(inRect.left(), inRect.top(), inRect.width(), inRect.height());
+        painter.fillRect(rectF, QColor(255, 255, 255));
+        painter.drawImage(rectF, *mImage);
+    }
+}
+
+
 void TetrisWidget::drawLine(int x1, int y1, int x2, int y2, int inPenWidth, const RGBColor & inColor)
 {
     if (!mPainter.get())
