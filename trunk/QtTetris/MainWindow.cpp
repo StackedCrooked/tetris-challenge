@@ -1,6 +1,7 @@
 #include "MainWindow.h"
 #include "Tetris/Assert.h"
 #include "Tetris/AutoPtrSupport.h"
+#include "Tetris/BlockMover.h"
 #include "Tetris/ComputerPlayer.h"
 #include "Tetris/Game.h"
 #include "Tetris/Logger.h"
@@ -69,20 +70,34 @@ public:
     virtual std::auto_ptr<Evaluator> updateAIParameters(const GameState & inGameState,
                                                         int & outSearchDepth,
                                                         int & outSearchWidth,
-                                                        int & outWorkerCount)
+                                                        int & outWorkerCount,
+                                                        int & /*outMoveSpeed*/,
+                                                        BlockMover::MoveDownBehavior & outMoveDownBehavior)
     {
         outWorkerCount = std::max<int>(1, mCPUCount / 2);
         int firstRow = inGameState.firstOccupiedRow();
-        if (firstRow > 10)
+        int height = inGameState.grid().rowCount() - firstRow;
+
+        // Tactics adjustment
+        if (height <= 8)
         {
-            outSearchDepth = 8;
+            outSearchDepth = 10;
             outSearchWidth = 5;
+            outMoveDownBehavior = BlockMover::MoveDownBehavior_Drop;
             return CreatePoly<Evaluator, MakeTetrises>();
+        }
+        else if (height <= 12)
+        {
+            outSearchDepth = 6;
+            outSearchWidth = 5;
+            outMoveDownBehavior = BlockMover::MoveDownBehavior_Drop;
+            return CreatePoly<Evaluator, Balanced>();
         }
         else
         {
-            outSearchDepth = 4;
-            outSearchWidth = 4;
+            outSearchDepth = 6;
+            outSearchWidth = 5;
+            outMoveDownBehavior = BlockMover::MoveDownBehavior_Drop;
             return CreatePoly<Evaluator, Survival>();
         }
     }
@@ -123,7 +138,7 @@ public:
                 player->simpleGame()->setStartingLevel(allComputer ? 6 : 0);
                 player->simpleGame()->setComputerMoveSpeed(allComputer ? 40 : 20);
             }
-            player->simpleGame()->setPaused(true);
+            //player->simpleGame()->setPaused(true);
         }
     }
 
@@ -140,6 +155,8 @@ private:
         mNames.push_back("Nami");
         mNames.push_back("Sanji");
         mNames.push_back("Chopper");
+        srand(time(0));
+        std::random_shuffle(mNames.begin(), mNames.end());
     }
 
     std::string GetHumanPlayerName()

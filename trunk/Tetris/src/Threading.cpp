@@ -7,7 +7,7 @@ namespace Tetris {
 
 
 InstanceTracker::ThreadedInstances InstanceTracker::sInstances;
-const int cMaximumLockDurationMs(32);
+const int cMaximumLockDurationMs(16);
 
 
 class StopwatchImpl

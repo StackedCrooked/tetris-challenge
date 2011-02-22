@@ -34,7 +34,8 @@ extern const int cMaxLevel = sizeof(sIntervals)/sizeof(int) - 1;
 struct Gravity::Impl : boost::noncopyable
 {
     Impl(ThreadSafe<Game> inThreadSafeGame) :
-        mThreadSafeGame(inThreadSafeGame)
+        mThreadSafeGame(inThreadSafeGame),
+        mLevel(0)
     {
     }
 

@@ -10,6 +10,7 @@
 #include "Tetris/MakeString.h"
 #include "Tetris/Threading.h"
 #include "Tetris/Assert.h"
+#include "Poco/AtomicCounter.h"
 #include "Poco/Stopwatch.h"
 #include "Poco/Timer.h"
 #include <boost/bind.hpp>
@@ -24,7 +25,10 @@ struct BlockMover::Impl
         mGame(inGame),
         mTimer(),
         mStopwatch(),
-        mNumMovesPerSecond(1)
+        mNumMovesPerSecond(1),
+        mMoveCount(0),
+        mActualSpeed(0),
+        mMoveDownBehavior(MoveDownBehavior_Move)
     {
     }
 
@@ -48,6 +52,9 @@ struct BlockMover::Impl
     boost::scoped_ptr<Poco::Timer> mTimer;
     Poco::Stopwatch mStopwatch;
     int mNumMovesPerSecond;
+    Poco::AtomicCounter mMoveCount;
+    int mActualSpeed;
+    MoveDownBehavior mMoveDownBehavior;
 };
 
 
@@ -68,24 +75,51 @@ BlockMover::~BlockMover()
 }
 
 
+void BlockMover::setSpeed(int inNumMovesPerSecond)
+{
+    if (inNumMovesPerSecond <= 0)
+    {
+        throw std::invalid_argument("Number of moves per second must be different from 0.");
+    }
+    if (inNumMovesPerSecond > 1000)
+    {
+        throw std::runtime_error(MakeString() << "Max move speed exceeded: " << inNumMovesPerSecond << "/1000");
+    }
+
+    mImpl->mNumMovesPerSecond = inNumMovesPerSecond;
+    if (mImpl->mNumMovesPerSecond < 1)
+    {
+        mImpl->mNumMovesPerSecond = 1;
+    }
+    if (mImpl->mTimer)
+    {
+        mImpl->mTimer->setPeriodicInterval(mImpl->periodicInterval());
+    }
+}
+
+
 int BlockMover::speed() const
 {
     return mImpl->mNumMovesPerSecond;
 }
 
 
-void BlockMover::setSpeed(int inNumMovesPerSecond)
-{
-    if (inNumMovesPerSecond == 0)
-    {
-        throw std::invalid_argument("Number of moves per second must be different from 0.");
-    }
 
-    mImpl->mNumMovesPerSecond = inNumMovesPerSecond;
-    if (mImpl->mTimer)
-    {
-        mImpl->mTimer->setPeriodicInterval(mImpl->periodicInterval());
-    }
+int BlockMover::actualSpeed() const
+{
+    return mImpl->mActualSpeed;
+}
+
+
+void BlockMover::setMoveDownBehavior(MoveDownBehavior inMoveDownBehavior)
+{
+    mImpl->mMoveDownBehavior = inMoveDownBehavior;
+}
+
+
+BlockMover::MoveDownBehavior BlockMover::moveDownBehavior() const
+{
+    return mImpl->mMoveDownBehavior;
 }
 
 
@@ -94,6 +128,15 @@ void BlockMover::Impl::onTimer(Poco::Timer &)
     try
     {
         move();
+        ++mMoveCount;
+
+        static const Poco::UInt64 cOneSecond = 1000 * 1000;
+        if (mStopwatch.elapsed() >= 4 * cOneSecond)
+        {
+            mActualSpeed = mMoveCount / 4;
+            mMoveCount = 0;
+            mStopwatch.restart();
+        }
     }
     catch (const std::exception & inException)
     {
@@ -104,6 +147,7 @@ void BlockMover::Impl::onTimer(Poco::Timer &)
 
 void BlockMover::Impl::move()
 {
+
     ScopedReaderAndWriter<Game> wGame(mGame);
     ComputerGame & game = dynamic_cast<ComputerGame&>(*wGame.get());
     if (game.isPaused())
@@ -151,9 +195,17 @@ void BlockMover::Impl::move()
             game.drop();
         }
     }
-    else
+    else if (mMoveDownBehavior == BlockMover::MoveDownBehavior_Move)
     {
         game.move(MoveDirection_Down);
+    }
+    else if (mMoveDownBehavior == BlockMover::MoveDownBehavior_Drop)
+    {
+        game.drop();
+    }
+    else
+    {
+        throw std::logic_error(MakeString() << "MoveDownBehavior: invalid enum value: " << mMoveDownBehavior);
     }
 }
 

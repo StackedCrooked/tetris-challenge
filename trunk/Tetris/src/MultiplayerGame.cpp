@@ -22,7 +22,6 @@ struct MultiplayerGame::Impl : public SimpleGame::EventHandler,
 
     virtual void onDestroy(SimpleGame * )
     {
-        LogInfo("MultiplayerGame::Impl::onDestroy");
     }
 
     Player & findPlayer(SimpleGame * inSimpleGame) const

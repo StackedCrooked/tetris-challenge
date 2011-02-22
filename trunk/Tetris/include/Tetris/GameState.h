@@ -49,6 +49,7 @@ public:
     int numTetrises() const { return mNumTetrises; }
     int score() const;
     int firstOccupiedRow() const { return mFirstOccupiedRow; }
+    int currentHeight() const { return mGrid.rowCount() - mFirstOccupiedRow; }
 
     void updateCache();
 
