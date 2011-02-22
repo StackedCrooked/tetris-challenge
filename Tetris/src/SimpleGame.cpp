@@ -188,7 +188,6 @@ ThreadSafe<Game> SimpleGame::game() const
 
 void SimpleGame::setPaused(bool inPaused)
 {
-    LogInfo(MakeString() << "SimpleGame::setPaused: " << inPaused);
     ScopedReaderAndWriter<Game> rwgame(mImpl->mGame);
     return rwgame->setPaused(inPaused);
 }

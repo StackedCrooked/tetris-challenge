@@ -8,6 +8,7 @@
 #include "Tetris/MultiplayerGame.h"
 #include "Tetris/Player.h"
 #include "Tetris/PlayerType.h"
+#include "Poco/Stopwatch.h"
 #include <boost/scoped_ptr.hpp>
 
 
@@ -54,6 +55,7 @@ private:
     QTextEdit * mLogField;
     bool mShowLog;
     bool mGameOver;
+    Poco::Stopwatch mStopwatch;
 };
 
 

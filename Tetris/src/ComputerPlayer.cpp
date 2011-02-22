@@ -3,7 +3,6 @@
 #include "Tetris/ComputerPlayer.h"
 #include "Tetris/NodeCalculator.h"
 #include "Tetris/AISupport.h"
-#include "Tetris/BlockMover.h"
 #include "Tetris/Gravity.h"
 #include "Tetris/Game.h"
 #include "Tetris/GameStateComparator.h"
@@ -51,7 +50,7 @@ public:
         mStop(false),
         mReset(false),
         mQuitFlag(false),
-        mTimer(15, 15)
+        mTimer(10, 10)
     {
     }
 
@@ -68,6 +67,8 @@ public:
     void timerEvent();
 
     int calculateRemainingTimeMs(const Game & inGame) const;
+
+    void updateComputerBlockMoveSpeed();
 
     void startNodeCalculator();
     void onStarted();
@@ -250,9 +251,68 @@ int ComputerPlayer::Impl::calculateRemainingTimeMs(const Game & inGame) const
 }
 
 
+void ComputerPlayer::Impl::updateComputerBlockMoveSpeed()
+{
+    // Consult the Tweaker for improved settings
+    if (mTweaker)
+    {
+        BlockMover::MoveDownBehavior moveDownBehavior = BlockMover::MoveDownBehavior_Null;
+        int moveSpeed = 0;
+        int currentHeight = 0;
+        int totalHeight = 0;
+
+        // Critical section
+        {
+            ScopedReader<Game> wgame(mProtectedGame);
+            const ComputerGame & game(dynamic_cast<const ComputerGame&>(*wgame.get()));
+
+            currentHeight = game.gameState().currentHeight();
+            totalHeight = game.rowCount();
+
+            mEvaluator.reset(
+                mTweaker->updateAIParameters(game.gameState(),
+                                             mSearchDepth,
+                                             mSearchWidth,
+                                             mWorkerCount,
+                                             moveSpeed,
+                                             moveDownBehavior).release());
+        }
+
+        if (mSearchDepth < 1 || mSearchDepth > 100)
+        {
+            throw std::runtime_error(MakeString() << "Invalid search depth: " << mSearchDepth);
+        }
+
+        if (mSearchWidth < 1 || mSearchWidth > 100)
+        {
+            throw std::runtime_error(MakeString() << "Invalid search width: " << mSearchWidth);
+        }
+
+        if (mWorkerCount < 1 || mWorkerCount > 32)
+        {
+            throw std::runtime_error(MakeString() << "Invalid worker count: " << mWorkerCount);
+        }
+
+        if (moveSpeed != 0)
+        {
+            if (moveSpeed < 0)
+            {
+                throw std::runtime_error(MakeString() << "Invalid move speed: " << moveSpeed);
+            }
+            mBlockMover->setSpeed(moveSpeed);
+        }
+
+        if (moveDownBehavior != BlockMover::MoveDownBehavior_Null)
+        {
+            mBlockMover->setMoveDownBehavior(moveDownBehavior);
+        }
+    }
+}
+
+
 void ComputerPlayer::Impl::timerEvent()
 {
-    // Already locked.
+    updateComputerBlockMoveSpeed();
 
     if (mReset)
     {
@@ -332,16 +392,6 @@ void ComputerPlayer::Impl::startNodeCalculator()
             return;
         }
 
-        // Consult the Tweaker for improved settings
-        if (mTweaker)
-        {
-            mEvaluator.reset(
-                mTweaker->updateAIParameters(game.gameState(),
-                                             mSearchDepth,
-                                             mSearchWidth,
-                                             mWorkerCount).release());
-        }
-
         // Clone the starting node
         // The end node becomes the new start node. It's like... a vantage point!
         endNode = game.endNode()->clone();
@@ -410,7 +460,8 @@ void ComputerPlayer::Impl::onWorking()
         return;
     }
 
-    if (game.numPrecalculatedMoves() == 0 && calculateRemainingTimeMs(game) < 1000)
+    //if (game.numPrecalculatedMoves() == 0 && calculateRemainingTimeMs(game) < 1000)
+    if (game.numPrecalculatedMoves() == 0)
     {
         mStop = true;
         return;
@@ -438,6 +489,7 @@ void ComputerPlayer::Impl::onFinished()
 
     ScopedReaderAndWriter<Game> wgame(mProtectedGame);
     ComputerGame & game(dynamic_cast<ComputerGame&>(*wgame.get()));
+
 
     // Check for sync problems.
     if (resultNode->depth() != game.endNode()->depth() + 1)

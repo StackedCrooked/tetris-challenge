@@ -35,6 +35,19 @@ public:
 
     int speed() const;
 
+    int actualSpeed() const;
+
+    enum MoveDownBehavior
+    {
+        MoveDownBehavior_Null,
+        MoveDownBehavior_Move,
+        MoveDownBehavior_Drop
+    };
+
+    void setMoveDownBehavior(MoveDownBehavior inMoveDownBehavior);
+
+    MoveDownBehavior moveDownBehavior() const;
+
 private:
     BlockMover(const BlockMover &);
     BlockMover & operator=(const BlockMover&);

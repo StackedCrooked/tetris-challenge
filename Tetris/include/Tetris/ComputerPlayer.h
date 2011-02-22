@@ -3,6 +3,7 @@
 
 
 #include "Tetris/AutoPtrSupport.h"
+#include "Tetris/BlockMover.h"
 #include "Tetris/Evaluator.h"
 #include "Tetris/Threading.h"
 
@@ -29,7 +30,9 @@ public:
         virtual std::auto_ptr<Evaluator> updateAIParameters(const GameState & inGameState,
                                                             int & outSearchDepth,
                                                             int & outSearchWidth,
-                                                            int & outWorkerCount) = 0;
+                                                            int & outWorkerCount,
+                                                            int & outMoveSpeed,
+                                                            BlockMover::MoveDownBehavior & outMoveDownBehavior) = 0;
     };
 
     ComputerPlayer(const std::string & inName,
