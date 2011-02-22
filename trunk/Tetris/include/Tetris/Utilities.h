@@ -54,6 +54,26 @@ public:
         return *this;
     }
 
+    bool operator==(const shared_ptr & rhs)
+    {
+        return mImpl == rhs.mImpl;
+    }
+
+    operator bool() const
+    {
+        return mImpl != 0;
+    }
+
+    T * get()
+    {
+        return mImpl->mValue;
+    }
+
+    const T * get() const
+    {
+        return mImpl->mValue;
+    }
+
     void reset()
     {
         unref();
