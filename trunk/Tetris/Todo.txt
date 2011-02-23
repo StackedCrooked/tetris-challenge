@@ -1,5 +1,6 @@
 Todo
 ----
+- Implement the regular tetris game with single player and multiplayer modes. This is already cool.
 - Cleanup application code
 - Game concept: allow a player to configure his ally computer using a point system like in D&D
 - Startup screen
