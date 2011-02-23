@@ -58,7 +58,7 @@ AbstractWidget::AbstractWidget(int inSquareWidth, int inSquareHeight) :
     mSquareWidth(inSquareWidth),
     mSquareHeight(inSquareHeight),
     mStatItemHeight(45),
-    mCaptionRectHeight(4 * inSquareHeight),
+    mAvatarWidth(80),
     mSpacing(5),
     mMargin(2),
     mPaintActiveBlockShadow(false),
@@ -127,7 +127,7 @@ void AbstractWidget::setPlayer(Player * inPlayer)
     if (mPlayer && SimpleGame::Exists(mPlayer->simpleGame()))
     {
         setMinSize(Size(2 * margin() + futureBlocksRect().right() - gameRect().left(),
-                        2 * margin() + gameRect().bottom() - captionRect().top()));
+                        2 * margin() + avatarRect().bottom() - gameRect().top()));
 
         SimpleGame::RegisterEventHandler(mPlayer->simpleGame(), this);
     }
@@ -218,36 +218,26 @@ const RGBColor & AbstractWidget::getColor(BlockType inBlockType) const
     return fColors[static_cast<int>(inBlockType)];
 }
 
-
-Rect AbstractWidget::captionRect() const
-{
-    int x = margin();
-    int y = margin();
-    int width = simpleGame()->gameGrid().columnCount() * squareWidth();
-    int height = mCaptionRectHeight;
-    return Rect(x, y, width, height);
-}
-
-
 Rect AbstractWidget::gameRect() const
 {
     int x = margin();
-    int y = margin() + mCaptionRectHeight + margin();
+    int y = margin();
     int w = simpleGame()->gameGrid().columnCount() * squareWidth();
     int h = simpleGame()->gameGrid().rowCount() * squareHeight();
     return Rect(x, y, w, h);
 }
 
 
-Rect AbstractWidget::avatarRect() const
+Rect AbstractWidget::userInfoRect() const
 {
-    Rect theCaptionRect = captionRect();
-    int x = theCaptionRect.right() + margin();
-    int y = theCaptionRect.top();
-    int width = mCaptionRectHeight;
-    int height = mCaptionRectHeight;
+    Rect theGameRect = gameRect();
+    int x = margin();
+    int y = theGameRect.bottom() + margin();
+    int width = theGameRect.width();
+    int height = avatarRect().bottom() - y;
     return Rect(x, y, width, height);
 }
+
 
 
 Rect AbstractWidget::futureBlocksRect() const
@@ -259,10 +249,10 @@ Rect AbstractWidget::futureBlocksRect() const
     {
         totalHeight += (numFutureBlocks - 1) * squareHeight();
     }
-    Rect theAvatarRect = avatarRect();
-    int x = theAvatarRect.x();
-    int y = theAvatarRect.bottom() + margin();
-    int w = theAvatarRect.width();
+    Rect theGameRect = gameRect();
+    int x = theGameRect.right() + margin();
+    int y = theGameRect.top();
+    int w = mAvatarWidth;
     int h = totalHeight;
     return Rect(x, y, w, h);
 }
@@ -283,13 +273,22 @@ Rect AbstractWidget::statsRect() const
 }
 
 
+Rect AbstractWidget::avatarRect() const
+{
+    Rect theStatsRect = statsRect();
+    int x = theStatsRect.x();
+    int y = theStatsRect.bottom() + margin();
+    int width = mAvatarWidth;
+    int height = mAvatarWidth;
+    return Rect(x, y, width, height);
+}
+
+
 void AbstractWidget::coordinateRepaint(const SimpleGame & inGame)
 {
     Tetris::Size minSize = getMinSize();
-    fillRect(Rect(0, 0, minSize.width(), minSize.height()), RGBColor(0, 0, 0));
+    fillRect(Rect(0, 0, minSize.width(), minSize.height()), RGBColor(0, 50, 100));
 
-    // Paint the caption
-    paintCaption();
 
     // Paint the game
     paintGameGrid(inGame.gameGrid());
@@ -320,6 +319,8 @@ void AbstractWidget::coordinateRepaint(const SimpleGame & inGame)
     }
 
     paintAvatar(inGame);
+
+    paintUserInfo();
 
     recalculateFPS();
 }
@@ -365,16 +366,11 @@ void AbstractWidget::paintGrid(int x, int y, const Grid & inGrid, const RGBColor
 }
 
 
-void AbstractWidget::paintCaption()
+void AbstractWidget::paintUserInfo()
 {
-    Rect theCaptionRect = captionRect();
-    RGBColor captionColor(100, 150, 255);
-    if (player()->simpleGame()->playerType() == PlayerType_Human)
-    {
-        captionColor = RGBColor(25, 200, 50);
-    }
-    fillRect(theCaptionRect, captionColor);
-    drawTextCentered(theCaptionRect, player()->teamName() + ": " + player()->playerName(), 14, RGBColor(0, 255, 255));
+    Rect theuserInfoRect = userInfoRect();
+    fillRect(theuserInfoRect, RGBColor(255, 255, 255));
+    drawTextRightAligned(theuserInfoRect, player()->teamName() + ": " + player()->playerName(), 14, RGBColor(0, 255, 255));
 }
 
 

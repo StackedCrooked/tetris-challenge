@@ -1,20 +1,16 @@
 Todo
 ----
-- Implement the regular tetris game with single player and multiplayer modes. This is already cool.
+-> Implement the regular tetris game with single player and multiplayer modes. This is already cool.
 - Cleanup application code
-- Game concept: allow a player to configure his ally computer using a point system like in D&D
 - Startup screen
 - Gameover screen
-- Associate computer names with strategies.
-- Use computer avatars
+- Local highscores
 - Online highscores
-- Add a toolbar
-- Release a simple Qt game: single player, player vs computer, computer vs computer.
+- Associate computer names with strategies.
+- Pretty background image
 - Use a single shared timer.
-- Teams
-- Online multiplayer
-- Qt Playable game
-- Multiplayer
+v Add a toolbar
+v Use computer avatars
 v Icon
 v Mac Bundle
 v Computer drop should also work.
