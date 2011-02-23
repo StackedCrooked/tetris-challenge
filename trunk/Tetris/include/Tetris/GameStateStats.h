@@ -12,12 +12,14 @@ public:
                    int inNumSingles,
                    int inNumDoubles,
                    int inNumTriples,
-                   int inNumTetrises) :
+                   int inNumTetrises,
+                   int inCurrentHeight) :
         mNumLines(inNumLines),
         mNumSingles(inNumSingles),
         mNumDoubles(inNumDoubles),
         mNumTriples(inNumTriples),
-        mNumTetrises(inNumTetrises)
+        mNumTetrises(inNumTetrises),
+        mCurrentHeight(inCurrentHeight)
     {
     }
 
@@ -36,6 +38,9 @@ public:
     inline int numTetrises() const
     { return mNumTetrises; }
 
+    inline int currentHeight() const
+    { return mCurrentHeight; }
+
     inline int score() const
     {
         return   40 * mNumSingles +
@@ -50,7 +55,7 @@ private:
     int mNumDoubles;
     int mNumTriples;
     int mNumTetrises;
-    int mFirstOccupiedRow;
+    int mCurrentHeight;
 };
 
 

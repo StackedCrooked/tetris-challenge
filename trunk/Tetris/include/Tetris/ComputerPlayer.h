@@ -5,6 +5,7 @@
 #include "Tetris/AutoPtrSupport.h"
 #include "Tetris/BlockMover.h"
 #include "Tetris/Evaluator.h"
+#include "Tetris/Player.h"
 #include "Tetris/Threading.h"
 
 
@@ -20,14 +21,18 @@ class Game;
 class GameState;
 
 
-class ComputerPlayer
+class ComputerPlayer : public Player
 {
 public:
     class Tweaker
     {
     public:
-        // WARNING: This callback will be received in a worker thread!
-        virtual std::auto_ptr<Evaluator> updateAIParameters(const GameState & inGameState,
+        /**
+         * Gets new parametrs from the tweaker object.
+         *
+         * WARNING: This callback will be received in a worker thread!
+         */
+        virtual std::auto_ptr<Evaluator> updateAIParameters(const Player & inPlayer,
                                                             int & outSearchDepth,
                                                             int & outSearchWidth,
                                                             int & outWorkerCount,
@@ -35,13 +40,12 @@ public:
                                                             BlockMover::MoveDownBehavior & outMoveDownBehavior) = 0;
     };
 
-    ComputerPlayer(const std::string & inName,
-                   const ThreadSafe<Game> & inProtectedGame,
-                   std::auto_ptr<Evaluator> inEvaluator);
+    ComputerPlayer(const TeamName & inTeamName,
+                   const PlayerName & inPlayerName,
+                   size_t inRowCount,
+                   size_t inColumnCount);
 
-    ~ComputerPlayer();
-
-    const std::string & name() const;
+    virtual ~ComputerPlayer();
 
     void setTweaker(Tweaker * inTweaker);
 
@@ -62,11 +66,9 @@ public:
 
     void setEvaluator(std::auto_ptr<Evaluator> inEvaluator);
 
-    //const Evaluator & evaluator() const;
-
     int workerCount() const;
 
-    // Set to 0 to auto-select (75% of CPU count)
+    // Set to 0 to auto-select
     void setWorkerCount(int inWorkerCount);
 
 private:

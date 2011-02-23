@@ -139,6 +139,16 @@ namespace Tetris
     };
 
 
+    class Multiplayer : public Evaluator
+    {
+    public:
+        Multiplayer();
+
+        virtual std::auto_ptr<Evaluator> clone() const
+        { return CreatePoly<Evaluator, Multiplayer>(*this); }
+    };
+
+
     class Depressed : public Evaluator
     {
     public:

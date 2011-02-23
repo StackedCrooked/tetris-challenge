@@ -102,9 +102,8 @@ void Gravity::Impl::onTimerEvent(Poco::Timer & )
         if (mLevel != oldLevel)
         {
             Assert(mLevel < cIntervalCount);
-            int newLevel = sIntervals[mLevel];
-            LogInfo(MakeString() << "Set level to " << mLevel << ".");
-            mTimer.setPeriodicInterval(newLevel);
+            mTimer.setPeriodicInterval(sIntervals[mLevel]);
+            LogInfo(MakeString() << "Level increment from " << oldLevel << " to " << mLevel << ".");
         }
     }
     catch (const std::exception & inException)

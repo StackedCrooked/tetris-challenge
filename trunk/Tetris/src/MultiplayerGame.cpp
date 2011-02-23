@@ -15,6 +15,17 @@ namespace Tetris {
 struct MultiplayerGame::Impl : public SimpleGame::EventHandler,
                                boost::noncopyable
 {
+    Impl(size_t inRowCount, size_t inColumnCount) :
+        mRowCount(inRowCount),
+        mColumnCount(inColumnCount)
+    {
+    }
+
+    ~Impl()
+    {
+    }
+
+
     virtual void onGameStateChanged(SimpleGame * )
     {
         // Not interested.
@@ -55,11 +66,13 @@ struct MultiplayerGame::Impl : public SimpleGame::EventHandler,
     }
 
     Players mPlayers;
+    size_t mRowCount;
+    size_t mColumnCount;
 };
 
 
-MultiplayerGame::MultiplayerGame() :
-    mImpl(new Impl)
+MultiplayerGame::MultiplayerGame(size_t inRowCount, size_t inColumnCount) :
+    mImpl(new Impl(inRowCount, inColumnCount))
 {
 }
 
@@ -70,15 +83,22 @@ MultiplayerGame::~MultiplayerGame()
 }
 
 
-Player * MultiplayerGame::join(std::auto_ptr<Player> inPlayer)
+Player * MultiplayerGame::addPlayer(PlayerType inPlayerType,
+                                    const TeamName & inTeamName,
+                                    const PlayerName & inPlayerName)
 {
-    mImpl->mPlayers.push_back(inPlayer.release());
-    SimpleGame::RegisterEventHandler(mImpl->mPlayers.back()->simpleGame(), mImpl);
-    return mImpl->mPlayers.back();
+    mImpl->mPlayers.push_back(Player::Create(inPlayerType,
+                                             inTeamName,
+                                             inPlayerName,
+                                             mImpl->mRowCount,
+                                             mImpl->mColumnCount).release());
+    Player * player = mImpl->mPlayers.back();
+    SimpleGame::RegisterEventHandler(player->simpleGame(), mImpl);
+    return player;
 }
 
 
-void MultiplayerGame::leave(Player * inPlayer)
+void MultiplayerGame::removePlayer(Player * inPlayer)
 {
     SimpleGame::UnregisterEventHandler(inPlayer->simpleGame(), mImpl);
     Players::iterator it = std::find(mImpl->mPlayers.begin(), mImpl->mPlayers.end(), inPlayer);

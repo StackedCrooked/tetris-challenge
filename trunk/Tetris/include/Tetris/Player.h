@@ -20,13 +20,21 @@ Tetris_TypedWrapper(PlayerName, std::string);
 class Player
 {
 public:
+    static std::auto_ptr<Player> Create(PlayerType inPlayerType,
+                                        const TeamName & inTeamName,
+                                        const PlayerName & inPlayerName,
+                                        size_t inRowCount,
+                                        size_t inColumnCount);
+
     Player(PlayerType inPlayerType,
            const TeamName & inTeamName,
            const PlayerName & inPlayerName,
            size_t inRowCount,
            size_t inColumnCount);
 
-    ~Player();
+    virtual ~Player() = 0;
+
+    PlayerType type() const;
 
     const std::string & teamName() const;
 
@@ -35,8 +43,6 @@ public:
     const SimpleGame * simpleGame() const;
 
     SimpleGame * simpleGame();
-
-    void resetGame();
 
 private:
     Player(const Player&);
@@ -51,6 +57,18 @@ private:
 
 
 typedef Array<Player> Players;
+
+
+class HumanPlayer : public Player
+{
+public:
+    HumanPlayer(const TeamName & inTeamName,
+                const PlayerName & inPlayerName,
+                size_t inRowCount,
+                size_t inColumnCount);
+
+    virtual ~HumanPlayer();
+};
 
 
 } // namespace Tetris

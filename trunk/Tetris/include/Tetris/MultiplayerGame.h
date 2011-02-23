@@ -13,14 +13,16 @@ namespace Tetris {
 class MultiplayerGame
 {
 public:
-    MultiplayerGame();
+    MultiplayerGame(size_t inRowCount, size_t inColumnCount);
 
     ~MultiplayerGame();
 
     // Takes ownership!
-    Player * join(std::auto_ptr<Player> inPlayer);
+    Player * addPlayer(PlayerType inPlayerType,
+                       const TeamName & inTeamName,
+                       const PlayerName & inPlayerName);
 
-    void leave(Player * inPlayer);
+    void removePlayer(Player * inPlayer);
 
     size_t playerCount() const;
 
