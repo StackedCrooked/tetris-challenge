@@ -112,7 +112,7 @@ public:
 
     virtual void refresh() = 0;
 
-    virtual Rect captionRect() const;
+    virtual Rect userInfoRect() const;
 
     virtual Rect gameRect() const;
 
@@ -135,12 +135,13 @@ protected:
     virtual void drawLine(int x1, int y1, int x2, int y2, int inPenWidth, const RGBColor & inColor) = 0;
     virtual void drawText(int x, int y, const std::string & inText) = 0;
     virtual void drawTextCentered(const Rect & inRect, const std::string & inText, int inFontSize, const RGBColor & inColor) = 0;
+    virtual void drawTextRightAligned(const Rect & inRect, const std::string & inText, int inFontSize, const RGBColor & inColor) = 0;
 
 
 private:
     void paintGrid(int x, int y, const Grid & inGrid);
     void paintGrid(int x, int y, const Grid & inGrid, const RGBColor & inColor);
-    void paintCaption();
+    void paintUserInfo();
     void paintGameGrid(const Grid & inGrid);
     void paintAvatar(const SimpleGame & inSimpleGame);
     void paintActiveBlockShadow(const SimpleGame & inSimpleGame);
@@ -152,7 +153,7 @@ private:
     int mSquareWidth;
     int mSquareHeight;
     int mStatItemHeight;
-    int mCaptionRectHeight;
+    int mAvatarWidth;
     int mSpacing;
     int mMargin;
     bool mPaintActiveBlockShadow;

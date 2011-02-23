@@ -261,6 +261,31 @@ void TetrisWidget::drawTextCentered(const Rect & inRect, const std::string & inT
 }
 
 
+void TetrisWidget::drawTextRightAligned(const Rect & inRect, const std::string & inText, int inFontSize, const RGBColor & inColor)
+{
+    if (!mPainter.get())
+    {
+        throw std::logic_error("Painter is not set.");
+    }
+
+    QPainter & painter(*mPainter);
+    painter.setPen(QColor(inColor.red(), inColor.green(), inColor.blue()));
+
+    // Paint the stats title
+    QFont textFont(painter.font());
+    textFont.setPointSize(inFontSize);
+    textFont.setBold(true);
+    painter.setFont(textFont);
+
+    int textWidth = painter.fontMetrics().width(inText.c_str());
+    int textHeight = painter.fontMetrics().height();
+
+    int x = inRect.right() - textWidth - margin();
+    int y = inRect.top()  + (inRect.height() - textHeight)/2;
+    drawText(x, y, inText);
+}
+
+
 void TetrisWidget::paintEvent(QPaintEvent * )
 {
     if (!simpleGame())
