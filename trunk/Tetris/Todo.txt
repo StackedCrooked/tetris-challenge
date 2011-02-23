@@ -1,14 +1,14 @@
 Todo
 ----
--> Implement the regular tetris game with single player and multiplayer modes. This is already cool.
+- Computer is allowed to make a move after the player made one.
 - Cleanup application code
 - Startup screen
 - Gameover screen
 - Local highscores
 - Online highscores
 - Associate computer names with strategies.
-- Pretty background image
 - Use a single shared timer.
+- Game state comparator could shuffle in case of equal
 v Add a toolbar
 v Use computer avatars
 v Icon
