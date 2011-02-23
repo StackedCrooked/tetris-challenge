@@ -29,23 +29,19 @@ namespace Tetris {
 struct ComputerPlayer::Impl : boost::noncopyable
 {
 public:
-    static const int cDefaultSearchDepth = 3;
-    static const int cDefaultSearchWidth = 8;
-
     typedef ComputerPlayer::Tweaker Tweaker;
 
-    Impl(const std::string & inName,
-         const ThreadSafe<Game> & inProtectedGame,
-         std::auto_ptr<Evaluator> inEvaluator) :
+    MakeTetrises a;
+
+    Impl() :
+        mComputerPlayer(0),
         mTweaker(0),
-        mName(inName),
-        mProtectedGame(inProtectedGame),
-        mWorkerPool("ComputerPlayer WorkerPool", Poco::Environment::processorCount()),
-        mEvaluator(inEvaluator.release()),
-        mBlockMover(new BlockMover(mProtectedGame)),
-        mSearchDepth(cDefaultSearchDepth),
-        mSearchWidth(cDefaultSearchWidth),
-        mWorkerCount(Poco::Environment::processorCount()),
+        mWorkerPool("ComputerPlayer WorkerPool", 1), //Poco::Environment::processorCount()),
+        mEvaluator(new MakeTetrises()),
+        mBlockMover(),
+        mSearchDepth(6),
+        mSearchWidth(4),
+        mWorkerCount(1), //Poco::Environment::processorCount()),
         mGameDepth(0),
         mStop(false),
         mReset(false),
@@ -66,7 +62,7 @@ public:
 
     void timerEvent();
 
-    int calculateRemainingTimeMs(const Game & inGame) const;
+    //int calculateRemainingTimeMs(const Game & inGame) const;
 
     void updateComputerBlockMoveSpeed();
 
@@ -77,9 +73,9 @@ public:
     void onFinished();
     void onError();
 
+    ComputerPlayer * mComputerPlayer;
     Tweaker * mTweaker;
-    std::string mName;
-    ThreadSafe<Game> mProtectedGame;
+
     WorkerPool mWorkerPool;
     boost::scoped_ptr<NodeCalculator> mNodeCalculator;
     boost::scoped_ptr<Evaluator> mEvaluator;
@@ -96,11 +92,15 @@ public:
 };
 
 
-ComputerPlayer::ComputerPlayer(const std::string & inName,
-                               const ThreadSafe<Game> & inProtectedGame,
-                               std::auto_ptr<Evaluator> inEvaluator) :
-    mImpl(new Impl(inName, inProtectedGame, inEvaluator))
+ComputerPlayer::ComputerPlayer(const TeamName & inTeamName,
+                               const PlayerName & inPlayerName,
+                               size_t inRowCount,
+                               size_t inColumnCount) :
+    Player(PlayerType_Computer, inTeamName, inPlayerName, inRowCount, inColumnCount),
+    mImpl(new Impl())
 {
+    mImpl->mComputerPlayer = this;
+    mImpl->mBlockMover.reset(new BlockMover(simpleGame()->game()));
     mImpl->mTimer.start(Poco::TimerCallback<ComputerPlayer>(*this, &ComputerPlayer::onTimerEvent));
 }
 
@@ -113,12 +113,6 @@ ComputerPlayer::~ComputerPlayer()
     }
     mImpl->mTimer.stop();
     delete mImpl;
-}
-
-
-const std::string & ComputerPlayer::name() const
-{
-    return mImpl->mName;
 }
 
 
@@ -227,30 +221,6 @@ void ComputerPlayer::setWorkerCount(int inWorkerCount)
 }
 
 
-int ComputerPlayer::Impl::calculateRemainingTimeMs(const Game & inGame) const
-{
-    // Already locked.
-
-    const ComputerGame & game(dynamic_cast<const ComputerGame&>(inGame));
-
-    int firstOccupiedRow = game.currentNode()->gameState().firstOccupiedRow();
-    int currentBlockRow = game.activeBlock().row();
-    int numBlockRows = std::max<int>(game.activeBlock().grid().rowCount(), game.activeBlock().grid().columnCount());
-    int numRemainingRows = firstOccupiedRow - (currentBlockRow + numBlockRows);
-    if (numRemainingRows <= 2)
-    {
-        return 0;
-    }
-
-    double numRowsPerSecond = Gravity::CalculateSpeed(game.level());
-    double remainingTime = 1000 * static_cast<double>(numRemainingRows) / numRowsPerSecond;
-    int maxRequiredMoves = game.activeBlock().numRotations() + (game.columnCount()/2);
-    int moveSpeed = mBlockMover->speed();
-    double timeRequiredForMove = 1000.0 * static_cast<double>(maxRequiredMoves) / static_cast<double>(moveSpeed);
-    return static_cast<int>(0.5 + remainingTime - timeRequiredForMove);
-}
-
-
 void ComputerPlayer::Impl::updateComputerBlockMoveSpeed()
 {
     // Consult the Tweaker for improved settings
@@ -258,25 +228,14 @@ void ComputerPlayer::Impl::updateComputerBlockMoveSpeed()
     {
         BlockMover::MoveDownBehavior moveDownBehavior = BlockMover::MoveDownBehavior_Null;
         int moveSpeed = 0;
-        int currentHeight = 0;
-        int totalHeight = 0;
 
-        // Critical section
-        {
-            ScopedReader<Game> wgame(mProtectedGame);
-            const ComputerGame & game(dynamic_cast<const ComputerGame&>(*wgame.get()));
-
-            currentHeight = game.gameState().currentHeight();
-            totalHeight = game.rowCount();
-
-            mEvaluator.reset(
-                mTweaker->updateAIParameters(game.gameState(),
-                                             mSearchDepth,
-                                             mSearchWidth,
-                                             mWorkerCount,
-                                             moveSpeed,
-                                             moveDownBehavior).release());
-        }
+        mEvaluator.reset(
+            mTweaker->updateAIParameters(*mComputerPlayer,
+                                         mSearchDepth,
+                                         mSearchWidth,
+                                         mWorkerCount,
+                                         moveSpeed,
+                                         moveDownBehavior).release());
 
         if (mSearchDepth < 1 || mSearchDepth > 100)
         {
@@ -288,7 +247,7 @@ void ComputerPlayer::Impl::updateComputerBlockMoveSpeed()
             throw std::runtime_error(MakeString() << "Invalid search width: " << mSearchWidth);
         }
 
-        if (mWorkerCount < 1 || mWorkerCount > 32)
+        if (mWorkerCount < 1 || mWorkerCount > 128)
         {
             throw std::runtime_error(MakeString() << "Invalid worker count: " << mWorkerCount);
         }
@@ -312,8 +271,6 @@ void ComputerPlayer::Impl::updateComputerBlockMoveSpeed()
 
 void ComputerPlayer::Impl::timerEvent()
 {
-    updateComputerBlockMoveSpeed();
-
     if (mReset)
     {
         mReset = false;
@@ -328,12 +285,14 @@ void ComputerPlayer::Impl::timerEvent()
         return;
     }
 
+    // Consult the tweaker.
+    updateComputerBlockMoveSpeed();
+
     if (!mNodeCalculator)
     {
         startNodeCalculator();
         return;
     }
-
 
     switch (mNodeCalculator->status())
     {
@@ -382,7 +341,7 @@ void ComputerPlayer::Impl::startNodeCalculator()
 
     // Critical section
     {
-        ScopedReader<Game> wgame(mProtectedGame);
+        ScopedReader<Game> wgame(mComputerPlayer->simpleGame()->game());
         const ComputerGame & game(dynamic_cast<const ComputerGame&>(*wgame.get()));
 
 
@@ -450,7 +409,7 @@ void ComputerPlayer::Impl::onStarted()
 
 void ComputerPlayer::Impl::onWorking()
 {
-    ScopedReader<Game> wgame(mProtectedGame);
+    ScopedReader<Game> wgame(mComputerPlayer->simpleGame()->game());
     const ComputerGame & game(dynamic_cast<const ComputerGame&>(*wgame.get()));
 
     if (mGameDepth < game.endNode()->depth())
@@ -460,7 +419,6 @@ void ComputerPlayer::Impl::onWorking()
         return;
     }
 
-    //if (game.numPrecalculatedMoves() == 0 && calculateRemainingTimeMs(game) < 1000)
     if (game.numPrecalculatedMoves() == 0)
     {
         mStop = true;
@@ -487,9 +445,8 @@ void ComputerPlayer::Impl::onFinished()
         return;
     }
 
-    ScopedReaderAndWriter<Game> wgame(mProtectedGame);
+    ScopedReaderAndWriter<Game> wgame(mComputerPlayer->simpleGame()->game());
     ComputerGame & game(dynamic_cast<ComputerGame&>(*wgame.get()));
-
 
     // Check for sync problems.
     if (resultNode->depth() != game.endNode()->depth() + 1)
@@ -505,7 +462,7 @@ void ComputerPlayer::Impl::onFinished()
 void ComputerPlayer::Impl::onError()
 {
     mReset = true;
-    LogError(mName + " " + mNodeCalculator->errorMessage());
+    LogError("ComputerPlayer: " + mNodeCalculator->errorMessage());
 }
 
 

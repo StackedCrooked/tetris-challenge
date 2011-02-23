@@ -243,8 +243,8 @@ namespace Tetris
                   NumDoublesFactor(2),
                   NumTriplesFactor(4),
                   NumTetrisesFactor(8),
-                  SearchDepth(5),
-                  SearchWidth(5))
+                  SearchDepth(6),
+                  SearchWidth(4))
     {
     }
 
@@ -283,6 +283,21 @@ namespace Tetris
             }
         }
         return Evaluator::evaluate(inGameState);
+    }
+
+
+    Multiplayer::Multiplayer() :
+        Evaluator("Multiplayer",
+                  GameHeightFactor(-2),
+                  LastBlockHeightFactor(-1),
+                  NumHolesFactor(-4),
+                  NumSinglesFactor(-4),
+                  NumDoublesFactor(-4),
+                  NumTriplesFactor(8),
+                  NumTetrisesFactor(16),
+                  SearchDepth(8),
+                  SearchWidth(4))
+    {
     }
 
 

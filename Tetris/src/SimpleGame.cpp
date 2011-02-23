@@ -19,7 +19,7 @@ struct SimpleGame::Impl : public Game::EventHandler
 {
     typedef SimpleGame::BackReference BackReference;
 
-    static std::auto_ptr<Game> CreateGame(size_t inRowCount, size_t inColumnCount, PlayerType inPlayerType)
+    static std::auto_ptr<Game> CreateGame(PlayerType inPlayerType, size_t inRowCount, size_t inColumnCount)
     {
         if (inPlayerType == PlayerType_Human)
         {
@@ -32,24 +32,16 @@ struct SimpleGame::Impl : public Game::EventHandler
         throw std::logic_error("Invalid enum value for PlayerType.");
     }
 
-    Impl(const std::string & inName,
+    Impl(PlayerType inPlayerType,
          size_t inRowCount,
-         size_t inColumnCount,
-         PlayerType inPlayerType) :
-        mName(inName),
-        mGame(CreateGame(inRowCount, inColumnCount, inPlayerType)),
+         size_t inColumnCount) :
+        mGame(CreateGame(inPlayerType, inRowCount, inColumnCount)),
         mPlayerType(inPlayerType),
-        mComputerPlayer(),
         mGravity(new Gravity(mGame)),
         mCenterColumn(static_cast<size_t>(0.5 + inColumnCount / 2.0)),
         mSimpleGame(0),
         mBackReference(0)
     {
-        if (inPlayerType == PlayerType_Computer)
-        {
-            std::auto_ptr<Evaluator> evaluator(CreatePoly<Evaluator, MakeTetrises>());
-            mComputerPlayer.reset(new ComputerPlayer(mName, mGame, evaluator));
-        }
     }
 
     ~Impl()
@@ -86,7 +78,6 @@ struct SimpleGame::Impl : public Game::EventHandler
     std::string mName;
     ThreadSafe<Game> mGame;
     PlayerType mPlayerType;
-    boost::scoped_ptr<ComputerPlayer> mComputerPlayer;
     boost::scoped_ptr<Gravity> mGravity;
     std::size_t mCenterColumn;
     SimpleGame * mSimpleGame;
@@ -99,8 +90,8 @@ struct SimpleGame::Impl : public Game::EventHandler
 SimpleGame::Instances SimpleGame::sInstances;
 
 
-SimpleGame::SimpleGame(const std::string & inName, size_t inRowCount, size_t inColumnCount, PlayerType inPlayerType) :
-    mImpl(new Impl(inName, inRowCount, inColumnCount, inPlayerType))
+SimpleGame::SimpleGame(PlayerType inPlayerType, size_t inRowCount, size_t inColumnCount) :
+    mImpl(new Impl(inPlayerType, inRowCount, inColumnCount))
 {
     mImpl->init(this);
     sInstances.insert(this);
@@ -149,37 +140,6 @@ bool SimpleGame::Exists(SimpleGame * inSimpleGame)
     return sInstances.find(inSimpleGame) != sInstances.end();
 }
 
-
-void SimpleGame::setAITweaker(ComputerPlayer::Tweaker * inTweaker)
-{
-    if (mImpl->mPlayerType != PlayerType_Computer)
-    {
-        throw std::runtime_error("You can only set a tweaker on computer players.");
-    }
-
-    Assert(mImpl->mComputerPlayer);
-    if (mImpl->mComputerPlayer)
-    {
-        mImpl->mComputerPlayer->setTweaker(inTweaker);
-    }
-}
-
-
-void SimpleGame::setComputerMoveSpeed(int inMovesPerSecond)
-{
-    if (mImpl->mPlayerType != PlayerType_Computer)
-    {
-        throw std::runtime_error("Computer move speed only applies to computer players.");
-    }
-
-    Assert(mImpl->mComputerPlayer);
-    if (mImpl->mComputerPlayer)
-    {
-        mImpl->mComputerPlayer->setMoveSpeed(inMovesPerSecond);
-    }
-}
-
-
 ThreadSafe<Game> SimpleGame::game() const
 {
     return mImpl->mGame;
@@ -208,7 +168,8 @@ GameStateStats SimpleGame::stats() const
                           gameState.numSingles(),
                           gameState.numDoubles(),
                           gameState.numTriples(),
-                          gameState.numTetrises());
+                          gameState.numTetrises(),
+                          gameState.currentHeight());
 }
 
 

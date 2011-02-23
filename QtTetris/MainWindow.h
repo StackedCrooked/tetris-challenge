@@ -45,6 +45,8 @@ private slots:
 private:
     void onNewGame(const Tetris::PlayerTypes & inPlayerTypes);
 
+    void timerEvent();
+
     static MainWindow * sInstance;
 
 private:

@@ -41,6 +41,12 @@ public:
 
     bool IsGameOver()
     {
+        if (!mMultiplayerGame)
+        {
+            return true;
+        }
+
+
         for (size_t idx = 0; idx < mMultiplayerGame->playerCount(); ++idx)
         {
             Player * player = mMultiplayerGame->getPlayer(idx);
@@ -64,49 +70,58 @@ public:
 
     MultiplayerGame & multiplayerGame()
     {
+        if (!mMultiplayerGame)
+        {
+            throw std::runtime_error("There is currently no game running.");
+        }
         return *mMultiplayerGame;
     }
 
-    virtual std::auto_ptr<Evaluator> updateAIParameters(const GameState & inGameState,
+    virtual std::auto_ptr<Evaluator> updateAIParameters(const Player & inPlayer,
                                                         int & outSearchDepth,
                                                         int & outSearchWidth,
                                                         int & outWorkerCount,
                                                         int & /*outMoveSpeed*/,
                                                         BlockMover::MoveDownBehavior & outMoveDownBehavior)
     {
-        outWorkerCount = std::max<int>(1, mCPUCount / 2);
-        int firstRow = inGameState.firstOccupiedRow();
-        int height = inGameState.grid().rowCount() - firstRow;
+        if (!inPlayer.simpleGame())
+        {
+            throw std::runtime_error("GameState is null!");
+        }
+
+        const SimpleGame & game = *inPlayer.simpleGame();
+        outWorkerCount = 1; //std::max<int>(1, mCPUCount / 2);
+        int currentHeight = game.stats().currentHeight();
 
         // Tactics adjustment
-        if (height <= 8)
+        if (currentHeight <= 5)
         {
-            outSearchDepth = 10;
+            outSearchDepth = 8;
             outSearchWidth = 5;
-            outMoveDownBehavior = BlockMover::MoveDownBehavior_Drop;
+            outMoveDownBehavior = BlockMover::MoveDownBehavior_Move;
             return CreatePoly<Evaluator, MakeTetrises>();
         }
-        else if (height <= 12)
+        else if (currentHeight <= 10)
         {
             outSearchDepth = 6;
             outSearchWidth = 5;
-            outMoveDownBehavior = BlockMover::MoveDownBehavior_Drop;
-            return CreatePoly<Evaluator, Balanced>();
+            outMoveDownBehavior = BlockMover::MoveDownBehavior_Move;
+            return CreatePoly<Evaluator, Multiplayer>();
         }
         else
         {
             outSearchDepth = 6;
-            outSearchWidth = 5;
+            outSearchWidth = 4;
             outMoveDownBehavior = BlockMover::MoveDownBehavior_Drop;
             return CreatePoly<Evaluator, Survival>();
         }
     }
 
 
-    void reset(const PlayerTypes & inPlayerTypes, size_t inRowCount, size_t inColCount)
+    void reset(const PlayerTypes & inPlayerTypes, size_t inRowCount, size_t inColumnCount)
     {
         mMultiplayerGame.reset();
-        mMultiplayerGame.reset(new MultiplayerGame);
+        mMultiplayerGame.reset(new MultiplayerGame(inRowCount, inColumnCount));
         mGameOver = false;
         bool allComputer = true;
         for (PlayerTypes::size_type idx = 0; idx < inPlayerTypes.size(); ++idx)
@@ -126,17 +141,14 @@ public:
                 teamName = "Team 2";
             }
 
-            Player * player = mMultiplayerGame->join(
-                Create<Player>(inPlayerTypes[idx],
-                               TeamName(teamName),
-                               PlayerName(GetPlayerName(inPlayerTypes[idx])),
-                               inRowCount,
-                               inColCount));
-            if (inPlayerTypes[idx] == PlayerType_Computer)
+            Player * player(0);
+            PlayerType playerType = inPlayerTypes[idx];
+            player = mMultiplayerGame->addPlayer(playerType, TeamName(teamName), PlayerName(GetPlayerName(inPlayerTypes[idx])));
+
+            if (ComputerPlayer * computerPlayer = dynamic_cast<ComputerPlayer*>(player))
             {
-                player->simpleGame()->setAITweaker(&Model::Instance());
-                player->simpleGame()->setStartingLevel(allComputer ? 6 : 0);
-                player->simpleGame()->setComputerMoveSpeed(allComputer ? 40 : 20);
+                computerPlayer->setTweaker(&Model::Instance());
+                computerPlayer->setMoveSpeed(allComputer ? 60 : 20);
             }
             //player->simpleGame()->setPaused(true);
         }
@@ -148,7 +160,7 @@ private:
         mNamesIndex(0),
         mHumanName(),
         mCPUCount(Poco::Environment::processorCount()),
-        mGameOver(false)
+        mGameOver(true)
     {
         mNames.push_back("Luffy");
         mNames.push_back("Zoro");
@@ -213,6 +225,19 @@ private:
 
 
 void MainWindow::onTimerEvent()
+{
+    try
+    {
+        timerEvent();
+    }
+    catch (const std::exception & exc)
+    {
+        LogError(exc.what());
+    }
+}
+
+
+void MainWindow::timerEvent()
 {
     // We already know about the GameOver event.
     // No longer interested.
@@ -337,7 +362,7 @@ MainWindow::MainWindow(QWidget *parent) :
     timer->start(500);
 
 
-    onNewHumanVsComputerGame();
+    onNewComputerVsComputerGame();
 }
 
 
