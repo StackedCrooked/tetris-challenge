@@ -1,14 +1,15 @@
 Todo
 ----
-- Computer is allowed to make a move after the player made one.
-- Cleanup application code
-- Startup screen
-- Gameover screen
+- Use a "New game"-dialog with game options.
+- On startup the new game dialog should popup.
+- Use hotkey P for pause.
+- Gameover is painted instead of popup
 - Local highscores
 - Online highscores
 - Associate computer names with strategies.
 - Use a single shared timer.
 - Game state comparator could shuffle in case of equal
+- Optional: Computer is allowed to make a move after the player made one.
 v Add a toolbar
 v Use computer avatars
 v Icon
