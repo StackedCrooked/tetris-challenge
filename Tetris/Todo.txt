@@ -1,12 +1,12 @@
 Todo
 ----
+- Cleanup application code
 - Game concept: allow a player to configure his ally computer using a point system like in D&D
 - Startup screen
 - Gameover screen
 - Associate computer names with strategies.
 - Use computer avatars
 - Online highscores
-- Animate falling blocks to reduce jitter?
 - Add a toolbar
 - Release a simple Qt game: single player, player vs computer, computer vs computer.
 - Use a single shared timer.

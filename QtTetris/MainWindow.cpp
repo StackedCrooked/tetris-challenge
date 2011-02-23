@@ -90,29 +90,37 @@ public:
         }
 
         const SimpleGame & game = *inPlayer.simpleGame();
-        outWorkerCount = 1; //std::max<int>(1, mCPUCount / 2);
+        outWorkerCount = Poco::Environment::processorCount();
         int currentHeight = game.stats().currentHeight();
 
+        // Drop or not?
+        if (currentHeight < 10)
+        {
+            outMoveDownBehavior = BlockMover::MoveDownBehavior_Move;
+        }
+        else
+        {
+            outMoveDownBehavior = BlockMover::MoveDownBehavior_Drop;
+        }
+
+
         // Tactics adjustment
-        if (currentHeight <= 5)
+        if (currentHeight < 8)
         {
             outSearchDepth = 8;
             outSearchWidth = 5;
-            outMoveDownBehavior = BlockMover::MoveDownBehavior_Move;
             return CreatePoly<Evaluator, MakeTetrises>();
         }
-        else if (currentHeight <= 10)
+        else if (currentHeight < 14)
         {
             outSearchDepth = 6;
-            outSearchWidth = 5;
-            outMoveDownBehavior = BlockMover::MoveDownBehavior_Move;
+            outSearchWidth = 4;
             return CreatePoly<Evaluator, Multiplayer>();
         }
         else
         {
             outSearchDepth = 6;
-            outSearchWidth = 4;
-            outMoveDownBehavior = BlockMover::MoveDownBehavior_Drop;
+            outSearchWidth = 3;
             return CreatePoly<Evaluator, Survival>();
         }
     }
@@ -148,9 +156,9 @@ public:
             if (ComputerPlayer * computerPlayer = dynamic_cast<ComputerPlayer*>(player))
             {
                 computerPlayer->setTweaker(&Model::Instance());
-                computerPlayer->setMoveSpeed(allComputer ? 60 : 20);
+                computerPlayer->setMoveSpeed(allComputer ? 50 : 20);
             }
-            //player->simpleGame()->setPaused(true);
+            player->simpleGame()->setPaused(true);
         }
     }
 
