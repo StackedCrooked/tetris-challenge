@@ -45,7 +45,10 @@ void TetrisWidget::refresh()
 
 void TetrisWidget::keyPressEvent(QKeyEvent * inEvent)
 {
-    if (!simpleGame() || simpleGame()->isGameOver() || simpleGame()->playerType() == PlayerType_Computer)
+    if (!simpleGame() ||
+         simpleGame()->isPaused() ||
+         simpleGame()->isGameOver() ||
+         simpleGame()->playerType() == PlayerType_Computer)
     {
         QWidget::keyPressEvent(inEvent);
         return;

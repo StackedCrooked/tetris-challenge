@@ -158,7 +158,7 @@ public:
                 computerPlayer->setTweaker(&Model::Instance());
                 computerPlayer->setMoveSpeed(allComputer ? 50 : 20);
             }
-            player->simpleGame()->setPaused(true);
+            //player->simpleGame()->setPaused(true);
         }
     }
 
