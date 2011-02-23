@@ -103,7 +103,6 @@ void Gravity::Impl::onTimerEvent(Poco::Timer & )
         {
             Assert(mLevel < cIntervalCount);
             mTimer.setPeriodicInterval(sIntervals[mLevel]);
-            LogInfo(MakeString() << "Level increment from " << oldLevel << " to " << mLevel << ".");
         }
     }
     catch (const std::exception & inException)
