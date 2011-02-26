@@ -341,7 +341,6 @@ MainWindow::MainWindow(QWidget *parent) :
         LogInfo(Poco::Path::current());
     }
 
-
     QTimer * timer(new QTimer(this));
     connect(timer, SIGNAL(timeout()), this, SLOT(onTimerEvent()));
     timer->start(500);
