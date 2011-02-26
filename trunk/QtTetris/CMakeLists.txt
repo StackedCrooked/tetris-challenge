@@ -115,6 +115,7 @@ add_subdirectory(${SOLUTIONDIR}Tetris ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 set(QtTetris_SOURCES
     main.cpp
     MainWindow.cpp
+    NewGameDialog.cpp
     TetrisWidget.cpp
     QtMainThread.cpp)
 
@@ -122,7 +123,7 @@ set(QtTetris_SOURCES
 #
 # QtTetris header files
 #
-set(QtTetris_QT_HEADERS MainWindow.h TetrisWidget.h)
+set(QtTetris_QT_HEADERS MainWindow.h TetrisWidget.h NewGameDialog.h)
 set(QtTetris_REGULAR_HEADERS MainWindow.h)
 set(QtTetris_HEADERS ${QtTetris_QT_HEADERS} ${QtTetris_REGULAR_HEADERS})
 

@@ -28,7 +28,11 @@ public:
     void logMessage(const std::string & inMessage);
 
 private slots:
-    void onNewSinglePlayerGame();
+    void onNew();
+
+    void onNewSingleHumanPlayerGame();
+
+    void onNewSingleComputerPlayerGame();
 
     void onNewHumanVsComputerGame();
 

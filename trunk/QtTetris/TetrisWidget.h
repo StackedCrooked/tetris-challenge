@@ -23,7 +23,7 @@ class TetrisWidget : public QWidget,
 public:
     explicit TetrisWidget(QWidget * inParent, int inSquareWidth, int inSquareHeight);
 
-    ~TetrisWidget();
+    virtual ~TetrisWidget();
 
     virtual void keyPressEvent(QKeyEvent * inKeyEvent);
 

@@ -1,9 +1,9 @@
 Todo
 ----
-- Fix resource system! (It's totally broken right now.)
 - Use a "New game"-dialog with game options.
 - On startup the new game dialog should popup.
 - Use hotkey P for pause.
+- Fix resource system! (It's totally broken right now.)
 - Gameover is painted instead of popup
 - Local highscores
 - Online highscores

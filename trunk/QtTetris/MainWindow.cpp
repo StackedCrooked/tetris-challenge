@@ -1,4 +1,5 @@
 #include "MainWindow.h"
+#include "NewGameDialog.h"
 #include "Tetris/Assert.h"
 #include "Tetris/AutoPtrSupport.h"
 #include "Tetris/BlockMover.h"
@@ -309,44 +310,21 @@ MainWindow::MainWindow(QWidget *parent) :
     mGameOver(false)
 {
     sInstance = this;
-
     setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum));
-
     setWindowTitle("QtTetris");
 
-    QToolBar * toolBar = addToolBar("Tetris");
-    toolBar->setMovable(false);
-    QAction * pauseAction = toolBar->addAction("Pause");
-    connect(pauseAction, SIGNAL(triggered()), this, SLOT(onPaused()));
-
-    QAction * tbNewSinglePlayerGame = toolBar->addAction("Single Player");
-    connect(tbNewSinglePlayerGame, SIGNAL(triggered()), this, SLOT(onNewSinglePlayerGame()));
-
-    QAction * tbNewHumanVsComputerGame = toolBar->addAction("Human vs Computer");
-    connect(tbNewHumanVsComputerGame, SIGNAL(triggered()), this, SLOT(onNewHumanVsComputerGame()));
-
-    QAction * tbNewComputerVsComputerGame = toolBar->addAction("Computer vs Computer");
-    connect(tbNewComputerVsComputerGame, SIGNAL(triggered()), this, SLOT(onNewComputerVsComputerGame()));
-
-//    QAction * tbNewHumanComputervsComputerComputerGame = toolBar->addAction("2v2");
-//    connect(tbNewHumanComputervsComputerComputerGame, SIGNAL(triggered()), this, SLOT(on2v2Game()));
-
-
-    QWidget * theCentralWidget(new QWidget);
-
     QMenu * tetrisMenu = menuBar()->addMenu("Tetris");
+    QAction * newGame = tetrisMenu->addAction("New");
+    newGame->setShortcut(QKeySequence("Ctrl+N"));
 
-    QAction * newSinglePlayerGame = tetrisMenu->addAction("New Single Player Game");
-    connect(newSinglePlayerGame, SIGNAL(triggered()), this, SLOT(onNewSinglePlayerGame()));
-
-    QAction * newHumanVsComputerGame = tetrisMenu->addAction("New Human vs Computer Game");
-    connect(newHumanVsComputerGame, SIGNAL(triggered()), this, SLOT(onNewHumanVsComputerGame()));
-
-    QAction * newComputerVsComputerGame = tetrisMenu->addAction("New Computer vs Computer Game");
-    connect(newComputerVsComputerGame, SIGNAL(triggered()), this, SLOT(onNewComputerVsComputerGame()));
+    connect(newGame, SIGNAL(triggered()), this, SLOT(onNew()));
 
     QAction * pauseGame = tetrisMenu->addAction("Pause");
     connect(pauseGame, SIGNAL(triggered()), this, SLOT(onPaused()));
+    pauseGame->setShortcut(QKeySequence("Ctrl+P"));
+
+    QWidget * theCentralWidget(new QWidget);
+    setCentralWidget(theCentralWidget);
 
     QVBoxLayout * vbox = new QVBoxLayout(theCentralWidget);
     mTetrisWidgetHolder = new QHBoxLayout;
@@ -363,14 +341,13 @@ MainWindow::MainWindow(QWidget *parent) :
         LogInfo(Poco::Path::current());
     }
 
-    setCentralWidget(theCentralWidget);
 
     QTimer * timer(new QTimer(this));
     connect(timer, SIGNAL(timeout()), this, SLOT(onTimerEvent()));
     timer->start(500);
 
-
     onNewComputerVsComputerGame();
+    onNew();
 }
 
 
@@ -411,6 +388,7 @@ void MainWindow::onNewGame(const PlayerTypes & inPlayerTypes)
     for (TetrisWidgets::size_type idx = 0; idx < mTetrisWidgets.size(); ++idx)
     {
         mTetrisWidgets[idx]->setPlayer(0);
+        mTetrisWidgets[idx]->releaseKeyboard();
     }
 
     // Ensure that we have widget for each player.
@@ -442,14 +420,53 @@ void MainWindow::onNewGame(const PlayerTypes & inPlayerTypes)
     {
         Player * player = mgame.getPlayer(idx);
         mTetrisWidgets[idx]->setPlayer(player);
+        if (player->type() == PlayerType_Human)
+        {
+            mTetrisWidgets[idx]->setFocus();
+        }
     }
 }
 
 
-void MainWindow::onNewSinglePlayerGame()
+void MainWindow::onNew()
+{
+    NewGameDialog dialog(this);
+    if (dialog.exec() == QDialog::Accepted)
+    {
+        NewGameDialog::Selection selection = dialog.selection();
+        if (selection == NewGameDialog::Selection_Human)
+        {
+            onNewSingleHumanPlayerGame();
+        }
+        else if (selection == NewGameDialog::Selection_Computer)
+        {
+            onNewSingleComputerPlayerGame();
+        }
+        else if (selection == NewGameDialog::Selection_HumanVsComputer)
+        {
+            onNewHumanVsComputerGame();
+        }
+        else if (selection == NewGameDialog::Selection_ComputerVsComputer)
+        {
+            onNewComputerVsComputerGame();
+        }
+    }
+    updateGeometry();
+}
+
+
+void MainWindow::onNewSingleHumanPlayerGame()
 {
     PlayerTypes playerTypes;
     playerTypes.push_back(PlayerType_Human);
+    onNewGame(playerTypes);
+}
+
+
+void MainWindow::onNewSingleComputerPlayerGame()
+{
+    PlayerTypes playerTypes;
+    playerTypes.push_back(PlayerType_Computer);
     onNewGame(playerTypes);
 }
 
