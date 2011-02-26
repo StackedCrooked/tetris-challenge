@@ -421,6 +421,7 @@ void ComputerPlayer::Impl::onWorking()
 
     if (game.numPrecalculatedMoves() == 0)
     {
+        // Stop and use current results.
         mStop = true;
         return;
     }

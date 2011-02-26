@@ -44,7 +44,8 @@ SOURCES += \
     Tetris/src/Unicode.cpp \
     Tetris/src/Worker.cpp \
     Tetris/src/WorkerPool.cpp \
-    QtTetris/TetrisWidget.cpp
+    QtTetris/TetrisWidget.cpp \
+    QtTetris/NewGameDialog.cpp
 
 
 HEADERS += \
@@ -96,7 +97,8 @@ HEADERS += \
     Tetris/include/Tetris/Unicode.h \
     Tetris/include/Tetris/Utilities.h \
     Tetris/include/Tetris/Worker.h \
-    Tetris/include/Tetris/WorkerPool.h
+    Tetris/include/Tetris/WorkerPool.h \
+    QtTetris/NewGameDialog.h
 
 
 OTHER_FILES += \
