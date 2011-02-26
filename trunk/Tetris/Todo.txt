@@ -1,8 +1,5 @@
 Todo
 ----
-- Use a "New game"-dialog with game options.
-- On startup the new game dialog should popup.
-- Use hotkey P for pause.
 - Fix resource system! (It's totally broken right now.)
 - Gameover is painted instead of popup
 - Local highscores
@@ -11,6 +8,9 @@ Todo
 - Use a single shared timer.
 - Game state comparator could shuffle in case of equal
 - Optional: Computer is allowed to make a move after the player made one.
+v Use Ctrl-P for pause.
+v On startup the new game dialog should popup.
+v Use a "New game"-dialog with game options.
 v Add a toolbar
 v Use computer avatars
 v Icon
