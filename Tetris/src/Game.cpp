@@ -294,7 +294,7 @@ std::auto_ptr<Block> Game::CreateDefaultBlock(BlockType inBlockType, size_t inNu
 }
 
 
-void Game::supplyBlocks() const
+void Game::supplyBlocks()
 {
     while (mCurrentBlockIndex >= mBlocks.size())
     {
@@ -345,7 +345,7 @@ void Game::reserveBlocks(size_t inCount)
 
 const Block & Game::activeBlock() const
 {
-    supplyBlocks();
+    Assert(mActiveBlock);
     return *mActiveBlock;
 }
 
@@ -356,7 +356,7 @@ const Grid & Game::gameGrid() const
 }
 
 
-void Game::getFutureBlocks(size_t inCount, BlockTypes & outBlocks) const
+void Game::getFutureBlocks(size_t inCount, BlockTypes & outBlocks)
 {
     // Make sure we have all blocks we need.
     while (mBlocks.size() < mCurrentBlockIndex + inCount)
@@ -371,7 +371,7 @@ void Game::getFutureBlocks(size_t inCount, BlockTypes & outBlocks) const
 }
 
 
-void Game::getFutureBlocksWithOffset(size_t inOffset, size_t inCount, BlockTypes & outBlocks) const
+void Game::getFutureBlocksWithOffset(size_t inOffset, size_t inCount, BlockTypes & outBlocks)
 {
     // Make sure we have all blocks we need.
     while (mBlocks.size() < inOffset + inCount)

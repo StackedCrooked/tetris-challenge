@@ -92,10 +92,10 @@ public:
     Grid gameGrid() const;
 
     // Gets the currently active block and any blocks that follow.
-    Block getNextBlock() const;
+    Block getNextBlock();
 
     // Gets the next blocks. The length of the resulting vector is the same as futureBlocksCount().
-    std::vector<Block> getNextBlocks() const;
+    std::vector<Block> getNextBlocks();
 
     int futureBlocksCount() const;
 

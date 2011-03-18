@@ -197,7 +197,7 @@ namespace Tetris
     }
 
 
-    void NodeCalculatorImpl::calculateResult() const
+    void NodeCalculatorImpl::calculateResult()
     {
         if (getQuitFlag())
         {

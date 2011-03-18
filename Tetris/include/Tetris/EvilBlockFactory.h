@@ -29,7 +29,7 @@ private:
     std::auto_ptr<NodeCalculator> createNodeCalculator(const BlockTypes & inBlockTypes);
 
     ThreadSafe<Game> mGame;
-    mutable WorkerPool mWorkerPool;
+    WorkerPool mWorkerPool;
 };
 
 

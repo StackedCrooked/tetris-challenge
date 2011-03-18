@@ -263,11 +263,11 @@ Grid SimpleGame::gameGrid() const
 }
 
 
-Block SimpleGame::getNextBlock() const
+Block SimpleGame::getNextBlock()
 {
     std::vector<BlockType> blockTypes;
     {
-        ScopedReader<Game> game(mImpl->mGame);
+        ScopedReaderAndWriter<Game> game(mImpl->mGame);
         game->getFutureBlocks(2, blockTypes);
     }
 
@@ -280,12 +280,12 @@ Block SimpleGame::getNextBlock() const
 }
 
 
-std::vector<Block> SimpleGame::getNextBlocks() const
+std::vector<Block> SimpleGame::getNextBlocks()
 {
     std::vector<BlockType> blockTypes;
     int numFutureBlocks = futureBlocksCount();
     {
-        ScopedReader<Game> game(mImpl->mGame);
+        ScopedReaderAndWriter<Game> game(mImpl->mGame);
         game->getFutureBlocks(1 + numFutureBlocks, blockTypes);
     }
 
