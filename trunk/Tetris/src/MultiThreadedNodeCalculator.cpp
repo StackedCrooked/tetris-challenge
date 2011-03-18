@@ -10,8 +10,8 @@
 #include "Tetris/Logging.h"
 #include "Tetris/Assert.h"
 #include "Tetris/MakeString.h"
+#include "Tetris/Threading.h"
 #include <boost/shared_ptr.hpp>
-#include <boost/thread.hpp>
 #include <memory>
 #include <stdexcept>
 
@@ -129,7 +129,7 @@ namespace Tetris
             size_t targetDepth = 1;
             while (targetDepth <= mBlockTypes.size())
             {
-                boost::mutex::scoped_lock lock(mNodeMutex);
+                ScopedLock lock(mNodeMutex);
                 populateNodes(mNode, mBlockTypes, mWidths, 0, targetDepth);
                 mWorkerPool.wait();
                 Assert(mWorkerPool.getActiveWorkerCount() == 0);

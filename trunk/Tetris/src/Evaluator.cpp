@@ -56,8 +56,8 @@ namespace Tetris
 
         if (this != &rhs)
         {
-            boost::mutex::scoped_lock rhsLock(rhs.mMutex);
-            boost::mutex::scoped_lock lhsLock(mMutex);
+            ScopedLock rhsLock(rhs.mMutex);
+            ScopedLock lhsLock(mMutex);
             mName = rhs.mName;
             mGameHeightFactor = rhs.mGameHeightFactor;
             mLastBlockHeightFactor = rhs.mLastBlockHeightFactor;
@@ -76,7 +76,7 @@ namespace Tetris
     Evaluator::~Evaluator()
     {
         // Wait for the other actions to complete.
-        boost::mutex::scoped_lock lock(mMutex);
+        ScopedLock lock(mMutex);
     }
 
 
@@ -84,7 +84,7 @@ namespace Tetris
     {
         // This lock is necessary because one thread could destroy an
         // Evaluator object while the main thread is painting it's name.
-        boost::mutex::scoped_lock lock(mMutex);
+        ScopedLock lock(mMutex);
         return mName;
     }
 

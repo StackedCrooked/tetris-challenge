@@ -1,10 +1,10 @@
 #include "WorkerPoolTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
+#include "Tetris/Threading.h"
 #include "Tetris/WorkerPool.h"
 #include "Tetris/Assert.h"
 #include "Poco/Thread.h"
-#include <boost/thread.hpp>
 #include <iostream>
 
 

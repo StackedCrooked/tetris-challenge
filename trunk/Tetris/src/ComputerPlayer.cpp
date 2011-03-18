@@ -52,7 +52,7 @@ public:
 
     ~Impl()
     {
-        boost::mutex::scoped_lock lock(mMutex);
+        ScopedLock lock(mMutex);
         if (mNodeCalculator)
         {
             mNodeCalculator->stop();
@@ -87,7 +87,7 @@ public:
     bool mStop;
     bool mReset;
     bool mQuitFlag;
-    boost::mutex mMutex;
+    Mutex mMutex;
     Poco::Timer mTimer;
 };
 
@@ -108,7 +108,7 @@ ComputerPlayer::ComputerPlayer(const TeamName & inTeamName,
 ComputerPlayer::~ComputerPlayer()
 {
     {
-        boost::mutex::scoped_lock lock(mImpl->mMutex);
+        ScopedLock lock(mImpl->mMutex);
         mImpl->mQuitFlag = true;
     }
     mImpl->mTimer.stop();
@@ -120,7 +120,7 @@ void ComputerPlayer::onTimerEvent(Poco::Timer & )
 {
     try
     {
-        boost::mutex::scoped_lock lock(mImpl->mMutex);
+        ScopedLock lock(mImpl->mMutex);
         if (!mImpl->mQuitFlag)
         {
             mImpl->timerEvent();
@@ -135,42 +135,42 @@ void ComputerPlayer::onTimerEvent(Poco::Timer & )
 
 void ComputerPlayer::setTweaker(Tweaker *inTweaker)
 {
-    boost::mutex::scoped_lock lock(mImpl->mMutex);
+    ScopedLock lock(mImpl->mMutex);
     mImpl->mTweaker = inTweaker;
 }
 
 
 int ComputerPlayer::searchDepth() const
 {
-    boost::mutex::scoped_lock lock(mImpl->mMutex);
+    ScopedLock lock(mImpl->mMutex);
     return mImpl->mSearchDepth;
 }
 
 
 void ComputerPlayer::setSearchDepth(int inSearchDepth)
 {
-    boost::mutex::scoped_lock lock(mImpl->mMutex);
+    ScopedLock lock(mImpl->mMutex);
     mImpl->mSearchDepth = inSearchDepth;
 }
 
 
 int ComputerPlayer::searchWidth() const
 {
-    boost::mutex::scoped_lock lock(mImpl->mMutex);
+    ScopedLock lock(mImpl->mMutex);
     return mImpl->mSearchWidth;
 }
 
 
 void ComputerPlayer::setSearchWidth(int inSearchWidth)
 {
-    boost::mutex::scoped_lock lock(mImpl->mMutex);
+    ScopedLock lock(mImpl->mMutex);
     mImpl->mSearchWidth = inSearchWidth;
 }
 
 
 int ComputerPlayer::currentSearchDepth() const
 {
-    boost::mutex::scoped_lock lock(mImpl->mMutex);
+    ScopedLock lock(mImpl->mMutex);
     if (mImpl->mNodeCalculator)
     {
         return mImpl->mNodeCalculator->getCurrentSearchDepth();
@@ -181,35 +181,35 @@ int ComputerPlayer::currentSearchDepth() const
 
 int ComputerPlayer::moveSpeed() const
 {
-    boost::mutex::scoped_lock lock(mImpl->mMutex);
+    ScopedLock lock(mImpl->mMutex);
     return mImpl->mBlockMover->speed();
 }
 
 
 void ComputerPlayer::setMoveSpeed(int inMoveSpeed)
 {
-    boost::mutex::scoped_lock lock(mImpl->mMutex);
+    ScopedLock lock(mImpl->mMutex);
     mImpl->mBlockMover->setSpeed(inMoveSpeed);
 }
 
 
 void ComputerPlayer::setEvaluator(std::auto_ptr<Evaluator> inEvaluator)
 {
-    boost::mutex::scoped_lock lock(mImpl->mMutex);
+    ScopedLock lock(mImpl->mMutex);
     mImpl->mEvaluator.reset(inEvaluator.release());
 }
 
 
 int ComputerPlayer::workerCount() const
 {
-    boost::mutex::scoped_lock lock(mImpl->mMutex);
+    ScopedLock lock(mImpl->mMutex);
     return mImpl->mWorkerCount;
 }
 
 
 void ComputerPlayer::setWorkerCount(int inWorkerCount)
 {
-    boost::mutex::scoped_lock lock(mImpl->mMutex);
+    ScopedLock lock(mImpl->mMutex);
     if (inWorkerCount == 0)
     {
         mImpl->mWorkerCount = Poco::Environment::processorCount();

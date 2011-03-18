@@ -135,7 +135,7 @@ namespace Tetris
 
             inline NodePtr bestNode(size_t inDepth) const
             {
-                boost::mutex::scoped_lock lock(mMutex);
+                ScopedLock lock(mMutex);
                 Assert(inDepth > 0 && inDepth <= mInfos.size());
                 return mInfos[inDepth - 1].bestNode();
             }
@@ -153,19 +153,19 @@ namespace Tetris
 
             inline size_t nodeCount(size_t inDepth) const
             {
-                boost::mutex::scoped_lock lock(mMutex);
+                ScopedLock lock(mMutex);
                 return mInfos[inDepth - 1].nodeCount();
             }
 
             inline bool finished(size_t inDepth) const
             {
-                boost::mutex::scoped_lock lock(mMutex);
+                ScopedLock lock(mMutex);
                 return mInfos[inDepth - 1].finished();
             }
 
             void registerNode(NodePtr inNode, size_t inDepth)
             {
-                boost::mutex::scoped_lock lock(mMutex);
+                ScopedLock lock(mMutex);
                 mInfos[inDepth - 1].registerNode(inNode);
             }
 
@@ -185,16 +185,16 @@ namespace Tetris
         private:
             std::vector<TreeRowInfo> mInfos;
             int mCurrentSearchDepth;
-            mutable boost::mutex mMutex;
+            mutable Mutex mMutex;
         };
 
         NodePtr mNode;
         NodePtr mResult;
-        mutable boost::mutex mNodeMutex;
+        mutable Mutex mNodeMutex;
 
 
         bool mQuitFlag;
-        mutable boost::mutex mQuitFlagMutex;
+        mutable Mutex mQuitFlagMutex;
 
         TreeRowInfos mTreeRowInfos;
 
@@ -203,7 +203,7 @@ namespace Tetris
         boost::scoped_ptr<Evaluator> mEvaluator;
 
         int mStatus;
-        mutable boost::mutex mStatusMutex;
+        mutable Mutex mStatusMutex;
         std::string mErrorMessage;
 
         Worker mMainWorker;

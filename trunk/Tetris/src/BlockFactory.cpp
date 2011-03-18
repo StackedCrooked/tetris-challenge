@@ -43,8 +43,8 @@ public:
 
     static seed_t GetRandomSeed()
     {
-        static boost::mutex fMutex;
-        boost::mutex::scoped_lock lock(fMutex);
+        static Mutex fMutex;
+        ScopedLock lock(fMutex);
         static RandomSeed fRandomSeed;
         return fRandomSeed.get();
     }

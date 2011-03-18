@@ -10,7 +10,6 @@
 #include "Tetris/NodePtr.h"
 #include "Tetris/Threading.h"
 #include <boost/scoped_ptr.hpp>
-#include <boost/thread.hpp>
 #include <memory>
 #include <set>
 

@@ -2,11 +2,11 @@
 #define TETRIS_WORKERTHREAD_H_INCLUDED
 
 
-#include <list>
+#include "Tetris/Threading.h"
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
 #include <boost/scoped_ptr.hpp>
-#include <boost/thread.hpp>
+#include <list>
 
 
 namespace Tetris {
@@ -99,14 +99,14 @@ private:
 
     std::string mName;
     Status mStatus;
-    mutable boost::mutex mStatusMutex;
+    mutable Mutex mStatusMutex;
     boost::condition_variable mStatusCondition;
 
     std::list<Task> mQueue;
-    mutable boost::mutex mQueueMutex;
+    mutable Mutex mQueueMutex;
     boost::condition_variable mQueueCondition;
 
-    mutable boost::mutex mQuitFlagMutex;
+    mutable Mutex mQuitFlagMutex;
     bool mQuitFlag;
 
     boost::scoped_ptr<boost::thread> mThread;
