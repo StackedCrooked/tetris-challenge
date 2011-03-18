@@ -126,7 +126,7 @@ protected:
     virtual void setMinSize(const Size & inMinSize) = 0;
     virtual Size getMinSize() const = 0;
 
-    void coordinateRepaint(const SimpleGame & inGame);
+    void coordinateRepaint(SimpleGame & inGame);
     virtual void paintSquare(const Rect & inRect, const RGBColor & inColor) = 0;
     virtual void paintStatItem(const Tetris::Rect & inRect, const std::string & inName, const std::string & inValue) = 0;
     virtual void paintImage(const Tetris::Rect & inRect, const std::string & inFileName) = 0;

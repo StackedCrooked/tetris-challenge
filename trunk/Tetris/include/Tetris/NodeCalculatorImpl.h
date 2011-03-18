@@ -59,7 +59,8 @@ namespace Tetris
                                       size_t inMaxIndex);
 
         void destroyInferiorChildren();
-        void calculateResult() const;
+
+        void calculateResult();
 
         // Store info per horizontal level of nodes.
         class TreeRowInfo
@@ -188,7 +189,7 @@ namespace Tetris
         };
 
         NodePtr mNode;
-        mutable NodePtr mResult;
+        NodePtr mResult;
         mutable boost::mutex mNodeMutex;
 
 

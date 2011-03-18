@@ -37,7 +37,7 @@ struct WithMutex : boost::noncopyable
     }
 
     Variable * mVariable;
-    mutable boost::shared_mutex mMutex;
+    boost::shared_mutex mMutex;
 };
 
 

@@ -284,7 +284,7 @@ Rect AbstractWidget::avatarRect() const
 }
 
 
-void AbstractWidget::coordinateRepaint(const SimpleGame & inGame)
+void AbstractWidget::coordinateRepaint(SimpleGame & inGame)
 {
     Tetris::Size minSize = getMinSize();
     fillRect(Rect(0, 0, minSize.width(), minSize.height()), RGBColor(0, 50, 100));

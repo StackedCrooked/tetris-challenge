@@ -46,7 +46,7 @@ private:
     BlockFactory& operator=(const BlockFactory&);
 
     struct Impl;
-    mutable ThreadSafe<Impl> mThreadSafeImpl;
+    ThreadSafe<Impl> mThreadSafeImpl;
 };
 
 

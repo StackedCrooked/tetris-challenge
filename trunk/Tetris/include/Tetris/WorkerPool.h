@@ -48,7 +48,7 @@ private:
     void interruptRange(size_t inBegin, size_t inCount);
 
     std::string mName;
-    mutable size_t mRotation;
+    size_t mRotation;
 
     typedef boost::shared_ptr<Worker> WorkerPtr;
     typedef std::vector<WorkerPtr> Workers;

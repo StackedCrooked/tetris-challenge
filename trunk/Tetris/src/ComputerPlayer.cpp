@@ -341,8 +341,8 @@ void ComputerPlayer::Impl::startNodeCalculator()
 
     // Critical section
     {
-        ScopedReader<Game> wgame(mComputerPlayer->simpleGame()->game());
-        const ComputerGame & game(dynamic_cast<const ComputerGame&>(*wgame.get()));
+        ScopedReaderAndWriter<Game> wgame(mComputerPlayer->simpleGame()->game());
+        ComputerGame & game(dynamic_cast<ComputerGame&>(*wgame.get()));
 
 
         if (game.numPrecalculatedMoves() > 8)

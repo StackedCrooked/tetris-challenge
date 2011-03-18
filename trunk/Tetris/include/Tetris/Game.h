@@ -92,9 +92,9 @@ public:
 
     void setFutureBlocksCount(int inFutureBlocksCount);
 
-    void getFutureBlocks(size_t inCount, BlockTypes & outBlocks) const;
+    void getFutureBlocks(size_t inCount, BlockTypes & outBlocks);
 
-    void getFutureBlocksWithOffset(size_t inOffset, size_t inCount, BlockTypes & outBlocks) const;
+    void getFutureBlocksWithOffset(size_t inOffset, size_t inCount, BlockTypes & outBlocks);
 
     virtual const GameState & gameState() const = 0;
 
@@ -117,7 +117,7 @@ protected:
 
     static std::auto_ptr<Block> CreateDefaultBlock(BlockType inBlockType, size_t inNumColumns);
     void reserveBlocks(size_t inCount);
-    void supplyBlocks() const;
+    void supplyBlocks();
 
     std::vector<BlockType> getGarbageRow() const;
 
@@ -125,7 +125,7 @@ protected:
     size_t mNumColumns;
     boost::scoped_ptr<Block> mActiveBlock;
     boost::scoped_ptr<BlockFactory> mBlockFactory;
-    mutable BlockTypes mBlocks;
+    BlockTypes mBlocks;
     int mFutureBlocksCount;
     size_t mCurrentBlockIndex;
     int mStartingLevel;
