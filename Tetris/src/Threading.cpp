@@ -7,52 +7,39 @@ namespace Tetris {
 
 
 InstanceTracker::ThreadedInstances InstanceTracker::sInstances;
-const int cMaximumLockDurationMs(16);
 
 
-class StopwatchImpl
+struct Stopwatch::Impl : boost::noncopyable
 {
 public:
-    StopwatchImpl()
+    Impl()
     {
-        mStopwatch.start();
+        mPocoStopwatch.start();
     }
 
-
-    ~StopwatchImpl()
+    ~Impl()
     {
     }
 
-
-    int elapsedTimeMs() const
-    {
-        return static_cast<int>(0.5 + static_cast<double>(mStopwatch.elapsed()) / 1000.0);
-    }
-
-private:
-    StopwatchImpl(const StopwatchImpl&);
-    StopwatchImpl& operator=(const StopwatchImpl&);
-
-    Poco::Stopwatch mStopwatch;
+    Poco::Stopwatch mPocoStopwatch;
 };
 
 
 Stopwatch::Stopwatch() :
-    mImpl(new StopwatchImpl)
+    mImpl(new Impl)
 {
 }
 
 
 Stopwatch::~Stopwatch()
 {
-    delete mImpl;
-    mImpl = 0;
+    mImpl.reset();
 }
 
 
 int Stopwatch::elapsedTimeMs() const
 {
-    return mImpl->elapsedTimeMs();
+    return static_cast<int>(0.5 + static_cast<double>(mImpl->mPocoStopwatch.elapsed()) / 1000.0);
 }
 
 
