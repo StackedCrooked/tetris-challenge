@@ -18,27 +18,10 @@
 namespace Tetris {
 
 
-template<class Variable>
-struct WithMutex : boost::noncopyable
-{
-    WithMutex(std::auto_ptr<Variable> inVariable) :
-        mVariable(inVariable.release())
-    {
-    }
-
-    WithMutex(Variable * inVariable) :
-        mVariable(inVariable)
-    {
-    }
-
-    ~WithMutex()
-    {
-        delete mVariable;
-    }
-
-    Variable * mVariable;
-    boost::shared_mutex mMutex;
-};
+//
+// Configuration options
+//
+typedef boost::shared_mutex SharedMutex;
 
 
 // Forward declaration.
@@ -56,21 +39,18 @@ class ThreadSafe
 {
 public:
     ThreadSafe(std::auto_ptr<Variable> inVariable) :
-        mVariableWithMutex(new WithMutex<Variable>(inVariable)),
-        mIdentifier(++sInstanceCount)
+        mImpl(new Impl(inVariable))
     {
     }
 
     ThreadSafe(Variable * inVariable) :
-        mVariableWithMutex(new WithMutex<Variable>(inVariable)),
-        mIdentifier(++sInstanceCount)
+        mImpl(new Impl(inVariable))
     {
     }
 
     // Default constructor can only be used if Variable has a default constructor.
     ThreadSafe() :
-        mVariableWithMutex(new WithMutex<Variable>(new Variable)),
-        mIdentifier(++sInstanceCount)
+        mImpl(new Impl(new Variable))
     {
     }
 
@@ -82,20 +62,41 @@ public:
 
     operator bool() const
     {
-        return mVariableWithMutex.get() != 0;
+        return mImpl.get() != 0;
     }
 
     size_t id() const
-    { return mIdentifier; }
-
-    boost::timed_mutex & getMutex() const
-    { return mVariableWithMutex->mMutex; }
+    { return mImpl->mIdentifier; }
 
 private:
     friend class ScopedReaderAndWriter<Variable>;
     friend class ScopedReader<Variable>;
-    boost::shared_ptr<WithMutex<Variable> > mVariableWithMutex;
-    size_t mIdentifier;
+
+    struct Impl : boost::noncopyable
+    {
+        Impl(std::auto_ptr<Variable> inVariable) :
+            mVariable(inVariable.release()),
+            mIdentifier(++sInstanceCount)
+        {
+        }
+
+        Impl(Variable * inVariable) :
+            mVariable(inVariable),
+            mIdentifier(++sInstanceCount)
+        {
+        }
+
+        ~Impl()
+        {
+            delete mVariable;
+        }
+
+        Variable * mVariable;
+        SharedMutex mMutex;
+        size_t mIdentifier;
+    };
+
+    boost::shared_ptr<Impl> mImpl;
     static Poco::AtomicCounter sInstanceCount;
 };
 
@@ -140,9 +141,9 @@ class ScopedReaderAndWriter
 {
 public:
     ScopedReaderAndWriter(ThreadSafe<Variable> inProtectedVariable) :
-        mSharedLock(inProtectedVariable.mVariableWithMutex->mMutex),
+        mSharedLock(inProtectedVariable.mImpl->mMutex),
         mUpgradeLock(mSharedLock),
-        mVariable(inProtectedVariable.mVariableWithMutex->mVariable)
+        mVariable(inProtectedVariable.mImpl->mVariable)
     {
 
     }
@@ -178,8 +179,8 @@ class ScopedReader
 {
 public:
     ScopedReader(ThreadSafe<Variable> inProtectedVariable) :
-        mSharedLock(inProtectedVariable.mVariableWithMutex->mMutex),
-        mVariable(inProtectedVariable.mVariableWithMutex->mVariable)
+        mSharedLock(inProtectedVariable.mImpl->mMutex),
+        mVariable(inProtectedVariable.mImpl->mVariable)
     {
     }
 
