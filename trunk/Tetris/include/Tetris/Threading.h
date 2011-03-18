@@ -22,6 +22,8 @@ namespace Tetris {
 // Configuration options
 //
 typedef boost::shared_mutex SharedMutex;
+typedef boost::upgrade_lock<SharedMutex> SharedLock;
+typedef boost::upgrade_to_unique_lock<SharedMutex> UniqueLock;
 
 
 // Forward declaration.
@@ -115,8 +117,7 @@ bool operator< (const ThreadSafe<Variable> & lhs, const ThreadSafe<Variable> & r
 
 // Simple stopwatch class.
 // Helper for ScopedReaderAndWriter and ScopedReader.
-class StopwatchImpl;
-class Stopwatch
+class Stopwatch : boost::noncopyable
 {
 public:
     Stopwatch();
@@ -126,56 +127,51 @@ public:
     int elapsedTimeMs() const;
 
 private:
-    Stopwatch(const Stopwatch&);
-    Stopwatch& operator=(const Stopwatch&);
-
-    StopwatchImpl * mImpl;
+    struct Impl;
+    boost::scoped_ptr<Impl> mImpl;
 };
 
 
-extern const int cMaximumLockDurationMs;
-
-
-template<class Variable>
-class ScopedReaderAndWriter
+/**
+ * VoidPolicy can be used as a default type for policies that you don't want to set.
+ */
+class VoidPolicy
 {
-public:
-    ScopedReaderAndWriter(ThreadSafe<Variable> inProtectedVariable) :
-        mSharedLock(inProtectedVariable.mImpl->mMutex),
-        mUpgradeLock(mSharedLock),
-        mVariable(inProtectedVariable.mImpl->mVariable)
-    {
+};
 
+
+/**
+ * TimeLimitMs is an object that checks the duration of its own lifetime.
+ * During destruction it is checked if the duration has been exceeded.
+ * If yes, then an assert is triggered.
+ */
+template<unsigned int MaxDurationMs>
+struct TimeLimitMs
+{
+    ~TimeLimitMs()
+    {
+        Assert(mStopwatch.elapsedTimeMs() < MaxDurationMs);
     }
 
-    ~ScopedReaderAndWriter()
-    {
-        Assert(mStopwatch.elapsedTimeMs() < cMaximumLockDurationMs);
-    }
-
-    Variable & operator *()
-    { return *mVariable; }
-
-    Variable * get()
-    { return mVariable; }
-
-    Variable * operator->()
-    { return mVariable; }
-
-private:
-    ScopedReaderAndWriter(const ScopedReaderAndWriter&);
-    ScopedReaderAndWriter& operator=(const ScopedReaderAndWriter&);
-
-    boost::upgrade_lock<boost::shared_mutex> mSharedLock;
-    boost::upgrade_to_unique_lock<boost::shared_mutex> mUpgradeLock;
-
-    Variable * mVariable;
+    // Stopwatch starts during construction.
     Stopwatch mStopwatch;
 };
 
 
+template<
+    class Variable,
+    class CheckLockDurationPolicy = TimeLimitMs<10>,
+    class CheckLockOrderPolicy = VoidPolicy
+>
+class ScopedLock : CheckLockDurationPolicy,
+                   CheckLockOrderPolicy,
+                   boost::noncopyable
+{
+};
+
+
 template<class Variable>
-class ScopedReader
+class ScopedReader : public ScopedLock<Variable>
 {
 public:
     ScopedReader(ThreadSafe<Variable> inProtectedVariable) :
@@ -186,7 +182,6 @@ public:
 
     ~ScopedReader()
     {
-        Assert(mStopwatch.elapsedTimeMs() < cMaximumLockDurationMs);
     }
 
     const Variable & operator *() const
@@ -198,13 +193,39 @@ public:
     const Variable * operator->() const
     { return mVariable; }
 
-private:
-    ScopedReader(const ScopedReader&);
-    ScopedReader& operator=(const ScopedReader&);
+protected:
+    SharedLock mSharedLock;
+    Variable * mVariable;
+};
 
-    boost::upgrade_lock<boost::shared_mutex> mSharedLock;
-    const Variable * mVariable;
-    Stopwatch mStopwatch;
+
+template<class Variable>
+class ScopedReaderAndWriter : public ScopedReader<Variable>
+{
+public:
+    typedef ScopedReader<Variable> Super;
+
+    ScopedReaderAndWriter(ThreadSafe<Variable> inProtectedVariable) :
+        Super(inProtectedVariable),
+        mUniqueLock(Super::mSharedLock)
+    {
+    }
+
+    ~ScopedReaderAndWriter()
+    {
+    }
+
+    Variable & operator *()
+    { return *Super::mVariable; }
+
+    Variable * get()
+    { return Super::mVariable; }
+
+    Variable * operator->()
+    { return Super::mVariable; }
+
+private:
+    UniqueLock mUniqueLock;
 };
 
 
