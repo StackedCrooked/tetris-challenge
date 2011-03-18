@@ -99,7 +99,9 @@ HEADERS += \
     Tetris/include/Tetris/Utilities.h \
     Tetris/include/Tetris/Worker.h \
     Tetris/include/Tetris/WorkerPool.h \
-    QtTetris/NewGameDialog.h
+    QtTetris/NewGameDialog.h \
+    Tetris/include/Tetris/ThreadingConfiguration.h \
+    Tetris/include/Tetris/ThreadingConfigurationBoost.h
 
 
 OTHER_FILES += \

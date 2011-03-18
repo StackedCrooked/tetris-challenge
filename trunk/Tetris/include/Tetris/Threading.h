@@ -2,13 +2,13 @@
 #define TETRIS_THREADING_H_INCLUDED
 
 
+#include "Tetris/ThreadingConfiguration.h"
 #include "Tetris/Assert.h"
 #include "Tetris/MainThread.h"
 #include "Tetris/Logging.h"
 #include "Tetris/Utilities.h"
 #include "Poco/AtomicCounter.h"
 #include <boost/noncopyable.hpp>
-#include <boost/thread.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/noncopyable.hpp>
 #include <memory>
@@ -16,14 +16,6 @@
 
 
 namespace Tetris {
-
-
-//
-// Configuration options
-//
-typedef boost::shared_mutex SharedMutex;
-typedef boost::upgrade_lock<SharedMutex> SharedLock;
-typedef boost::upgrade_to_unique_lock<SharedMutex> UniqueLock;
 
 
 // Forward declarations
@@ -318,18 +310,6 @@ public:
 private:
     Mutexes mMutexes;
 };
-
-
-inline void LockMutex(boost::mutex & inMutex)
-{
-    inMutex.lock();
-}
-
-
-inline void UnlockMutex(boost::mutex & inMutex)
-{
-    inMutex.unlock();
-}
 
 
 template<class Mutex>
