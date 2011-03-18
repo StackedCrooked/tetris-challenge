@@ -101,7 +101,7 @@ SimpleGame::SimpleGame(PlayerType inPlayerType, size_t inRowCount, size_t inColu
 SimpleGame::~SimpleGame()
 {
     sInstances.erase(this);
-    delete mImpl;
+    mImpl.reset();
 }
 
 

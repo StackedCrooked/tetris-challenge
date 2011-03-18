@@ -3,6 +3,7 @@
 
 
 #include "Tetris/Threading.h"
+#include <boost/scoped_ptr.hpp>
 
 
 namespace Tetris {
@@ -35,7 +36,7 @@ private:
     Gravity & operator=(const Gravity &);
 
     struct Impl;
-    Impl * mImpl;
+    boost::scoped_ptr<Impl> mImpl;
 };
 
 

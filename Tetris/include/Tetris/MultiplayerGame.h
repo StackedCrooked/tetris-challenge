@@ -3,6 +3,7 @@
 
 
 #include "Tetris/Player.h"
+#include <boost/scoped_ptr.hpp>
 #include <memory>
 #include <set>
 
@@ -35,7 +36,7 @@ private:
     MultiplayerGame& operator=(const MultiplayerGame&);
 
     struct Impl;
-    Impl * mImpl;
+    boost::scoped_ptr<Impl> mImpl;
 };
 
 

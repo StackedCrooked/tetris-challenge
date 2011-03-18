@@ -6,6 +6,7 @@
 #include "Tetris/PlayerType.h"
 #include "Tetris/SimpleGame.h"
 #include "Tetris/TypedWrapper.h"
+#include <boost/scoped_ptr.hpp>
 #include <string>
 #include <vector>
 
@@ -52,7 +53,7 @@ private:
     friend bool operator<(const Player & lhs, const Player & rhs);
 
     struct Impl;
-    Impl * mImpl;
+    boost::scoped_ptr<Impl> mImpl;
 };
 
 

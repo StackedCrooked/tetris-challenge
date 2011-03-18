@@ -3,6 +3,7 @@
 #include "Tetris/Assert.h"
 #include "Tetris/AutoPtrSupport.h"
 #include "Tetris/BlockMover.h"
+#include "Tetris/Boost.h"
 #include "Tetris/ComputerPlayer.h"
 #include "Tetris/Game.h"
 #include "Tetris/Logger.h"
@@ -25,10 +26,10 @@ int Tetris_GetSquareWidth();
 int Tetris_GetSquareHeight();
 
 
-typedef Tetris::shared_ptr<Tetris::SimpleGame> SimpleGamePtr;
-
-
 using namespace Tetris;
+
+
+typedef Boost::shared_ptr<Tetris::SimpleGame> SimpleGamePtr;
 
 
 class Model : public ComputerPlayer::Tweaker

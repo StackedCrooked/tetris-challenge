@@ -70,8 +70,7 @@ BlockMover::BlockMover(ThreadSafe<Game> inGame) :
 
 BlockMover::~BlockMover()
 {
-    delete mImpl;
-    mImpl = 0;
+    mImpl.reset();
 }
 
 

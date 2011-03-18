@@ -74,8 +74,7 @@ Gravity::Gravity(const ThreadSafe<Game> & inThreadSafeGame) :
 
 Gravity::~Gravity()
 {
-    delete mImpl;
-    mImpl = 0;
+    mImpl.reset();
 }
 
 

@@ -74,8 +74,7 @@ GameStateNode::GameStateNode(NodePtr inParent, GameState *  inGameState, Evaluat
 
 GameStateNode::~GameStateNode()
 {
-    delete mImpl;
-    mImpl = 0;
+    mImpl.reset();
 }
 
 

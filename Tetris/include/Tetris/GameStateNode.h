@@ -4,6 +4,7 @@
 
 #include "Tetris/Grid.h"
 #include "Tetris/NodePtr.h"
+#include <boost/scoped_ptr.hpp>
 #include <memory>
 
 
@@ -65,7 +66,7 @@ public:
 
 private:
     struct Impl;
-    Impl * mImpl;
+    boost::scoped_ptr<Impl> mImpl;
 };
 
 

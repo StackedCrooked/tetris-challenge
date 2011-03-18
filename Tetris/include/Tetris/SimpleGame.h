@@ -110,7 +110,7 @@ private:
     SimpleGame & operator=(const SimpleGame&);
 
     struct Impl;
-    Impl * mImpl;
+    boost::scoped_ptr<Impl> mImpl;
 
     typedef std::set<SimpleGame*> Instances;
     static Instances sInstances;

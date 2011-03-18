@@ -112,7 +112,7 @@ ComputerPlayer::~ComputerPlayer()
         mImpl->mQuitFlag = true;
     }
     mImpl->mTimer.stop();
-    delete mImpl;
+    mImpl.reset();
 }
 
 
