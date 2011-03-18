@@ -26,14 +26,9 @@ typedef boost::upgrade_lock<SharedMutex> SharedLock;
 typedef boost::upgrade_to_unique_lock<SharedMutex> UniqueLock;
 
 
-// Forward declaration.
+// Forward declarations
 template<class Variable>
-class ScopedReader;
-
-
-// Forward declaration.
-template<class Variable>
-class ScopedReaderAndWriter;
+class ScopedAccessor;
 
 
 template<class Variable>
@@ -71,8 +66,7 @@ public:
     { return mImpl->mIdentifier; }
 
 private:
-    friend class ScopedReaderAndWriter<Variable>;
-    friend class ScopedReader<Variable>;
+    friend class ScopedAccessor<Variable>;
 
     struct Impl : boost::noncopyable
     {
@@ -94,7 +88,7 @@ private:
         }
 
         Variable * mVariable;
-        SharedMutex mMutex;
+        SharedMutex mSharedMutex;
         size_t mIdentifier;
     };
 
@@ -158,25 +152,61 @@ struct TimeLimitMs
 };
 
 
-template<
-    class Variable,
-    class CheckLockDurationPolicy = TimeLimitMs<10>,
-    class CheckLockOrderPolicy = VoidPolicy
->
-class ScopedLock : CheckLockDurationPolicy,
-                   CheckLockOrderPolicy,
-                   boost::noncopyable
+template<class Variable>
+class ScopedAccessor : boost::noncopyable
 {
+public:
+    ScopedAccessor(ThreadSafe<Variable> inProtectedVariable) :
+        mProtectedVariable(inProtectedVariable)
+    {
+    }
+
+protected:
+    SharedMutex & getSharedMutex()
+    {
+        return mProtectedVariable.mImpl->mSharedMutex;
+    }
+
+    const Variable * getVariable() const
+    {
+        return mProtectedVariable.mImpl->mVariable;
+    }
+
+    Variable * getVariable()
+    {
+        return mProtectedVariable.mImpl->mVariable;
+    }
+
+private:
+    ThreadSafe<Variable> mProtectedVariable;
+};
+
+
+template<class Variable,
+         class CheckLockDurationPolicy = TimeLimitMs<10>,
+         class CheckLockOrderPolicy = VoidPolicy>
+class ConfigurableScopedAccessor : public  ScopedAccessor<Variable>,
+                                   private CheckLockDurationPolicy,
+                                   private CheckLockOrderPolicy
+{
+public:
+    typedef ScopedAccessor<Variable> Super;
+    ConfigurableScopedAccessor(ThreadSafe<Variable> inProtectedVariable) :
+        Super(inProtectedVariable)
+    {
+    }
 };
 
 
 template<class Variable>
-class ScopedReader : public ScopedLock<Variable>
+class ScopedReader : public ConfigurableScopedAccessor<Variable>
 {
 public:
+    typedef ConfigurableScopedAccessor<Variable> Super;
+
     ScopedReader(ThreadSafe<Variable> inProtectedVariable) :
-        mSharedLock(inProtectedVariable.mImpl->mMutex),
-        mVariable(inProtectedVariable.mImpl->mVariable)
+        Super(inProtectedVariable),
+        mSharedLock(ScopedAccessor<Variable>::getSharedMutex())
     {
     }
 
@@ -185,17 +215,16 @@ public:
     }
 
     const Variable & operator *() const
-    { return *mVariable; }
+    { return *ScopedAccessor<Variable>::getVariable(); }
 
     const Variable * get() const
-    { return mVariable; }
+    { return ScopedAccessor<Variable>::getVariable(); }
 
     const Variable * operator->() const
-    { return mVariable; }
+    { return ScopedAccessor<Variable>::getVariable(); }
 
 protected:
     SharedLock mSharedLock;
-    Variable * mVariable;
 };
 
 
@@ -216,19 +245,23 @@ public:
     }
 
     Variable & operator *()
-    { return *Super::mVariable; }
+    { return *ScopedAccessor<Variable>::getVariable(); }
 
     Variable * get()
-    { return Super::mVariable; }
+    { return ScopedAccessor<Variable>::getVariable(); }
 
     Variable * operator->()
-    { return Super::mVariable; }
+    { return ScopedAccessor<Variable>::getVariable(); }
 
 private:
     UniqueLock mUniqueLock;
 };
 
 
+/**
+ * InstanceTracker allows you to monitor instances of a class.
+ * To use it the class must inherit InstanceTracker.
+ */
 class InstanceTracker : boost::noncopyable
 {
 public:
@@ -259,7 +292,7 @@ private:
 
 
 /**
- * LockMany is a scoped mutex locker that can lock an arbitrary number of mutexes.
+ * LockMany is a mutex lock that can lock an arbitrary number of mutexes.
  */
 template<class Mutex>
 class LockMany : boost::noncopyable
@@ -355,4 +388,4 @@ typename LockMany<Mutex>::size_type LockMany<Mutex>::size() const
 } // namespace Tetris
 
 
-#endif // THREADING_H_INCLUDED
+#endif // TETRIS_THREADING_H_INCLUDED
