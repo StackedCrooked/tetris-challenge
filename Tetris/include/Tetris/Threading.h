@@ -5,6 +5,7 @@
 #include "Tetris/Assert.h"
 #include "Tetris/MainThread.h"
 #include "Tetris/Logging.h"
+#include "Tetris/Utilities.h"
 #include "Poco/AtomicCounter.h"
 #include <boost/noncopyable.hpp>
 #include <boost/thread.hpp>

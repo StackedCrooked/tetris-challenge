@@ -62,6 +62,7 @@ HEADERS += \
     Tetris/include/Tetris/BlockMover.h \
     Tetris/include/Tetris/BlockType.h \
     Tetris/include/Tetris/BlockTypes.h \
+    Tetris/include/Tetris/Boost.h \
     Tetris/include/Tetris/ComputerPlayer.h \
     Tetris/include/Tetris/Config.h \
     Tetris/include/Tetris/Direction.h \

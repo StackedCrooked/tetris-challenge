@@ -1,27 +1,22 @@
-#ifndef TETRIS_UTILITIES_H_INCLUDED
-#define TETRIS_UTILITIES_H_INCLUDED
+#ifndef TETRIS_BOOST_H_INCLUDED
+#define TETRIS_BOOST_H_INCLUDED
 
 
+/**
+ * This is my own re-implementation of commonly classes from the boost library.
+ * Purposes:
+ * - Can be inserted in a codebase where boost is not available.
+ * - Simpler stack traces when debugging.
+ */
 namespace Tetris {
-
-
-template<class T>
-static T DivideByTwo(T inValue)
-{
-    return static_cast<int>(0.5 + 0.5 * inValue);
-}
+namespace Boost {
 
 
 class noncopyable
 {
 protected:
-    noncopyable()
-    {
-    }
-
-    ~noncopyable()
-    {
-    }
+    noncopyable() {}
+    ~noncopyable() {}
 
 private:  // emphasize the following members are private
     noncopyable(const noncopyable&);
@@ -33,17 +28,6 @@ template<class T>
 class shared_ptr
 {
 public:
-    struct Impl
-    {
-        Impl(T * inValue) :
-            mRefCount(1),
-            mValue(inValue)
-        {
-        }
-        int mRefCount;
-        T * mValue;
-    };
-
     shared_ptr(T * inValue = 0) :
         mImpl(new Impl(inValue))
     {
@@ -113,6 +97,17 @@ public:
     }
 
 private:
+    struct Impl
+    {
+        Impl(T * inValue) :
+            mRefCount(1),
+            mValue(inValue)
+        {
+        }
+        int mRefCount;
+        T * mValue;
+    };
+
     inline void unref()
     {
         if (--mImpl->mRefCount == 0)
@@ -127,7 +122,7 @@ private:
 };
 
 
-} // namespace Tetris
+} } // namespace Tetris::Boost
 
 
-#endif // UTILITIES_H_INCLUDED
+#endif // TETRIS_BOOST_H_INCLUDED
