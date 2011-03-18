@@ -79,7 +79,7 @@ MultiplayerGame::MultiplayerGame(size_t inRowCount, size_t inColumnCount) :
 
 MultiplayerGame::~MultiplayerGame()
 {
-    delete mImpl;
+    mImpl.reset();
 }
 
 
@@ -93,14 +93,14 @@ Player * MultiplayerGame::addPlayer(PlayerType inPlayerType,
                                              mImpl->mRowCount,
                                              mImpl->mColumnCount).release());
     Player * player = mImpl->mPlayers.back();
-    SimpleGame::RegisterEventHandler(player->simpleGame(), mImpl);
+    SimpleGame::RegisterEventHandler(player->simpleGame(), mImpl.get());
     return player;
 }
 
 
 void MultiplayerGame::removePlayer(Player * inPlayer)
 {
-    SimpleGame::UnregisterEventHandler(inPlayer->simpleGame(), mImpl);
+    SimpleGame::UnregisterEventHandler(inPlayer->simpleGame(), mImpl.get());
     Players::iterator it = std::find(mImpl->mPlayers.begin(), mImpl->mPlayers.end(), inPlayer);
     if (it == mImpl->mPlayers.end())
     {

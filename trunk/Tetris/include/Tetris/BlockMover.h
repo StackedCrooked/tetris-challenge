@@ -3,6 +3,7 @@
 
 
 #include "Tetris/Utilities.h"
+#include <boost/scoped_ptr.hpp>
 #include <boost/function.hpp>
 
 
@@ -53,7 +54,7 @@ private:
     BlockMover & operator=(const BlockMover&);
 
     struct Impl;
-    Impl * mImpl;
+    boost::scoped_ptr<Impl> mImpl;
 };
 
 

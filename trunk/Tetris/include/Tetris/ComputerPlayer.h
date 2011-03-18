@@ -7,6 +7,7 @@
 #include "Tetris/Evaluator.h"
 #include "Tetris/Player.h"
 #include "Tetris/Threading.h"
+#include <boost/scoped_ptr.hpp>
 
 
 namespace Poco {
@@ -78,7 +79,7 @@ private:
     void onTimerEvent(Poco::Timer & );
 
     struct Impl;
-    Impl * mImpl;
+    boost::scoped_ptr<Impl> mImpl;
 };
 
 } // namespace Tetris

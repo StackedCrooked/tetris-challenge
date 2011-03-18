@@ -74,8 +74,7 @@ Player::Player(PlayerType inPlayerType,
 
 Player::~Player()
 {
-    delete mImpl;
-    mImpl = 0;
+    mImpl.reset();
 }
 
 
