@@ -104,4 +104,4 @@ namespace Tetris
 } // namespace Tetris
 
 
-#endif // UTILITIES_H_INCLUDED
+#endif // TETRIS_AUTOPTRSUPPORT_H_INCLUDED

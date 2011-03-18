@@ -13,6 +13,7 @@ add_library(Tetris
     include/Tetris/BlockMover.h
     include/Tetris/BlockType.h
     include/Tetris/BlockTypes.h
+    include/Tetris/Boost.h
     include/Tetris/ComputerPlayer.h
     include/Tetris/Config.h
     include/Tetris/Direction.h
