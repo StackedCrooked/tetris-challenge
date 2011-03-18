@@ -4,7 +4,7 @@
 
 #include "Tetris/TypedWrapper.h"
 #include "Tetris/AutoPtrSupport.h"
-#include <boost/thread.hpp>
+#include "Tetris/Threading.h"
 #include <memory>
 #include <string>
 
@@ -85,7 +85,7 @@ namespace Tetris
         int mNumTetrisesFactor;
         int mRecommendedSearchDepth;
         int mRecommendedSearchWidth;
-        mutable boost::mutex mMutex;
+        mutable Mutex mMutex;
     };
 
 

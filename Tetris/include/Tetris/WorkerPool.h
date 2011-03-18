@@ -54,7 +54,7 @@ private:
     typedef std::vector<WorkerPtr> Workers;
     Workers mWorkers;
 
-    mutable boost::mutex mMutex;
+    mutable Mutex mMutex;
 };
 
 

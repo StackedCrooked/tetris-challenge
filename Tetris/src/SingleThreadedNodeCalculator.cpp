@@ -7,8 +7,8 @@
 #include "Tetris/WorkerPool.h"
 #include "Tetris/Logging.h"
 #include "Tetris/MakeString.h"
+#include "Tetris/Threading.h"
 #include <boost/shared_ptr.hpp>
-#include <boost/thread.hpp>
 #include <memory>
 #include <stdexcept>
 
@@ -43,7 +43,7 @@ namespace Tetris
             size_t targetDepth = 1;
             while (targetDepth <= mBlockTypes.size())
             {
-                boost::mutex::scoped_lock lock(mNodeMutex);
+                ScopedLock lock(mNodeMutex);
                 populateNodesRecursively(mNode, mBlockTypes, mWidths, 0, targetDepth - 1);
                 mTreeRowInfos.setFinished(targetDepth);
                 targetDepth++;

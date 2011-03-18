@@ -91,8 +91,8 @@ Worker::~Worker()
 {
     {
         setQuitFlag();
-        boost::mutex::scoped_lock queueLock(mQueueMutex);
-        boost::mutex::scoped_lock statusLock(mStatusMutex);
+        ScopedLock queueLock(mQueueMutex);
+        ScopedLock statusLock(mStatusMutex);
         mQueue.clear();
         mThread->interrupt();
         mQueueCondition.notify_all();
@@ -105,21 +105,21 @@ Worker::~Worker()
 
 void Worker::setQuitFlag()
 {
-    boost::mutex::scoped_lock lock(mQuitFlagMutex);
+    ScopedLock lock(mQuitFlagMutex);
     mQuitFlag = true;
 }
 
 
 bool Worker::getQuitFlag() const
 {
-    boost::mutex::scoped_lock lock(mQuitFlagMutex);
+    ScopedLock lock(mQuitFlagMutex);
     return mQuitFlag;
 }
 
 
 void Worker::setStatus(Status inStatus)
 {
-    boost::mutex::scoped_lock lock(mStatusMutex);
+    ScopedLock lock(mStatusMutex);
     mStatus = inStatus;
     mStatusCondition.notify_all();
 }
@@ -127,7 +127,7 @@ void Worker::setStatus(Status inStatus)
 
 Worker::Status Worker::status() const
 {
-    boost::mutex::scoped_lock lock(mStatusMutex);
+    ScopedLock lock(mStatusMutex);
     return mStatus;
 }
 
@@ -140,7 +140,7 @@ void Worker::wait()
 
 void Worker::waitForStatus(Status inStatus)
 {
-    boost::mutex::scoped_lock lock(mStatusMutex);
+    ScopedLock lock(mStatusMutex);
     while (mStatus != inStatus)
     {
         mStatusCondition.wait(lock);
@@ -150,14 +150,14 @@ void Worker::waitForStatus(Status inStatus)
 
 size_t Worker::size() const
 {
-    boost::mutex::scoped_lock lock(mQueueMutex);
+    ScopedLock lock(mQueueMutex);
     return mQueue.size();
 }
 
 
 void Worker::interrupt(InterruptOption inInterruptOption)
 {
-    boost::mutex::scoped_lock statusLock(mStatusMutex);
+    ScopedLock statusLock(mStatusMutex);
     if (mStatus == Status_Working)
     {
         mThread->interrupt();
@@ -171,9 +171,9 @@ void Worker::interrupt(InterruptOption inInterruptOption)
 
 void Worker::interruptAndClearQueue(InterruptOption inInterruptOption)
 {
-    boost::mutex::scoped_lock queueLock(mQueueMutex);
+    ScopedLock queueLock(mQueueMutex);
     mQueue.clear();
-    boost::mutex::scoped_lock statusLock(mStatusMutex);
+    ScopedLock statusLock(mStatusMutex);
     mThread->interrupt();
     mQueueCondition.notify_all();
     queueLock.unlock();
@@ -186,10 +186,10 @@ void Worker::interruptAndClearQueue(InterruptOption inInterruptOption)
 
 void Worker::schedule(const Worker::Task & inTask)
 {
-    boost::mutex::scoped_lock lock(mQueueMutex);
+    ScopedLock lock(mQueueMutex);
     mQueue.push_back(inTask);
     {
-        boost::mutex::scoped_lock statusLock(mStatusMutex);
+        ScopedLock statusLock(mStatusMutex);
         if (mStatus <= Status_Waiting)
         {
             mStatus = Status_Scheduled;
@@ -201,7 +201,7 @@ void Worker::schedule(const Worker::Task & inTask)
 
 Worker::Task Worker::nextTask()
 {
-    boost::mutex::scoped_lock lock(mQueueMutex);
+    ScopedLock lock(mQueueMutex);
     while (mQueue.empty())
     {
         setStatus(Status_Waiting);

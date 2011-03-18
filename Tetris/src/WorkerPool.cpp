@@ -31,7 +31,7 @@ WorkerPool::~WorkerPool()
 
 void WorkerPool::schedule(const Worker::Task & inTask)
 {
-    boost::mutex::scoped_lock lock(mMutex);
+    ScopedLock lock(mMutex);
     mRotation = (mRotation + 1) % mWorkers.size();
     mWorkers[mRotation]->schedule(inTask);
 }
@@ -39,14 +39,14 @@ void WorkerPool::schedule(const Worker::Task & inTask)
 
 size_t WorkerPool::size() const
 {
-    boost::mutex::scoped_lock lock(mMutex);
+    ScopedLock lock(mMutex);
     return mWorkers.size();
 }
 
 
 void WorkerPool::resize(size_t inSize)
 {
-    boost::mutex::scoped_lock lock(mMutex);
+    ScopedLock lock(mMutex);
     if (inSize > mWorkers.size())
     {
         while (mWorkers.size() < inSize)
@@ -65,7 +65,7 @@ void WorkerPool::resize(size_t inSize)
 
 void WorkerPool::wait()
 {
-    boost::mutex::scoped_lock lock(mMutex);
+    ScopedLock lock(mMutex);
     for (size_t idx = 0; idx != mWorkers.size(); ++idx)
     {
         Worker & worker = *mWorkers[idx];
@@ -76,7 +76,7 @@ void WorkerPool::wait()
 
 void WorkerPool::interruptRange(size_t inBegin, size_t inCount)
 {
-    LockMany<boost::mutex> locker;
+    LockMany<Mutex> locker;
 
     //
     // Lock all workers' queue and status.
@@ -103,7 +103,7 @@ void WorkerPool::interruptRange(size_t inBegin, size_t inCount)
     for (size_t idx = inBegin; idx != inBegin + inCount; ++idx)
     {
         Worker & worker = *mWorkers[idx];
-        boost::mutex::scoped_lock statusLock(worker.mStatusMutex);
+        ScopedLock statusLock(worker.mStatusMutex);
         if (worker.mStatus == Worker::Status_Working)
         {
             worker.mStatusCondition.wait(statusLock);
@@ -114,14 +114,14 @@ void WorkerPool::interruptRange(size_t inBegin, size_t inCount)
 
 void WorkerPool::interruptAndClearQueue()
 {
-    boost::mutex::scoped_lock lock(mMutex);
+    ScopedLock lock(mMutex);
     interruptRange(0, mWorkers.size());
 }
 
 
 int WorkerPool::getActiveWorkerCount() const
 {
-    boost::mutex::scoped_lock lock(mMutex);
+    ScopedLock lock(mMutex);
     int activeWorkerCount = 0;
     for (size_t idx = 0; idx != mWorkers.size(); ++idx)
     {

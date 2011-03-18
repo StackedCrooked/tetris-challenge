@@ -11,8 +11,8 @@
 #include "Tetris/WorkerPool.h"
 #include "Tetris/Logging.h"
 #include "Tetris/MakeString.h"
+#include "Tetris/Threading.h"
 #include <boost/shared_ptr.hpp>
-#include <boost/thread.hpp>
 #include <memory>
 #include <stack>
 #include <stdexcept>
@@ -53,14 +53,14 @@ namespace Tetris
 
     void NodeCalculatorImpl::setQuitFlag()
     {
-        boost::mutex::scoped_lock lock(mQuitFlagMutex);
+        ScopedLock lock(mQuitFlagMutex);
         mQuitFlag = true;
     }
 
 
     bool NodeCalculatorImpl::getQuitFlag() const
     {
-        boost::mutex::scoped_lock lock(mQuitFlagMutex);
+        ScopedLock lock(mQuitFlagMutex);
         return mQuitFlag;
     }
 
@@ -80,14 +80,14 @@ namespace Tetris
     NodePtr NodeCalculatorImpl::result() const
     {
         Assert(status() == NodeCalculator::Status_Finished);
-        boost::mutex::scoped_lock lock(mNodeMutex);
+        ScopedLock lock(mNodeMutex);
         return mResult;
     }
 
 
     int NodeCalculatorImpl::status() const
     {
-        boost::mutex::scoped_lock lock(mStatusMutex);
+        ScopedLock lock(mStatusMutex);
         return mStatus;
     }
 
@@ -100,7 +100,7 @@ namespace Tetris
 
     void NodeCalculatorImpl::setStatus(int inStatus)
     {
-        boost::mutex::scoped_lock lock(mStatusMutex);
+        ScopedLock lock(mStatusMutex);
         mStatus = inStatus;
     }
 
@@ -186,7 +186,7 @@ namespace Tetris
         // We use the 'best child' from this search depth.
         // The path between the start node and this best
         // child will be the list of precalculated nodes.
-        boost::mutex::scoped_lock nodeLock(mNodeMutex);
+        ScopedLock nodeLock(mNodeMutex);
         NodePtr endNode = mTreeRowInfos.bestNode();
         Assert(endNode);
         if (endNode)
@@ -209,7 +209,7 @@ namespace Tetris
             return;
         }
 
-        boost::mutex::scoped_lock lock(mNodeMutex);
+        ScopedLock lock(mNodeMutex);
 
         // Backtrack the best end-node to its starting node.
         std::stack<NodePtr> results;
@@ -273,7 +273,7 @@ namespace Tetris
 
     void NodeCalculatorImpl::start()
     {
-        boost::mutex::scoped_lock lock(mStatusMutex);
+        ScopedLock lock(mStatusMutex);
         Assert(mStatus == NodeCalculator::Status_Nil);
         mMainWorker.schedule(boost::bind(&NodeCalculatorImpl::startImpl, this));
         mStatus = NodeCalculator::Status_Started;
