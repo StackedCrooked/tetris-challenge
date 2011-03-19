@@ -3,16 +3,17 @@
 
 
 #include "Tetris/BlockType.h"
-#include "Tetris/GenericGrid.h"
+#include "Futile/GenericGrid.h"
 
 
-namespace Tetris
-{
+namespace Tetris {
 
-    typedef GenericGrid<BlockType, Allocator_Malloc> Grid;
 
-} // namespace Tetris
+typedef Futile::GenericGrid<BlockType> Grid;
 
+
+} // namespace Futile
 
 
 #endif // TETRIS_GRID_H_INCLUDED
+

@@ -6,14 +6,20 @@
 #include "Tetris/GameStateComparator.h"
 #include "Tetris/GameState.h"
 #include "Tetris/Block.h"
-#include "Tetris/Logging.h"
-#include "Tetris/MakeString.h"
-#include "Tetris/Threading.h"
-#include "Tetris/Assert.h"
+#include "Futile/Logging.h"
+#include "Futile/MakeString.h"
+#include "Futile/Threading.h"
+#include "Futile/Assert.h"
 #include "Poco/AtomicCounter.h"
 #include "Poco/Stopwatch.h"
 #include "Poco/Timer.h"
 #include <boost/bind.hpp>
+
+
+using Futile::LogError;
+using Futile::MakeString;
+using Futile::ScopedReader;
+using Futile::ScopedReaderAndWriter;
 
 
 namespace Tetris {

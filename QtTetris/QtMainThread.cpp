@@ -1,5 +1,24 @@
 #include "QtMainThread.h"
-#include "Tetris/AutoPtrSupport.h"
+#include "Futile/AutoPtrSupport.h"
+
+
+using Futile::Action;
+using Futile::MainThreadImpl;
+
+
+namespace Futile {
+
+
+// Used in MainThread.cpp.
+std::auto_ptr<MainThreadImpl> CreateMainThreadImpl()
+{
+    std::auto_ptr<MainThreadImpl> result;
+    result.reset(new Tetris::QtMainThread);
+    return result;
+}
+
+
+} // namespace Futile
 
 
 namespace Tetris {
@@ -30,15 +49,6 @@ void QtAction::invokeAction()
     {
         mAction();
     }
-}
-
-
-// Used in MainThread.cpp.
-std::auto_ptr<MainThreadImpl> CreateMainThreadImpl()
-{
-    std::auto_ptr<MainThreadImpl> result;
-    result.reset(new QtMainThread);
-    return result;
 }
 
 

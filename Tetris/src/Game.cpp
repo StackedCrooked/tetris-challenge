@@ -6,15 +6,24 @@
 #include "Tetris/Evaluator.h"
 #include "Tetris/Block.h"
 #include "Tetris/Utilities.h"
-#include "Tetris/Logging.h"
-#include "Tetris/Threading.h"
-#include "Tetris/Assert.h"
+#include "Futile/Assert.h"
+#include "Futile/Logging.h"
+#include "Futile/Threading.h"
 #include "Poco/Exception.h"
 #include "Poco/Random.h"
 #include <algorithm>
 #include <ctime>
 #include <set>
 #include <stdexcept>
+
+
+using Futile::InvokeLater;
+using Futile::LogError;
+using Futile::LogWarning;
+using Futile::MakeString;
+using Futile::Mutex;
+using Futile::ScopedReader;
+using Futile::ScopedReaderAndWriter;
 
 
 namespace Tetris {

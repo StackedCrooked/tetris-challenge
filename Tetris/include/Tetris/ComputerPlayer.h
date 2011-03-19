@@ -2,11 +2,11 @@
 #define TETRIS_COMPUTERPLAYER_H_INCLUDED
 
 
-#include "Tetris/AutoPtrSupport.h"
 #include "Tetris/BlockMover.h"
 #include "Tetris/Evaluator.h"
 #include "Tetris/Player.h"
-#include "Tetris/Threading.h"
+#include "Futile/AutoPtrSupport.h"
+#include "Futile/Threading.h"
 #include <boost/scoped_ptr.hpp>
 
 

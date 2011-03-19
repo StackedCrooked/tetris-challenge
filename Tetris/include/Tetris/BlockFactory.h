@@ -3,7 +3,7 @@
 
 
 #include "Tetris/BlockTypes.h"
-#include "Tetris/Threading.h"
+#include "Futile/Threading.h"
 #include <memory>
 
 
@@ -46,7 +46,7 @@ private:
     BlockFactory& operator=(const BlockFactory&);
 
     struct Impl;
-    ThreadSafe<Impl> mThreadSafeImpl;
+    Futile::ThreadSafe<Impl> mThreadSafeImpl;
 };
 
 

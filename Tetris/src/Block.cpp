@@ -1,9 +1,13 @@
 #include "Tetris/Config.h"
 #include "Tetris/Block.h"
 #include "Tetris/BlockType.h"
-#include "Tetris/AutoPtrSupport.h"
-#include "Tetris/Assert.h"
+#include "Futile/AutoPtrSupport.h"
+#include "Futile/Assert.h"
 #include <stdexcept>
+
+
+using Futile::Create;
+using Futile::CreatePoly;
 
 
 namespace Tetris {

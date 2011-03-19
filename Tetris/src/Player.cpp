@@ -1,5 +1,9 @@
+#include "Tetris/Config.h"
 #include "Tetris/Player.h"
 #include "Tetris/ComputerPlayer.h"
+
+
+using Futile::MakeString;
 
 
 namespace Tetris {

@@ -88,9 +88,15 @@ endif()
 
 
 #
-# Poco dependency
+# Add dependencies
 #
-include_directories(${POCO}Foundation/include ${POCO}CppSquare/include ${SOLUTIONDIR}Tetris/include)
+include_directories(
+    ${POCO}Foundation/include
+    ${POCO}CppSquare/include
+    ${SOLUTIONDIR}Futile/include
+    ${SOLUTIONDIR}Tetris/include)
+
+
 link_directories(${POCO}lib/${PLATFORM}/${ARCH})
 
 
@@ -104,9 +110,10 @@ set(LIB_BOOST_THREAD boost_thread)
 
 
 #
-# Tetris dependency
+# Tetris & Futile dependencies
 #
-add_subdirectory(${SOLUTIONDIR}Tetris ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
+add_subdirectory(${SOLUTIONDIR}Tetris ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Tetris)
+add_subdirectory(${SOLUTIONDIR}Futile ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Futile)
 
 
 #
@@ -194,12 +201,14 @@ endif(APPLE)
 #
 target_link_libraries(${EXECUTABLE}
     ${QT_LIBRARIES}
-    Tetris
+    ${LIB_BOOST_THREAD}
     PocoFoundation
-    ${LIB_BOOST_THREAD})
+    Futile
+    Tetris)
 
 
 #
 # Target properties
 #
 set_target_properties(${EXECUTABLE} PROPERTIES COMPILE_FLAGS ${FINAL_COMPILE_FLAGS})
+

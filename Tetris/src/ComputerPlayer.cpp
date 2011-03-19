@@ -10,17 +10,26 @@
 #include "Tetris/GameStateNode.h"
 #include "Tetris/GameState.h"
 #include "Tetris/Block.h"
-#include "Tetris/WorkerPool.h"
-#include "Tetris/Worker.h"
-#include "Tetris/Threading.h"
-#include "Tetris/Logging.h"
-#include "Tetris/MakeString.h"
-#include "Tetris/Assert.h"
+#include "Futile/WorkerPool.h"
+#include "Futile/Worker.h"
+#include "Futile/Threading.h"
+#include "Futile/Logging.h"
+#include "Futile/MakeString.h"
+#include "Futile/Assert.h"
 #include "Poco/Environment.h"
 #include "Poco/Timer.h"
 #include <boost/bind.hpp>
 #include <boost/noncopyable.hpp>
 #include <set>
+
+
+using Futile::LogError;
+using Futile::MakeString;
+using Futile::Mutex;
+using Futile::ScopedLock;
+using Futile::ScopedReader;
+using Futile::ScopedReaderAndWriter;
+using Futile::WorkerPool;
 
 
 namespace Tetris {

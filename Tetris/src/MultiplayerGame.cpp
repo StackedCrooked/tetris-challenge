@@ -1,7 +1,8 @@
+#include "Tetris/Config.h"
 #include "Tetris/MultiplayerGame.h"
 #include "Tetris/Game.h"
-#include "Tetris/Logging.h"
-#include "Tetris/Threading.h"
+#include "Futile/Logging.h"
+#include "Futile/Threading.h"
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <algorithm>

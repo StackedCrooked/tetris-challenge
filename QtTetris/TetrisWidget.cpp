@@ -1,8 +1,8 @@
 #include "TetrisWidget.h"
 #include "Tetris/Game.h"
 #include "Tetris/SimpleGame.h"
-#include "Tetris/Threading.h"
-#include "Tetris/AutoPtrSupport.h"
+#include "Futile/Threading.h"
+#include "Futile/AutoPtrSupport.h"
 #include <QtGui/QApplication>
 #include <QKeyEvent>
 #include <QColor>

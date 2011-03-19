@@ -2,13 +2,13 @@
 #define TETRIS_GAMEOVER_H_INCLUDED
 
 
-#include "Tetris/TypedWrapper.h"
+#include "Futile/TypedWrapper.h"
 
 
 namespace Tetris
 {
 
-    Tetris_TypedWrapper(GameOver, bool);
+    Futile_TypedWrapper(GameOver, bool);
 
 } // namespace Tetris
 
