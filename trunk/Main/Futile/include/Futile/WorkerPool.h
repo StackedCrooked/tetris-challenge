@@ -1,5 +1,5 @@
-#ifndef TETRIS_WORKERPOOL_H_INCLUDED
-#define TETRIS_WORKERPOOL_H_INCLUDED
+#ifndef FUTILE_WORKERPOOL_H_INCLUDED
+#define FUTILE_WORKERPOOL_H_INCLUDED
 
 
 #include "Futile/Array.h"
@@ -61,4 +61,4 @@ private:
 } // namespace Futile
 
 
-#endif // TETRIS_WORKERPOOL_H_INCLUDED
+#endif // FUTILE_WORKERPOOL_H_INCLUDED

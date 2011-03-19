@@ -1,5 +1,5 @@
-#ifndef TETRIS_LOGGER_H_INCLUDED
-#define TETRIS_LOGGER_H_INCLUDED
+#ifndef FUTILE_LOGGER_H_INCLUDED
+#define FUTILE_LOGGER_H_INCLUDED
 
 
 #include "Futile/Threading.h"
