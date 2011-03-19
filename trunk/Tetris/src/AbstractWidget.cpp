@@ -2,13 +2,18 @@
 #include "Tetris/AbstractWidget.h"
 #include "Tetris/Block.h"
 #include "Tetris/Game.h"
-#include "Tetris/MakeString.h"
 #include "Tetris/SimpleGame.h"
-#include "Tetris/Threading.h"
+#include "Futile/MakeString.h"
+#include "Futile/Threading.h"
 #include <boost/bind.hpp>
 
 
+using Futile::ScopedReader;
+using Futile::MakeString;
+
+
 namespace Tetris {
+
 
 
 RGBColor::RGBColor(int red, int green, int blue) :

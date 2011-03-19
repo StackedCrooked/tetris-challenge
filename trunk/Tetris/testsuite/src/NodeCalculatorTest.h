@@ -7,7 +7,7 @@
 
 #include "CppUnit/TestCase.h"
 #include "Tetris/TypedWrapper.h"
-#include "Tetris/WorkerPool.h"
+#include "Futile/WorkerPool.h"
 #include "Poco/Stopwatch.h"
 #include "Poco/Types.h"
 
@@ -21,10 +21,10 @@ public:
 
     void testNodeCalculator();
 
-    Tetris_TypedWrapper(Depth, int);
-    Tetris_TypedWrapper(Width, int);
-    Tetris_TypedWrapper(WorkerCount, int);
-    Tetris_TypedWrapper(TimeMs, int);
+    Futile_TypedWrapper(Depth, int);
+    Futile_TypedWrapper(Width, int);
+    Futile_TypedWrapper(WorkerCount, int);
+    Futile_TypedWrapper(TimeMs, int);
 
     void testInterrupt(Depth inDepth, Width inWidth, WorkerCount inWorkerCount, TimeMs inTimeMs);
 

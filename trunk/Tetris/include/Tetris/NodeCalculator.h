@@ -4,67 +4,66 @@
 
 #include "Tetris/BlockTypes.h"
 #include "Tetris/NodePtr.h"
+#include "Futile/WorkerPool.h"
 #include <vector>
 #include <memory>
 
 
-namespace Tetris
+namespace Tetris {
+
+
+class Evaluator;
+class GameStateNode;
+class NodeCalculatorImpl;
+
+
+class NodeCalculator
 {
+public:
+    NodeCalculator(std::auto_ptr<GameStateNode> inNode,
+                   const BlockTypes & inBlockTypes,
+                   const std::vector<int> & inWidths,
+                   std::auto_ptr<Evaluator> inEvaluator,
+                   Futile::WorkerPool & inWorkerPool);
 
-    class Evaluator;
-    class GameStateNode;
-    class WorkerPool;
-    class NodeCalculatorImpl;
+    ~NodeCalculator();
 
+    void start();
 
-    class NodeCalculator
+    void stop();
+
+    int getCurrentSearchDepth() const;
+
+    int getMaxSearchDepth() const;
+
+    NodePtr result() const;
+
+    enum Status
     {
-    public:
-        NodeCalculator(std::auto_ptr<GameStateNode> inNode,
-                       const BlockTypes & inBlockTypes,
-                       const std::vector<int> & inWidths,
-                       std::auto_ptr<Evaluator> inEvaluator,
-                       WorkerPool & inWorkerPool);
-
-        ~NodeCalculator();
-
-        void start();
-
-        void stop();
-
-        int getCurrentSearchDepth() const;
-
-        int getMaxSearchDepth() const;
-
-        NodePtr result() const;
-
-        enum Status
-        {
-            Status_Nil,
-            Status_Begin,
-            Status_Started = Status_Begin,
-            Status_Working,
-            Status_Stopped,
-            Status_Finished,
-			Status_Error,
-            Status_End
-        };
-
-        Status status() const;
-
-		// Returns the error message (in case of Status_Error).
-		const std::string & errorMessage() const;
-
-    private:
-        // non-copyable
-        NodeCalculator(const NodeCalculator &);
-        NodeCalculator & operator=(const NodeCalculator &);
-
-        NodeCalculatorImpl * mImpl;
+        Status_Nil,
+        Status_Begin,
+        Status_Started = Status_Begin,
+        Status_Working,
+        Status_Stopped,
+        Status_Finished,
+        Status_Error,
+        Status_End
     };
+
+    Status status() const;
+
+    // Returns the error message (in case of Status_Error).
+    const std::string & errorMessage() const;
+
+private:
+    // non-copyable
+    NodeCalculator(const NodeCalculator &);
+    NodeCalculator & operator=(const NodeCalculator &);
+
+    NodeCalculatorImpl * mImpl;
+};
 
 } // namespace Tetris
 
 
 #endif // TETRIS_NODECALCULATOR_H_INCLUDED
-

@@ -2,10 +2,10 @@
 #define TETRIS_PLAYER_H_INCLUDED
 
 
-#include "Tetris/Array.h"
 #include "Tetris/PlayerType.h"
 #include "Tetris/SimpleGame.h"
-#include "Tetris/TypedWrapper.h"
+#include "Futile/Array.h"
+#include "Futile/TypedWrapper.h"
 #include <boost/scoped_ptr.hpp>
 #include <string>
 #include <vector>
@@ -14,8 +14,8 @@
 namespace Tetris {
 
 
-Tetris_TypedWrapper(TeamName, std::string);
-Tetris_TypedWrapper(PlayerName, std::string);
+Futile_TypedWrapper(TeamName, std::string);
+Futile_TypedWrapper(PlayerName, std::string);
 
 
 class Player
@@ -57,7 +57,7 @@ private:
 };
 
 
-typedef Array<Player> Players;
+typedef Futile::Array<Player> Players;
 
 
 class HumanPlayer : public Player

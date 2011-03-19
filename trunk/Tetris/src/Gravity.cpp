@@ -5,13 +5,18 @@
 #include "Tetris/GameState.h"
 #include "Tetris/Game.h"
 #include "Tetris/Direction.h"
-#include "Tetris/Logging.h"
-#include "Tetris/MakeString.h"
-#include "Tetris/Assert.h"
+#include "Futile/Logging.h"
+#include "Futile/MakeString.h"
+#include "Futile/Assert.h"
 #include "Poco/Timer.h"
 #include "Poco/Stopwatch.h"
 #include <boost/noncopyable.hpp>
 #include <algorithm>
+
+
+using Futile::LogError;
+using Futile::ScopedReader;
+using Futile::ScopedReaderAndWriter;
 
 
 namespace Tetris {

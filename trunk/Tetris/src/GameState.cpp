@@ -4,9 +4,9 @@
 #include "Tetris/Block.h"
 #include "Tetris/BlockType.h"
 #include "Tetris/Grid.h"
-#include "Tetris/Logging.h"
-#include "Tetris/MakeString.h"
-#include "Tetris/Assert.h"
+#include "Futile/Logging.h"
+#include "Futile/MakeString.h"
+#include "Futile/Assert.h"
 #include <algorithm>
 #include <vector>
 

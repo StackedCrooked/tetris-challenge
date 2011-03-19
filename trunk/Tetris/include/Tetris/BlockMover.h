@@ -3,6 +3,7 @@
 
 
 #include "Tetris/Utilities.h"
+#include "Futile/Threading.h"
 #include <boost/scoped_ptr.hpp>
 #include <boost/function.hpp>
 
@@ -10,7 +11,6 @@
 namespace Tetris {
 
 
-template<class Variable> class ThreadSafe;
 class Game;
 class BlockMover;
 
@@ -28,7 +28,7 @@ typedef boost::function<void(BlockMover *)> BlockMoverCallback;
 class BlockMover
 {
 public:
-    BlockMover(ThreadSafe<Game> inGame);
+    BlockMover(Futile::ThreadSafe<Game> inGame);
 
     ~BlockMover();
 

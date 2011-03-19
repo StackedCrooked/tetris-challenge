@@ -4,12 +4,18 @@
 #include "Tetris/Evaluator.h"
 #include "Tetris/Game.h"
 #include "Tetris/Gravity.h"
-#include "Tetris/Logging.h"
-#include "Tetris/Threading.h"
-#include "Tetris/AutoPtrSupport.h"
+#include "Futile/Logging.h"
+#include "Futile/Threading.h"
+#include "Futile/AutoPtrSupport.h"
 #include <boost/bind.hpp>
 #include <set>
 #include <stdexcept>
+
+
+using Futile::CreatePoly;
+using Futile::LogWarning;
+using Futile::ScopedReader;
+using Futile::ScopedReaderAndWriter;
 
 
 namespace Tetris {

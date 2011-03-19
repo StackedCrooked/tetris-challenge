@@ -8,10 +8,13 @@
 #include "Tetris/GameState.h"
 #include "Tetris/Grid.h"
 #include "Tetris/NodePtr.h"
-#include "Tetris/Threading.h"
+#include "Futile/Threading.h"
 #include <boost/scoped_ptr.hpp>
 #include <memory>
 #include <set>
+
+
+using Futile::ThreadSafe;
 
 
 namespace Tetris {

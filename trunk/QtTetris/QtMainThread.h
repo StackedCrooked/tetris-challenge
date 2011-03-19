@@ -2,7 +2,7 @@
 #define QTMAINTHREAD_H
 
 
-#include "Tetris/MainThreadImpl.h"
+#include "Futile/MainThreadImpl.h"
 #include <QtCore>
 
 
@@ -10,14 +10,14 @@ namespace Tetris {
 
 
 class QtMainThread : public QObject,
-                     public MainThreadImpl
+                     public Futile::MainThreadImpl
 {
 public:
     QtMainThread();
 
     virtual ~QtMainThread();
 
-    virtual void postAction(Action inAction);
+    virtual void postAction(Futile::Action inAction);
 
     virtual bool event(QEvent * inEvent);
 };

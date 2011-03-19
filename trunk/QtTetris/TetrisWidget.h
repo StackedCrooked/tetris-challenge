@@ -3,7 +3,7 @@
 
 
 #include "Tetris/AbstractWidget.h"
-#include "Tetris/Threading.h"
+#include "Futile/Threading.h"
 #include <QPainter>
 #include <QMutex>
 #include <QWidget>
@@ -49,7 +49,7 @@ private:
     QSize mMinSize;
     std::auto_ptr<QPainter> mPainter;
 
-    friend void Tetris::InvokeLater(const Tetris::Action &);
+    friend void Futile::InvokeLater(const Futile::Action &);
 
     typedef std::set<TetrisWidget*> Instances;
     static Instances sInstances;

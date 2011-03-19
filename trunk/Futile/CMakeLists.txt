@@ -1,10 +1,9 @@
-set(SolutionDir ..)
 include_directories(
+    .
     include
-    ${SolutionDir}/3rdParty/Boost
-    ${SolutionDir}/3rdParty/Poco/Foundation/include
-)
-
+    ${SolutionDir}Tetris/include
+    ${SolutionDir}3rdPary/Boost
+    ${SolutionDir}3rdPary/Poco/Foundation/include)
 
 add_library(Futile
     include/Futile/Allocator.h
@@ -14,12 +13,14 @@ add_library(Futile
     include/Futile/Boost.h
     include/Futile/Config.h
     include/Futile/GenericGrid.h
-    include/Futile/Grid.h
     include/Futile/Logger.h
     include/Futile/Logging.h
     include/Futile/MainThread.h
+    include/Futile/MainThreadImpl.h
     include/Futile/MakeString.h
     include/Futile/Threading.h
+    include/Futile/ThreadingConfiguration.h
+    include/Futile/ThreadingConfigurationBoost.h
     include/Futile/TypedWrapper.h
     include/Futile/Worker.h
     include/Futile/WorkerPool.h
@@ -29,4 +30,3 @@ add_library(Futile
     src/Threading.cpp
     src/Worker.cpp
     src/WorkerPool.cpp)
-

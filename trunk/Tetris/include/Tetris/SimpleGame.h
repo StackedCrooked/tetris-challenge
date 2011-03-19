@@ -6,6 +6,7 @@
 #include "Tetris/Block.h"
 #include "Tetris/GameStateStats.h"
 #include "Tetris/PlayerType.h"
+#include "Futile/Threading.h"
 #include <boost/scoped_ptr.hpp>
 #include <cstddef>
 #include <set>
@@ -13,12 +14,14 @@
 #include <vector>
 
 
+using Futile::ThreadSafe;
+
+
 namespace Tetris {
 
 
 class Game;
 class GameState;
-template<class Variable> class ThreadSafe;
 
 
 /**

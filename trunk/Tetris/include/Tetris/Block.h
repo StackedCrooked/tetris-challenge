@@ -3,7 +3,7 @@
 
 
 #include "Tetris/Grid.h"
-#include "Tetris/TypedWrapper.h"
+#include "Futile/TypedWrapper.h"
 #include <memory>
 
 
@@ -11,9 +11,9 @@ namespace Tetris {
 
 
 // Generate the typesafe wrapper classes
-Tetris_TypedWrapper(Rotation, size_t);
-Tetris_TypedWrapper(Row, size_t);
-Tetris_TypedWrapper(Column, size_t);
+Futile_TypedWrapper(Rotation, size_t);
+Futile_TypedWrapper(Row, size_t);
+Futile_TypedWrapper(Column, size_t);
 
 
 // Forward declarations.

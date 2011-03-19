@@ -11,7 +11,7 @@
 namespace Futile {
 
 
-template<class T, template <class> class Allocator = Allocator_Vector>
+template<class T, template <class> class Allocator = Allocator_Malloc>
 class GenericGrid : private Allocator<T>
 {
 public:

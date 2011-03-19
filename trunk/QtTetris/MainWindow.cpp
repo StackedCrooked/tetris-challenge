@@ -1,16 +1,16 @@
 #include "MainWindow.h"
 #include "NewGameDialog.h"
-#include "Tetris/Assert.h"
-#include "Tetris/AutoPtrSupport.h"
 #include "Tetris/BlockMover.h"
-#include "Tetris/Boost.h"
 #include "Tetris/ComputerPlayer.h"
 #include "Tetris/Game.h"
-#include "Tetris/Logger.h"
-#include "Tetris/Logging.h"
-#include "Tetris/MakeString.h"
 #include "Poco/Path.h"
 #include "Tetris/Utilities.h"
+#include "Futile/Assert.h"
+#include "Futile/AutoPtrSupport.h"
+#include "Futile/Boost.h"
+#include "Futile/Logger.h"
+#include "Futile/Logging.h"
+#include "Futile/MakeString.h"
 #include "Poco/Environment.h"
 #include <QLayout>
 #include <QLabel>
@@ -20,16 +20,23 @@
 #include <sstream>
 
 
+using Futile::Create;
+using Futile::CreatePoly;
+using Futile::LogError;
+using Futile::LogInfo;
+using Futile::Logger;
+
+
+using namespace Tetris;
+
+
 int Tetris_RowCount();
 int Tetris_ColumnCount();
 int Tetris_GetSquareWidth();
 int Tetris_GetSquareHeight();
 
 
-using namespace Tetris;
-
-
-typedef Boost::shared_ptr<Tetris::SimpleGame> SimpleGamePtr;
+typedef Futile::Boost::shared_ptr<SimpleGame> SimpleGamePtr;
 
 
 class Model : public ComputerPlayer::Tweaker
@@ -222,7 +229,7 @@ private:
     Model(const Model &);
     Model& operator=(const Model&);
 
-    boost::scoped_ptr<Tetris::MultiplayerGame> mMultiplayerGame;
+    boost::scoped_ptr<MultiplayerGame> mMultiplayerGame;
 
     typedef std::vector<std::string> Names;
     Names mNames;

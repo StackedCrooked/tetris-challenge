@@ -1,9 +1,9 @@
 #include "WorkerTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Tetris/Worker.h"
-#include "Tetris/Threading.h"
-#include "Tetris/Assert.h"
+#include "Futile/Worker.h"
+#include "Futile/Threading.h"
+#include "Futile/Assert.h"
 #include "Poco/Thread.h"
 #include "Poco/Stopwatch.h"
 #include <iostream>

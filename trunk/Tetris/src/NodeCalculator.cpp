@@ -5,89 +5,93 @@
 #include "Tetris/SingleThreadedNodeCalculator.h"
 
 
-namespace Tetris
+using Futile::WorkerPool;
+
+
+namespace Tetris {
+
+
+static std::auto_ptr<NodeCalculatorImpl> CreateImpl(std::auto_ptr<GameStateNode> inNode,
+                                                    const BlockTypes & inBlockTypes,
+                                                    const std::vector<int> & inWidths,
+                                                    std::auto_ptr<Evaluator> inEvaluator,
+                                                    WorkerPool & inWorkerPool)
 {
-    
-    static std::auto_ptr<NodeCalculatorImpl> CreateImpl(std::auto_ptr<GameStateNode> inNode,
-                                                        const BlockTypes & inBlockTypes,
-                                                        const std::vector<int> & inWidths,
-                                                        std::auto_ptr<Evaluator> inEvaluator,
-                                                        WorkerPool & inWorkerPool)
+    if (inWorkerPool.size() > 1)
     {
-        if (inWorkerPool.size() > 1)
-        {
-            return std::auto_ptr<NodeCalculatorImpl>(
-                new MultithreadedNodeCalculator(inNode, inBlockTypes, inWidths, inEvaluator, inWorkerPool));
-        }
-        else if (inWorkerPool.size() == 1)
-        {
-            return std::auto_ptr<NodeCalculatorImpl>(
-                new SingleThreadedNodeCalculator(inNode, inBlockTypes, inWidths, inEvaluator, inWorkerPool));
-        }
-        else
-        {
-            throw std::logic_error("Failed to create NodeCalculator object because the given WorkerPool is empty.");
-        }
+        return std::auto_ptr<NodeCalculatorImpl>(
+            new MultithreadedNodeCalculator(inNode, inBlockTypes, inWidths, inEvaluator, inWorkerPool));
     }
-
-
-    NodeCalculator::NodeCalculator(std::auto_ptr<GameStateNode> inNode,
-                                   const BlockTypes & inBlockTypes,
-                                   const std::vector<int> & inWidths,
-                                   std::auto_ptr<Evaluator> inEvaluator,
-                                   WorkerPool & inWorkerPool) :
-        mImpl(CreateImpl(inNode, inBlockTypes, inWidths, inEvaluator, inWorkerPool).release())
+    else if (inWorkerPool.size() == 1)
     {
+        return std::auto_ptr<NodeCalculatorImpl>(
+            new SingleThreadedNodeCalculator(inNode, inBlockTypes, inWidths, inEvaluator, inWorkerPool));
     }
-
-
-    NodeCalculator::~NodeCalculator()
+    else
     {
-        delete mImpl;
-        mImpl = 0;
+        throw std::logic_error("Failed to create NodeCalculator object because the given WorkerPool is empty.");
     }
+}
 
 
-    void NodeCalculator::start()
-    {
-        return mImpl->start();
-    }
+NodeCalculator::NodeCalculator(std::auto_ptr<GameStateNode> inNode,
+                               const BlockTypes & inBlockTypes,
+                               const std::vector<int> & inWidths,
+                               std::auto_ptr<Evaluator> inEvaluator,
+                               WorkerPool & inWorkerPool) :
+    mImpl(CreateImpl(inNode, inBlockTypes, inWidths, inEvaluator, inWorkerPool).release())
+{
+}
 
 
-    void NodeCalculator::stop()
-    {
-        mImpl->stop();
-    }
+NodeCalculator::~NodeCalculator()
+{
+    delete mImpl;
+    mImpl = 0;
+}
 
 
-    int NodeCalculator::getCurrentSearchDepth() const
-    {
-        return mImpl->getCurrentSearchDepth();
-    }
+void NodeCalculator::start()
+{
+    return mImpl->start();
+}
 
 
-    int NodeCalculator::getMaxSearchDepth() const
-    {
-        return mImpl->getMaxSearchDepth();
-    }
+void NodeCalculator::stop()
+{
+    mImpl->stop();
+}
 
 
-    NodePtr NodeCalculator::result() const
-    {
-		Assert(status() != Status_Error);
-        return mImpl->result();
-    }
+int NodeCalculator::getCurrentSearchDepth() const
+{
+    return mImpl->getCurrentSearchDepth();
+}
 
 
-    NodeCalculator::Status NodeCalculator::status() const
-    {
-        return static_cast<Status>(mImpl->status());
-    }
+int NodeCalculator::getMaxSearchDepth() const
+{
+    return mImpl->getMaxSearchDepth();
+}
 
 
-	const std::string & NodeCalculator::errorMessage() const
-	{
-		return mImpl->errorMessage();
-	}
+NodePtr NodeCalculator::result() const
+{
+    Assert(status() != Status_Error);
+    return mImpl->result();
+}
+
+
+NodeCalculator::Status NodeCalculator::status() const
+{
+    return static_cast<Status>(mImpl->status());
+}
+
+
+const std::string & NodeCalculator::errorMessage() const
+{
+    return mImpl->errorMessage();
+}
+
 
 } // namespace Tetris

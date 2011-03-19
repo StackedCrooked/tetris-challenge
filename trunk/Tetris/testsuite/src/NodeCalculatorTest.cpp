@@ -8,10 +8,10 @@
 #include "Tetris/GameState.h"
 #include "Tetris/Block.h"
 #include "Tetris/BlockTypes.h"
-#include "Tetris/WorkerPool.h"
-#include "Tetris/Assert.h"
-#include "Tetris/Logging.h"
-#include "Tetris/MakeString.h"
+#include "Futile/WorkerPool.h"
+#include "Futile/Assert.h"
+#include "Futile/Logging.h"
+#include "Futile/MakeString.h"
 #include "Poco/Thread.h"
 #include <iostream>
 

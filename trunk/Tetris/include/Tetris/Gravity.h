@@ -2,7 +2,7 @@
 #define TETRIS_GRAVITY_H_INCLUDED
 
 
-#include "Tetris/Threading.h"
+#include "Futile/Threading.h"
 #include <boost/scoped_ptr.hpp>
 
 
@@ -22,7 +22,7 @@ class Gravity;
 class Gravity
 {
 public:
-    Gravity(const ThreadSafe<Game> & inGame);
+    Gravity(const Futile::ThreadSafe<Game> & inGame);
 
     ~Gravity();
 

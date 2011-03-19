@@ -3,7 +3,7 @@
 #include "CppUnit/TestSuite.h"
 #include "Tetris/Allocator.h"
 #include "Tetris/GenericGrid.h"
-#include "Tetris/Assert.h"
+#include "Futile/Assert.h"
 #include <iostream>
 
 

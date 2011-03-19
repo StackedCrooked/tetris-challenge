@@ -1,23 +1,24 @@
-include_directories(include .)
+include_directories(
+    .
+    include
+    ${SolutionDir}Futile/include
+    ${SolutionDir}3rdPary/Boost
+    ${SolutionDir}3rdPary/Poco/Foundation/include)
 
 
 add_library(Tetris
     include/Tetris/AbstractWidget.h
     include/Tetris/AISupport.h
-    include/Tetris/Allocator.h
-    include/Tetris/Array.h
-    include/Tetris/Assert.h
-    include/Tetris/AutoPtrSupport.h
     include/Tetris/Block.h
     include/Tetris/BlockFactory.h
     include/Tetris/BlockMover.h
     include/Tetris/BlockType.h
     include/Tetris/BlockTypes.h
-    include/Tetris/Boost.h
     include/Tetris/ComputerPlayer.h
     include/Tetris/Config.h
     include/Tetris/Direction.h
     include/Tetris/Evaluator.h
+    include/Tetris/EvilBlockFactory.h
     include/Tetris/ForwardDeclarations.h
     include/Tetris/Game.h
     include/Tetris/GameOver.h
@@ -25,13 +26,8 @@ add_library(Tetris
     include/Tetris/GameStateComparator.h
     include/Tetris/GameStateNode.h
     include/Tetris/GameStateStats.h
-    include/Tetris/GenericGrid.h
     include/Tetris/Gravity.h
     include/Tetris/Grid.h
-    include/Tetris/Logger.h
-    include/Tetris/Logging.h
-    include/Tetris/MainThread.h
-    include/Tetris/MakeString.h
     include/Tetris/MultiplayerGame.h
     include/Tetris/MultithreadedNodeCalculator.h
     include/Tetris/NodeCalculator.h
@@ -42,12 +38,8 @@ add_library(Tetris
     include/Tetris/SimpleGame.h
     include/Tetris/SingleThreadedNodeCalculator.h
     include/Tetris/Tetris.h
-    include/Tetris/Threading.h
-    include/Tetris/TypedWrapper.h
     include/Tetris/Unicode.h
     include/Tetris/Utilities.h
-    include/Tetris/Worker.h
-    include/Tetris/WorkerPool.h
     src/AbstractWidget.cpp
     src/AISupport.cpp
     src/Block.cpp
@@ -56,14 +48,12 @@ add_library(Tetris
     src/BlockType.cpp
     src/ComputerPlayer.cpp
     src/Evaluator.cpp
+    src/EvilBlockFactory.cpp
     src/Game.cpp
     src/GameState.cpp
     src/GameStateComparator.cpp
     src/GameStateNode.cpp
     src/Gravity.cpp
-    src/Logger.cpp
-    src/Logging.cpp
-    src/MainThread.cpp
     src/MultiplayerGame.cpp
     src/MultiThreadedNodeCalculator.cpp
     src/NodeCalculator.cpp
@@ -71,10 +61,7 @@ add_library(Tetris
     src/Player.cpp
     src/SimpleGame.cpp
     src/SingleThreadedNodeCalculator.cpp
-    src/Threading.cpp
-    src/Unicode.cpp
-    src/Worker.cpp
-    src/WorkerPool.cpp)
+    src/Unicode.cpp)
 
 set_target_properties(Tetris PROPERTIES COMPILE_FLAGS ${FINAL_COMPILE_FLAGS})
 

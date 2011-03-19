@@ -16,7 +16,7 @@ namespace Tetris
                                     const BlockTypes & inBlockTypes,
                                     const std::vector<int> & inWidths,
                                     std::auto_ptr<Evaluator> inEvaluator,
-                                    WorkerPool & inWorkerPool);
+                                    Futile::WorkerPool & inWorkerPool);
 
         virtual ~MultithreadedNodeCalculator();
 
@@ -40,4 +40,3 @@ namespace Tetris
 
 
 #endif // TETRIS_MULTITHREADEDNODECALCULATORIMPL_H_INCLUDED
-

@@ -5,7 +5,7 @@
 #include "Tetris/GameState.h"
 #include "Tetris/Block.h"
 #include "Tetris/Utilities.h"
-#include "Tetris/Assert.h"
+#include "Futile/Assert.h"
 #include <set>
 #include <boost/scoped_ptr.hpp>
 #include <boost/weak_ptr.hpp>

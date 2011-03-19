@@ -8,6 +8,12 @@
 #include <ctime>
 
 
+using Futile::Mutex;
+using Futile::ScopedLock;
+using Futile::ScopedReader;
+using Futile::ScopedReaderAndWriter;
+
+
 namespace Tetris {
 
 

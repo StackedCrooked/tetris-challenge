@@ -10,8 +10,8 @@
 #include "Tetris/GameState.h"
 #include "Tetris/GameStateNode.h"
 #include "Tetris/NodeCalculator.h"
-#include "Tetris/Threading.h"
-#include "Tetris/WorkerPool.h"
+#include "Futile/Threading.h"
+#include "Futile/WorkerPool.h"
 #include <boost/scoped_ptr.hpp>
 
 

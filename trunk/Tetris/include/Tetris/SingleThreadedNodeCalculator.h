@@ -5,26 +5,26 @@
 #include "Tetris/NodeCalculatorImpl.h"
 
 
-namespace Tetris
+namespace Tetris {
+
+
+class SingleThreadedNodeCalculator : public NodeCalculatorImpl
 {
+public:
+    SingleThreadedNodeCalculator(std::auto_ptr<GameStateNode> inNode,
+                                 const BlockTypes & inBlockTypes,
+                                 const std::vector<int> & inWidths,
+                                 std::auto_ptr<Evaluator> inEvaluator,
+                                 Futile::WorkerPool & inWorkerPool);
 
-    class SingleThreadedNodeCalculator : public NodeCalculatorImpl
-    {
-    public:
-        SingleThreadedNodeCalculator(std::auto_ptr<GameStateNode> inNode,
-                                     const BlockTypes & inBlockTypes,
-                                     const std::vector<int> & inWidths,
-                                     std::auto_ptr<Evaluator> inEvaluator,
-                                     WorkerPool & inWorkerPool);
+    virtual ~SingleThreadedNodeCalculator();
 
-        virtual ~SingleThreadedNodeCalculator();
+private:
+    virtual void populate();
+};
 
-    private:
-        virtual void populate();
-    };
 
 } // namespace Tetris
 
 
 #endif // TETRIS_SINGLETHREADEDNODECALCULATORIMPL_H_INCLUDED
-

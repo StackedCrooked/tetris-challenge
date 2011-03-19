@@ -1,6 +1,9 @@
 #include <QtGui/QApplication>
 #include "MainWindow.h"
-#include "Tetris/MainThread.h"
+#include "Futile/MainThread.h"
+
+
+using Futile::MainThread;
 
 
 int Tetris_RowCount()
@@ -31,7 +34,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     a.setApplicationName("QtTetris");
     a.setApplicationVersion("0.0 alpha");
-    Tetris::MainThread::Initializer scopedInit;
+    MainThread::Initializer scopedInit;
     MainWindow w;
     w.show();
 
