@@ -10,8 +10,7 @@ set(CMAKE_BUILD_TYPE $ENV{TETRIS_BUILD_TYPE})
 if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "Release")
 message("CMAKE_BUILD_TYPE is ${CMAKE_BUILD_TYPE}")
 else()
-message(FATAL_ERROR "TETRIS_BUILD_TYPE is \"${TETRIS_BUILD_TYPE}\". Should be \"Debug\" or \"Release\"")
-else()
+set(CMAKE_BUILD_TYPE Release)
 endif()
 
 
