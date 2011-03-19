@@ -1,13 +1,16 @@
 #include "GenericGridTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Tetris/Allocator.h"
-#include "Tetris/GenericGrid.h"
+#include "Futile/Allocator.h"
+#include "Futile/GenericGrid.h"
 #include "Futile/Assert.h"
 #include <iostream>
 
 
-using namespace Tetris;
+using Futile::GenericGrid;
+using Futile::Allocator_Malloc;
+using Futile::Allocator_New;
+using Futile::Allocator_Vector;
 
 
 GenericGridTest::GenericGridTest(const std::string & inName):

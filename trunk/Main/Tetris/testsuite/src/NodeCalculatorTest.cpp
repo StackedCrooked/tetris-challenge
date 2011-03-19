@@ -16,6 +16,10 @@
 #include <iostream>
 
 
+using Futile::MakeString;
+using Futile::WorkerPool;
+
+
 using namespace Tetris;
 
 

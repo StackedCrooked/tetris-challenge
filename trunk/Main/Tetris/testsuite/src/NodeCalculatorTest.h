@@ -6,7 +6,7 @@
 
 
 #include "CppUnit/TestCase.h"
-#include "Tetris/TypedWrapper.h"
+#include "Futile/TypedWrapper.h"
 #include "Futile/WorkerPool.h"
 #include "Poco/Stopwatch.h"
 #include "Poco/Types.h"
@@ -28,7 +28,7 @@ public:
 
     void testInterrupt(Depth inDepth, Width inWidth, WorkerCount inWorkerCount, TimeMs inTimeMs);
 
-    void testDestroy(Tetris::WorkerPool & inWorkerPool);
+    void testDestroy(Futile::WorkerPool & inWorkerPool);
 	
 	void setUp();
 

@@ -3,10 +3,9 @@
 
 
 /**
- * This is my own re-implementation of commonly classes from the boost library.
- * Purposes:
- * - Can be inserted in a codebase where boost is not available.
- * - Simpler stack traces when debugging.
+ * This is my a mini-boost implementation that may be useful when want to avoid the big boost dependency.
+ * This simple code is also more debugger-friendly than the orignal (very complicated) boost code.
+ * May contain bugs though :/
  */
 namespace Futile {
 namespace Boost {

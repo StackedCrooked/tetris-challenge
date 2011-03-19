@@ -9,7 +9,7 @@
 #include <iostream>
 
 
-using namespace Tetris;
+using Futile::Worker;
 
 
 static const int cSleepTimeMs = 100;
