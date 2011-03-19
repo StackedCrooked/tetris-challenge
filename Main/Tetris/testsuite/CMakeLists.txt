@@ -19,11 +19,16 @@ endif()
 
 
 #
-# Detect the build configuration.
-# Reads from environment variable TETRIS_BUILD_CONFIGURATION
+# Check TETRIS_BUILD_TYPE environment variable
 #
-set(CMAKE_BUILD_TYPE $ENV{TETRIS_BUILD_CONFIGURATION})
-message("TETRIS_BUILD_CONFIGURATION: $ENV{TETRIS_BUILD_CONFIGURATION}")
+set(CMAKE_BUILD_TYPE $ENV{TETRIS_BUILD_TYPE})
+if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "Release")
+    message("CMAKE_BUILD_TYPE is ${CMAKE_BUILD_TYPE}")
+else()
+    set(CMAKE_BUILD_TYPE "Release")
+    message("CMAKE_BUILD_TYPE was not set or not correctly set. Defaulting to \"Release\"")
+else()
+endif()
 
 
 #
@@ -31,19 +36,15 @@ message("TETRIS_BUILD_CONFIGURATION: $ENV{TETRIS_BUILD_CONFIGURATION}")
 #
 set(EXECUTABLE TetrisTestSuite)
 set(CMAKE_OSX_ARCHITECTURES ${ARCH})
-set(SOLUTIONDIR "${TetrisTestSuite_SOURCE_DIR}/../../")
+set(SOLUTIONDIR ${TetrisTestSuite_SOURCE_DIR}/../../)
+set(BUILD_ROOT ${SOLUTIONDIR}../Build/)
 set(POCO ${SOLUTIONDIR}3rdParty/Poco/)
 
 
 #
 # Set output directory
 #
-# Note:
-# If you want to build multiple platforms/architetures from the same
-# location then you need to use the second definition below.
-#
-set(OUTDIR ${SOLUTIONDIR}Build/${CMAKE_BUILD_TYPE}/)
-#set(OUTDIR ${SOLUTIONDIR}Build/${PLATFORM}/${ARCH}/${CMAKE_BUILD_TYPE}/)
+set(OUTDIR ${BUILD_ROOT}${CMAKE_BUILD_TYPE}/${PLATFORM}/${ARCH}/)
 
 
 #
@@ -65,14 +66,23 @@ set(FINAL_COMPILE_FLAGS "${CXX_FLAGS_${CMAKE_BUILD_TYPE}}")
 
 
 #
-# Poco dependency
+# Include directories for Tetris, Futile and Poco.
 #
-include_directories(${POCO}Foundation/include ${POCO}CppUnit/include ${SOLUTIONDIR}Tetris/include)
+include_directories(
+    ${POCO}Foundation/include
+    ${POCO}CppUnit/include
+    ${SOLUTIONDIR}Futile/include
+    ${SOLUTIONDIR}Tetris/include)
+
+
+#
+# Link with Poco
+#
 link_directories(${POCO}lib/${PLATFORM}/${ARCH})
 
 
 #
-# Boost dependency
+# Boost include paths and libs
 #
 set(BOOST ${SOLUTIONDIR}3rdParty/Boost_1_44_0/)
 include_directories(${BOOST})
@@ -81,9 +91,10 @@ set(LIB_BOOST_THREAD boost_thread)
 
 
 #
-# Tetris dependency
+# Add Tetris project to our build
 #
-add_subdirectory(${SOLUTIONDIR}Tetris ${LIBRARY_OUTPUT_PATH})
+add_subdirectory(${SOLUTIONDIR}Tetris ${LIBRARY_OUTPUT_PATH}/Tetris)
+add_subdirectory(${SOLUTIONDIR}Futile ${LIBRARY_OUTPUT_PATH}/Futile)
 
 
 #
@@ -129,6 +140,7 @@ add_executable(${EXECUTABLE} ${TetrisTestSuite_SOURCES} ${TetrisTestSuite_HEADER
 target_link_libraries(${EXECUTABLE}
     ${QT_LIBRARIES}
     Tetris
+    Futile
     PocoFoundation
     CppUnit
     ${LIB_BOOST_THREAD})

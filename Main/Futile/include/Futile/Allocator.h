@@ -3,6 +3,7 @@
 
 
 #include "Futile/Assert.h"
+#include <algorithm>
 #include <cstddef>
 #include <cstdlib>
 #include <vector>
@@ -11,18 +12,8 @@
 namespace Futile {
 
 
-template<class T>
-inline void Allocator_FillBuffer(T * inBuffer, size_t inSize, const T & inInitialValue)
-{
-    for (size_t i = 0; i < inSize; ++i)
-    {
-        inBuffer[i] = inInitialValue;
-    }
-}
-
-
 /**
- * Allocator_Vector
+ * Allocator_Vector manages memory through a std::vector<T> object
  */
 template<class T>
 class Allocator_Vector
@@ -38,13 +29,13 @@ public:
 
     void set(size_t inIndex, const T & inValue);
 
-private:
+private:	
     std::vector<T> mVector;
 };
 
 
 /**
- * Allocator_Malloc
+ * Allocator_Malloc manages memory with malloc/free.
  */
 template<class T>
 class Allocator_Malloc
@@ -73,7 +64,7 @@ private:
 
 
 /**
- * Allocator_New
+ * Allocator_New manages memory with new[]/delete[].
  */
 template<class T>
 class Allocator_New
@@ -149,7 +140,7 @@ Allocator_Malloc<T>::Allocator_Malloc(size_t inSize, const T & inInitialValue) :
     mBuffer(reinterpret_cast<T*>(malloc(sizeof(T) * inSize))),
     mSize(inSize)
 {
-    Allocator_FillBuffer(mBuffer, inSize, inInitialValue);
+	std::fill(mBuffer, mBuffer + inSize, inInitialValue);
 }
 
 
@@ -218,7 +209,7 @@ template<class T>
 Allocator_New<T>::Allocator_New(size_t inSize, const T & inInitialValue) :
     mBuffer(new T[inSize])
 {
-    Allocator_FillBuffer(mBuffer, inSize, inInitialValue);
+	std::fill(mBuffer, mBuffer + inSize, inInitialValue);
 }
 
 

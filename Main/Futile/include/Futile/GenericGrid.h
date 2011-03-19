@@ -11,6 +11,12 @@
 namespace Futile {
 
 
+/**
+ * GenericGrid can be used for simple matrices or 2D arrays.
+ * It provides nothing more than simple get/set methods.
+ * The Allocator template argument allows you to choose a different memory allocation implementation.]
+ * Check the Allocators.h header for other available options.  
+ */	
 template<class T, template <class> class Allocator = Allocator_Malloc>
 class GenericGrid : private Allocator<T>
 {

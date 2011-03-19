@@ -55,10 +55,6 @@ set(POCO ${SOLUTIONDIR}3rdParty/Poco/)
 #
 # Set output directory variable
 #
-# Note:
-# - OUTDIR is a user-variable
-# - use the second definition for more flexibility.
-#
 set(OUTDIR ${BUILD_ROOT}${CMAKE_BUILD_TYPE}/${PLATFORM}/${ARCH}/)
 
 
@@ -92,7 +88,7 @@ endif()
 #
 include_directories(
     ${POCO}Foundation/include
-    ${POCO}CppSquare/include
+    ${POCO}CppUnit/include
     ${SOLUTIONDIR}Futile/include
     ${SOLUTIONDIR}Tetris/include)
 

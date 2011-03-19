@@ -9,14 +9,13 @@ namespace Futile {
 
 
 /**
- * Array is a wrapper for std::vector that always takes ownership of the entries.
+ * Array stores pointer objects and deletes them when they are no longer needed.
+ * For your convenience the class interface is the same as that of std::vector.
  */
 template<class T>
 class Array
 {
 public:
-    typedef std::vector<T*> Data;
-    Data mData;
 
     Array() { }
 
@@ -28,7 +27,8 @@ public:
             mData.pop_back();
         }
     }
-
+	
+    typedef std::vector<T*> Data;
     typedef typename Data::iterator iterator;
     typedef typename Data::const_iterator const_iterator;
 
@@ -52,7 +52,7 @@ public:
         return mData.end();
     }
 
-    T * operator [ ] (typename Data::size_type inIndex)
+    T * operator [] (typename Data::size_type inIndex)
     {
         return mData[inIndex];
     }
@@ -74,6 +74,14 @@ public:
 
     void resize(typename Data::size_type inNewSize)
     {
+        while (mData.size() > inNewSize)
+        {
+            delete mData.back();
+            mData.pop_back();
+        }
+
+        // We still need to resize in case the new
+        // size is bigger than the current size.
         mData.resize(inNewSize);
     }
 
@@ -89,8 +97,12 @@ public:
 
     void erase(iterator it)
     {
+        delete *it;
         mData.erase(it);
     }
+	
+private:
+    Data mData;
 };
 
 
@@ -98,3 +110,4 @@ public:
 
 
 #endif // FUTILE_ARRAY_H
+
