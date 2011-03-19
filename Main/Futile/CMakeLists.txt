@@ -1,9 +1,8 @@
 include_directories(
     .
     include
-    ${SolutionDir}Tetris/include
-    ${SolutionDir}3rdPary/Boost
-    ${SolutionDir}3rdPary/Poco/Foundation/include)
+    ../3rdParty/Boost
+    ../3rdParty/Poco/Foundation/include)
 
 add_library(Futile
     include/Futile/Allocator.h

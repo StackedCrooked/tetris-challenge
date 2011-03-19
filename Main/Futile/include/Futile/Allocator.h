@@ -1,5 +1,5 @@
-#ifndef TETRIS_ALLOCATOR_H_INCLUDED
-#define TETRIS_ALLOCATOR_H_INCLUDED
+#ifndef FUTILE_ALLOCATOR_H_INCLUDED
+#define FUTILE_ALLOCATOR_H_INCLUDED
 
 
 #include "Futile/Assert.h"
@@ -254,4 +254,4 @@ void Allocator_New<T>::set(size_t inIndex, const T & inValue)
 } // namespace Futile
 
 
-#endif // TETRIS_ALLOCATOR_H_INCLUDED
+#endif // FUTILE_ALLOCATOR_H_INCLUDED

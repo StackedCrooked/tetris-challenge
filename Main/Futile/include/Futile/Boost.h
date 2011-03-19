@@ -1,5 +1,5 @@
-#ifndef TETRIS_BOOST_H_INCLUDED
-#define TETRIS_BOOST_H_INCLUDED
+#ifndef FUTILE_BOOST_H_INCLUDED
+#define FUTILE_BOOST_H_INCLUDED
 
 
 /**
@@ -125,4 +125,4 @@ private:
 } } // namespace Futile::Boost
 
 
-#endif // TETRIS_BOOST_H_INCLUDED
+#endif // FUTILE_BOOST_H_INCLUDED

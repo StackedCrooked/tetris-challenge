@@ -1,5 +1,5 @@
-#ifndef TETRIS_LOGGING_H_INCLUDED
-#define TETRIS_LOGGING_H_INCLUDED
+#ifndef FUTILE_LOGGING_H_INCLUDED
+#define FUTILE_LOGGING_H_INCLUDED
 
 
 #include "Futile/MakeString.h"

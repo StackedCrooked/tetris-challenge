@@ -1,5 +1,5 @@
-#ifndef TETRIS_MAINTHREAD_H_INCLUDED
-#define TETRIS_MAINTHREAD_H_INCLUDED
+#ifndef FUTILE_MAINTHREAD_H_INCLUDED
+#define FUTILE_MAINTHREAD_H_INCLUDED
 
 
 #include <boost/function.hpp>
@@ -17,6 +17,8 @@ typedef boost::function<void()> Action;
 /**
  * Invokelater enables worker threads to schedule an action to be executed in the main thread.
  * This is achieved by pushing a (platform specific) "post message" on the main message loop.
+ * This can only be used in applications that have a message loop (usually GUI applications).
+ * Currently only Qt is supported (currently it's in the Tetris library, heh).
  */
 void InvokeLater(const Action & inAction);
 
@@ -61,4 +63,4 @@ private:
 } // namespace Futile
 
 
-#endif // TETRIS_MAINTHREAD_H_INCLUDED
+#endif // FUTILE_MAINTHREAD_H_INCLUDED

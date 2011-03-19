@@ -1,5 +1,5 @@
-#ifndef TETRIS_THREADING_H_INCLUDED
-#define TETRIS_THREADING_H_INCLUDED
+#ifndef FUTILE_THREADING_H_INCLUDED
+#define FUTILE_THREADING_H_INCLUDED
 
 
 #include "Futile/ThreadingConfiguration.h"
@@ -22,15 +22,24 @@ template<class Variable>
 class ScopedAccessor;
 
 
+/**
+ * ThreadSafe can be used to enapsulate an object that needs to be accessed by multiple threads.
+ * The object is stored as a private member variable and access can only be obtained by using
+ * one of two friend classes: ScopedReader and ScopedReaderAndWriter.
+ * ScopedReader is a shared-read-lock and gives you const access the the object.
+ * ScopedReaderAndWriter is a unique lock that gives you full access to the object.
+ */
 template<class Variable>
 class ThreadSafe
 {
 public:
+	// Constructor that takes an autoptr object.
     ThreadSafe(std::auto_ptr<Variable> inVariable) :
         mImpl(new Impl(inVariable))
     {
     }
 
+	// Constructor that takes the new object.
     ThreadSafe(Variable * inVariable) :
         mImpl(new Impl(inVariable))
     {
@@ -57,6 +66,7 @@ public:
     { return mImpl->mIdentifier; }
 
 private:
+	// This is the base class for the ScopedReader and ScopedReaderAndWriter classes.
     friend class ScopedAccessor<Variable>;
 
     struct Impl : boost::noncopyable
@@ -101,7 +111,7 @@ bool operator< (const ThreadSafe<Variable> & lhs, const ThreadSafe<Variable> & r
 
 
 // Simple stopwatch class.
-// Helper for ScopedReaderAndWriter and ScopedReader.
+// Used by the TimeLimitPolicy class of the ScopedReaderAndWriter and ScopedReader classes.
 class Stopwatch : boost::noncopyable
 {
 public:
@@ -126,11 +136,12 @@ class VoidPolicy
 
 
 /**
- * TimeLimitMs is an object that checks the duration of its own lifetime.
- * During destruction it is checked if the duration has been exceeded.
- * If yes, then an assert is triggered.
+ * TimeLimitMs checks the duration of its own object lifetime.
+ * During destruction it is checked if the maximum allowed duration
+ * (which is specified as a value-type template argument) was exceeded.
+ * If yes, then an assert/exception will result.
  */
-template<unsigned int MaxDurationMs>
+template<time_t MaxDurationMs>
 struct TimeLimitMs
 {
     ~TimeLimitMs()
@@ -143,6 +154,9 @@ struct TimeLimitMs
 };
 
 
+/**
+ * ScopedAccessor is the base class for the ScopedReader and ScopedReadedAndWriter classes.
+ */
 template<class Variable>
 class ScopedAccessor : boost::noncopyable
 {
@@ -173,9 +187,15 @@ private:
 };
 
 
-template<class Variable,
-         class CheckLockDurationPolicy = TimeLimitMs<10>,
-         class CheckLockOrderPolicy = VoidPolicy>
+/**
+ * ConfigurableScopedAccessor sits between the ScopedReader/ScopedReadAndWriter and the ScopedAccessor classes.
+ * The policy template arguments can be used to specify whether and how the class should do extra runtime checking
+ * and error reporting.
+ */
+template<
+	class Variable,
+	class CheckLockDurationPolicy = TimeLimitMs<10>,
+    class CheckLockOrderPolicy    = VoidPolicy>
 class ConfigurableScopedAccessor : public  ScopedAccessor<Variable>,
                                    private CheckLockDurationPolicy,
                                    private CheckLockOrderPolicy
@@ -189,6 +209,12 @@ public:
 };
 
 
+/**
+ * ScopedReader creates a read-lock during the lifetime of its object.
+ * Access to the wrapped object is restricted to const-ref.
+ *
+ * Be careful if your object has mutable data!
+ */
 template<class Variable>
 class ScopedReader : public ConfigurableScopedAccessor<Variable>
 {
@@ -205,6 +231,7 @@ public:
     {
     }
 
+	// Access is limited to const-ref.
     const Variable & operator *() const
     { return *ScopedAccessor<Variable>::getVariable(); }
 
@@ -218,7 +245,11 @@ protected:
     SharedLock mSharedLock;
 };
 
-
+	
+/**
+ * ScopedReaderAndWriter creates, during it's lifetime, a unique-lock
+ * on the shared resource and provides full access to the object.
+ */
 template<class Variable>
 class ScopedReaderAndWriter : public ScopedReader<Variable>
 {
@@ -235,6 +266,7 @@ public:
     {
     }
 
+	// Full access to the wrapped object.
     Variable & operator *()
     { return *ScopedAccessor<Variable>::getVariable(); }
 
@@ -251,7 +283,7 @@ private:
 
 /**
  * InstanceTracker allows you to monitor instances of a class.
- * To use it the class must inherit InstanceTracker.
+ * To use it the monitored class must inherit InstanceTracker.
  */
 class InstanceTracker : boost::noncopyable
 {
@@ -283,7 +315,7 @@ private:
 
 
 /**
- * LockMany is a mutex lock that can lock an arbitrary number of mutexes.
+ * LockMany is a mutex lock that can lock multiple mutexes.
  */
 template<class Mutex>
 class LockMany : boost::noncopyable
@@ -367,4 +399,4 @@ typename LockMany<Mutex>::size_type LockMany<Mutex>::size() const
 } // namespace Futile
 
 
-#endif // TETRIS_THREADING_H_INCLUDED
+#endif // FUTILE_THREADING_H_INCLUDED

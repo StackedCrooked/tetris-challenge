@@ -1,5 +1,5 @@
-#ifndef TETRIS_ARRAY_H
-#define TETRIS_ARRAY_H
+#ifndef FUTILE_ARRAY_H
+#define FUTILE_ARRAY_H
 
 
 #include <vector>
@@ -97,4 +97,4 @@ public:
 } // namespace Futile
 
 
-#endif // TETRIS_ARRAY_H
+#endif // FUTILE_ARRAY_H
