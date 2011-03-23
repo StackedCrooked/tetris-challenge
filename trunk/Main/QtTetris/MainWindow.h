@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 
 
-#include <QtGui>
+#include <Qt/QtGui>
 #include "TetrisWidget.h"
 #include "Tetris/SimpleGame.h"
 #include "Tetris/MultiplayerGame.h"

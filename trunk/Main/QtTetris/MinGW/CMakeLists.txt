@@ -13,7 +13,12 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OUTDIR}bin/)
 set(POCO  ${SOLUTIONDIR}3rdParty/Poco/)
 set(BOOST ${SOLUTIONDIR}3rdParty/Boost_1_44_0/)
 
+# TODO: use non-hardcoded path
+set(QT /home/francis/qtsdk-2010.05/qt/include)
+
 include_directories(
+    ${SOLUTIONDIR}QtTetris
+    ${QT}
     ${BOOST}
     ${POCO}Foundation/include
     ${POCO}CppUnit/include
