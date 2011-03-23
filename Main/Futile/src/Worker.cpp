@@ -10,6 +10,8 @@
 // Enables you to see the thread name the Visual Studio debugger.
 //
 #ifdef _WIN32
+#define SetThreadName(...)
+#if 0
 #include <windows.h>
 void SetThreadName(DWORD inThreadId, const std::string & inThreadName)
 {
@@ -38,6 +40,7 @@ void SetThreadName(DWORD inThreadId, const std::string & inThreadName)
     {
     }
 }
+#endif // 0
 #else
 #define SetThreadName(...)
 #endif

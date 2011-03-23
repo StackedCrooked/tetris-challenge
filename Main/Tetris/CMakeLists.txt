@@ -5,7 +5,6 @@ include_directories(
     ${SolutionDir}3rdPary/Boost
     ${SolutionDir}3rdPary/Poco/Foundation/include)
 
-
 add_library(Tetris
     include/Tetris/AbstractWidget.h
     include/Tetris/AISupport.h
@@ -62,6 +61,4 @@ add_library(Tetris
     src/SimpleGame.cpp
     src/SingleThreadedNodeCalculator.cpp
     src/Unicode.cpp)
-
-set_target_properties(Tetris PROPERTIES COMPILE_FLAGS ${FINAL_COMPILE_FLAGS})
 
