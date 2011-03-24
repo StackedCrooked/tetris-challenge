@@ -15,7 +15,7 @@
 using Futile::CreatePoly;
 using Futile::LogWarning;
 using Futile::ScopedReader;
-using Futile::ScopedReaderAndWriter;
+using Futile::ScopedWriter;
 
 
 namespace Tetris {
@@ -154,7 +154,7 @@ ThreadSafe<Game> SimpleGame::game() const
 
 void SimpleGame::setPaused(bool inPaused)
 {
-    ScopedReaderAndWriter<Game> rwgame(mImpl->mGame);
+    ScopedWriter<Game> rwgame(mImpl->mGame);
     return rwgame->setPaused(inPaused);
 }
 
@@ -181,14 +181,14 @@ GameStateStats SimpleGame::stats() const
 
 void SimpleGame::applyLinePenalty(int inNumberOfLinesMadeByOpponent)
 {
-    ScopedReaderAndWriter<Game> rwgame(mImpl->mGame);
+    ScopedWriter<Game> rwgame(mImpl->mGame);
     rwgame->applyLinePenalty(inNumberOfLinesMadeByOpponent);
 }
 
 
 //void SimpleGame::setActiveBlock(const Block & inBlock)
 //{
-//    ScopedReaderAndWriter<Game> rwgame(mImpl->mGame);
+//    ScopedWriter<Game> rwgame(mImpl->mGame);
 //    Game & game(*rwgame.get());
 //    game.setActiveBlock(inBlock);
 //}
@@ -196,7 +196,7 @@ void SimpleGame::applyLinePenalty(int inNumberOfLinesMadeByOpponent)
 
 //void SimpleGame::setGameGrid(const Grid & inGrid)
 //{
-//    ScopedReaderAndWriter<Game> rwgame(mImpl->mGame);
+//    ScopedWriter<Game> rwgame(mImpl->mGame);
 //    Game & game(*rwgame.get());
 //    game.setGrid(inGrid);
 //}
@@ -225,28 +225,28 @@ int SimpleGame::columnCount() const
 
 void SimpleGame::move(MoveDirection inDirection)
 {
-    ScopedReaderAndWriter<Game> game(mImpl->mGame);
+    ScopedWriter<Game> game(mImpl->mGame);
     game->move(inDirection);
 }
 
 
 void SimpleGame::rotate()
 {
-    ScopedReaderAndWriter<Game> game(mImpl->mGame);
+    ScopedWriter<Game> game(mImpl->mGame);
     game->rotate();
 }
 
 
 void SimpleGame::drop()
 {
-    ScopedReaderAndWriter<Game> game(mImpl->mGame);
+    ScopedWriter<Game> game(mImpl->mGame);
     game->drop();
 }
 
 
 void SimpleGame::setStartingLevel(int inLevel)
 {
-    ScopedReaderAndWriter<Game> rwgame(mImpl->mGame);
+    ScopedWriter<Game> rwgame(mImpl->mGame);
     rwgame->setStartingLevel(inLevel);
 }
 
@@ -273,7 +273,7 @@ Block SimpleGame::getNextBlock()
 {
     std::vector<BlockType> blockTypes;
     {
-        ScopedReaderAndWriter<Game> game(mImpl->mGame);
+        ScopedWriter<Game> game(mImpl->mGame);
         game->getFutureBlocks(2, blockTypes);
     }
 
@@ -291,7 +291,7 @@ std::vector<Block> SimpleGame::getNextBlocks()
     std::vector<BlockType> blockTypes;
     int numFutureBlocks = futureBlocksCount();
     {
-        ScopedReaderAndWriter<Game> game(mImpl->mGame);
+        ScopedWriter<Game> game(mImpl->mGame);
         game->getFutureBlocks(1 + numFutureBlocks, blockTypes);
     }
 

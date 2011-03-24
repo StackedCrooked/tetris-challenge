@@ -234,7 +234,7 @@ namespace Tetris {
 
     //    {
     //        mComputerPlayer.reset();
-    //        ScopedReaderAndWriter<Game> wgame(*mProtectedGame.get());
+    //        ScopedWriter<Game> wgame(*mProtectedGame.get());
     //        Game & game(*wgame.get());
     //        game.clearPrecalculatedNodes();
 
@@ -374,7 +374,7 @@ namespace Tetris {
 
     LRESULT Controller::onClearPrecalculated(WPARAM wParam, LPARAM lParam)
     {
-        ScopedReaderAndWriter<Game> game(*mProtectedGame);
+        ScopedWriter<Game> game(*mProtectedGame);
         game->clearPrecalculatedNodes();
         return XULWin::cHandled;
     }
@@ -472,7 +472,7 @@ namespace Tetris {
     {
         if (mPlayerIsHuman->isSelected())
         {
-            ScopedReaderAndWriter<Game> wgame(*mProtectedGame);
+            ScopedWriter<Game> wgame(*mProtectedGame);
             Game & game = *wgame.get();
             return game.move(inDirection);
         }
@@ -484,7 +484,7 @@ namespace Tetris {
     {
         if (mPlayerIsHuman->isSelected())
         {
-            ScopedReaderAndWriter<Game> wgame(*mProtectedGame);
+            ScopedWriter<Game> wgame(*mProtectedGame);
             Game & game = *wgame.get();
             game.drop();
         }
@@ -495,7 +495,7 @@ namespace Tetris {
     {
         if (mPlayerIsHuman->isSelected())
         {
-            ScopedReaderAndWriter<Game> wgame(*mProtectedGame);
+            ScopedWriter<Game> wgame(*mProtectedGame);
             Game & game = *wgame.get();
             return game.rotate();
         }

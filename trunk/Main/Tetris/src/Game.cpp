@@ -23,7 +23,7 @@ using Futile::LogWarning;
 using Futile::MakeString;
 using Futile::Mutex;
 using Futile::ScopedReader;
-using Futile::ScopedReaderAndWriter;
+using Futile::ScopedWriter;
 
 
 namespace Tetris {
@@ -85,7 +85,7 @@ Game::~Game()
 
 void Game::RegisterEventHandler(ThreadSafe<Game> inGame, EventHandler * inEventHandler)
 {
-    ScopedReaderAndWriter<Game> rwgame(inGame);
+    ScopedWriter<Game> rwgame(inGame);
     Game * game(rwgame.get());
     if (sInstances.find(game) == sInstances.end())
     {
@@ -99,7 +99,7 @@ void Game::RegisterEventHandler(ThreadSafe<Game> inGame, EventHandler * inEventH
 
 void Game::UnregisterEventHandler(ThreadSafe<Game> inGame, EventHandler * inEventHandler)
 {
-    ScopedReaderAndWriter<Game> rwgame(inGame);
+    ScopedWriter<Game> rwgame(inGame);
     Game * game(rwgame.get());
     if (sInstances.find(game) == sInstances.end())
     {

@@ -19,7 +19,7 @@
 using Futile::LogError;
 using Futile::MakeString;
 using Futile::ScopedReader;
-using Futile::ScopedReaderAndWriter;
+using Futile::ScopedWriter;
 
 
 namespace Tetris {
@@ -153,7 +153,7 @@ void BlockMover::Impl::onTimer(Poco::Timer &)
 void BlockMover::Impl::move()
 {
 
-    ScopedReaderAndWriter<Game> wGame(mGame);
+    ScopedWriter<Game> wGame(mGame);
     ComputerGame & game = dynamic_cast<ComputerGame&>(*wGame.get());
     if (game.isPaused())
     {
