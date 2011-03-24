@@ -14,19 +14,24 @@
 
 
 #define FUTILE_THREADING_BOOST 1
-#define FUTILE_THREADING_POCO 0
+#define FUTILE_THREADING_POCO  0
+
+
+
+
+#if FUTILE_THREADING_BOOST
+
+
+#include <boost/thread.hpp>
 
 
 namespace Futile {
 
 
-#if FUTILE_THREADING_BOOST
-//
-// Typedefs for boost classes
-//
 typedef boost::mutex Mutex;
 typedef boost::mutex::scoped_lock ScopedLock;
 typedef boost::shared_mutex RWMutex;
+typedef boost::condition_variable Condition;
 
 class ScopedRWLock : boost::noncopyable
 {
@@ -53,13 +58,34 @@ private:
 };
 
 
-typedef boost::upgrade_lock<RWMutex> ReadLock;
-typedef boost::upgrade_to_unique_lock<RWMutex> WriteLock;
-typedef boost::condition_variable Condition;
+} // namespace Futile
+
+
 #elif FUTILE_THREADING_POCO
+
+
+#include "Poco/Condition.h"
+#include "Poco/Mutex.h"
+#include "Poco/RWLock.h"
+
+
+namespace Futile {
+
+
+typedef Poco::Mutex Mutex;
+typedef Poco::Condition Condition;
+typedef Poco::RWLock RWMutex;
+
+
+} // namespace Futile
+
+
 #else
 #error "Neither FUTILE_THREADING_BOOST nor FUTILE_THREADING_POCO was defined"
 #endif
+
+
+namespace Futile {
 
 
 // Forward declarations
@@ -232,15 +258,22 @@ private:
 };
 
 
+enum LockType
+{
+    LockType_ReadLock,
+    LockType_ReadAndWriteLock
+};
+
+
 /**
  * ConfigurableScopedAccessor sits between the ScopedReader/ScopedReadAndWriter and the ScopedAccessor classes.
  * The policy template arguments can be used to specify whether and how the class should do extra runtime checking
  * and error reporting.
  */
-template<
-    class Variable,
-    class CheckLockDurationPolicy = TimeLimitMs<10>,
-    class CheckLockOrderPolicy    = VoidPolicy>
+template<class Variable,
+         LockType inLockType,
+         class CheckLockDurationPolicy = TimeLimitMs<10>,
+         class CheckLockOrderPolicy    = VoidPolicy>
 class ConfigurableScopedAccessor : public  ScopedAccessor<Variable>,
                                    private CheckLockDurationPolicy,
                                    private CheckLockOrderPolicy
@@ -248,9 +281,13 @@ class ConfigurableScopedAccessor : public  ScopedAccessor<Variable>,
 public:
     typedef ScopedAccessor<Variable> Super;
     ConfigurableScopedAccessor(ThreadSafe<Variable> inProtectedVariable) :
-        Super(inProtectedVariable)
+        Super(inProtectedVariable),
+        mScopedRWLock(ScopedAccessor<Variable>::getRWMutex(), inLockType == LockType_ReadAndWriteLock)
     {
     }
+
+protected:
+    ScopedRWLock mScopedRWLock;
 };
 
 
@@ -261,18 +298,14 @@ public:
  * Be careful if your object has mutable data!
  */
 template<class Variable>
-class ScopedReader : public ConfigurableScopedAccessor<Variable>
+class ScopedReader : public ConfigurableScopedAccessor<Variable, LockType_ReadLock>
 {
+private:
+    typedef ConfigurableScopedAccessor<Variable, LockType_ReadLock> Super;
+
 public:
-    typedef ConfigurableScopedAccessor<Variable> Super;
-
     ScopedReader(ThreadSafe<Variable> inProtectedVariable) :
-        Super(inProtectedVariable),
-        mReadLock(ScopedAccessor<Variable>::getRWMutex())
-    {
-    }
-
-    ~ScopedReader()
+        Super(inProtectedVariable)
     {
     }
 
@@ -285,9 +318,6 @@ public:
 
     const Variable * operator->() const
     { return ScopedAccessor<Variable>::getVariable(); }
-
-protected:
-    ReadLock mReadLock;
 };
 
 
@@ -296,22 +326,17 @@ protected:
  * on the shared resource and provides full access to the object.
  */
 template<class Variable>
-class ScopedReaderAndWriter : public ScopedReader<Variable>
+class ScopedReaderAndWriter : public ConfigurableScopedAccessor<Variable, LockType_ReadAndWriteLock>
 {
+private:
+    typedef ConfigurableScopedAccessor<Variable, LockType_ReadAndWriteLock> Super;
+
 public:
-    typedef ScopedReader<Variable> Super;
-
     ScopedReaderAndWriter(ThreadSafe<Variable> inProtectedVariable) :
-        Super(inProtectedVariable),
-        mWriteLock(Super::mReadLock)
+        Super(inProtectedVariable)
     {
     }
 
-    ~ScopedReaderAndWriter()
-    {
-    }
-
-    // Full access to the wrapped object.
     Variable & operator *()
     { return *ScopedAccessor<Variable>::getVariable(); }
 
@@ -320,9 +345,6 @@ public:
 
     Variable * operator->()
     { return ScopedAccessor<Variable>::getVariable(); }
-
-private:
-    WriteLock mWriteLock;
 };
 
 
