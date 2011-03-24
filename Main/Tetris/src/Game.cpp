@@ -8,6 +8,7 @@
 #include "Tetris/Utilities.h"
 #include "Futile/Assert.h"
 #include "Futile/Logging.h"
+#include "Futile/MainThread.h"
 #include "Futile/Threading.h"
 #include "Poco/Exception.h"
 #include "Poco/Random.h"

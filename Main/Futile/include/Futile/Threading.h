@@ -3,8 +3,6 @@
 
 
 #include "Futile/Assert.h"
-#include "Futile/MainThread.h"
-#include "Futile/Logging.h"
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread.hpp>
