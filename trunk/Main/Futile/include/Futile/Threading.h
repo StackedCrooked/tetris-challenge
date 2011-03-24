@@ -18,33 +18,8 @@ namespace Futile {
 
 typedef boost::mutex Mutex;
 typedef boost::mutex::scoped_lock ScopedLock;
-typedef boost::shared_mutex RWMutex;
+typedef boost::shared_mutex SharedMutex;
 typedef boost::condition_variable Condition;
-
-
-class ScopedRWLock : boost::noncopyable
-{
-public:
-    ScopedRWLock(RWMutex & inRWMutex, bool inWrite = false) :
-        mReadLock(inRWMutex)
-    {
-        if (inWrite)
-        {
-            mWriteLock.reset(new WriteLock(mReadLock));
-        }
-    }
-
-    ~ScopedRWLock()
-    {
-    }
-
-private:
-    typedef boost::upgrade_lock<RWMutex> ReadLock;
-    ReadLock mReadLock;
-
-    typedef boost::upgrade_to_unique_lock<RWMutex> WriteLock;
-    boost::scoped_ptr<WriteLock> mWriteLock;
-};
 
 
 // Forward declarations
@@ -123,7 +98,7 @@ private:
         }
 
         Variable * mVariable;
-        RWMutex mRWMutex;
+        SharedMutex mSharedMutex;
         size_t mIdentifier;
     };
 
@@ -201,9 +176,9 @@ public:
     }
 
 protected:
-    RWMutex & getRWMutex()
+    SharedMutex & getSharedMutex()
     {
-        return mProtectedVariable.mImpl->mRWMutex;
+        return mProtectedVariable.mImpl->mSharedMutex;
     }
 
     const Variable * getVariable() const
@@ -221,20 +196,12 @@ private:
 };
 
 
-enum LockType
-{
-    LockType_ReadLock,
-    LockType_WriteLock
-};
-
-
 /**
  * ConfigurableScopedAccessor sits between the ScopedReader/ScopedReadAndWriter and the ScopedAccessor classes.
  * The policy template arguments can be used to specify whether and how the class should do extra runtime checking
  * and error reporting.
  */
 template<class Variable,
-         LockType inLockType,
          class CheckLockDurationPolicy = TimeLimitMs<10>,
          class CheckLockOrderPolicy    = VoidPolicy>
 class ConfigurableScopedAccessor : public  ScopedAccessor<Variable>,
@@ -244,13 +211,9 @@ class ConfigurableScopedAccessor : public  ScopedAccessor<Variable>,
 public:
     typedef ScopedAccessor<Variable> Super;
     ConfigurableScopedAccessor(ThreadSafe<Variable> inProtectedVariable) :
-        Super(inProtectedVariable),
-        mScopedRWLock(ScopedAccessor<Variable>::getRWMutex(), inLockType == LockType_WriteLock)
+        Super(inProtectedVariable)
     {
     }
-
-protected:
-    ScopedRWLock mScopedRWLock;
 };
 
 
@@ -261,14 +224,12 @@ protected:
  * Be careful if your object has mutable data!
  */
 template<class Variable>
-class ScopedReader : public ConfigurableScopedAccessor<Variable, LockType_ReadLock>
+class ScopedReader : public ConfigurableScopedAccessor<Variable>
 {
-private:
-    typedef ConfigurableScopedAccessor<Variable, LockType_ReadLock> Super;
-
 public:
     ScopedReader(ThreadSafe<Variable> inProtectedVariable) :
-        Super(inProtectedVariable)
+        Super(inProtectedVariable),
+        mReadLock(ScopedAccessor<Variable>::getSharedMutex())
     {
     }
 
@@ -281,22 +242,25 @@ public:
 
     const Variable * operator->() const
     { return ScopedAccessor<Variable>::getVariable(); }
+
+protected:
+    typedef ConfigurableScopedAccessor<Variable> Super;
+    boost::upgrade_lock<SharedMutex> mReadLock;
+
 };
 
 
 /**
- * ScopedWriter creates, during it's lifetime, a unique-lock
- * on the shared resource and provides full access to the object.
+ * ScopedWriter creates, during it's lifetime, a unique-lock on
+ * the C++ object and provides both read and write access to it.
  */
 template<class Variable>
-class ScopedWriter : public ConfigurableScopedAccessor<Variable, LockType_WriteLock>
+class ScopedWriter : public ScopedReader<Variable>
 {
-private:
-    typedef ConfigurableScopedAccessor<Variable, LockType_WriteLock> Super;
-
 public:
     ScopedWriter(ThreadSafe<Variable> inProtectedVariable) :
-        Super(inProtectedVariable)
+        Super(inProtectedVariable),
+        mWriteLock(ScopedReader<Variable>::mReadLock)
     {
     }
 
@@ -308,6 +272,11 @@ public:
 
     Variable * operator->()
     { return ScopedAccessor<Variable>::getVariable(); }
+
+
+private:
+    typedef ScopedReader<Variable> Super;
+    boost::upgrade_to_unique_lock<SharedMutex> mWriteLock;
 };
 
 
