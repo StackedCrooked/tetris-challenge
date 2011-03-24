@@ -48,21 +48,25 @@ private:
 
 
 // Forward declarations
-template<class Variable>
-class ScopedAccessor;
+template<class> class ScopedAccessor;
+template<class> class ScopedReader;
+template<class> class ScopedWriter;
 
 
 /**
  * ThreadSafe can be used to enapsulate an object that needs to be accessed by multiple threads.
  * The object is stored as a private member variable and access can only be obtained by using
- * one of two friend classes: ScopedReader and ScopedReaderAndWriter.
+ * one of two friend classes: ScopedReader and ScopedWriter.
  * ScopedReader is a shared-read-lock and gives you const access the the object.
- * ScopedReaderAndWriter is a unique lock that gives you full access to the object.
+ * ScopedWriter is a unique lock that gives you full access to the object.
  */
 template<class Variable>
 class ThreadSafe
 {
 public:
+    typedef ScopedReader<Variable> ScopedReader;
+    typedef ScopedWriter<Variable> ScopedWriter;
+
     // Constructor that takes an autoptr object.
     ThreadSafe(std::auto_ptr<Variable> inVariable) :
         mImpl(new Impl(inVariable))
@@ -96,7 +100,7 @@ public:
     { return mImpl->mIdentifier; }
 
 private:
-    // This is the base class for the ScopedReader and ScopedReaderAndWriter classes.
+    // This is the base class for the ScopedReader and ScopedWriter classes.
     friend class ScopedAccessor<Variable>;
 
     struct Impl : boost::noncopyable
@@ -141,7 +145,7 @@ bool operator< (const ThreadSafe<Variable> & lhs, const ThreadSafe<Variable> & r
 
 
 // Simple stopwatch class.
-// Used by the TimeLimitPolicy class of the ScopedReaderAndWriter and ScopedReader classes.
+// Used by the TimeLimitPolicy class of the ScopedWriter and ScopedReader classes.
 class Stopwatch : boost::noncopyable
 {
 public:
@@ -220,7 +224,7 @@ private:
 enum LockType
 {
     LockType_ReadLock,
-    LockType_ReadAndWriteLock
+    LockType_WriteLock
 };
 
 
@@ -241,7 +245,7 @@ public:
     typedef ScopedAccessor<Variable> Super;
     ConfigurableScopedAccessor(ThreadSafe<Variable> inProtectedVariable) :
         Super(inProtectedVariable),
-        mScopedRWLock(ScopedAccessor<Variable>::getRWMutex(), inLockType == LockType_ReadAndWriteLock)
+        mScopedRWLock(ScopedAccessor<Variable>::getRWMutex(), inLockType == LockType_WriteLock)
     {
     }
 
@@ -281,17 +285,17 @@ public:
 
 
 /**
- * ScopedReaderAndWriter creates, during it's lifetime, a unique-lock
+ * ScopedWriter creates, during it's lifetime, a unique-lock
  * on the shared resource and provides full access to the object.
  */
 template<class Variable>
-class ScopedReaderAndWriter : public ConfigurableScopedAccessor<Variable, LockType_ReadAndWriteLock>
+class ScopedWriter : public ConfigurableScopedAccessor<Variable, LockType_WriteLock>
 {
 private:
-    typedef ConfigurableScopedAccessor<Variable, LockType_ReadAndWriteLock> Super;
+    typedef ConfigurableScopedAccessor<Variable, LockType_WriteLock> Super;
 
 public:
-    ScopedReaderAndWriter(ThreadSafe<Variable> inProtectedVariable) :
+    ScopedWriter(ThreadSafe<Variable> inProtectedVariable) :
         Super(inProtectedVariable)
     {
     }
@@ -319,13 +323,13 @@ public:
 
     InstanceTracker()
     {
-        ScopedReaderAndWriter<Instances> rwInstances(sInstances);
+        ScopedWriter<Instances> rwInstances(sInstances);
         rwInstances->insert(this);
     }
 
     virtual ~InstanceTracker()
     {
-        ScopedReaderAndWriter<Instances> rwInstances(sInstances);
+        ScopedWriter<Instances> rwInstances(sInstances);
         rwInstances->erase(this);
     }
 

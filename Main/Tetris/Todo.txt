@@ -23,7 +23,7 @@ v Fix random seeds.
 v Fix unittest build.
 v QtTetris: paint stats
 v Differentiate between Human and Computer game objects.
-v Introduce ScopedReader and ScopedReaderAndWriter. Use read lock for the ScopedReader.
+v Introduce ScopedReader and ScopedWriter. Use read lock for the ScopedReader.
 v Rename TetrisCore to Tetris
 v Add checkbox: 'switch to Survive when height reaches xx%'
 v Add multicore search and add spin button to GUI to specify number of threads.

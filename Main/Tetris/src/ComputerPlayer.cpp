@@ -28,7 +28,7 @@ using Futile::MakeString;
 using Futile::Mutex;
 using Futile::ScopedLock;
 using Futile::ScopedReader;
-using Futile::ScopedReaderAndWriter;
+using Futile::ScopedWriter;
 using Futile::WorkerPool;
 
 
@@ -350,7 +350,7 @@ void ComputerPlayer::Impl::startNodeCalculator()
 
     // Critical section
     {
-        ScopedReaderAndWriter<Game> wgame(mComputerPlayer->simpleGame()->game());
+        ScopedWriter<Game> wgame(mComputerPlayer->simpleGame()->game());
         ComputerGame & game(dynamic_cast<ComputerGame&>(*wgame.get()));
 
 
@@ -455,7 +455,7 @@ void ComputerPlayer::Impl::onFinished()
         return;
     }
 
-    ScopedReaderAndWriter<Game> wgame(mComputerPlayer->simpleGame()->game());
+    ScopedWriter<Game> wgame(mComputerPlayer->simpleGame()->game());
     ComputerGame & game(dynamic_cast<ComputerGame&>(*wgame.get()));
 
     // Check for sync problems.

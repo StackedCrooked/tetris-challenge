@@ -16,7 +16,7 @@
 
 using Futile::LogError;
 using Futile::ScopedReader;
-using Futile::ScopedReaderAndWriter;
+using Futile::ScopedWriter;
 
 
 namespace Tetris {
@@ -91,7 +91,7 @@ void Gravity::Impl::onTimerEvent(Poco::Timer & )
         if (mStopwatch.elapsed() > 1000  * interval())
         {
             mStopwatch.restart();
-            ScopedReaderAndWriter<Game> game(mThreadSafeGame);
+            ScopedWriter<Game> game(mThreadSafeGame);
             if (game->isGameOver() || game->isPaused())
             {
                 return;
