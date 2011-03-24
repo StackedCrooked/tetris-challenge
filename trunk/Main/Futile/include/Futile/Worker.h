@@ -100,11 +100,11 @@ private:
     std::string mName;
     Status mStatus;
     mutable Mutex mStatusMutex;
-    boost::condition_variable mStatusCondition;
+    Condition mStatusCondition;
 
     std::list<Task> mQueue;
     mutable Mutex mQueueMutex;
-    boost::condition_variable mQueueCondition;
+    Condition mQueueCondition;
 
     mutable Mutex mQuitFlagMutex;
     bool mQuitFlag;

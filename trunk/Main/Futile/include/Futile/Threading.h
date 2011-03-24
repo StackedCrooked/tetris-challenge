@@ -13,18 +13,53 @@
 #include <set>
 
 
+#define FUTILE_THREADING_BOOST 1
+#define FUTILE_THREADING_POCO 0
+
+
 namespace Futile {
 
 
+#if FUTILE_THREADING_BOOST
 //
 // Typedefs for boost classes
 //
 typedef boost::mutex Mutex;
 typedef boost::mutex::scoped_lock ScopedLock;
-typedef boost::shared_mutex SharedMutex;
-typedef boost::upgrade_lock<SharedMutex> UpgradeLock;
-typedef boost::upgrade_to_unique_lock<SharedMutex> UniqueLock;
-typedef boost::condition_variable ConditionVariable;
+typedef boost::shared_mutex RWMutex;
+
+class ScopedRWLock : boost::noncopyable
+{
+public:
+    ScopedRWLock(RWMutex & inRWMutex, bool inWrite = false) :
+        mReadLock(inRWMutex)
+    {
+        if (inWrite)
+        {
+            mWriteLock.reset(new WriteLock(mReadLock));
+        }
+    }
+
+    ~ScopedRWLock()
+    {
+    }
+
+private:
+    typedef boost::upgrade_lock<RWMutex> ReadLock;
+    ReadLock mReadLock;
+
+    typedef boost::upgrade_to_unique_lock<RWMutex> WriteLock;
+    boost::scoped_ptr<WriteLock> mWriteLock;
+};
+
+
+typedef boost::upgrade_lock<RWMutex> ReadLock;
+typedef boost::upgrade_to_unique_lock<RWMutex> WriteLock;
+typedef boost::condition_variable Condition;
+#elif FUTILE_THREADING_POCO
+#else
+#error "Neither FUTILE_THREADING_BOOST nor FUTILE_THREADING_POCO was defined"
+#endif
 
 
 // Forward declarations
@@ -99,7 +134,7 @@ private:
         }
 
         Variable * mVariable;
-        SharedMutex mSharedMutex;
+        RWMutex mRWMutex;
         size_t mIdentifier;
     };
 
@@ -177,9 +212,9 @@ public:
     }
 
 protected:
-    SharedMutex & getSharedMutex()
+    RWMutex & getRWMutex()
     {
-        return mProtectedVariable.mImpl->mSharedMutex;
+        return mProtectedVariable.mImpl->mRWMutex;
     }
 
     const Variable * getVariable() const
@@ -233,7 +268,7 @@ public:
 
     ScopedReader(ThreadSafe<Variable> inProtectedVariable) :
         Super(inProtectedVariable),
-        mUpgradeLock(ScopedAccessor<Variable>::getSharedMutex())
+        mReadLock(ScopedAccessor<Variable>::getRWMutex())
     {
     }
 
@@ -252,7 +287,7 @@ public:
     { return ScopedAccessor<Variable>::getVariable(); }
 
 protected:
-    UpgradeLock mUpgradeLock;
+    ReadLock mReadLock;
 };
 
 
@@ -268,7 +303,7 @@ public:
 
     ScopedReaderAndWriter(ThreadSafe<Variable> inProtectedVariable) :
         Super(inProtectedVariable),
-        mUniqueLock(Super::mUpgradeLock)
+        mWriteLock(Super::mReadLock)
     {
     }
 
@@ -287,7 +322,7 @@ public:
     { return ScopedAccessor<Variable>::getVariable(); }
 
 private:
-    UniqueLock mUniqueLock;
+    WriteLock mWriteLock;
 };
 
 
