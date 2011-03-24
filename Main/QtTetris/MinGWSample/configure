@@ -1,8 +1,0 @@
-mkdir -p Build
-cd Build
-cmake -DCMAKE_TOOLCHAIN_FILE=../ToolChain.MinGW.cmake ..
-echo
-echo "Build instructions:"
-echo "  cd Build"
-echo "  make VERBOSE=1"
-
