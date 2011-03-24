@@ -5,7 +5,6 @@
 #include "Futile/Assert.h"
 #include "Futile/MainThread.h"
 #include "Futile/Logging.h"
-#include "Poco/AtomicCounter.h"
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread.hpp>
@@ -61,18 +60,13 @@ public:
     }
 
     bool operator== (const ThreadSafe<Variable> & rhs) const
-    { return id() == rhs.id(); }
+    { return mImpl.get() == rhs.mImpl.get(); }
 
     bool operator!= (const ThreadSafe<Variable> & rhs) const
     { return !(*this == rhs); }
 
-    operator bool() const
-    {
-        return mImpl.get() != 0;
-    }
-
-    size_t id() const
-    { return mImpl->mIdentifier; }
+    bool compare(const ThreadSafe<Variable> & inOther)
+    { return mImpl.get() < inOther.mImpl.get(); }
 
 private:
     // This is the base class for the ScopedReader and ScopedWriter classes.
@@ -81,14 +75,12 @@ private:
     struct Impl : boost::noncopyable
     {
         Impl(std::auto_ptr<Variable> inVariable) :
-            mVariable(inVariable.release()),
-            mIdentifier(++sInstanceCount)
+            mVariable(inVariable.release())
         {
         }
 
         Impl(Variable * inVariable) :
-            mVariable(inVariable),
-            mIdentifier(++sInstanceCount)
+            mVariable(inVariable)
         {
         }
 
@@ -99,23 +91,16 @@ private:
 
         Variable * mVariable;
         SharedMutex mSharedMutex;
-        size_t mIdentifier;
     };
 
     boost::shared_ptr<Impl> mImpl;
-    static Poco::AtomicCounter sInstanceCount;
 };
-
-
-// Static member initialization.
-template<class Variable>
-Poco::AtomicCounter ThreadSafe<Variable>::sInstanceCount(0);
 
 
 template<class Variable>
 bool operator< (const ThreadSafe<Variable> & lhs, const ThreadSafe<Variable> & rhs)
 {
-    return lhs.id() < rhs.id();
+    return lhs.compare(rhs);
 }
 
 

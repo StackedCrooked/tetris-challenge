@@ -1,8 +1,7 @@
 include_directories(
     .
     include
-    ../3rdParty/Boost
-    ../3rdParty/Poco/Foundation/include)
+    ../3rdParty/Boost)
 
 add_library(Futile
     include/Futile/Allocator.h
