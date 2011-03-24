@@ -2,19 +2,29 @@
 #define FUTILE_THREADING_H_INCLUDED
 
 
-#include "Futile/ThreadingConfiguration.h"
 #include "Futile/Assert.h"
 #include "Futile/MainThread.h"
 #include "Futile/Logging.h"
 #include "Poco/AtomicCounter.h"
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
-#include <boost/noncopyable.hpp>
+#include <boost/thread.hpp>
 #include <memory>
 #include <set>
 
 
 namespace Futile {
+
+
+//
+// Typedefs for boost classes
+//
+typedef boost::mutex Mutex;
+typedef boost::mutex::scoped_lock ScopedLock;
+typedef boost::shared_mutex SharedMutex;
+typedef boost::upgrade_lock<SharedMutex> UpgradeLock;
+typedef boost::upgrade_to_unique_lock<SharedMutex> UniqueLock;
+typedef boost::condition_variable ConditionVariable;
 
 
 // Forward declarations
@@ -33,13 +43,13 @@ template<class Variable>
 class ThreadSafe
 {
 public:
-	// Constructor that takes an autoptr object.
+    // Constructor that takes an autoptr object.
     ThreadSafe(std::auto_ptr<Variable> inVariable) :
         mImpl(new Impl(inVariable))
     {
     }
 
-	// Constructor that takes the new object.
+    // Constructor that takes the new object.
     ThreadSafe(Variable * inVariable) :
         mImpl(new Impl(inVariable))
     {
@@ -66,7 +76,7 @@ public:
     { return mImpl->mIdentifier; }
 
 private:
-	// This is the base class for the ScopedReader and ScopedReaderAndWriter classes.
+    // This is the base class for the ScopedReader and ScopedReaderAndWriter classes.
     friend class ScopedAccessor<Variable>;
 
     struct Impl : boost::noncopyable
@@ -193,8 +203,8 @@ private:
  * and error reporting.
  */
 template<
-	class Variable,
-	class CheckLockDurationPolicy = TimeLimitMs<10>,
+    class Variable,
+    class CheckLockDurationPolicy = TimeLimitMs<10>,
     class CheckLockOrderPolicy    = VoidPolicy>
 class ConfigurableScopedAccessor : public  ScopedAccessor<Variable>,
                                    private CheckLockDurationPolicy,
@@ -223,7 +233,7 @@ public:
 
     ScopedReader(ThreadSafe<Variable> inProtectedVariable) :
         Super(inProtectedVariable),
-        mSharedLock(ScopedAccessor<Variable>::getSharedMutex())
+        mUpgradeLock(ScopedAccessor<Variable>::getSharedMutex())
     {
     }
 
@@ -231,7 +241,7 @@ public:
     {
     }
 
-	// Access is limited to const-ref.
+    // Access is limited to const-ref.
     const Variable & operator *() const
     { return *ScopedAccessor<Variable>::getVariable(); }
 
@@ -242,10 +252,10 @@ public:
     { return ScopedAccessor<Variable>::getVariable(); }
 
 protected:
-    SharedLock mSharedLock;
+    UpgradeLock mUpgradeLock;
 };
 
-	
+
 /**
  * ScopedReaderAndWriter creates, during it's lifetime, a unique-lock
  * on the shared resource and provides full access to the object.
@@ -258,7 +268,7 @@ public:
 
     ScopedReaderAndWriter(ThreadSafe<Variable> inProtectedVariable) :
         Super(inProtectedVariable),
-        mUniqueLock(Super::mSharedLock)
+        mUniqueLock(Super::mUpgradeLock)
     {
     }
 
@@ -266,7 +276,7 @@ public:
     {
     }
 
-	// Full access to the wrapped object.
+    // Full access to the wrapped object.
     Variable & operator *()
     { return *ScopedAccessor<Variable>::getVariable(); }
 
@@ -359,7 +369,7 @@ LockMany<Mutex>::~LockMany()
 template<class Mutex>
 void LockMany<Mutex>::lock(Mutex & inMutex)
 {
-    LockMutex(inMutex);
+    inMutex.lock();
     mMutexes.push_back(&inMutex);
 }
 
@@ -369,7 +379,7 @@ void LockMany<Mutex>::unlockAll()
 {
     while (!mMutexes.empty())
     {
-        UnlockMutex(*mMutexes.back());
+        mMutexes.back()->unlock();
         mMutexes.pop_back();
     }
 }

@@ -18,8 +18,6 @@ add_library(Futile
     include/Futile/MainThreadImpl.h
     include/Futile/MakeString.h
     include/Futile/Threading.h
-    include/Futile/ThreadingConfiguration.h
-    include/Futile/ThreadingConfigurationBoost.h
     include/Futile/TypedWrapper.h
     include/Futile/Worker.h
     include/Futile/WorkerPool.h

@@ -110,8 +110,6 @@ HEADERS += \
     Futile/include/Futile/MainThreadImpl.h \
     Futile/include/Futile/MakeString.h \
     Futile/include/Futile/Threading.h \
-    Futile/include/Futile/ThreadingConfiguration.h \
-    Futile/include/Futile/ThreadingConfigurationBoost.h \
     Futile/include/Futile/TypedWrapper.h \
     Futile/include/Futile/Worker.h \
     Futile/include/Futile/WorkerPool.h \
