@@ -1,6 +1,6 @@
 #include "Futile/Config.h"
 #include "Futile/Threading.h"
-#include "Poco/Stopwatch.h"
+#include <ctime>
 
 
 namespace Futile {
@@ -11,17 +11,17 @@ InstanceTracker::ThreadedInstances InstanceTracker::sInstances;
 
 struct Stopwatch::Impl : boost::noncopyable
 {
-public:
-    Impl()
+    Impl() :
+        mStart(clock())
     {
-        mPocoStopwatch.start();
+
     }
 
     ~Impl()
     {
     }
 
-    Poco::Stopwatch mPocoStopwatch;
+    clock_t mStart;
 };
 
 
@@ -39,7 +39,8 @@ Stopwatch::~Stopwatch()
 
 int Stopwatch::elapsedTimeMs() const
 {
-    return static_cast<int>(0.5 + static_cast<double>(mImpl->mPocoStopwatch.elapsed()) / 1000.0);
+    static const clock_t CLOCKS_PER_MS = CLOCKS_PER_SEC / 1000;
+    return static_cast<int>((clock() - mImpl->mStart) / CLOCKS_PER_MS);
 }
 
 
