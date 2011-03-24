@@ -13,76 +13,45 @@
 #include <set>
 
 
-#define FUTILE_THREADING_BOOST 1
-#define FUTILE_THREADING_POCO  0
-
-
-
-
-#if FUTILE_THREADING_BOOST
-
-
-#include <boost/thread.hpp>
-
-
 namespace Futile {
 
 
 typedef boost::mutex Mutex;
 typedef boost::mutex::scoped_lock ScopedLock;
-typedef boost::shared_mutex RWMutex;
+typedef boost::shared_mutex SharedMutex;
 typedef boost::condition_variable Condition;
 
-class ScopedRWLock : boost::noncopyable
+
+class ScopedReadLock : boost::noncopyable
 {
 public:
-    ScopedRWLock(RWMutex & inRWMutex, bool inWrite = false) :
-        mReadLock(inRWMutex)
+    ScopedReadLock(SharedMutex & inSharedMutex) :
+        mReadLock(inSharedMutex)
     {
-        if (inWrite)
-        {
-            mWriteLock.reset(new WriteLock(mReadLock));
-        }
     }
 
-    ~ScopedRWLock()
+protected:
+    typedef boost::upgrade_lock<SharedMutex> ReadLock;
+    ReadLock mReadLock;
+};
+
+
+class ScopedWriteLock : public ScopedReadLock
+{
+public:
+    ScopedWriteLock(SharedMutex & inSharedMutex) :
+        ScopedReadLock(inSharedMutex),
+        mWriteLock(mReadLock)
     {
     }
 
 private:
-    typedef boost::upgrade_lock<RWMutex> ReadLock;
-    ReadLock mReadLock;
-
-    typedef boost::upgrade_to_unique_lock<RWMutex> WriteLock;
-    boost::scoped_ptr<WriteLock> mWriteLock;
+    typedef boost::upgrade_to_unique_lock<SharedMutex> WriteLock;
+    WriteLock mWriteLock;
 };
 
 
 } // namespace Futile
-
-
-#elif FUTILE_THREADING_POCO
-
-
-#include "Poco/Condition.h"
-#include "Poco/Mutex.h"
-#include "Poco/RWLock.h"
-
-
-namespace Futile {
-
-
-typedef Poco::Mutex Mutex;
-typedef Poco::Condition Condition;
-typedef Poco::RWLock RWMutex;
-
-
-} // namespace Futile
-
-
-#else
-#error "Neither FUTILE_THREADING_BOOST nor FUTILE_THREADING_POCO was defined"
-#endif
 
 
 namespace Futile {
@@ -160,7 +129,7 @@ private:
         }
 
         Variable * mVariable;
-        RWMutex mRWMutex;
+        SharedMutex mSharedMutex;
         size_t mIdentifier;
     };
 
@@ -238,9 +207,9 @@ public:
     }
 
 protected:
-    RWMutex & getRWMutex()
+    SharedMutex & getRWLock()
     {
-        return mProtectedVariable.mImpl->mRWMutex;
+        return mProtectedVariable.mImpl->mSharedMutex;
     }
 
     const Variable * getVariable() const
@@ -271,7 +240,6 @@ enum LockType
  * and error reporting.
  */
 template<class Variable,
-         LockType inLockType,
          class CheckLockDurationPolicy = TimeLimitMs<10>,
          class CheckLockOrderPolicy    = VoidPolicy>
 class ConfigurableScopedAccessor : public  ScopedAccessor<Variable>,
@@ -281,13 +249,9 @@ class ConfigurableScopedAccessor : public  ScopedAccessor<Variable>,
 public:
     typedef ScopedAccessor<Variable> Super;
     ConfigurableScopedAccessor(ThreadSafe<Variable> inProtectedVariable) :
-        Super(inProtectedVariable),
-        mScopedRWLock(ScopedAccessor<Variable>::getRWMutex(), inLockType == LockType_ReadAndWriteLock)
+        Super(inProtectedVariable)
     {
     }
-
-protected:
-    ScopedRWLock mScopedRWLock;
 };
 
 
@@ -298,14 +262,15 @@ protected:
  * Be careful if your object has mutable data!
  */
 template<class Variable>
-class ScopedReader : public ConfigurableScopedAccessor<Variable, LockType_ReadLock>
+class ScopedReader : public ConfigurableScopedAccessor<Variable>
 {
 private:
-    typedef ConfigurableScopedAccessor<Variable, LockType_ReadLock> Super;
+    typedef ConfigurableScopedAccessor<Variable> Super;
 
 public:
     ScopedReader(ThreadSafe<Variable> inProtectedVariable) :
-        Super(inProtectedVariable)
+        Super(inProtectedVariable),
+        mSharedMutex(inProtectedVariable.mImpl->mSharedMutex)
     {
     }
 
@@ -318,6 +283,10 @@ public:
 
     const Variable * operator->() const
     { return ScopedAccessor<Variable>::getVariable(); }
+
+private:
+    SharedMutex mSharedMutex;
+    ScopedReadLock mScopedReadLock;
 };
 
 
@@ -326,7 +295,7 @@ public:
  * on the shared resource and provides full access to the object.
  */
 template<class Variable>
-class ScopedReaderAndWriter : public ConfigurableScopedAccessor<Variable, LockType_ReadAndWriteLock>
+class ScopedReaderAndWriter : public ScopedReader
 {
 private:
     typedef ConfigurableScopedAccessor<Variable, LockType_ReadAndWriteLock> Super;
