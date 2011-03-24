@@ -16,13 +16,12 @@
 #include "XULWin/WinUtils.h"
 #include "Poco/Stopwatch.h"
 #include <boost/scoped_ptr.hpp>
-#include <boost/thread.hpp>
 
 
 namespace Tetris
 {
     class Block;
-    class Game;    
+    class Game;
 
 
     /**
