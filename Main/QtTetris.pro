@@ -51,7 +51,8 @@ SOURCES += \
     Futile/src/MainThread.cpp \
     Futile/src/Threading.cpp \
     Futile/src/Worker.cpp \
-    Futile/src/WorkerPool.cpp
+    Futile/src/WorkerPool.cpp \
+    Futile/src/LeakDetector.cpp
 
 
 HEADERS += \
@@ -397,7 +398,9 @@ HEADERS += \
     3rdParty/Poco/Foundation/include/Poco/WindowsConsoleChannel.h \
     3rdParty/Poco/Foundation/include/Poco/zconf.h \
     3rdParty/Poco/Foundation/include/Poco/zlib.h \
-    3rdParty/Poco/Foundation/include/pocomsg.h
+    3rdParty/Poco/Foundation/include/pocomsg.h \
+    Futile/include/Futile/LeakDetector.h \
+    Futile/include/Futile/Singleton.h
 
 
 OTHER_FILES += \
@@ -405,4 +408,3 @@ OTHER_FILES += \
     QtTetris/CMakeLists.txt \
     Tetris/CMakeLists.txt \
     Tetris/testsuite/CMakeLists.txt
-
