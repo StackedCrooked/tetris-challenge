@@ -3,24 +3,25 @@
 #include "Futile/Logger.h"
 
 
-namespace Futile
+namespace Futile {
+
+
+void LogInfo(const std::string & inMessage)
 {
-
-    void LogInfo(const std::string & inMessage)
-    {
-        Logger::Instance().log(LogLevel_Info, inMessage);
-    }
+    Logger::Instance().log(LogLevel_Info, inMessage);
+}
 
 
-    void LogWarning(const std::string & inMessage)
-    {
-        Logger::Instance().log(LogLevel_Warning, inMessage);
-    }
+void LogWarning(const std::string & inMessage)
+{
+    Logger::Instance().log(LogLevel_Warning, inMessage);
+}
 
 
-    void LogError(const std::string & inMessage)
-    {
-        Logger::Instance().log(LogLevel_Error, inMessage);
-    }
+void LogError(const std::string & inMessage)
+{
+    Logger::Instance().log(LogLevel_Error, inMessage);
+}
+
 
 } // namespace Futile
