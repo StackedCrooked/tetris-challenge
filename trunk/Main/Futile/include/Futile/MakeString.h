@@ -38,4 +38,4 @@ private:
 } // namespace Futile
 
 
-#endif // MAKESTRING_H_INCLUDED
+#endif // FUTILE_MAKESTRING_H_INCLUDED

@@ -6,35 +6,36 @@
 #include "boost/shared_ptr.hpp"
 
 
-namespace Tetris
+namespace Tetris {
+
+
+class MultithreadedNodeCalculator : public NodeCalculatorImpl
 {
+public:
+    MultithreadedNodeCalculator(std::auto_ptr<GameStateNode> inNode,
+                                const BlockTypes & inBlockTypes,
+                                const std::vector<int> & inWidths,
+                                std::auto_ptr<Evaluator> inEvaluator,
+                                Futile::WorkerPool & inWorkerPool);
 
-    class MultithreadedNodeCalculator : public NodeCalculatorImpl
-    {
-    public:
-        MultithreadedNodeCalculator(std::auto_ptr<GameStateNode> inNode,
-                                    const BlockTypes & inBlockTypes,
-                                    const std::vector<int> & inWidths,
-                                    std::auto_ptr<Evaluator> inEvaluator,
-                                    Futile::WorkerPool & inWorkerPool);
+    virtual ~MultithreadedNodeCalculator();
 
-        virtual ~MultithreadedNodeCalculator();
+private:
+    virtual void populate();
 
-    private:
-        virtual void populate();
+    void generateChildNodes(NodePtr ioNode,
+                            boost::shared_ptr<Evaluator> inEvaluator,
+                            BlockType inBlockType,
+                            int inDepth,
+                            int inWidth);
 
-        void generateChildNodes(NodePtr ioNode,
-                                boost::shared_ptr<Evaluator> inEvaluator,
-                                BlockType inBlockType,
-                                int inDepth,
-                                int inWidth);
+    void populateNodes(NodePtr ioNode,
+                       const BlockTypes & inBlockTypes,
+                       const std::vector<int> & inWidths,
+                       size_t inIndex,
+                       size_t inEndIndex);
+};
 
-        void populateNodes(NodePtr ioNode,
-                           const BlockTypes & inBlockTypes,
-                           const std::vector<int> & inWidths,
-                           size_t inIndex,
-                           size_t inEndIndex);
-    };
 
 } // namespace Tetris
 

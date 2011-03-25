@@ -5,12 +5,13 @@
 #include <string>
 
 
-namespace Tetris
-{
+namespace Tetris {
 
-    std::string ToUTF8(const std::wstring & inText);
 
-    std::wstring ToUTF16(const std::string & inText);
+std::string ToUTF8(const std::wstring & inText);
+
+std::wstring ToUTF16(const std::string & inText);
+
 
 } // namespace Tetris
 
