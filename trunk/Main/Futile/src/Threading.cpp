@@ -6,9 +6,6 @@
 namespace Futile {
 
 
-InstanceTracker::ThreadedInstances InstanceTracker::sInstances;
-
-
 struct Stopwatch::Impl : boost::noncopyable
 {
     Impl() :

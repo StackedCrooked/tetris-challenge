@@ -1,9 +1,10 @@
 #include <QtGui/QApplication>
 #include "MainWindow.h"
 #include "Futile/MainThread.h"
-
-
-using Futile::MainThread;
+#include "Futile/LeakDetector.h"
+#include "Futile/Logger.h"
+#include <iostream>
+#include <stdexcept>
 
 
 int Tetris_RowCount()
@@ -29,14 +30,35 @@ int Tetris_GetSquareHeight()
     return 20;
 }
 
-int main(int argc, char *argv[])
+
+
+int run(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     a.setApplicationName("QtTetris");
     a.setApplicationVersion("0.0 alpha");
-    MainThread::Initializer scopedInit;
     MainWindow w;
     w.show();
-
     return a.exec();
+}
+
+
+int main(int argc, char *argv[])
+{
+    try
+    {
+        Futile::LeakDetector::Initializer initLeakDetector;
+        Futile::Logger::Initializer initLogger;
+        Futile::MainThread::Initializer initMainThread;
+        return run(argc, argv);
+    }
+    catch (const std::exception & exc)
+    {
+        std::cerr << "Exception caught in main: " << exc.what() << std::endl;
+    }
+    catch (...)
+    {
+        std::cerr << "Anonymous exception caught in main. Exit program." << std::endl;
+    }
+    return 1;
 }

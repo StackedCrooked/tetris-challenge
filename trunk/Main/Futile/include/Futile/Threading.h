@@ -264,39 +264,6 @@ private:
 
 
 /**
- * InstanceTracker allows you to monitor instances of a class.
- * To use it the monitored class must inherit InstanceTracker.
- */
-class InstanceTracker : boost::noncopyable
-{
-public:
-    typedef std::set<InstanceTracker*> Instances;
-    typedef ThreadSafe<Instances> ThreadedInstances;
-
-    InstanceTracker()
-    {
-        ScopedWriter<Instances> rwInstances(sInstances);
-        rwInstances->insert(this);
-    }
-
-    virtual ~InstanceTracker()
-    {
-        ScopedWriter<Instances> rwInstances(sInstances);
-        rwInstances->erase(this);
-    }
-
-    static bool HasInstance(InstanceTracker * inInstance)
-    {
-        ScopedReader<Instances> rInstances(sInstances);
-        return rInstances->find(inInstance) != rInstances->end();
-    }
-
-private:
-    static ThreadedInstances sInstances;
-};
-
-
-/**
  * LockMany is a mutex lock that can lock multiple mutexes.
  */
 template<class Mutex>
