@@ -6,28 +6,29 @@
 #include "Futile/Assert.h"
 
 
-namespace Tetris
+namespace Tetris {
+
+
+GameStateComparator::GameStateComparator()
 {
-
-    GameStateComparator::GameStateComparator()
-    {
-        throw std::logic_error("Should never come here!");
-    }
+    throw std::logic_error("Should never come here!");
+}
 
 
-    GameStateComparator::GameStateComparator(std::auto_ptr<Evaluator> inEvaluator) :
-        mEvaluator(inEvaluator.release())
-    {
-    }
+GameStateComparator::GameStateComparator(std::auto_ptr<Evaluator> inEvaluator) :
+    mEvaluator(inEvaluator.release())
+{
+}
 
 
-    bool GameStateComparator::operator()(NodePtr lhs, NodePtr rhs)
-    {
-        Assert(lhs && rhs);
-        Assert(lhs.get() != rhs.get());
+bool GameStateComparator::operator()(NodePtr lhs, NodePtr rhs)
+{
+    Assert(lhs && rhs);
+    Assert(lhs.get() != rhs.get());
 
-        // Order by descending quality.
-		return lhs->quality() > rhs->quality();
-    }
+    // Order by descending quality.
+    return lhs->quality() > rhs->quality();
+}
+
 
 } // namespace Tetris

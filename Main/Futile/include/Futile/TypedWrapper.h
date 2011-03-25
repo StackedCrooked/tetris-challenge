@@ -34,4 +34,4 @@
     } // semi-colon must be typed when calling the macro
 
 
-#endif // TYPEDWRAPPER_H_INCLUDED
+#endif // FUTILE_TYPEDWRAPPER_H_INCLUDED

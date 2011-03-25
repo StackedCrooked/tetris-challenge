@@ -19,4 +19,4 @@ void LogError(const std::string & inMessage);
 } // namespace Futile
 
 
-#endif // LOGGING_H_INCLUDED
+#endif // FUTILE_LOGGING_H_INCLUDED

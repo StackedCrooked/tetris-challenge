@@ -185,7 +185,7 @@ private:
  * and error reporting.
  */
 template<class Variable,
-         class CheckLockDurationPolicy = TimeLimitMs<10>,
+         class CheckLockDurationPolicy = TimeLimitMs<200>,
          class CheckLockOrderPolicy    = VoidPolicy>
 class ConfigurableScopedAccessor : public  ScopedAccessor<Variable>,
                                    private CheckLockDurationPolicy,

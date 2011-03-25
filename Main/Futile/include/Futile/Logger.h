@@ -51,4 +51,4 @@ private:
 } // namespace Futile
 
 
-#endif // LOGGER_H_INCLUDED
+#endif // FUTILE_LOGGER_H_INCLUDED

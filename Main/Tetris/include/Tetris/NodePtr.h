@@ -6,16 +6,18 @@
 #include <set>
 
 
-namespace Tetris
-{
+namespace Tetris {
 
-    class GameStateNode;
-    typedef boost::shared_ptr<GameStateNode> NodePtr;
 
-    class GameStateComparator;
-    typedef std::multiset<NodePtr, GameStateComparator> ChildNodes;
+class GameStateNode;
+typedef boost::shared_ptr<GameStateNode> NodePtr;
 
-}
+class GameStateComparator;
+typedef std::multiset<NodePtr, GameStateComparator> ChildNodes;
+
+
+} // namespace Tetris
 
 
 #endif // TETRIS_NODEPTR_H_INCLUDED
+

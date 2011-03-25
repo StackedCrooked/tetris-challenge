@@ -5,12 +5,14 @@
 #include "Futile/TypedWrapper.h"
 
 
-namespace Tetris
-{
+namespace Tetris {
 
-    Futile_TypedWrapper(GameOver, bool);
+
+Futile_TypedWrapper(GameOver, bool);
+
 
 } // namespace Tetris
 
 
 #endif // TETRIS_GAMEOVER_H_INCLUDED
+

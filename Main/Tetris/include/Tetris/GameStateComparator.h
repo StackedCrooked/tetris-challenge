@@ -7,23 +7,24 @@
 #include <boost/shared_ptr.hpp>
 
 
-namespace Tetris
+namespace Tetris {
+
+
+class Evaluator;
+
+class GameStateComparator
 {
+public:
+    GameStateComparator();
 
-    class Evaluator;
+    GameStateComparator(std::auto_ptr<Evaluator> inChildPtrCompare);
 
-    class GameStateComparator
-    {
-    public:
-        GameStateComparator();
+    bool operator()(NodePtr lhs, NodePtr rhs);
 
-        GameStateComparator(std::auto_ptr<Evaluator> inChildPtrCompare);
+private:
+    boost::shared_ptr<Evaluator> mEvaluator;
+};
 
-        bool operator()(NodePtr lhs, NodePtr rhs);
-
-    private:
-        boost::shared_ptr<Evaluator> mEvaluator;
-    };
 
 } // namespace Tetris
 

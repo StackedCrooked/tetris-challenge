@@ -6,12 +6,14 @@
 #include <vector>
 
 
-namespace Tetris
-{
+namespace Tetris {
 
-    typedef std::vector<BlockType> BlockTypes;
+
+typedef std::vector<BlockType> BlockTypes;
+
 
 } // namespace Tetris
 
 
 #endif // TETRIS_BLOCKTYPES_H_INCLUDED
+

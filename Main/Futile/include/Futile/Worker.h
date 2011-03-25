@@ -119,4 +119,4 @@ std::string ToString(Worker::Status);
 } // namespace Futile
 
 
-#endif // WORKERTHREAD_H_INCLUDED
+#endif // FUTILE_WORKERTHREAD_H_INCLUDED

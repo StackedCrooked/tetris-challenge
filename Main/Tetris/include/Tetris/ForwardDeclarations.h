@@ -2,16 +2,17 @@
 #define TETRIS_FORWARDDECLARATIONS_H_INCLUDED
 
 
-namespace Tetris
-{
+namespace Tetris {
 
-    class Block;
-    class BlockFactory;
-    class Evaluator;
-    class Game;
-    class GameQualityEvaluator;
-    class GameState;
-    class GameStateNode;    
+
+class Block;
+class BlockFactory;
+class Evaluator;
+class Game;
+class GameQualityEvaluator;
+class GameState;
+class GameStateNode;    
+
 
 } // namespace Tetris
 
