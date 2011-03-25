@@ -30,7 +30,7 @@ public:
     }
 
     template<class T>
-    void erase(T * inObject)
+    void erase(CountedInstance<T> * inObject)
     {
         TypeInfos::iterator it = mTypeInfos.find(inObject);
         if (it == mTypeInfos.end())
@@ -54,6 +54,9 @@ private:
 };
 
 
+/**
+ * A class may inherit CountedInstance<ClassName> to enable leak detection.
+ */
 template<class SubType>
 class CountedInstance : boost::noncopyable
 {
@@ -65,7 +68,7 @@ public:
 
     ~CountedInstance()
     {
-        LeakDetector::Instance().erase(this);
+        LeakDetector::Instance().erase<SubType>(this);
     }
 };
 
