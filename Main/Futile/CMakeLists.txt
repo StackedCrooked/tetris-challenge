@@ -11,6 +11,7 @@ add_library(Futile
     include/Futile/Boost.h
     include/Futile/Config.h
     include/Futile/GenericGrid.h
+    include/Futile/LeakDetector.h
     include/Futile/Logger.h
     include/Futile/Logging.h
     include/Futile/MainThread.h
@@ -20,6 +21,7 @@ add_library(Futile
     include/Futile/TypedWrapper.h
     include/Futile/Worker.h
     include/Futile/WorkerPool.h
+    src/LeakDetector.cpp
     src/Logger.cpp
     src/Logging.cpp
     src/MainThread.cpp

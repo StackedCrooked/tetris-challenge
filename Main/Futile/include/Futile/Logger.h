@@ -2,6 +2,7 @@
 #define FUTILE_LOGGER_H_INCLUDED
 
 
+#include "Futile/LeakDetector.h"
 #include "Futile/Threading.h"
 #include <boost/function.hpp>
 #include <string>
@@ -20,11 +21,9 @@ enum LogLevel
 
 std::string ToString(LogLevel inLogLevel);
 
-class Logger
+class Logger : public Singleton<Logger>
 {
 public:
-    static Logger & Instance();
-
     typedef boost::function<void(const std::string &)> LogHandler;
 
     void setLogHandler(const LogHandler & inHandler);
@@ -39,7 +38,14 @@ public:
     // This method should probably only be called from the main thread.
     void flush();
 
+protected:
+    Logger() {}
+
+    ~Logger() {}
+
 private:
+    friend class Singleton<Logger>;
+
     void logImpl(const std::string & inMessage);
 
     LogHandler mHandler;
