@@ -35,13 +35,6 @@ std::string GetMessage(LogLevel inLogLevel, const std::string & inMessage)
 }
 
 
-Logger & Logger::Instance()
-{
-    static Logger fInstance;
-    return fInstance;
-}
-
-
 void Logger::setLogHandler(const LogHandler & inHandler)
 {
     mHandler = inHandler;
