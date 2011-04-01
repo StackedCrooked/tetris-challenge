@@ -47,8 +47,8 @@ int main(int argc, char *argv[])
 {
     try
     {
-        Futile::LeakDetector::Initializer initLeakDetector;
-        Futile::Logger::Initializer initLogger;
+        Futile::Singleton<Futile::Logger>::Initializer initLogger;
+        Futile::Singleton<Futile::LeakDetector>::Initializer initLeakDetector;
         Futile::MainThread::Initializer initMainThread;
         return run(argc, argv);
     }

@@ -17,10 +17,8 @@ class Singleton : boost::noncopyable
 public:
     typedef Singleton<T> This;
 
-    /**
-     * User must create a scoped Initializer object to
-     * determine the lifetime of the Singleton object.
-     */
+    /// Create an Initializer object as a named local variable
+    /// to have deterministic lifetime of the singleton object.
     struct Initializer : boost::noncopyable
     {
         Initializer() { This::CreateInstance(); }
@@ -47,13 +45,11 @@ protected:
 private:
     static void CreateInstance()
     {
-        Assert(!sInstance);
         sInstance = new T;
     }
 
     static void DestroyInstance()
     {
-        Assert(sInstance);
         delete sInstance;
         sInstance = 0;
     }
