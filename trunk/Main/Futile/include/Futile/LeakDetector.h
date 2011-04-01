@@ -20,7 +20,7 @@ template<class> class CountedInstance;
  * destruction of the LeakDetector Singleton object
  * will be reported as memory leaks.
  */
-class LeakDetector : public Singleton<LeakDetector>
+class LeakDetector
 {
 public:
     template<class T>
@@ -63,12 +63,12 @@ class CountedInstance : boost::noncopyable
 public:
     CountedInstance()
     {
-        LeakDetector::Instance().insert<SubType>(this);
+        Singleton<LeakDetector>::Instance().insert<SubType>(this);
     }
 
     ~CountedInstance()
     {
-        LeakDetector::Instance().erase<SubType>(this);
+        Singleton<LeakDetector>::Instance().erase<SubType>(this);
     }
 };
 
