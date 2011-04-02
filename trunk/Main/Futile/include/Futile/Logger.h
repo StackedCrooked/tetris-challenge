@@ -21,7 +21,7 @@ enum LogLevel
 
 std::string ToString(LogLevel inLogLevel);
 
-class Logger : public Singleton<Logger>
+class Logger
 {
 public:
     typedef boost::function<void(const std::string &)> LogHandler;

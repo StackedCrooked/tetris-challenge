@@ -8,19 +8,19 @@ namespace Futile {
 
 void LogInfo(const std::string & inMessage)
 {
-    Logger::Instance().log(LogLevel_Info, inMessage);
+    Singleton<Logger>::Instance().log(LogLevel_Info, inMessage);
 }
 
 
 void LogWarning(const std::string & inMessage)
 {
-    Logger::Instance().log(LogLevel_Warning, inMessage);
+    Singleton<Logger>::Instance().log(LogLevel_Warning, inMessage);
 }
 
 
 void LogError(const std::string & inMessage)
 {
-    Logger::Instance().log(LogLevel_Error, inMessage);
+    Singleton<Logger>::Instance().log(LogLevel_Error, inMessage);
 }
 
 
