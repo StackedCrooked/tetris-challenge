@@ -25,6 +25,7 @@ using Futile::CreatePoly;
 using Futile::LogError;
 using Futile::LogInfo;
 using Futile::Logger;
+using Futile::Singleton;
 
 
 using namespace Tetris;
@@ -345,7 +346,7 @@ MainWindow::MainWindow(QWidget *parent) :
         mLogField = new QTextEdit(theCentralWidget);
         mLogField->setReadOnly(true);
         vbox->addWidget(mLogField, 1);
-        Logger::Instance().setLogHandler(boost::bind(&MainWindow::logMessage, this, _1));
+        Singleton<Logger>::Instance().setLogHandler(boost::bind(&MainWindow::logMessage, this, _1));
         LogInfo(Poco::Path::current());
     }
 
@@ -362,7 +363,7 @@ MainWindow::~MainWindow()
 {
     typedef boost::function<void(const std::string &)> DummyFunction;
     DummyFunction dummy;
-    Logger::Instance().setLogHandler(dummy);
+    Singleton<Logger>::Instance().setLogHandler(dummy);
     sInstance = 0;
 }
 
@@ -380,7 +381,7 @@ bool MainWindow::event(QEvent * inEvent)
 {
     if (inEvent->type() == QEvent::Paint)
     {
-        Logger::Instance().flush();
+        Singleton<Logger>::Instance().flush();
     }
     return QWidget::event(inEvent);
 }
