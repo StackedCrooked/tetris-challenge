@@ -82,7 +82,7 @@ link_directories(${POCO}lib/${PLATFORM}/${ARCH})
 
 
 #
-# Boost include paths and libs
+# Boost dependency
 #
 set(BOOST ${SOLUTIONDIR}3rdParty/Boost_1_44_0/)
 include_directories(${BOOST})

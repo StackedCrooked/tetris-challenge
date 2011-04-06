@@ -35,7 +35,6 @@ set(EXECUTABLE QtTetris)
 set(CMAKE_OSX_ARCHITECTURES ${ARCH})
 set(SOLUTIONDIR "${QtTetris_SOURCE_DIR}/../")
 set(BUILD_ROOT ${SOLUTIONDIR}../Build/)
-set(POCO ${SOLUTIONDIR}3rdParty/Poco/)
 
 
 #
@@ -70,16 +69,15 @@ endif()
 
 
 #
-# Add dependencies
+# Poco dependency
 #
+set(POCO_ROOT ${SOLUTIONDIR}3rdParty/Poco/)
+
 include_directories(
-    ${POCO}Foundation/include
-    ${POCO}CppUnit/include
-    ${SOLUTIONDIR}Futile/include
-    ${SOLUTIONDIR}Tetris/include)
+    ${POCO_ROOT}Foundation/include
+    ${POCO_ROOT}CppUnit/include)
 
-
-link_directories(${POCO}lib/${PLATFORM}/${ARCH})
+link_directories(${POCO_ROOT}lib/${PLATFORM}/${ARCH})
 
 
 #
@@ -96,6 +94,9 @@ set(LIB_BOOST_THREAD boost_thread)
 #
 add_subdirectory(${SOLUTIONDIR}Tetris ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Tetris)
 add_subdirectory(${SOLUTIONDIR}Futile ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Futile)
+include_directories(
+    ${SOLUTIONDIR}Futile/include
+    ${SOLUTIONDIR}Tetris/include)
 
 
 #
@@ -183,10 +184,10 @@ endif(APPLE)
 #
 target_link_libraries(${EXECUTABLE}
     ${QT_LIBRARIES}
-    ${LIB_BOOST_THREAD}
-    PocoFoundation
+    Tetris
     Futile
-    Tetris)
+    PocoFoundation
+    ${LIB_BOOST_THREAD})
 
 
 #
