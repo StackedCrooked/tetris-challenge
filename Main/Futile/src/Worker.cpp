@@ -9,7 +9,7 @@
 //
 // Enables you to see the thread name the Visual Studio debugger.
 //
-#ifdef _WIN32
+#if defined(_WIN32) and not defined(__MINGW32__)
 #include <windows.h>
 void SetThreadName(DWORD inThreadId, const std::string & inThreadName)
 {

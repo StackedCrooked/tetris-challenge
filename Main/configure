@@ -3,6 +3,7 @@
 # These environment variables will be read by CMake
 export TETRIS_BUILD_TYPE=${TETRIS_BUILD_TYPE:-Release}
 export TETRIS_DEPLOY_DMG=${TETRIS_DEPLOY_DMG:-No}
+export TETRIS_MINGW=${TETRIS_MINGW:-No}
 
 MAIN_DIR=`pwd`
 CMAKE_DIR=$MAIN_DIR/../Build/CMake/QtTetris
