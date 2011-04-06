@@ -15,19 +15,6 @@ endif()
 
 
 #
-# Check Apple specific argument: TETRIS_DEPLOY_DMG.
-#
-if(APPLE)
-set(TETRIS_DEPLOY_DMG $ENV{TETRIS_DEPLOY_DMG})
-if(TETRIS_DEPLOY_DMG STREQUAL "Yes" OR TETRIS_DEPLOY_DMG STREQUAL "No")
-message("TETRIS_DEPLOY_DMG is ${TETRIS_DEPLOY_DMG}")
-else()
-message(FATAL_ERROR "TETRIS_DEPLOY_DMG is \"${TETRIS_DEPLOY_DMG}\". Should be \"Yes\" or \"No\"")
-endif()
-endif(APPLE)
-
-
-#
 # Detect PLATFORM and ARCH variables
 #
 if(WIN32)
@@ -174,7 +161,7 @@ add_custom_command(TARGET ${EXECUTABLE}
 #
 if(APPLE)
 set(BUNDLE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}QtTetris.app")
-if(TETRIS_DEPLOY_DMG STREQUAL "Yes")
+if($ENV{TETRIS_DEPLOY_DMG} STREQUAL "Yes")
 set(MACDEPLOYQT_OPTIONS "-dmg")
 else()
 set(MACDEPLOYQT_OPTIONS "")
