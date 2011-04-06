@@ -1,7 +1,7 @@
 include_directories(
-    .
-    include
-    ../3rdParty/Boost)
+    ${SOLUTIONDIR}Futile/include
+    ${SOLUTIONDIR}Tetris/include
+    ${BOOST_ROOT})
 
 add_library(Futile
     include/Futile/Allocator.h

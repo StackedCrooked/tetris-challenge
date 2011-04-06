@@ -36,9 +36,6 @@ template<class Variable>
 class ThreadSafe
 {
 public:
-    typedef ScopedReader<Variable> ScopedReader;
-    typedef ScopedWriter<Variable> ScopedWriter;
-
     // Constructor that takes an autoptr object.
     ThreadSafe(std::auto_ptr<Variable> inVariable) :
         mImpl(new Impl(inVariable))
