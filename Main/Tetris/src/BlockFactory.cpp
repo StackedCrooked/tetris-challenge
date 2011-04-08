@@ -37,8 +37,8 @@ public:
         mSeed(0)
     {
         Poco::Timestamp ts;
-        Poco::Timestamp::TimeVal max(cMaxSeed);
-        mSeed = static_cast<seed_t>(ts.epochMicroseconds() % max);
+        Poco::Timestamp::TimeVal theMax(cMaxSeed);
+        mSeed = static_cast<seed_t>(ts.epochMicroseconds() % theMax);
     }
 
     seed_t get()

@@ -3,7 +3,7 @@
 #include <stdexcept>
 #include <io.h>
 #include <fcntl.h>
-#include <windows.h>
+#include "XULWin/Windows.h"
 
 
 void AttachToConsole()

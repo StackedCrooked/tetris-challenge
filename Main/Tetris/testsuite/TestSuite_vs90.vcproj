@@ -18,7 +18,7 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="$(SolutionDir)Build\Windows\x86\v90\$(ConfigurationName)\$(ProjectName)\"
+			OutputDirectory="$(SolutionDir)..\Build\Windows\x86\v90\$(ConfigurationName)\$(ProjectName)\"
 			IntermediateDirectory="$(OutDir)\Intermediate\"
 			ConfigurationType="4"
 			CharacterSet="1"
@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)Tetris\include&quot;;&quot;$(SolutionDir)3rdParty\Poco\CppUnit\include&quot;;&quot;$(SolutionDir)3rdParty\Poco\Foundation\include&quot;;&quot;$(SolutionDir)3rdParty\Boost_1_44_0&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)Tetris\include&quot;;&quot;$(SolutionDir)Futile\include&quot;;&quot;$(SolutionDir)3rdParty\Poco\CppUnit\include&quot;;&quot;$(SolutionDir)3rdParty\Poco\Foundation\include&quot;;&quot;$(SolutionDir)3rdParty\Boost_1_44_0&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -80,9 +80,9 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="$(SolutionDir)Build\Windows\x86\v90\$(ConfigurationName)\$(ProjectName)\"
+			OutputDirectory="$(SolutionDir)..\Build\Windows\x86\v90\$(ConfigurationName)\$(ProjectName)\"
 			IntermediateDirectory="$(OutDir)\Intermediate\"
-			ConfigurationType="4"
+			ConfigurationType="1"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
 			>
@@ -109,7 +109,7 @@
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
 				EnableFiberSafeOptimizations="true"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)Tetris\include&quot;;&quot;$(SolutionDir)3rdParty\Poco\CppUnit\include&quot;;&quot;$(SolutionDir)3rdParty\Poco\Foundation\include&quot;;&quot;$(SolutionDir)3rdParty\Boost_1_44_0&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)Tetris\include&quot;;&quot;$(SolutionDir)Futile\include&quot;;&quot;$(SolutionDir)3rdParty\Poco\CppUnit\include&quot;;&quot;$(SolutionDir)3rdParty\Poco\Foundation\include&quot;;&quot;$(SolutionDir)3rdParty\Boost_1_44_0&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
@@ -127,10 +127,14 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLibrarianTool"
+				Name="VCLinkerTool"
+				AdditionalLibraryDirectories="&quot;$(SolutionDir)3rdParty\Boost_1_44_0\lib\Windows\i686&quot;"
 			/>
 			<Tool
 				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -142,12 +146,15 @@
 				Name="VCFxCopTool"
 			/>
 			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
 		<Configuration
 			Name="Debug_NoSecureSTL|Win32"
-			OutputDirectory="$(SolutionDir)Build\Windows\x86\v90\$(ConfigurationName)\$(ProjectName)\"
+			OutputDirectory="$(SolutionDir)..\Build\Windows\x86\v90\$(ConfigurationName)\$(ProjectName)\"
 			IntermediateDirectory="$(OutDir)\Intermediate\"
 			ConfigurationType="4"
 			CharacterSet="1"
@@ -171,7 +178,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/D &quot;_HAS_ITERATOR_DEBUGGING=0&quot; /D &quot;_SECURE_SCL=0&quot;"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)Tetris\include&quot;;&quot;$(SolutionDir)3rdParty\Poco\CppUnit\include&quot;;&quot;$(SolutionDir)3rdParty\Poco\Foundation\include&quot;;&quot;$(SolutionDir)3rdParty\Boost_1_44_0&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)Tetris\include&quot;;&quot;$(SolutionDir)Futile\include&quot;;&quot;$(SolutionDir)3rdParty\Poco\CppUnit\include&quot;;&quot;$(SolutionDir)3rdParty\Poco\Foundation\include&quot;;&quot;$(SolutionDir)3rdParty\Boost_1_44_0&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"

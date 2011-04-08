@@ -2,7 +2,7 @@
 #include "TetrisPaintFunctions.h"
 #include "Tetris/ComputerPlayer.h"
 #include "Tetris/Block.h"
-#include "Tetris/GenericGrid.h"
+#include "Futile/GenericGrid.h"
 #include "XULWin/Conversions.h"
 #include "XULWin/ErrorReporter.h"
 #include "XULWin/Gdiplus.h"
@@ -92,7 +92,7 @@ namespace Tetris
         sTetrisComponentInstances.insert(this);
 
         mWinAPITimer.start(boost::bind(&TetrisComponent::onTimerEvent, this), 40);
-        mFPSStopwatch.start();
+        //mFPSStopwatch.start();
     }
 
 
@@ -271,13 +271,13 @@ namespace Tetris
         }
 
         mFrameCount++;
-        const Poco::Timestamp::TimeVal elapsedMs = (1000 * mFPSStopwatch.elapsed()) / mFPSStopwatch.resolution();
-        if (elapsedMs >= 5000)
-        {
-            mFPS = mFrameCount / 5;
-            mFrameCount = 0;
-            mFPSStopwatch.restart();
-        }
+        //int elapsedMs = (1000 * mFPSStopwatch.elapsed()) / mFPSStopwatch.resolution();
+        //if (elapsedMs >= 5000)
+        //{
+        //    mFPS = mFrameCount / 5;
+        //    mFrameCount = 0;
+        //    mFPSStopwatch.restart();
+        //}
     }
 
 

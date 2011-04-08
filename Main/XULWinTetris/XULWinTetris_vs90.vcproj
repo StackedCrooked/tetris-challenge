@@ -17,7 +17,7 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="$(SolutionDir)Build\Windows\x86\v90\$(ConfigurationName)\$(ProjectName)\"
+			OutputDirectory="$(SolutionDir)..\Build\Windows\x86\v90\$(ConfigurationName)\$(ProjectName)\"
 			IntermediateDirectory="$(OutDir)\Intermediate\"
 			ConfigurationType="4"
 			CharacterSet="1"
@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)XULWinTetris\include&quot;;&quot;$(SolutionDir)Tetris\include&quot;;&quot;$(SolutionDir)XULWin\include&quot;;&quot;$(SolutionDir)3rdParty\Poco\Foundation\include&quot;;&quot;$(SolutionDir)3rdParty\Boost_1_44_0&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)XULWinTetris\include&quot;;&quot;$(SolutionDir)Futile\include&quot;;&quot;$(SolutionDir)Tetris\include&quot;;&quot;$(SolutionDir)XULWin\include&quot;;&quot;$(SolutionDir)3rdParty\Poco\Foundation\include&quot;;&quot;$(SolutionDir)3rdParty\Boost_1_44_0&quot;"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -77,7 +77,7 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="$(SolutionDir)Build\Windows\x86\v90\$(ConfigurationName)\$(ProjectName)\"
+			OutputDirectory="$(SolutionDir)..\Build\Windows\x86\v90\$(ConfigurationName)\$(ProjectName)\"
 			IntermediateDirectory="$(OutDir)\Intermediate\"
 			ConfigurationType="4"
 			CharacterSet="1"
@@ -107,7 +107,7 @@
 				OmitFramePointers="true"
 				EnableFiberSafeOptimizations="true"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)XULWinTetris\include&quot;;&quot;$(SolutionDir)Tetris\include&quot;;&quot;$(SolutionDir)XULWin\include&quot;;&quot;$(SolutionDir)3rdParty\Poco\Foundation\include&quot;;&quot;$(SolutionDir)3rdParty\Boost_1_44_0&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)XULWinTetris\include&quot;;&quot;$(SolutionDir)Futile\include&quot;;&quot;$(SolutionDir)Tetris\include&quot;;&quot;$(SolutionDir)XULWin\include&quot;;&quot;$(SolutionDir)3rdParty\Poco\Foundation\include&quot;;&quot;$(SolutionDir)3rdParty\Boost_1_44_0&quot;"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
 				WarningLevel="3"
@@ -143,7 +143,7 @@
 		</Configuration>
 		<Configuration
 			Name="Debug_NoSecureSTL|Win32"
-			OutputDirectory="$(SolutionDir)Build\Windows\x86\v90\$(ConfigurationName)\$(ProjectName)\"
+			OutputDirectory="$(SolutionDir)..\Build\Windows\x86\v90\$(ConfigurationName)\$(ProjectName)\"
 			IntermediateDirectory="$(OutDir)\Intermediate\"
 			ConfigurationType="4"
 			CharacterSet="1"
@@ -167,7 +167,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/D &quot;_HAS_ITERATOR_DEBUGGING=0&quot; /D &quot;_SECURE_SCL=0&quot;"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)XULWinTetris\include&quot;;&quot;$(SolutionDir)Tetris\include&quot;;&quot;$(SolutionDir)XULWin\include&quot;;&quot;$(SolutionDir)3rdParty\Poco\Foundation\include&quot;;&quot;$(SolutionDir)3rdParty\Boost_1_44_0&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)XULWinTetris\include&quot;;&quot;$(SolutionDir)Futile\include&quot;;&quot;$(SolutionDir)Tetris\include&quot;;&quot;$(SolutionDir)XULWin\include&quot;;&quot;$(SolutionDir)3rdParty\Poco\Foundation\include&quot;;&quot;$(SolutionDir)3rdParty\Boost_1_44_0&quot;"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"

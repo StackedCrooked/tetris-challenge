@@ -18,7 +18,7 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="$(SolutionDir)Build\Windows\x86\v90\$(ConfigurationName)\$(ProjectName)\"
+			OutputDirectory="$(SolutionDir)..\Build\Windows\x86\v90\$(ConfigurationName)\$(ProjectName)\"
 			IntermediateDirectory="$(OutDir)\Intermediate\"
 			ConfigurationType="4"
 			CharacterSet="1"
@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)Tetris\include&quot;;&quot;$(SolutionDir)3rdParty\Poco\Foundation\include&quot;;&quot;$(SolutionDir)3rdParty\Boost_1_44_0&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)Tetris\include&quot;;&quot;$(SolutionDir)Futile\include&quot;;&quot;$(SolutionDir)3rdParty\Poco\Foundation\include&quot;;&quot;$(SolutionDir)3rdParty\Boost_1_44_0&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
 				StringPooling="true"
 				MinimalRebuild="true"
@@ -84,7 +84,7 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="$(SolutionDir)Build\Windows\x86\v90\$(ConfigurationName)\$(ProjectName)\"
+			OutputDirectory="$(SolutionDir)..\Build\Windows\x86\v90\$(ConfigurationName)\$(ProjectName)\"
 			IntermediateDirectory="$(OutDir)\Intermediate\"
 			ConfigurationType="4"
 			CharacterSet="1"
@@ -114,7 +114,7 @@
 				OmitFramePointers="true"
 				EnableFiberSafeOptimizations="true"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)Tetris\include&quot;;&quot;$(SolutionDir)3rdParty\Poco\Foundation\include&quot;;&quot;$(SolutionDir)3rdParty\Boost_1_44_0&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)Tetris\include&quot;;&quot;$(SolutionDir)Futile\include&quot;;&quot;$(SolutionDir)3rdParty\Poco\Foundation\include&quot;;&quot;$(SolutionDir)3rdParty\Boost_1_44_0&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
 				StringPooling="true"
 				RuntimeLibrary="0"
@@ -155,7 +155,7 @@
 		</Configuration>
 		<Configuration
 			Name="Debug_NoSecureSTL|Win32"
-			OutputDirectory="$(SolutionDir)Build\Windows\x86\v90\$(ConfigurationName)\$(ProjectName)\"
+			OutputDirectory="$(SolutionDir)..\Build\Windows\x86\v90\$(ConfigurationName)\$(ProjectName)\"
 			IntermediateDirectory="$(OutDir)\Intermediate\"
 			ConfigurationType="4"
 			CharacterSet="1"
@@ -179,7 +179,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/D &quot;_HAS_ITERATOR_DEBUGGING=0&quot; /D &quot;_SECURE_SCL=0&quot;"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)Tetris\include&quot;;&quot;$(SolutionDir)3rdParty\Poco\Foundation\include&quot;;&quot;$(SolutionDir)3rdParty\Boost_1_44_0&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)Tetris\include&quot;;&quot;$(SolutionDir)Futile\include&quot;;&quot;$(SolutionDir)3rdParty\Poco\Foundation\include&quot;;&quot;$(SolutionDir)3rdParty\Boost_1_44_0&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
 				StringPooling="true"
 				MinimalRebuild="true"
@@ -225,272 +225,232 @@
 	</References>
 	<Files>
 		<Filter
-			Name="Tetris"
+			Name="Include Files"
 			>
-			<Filter
-				Name="Header Files"
+			<File
+				RelativePath=".\include\Tetris\AbstractWidget.h"
 				>
-				<File
-					RelativePath=".\include\Tetris\Block.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Tetris\BlockFactory.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Tetris\BlockMover.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Tetris\BlockType.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Tetris\BlockTypes.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Tetris\Direction.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Tetris\Evaluator.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Tetris\Game.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Tetris\GameOver.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Tetris\GameState.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Tetris\GameStateComparator.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Tetris\GameStateNode.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Tetris\Gravity.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Tetris\Grid.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Tetris\NodePtr.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Tetris\Tetris.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="Source Files"
+			</File>
+			<File
+				RelativePath=".\include\Tetris\AISupport.h"
 				>
-				<File
-					RelativePath=".\src\Block.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\BlockFactory.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\BlockMover.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\BlockType.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\Evaluator.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\Game.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\GameState.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\GameStateComparator.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\GameStateNode.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\Gravity.cpp"
-					>
-				</File>
-			</Filter>
+			</File>
+			<File
+				RelativePath=".\include\Tetris\Block.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\Tetris\BlockFactory.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\Tetris\BlockMover.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\Tetris\BlockType.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\Tetris\BlockTypes.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\Tetris\ComputerPlayer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\Tetris\Config.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\Tetris\Direction.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\Tetris\Evaluator.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\Tetris\EvilBlockFactory.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\Tetris\ForwardDeclarations.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\Tetris\Game.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\Tetris\GameOver.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\Tetris\GameState.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\Tetris\GameStateComparator.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\Tetris\GameStateNode.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\Tetris\GameStateStats.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\Tetris\Gravity.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\Tetris\Grid.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\Tetris\MultiplayerGame.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\Tetris\MultithreadedNodeCalculator.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\Tetris\NodeCalculator.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\Tetris\NodeCalculatorImpl.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\Tetris\NodePtr.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\Tetris\Player.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\Tetris\PlayerType.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\Tetris\SimpleGame.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\Tetris\SingleThreadedNodeCalculator.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\Tetris\Tetris.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\Tetris\Unicode.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\Tetris\Utilities.h"
+				>
+			</File>
 		</Filter>
 		<Filter
-			Name="General"
+			Name="Source Files"
 			>
-			<Filter
-				Name="Header Files"
+			<File
+				RelativePath=".\src\AbstractWidget.cpp"
 				>
-				<File
-					RelativePath=".\include\Tetris\Assert.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Tetris\AutoPtrSupport.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Tetris\Config.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Tetris\GenericGrid.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Tetris\Logger.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Tetris\Logging.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Tetris\MakeString.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Tetris\Threading.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Tetris\TypedWrapper.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Tetris\Unicode.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Tetris\Utilities.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Tetris\Worker.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Tetris\WorkerPool.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="Source Files"
+			</File>
+			<File
+				RelativePath=".\src\AISupport.cpp"
 				>
-				<File
-					RelativePath=".\src\GenericGrid.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\Logger.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\Logging.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\Threading.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\Unicode.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\Worker.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\WorkerPool.cpp"
-					>
-				</File>
-			</Filter>
-		</Filter>
-		<Filter
-			Name="ComputerPlayer"
-			>
-			<Filter
-				Name="Header Files"
+			</File>
+			<File
+				RelativePath=".\src\Block.cpp"
 				>
-				<File
-					RelativePath=".\include\Tetris\AISupport.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Tetris\ComputerPlayer.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Tetris\MultithreadedNodeCalculator.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Tetris\NodeCalculator.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Tetris\NodeCalculatorImpl.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Tetris\SingleThreadedNodeCalculator.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="Source Files"
+			</File>
+			<File
+				RelativePath=".\src\BlockFactory.cpp"
 				>
-				<File
-					RelativePath=".\src\AISupport.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\ComputerPlayer.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\MultiThreadedNodeCalculator.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\NodeCalculator.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\NodeCalculatorImpl.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\SingleThreadedNodeCalculator.cpp"
-					>
-				</File>
-			</Filter>
+			</File>
+			<File
+				RelativePath=".\src\BlockMover.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\BlockType.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\ComputerPlayer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\Evaluator.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\EvilBlockFactory.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\Game.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\GameState.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\GameStateComparator.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\GameStateNode.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\Gravity.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\MultiplayerGame.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\MultiThreadedNodeCalculator.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\NodeCalculator.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\NodeCalculatorImpl.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\Player.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\SimpleGame.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\SingleThreadedNodeCalculator.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\Unicode.cpp"
+				>
+			</File>
 		</Filter>
 		<File
 			RelativePath=".\Todo.txt"
