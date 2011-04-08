@@ -4,11 +4,11 @@
 #include "Futile/Threading.h"
 #include "Futile/AutoPtrSupport.h"
 #include <QtGui/QApplication>
-#include <QKeyEvent>
-#include <QColor>
-#include <QMutexLocker>
-#include <QPainter>
-#include <QTimer>
+#include <QtGui/QColor>
+#include <QtGui/QKeyEvent>
+#include <QtGui/QPainter>
+#include <QtCore/QMutexLocker>
+#include <QtCore/QTimer>
 #include <stdexcept>
 #include <iostream>
 

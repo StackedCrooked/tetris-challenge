@@ -2,7 +2,7 @@
 #define NEWGAMEDIALOG_H
 
 
-#include <QtGui>
+#include <QtGui/QtGui>
 
 
 class NewGameDialog : public QDialog
