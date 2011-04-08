@@ -5,9 +5,9 @@
 #include "Tetris/AbstractWidget.h"
 #include "Futile/MainThread.h"
 #include "Futile/Threading.h"
-#include <QPainter>
-#include <QMutex>
-#include <QWidget>
+#include <QtGui/QPainter>
+#include <QtGui/QWidget>
+#include <QtCore/QMutex>
 #include <set>
 
 
