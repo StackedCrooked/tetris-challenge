@@ -14,7 +14,6 @@
 #include "XULWin/NativeControl.h"
 #include "XULWin/VirtualComponent.h"
 #include "XULWin/WinUtils.h"
-#include "Poco/Stopwatch.h"
 #include <boost/scoped_ptr.hpp>
 
 
@@ -196,7 +195,7 @@ namespace Tetris
         XULWin::WinAPI::Timer mWinAPITimer;
         int mFrameCount;
         int mFPS;
-        Poco::Stopwatch mFPSStopwatch;
+        //Futile::Stopwatch mFPSStopwatch;
     };
 
 } // namespace Tetris

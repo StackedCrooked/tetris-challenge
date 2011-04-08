@@ -36,7 +36,7 @@ public:
     }
 
 protected:
-    friend class This::Initializer;
+    friend struct This::Initializer;
 
     Singleton() { }
 

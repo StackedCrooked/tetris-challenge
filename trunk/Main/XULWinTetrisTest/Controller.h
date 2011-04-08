@@ -110,7 +110,6 @@ namespace Tetris
         LRESULT onQuit(WPARAM wParam, LPARAM lParam);
         LRESULT onAboutMenuItem(WPARAM wParam, LPARAM lParam);
         LRESULT onStrategySelected(WPARAM wParam, LPARAM lParam);
-        LRESULT onClearPrecalculated(WPARAM wParam, LPARAM lParam);
         LRESULT onSelectComputerPlayer(WPARAM wParam, LPARAM lParam);
         //LRESULT onSplatter(WPARAM wParam, LPARAM lParam);
 

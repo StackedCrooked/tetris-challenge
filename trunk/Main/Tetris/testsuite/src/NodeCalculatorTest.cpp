@@ -1,3 +1,4 @@
+#include "Poco/Foundation.h"
 #include "NodeCalculatorTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"

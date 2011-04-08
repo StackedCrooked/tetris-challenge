@@ -1,6 +1,6 @@
 #include "TetrisPaintFunctions.h"
 #include "Tetris/Grid.h"
-#include "Tetris/GenericGrid.h"
+#include "Futile/GenericGrid.h"
 #include "XULWin/Gdiplus.h"
 #include "XULWin/RGBColor.h"
 #include "XULWin/HSVColor.h"
