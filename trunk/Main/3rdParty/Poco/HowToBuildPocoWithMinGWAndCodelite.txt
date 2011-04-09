@@ -1,0 +1,10 @@
+Build Poco with MinGW and Codelite
+----------------------------------
+- Open cmd.exe and cd to the Poco directory.
+- Run premake4 and use codelite or codeblocks as action:
+    premake4 codelite
+- Open codelite and build the projects.
+- Make sure the Foundation project selects the gcc compiler, not the g++ compiler because zlib compilation fails with g++.
+- Make sure you use the latest version of MinGW! Don't use the version that is shipped with Codelite or Code::Blocks
+
+Source: http://gluescript.sourceforge.net/?q=node/22
