@@ -1,7 +1,7 @@
 #!/bin/sh
 rm -rf Build
-mkdir Build
-cd Build
-cmake ../Main/QtTetris
-make VERBOSE=1 -j
+mkdir -p Build/QtTetris
+cd Build/QtTetris
+cmake ../../Main/QtTetris
+make VERBOSE=1
 
