@@ -1,8 +1,10 @@
 Todo
 ----
-- Implement Qt resource system for cross-platform compatibility.
+- Seamless cross-platform builds: Mac OS X, Linux and Windows.
+- Fix the resource system.
+- Release a next version. Nothing fancy yet. Doesn't need to be very public (SO chat..)
 - Paint GameOver instead of showing a MessageBox
-- Add to highscores
+- Online highscores.
 - Associate computer names with strategies.
 - Use a single shared timer.
 - Game state comparator could shuffle in case of equal
