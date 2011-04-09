@@ -3,5 +3,5 @@ rm -rf Build
 mkdir Build
 cd Build
 cmake ../Main/QtTetris
-make VERBOSE=1 -j6
+make VERBOSE=1 -j
 
