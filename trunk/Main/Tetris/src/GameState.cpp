@@ -196,19 +196,18 @@ bool GameState::tainted() const
 
 void GameState::updateCache()
 {
+    mFirstOccupiedRow = 0;
     for (size_t r = 0; r != mGrid.rowCount(); ++r)
     {
         for (size_t c = 0; c != mGrid.columnCount(); ++c)
         {
             if (mGrid.get(r, c) != BlockType_Nil)
             {
-                mFirstOccupiedRow = r;
                 return;
             }
         }
+        mFirstOccupiedRow++;
     }
-    // The field is totally empty.
-    mFirstOccupiedRow = mGrid.rowCount();
 }
 
 
