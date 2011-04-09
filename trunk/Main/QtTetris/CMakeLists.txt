@@ -77,7 +77,7 @@ set(FINAL_COMPILE_FLAGS "${CXX_FLAGS_${CMAKE_BUILD_TYPE}}")
 
 
 #
-# Platform specific compilar flags
+# Platform specific compiler flags
 #
 if(APPLE)
     set(WARNING_OPTIONS "-arch ${ARCH} ")

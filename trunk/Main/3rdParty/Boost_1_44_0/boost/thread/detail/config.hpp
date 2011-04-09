@@ -37,7 +37,7 @@
 #elif defined(BOOST_THREAD_USE_LIB)   //Use lib
 #else //Use default
 #   if defined(BOOST_THREAD_PLATFORM_WIN32)
-#       if defined(BOOST_MSVC) || defined(BOOST_INTEL_WIN)
+#       if defined(BOOST_MSVC) || defined(BOOST_INTEL_WIN) || defined(__MINGW32__) // FR: This must be checked as well :/	
             //For compilers supporting auto-tss cleanup
             //with Boost.Threads lib, use Boost.Threads lib
 #           define BOOST_THREAD_USE_LIB
