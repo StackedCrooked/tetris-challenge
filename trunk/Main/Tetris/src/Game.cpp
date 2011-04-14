@@ -25,6 +25,7 @@ using Futile::MakeString;
 using Futile::Mutex;
 using Futile::ScopedReader;
 using Futile::ScopedWriter;
+using Futile::ThreadSafe;
 
 
 namespace Tetris {
@@ -85,6 +86,12 @@ Game::~Game()
 }
 
 
+void Game::setThreadSafeGame(const Futile::ThreadSafe<Game> & inThreadSafeGame)
+{
+    mThreadSafeGame.reset(new Futile::ThreadSafe<Game>(inThreadSafeGame));
+}
+
+
 void Game::RegisterEventHandler(ThreadSafe<Game> inGame, EventHandler * inEventHandler)
 {
     ScopedWriter<Game> rwgame(inGame);
@@ -114,10 +121,10 @@ void Game::UnregisterEventHandler(ThreadSafe<Game> inGame, EventHandler * inEven
 
 void Game::onChanged()
 {
-    if (!mIsChanged.get())
+    if (!mIsChanged)
     {
-        InvokeLater(boost::bind(&Game::OnChangedImpl, this));
-        mIsChanged.set(true);
+        InvokeLater(boost::bind(Game::OnChangedImpl, this));
+        mIsChanged = true;
     }
 }
 
@@ -130,24 +137,45 @@ bool Game::Exists(Game * inGame)
 
 void Game::OnChangedImpl(Game * inGame)
 {
+    //
+    // We are now in the MAIN thread.
+    //
 
     if (!Exists(inGame))
     {
         return;
     }
-    inGame->mIsChanged.set(false);
 
-    EventHandlers::iterator it = inGame->mEventHandlers.begin(), end = inGame->mEventHandlers.end();
-    for (; it != end; ++it)
+    // Lock the game because there may (and almost certainly will)
+    // worker threads be operating on it.
+    Futile::ThreadSafe<Game> threadSafeGame = *inGame->mThreadSafeGame;
+    Futile::ScopedWriter<Game> wgame(threadSafeGame);
+
+    Game * game = wgame.get();
+
+    // Call the event handlers
+    try
     {
-        Game::EventHandler * eventHandler(*it);
-        if (!EventHandler::Exists(eventHandler))
-        {
-            return;
-        }
 
-        eventHandler->onGameStateChanged(inGame);
+        //
+        for (EventHandlers::iterator it = game->mEventHandlers.begin(), end = game->mEventHandlers.end();
+             it != end;
+             ++it)
+        {
+            Game::EventHandler * eventHandler(*it);
+            if (EventHandler::Exists(eventHandler))
+            {
+                eventHandler->onGameStateChanged(game);
+            }
+        }
     }
+    catch (const std::exception & exc)
+    {
+        LogError(exc.what());
+    }
+
+    // Set the changed flag to false.
+    game->mIsChanged = false;
 }
 
 

@@ -20,6 +20,7 @@ using Futile::LogError;
 using Futile::MakeString;
 using Futile::ScopedReader;
 using Futile::ScopedWriter;
+using Futile::ThreadSafe;
 
 
 namespace Tetris {

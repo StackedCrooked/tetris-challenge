@@ -39,7 +39,7 @@ public:
     void flush();
 
 protected:
-    Logger() {}
+    Logger() : mProtectedQueue(new Queue) {}
 
     ~Logger() {}
 

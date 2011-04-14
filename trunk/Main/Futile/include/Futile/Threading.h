@@ -25,6 +25,59 @@ template<class> class ScopedReader;
 template<class> class ScopedWriter;
 
 
+template<class T>
+class PtrHolder_SharedPtr
+{
+public:
+    PtrHolder_SharedPtr(T * inPtr) :
+        mSharedPtr(inPtr)
+    {
+    }
+
+    const T *  getPtr() const
+    {
+        return mSharedPtr.get();
+    }
+
+    T *  getPtr()
+    {
+        return mSharedPtr.get();
+    }
+
+
+private:
+    boost::shared_ptr<T> mSharedPtr;
+};
+
+
+template<class VariableType>
+struct VariableWithMutex : boost::noncopyable
+{
+public:
+    typedef VariableType Variable;
+    typedef Futile::SharedMutex Mutex;
+    typedef VariableWithMutex<Variable> This;
+
+    VariableWithMutex(Variable * inVariable) :
+        mVariable(inVariable)
+    {
+    }
+
+    VariableWithMutex(std::auto_ptr<Variable> inVariable) :
+        mVariable(inVariable.release())
+    {
+    }
+
+    ~VariableWithMutex()
+    {
+        delete mVariable;
+    }
+
+    Mutex mMutex;
+    Variable * mVariable;
+};
+
+
 /**
  * ThreadSafe can be used to enapsulate an object that needs to be accessed by multiple threads.
  * The object is stored as a private member variable and access can only be obtained by using
@@ -32,68 +85,87 @@ template<class> class ScopedWriter;
  * ScopedReader is a shared-read-lock and gives you const access the the object.
  * ScopedWriter is a unique lock that gives you full access to the object.
  */
-template<class Variable>
-class ThreadSafe
+template<class Variable,
+         template<class> class GenericVariableWithMutex,
+         template<class> class GenericPtrHolder>
+class GenericThreadSafe : GenericPtrHolder< GenericVariableWithMutex<Variable> >
 {
 public:
+    typedef GenericThreadSafe<Variable, GenericVariableWithMutex, GenericPtrHolder> This;
+    typedef GenericVariableWithMutex<Variable> VariableWithMutex;
+    typedef GenericPtrHolder<VariableWithMutex> PtrHolder;
+    typedef typename VariableWithMutex::Mutex Mutex;
+
     // Constructor that takes an autoptr object.
-    ThreadSafe(std::auto_ptr<Variable> inVariable) :
-        mImpl(new Impl(inVariable))
+    GenericThreadSafe(std::auto_ptr<Variable> inVariable) :
+        PtrHolder(new VariableWithMutex(inVariable))
     {
     }
 
     // Constructor that takes the new object.
-    ThreadSafe(Variable * inVariable) :
-        mImpl(new Impl(inVariable))
+    GenericThreadSafe(Variable * inVariable) :
+        PtrHolder(new VariableWithMutex(inVariable))
     {
     }
 
-    // Default constructor can only be used if Variable has a default constructor.
-    ThreadSafe() :
-        mImpl(new Impl(new Variable))
-    {
-    }
+    bool operator== (const This & rhs) const
+    { return PtrHolder::getPtr() == rhs.PtrHolder::getPtr(); }
 
-    bool operator== (const ThreadSafe<Variable> & rhs) const
-    { return mImpl.get() == rhs.mImpl.get(); }
-
-    bool operator!= (const ThreadSafe<Variable> & rhs) const
+    bool operator!= (const This & rhs) const
     { return !(*this == rhs); }
 
-    bool compare(const ThreadSafe<Variable> & inOther)
-    { return mImpl.get() < inOther.mImpl.get(); }
+    bool compare(const This & inOther)
+    { return PtrHolder::getPtr() < inOther.PtrHolder::getPtr(); }
 
 private:
     // This is the base class for the ScopedReader and ScopedWriter classes.
     friend class ScopedAccessor<Variable>;
 
-    struct Impl : boost::noncopyable
+    const Mutex & getMutex() const
     {
-        Impl(std::auto_ptr<Variable> inVariable) :
-            mVariable(inVariable.release())
-        {
-        }
+        return PtrHolder::getPtr()->mMutex;
+    }
 
-        Impl(Variable * inVariable) :
-            mVariable(inVariable)
-        {
-        }
+    Mutex & getMutex()
+    {
+        return PtrHolder::getPtr()->mMutex;
+    }
 
-        ~Impl()
-        {
-            delete mVariable;
-        }
+    Variable * getVariable()
+    {
+        return PtrHolder::getPtr()->mVariable;
+    }
 
-        Variable * mVariable;
-        SharedMutex mSharedMutex;
-    };
+    const Variable * getVariable() const
+    {
+        return PtrHolder::getPtr()->mVariable;
+    }
+};
 
-    boost::shared_ptr<Impl> mImpl;
+
+template<class T>
+class ThreadSafe : public GenericThreadSafe<T, VariableWithMutex, PtrHolder_SharedPtr>
+{
+public:
+    typedef GenericThreadSafe<T, VariableWithMutex, PtrHolder_SharedPtr> Super;
+    typedef typename Super::PtrHolder PtrHolder;
+
+    // Constructor that takes an autoptr object.
+    ThreadSafe(std::auto_ptr<T> inAutoPtr) :
+        Super(inAutoPtr)
+    {
+    }
+
+    // Constructor that takes the new object.
+    ThreadSafe(T * inPtr) :
+        Super(inPtr)
+    {
+    }
 };
 
 
 template<class Variable>
-bool operator< (const ThreadSafe<Variable> & lhs, const ThreadSafe<Variable> & rhs)
+bool operator< (const GenericThreadSafe<Variable, VariableWithMutex, PtrHolder_SharedPtr> & lhs, const GenericThreadSafe<Variable, VariableWithMutex, PtrHolder_SharedPtr> & rhs)
 {
     return lhs.compare(rhs);
 }
@@ -156,19 +228,26 @@ public:
     }
 
 protected:
+    typedef typename ThreadSafe<Variable>::PtrHolder PtrHolder;
+
     SharedMutex & getSharedMutex()
     {
-        return mProtectedVariable.mImpl->mSharedMutex;
+        return mProtectedVariable.getMutex();
+    }
+
+    const SharedMutex & getSharedMutex() const
+    {
+        return mProtectedVariable.getMutex();
     }
 
     const Variable * getVariable() const
     {
-        return mProtectedVariable.mImpl->mVariable;
+        return mProtectedVariable.getVariable();
     }
 
     Variable * getVariable()
     {
-        return mProtectedVariable.mImpl->mVariable;
+        return mProtectedVariable.getVariable();
     }
 
 private:

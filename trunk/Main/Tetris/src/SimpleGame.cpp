@@ -30,11 +30,11 @@ struct SimpleGame::Impl : public Game::EventHandler
     {
         if (inPlayerType == PlayerType_Human)
         {
-            return HumanGame::Create(inRowCount, inColumnCount);
+            return Game::Create<HumanGame>(inRowCount, inColumnCount);
         }
         else if (inPlayerType == PlayerType_Computer)
         {
-            return ComputerGame::Create(inRowCount, inColumnCount);
+            return Game::Create<ComputerGame>(inRowCount, inColumnCount);
         }
         throw std::logic_error("Invalid enum value for PlayerType.");
     }
