@@ -56,8 +56,6 @@ public:
         static Instances sInstances;
     };
 
-    Game(size_t inNumRows, size_t inNumColumns);
-
     virtual ~Game();
 
     static void RegisterEventHandler(ThreadSafe<Game> inGame, EventHandler * inEventHandler);
@@ -102,12 +100,11 @@ public:
 
     // For multiplayer crazyness
     virtual void applyLinePenalty(int inNumberOfLinesMadeByOpponent);
-    //virtual void setActiveBlock(const Block & inBlock);
     virtual void setGrid(const Grid & inGrid) = 0;
-    //void swapGrid(Game & other);
-    //void swapActiveBlock(Game & other);
 
 protected:
+    Game(size_t inNumRows, size_t inNumColumns);
+
     virtual GameState & gameState() = 0;
 
     void onChanged();
@@ -150,9 +147,10 @@ private:
 class HumanGame : public Game
 {
 public:
-    HumanGame(size_t inNumRows, size_t inNumCols);
-
-    HumanGame(const Game & inGame);
+    static Futile::ThreadSafe<Game> Create(size_t inNumRows, size_t inNumCols)
+    {
+        return Futile::ThreadSafe<Game>(new HumanGame(inNumRows, inNumCols));
+    }
 
     virtual bool move(MoveDirection inDirection);
 
@@ -161,6 +159,10 @@ public:
     virtual void setGrid(const Grid & inGrid);
 
 protected:
+    HumanGame(size_t inNumRows, size_t inNumCols);
+
+    HumanGame(const Game & inGame);
+
     GameState & gameState();
 
 private:
@@ -171,10 +173,10 @@ private:
 class ComputerGame : public Game
 {
 public:
-    ComputerGame(size_t inNumRows, size_t inNumCols);
-
-    ComputerGame(const Game & inGame);
-
+    static Futile::ThreadSafe<Game> Create(size_t inNumRows, size_t inNumCols)
+    {
+        return Futile::ThreadSafe<Game>(new ComputerGame(inNumRows, inNumCols));
+    }
     virtual bool move(MoveDirection inDirection);
 
     void appendPrecalculatedNode(NodePtr inNode);
@@ -194,6 +196,10 @@ public:
     virtual void setGrid(const Grid & inGrid);
 
 protected:
+    ComputerGame(size_t inNumRows, size_t inNumCols);
+
+    ComputerGame(const Game & inGame);
+
     GameState & gameState();
 
 private:
