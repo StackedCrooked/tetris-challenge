@@ -14,9 +14,6 @@
 #include <set>
 
 
-using Futile::ThreadSafe;
-
-
 namespace Tetris {
 
 
@@ -56,11 +53,26 @@ public:
         static Instances sInstances;
     };
 
+    /// Factory method.
+    template<class SubType>
+    static Futile::ThreadSafe<Game> Create(size_t inNumRows, size_t inNumCols)
+    {
+        // Create the instance
+        Futile::ThreadSafe<Game> result(new SubType(inNumRows, inNumCols));
+
+        // Pass the ThreadSafe<Game> to the Game object itself.
+        // The ThreadSafe<Game> object is required during event
+        // handling.
+        Futile::ScopedWriter<Game> writer(result);
+        writer->setThreadSafeGame(result);
+        return result;
+    }
+
     virtual ~Game();
 
-    static void RegisterEventHandler(ThreadSafe<Game> inGame, EventHandler * inEventHandler);
+    static void RegisterEventHandler(Futile::ThreadSafe<Game> inGame, EventHandler * inEventHandler);
 
-    static void UnregisterEventHandler(ThreadSafe<Game> inGame, EventHandler * inEventHandler);
+    static void UnregisterEventHandler(Futile::ThreadSafe<Game> inGame, EventHandler * inEventHandler);
 
     void setPaused(bool inPause);
 
@@ -105,6 +117,8 @@ public:
 protected:
     Game(size_t inNumRows, size_t inNumColumns);
 
+    void setThreadSafeGame(const Futile::ThreadSafe<Game> & inThreadSafeGame);
+
     virtual GameState & gameState() = 0;
 
     void onChanged();
@@ -129,7 +143,8 @@ protected:
     size_t mCurrentBlockIndex;
     int mStartingLevel;
     bool mPaused;
-    Futile::AtomicPrimitive<bool> mIsChanged;
+    bool mIsChanged;
+    boost::scoped_ptr< Futile::ThreadSafe<Game> > mThreadSafeGame;
 
     typedef std::set<EventHandler*> EventHandlers;
     EventHandlers mEventHandlers;
@@ -147,11 +162,6 @@ private:
 class HumanGame : public Game
 {
 public:
-    static Futile::ThreadSafe<Game> Create(size_t inNumRows, size_t inNumCols)
-    {
-        return Futile::ThreadSafe<Game>(new HumanGame(inNumRows, inNumCols));
-    }
-
     virtual bool move(MoveDirection inDirection);
 
     const GameState & gameState() const;
@@ -159,6 +169,8 @@ public:
     virtual void setGrid(const Grid & inGrid);
 
 protected:
+    friend class Game;
+
     HumanGame(size_t inNumRows, size_t inNumCols);
 
     HumanGame(const Game & inGame);
@@ -173,10 +185,6 @@ private:
 class ComputerGame : public Game
 {
 public:
-    static Futile::ThreadSafe<Game> Create(size_t inNumRows, size_t inNumCols)
-    {
-        return Futile::ThreadSafe<Game>(new ComputerGame(inNumRows, inNumCols));
-    }
     virtual bool move(MoveDirection inDirection);
 
     void appendPrecalculatedNode(NodePtr inNode);
@@ -196,6 +204,8 @@ public:
     virtual void setGrid(const Grid & inGrid);
 
 protected:
+    friend class Game;
+
     ComputerGame(size_t inNumRows, size_t inNumCols);
 
     ComputerGame(const Game & inGame);
