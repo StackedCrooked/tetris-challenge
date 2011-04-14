@@ -354,7 +354,6 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(timer, SIGNAL(timeout()), this, SLOT(onTimerEvent()));
     timer->start(500);
 
-    onNewComputerVsComputerGame();
     onNew();
 }
 

@@ -261,6 +261,36 @@ private:
 
 
 /**
+ * AtomicPrimitive enables atomic get/set operations on variables that have a primitive datatype.
+ */
+template<class T>
+class AtomicPrimitive : boost::noncopyable
+{
+public:
+    AtomicPrimitive(T inValue = T()) :
+        mValue(inValue)
+    {
+    }
+
+    void set(T inValue)
+    {
+        ScopedLock lock(mMutex);
+        mValue = inValue;
+    }
+
+    T get() const
+    {
+        ScopedLock lock(mMutex);
+        return mValue;
+    }
+
+private:
+    mutable Mutex mMutex;
+    T mValue;
+};
+
+
+/**
  * LockMany is a mutex lock that can lock multiple mutexes.
  */
 template<class Mutex>

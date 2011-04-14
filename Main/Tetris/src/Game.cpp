@@ -66,7 +66,8 @@ Game::Game(size_t inNumRows, size_t inNumColumns) :
     mFutureBlocksCount(3),
     mCurrentBlockIndex(0),
     mStartingLevel(-1),
-    mPaused(false)
+    mPaused(false),
+    mIsChanged(false)
 {
     if (mBlocks.empty())
     {
@@ -113,8 +114,11 @@ void Game::UnregisterEventHandler(ThreadSafe<Game> inGame, EventHandler * inEven
 
 void Game::onChanged()
 {
-    // Invoke on main tread
-    InvokeLater(boost::bind(&Game::OnChangedImpl, this));
+    if (!mIsChanged.get())
+    {
+        InvokeLater(boost::bind(&Game::OnChangedImpl, this));
+        mIsChanged.set(true);
+    }
 }
 
 
@@ -126,15 +130,12 @@ bool Game::Exists(Game * inGame)
 
 void Game::OnChangedImpl(Game * inGame)
 {
-    //
-    // This code runs in the main thread.
-    // No synchronization should be required.
-    //
 
     if (!Exists(inGame))
     {
         return;
     }
+    inGame->mIsChanged.set(false);
 
     EventHandlers::iterator it = inGame->mEventHandlers.begin(), end = inGame->mEventHandlers.end();
     for (; it != end; ++it)
@@ -440,18 +441,7 @@ void Game::drop()
     {
         return;
     }
-
-    Block & block = *mActiveBlock;
-    const Grid & grid = gameGrid();
-    const GameState & state = gameState();
-    for (int r = block.row(); r < grid.rowCount(); ++r)
-    {
-        if (state.checkPositionValid(block, r, block.column()))
-        {
-            block.setRow(r);
-        }
-    }
-    move(MoveDirection_Down);
+    while(move(MoveDirection_Down));
 }
 
 
