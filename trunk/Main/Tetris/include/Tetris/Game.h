@@ -132,6 +132,7 @@ protected:
     size_t mCurrentBlockIndex;
     int mStartingLevel;
     bool mPaused;
+    Futile::AtomicPrimitive<bool> mIsChanged;
 
     typedef std::set<EventHandler*> EventHandlers;
     EventHandlers mEventHandlers;
