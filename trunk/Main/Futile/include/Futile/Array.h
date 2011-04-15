@@ -9,8 +9,8 @@ namespace Futile {
 
 
 /**
- * Array stores pointer objects and deletes them when they are no longer needed.
- * For your convenience the class interface is the same as that of std::vector.
+ * Array<T> is a wrapper around std::vector<T*> and takes ownership of the stored objects.
+ * The public interface is mostly similar to std::vector.
  */
 template<class T>
 class Array
