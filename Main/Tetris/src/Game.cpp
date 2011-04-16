@@ -67,8 +67,7 @@ Game::Game(size_t inNumRows, size_t inNumColumns) :
     mFutureBlocksCount(3),
     mCurrentBlockIndex(0),
     mStartingLevel(-1),
-    mPaused(false),
-    mIsChanged(false)
+    mPaused(false)
 {
     if (mBlocks.empty())
     {
@@ -83,12 +82,6 @@ Game::Game(size_t inNumRows, size_t inNumColumns) :
 Game::~Game()
 {
     sInstances.erase(this);
-}
-
-
-void Game::setThreadSafeGame(const Futile::ThreadSafe<Game> & inThreadSafeGame)
-{
-    mThreadSafeGame.reset(new Futile::ThreadSafe<Game>(inThreadSafeGame));
 }
 
 
@@ -121,11 +114,8 @@ void Game::UnregisterEventHandler(ThreadSafe<Game> inGame, EventHandler * inEven
 
 void Game::onChanged()
 {
-    if (!mIsChanged)
-    {
-        InvokeLater(boost::bind(Game::OnChangedImpl, this));
-        mIsChanged = true;
-    }
+    // Invoke on main tread
+    InvokeLater(boost::bind(&Game::OnChangedImpl, this));
 }
 
 
@@ -138,7 +128,8 @@ bool Game::Exists(Game * inGame)
 void Game::OnChangedImpl(Game * inGame)
 {
     //
-    // We are now in the MAIN thread.
+    // This code runs in the main thread.
+    // No synchronization should be required.
     //
 
     if (!Exists(inGame))
@@ -146,36 +137,17 @@ void Game::OnChangedImpl(Game * inGame)
         return;
     }
 
-    // Lock the game because there may (and almost certainly will)
-    // worker threads be operating on it.
-    Futile::ThreadSafe<Game> threadSafeGame = *inGame->mThreadSafeGame;
-    Futile::ScopedWriter<Game> wgame(threadSafeGame);
-
-    Game * game = wgame.get();
-
-    // Call the event handlers
-    try
+    EventHandlers::iterator it = inGame->mEventHandlers.begin(), end = inGame->mEventHandlers.end();
+    for (; it != end; ++it)
     {
-
-        //
-        for (EventHandlers::iterator it = game->mEventHandlers.begin(), end = game->mEventHandlers.end();
-             it != end;
-             ++it)
+        Game::EventHandler * eventHandler(*it);
+        if (!EventHandler::Exists(eventHandler))
         {
-            Game::EventHandler * eventHandler(*it);
-            if (EventHandler::Exists(eventHandler))
-            {
-                eventHandler->onGameStateChanged(game);
-            }
+            return;
         }
-    }
-    catch (const std::exception & exc)
-    {
-        LogError(exc.what());
-    }
 
-    // Set the changed flag to false.
-    game->mIsChanged = false;
+        eventHandler->onGameStateChanged(inGame);
+    }
 }
 
 
@@ -217,7 +189,7 @@ std::vector<BlockType> Game::getGarbageRow() const
 {
     BlockTypes result(mNumColumns, BlockType_Nil);
 
-    static Poco::UInt32 fSeed(time(0));
+    static Poco::UInt32 fSeed = static_cast<Poco::UInt32>(time(0) % Poco::UInt32(-1));
     fSeed = (fSeed + 1) % Poco::UInt32(-1);
     Poco::Random rand;
     rand.seed(fSeed);

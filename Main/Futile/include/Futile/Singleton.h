@@ -12,7 +12,7 @@ namespace Futile {
 
 
 template<class T>
-class Singleton : boost::noncopyable
+class Singleton
 {
 public:
     typedef Singleton<T> This;
@@ -28,6 +28,7 @@ public:
 
     static T & Instance()
     {
+        Assert(sInstance);
         if (!sInstance)
         {
             throw std::runtime_error("Tried to dereference null singleton instance for " + std::string(typeid(T).name()));
@@ -41,6 +42,9 @@ protected:
     Singleton() { }
 
     ~Singleton() { }
+
+    Singleton(const Singleton&);
+    Singleton& operator=(const Singleton&);
 
 private:
     static void CreateInstance()

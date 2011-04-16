@@ -15,6 +15,7 @@
 #include <QtGui/QLayout>
 #include <QtGui/QLabel>
 #include <QtCore/QTimer>
+#include <boost/noncopyable.hpp>
 #include <algorithm>
 #include <iostream>
 #include <sstream>
@@ -38,208 +39,6 @@ int Tetris_GetSquareHeight();
 
 
 typedef Futile::Boost::shared_ptr<SimpleGame> SimpleGamePtr;
-
-
-class Model : public ComputerPlayer::Tweaker
-{
-public:
-    static Model & Instance()
-    {
-        static Model fModel;
-        return fModel;
-    }
-
-    bool IsGameOver()
-    {
-        if (!mMultiplayerGame)
-        {
-            return true;
-        }
-
-
-        for (size_t idx = 0; idx < mMultiplayerGame->playerCount(); ++idx)
-        {
-            Player * player = mMultiplayerGame->getPlayer(idx);
-            if (player->simpleGame()->isGameOver())
-            {
-                mGameOver = true;
-            }
-        }
-        return mGameOver;
-    }
-
-    Player * getPlayer(size_t inIndex)
-    {
-        return mMultiplayerGame->getPlayer(inIndex);
-    }
-
-    const MultiplayerGame & multiplayerGame() const
-    {
-        return *mMultiplayerGame;
-    }
-
-    MultiplayerGame & multiplayerGame()
-    {
-        if (!mMultiplayerGame)
-        {
-            throw std::runtime_error("There is currently no game running.");
-        }
-        return *mMultiplayerGame;
-    }
-
-    virtual std::auto_ptr<Evaluator> updateAIParameters(const Player & inPlayer,
-                                                        int & outSearchDepth,
-                                                        int & outSearchWidth,
-                                                        int & outWorkerCount,
-                                                        int & /*outMoveSpeed*/,
-                                                        BlockMover::MoveDownBehavior & outMoveDownBehavior)
-    {
-        if (!inPlayer.simpleGame())
-        {
-            throw std::runtime_error("GameState is null!");
-        }
-
-        const SimpleGame & game = *inPlayer.simpleGame();
-        outWorkerCount = Poco::Environment::processorCount();
-        int currentHeight = game.stats().currentHeight();
-
-        // Drop or not?
-        if (currentHeight < 10)
-        {
-            outMoveDownBehavior = BlockMover::MoveDownBehavior_Move;
-        }
-        else
-        {
-            outMoveDownBehavior = BlockMover::MoveDownBehavior_Drop;
-        }
-
-
-        // Tactics adjustment
-        if (currentHeight < 8)
-        {
-            outSearchDepth = 8;
-            outSearchWidth = 5;
-            return CreatePoly<Evaluator, MakeTetrises>();
-        }
-        else if (currentHeight < 14)
-        {
-            outSearchDepth = 6;
-            outSearchWidth = 4;
-            return CreatePoly<Evaluator, Multiplayer>();
-        }
-        else
-        {
-            outSearchDepth = 6;
-            outSearchWidth = 3;
-            return CreatePoly<Evaluator, Survival>();
-        }
-    }
-
-
-    void reset(const PlayerTypes & inPlayerTypes, size_t inRowCount, size_t inColumnCount)
-    {
-        mMultiplayerGame.reset();
-        mMultiplayerGame.reset(new MultiplayerGame(inRowCount, inColumnCount));
-        mGameOver = false;
-        bool allComputer = true;
-        for (PlayerTypes::size_type idx = 0; idx < inPlayerTypes.size(); ++idx)
-        {
-            if (inPlayerTypes[idx] != PlayerType_Computer)
-            {
-                allComputer = false;
-                break;
-            }
-        }
-
-        std::string teamName = "Team 1";
-        for (PlayerTypes::size_type idx = 0; idx < inPlayerTypes.size(); ++idx)
-        {
-            if (idx >= inPlayerTypes.size() / 2)
-            {
-                teamName = "Team 2";
-            }
-
-            Player * player(0);
-            PlayerType playerType = inPlayerTypes[idx];
-            player = mMultiplayerGame->addPlayer(playerType, TeamName(teamName), PlayerName(GetPlayerName(inPlayerTypes[idx])));
-
-            if (ComputerPlayer * computerPlayer = dynamic_cast<ComputerPlayer*>(player))
-            {
-                computerPlayer->setTweaker(&Model::Instance());
-                computerPlayer->setMoveSpeed(allComputer ? 50 : 20);
-            }
-            //player->simpleGame()->setPaused(true);
-        }
-    }
-
-private:
-    Model() :
-        mNames(),
-        mNamesIndex(0),
-        mHumanName(),
-        mCPUCount(Poco::Environment::processorCount()),
-        mGameOver(true)
-    {
-        mNames.push_back("Luffy");
-        mNames.push_back("Zoro");
-        mNames.push_back("Nami");
-        mNames.push_back("Sanji");
-        mNames.push_back("Chopper");
-        srand(time(0));
-        std::random_shuffle(mNames.begin(), mNames.end());
-    }
-
-    std::string GetHumanPlayerName()
-    {
-        return "Luffy";
-//        bool ok = false;
-//        QString text = QInputDialog::getText(NULL,
-//                                             "QtTetris",
-//                                             "Player name:",
-//                                             QLineEdit::Normal,
-//                                             QString(),
-//                                             &ok);
-//        if (ok && !text.isEmpty())
-//        {
-//            return text.toUtf8().data();
-//        }
-//        else
-//        {
-//            QMessageBox::information(NULL, "QtTetris", "Your name shall be: Luffy!", QMessageBox::Ok);
-//            return "Luffy";
-//        }
-    }
-
-    std::string GetPlayerName(PlayerType inPlayerType)
-    {
-        if (inPlayerType == PlayerType_Human)
-        {
-            if (mHumanName.empty())
-            {
-                mHumanName = GetHumanPlayerName();
-            }
-            return mHumanName;
-        }
-        else
-        {
-            mNamesIndex = (mNamesIndex + 1) % mNames.size();
-            return mNames[mNamesIndex];
-        }
-    }
-
-    Model(const Model &);
-    Model& operator=(const Model&);
-
-    boost::scoped_ptr<MultiplayerGame> mMultiplayerGame;
-
-    typedef std::vector<std::string> Names;
-    Names mNames;
-    Names::size_type mNamesIndex;
-
-    std::string mHumanName;
-    int mCPUCount;
-    bool mGameOver;
-};
 
 
 void MainWindow::onTimerEvent()
@@ -300,17 +99,8 @@ void MainWindow::timerEvent()
 }
 
 
-MainWindow * MainWindow::sInstance(0);
-
-
-MainWindow * MainWindow::GetInstance()
-{
-    return sInstance;
-}
-
-
 MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
+    QMainWindow(parent),        
     mTetrisWidgetHolder(0),
     mTetrisWidgets(),
     mSpacing(12),
@@ -318,7 +108,6 @@ MainWindow::MainWindow(QWidget *parent) :
     mShowLog(true),
     mGameOver(false)
 {
-    sInstance = this;
     setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum));
     setWindowTitle("QtTetris");
 
@@ -346,7 +135,7 @@ MainWindow::MainWindow(QWidget *parent) :
         mLogField = new QTextEdit(theCentralWidget);
         mLogField->setReadOnly(true);
         vbox->addWidget(mLogField, 1);
-        Singleton<Logger>::Instance().setLogHandler(boost::bind(&MainWindow::logMessage, this, _1));
+        Logger::Instance().setLogHandler(boost::bind(&MainWindow::logMessage, this, _1));
         LogInfo(Poco::Path::current());
     }
 
@@ -360,10 +149,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-    typedef boost::function<void(const std::string &)> DummyFunction;
-    DummyFunction dummy;
-    Singleton<Logger>::Instance().setLogHandler(dummy);
-    sInstance = 0;
 }
 
 
@@ -376,11 +161,18 @@ void MainWindow::logMessage(const std::string & inMessage)
 }
 
 
+void MainWindow::closeEvent(QCloseEvent*)
+{
+    //typedef std::vector<TetrisWidget *> TetrisWidgets;
+    //mTetrisWidgets.back()->
+}
+
+
 bool MainWindow::event(QEvent * inEvent)
 {
     if (inEvent->type() == QEvent::Paint)
     {
-        Singleton<Logger>::Instance().flush();
+        Logger::Instance().flush();
     }
     return QWidget::event(inEvent);
 }
@@ -419,7 +211,7 @@ void MainWindow::onNewGame(const PlayerTypes & inPlayerTypes)
     }
 
     // Reset the game.
-    Model::Instance().reset(inPlayerTypes, Tetris_RowCount(), Tetris_ColumnCount());
+    Model::Instance().newGame(inPlayerTypes, Tetris_RowCount(), Tetris_ColumnCount());
 
     // Add the players.
     MultiplayerGame & mgame = Model::Instance().multiplayerGame();
@@ -530,11 +322,3 @@ void MainWindow::onPenalty()
         break;
     }
 }
-
-
-
-
-
-
-
-

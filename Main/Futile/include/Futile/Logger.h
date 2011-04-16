@@ -21,7 +21,7 @@ enum LogLevel
 
 std::string ToString(LogLevel inLogLevel);
 
-class Logger
+class Logger : public Singleton<Logger>
 {
 public:
     typedef boost::function<void(const std::string &)> LogHandler;
@@ -39,7 +39,7 @@ public:
     void flush();
 
 protected:
-    Logger() : mProtectedQueue(new Queue) {}
+    Logger() {}
 
     ~Logger() {}
 
