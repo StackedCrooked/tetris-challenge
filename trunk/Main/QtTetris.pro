@@ -15,6 +15,7 @@ INCLUDEPATH += \
 SOURCES += \
     QtTetris/main.cpp \
     QtTetris/MainWindow.cpp \
+    QtTetris/Model.cpp \
     QtTetris/NewGameDialog.cpp \
     QtTetris/QtMainThread.cpp \
     QtTetris/TetrisWidget.cpp \
@@ -57,6 +58,7 @@ SOURCES += \
 
 HEADERS += \
     QtTetris/MainWindow.h \
+    QtTetris/Model.h \
     QtTetris/NewGameDialog.h \
     QtTetris/QtMainThread.h \
     QtTetris/TetrisWidget.h \
