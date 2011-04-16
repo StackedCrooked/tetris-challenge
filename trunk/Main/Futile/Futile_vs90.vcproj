@@ -103,6 +103,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/MP"
 				Optimization="2"
 				InlineFunctionExpansion="2"
 				EnableIntrinsicFunctions="true"
@@ -111,7 +112,8 @@
 				EnableFiberSafeOptimizations="true"
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="&quot;$(SolutionDir)Futile\include&quot;;&quot;$(SolutionDir)3rdParty\Boost_1_44_0&quot;"
-				RuntimeLibrary="0"
+				PreprocessorDefinitions="NDEBUG;_WINDOWS;POCO_STATIC;POCO_NO_AUTOMATIC_LIBS"
+				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				WarningLevel="3"
 				DebugInformationFormat="3"
