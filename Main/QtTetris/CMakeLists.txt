@@ -131,6 +131,7 @@ include_directories(
 set(QtTetris_SOURCES
     main.cpp
     MainWindow.cpp
+    Model.cpp
     NewGameDialog.cpp
     TetrisWidget.cpp
     QtMainThread.cpp)
