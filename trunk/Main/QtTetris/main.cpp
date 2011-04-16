@@ -1,10 +1,16 @@
 #include <QtGui/QApplication>
+#include "Model.h"
 #include "MainWindow.h"
 #include "Futile/MainThread.h"
 #include "Futile/LeakDetector.h"
 #include "Futile/Logger.h"
 #include <iostream>
 #include <stdexcept>
+
+
+using Futile::Logger;
+using Futile::LeakDetector;
+using Futile::MainThread;
 
 
 int Tetris_RowCount()
@@ -31,14 +37,13 @@ int Tetris_GetSquareHeight()
 }
 
 
-
 int run(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     a.setApplicationName("QtTetris");
     a.setApplicationVersion("0.0 alpha");
-    MainWindow w;
-    w.show();
+    MainWindow::Initializer initMainWindow;
+    MainWindow::Instance().show();
     return a.exec();
 }
 
@@ -47,9 +52,10 @@ int main(int argc, char *argv[])
 {
     try
     {
-        Futile::Singleton<Futile::Logger>::Initializer initLogger;
-        Futile::Singleton<Futile::LeakDetector>::Initializer initLeakDetector;
-        Futile::MainThread::Initializer initMainThread;
+        Logger::Initializer initLogger;
+        LeakDetector::Initializer initLeakDetector;
+        MainThread::Initializer initMainThread;
+        Tetris::Model::Initializer initModel;
         return run(argc, argv);
     }
     catch (const std::exception & exc)

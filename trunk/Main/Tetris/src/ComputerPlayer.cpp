@@ -45,12 +45,12 @@ public:
     Impl() :
         mComputerPlayer(0),
         mTweaker(0),
-        mWorkerPool("ComputerPlayer WorkerPool", 1), //Poco::Environment::processorCount()),
+        mWorkerPool("ComputerPlayer WorkerPool", 2), //Poco::Environment::processorCount()),
         mEvaluator(new MakeTetrises()),
         mBlockMover(),
         mSearchDepth(6),
         mSearchWidth(4),
-        mWorkerCount(1), //Poco::Environment::processorCount()),
+        mWorkerCount(2), //Poco::Environment::processorCount()),
         mGameDepth(0),
         mStop(false),
         mReset(false),
@@ -120,6 +120,7 @@ ComputerPlayer::~ComputerPlayer()
         ScopedLock lock(mImpl->mMutex);
         mImpl->mQuitFlag = true;
     }
+    mImpl->mBlockMover.reset();
     mImpl->mTimer.stop();
     mImpl.reset();
 }
@@ -221,7 +222,7 @@ void ComputerPlayer::setWorkerCount(int inWorkerCount)
     ScopedLock lock(mImpl->mMutex);
     if (inWorkerCount == 0)
     {
-        mImpl->mWorkerCount = Poco::Environment::processorCount();
+        mImpl->mWorkerCount = 2; //Poco::Environment::processorCount();
     }
     else
     {
@@ -396,7 +397,7 @@ void ComputerPlayer::Impl::startNodeCalculator()
     Assert(mWorkerPool.getActiveWorkerCount() == 0);
     if (mWorkerCount == 0)
     {
-        mWorkerCount = Poco::Environment::processorCount();
+        mWorkerCount = 2; // Poco::Environment::processorCount();
     }
     mWorkerPool.resize(mWorkerCount);
     mNodeCalculator.reset(new NodeCalculator(endNode,

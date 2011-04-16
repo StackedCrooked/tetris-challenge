@@ -20,7 +20,6 @@ using Futile::LogError;
 using Futile::MakeString;
 using Futile::ScopedReader;
 using Futile::ScopedWriter;
-using Futile::ThreadSafe;
 
 
 namespace Tetris {
@@ -41,8 +40,19 @@ struct BlockMover::Impl
 
     ~Impl()
     {
-        mTimer->stop();
-        mTimer.reset();
+        try
+        {
+            mTimer->stop();
+            mTimer.reset();
+        }
+        catch (Poco::Exception & exc)
+        {
+            std::cerr << exc.what();
+        }
+        catch (const std::exception & exc)
+        {
+            std::cerr << exc.what();
+        }
     }
 
     void onTimer(Poco::Timer & inTimer);

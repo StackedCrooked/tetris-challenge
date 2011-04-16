@@ -3,29 +3,30 @@
 
 
 #include <QtGui/QtGui>
+#include "Model.h"
 #include "TetrisWidget.h"
 #include "Tetris/SimpleGame.h"
 #include "Tetris/MultiplayerGame.h"
 #include "Tetris/Player.h"
 #include "Tetris/PlayerType.h"
+#include "Futile/Singleton.h"
 #include "Poco/Stopwatch.h"
 #include <boost/scoped_ptr.hpp>
 
 
-class MainWindow : public QMainWindow
+class MainWindow : public QMainWindow,
+                   public Futile::Singleton<MainWindow>
 {
     Q_OBJECT
 
 public:
-    static MainWindow * GetInstance();
-
-    MainWindow(QWidget *parent = 0);
-
-    ~MainWindow();
 
     virtual bool event(QEvent * inEvent);
 
     void logMessage(const std::string & inMessage);
+
+protected:
+    void closeEvent(QCloseEvent*);
 
 private slots:
     void onNew();
@@ -47,11 +48,15 @@ private slots:
     void onTimerEvent();
 
 private:
+    friend class Futile::Singleton<MainWindow>;
+
+    MainWindow(QWidget *parent = 0);
+
+    ~MainWindow();
+
     void onNewGame(const Tetris::PlayerTypes & inPlayerTypes);
 
     void timerEvent();
-
-    static MainWindow * sInstance;
 
 private:
     typedef std::vector<TetrisWidget *> TetrisWidgets;

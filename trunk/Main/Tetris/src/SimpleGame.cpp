@@ -26,15 +26,15 @@ struct SimpleGame::Impl : public Game::EventHandler
 {
     typedef SimpleGame::BackReference BackReference;
 
-    static ThreadSafe<Game> CreateGame(PlayerType inPlayerType, size_t inRowCount, size_t inColumnCount)
+    static std::auto_ptr<Game> CreateGame(PlayerType inPlayerType, size_t inRowCount, size_t inColumnCount)
     {
         if (inPlayerType == PlayerType_Human)
         {
-            return Game::Create<HumanGame>(inRowCount, inColumnCount);
+            return CreatePoly<Game, HumanGame>(inRowCount, inColumnCount);
         }
         else if (inPlayerType == PlayerType_Computer)
         {
-            return Game::Create<ComputerGame>(inRowCount, inColumnCount);
+            return CreatePoly<Game, ComputerGame>(inRowCount, inColumnCount);
         }
         throw std::logic_error("Invalid enum value for PlayerType.");
     }

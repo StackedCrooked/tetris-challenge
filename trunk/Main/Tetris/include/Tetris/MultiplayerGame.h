@@ -18,7 +18,7 @@ public:
 
     ~MultiplayerGame();
 
-    // Takes ownership!
+    // Creates the player object and retains ownership
     Player * addPlayer(PlayerType inPlayerType,
                        const TeamName & inTeamName,
                        const PlayerName & inPlayerName);
