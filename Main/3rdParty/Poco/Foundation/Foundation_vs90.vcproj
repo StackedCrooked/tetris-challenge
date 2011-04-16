@@ -119,12 +119,12 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="/D &quot;_HAS_ITERATOR_DEBUGGING=0&quot; /D &quot;_SECURE_SCL=0&quot; /D &quot;_SCL_SECURE_NO_WARNINGS=0&quot;"
+				AdditionalOptions="/D &quot;_HAS_ITERATOR_DEBUGGING=0&quot; /D &quot;_SECURE_SCL=0&quot; /D &quot;_SCL_SECURE_NO_WARNINGS=0&quot; /MP"
 				Optimization="0"
 				AdditionalIncludeDirectories=".\include"
 				PreprocessorDefinitions="_DEBUG;_WINDOWS;POCO_STATIC;POCO_NO_AUTOMATIC_LIBS"
 				StringPooling="true"
-				MinimalRebuild="true"
+				MinimalRebuild="false"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				BufferSecurityCheck="true"
