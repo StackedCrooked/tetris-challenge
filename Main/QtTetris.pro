@@ -410,3 +410,6 @@ OTHER_FILES += \
     QtTetris/CMakeLists.txt \
     Tetris/CMakeLists.txt \
     Tetris/testsuite/CMakeLists.txt
+
+RESOURCES += \
+    QtTetris/QtTetris.qrc
