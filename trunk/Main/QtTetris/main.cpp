@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
     }
     catch (...)
     {
-        std::cerr << "Anonymous exception caught in main. Exit program." << std::endl;
+        std::cerr << "Anonymous exception caught in main. Exiting program." << std::endl;
     }
     return 1;
 }
