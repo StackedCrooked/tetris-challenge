@@ -22,8 +22,6 @@ typedef boost::function<void(BlockMover *)> BlockMoverCallback;
  *
  * A BlockMove object will peridically move the current tetris block
  * one square closer to the next precalculated block (from the AI).
- *
- * If no precalculated blocks are available then it will enter a waiting state.
  */
 class BlockMover
 {

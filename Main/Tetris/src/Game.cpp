@@ -720,8 +720,8 @@ bool ComputerGame::move(MoveDirection inDirection)
     // We can't move the block down any further => we hit the bottom => commit the block
     //
 
-    // Hitting the bottom isn't always a good thing. Especially if you fall in a place
-    // you didn't plan for. Here we check if the location we're falling to is the location
+    // Hitting the bottom isn't always a good thing. Especially if the block falls on a place
+    // that wasn't planned for. Here we check if the location we're falling to is the location
     // we planned.
     if (!mCurrentNode->children().empty())
     {
@@ -734,21 +734,21 @@ bool ComputerGame::move(MoveDirection inDirection)
             // The game is untainted. Good, now check if the blocks line up correctly.
             if (block.column() == nextBlock.column() && nextBlock.identification() == block.identification())
             {
-                // We don't actually commit the block. Instead we swap the current gamestate with
-                // the next precalculated one.
+                // Swap the current gamestate with the next precalculated one.
                 return navigateNodeDown();
             }
             else
             {
-                LogError("This current game state has been dirtied by unknown forces.");
+                // The current block has already been solidified and our calculations are no
+                // longer valid. Clear all invalid precalcualted nodes.
                 mCurrentNode->clearChildren();
             }
         }
         else
         {
-            // The game is 'tainted'. Meaning that the gamestate was force changed by
-            // an outsider force. Usually this is some multiplayer penalty or something.
-            // Anyway, it means that all our work is for naught because our precalculated
+            // The game is 'tainted'. Meaning that the gamestate was force changed.
+            // Usually this is caused by a multiplayer feature (add penalty lines for example).
+            // If the game is tainted then all our work is for naught because the precalculated
             // blocks are no longer correct.
             mCurrentNode->clearChildren();
         }
