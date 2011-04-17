@@ -87,7 +87,7 @@ void AbstractWidget::onGameStateChanged(SimpleGame * inSimpleGame)
 {
     if (!mPlayer || mPlayer->simpleGame() != inSimpleGame)
     {
-        throw std::logic_error("AbstractWidget::onDestroy: inGame != mGame");
+        throw std::logic_error("AbstractWidget::onGameStateChanged: inGame != mGame");
     }
 
     refresh();
@@ -98,22 +98,10 @@ void AbstractWidget::onLinesCleared(SimpleGame * inSimpleGame, int )
 {
     if (!mPlayer || mPlayer->simpleGame() != inSimpleGame)
     {
-        throw std::logic_error("AbstractWidget::onDestroy: inGame != mGame");
+        throw std::logic_error("AbstractWidget:: onLinesCleared: inGame != mGame");
     }
 
     refresh();
-}
-
-
-void AbstractWidget::onDestroy(SimpleGame * inSimpleGame)
-{
-    if (!mPlayer || mPlayer->simpleGame() != inSimpleGame)
-    {
-        throw std::logic_error("AbstractWidget::onDestroy: inGame != mGame");
-    }
-
-    SimpleGame::UnregisterEventHandler(mPlayer->simpleGame(), this);
-    mPlayer = 0;
 }
 
 

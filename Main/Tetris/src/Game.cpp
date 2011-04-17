@@ -127,11 +127,6 @@ bool Game::Exists(Game * inGame)
 
 void Game::OnChangedImpl(Game * inGame)
 {
-    //
-    // This code runs in the main thread.
-    // No synchronization should be required.
-    //
-
     if (!Exists(inGame))
     {
         return;

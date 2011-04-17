@@ -32,10 +32,6 @@ struct MultiplayerGame::Impl : public SimpleGame::EventHandler,
         // Not interested.
     }
 
-    virtual void onDestroy(SimpleGame * )
-    {
-    }
-
     Player * addPlayer(PlayerType inPlayerType, const TeamName & inTeamName, const PlayerName & inPlayerName);
 
     Player & findPlayer(SimpleGame * inSimpleGame) const
