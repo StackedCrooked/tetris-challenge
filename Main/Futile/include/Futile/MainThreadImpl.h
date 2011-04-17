@@ -12,6 +12,9 @@ namespace Futile {
 typedef boost::function<void()> Action;
 
 
+/**
+ * MainThreadImpl is the base class for platform specific implementations.
+ */
 class MainThreadImpl : boost::noncopyable
 {
 public:
