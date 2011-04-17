@@ -107,7 +107,7 @@ MainWindow::MainWindow(QWidget *parent) :
     mTetrisWidgets(),
     mSpacing(12),
     mLogField(0),
-    mShowLog(true),
+    mShowLog(false),
     mGameOver(false)
 {
     setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum));
@@ -130,6 +130,9 @@ MainWindow::MainWindow(QWidget *parent) :
     mTetrisWidgetHolder = new QHBoxLayout;
     vbox->addItem(mTetrisWidgetHolder);
     vbox->setAlignment(mTetrisWidgetHolder, Qt::AlignHCenter);
+
+    const std::string cCtrlKey = (Poco::Environment::osName() == "Darwin") ? "Command-N" : "Ctrl-N";
+    vbox->addWidget(new QLabel(std::string("Press " + cCtrlKey + " to start a new game.").c_str()));
     mTetrisWidgetHolder->setSpacing(mSpacing);
     while (mTetrisWidgets.size() < 2)
     {
@@ -150,7 +153,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(timer, SIGNAL(timeout()), this, SLOT(onTimerEvent()));
     timer->start(500);
 
-    onNew();
+    onNewComputerVsComputerGame();
 }
 
 
