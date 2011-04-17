@@ -43,9 +43,6 @@ protected:
 
     ~Singleton() { }
 
-    Singleton(const Singleton&);
-    Singleton& operator=(const Singleton&);
-
 private:
     static void CreateInstance()
     {

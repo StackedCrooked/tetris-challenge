@@ -36,6 +36,8 @@ struct MultiplayerGame::Impl : public SimpleGame::EventHandler,
     {
     }
 
+    Player * addPlayer(PlayerType inPlayerType, const TeamName & inTeamName, const PlayerName & inPlayerName);
+
     Player & findPlayer(SimpleGame * inSimpleGame) const
     {
         Players::const_iterator it = mPlayers.begin(), end = mPlayers.end();
@@ -84,18 +86,36 @@ MultiplayerGame::~MultiplayerGame()
 }
 
 
-Player * MultiplayerGame::addPlayer(PlayerType inPlayerType,
-                                    const TeamName & inTeamName,
-                                    const PlayerName & inPlayerName)
+Player * MultiplayerGame::Impl::addPlayer(PlayerType inPlayerType,
+                                          const TeamName & inTeamName,
+                                          const PlayerName & inPlayerName)
 {
-    mImpl->mPlayers.push_back(Player::Create(inPlayerType,
-                                             inTeamName,
-                                             inPlayerName,
-                                             mImpl->mRowCount,
-                                             mImpl->mColumnCount).release());
-    Player * player = mImpl->mPlayers.back();
-    SimpleGame::RegisterEventHandler(player->simpleGame(), mImpl.get());
+    mPlayers.push_back(Player::Create(inPlayerType,
+                                      inTeamName,
+                                      inPlayerName,
+                                      mRowCount,
+                                      mColumnCount).release());
+    Player * player = mPlayers.back();
+    SimpleGame::RegisterEventHandler(player->simpleGame(), this);
     return player;
+}
+
+
+Player * MultiplayerGame::addHumanPlayer(const TeamName & inTeamName,
+                                         const PlayerName & inPlayerName)
+{
+    return mImpl->addPlayer(PlayerType_Human, inTeamName, inPlayerName);
+}
+
+
+Player * MultiplayerGame::addComputerPlayer(const TeamName & inTeamName,
+                                            const PlayerName & inPlayerName,
+                                            ComputerPlayer::Tweaker * inTweaker)
+{
+    Player * result = mImpl->addPlayer(PlayerType_Computer, inTeamName, inPlayerName);
+    ComputerPlayer & computerPlayer = dynamic_cast<ComputerPlayer&>(*result);
+    computerPlayer.setTweaker(inTweaker);
+    return result;
 }
 
 
