@@ -72,8 +72,7 @@ private:
 };
 
 
-class AbstractWidget : public SimpleGame::EventHandler,
-                       public SimpleGame::BackReference
+class AbstractWidget : public SimpleGame::EventHandler
 {
 public:
     AbstractWidget(int insquareWidth, int inSquareHeight);
@@ -83,8 +82,6 @@ public:
     virtual void onGameStateChanged(SimpleGame * inGame);
 
     virtual void onLinesCleared(SimpleGame * inGame, int inLineCount);
-
-    virtual void onDestroy(SimpleGame * inGame);
 
     void setPlayer(Player * inPlayer);
 

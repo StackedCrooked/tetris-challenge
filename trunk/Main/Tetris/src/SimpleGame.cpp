@@ -24,8 +24,6 @@ namespace Tetris {
 
 struct SimpleGame::Impl : public Game::EventHandler
 {
-    typedef SimpleGame::BackReference BackReference;
-
     static std::auto_ptr<Game> CreateGame(PlayerType inPlayerType, size_t inRowCount, size_t inColumnCount)
     {
         if (inPlayerType == PlayerType_Human)
@@ -46,8 +44,7 @@ struct SimpleGame::Impl : public Game::EventHandler
         mPlayerType(inPlayerType),
         mGravity(new Gravity(mGame)),
         mCenterColumn(static_cast<size_t>(0.5 + inColumnCount / 2.0)),
-        mSimpleGame(0),
-        mBackReference(0)
+        mSimpleGame(0)
     {
     }
 
@@ -88,7 +85,6 @@ struct SimpleGame::Impl : public Game::EventHandler
     boost::scoped_ptr<Gravity> mGravity;
     std::size_t mCenterColumn;
     SimpleGame * mSimpleGame;
-    BackReference * mBackReference;
     typedef std::set<SimpleGame::EventHandler*> EventHandlers;
     EventHandlers mEventHandlers;
 };

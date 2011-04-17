@@ -30,6 +30,10 @@ class GameState;
 class SimpleGame
 {
 public:
+    /**
+     * EventHandler allows you to register callback method for game events.
+     * All callbacks are invoked on the main thread.
+     */
     class EventHandler
     {
     public:
@@ -39,17 +43,9 @@ public:
 
         virtual void onLinesCleared(SimpleGame * inGame, int inLineCount) = 0;
 
-        virtual void onDestroy(SimpleGame * inGame) = 0;
-
     private:
         EventHandler(const EventHandler&);
         EventHandler& operator=(const EventHandler&);
-    };
-
-    class BackReference
-    {
-    public:
-        virtual ~BackReference() {}
     };
 
     SimpleGame(PlayerType inPlayerType, size_t inRowCount, size_t inColumnCount);

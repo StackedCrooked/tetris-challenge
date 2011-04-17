@@ -44,6 +44,12 @@ public:
         // Check if the give EventHandler object still exists
         static bool Exists(EventHandler * inEventHandler);
 
+        // Notifies that the game state has changed.
+        // This method arrives in the main thread.
+        //
+        // The Game* pointer is unlocked at this moment. The
+        // user is responsible for locking the corresponding
+        // ThreadSafe<Game> object!
         virtual void onGameStateChanged(Game * inGame) = 0;
 
         virtual void onLinesCleared(Game * inGame, int inLineCount) = 0;
