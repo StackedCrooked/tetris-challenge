@@ -35,6 +35,9 @@ private:
 };
 
 
+typedef MakeString Str;
+
+
 } // namespace Futile
 
 
