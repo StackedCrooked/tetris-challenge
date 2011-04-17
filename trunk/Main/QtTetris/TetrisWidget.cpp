@@ -1,8 +1,9 @@
 #include "TetrisWidget.h"
 #include "Tetris/Game.h"
 #include "Tetris/SimpleGame.h"
-#include "Futile/Threading.h"
 #include "Futile/AutoPtrSupport.h"
+#include "Futile/Logging.h"
+#include "Futile/Threading.h"
 #include <QtGui/QApplication>
 #include <QtGui/QColor>
 #include <QtGui/QKeyEvent>
@@ -201,7 +202,8 @@ void TetrisWidget::paintImage(const Tetris::Rect & inRect, const std::string & i
     if (!mImage || mImageFileName != inFileName)
     {
         mImageFileName = inFileName;
-        mImage.reset(new QImage(inFileName.c_str()));
+        Futile::LogInfo(mImageFileName);
+        mImage.reset(new QImage(std::string(":/resources/avatar/" + mImageFileName).c_str()));
     }
 
     if (!mImage->isNull())

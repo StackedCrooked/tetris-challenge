@@ -146,6 +146,12 @@ set(QtTetris_HEADERS ${QtTetris_QT_HEADERS} ${QtTetris_REGULAR_HEADERS})
 
 
 #
+# Qt resources
+#
+QT4_ADD_RESOURCES(QtTetris_Resources "QtTetris.qrc")
+message("QtTetris_Resources: ${QtTetris_Resources}")
+
+#
 # Special settings to make CMake and Qt work together
 #
 QT4_WRAP_CPP(QtTetris_HEADERS_MOC ${QtTetris_QT_HEADERS})
@@ -167,7 +173,7 @@ endif()
 #
 # Set the executable. On Mac we want a bundle.
 #
-add_executable(${EXECUTABLE} ${EXECUTABLE_OPTIONS} ${QtTetris_SOURCES} ${QtTetris_HEADERS_MOC})
+add_executable(${EXECUTABLE} ${EXECUTABLE_OPTIONS} ${QtTetris_SOURCES} ${QtTetris_HEADERS_MOC} ${QtTetris_Resources})
 
 
 #
@@ -180,10 +186,8 @@ add_custom_command(TARGET ${EXECUTABLE}
                    POST_BUILD
                    COMMAND /bin/rm ARGS -f ${BUILD_ROOT}LastBuild
                    COMMAND /bin/ln ARGS -s ${OUTDIR} ${BUILD_ROOT}LastBuild
-                   COMMAND /bin/cp ARGS "${SOLUTIONDIR}Tetris/res/avatar/*.gif" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
                    WORKING_DIRECTORY    ${BUILD_ROOT})
 endif()
-
 
 #
 # APPLE-specific post-build steps:
