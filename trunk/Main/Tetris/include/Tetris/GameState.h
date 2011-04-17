@@ -15,13 +15,12 @@ namespace Tetris {
 class GameState
 {
 public:
-    // Creates a new GameState
     GameState(size_t inNumRows, size_t inNumColumns);
 
     const Grid & grid() const;
 
-    // Modifies the grid bypassing Tetris laws of nature.
-    // This is required to enable multiplayer penalties.
+    // Modifies the grid bypassing Tetris rules.
+    // This is added to enable for multiplayer features.
     void setGrid(const Grid & inGrid);
 
     // Returns true if setGrid() has been called.
