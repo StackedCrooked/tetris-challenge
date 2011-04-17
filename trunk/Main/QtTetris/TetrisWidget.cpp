@@ -177,7 +177,6 @@ void TetrisWidget::paintStatItem(const Tetris::Rect & inRect, const std::string 
     // Paint the stats title
     QFont titleFont(oldFont);
     titleFont.setBold(true);
-    titleFont.setWeight(QFont::Black);
     painter.setFont(titleFont);
 
     int nameX = inRect.left() + (inRect.width() - painter.fontMetrics().width(inName.c_str()))/2;
@@ -186,7 +185,6 @@ void TetrisWidget::paintStatItem(const Tetris::Rect & inRect, const std::string 
 
     // Paint the stats value
     QFont valueFont(oldFont);
-    valueFont.setWeight(QFont::Bold);
     painter.setFont(valueFont);
 
     int valueRectY = nameY + painter.fontMetrics().height();
