@@ -26,6 +26,8 @@ using Futile::CreatePoly;
 using Futile::LogError;
 using Futile::LogInfo;
 using Futile::Logger;
+using Futile::MakeString;
+using Futile::Str;
 using Futile::Singleton;
 
 
@@ -100,7 +102,7 @@ void MainWindow::timerEvent()
 
 
 MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),        
+    QMainWindow(parent),
     mTetrisWidgetHolder(0),
     mTetrisWidgets(),
     mSpacing(12),
@@ -129,6 +131,11 @@ MainWindow::MainWindow(QWidget *parent) :
     vbox->addItem(mTetrisWidgetHolder);
     vbox->setAlignment(mTetrisWidgetHolder, Qt::AlignHCenter);
     mTetrisWidgetHolder->setSpacing(mSpacing);
+    while (mTetrisWidgets.size() < 2)
+    {
+        mTetrisWidgets.push_back(new TetrisWidget(centralWidget(), Tetris_GetSquareWidth(), Tetris_GetSquareHeight()));
+        mTetrisWidgetHolder->addWidget(mTetrisWidgets.back(), 0);
+    }
 
     if (mShowLog)
     {
@@ -163,8 +170,6 @@ void MainWindow::logMessage(const std::string & inMessage)
 
 void MainWindow::closeEvent(QCloseEvent*)
 {
-    //typedef std::vector<TetrisWidget *> TetrisWidgets;
-    //mTetrisWidgets.back()->
 }
 
 
@@ -180,34 +185,21 @@ bool MainWindow::event(QEvent * inEvent)
 
 void MainWindow::onNewGame(const PlayerTypes & inPlayerTypes)
 {
+    if (inPlayerTypes.size() > mTetrisWidgets.size())
+    {
+        throw std::runtime_error(Str() << "Too make players: " << inPlayerTypes.size() << ". View only supports " << mTetrisWidgets.size() << " players.");
+    }
+
     // Unset the GameOver state.
     mGameOver = false;
 
     // Unset all widgets.
     for (TetrisWidgets::size_type idx = 0; idx < mTetrisWidgets.size(); ++idx)
     {
-        mTetrisWidgets[idx]->setPlayer(0);
-        mTetrisWidgets[idx]->releaseKeyboard();
-    }
-
-    // Ensure that we have widget for each player.
-    while (mTetrisWidgets.size() < inPlayerTypes.size())
-    {
-        mTetrisWidgets.push_back(new TetrisWidget(centralWidget(), Tetris_GetSquareWidth(), Tetris_GetSquareHeight()));
-    }
-
-    // Add the new tetris widgets to the layout
-    for (TetrisWidgets::size_type idx = mTetrisWidgetHolder->children().size(); idx < mTetrisWidgets.size(); ++idx)
-    {
-        mTetrisWidgetHolder->addWidget(mTetrisWidgets[idx], 0);
-        mTetrisWidgets[idx]->show();
-    }
-
-    // Remove surplus widgets from layout.
-    for (PlayerTypes::size_type idx = inPlayerTypes.size(); idx < mTetrisWidgets.size(); ++idx)
-    {
-        mTetrisWidgets[idx]->hide();
-        mTetrisWidgetHolder->removeWidget(mTetrisWidgets[idx]);
+        TetrisWidget * tetrisWidget = mTetrisWidgets[idx];
+        tetrisWidget->setPlayer(NULL);
+        tetrisWidget->releaseKeyboard();
+        tetrisWidget->hide();
     }
 
     // Reset the game.
@@ -218,10 +210,12 @@ void MainWindow::onNewGame(const PlayerTypes & inPlayerTypes)
     for (size_t idx = 0; idx < mgame.playerCount(); ++idx)
     {
         Player * player = mgame.getPlayer(idx);
-        mTetrisWidgets[idx]->setPlayer(player);
+        TetrisWidget * tetrisWidget = mTetrisWidgets[idx];
+        tetrisWidget->setPlayer(player);
+        tetrisWidget->show();
         if (player->type() == PlayerType_Human)
         {
-            mTetrisWidgets[idx]->setFocus();
+            tetrisWidget->setFocus();
         }
     }
 }
