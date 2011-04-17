@@ -103,20 +103,12 @@ const std::string & Player::playerName() const
 
 const SimpleGame * Player::simpleGame() const
 {
-    if (!mImpl->mSimpleGame)
-    {
-        return NULL;
-    }
     return mImpl->mSimpleGame.get();
 }
 
 
 SimpleGame * Player::simpleGame()
 {
-    if (!mImpl->mSimpleGame)
-    {
-        return NULL;
-    }
     return mImpl->mSimpleGame.get();
 }
 

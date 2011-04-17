@@ -3,6 +3,7 @@
 
 
 #include "Tetris/Player.h"
+#include "Tetris/ComputerPlayer.h"
 #include <boost/scoped_ptr.hpp>
 #include <memory>
 #include <set>
@@ -19,9 +20,13 @@ public:
     ~MultiplayerGame();
 
     // Creates the player object and retains ownership
-    Player * addPlayer(PlayerType inPlayerType,
-                       const TeamName & inTeamName,
-                       const PlayerName & inPlayerName);
+    Player * addHumanPlayer(const TeamName & inTeamName,
+                            const PlayerName & inPlayerName);
+
+    // Creates the player object and retains ownership
+    Player * addComputerPlayer(const TeamName & inTeamName,
+                               const PlayerName & inPlayerName,
+                               ComputerPlayer::Tweaker * inTweaker);
 
     void removePlayer(Player * inPlayer);
 

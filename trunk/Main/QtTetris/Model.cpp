@@ -144,14 +144,25 @@ void Model::newGame(const PlayerTypes & inPlayerTypes, size_t inRowCount, size_t
 
         Player * player(0);
         PlayerType playerType = inPlayerTypes[idx];
-        player = mMultiplayerGame->addPlayer(playerType, TeamName(teamName), PlayerName(GetPlayerName(inPlayerTypes[idx])));
-
-        if (ComputerPlayer * computerPlayer = dynamic_cast<ComputerPlayer*>(player))
+        if (playerType == PlayerType_Human)
         {
-            computerPlayer->setTweaker(this);
-            computerPlayer->setMoveSpeed(allComputer ? 50 : 20);
+            player = mMultiplayerGame->addHumanPlayer(TeamName(teamName),
+                                                      PlayerName(GetPlayerName(inPlayerTypes[idx])));
         }
-        //player->simpleGame()->setPaused(true);
+        else if (playerType == PlayerType_Computer)
+        {
+            player = mMultiplayerGame->addComputerPlayer(TeamName(teamName),
+                                                         PlayerName(GetPlayerName(inPlayerTypes[idx])),
+                                                         this);
+            if (ComputerPlayer * computerPlayer = dynamic_cast<ComputerPlayer*>(player))
+            {
+                computerPlayer->setMoveSpeed(allComputer ? 50 : 20);
+            }
+        }
+        else
+        {
+            throw std::invalid_argument("Invalid enum value for PlayerType.");
+        }
     }
 }
 
