@@ -363,7 +363,7 @@ void AbstractWidget::paintUserInfo()
 {
     Rect theuserInfoRect = userInfoRect();
     fillRect(theuserInfoRect, RGBColor(255, 255, 255));
-    drawTextRightAligned(theuserInfoRect, player()->teamName() + ": " + player()->playerName(), 14, RGBColor(0, 255, 255));
+    drawTextRightAligned(theuserInfoRect, player()->teamName() + ": " + player()->playerName(), 10, RGBColor(0, 255, 255));
 }
 
 
