@@ -17,14 +17,13 @@
  * Returns the string representation of the enum name.
  *
  * Values values();
- * Returns an array that stores a copy of all enum value.
- * This enables you to iterate over the enum values using a loop.
+ * Returns an array of the enumerators.
  *
  * Names names();
- * Returns an array that contains a string representations of the enum values.
+ * Returns an array containing the strings for the enumerators.
  *
  * int size();
- * Returns the size of the arrays returned by the values() and names() methods.
+ * Returns the size of the values and names array.
  *
  * EnumType first();
  * Returns the first enum value in the enum.
@@ -44,7 +43,7 @@
 
 
 /**
- * EnumValueInfo<EnumType, EnumValue> provides useful metadata for the requested enumerator value.
+ * EnumValueInfo<EnumType, EnumValue> provides metadata for the requested enumerator value.
  *
  * Overview:
  * - name() returns the EnumValue name
@@ -55,25 +54,29 @@
 
 
 /**
- * The ENUM macro allows you to generate a new enumeration and automatically generate
- * the accompanying code for parsing and serializing the enumerator values.
+ * Futile_Enum is a macro that can be used to specify an enum and have the accompanying specializations
+ * of the EnumInfo and EnumValueInfo classes autmatically generated.
  *
- * Use the "Futile_Enum" macro to generate the code:
+ * Usage example:
+ *
  *   Futile_Enum(HTTPRequestMethod, 9, (HEAD, GET, POST, PUT, DELETE, TRACE, OPTIONS, CONNECT, PATCH))
  *
- * The enum will be genereated like this:
+ * The enum is generated as a "real" enum:
+ *
  *   enum HTTPRequestMethod { HEAD, GET, POST, PUT, DELETE, TRACE, OPTIONS, CONNECT, PATCH };
  *
  * The macro also generates a specialization of the EnumInfo and EnumValueInfo template
  * classes. Documentation for these classes can be found at the Futile_EnumInfo and
  * Futile_EnumValueInfo macros.
  *
- * Limitations:
- * - The enumerators always start at value zero and are incremented by 1.
- *   There is currently now way to change this.
  *
- * - The string representation for an enum value is identical to the enumerator name.
- *   There is currently now way to change this.
+ * LIMITATIONS:
+ * 
+ *  - The enumerators always start at value zero and are incremented by 1.
+ *    There is currently now way to change this.
+ *
+ *  - The string representation for an enum value is identical to the enumerator name.
+ *    There is currently now way to change this.
  */
 #define Futile_Enum(EnumType, Size, Values)                                                       \
     Futile_EnumInfo                                                                               \
