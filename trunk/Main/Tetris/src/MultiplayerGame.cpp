@@ -100,7 +100,7 @@ Player * MultiplayerGame::Impl::addPlayer(PlayerType inPlayerType,
 Player * MultiplayerGame::addHumanPlayer(const TeamName & inTeamName,
                                          const PlayerName & inPlayerName)
 {
-    return mImpl->addPlayer(PlayerType_Human, inTeamName, inPlayerName);
+    return mImpl->addPlayer(Human, inTeamName, inPlayerName);
 }
 
 
@@ -108,7 +108,7 @@ Player * MultiplayerGame::addComputerPlayer(const TeamName & inTeamName,
                                             const PlayerName & inPlayerName,
                                             ComputerPlayer::Tweaker * inTweaker)
 {
-    Player * result = mImpl->addPlayer(PlayerType_Computer, inTeamName, inPlayerName);
+    Player * result = mImpl->addPlayer(Computer, inTeamName, inPlayerName);
     ComputerPlayer & computerPlayer = dynamic_cast<ComputerPlayer&>(*result);
     computerPlayer.setTweaker(inTweaker);
     return result;

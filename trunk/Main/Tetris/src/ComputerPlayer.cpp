@@ -105,7 +105,7 @@ ComputerPlayer::ComputerPlayer(const TeamName & inTeamName,
                                const PlayerName & inPlayerName,
                                size_t inRowCount,
                                size_t inColumnCount) :
-    Player(PlayerType_Computer, inTeamName, inPlayerName, inRowCount, inColumnCount),
+    Player(Computer, inTeamName, inPlayerName, inRowCount, inColumnCount),
     mImpl(new Impl())
 {
     mImpl->mComputerPlayer = this;

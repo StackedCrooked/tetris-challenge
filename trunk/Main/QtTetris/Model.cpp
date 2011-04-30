@@ -127,7 +127,7 @@ void Model::newGame(const PlayerTypes & inPlayerTypes, size_t inRowCount, size_t
     bool allComputer = true;
     for (PlayerTypes::size_type idx = 0; idx < inPlayerTypes.size(); ++idx)
     {
-        if (inPlayerTypes[idx] != PlayerType_Computer)
+        if (inPlayerTypes[idx] != Computer)
         {
             allComputer = false;
             break;
@@ -144,12 +144,12 @@ void Model::newGame(const PlayerTypes & inPlayerTypes, size_t inRowCount, size_t
 
         Player * player(0);
         PlayerType playerType = inPlayerTypes[idx];
-        if (playerType == PlayerType_Human)
+        if (playerType == Human)
         {
             player = mMultiplayerGame->addHumanPlayer(TeamName(teamName),
                                                       PlayerName(GetPlayerName(inPlayerTypes[idx])));
         }
-        else if (playerType == PlayerType_Computer)
+        else if (playerType == Computer)
         {
             player = mMultiplayerGame->addComputerPlayer(TeamName(teamName),
                                                          PlayerName(GetPlayerName(inPlayerTypes[idx])),
@@ -175,7 +175,7 @@ std::string Model::GetHumanPlayerName()
 
 std::string Model::GetPlayerName(PlayerType inPlayerType)
 {
-    if (inPlayerType == PlayerType_Human)
+    if (inPlayerType == Human)
     {
         if (mHumanName.empty())
         {
