@@ -9,135 +9,190 @@
 
 
 /**
- * EnumInfo<EnumType> provides useful meta data beloning to an enum type.
+ * EnumInfo<EnumType> provides metadata associated with an enum type. All methods are static.
  *
- * Details:
- *   - name() returns the enumeration's tag name.
- *   - values() returns an array containing all enumerator values.
- *   - names() returns an array containing all enumerator names.
- *   - size() returns the number of enumerators (this is the same as the length of the values and names arrays)
- *   - first() returns the first enumerator.
- *   - last() returns the last enumerator.
- *   - FromString(const std::string &) returns the enumerator value for the given string value.
- *       An exception is thrown if the string was not found in the list of enumerator names.
- *   - ToString(const std::string &) returns the enumerator name for a given enumerator value.
- *       A std::runtime_error is thrown if the enumerator value was not found.
+ * Overview:
+ *
+ * const char * name();
+ * Returns the string representation of the enum name.
+ *
+ * Values values();
+ * Returns an array that stores a copy of all enum value.
+ * This enables you to iterate over the enum values using a loop.
+ *
+ * Names names();
+ * Returns an array that contains a string representations of the enum values.
+ *
+ * int size();
+ * Returns the size of the arrays returned by the values() and names() methods.
+ *
+ * EnumType first();
+ * Returns the first enum value in the enum.
+ *
+ * EnumType last();
+ * Returns the last value in the enum.
+ *
+ * EnumType FromString(const std::string &);
+ * Returns the enum value that matches the given string.
+ *
+ * std::string ToString(EnumType);
+ * Returns the string representation of the provided enum value.
+ * Throws a std::invalid_argument if the enum value is invalid.
  */
 #define Futile_EnumInfo \
-    template<typename T> struct EnumInfo;
+    template<typename Enum_> struct EnumInfo;
 
 
 /**
- * EnumeratorInfo<EnumType, Enumerator> provides useful metadata for the requested enumerator value.
+ * EnumValueInfo<EnumType, Enumerator> provides useful metadata for the requested enumerator value.
  *
- * Details:
- *   - name() returns the Enumerator name
- *   - value() returns the Enumerator value
+ * Overview:
+ * - name() returns the Enumerator name
+ * - value() returns the Enumerator value
  */
-#define Futile_EnumeratorInfo \
-    template<class TEnum, TEnum TEnumerator> struct EnumeratorInfo;
+#define Futile_EnumValueInfo \
+    template<class Enum_, Enum_ EnumValue_> struct EnumValueInfo;
 
 
 /**
  * The ENUM macro allows you to generate a new enumeration and automatically generate
  * the accompanying code for parsing and serializing the enumerator values.
  *
- * Usage example:
+ * Use the "Futile_Enum" macro to generate the code:
+ *   Futile_Enum(HTTPRequestMethod, 9, (HEAD, GET, POST, PUT, DELETE, TRACE, OPTIONS, CONNECT, PATCH))
  *
- *    // Define the enum like this:
- *    Futile_Enum(HTTPRequestMethod, 9, (HEAD, GET, POST, PUT, DELETE, TRACE, OPTIONS, CONNECT, PATCH))
+ * The enum will be genereated like this:
+ *   enum HTTPRequestMethod { HEAD, GET, POST, PUT, DELETE, TRACE, OPTIONS, CONNECT, PATCH };
  *
- *    // Example for getting meta data
- *    EnumInfo<HTTPRequestMethod>::name() // returns "HTTPRequestMethod"
- *    EnumumeratorInfo<HTTPRequestMethod, HEAD>::name() // returns "HEAD"
+ * The macro also generates a specialization of the EnumInfo and EnumValueInfo template
+ * classes. Documentation for these classes can be found at the Futile_EnumInfo and
+ * Futile_EnumValueInfo macros.
  *
- * LIMITATIONS:
- *    - The enumerators always start at value zero and increment in units of 1.
- *      Negative enumerator values or interval gaps are not supported.
  *
- *    - The string representation are as specified in the macro call.
- *      Specifying a differernt string representation is not supported.
+ *   // - EnumValueInfo<HTTPRequestMethod> { ... };
+ *   // These classes provide metadata that can be accessed through static methods.
+
+ *   EnumInfo<HTTPRequestMethod>::name() // returns "HTTPRequestMethod"
+ *   EnumValueInfo<HTTPRequestMethod, HEAD>::name() // returns "HEAD"
  *
- * See the documentation for the EnumInfo and EnumeratorInfo classes for more information.
+ * Limitations:
+ * - The enumerators always start at value zero and increment in units of 1.
+ *   Negative enumerator values or interval gaps are not supported.
+ *
+ * - The string representation are as specified in the macro call.
+ *   Specifying a differernt string representation is not supported.
  *
  */
-#define Futile_Enum(Tag, Size, Values)                                                    \
-    Futile_EnumInfo                                                                       \
-    Futile_EnumeratorInfo                                                                 \
-    Futile_DefineEnum(Tag, Size, Values)                                                  \
-    Futile_DefineEnumInfoSpecialization(                                                  \
-        Tag,                                                                              \
-        Size,                                                                             \
-        Values,                                                                           \
-        BOOST_PP_LIST_FIRST(BOOST_PP_TUPLE_TO_LIST(Size, Values)),                        \
-        BOOST_PP_LIST_FIRST(BOOST_PP_LIST_REVERSE(BOOST_PP_TUPLE_TO_LIST(Size, Values)))) \
-    BOOST_PP_LIST_FOR_EACH(                                                               \
-        Futile_DefineEnumeratorInfoSpecialization,                                        \
-        Tag,                                                                              \
+#define Futile_Enum(EnumType, Size, Values)                                                       \
+    Futile_EnumInfo                                                                               \
+    Futile_EnumValueInfo                                                                          \
+    Futile_DefineEnum(EnumType, Size, Values)                                                     \
+    Futile_DefineEnumInfoSpecialization(                                                          \
+        EnumType,                                                                                 \
+        Size,                                                                                     \
+        Values,                                                                                   \
+        BOOST_PP_LIST_FIRST(BOOST_PP_TUPLE_TO_LIST(Size, Values)),                                \
+        BOOST_PP_LIST_FIRST(BOOST_PP_LIST_REVERSE(BOOST_PP_TUPLE_TO_LIST(Size, Values))))         \
+    BOOST_PP_LIST_FOR_EACH(                                                                       \
+        Futile_DefineEnumValueInfoSpecialization,                                                 \
+        EnumType,                                                                                 \
         BOOST_PP_TUPLE_TO_LIST(Size, Values))
 
 
 //
-// Macros for internal use
+// Helper macros. Private.
 //
-#define Futile_DefineEnum(Tag, Size, Enumerators) \
-    enum Tag { BOOST_PP_LIST_ENUM(BOOST_PP_TUPLE_TO_LIST(Size, Enumerators)) };
+#define Futile_DefineEnum(EnumType, Size, Enumerators)                                            \
+    enum EnumType                                                                                 \
+    {                                                                                             \
+        BOOST_PP_LIST_ENUM(BOOST_PP_TUPLE_TO_LIST(Size, Enumerators))                             \
+    };
 
 
-#define Futile_ToString(Dummy0, Dummy1, Element) \
+#define Futile_ToString(Dummy0, Dummy1, Element)                                                  \
     BOOST_PP_STRINGIZE(Element)
 
 
-#define Futile_DefineEnumInfoSpecialization(Tag, Size, Enumerator, First, Last)                   \
-    template<> struct EnumInfo<Tag>                                                               \
+#define Futile_DefineEnumInfoSpecialization(EnumType_, Size_, EnumValues_, First_, Last_)         \
+    template<> struct EnumInfo<EnumType_>                                                         \
     {                                                                                             \
-        static const char * name() { return #Tag; }                                               \
-        typedef const Tag Values[Size];                                                           \
+        enum                                                                                      \
+        {                                                                                         \
+            Size  = Size_,                                                                        \
+            First = First_,                                                                       \
+            Last  = Last_                                                                         \
+        };                                                                                        \
+                                                                                                  \
+        typedef EnumType_ EnumType;                                                               \
+        static const EnumType cFirst = First_;                                                    \
+        static const EnumType cLast = Last_;                                                      \
+                                                                                                  \
+        static const char * name() { return #EnumType_; }                                         \
+                                                                                                  \
+        typedef const EnumType Values[Size];                                                      \
         static const Values & values();                                                           \
+                                                                                                  \
         typedef const char * Names[Size];                                                         \
         static const Names & names();                                                             \
+                                                                                                  \
         static int size() { return Size; }                                                        \
-        static Tag first() { return First; }                                                      \
-        static Tag last() { return Last; }                                                        \
-        static Tag FromString(const std::string & inName) {                                       \
-            for (std::size_t idx = 0; idx < size(); ++idx) {                                      \
+                                                                                                  \
+        static EnumType first() { return cFirst; }                                                \
+                                                                                                  \
+        static EnumType last() { return cLast; }                                                  \
+                                                                                                  \
+        static EnumType FromString(const std::string & inName)                                    \
+        {                                                                                         \
+            for (int idx = 0; idx < size(); ++idx)                                                \
+            {                                                                                     \
                 const Names & theNames = names();                                                 \
                 const Values & theValues = values();                                              \
                 if (theNames[idx] == inName) return theValues[idx];                               \
             }                                                                                     \
             throw std::runtime_error("Invalid enumerator name: " + inName);                       \
         }                                                                                         \
-        static const char * ToString(Tag inValue) {                                               \
-            for (std::size_t idx = 0; idx < size(); ++idx) {                                      \
+                                                                                                  \
+        static const char * ToString(EnumType inValue)                                            \
+        {                                                                                         \
+            for (int idx = 0; idx < size(); ++idx)                                                \
+            {                                                                                     \
                 const Names & theNames = names();                                                 \
                 const Values & theValues = values();                                              \
                 if (theValues[idx] == inValue) return theNames[idx];                              \
             }                                                                                     \
-            throw std::runtime_error(                                                             \
-                    "Invalid enumerator value: " +                                                \
-                    boost::lexical_cast<std::string>(inValue));                                   \
+            throw std::invalid_argument(boost::lexical_cast<std::string>(inValue));               \
         }                                                                                         \
     };                                                                                            \
-    inline const EnumInfo<Tag>::Values & EnumInfo<Tag>::values() {                                \
-        static Values fValues = { BOOST_PP_LIST_ENUM(BOOST_PP_TUPLE_TO_LIST(Size, Enumerator)) }; \
+    inline const EnumInfo<EnumType_>::Values & EnumInfo<EnumType_>::values()                      \
+    {                                                                                             \
+        static Values fValues = {                                                                 \
+            BOOST_PP_LIST_ENUM(                                                                   \
+                    BOOST_PP_TUPLE_TO_LIST(Size_, EnumValues_))                                   \
+        };                                                                                        \
         return fValues;                                                                           \
-    };                                                                                            \
-    inline const EnumInfo<Tag>::Names & EnumInfo<Tag>::names() {                                  \
-        static Names fNames = {                                                                   \
+    }                                                                                             \
+    inline const EnumInfo<EnumType_>::Names & EnumInfo<EnumType_>::names()                        \
+    {                                                                                             \
+        static Names fNames =                                                                     \
+        {                                                                                         \
             BOOST_PP_LIST_ENUM(                                                                   \
                 BOOST_PP_LIST_TRANSFORM(                                                          \
                     Futile_ToString,                                                              \
                     Size,                                                                         \
-                    BOOST_PP_TUPLE_TO_LIST(Size, Enumerator))) };                                 \
+                    BOOST_PP_TUPLE_TO_LIST(Size_, EnumValues_)))                                  \
+        };                                                                                        \
         return fNames;                                                                            \
-    };
+    }
 
 
-#define Futile_DefineEnumeratorInfoSpecialization(Dummy, Enum, Enumerator) \
-    template<> struct EnumeratorInfo<Enum, Enumerator> {                   \
-        typedef Enum EnumType;                                             \
-        static const char * name() { return #Enumerator; }                 \
-        static Enum value() { return Enumerator; }                         \
+#define Futile_DefineEnumValueInfoSpecialization(Dummy, Enum, Enumerator)                         \
+    template<> struct EnumValueInfo<Enum, Enumerator>                                             \
+    {                                                                                             \
+        typedef Enum EnumType;                                                                    \
+                                                                                                  \
+        static const char * name() { return #Enumerator; }                                        \
+                                                                                                  \
+        static Enum value() { return Enumerator; }                                                \
     };
 
 
