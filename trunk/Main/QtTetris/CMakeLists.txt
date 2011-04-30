@@ -34,14 +34,18 @@ endif()
 # Detect PLATFORM and ARCH variables
 #
 if(WIN32)
-    set(ARCH x86)
     set(PLATFORM Windows)
+    set(ARCH x86)
 else()
     execute_process(COMMAND uname OUTPUT_VARIABLE PLATFORM)
     string(REPLACE "\n" "" PLATFORM ${PLATFORM})
     execute_process(COMMAND arch OUTPUT_VARIABLE ARCH)
     string(REPLACE "\n" "" ARCH ${ARCH})
 endif()
+
+
+message("PLATFORM: ${PLATFORM}")
+message("ARCH:     ${ARCH}")
 
 
 #
@@ -107,19 +111,11 @@ link_directories(${POCO_ROOT}lib/${PLATFORM}/${ARCH})
 
 
 #
-# Boost dependency => IS CURRENTLY BROKEN. USE LOCAL BOOST
+# Boost dependency
 #
-#set(BOOST ${SOLUTIONDIR}3rdParty/Boost_1_44_0/)
-if(APPLE)
-set(BOOST_INCLUDE /opt/local/include)
-set(BOOST_LIB /opt/local/lib)
-else()
-set(BOOST_INCLUDE /usr/include)
-set(BOOST_LIB /usr/lib)
-endif()
-include_directories(${BOOST_INCLUDE})
-link_directories(${BOOST_LIB})
-set(LIB_BOOST_THREAD boost_thread-mt)
+include_directories(${SOLUTIONDIR}3rdParty/Boost)
+link_directories(${SOLUTIONDIR}3rdParty/Boost/lib/${PLATFORM}-${ARCH})
+set(LIB_BOOST_THREAD libboost_thread.a)
 
 
 #
