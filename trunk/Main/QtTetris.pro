@@ -402,7 +402,8 @@ HEADERS += \
     3rdParty/Poco/Foundation/include/Poco/zlib.h \
     3rdParty/Poco/Foundation/include/pocomsg.h \
     Futile/include/Futile/LeakDetector.h \
-    Futile/include/Futile/Singleton.h
+    Futile/include/Futile/Singleton.h \
+    Futile/include/Futile/Enum.h
 
 
 OTHER_FILES += \
