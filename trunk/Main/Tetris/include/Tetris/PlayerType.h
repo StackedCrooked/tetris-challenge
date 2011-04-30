@@ -6,26 +6,10 @@
 #include <vector>
 
 
-
-namespace Futile {
-
-Futile_Enum(PlayerType, 2, (Human, Computer));
-
-} // namespace Futile
-
-
 namespace Tetris {
 
 
-//
-// TODO: The "using" keyword should not be necessary here.
-//       Try to fix this in the generator code.
-//
-using Futile::PlayerType;
-using Futile::Human;
-using Futile::Computer;
-using Futile::EnumInfo;
-using Futile::EnumeratorInfo;
+Futile_Enum(PlayerType, 2, (Human, Computer));
 typedef std::vector<PlayerType> PlayerTypes;
 
 

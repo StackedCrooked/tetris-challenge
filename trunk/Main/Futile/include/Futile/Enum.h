@@ -8,9 +8,6 @@
 #include <iostream>
 
 
-namespace Futile {
-
-
 /**
  * EnumInfo<EnumType> provides useful meta data beloning to an enum type.
  *
@@ -26,8 +23,8 @@ namespace Futile {
  *   - ToString(const std::string &) returns the enumerator name for a given enumerator value.
  *       A std::runtime_error is thrown if the enumerator value was not found.
  */
-template<typename T>
-struct EnumInfo {};
+#define Futile_EnumInfo \
+    template<typename T> struct EnumInfo;
 
 
 /**
@@ -37,8 +34,8 @@ struct EnumInfo {};
  *   - name() returns the Enumerator name
  *   - value() returns the Enumerator value
  */
-template<class TEnum, TEnum TEnumerator>
-struct EnumeratorInfo {};
+#define Futile_EnumeratorInfo \
+    template<class TEnum, TEnum TEnumerator> struct EnumeratorInfo;
 
 
 /**
@@ -65,6 +62,8 @@ struct EnumeratorInfo {};
  *
  */
 #define Futile_Enum(Tag, Size, Values)                                                    \
+    Futile_EnumInfo                                                                       \
+    Futile_EnumeratorInfo                                                                 \
     Futile_DefineEnum(Tag, Size, Values)                                                  \
     Futile_DefineEnumInfoSpecialization(                                                  \
         Tag,                                                                              \
@@ -140,9 +139,6 @@ struct EnumeratorInfo {};
         static const char * name() { return #Enumerator; }                 \
         static Enum value() { return Enumerator; }                         \
     };
-
-
-} // namespace Futile
 
 
 #endif // FUTILE_ENUM_H
