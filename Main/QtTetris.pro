@@ -53,7 +53,8 @@ SOURCES += \
     Futile/src/Threading.cpp \
     Futile/src/Worker.cpp \
     Futile/src/WorkerPool.cpp \
-    Futile/src/LeakDetector.cpp
+    Futile/src/LeakDetector.cpp \
+    Futile/src/Enum.cpp
 
 
 HEADERS += \

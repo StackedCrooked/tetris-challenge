@@ -26,11 +26,11 @@ struct SimpleGame::Impl : public Game::EventHandler
 {
     static std::auto_ptr<Game> CreateGame(PlayerType inPlayerType, size_t inRowCount, size_t inColumnCount)
     {
-        if (inPlayerType == PlayerType_Human)
+        if (inPlayerType == Human)
         {
             return CreatePoly<Game, HumanGame>(inRowCount, inColumnCount);
         }
-        else if (inPlayerType == PlayerType_Computer)
+        else if (inPlayerType == Computer)
         {
             return CreatePoly<Game, ComputerGame>(inRowCount, inColumnCount);
         }

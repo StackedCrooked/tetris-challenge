@@ -1,6 +1,8 @@
 #include <QtGui/QApplication>
 #include "Model.h"
 #include "MainWindow.h"
+#include "Tetris/PlayerType.h"
+#include "Futile/Enum.h"
 #include "Futile/MainThread.h"
 #include "Futile/LeakDetector.h"
 #include "Futile/Logger.h"
@@ -48,10 +50,28 @@ int run(int argc, char *argv[])
 }
 
 
+void TestEnum()
+{
+    using namespace Tetris;
+    for (std::size_t idx = 0; idx < Futile::EnumInfo<PlayerType>::size(); ++idx)
+    {
+        std::cout << "Name: " << Futile::EnumInfo<PlayerType>::names()[idx] << ", "
+                  << "value: " << Futile::EnumInfo<PlayerType>::values()[idx] << std::endl;
+    }
+    std::cout << std::endl;
+
+    std::cout << "Enumerator name: "    << Futile::EnumeratorInfo<PlayerType, Human>::name()
+              << ", value: "             << Futile::EnumeratorInfo<PlayerType, Human>::value() << std::endl
+              << "Enumerator name: " << Futile::EnumeratorInfo<PlayerType, Computer>::name()
+              << ", value: "             << Futile::EnumeratorInfo<PlayerType, Computer>::value() << std::endl;
+}
+
+
 int main(int argc, char *argv[])
 {
     try
     {
+        TestEnum();
         Logger::Initializer initLogger;
         LeakDetector::Initializer initLeakDetector;
         MainThread::Initializer initMainThread;

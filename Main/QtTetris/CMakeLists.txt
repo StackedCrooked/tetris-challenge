@@ -107,12 +107,19 @@ link_directories(${POCO_ROOT}lib/${PLATFORM}/${ARCH})
 
 
 #
-# Boost dependency
+# Boost dependency => IS CURRENTLY BROKEN. USE LOCAL BOOST
 #
-set(BOOST ${SOLUTIONDIR}3rdParty/Boost_1_44_0/)
-include_directories(${BOOST})
-link_directories(${BOOST}lib/${PLATFORM}/${ARCH})
-set(LIB_BOOST_THREAD boost_thread)
+#set(BOOST ${SOLUTIONDIR}3rdParty/Boost_1_44_0/)
+if(APPLE)
+set(BOOST_INCLUDE /opt/local/include)
+set(BOOST_LIB /opt/local/lib)
+else()
+set(BOOST_INCLUDE /usr/include)
+set(BOOST_LIB /usr/lib)
+endif()
+include_directories(${BOOST_INCLUDE})
+link_directories(${BOOST_LIB})
+set(LIB_BOOST_THREAD boost_thread-mt)
 
 
 #
