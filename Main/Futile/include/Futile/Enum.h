@@ -68,20 +68,12 @@
  * classes. Documentation for these classes can be found at the Futile_EnumInfo and
  * Futile_EnumValueInfo macros.
  *
- *
- *   // - EnumValueInfo<HTTPRequestMethod> { ... };
- *   // These classes provide metadata that can be accessed through static methods.
-
- *   EnumInfo<HTTPRequestMethod>::name() // returns "HTTPRequestMethod"
- *   EnumValueInfo<HTTPRequestMethod, HEAD>::name() // returns "HEAD"
- *
  * Limitations:
- * - The enumerators always start at value zero and increment in units of 1.
- *   Negative enumerator values or interval gaps are not supported.
+ * - The enumerators always start at value zero and are incremented by 1.
+ *   There is currently now way to change this.
  *
- * - The string representation are as specified in the macro call.
- *   Specifying a differernt string representation is not supported.
- *
+ * - The string representation for an enum value is identical to the enumerator name.
+ *   There is currently now way to change this.
  */
 #define Futile_Enum(EnumType, Size, Values)                                                       \
     Futile_EnumInfo                                                                               \
