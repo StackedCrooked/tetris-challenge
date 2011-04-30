@@ -64,17 +64,17 @@ struct EnumeratorInfo {};
  * See the documentation for the EnumInfo and EnumeratorInfo classes for more information.
  *
  */
-#define Futile_Enum(Tag, Size, Values) \
-    Futile_DefineEnum(Tag, Size, Values) \
-    Futile_DefineEnumInfoSpecialization( \
-        Tag, \
-        Size, \
-        Values, \
-        BOOST_PP_LIST_FIRST(BOOST_PP_TUPLE_TO_LIST(Size, Values)), \
+#define Futile_Enum(Tag, Size, Values)                                                    \
+    Futile_DefineEnum(Tag, Size, Values)                                                  \
+    Futile_DefineEnumInfoSpecialization(                                                  \
+        Tag,                                                                              \
+        Size,                                                                             \
+        Values,                                                                           \
+        BOOST_PP_LIST_FIRST(BOOST_PP_TUPLE_TO_LIST(Size, Values)),                        \
         BOOST_PP_LIST_FIRST(BOOST_PP_LIST_REVERSE(BOOST_PP_TUPLE_TO_LIST(Size, Values)))) \
-    BOOST_PP_LIST_FOR_EACH( \
-        Futile_DefineEnumeratorInfoSpecialization, \
-        Tag, \
+    BOOST_PP_LIST_FOR_EACH(                                                               \
+        Futile_DefineEnumeratorInfoSpecialization,                                        \
+        Tag,                                                                              \
         BOOST_PP_TUPLE_TO_LIST(Size, Values))
 
 
@@ -89,49 +89,56 @@ struct EnumeratorInfo {};
     BOOST_PP_STRINGIZE(Element)
 
 
-#define Futile_DefineEnumInfoSpecialization(Tag, Size, Enumerator, First, Last) \
-    template<> struct EnumInfo<Tag> \
-    { \
-        static const char * name() { return #Tag; } \
-        typedef const Tag Values[Size]; \
-        static const Values & values(); \
-        typedef const char * Names[Size]; \
-        static const Names & names(); \
-        static int size() { return Size; } \
-        static Tag first() { return First; } \
-        static Tag last() { return Last; } \
-        static Tag FromString(const std::string & inName) { \
-            for (std::size_t idx = 0; idx < size(); ++idx) { \
-                const Names & theNames = names(); \
-                const Values & theValues = values(); \
-                if (theNames[idx] == inName) return theValues[idx]; \
-            } \
-            throw std::runtime_error("Invalid enumerator name: " + inName); \
-        } \
-        static const char * ToString(Tag inValue) { \
-            for (std::size_t idx = 0; idx < size(); ++idx) { \
-                const Names & theNames = names(); \
-                const Values & theValues = values(); \
-                if (theValues[idx] == inValue) return theNames[idx]; \
-            } \
-            throw std::runtime_error("Invalid enumerator value: " + boost::lexical_cast<std::string>(inValue)); \
-        } \
-    };\
-    inline const EnumInfo<Tag>::Values & EnumInfo<Tag>::values() { \
+#define Futile_DefineEnumInfoSpecialization(Tag, Size, Enumerator, First, Last)                   \
+    template<> struct EnumInfo<Tag>                                                               \
+    {                                                                                             \
+        static const char * name() { return #Tag; }                                               \
+        typedef const Tag Values[Size];                                                           \
+        static const Values & values();                                                           \
+        typedef const char * Names[Size];                                                         \
+        static const Names & names();                                                             \
+        static int size() { return Size; }                                                        \
+        static Tag first() { return First; }                                                      \
+        static Tag last() { return Last; }                                                        \
+        static Tag FromString(const std::string & inName) {                                       \
+            for (std::size_t idx = 0; idx < size(); ++idx) {                                      \
+                const Names & theNames = names();                                                 \
+                const Values & theValues = values();                                              \
+                if (theNames[idx] == inName) return theValues[idx];                               \
+            }                                                                                     \
+            throw std::runtime_error("Invalid enumerator name: " + inName);                       \
+        }                                                                                         \
+        static const char * ToString(Tag inValue) {                                               \
+            for (std::size_t idx = 0; idx < size(); ++idx) {                                      \
+                const Names & theNames = names();                                                 \
+                const Values & theValues = values();                                              \
+                if (theValues[idx] == inValue) return theNames[idx];                              \
+            }                                                                                     \
+            throw std::runtime_error(                                                             \
+                    "Invalid enumerator value: " +                                                \
+                    boost::lexical_cast<std::string>(inValue));                                   \
+        }                                                                                         \
+    };                                                                                            \
+    inline const EnumInfo<Tag>::Values & EnumInfo<Tag>::values() {                                \
         static Values fValues = { BOOST_PP_LIST_ENUM(BOOST_PP_TUPLE_TO_LIST(Size, Enumerator)) }; \
-        return fValues; \
-    }; \
-    inline const EnumInfo<Tag>::Names & EnumInfo<Tag>::names() { \
-        static Names fNames = { BOOST_PP_LIST_ENUM(BOOST_PP_LIST_TRANSFORM(Futile_ToString, Size, BOOST_PP_TUPLE_TO_LIST(Size, Enumerator))) }; \
-        return fNames; \
+        return fValues;                                                                           \
+    };                                                                                            \
+    inline const EnumInfo<Tag>::Names & EnumInfo<Tag>::names() {                                  \
+        static Names fNames = {                                                                   \
+            BOOST_PP_LIST_ENUM(                                                                   \
+                BOOST_PP_LIST_TRANSFORM(                                                          \
+                    Futile_ToString,                                                              \
+                    Size,                                                                         \
+                    BOOST_PP_TUPLE_TO_LIST(Size, Enumerator))) };                                 \
+        return fNames;                                                                            \
     };
 
 
 #define Futile_DefineEnumeratorInfoSpecialization(Dummy, Enum, Enumerator) \
-    template<> struct EnumeratorInfo<Enum, Enumerator> { \
-        typedef Enum EnumType; \
-        static const char * name() { return #Enumerator; } \
-        static Enum value() { return Enumerator; } \
+    template<> struct EnumeratorInfo<Enum, Enumerator> {                   \
+        typedef Enum EnumType;                                             \
+        static const char * name() { return #Enumerator; }                 \
+        static Enum value() { return Enumerator; }                         \
     };
 
 
