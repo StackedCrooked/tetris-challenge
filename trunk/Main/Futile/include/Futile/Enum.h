@@ -44,11 +44,11 @@
 
 
 /**
- * EnumValueInfo<EnumType, Enumerator> provides useful metadata for the requested enumerator value.
+ * EnumValueInfo<EnumType, EnumValue> provides useful metadata for the requested enumerator value.
  *
  * Overview:
- * - name() returns the Enumerator name
- * - value() returns the Enumerator value
+ * - name() returns the EnumValue name
+ * - value() returns the EnumValue value
  */
 #define Futile_EnumValueInfo \
     template<class Enum_, Enum_ EnumValue_> struct EnumValueInfo;
@@ -102,10 +102,10 @@
 //
 // Helper macros. Private.
 //
-#define Futile_DefineEnum(EnumType, Size, Enumerators)                                            \
+#define Futile_DefineEnum(EnumType, Size, EnumValues)                                             \
     enum EnumType                                                                                 \
     {                                                                                             \
-        BOOST_PP_LIST_ENUM(BOOST_PP_TUPLE_TO_LIST(Size, Enumerators))                             \
+        BOOST_PP_LIST_ENUM(BOOST_PP_TUPLE_TO_LIST(Size, EnumValues))                              \
     };
 
 
@@ -185,14 +185,14 @@
     }
 
 
-#define Futile_DefineEnumValueInfoSpecialization(Dummy, Enum, Enumerator)                         \
-    template<> struct EnumValueInfo<Enum, Enumerator>                                             \
+#define Futile_DefineEnumValueInfoSpecialization(Dummy, Enum, EnumValue)                          \
+    template<> struct EnumValueInfo<Enum, EnumValue>                                              \
     {                                                                                             \
         typedef Enum EnumType;                                                                    \
                                                                                                   \
-        static const char * name() { return #Enumerator; }                                        \
+        static const char * name() { return #EnumValue; }                                         \
                                                                                                   \
-        static Enum value() { return Enumerator; }                                                \
+        static Enum value() { return EnumValue; }                                                 \
     };
 
 
