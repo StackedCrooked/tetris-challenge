@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="Futile"
 	ProjectGUID="{38AF5C44-D977-4123-9AE3-CAE078744562}"
 	RootNamespace="Futile"

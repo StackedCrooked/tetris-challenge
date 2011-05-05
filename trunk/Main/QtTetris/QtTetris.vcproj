@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="QtTetris"
 	ProjectGUID="{57ACA075-A82D-4127-AA99-3D12C3486E0C}"
 	RootNamespace="QtTetris"
@@ -68,7 +68,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="qtmain.lib QtCore4.lib QtGui4.lib iphlpapi.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
-				AdditionalLibraryDirectories="&quot;C:\Program Files\boost\boost_1_44\lib&quot;;&quot;$(QTDIR)\lib&quot;"
+				AdditionalLibraryDirectories="&quot;$(QTDIR)\lib&quot;;&quot;$(SolutionDir)3rdParty\Boost_1_46_1\lib\Windows-x86-vc90&quot;"
 				GenerateDebugInformation="false"
 				SubSystem="2"
 			/>
@@ -146,7 +146,7 @@
 				UseLibraryDependencyInputs="false"
 				AdditionalDependencies="qtmaind.lib QtCored4.lib QtGuid4.lib iphlpapi.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
-				AdditionalLibraryDirectories="&quot;C:\Program Files\boost\boost_1_44\lib&quot;;&quot;$(QTDIR)\lib&quot;"
+				AdditionalLibraryDirectories="&quot;$(QTDIR)\lib&quot;;&quot;$(SolutionDir)3rdParty\Boost_1_46_1\lib\Windows-x86-vc90&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 			/>
