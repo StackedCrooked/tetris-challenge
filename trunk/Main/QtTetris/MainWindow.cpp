@@ -82,7 +82,7 @@ void MainWindow::timerEvent()
         }
 
 
-        for (size_t idx = 0; idx < mgame.playerCount(); ++idx)
+        for (std::size_t idx = 0; idx < mgame.playerCount(); ++idx)
         {
             Player * player(mgame.getPlayer(idx));
             if (!player->simpleGame()->isGameOver())
@@ -210,7 +210,7 @@ void MainWindow::onNewGame(const PlayerTypes & inPlayerTypes)
 
     // Add the players.
     MultiplayerGame & mgame = Model::Instance().multiplayerGame();
-    for (size_t idx = 0; idx < mgame.playerCount(); ++idx)
+    for (std::size_t idx = 0; idx < mgame.playerCount(); ++idx)
     {
         Player * player = mgame.getPlayer(idx);
         TetrisWidget * tetrisWidget = mTetrisWidgets[idx];
@@ -300,7 +300,7 @@ void MainWindow::on2v2Game()
 void MainWindow::onPaused()
 {
     MultiplayerGame & mgame = Model::Instance().multiplayerGame();
-    for (size_t idx = 0; idx < mgame.playerCount(); ++idx)
+    for (std::size_t idx = 0; idx < mgame.playerCount(); ++idx)
     {
         Player * player = mgame.getPlayer(idx);
         bool isPaused = player->simpleGame()->isPaused();
@@ -312,7 +312,7 @@ void MainWindow::onPaused()
 void MainWindow::onPenalty()
 {
     MultiplayerGame & mgame = Model::Instance().multiplayerGame();
-    for (size_t idx = 0; idx < mgame.playerCount(); ++idx)
+    for (std::size_t idx = 0; idx < mgame.playerCount(); ++idx)
     {
         Player * player = mgame.getPlayer(idx);
         player->simpleGame()->applyLinePenalty(4);

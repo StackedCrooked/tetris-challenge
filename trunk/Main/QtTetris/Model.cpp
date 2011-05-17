@@ -36,7 +36,7 @@ bool Model::IsGameOver()
     }
 
 
-    for (size_t idx = 0; idx < mMultiplayerGame->playerCount(); ++idx)
+    for (std::size_t idx = 0; idx < mMultiplayerGame->playerCount(); ++idx)
     {
         Player * player = mMultiplayerGame->getPlayer(idx);
         if (player->simpleGame()->isGameOver())
@@ -48,7 +48,7 @@ bool Model::IsGameOver()
 }
 
 
-Player * Model::getPlayer(size_t inIndex)
+Player * Model::getPlayer(std::size_t inIndex)
 {
     return mMultiplayerGame->getPlayer(inIndex);
 }
@@ -119,7 +119,7 @@ std::auto_ptr<Evaluator> Model::updateAIParameters(const Player & inPlayer,
 }
 
 
-void Model::newGame(const PlayerTypes & inPlayerTypes, size_t inRowCount, size_t inColumnCount)
+void Model::newGame(const PlayerTypes & inPlayerTypes, std::size_t inRowCount, std::size_t inColumnCount)
 {
     mMultiplayerGame.reset();
     mMultiplayerGame.reset(new MultiplayerGame(inRowCount, inColumnCount));

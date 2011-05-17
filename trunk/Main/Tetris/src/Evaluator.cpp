@@ -150,14 +150,14 @@ int Evaluator::recommendedSearchWidth() const
 int Evaluator::evaluate(const GameState & inGameState) const
 {
     const Grid & grid = inGameState.grid();
-    size_t top = grid.rowCount();
+    std::size_t top = grid.rowCount();
     bool foundTop = false;
     int numHoles = 0;
     int numOccupiedUnderTop = 0;
 
-    for (size_t rowIdx = 0; rowIdx != grid.rowCount(); ++rowIdx)
+    for (std::size_t rowIdx = 0; rowIdx != grid.rowCount(); ++rowIdx)
     {
-        for (size_t colIdx = 0; colIdx != grid.columnCount(); ++colIdx)
+        for (std::size_t colIdx = 0; colIdx != grid.columnCount(); ++colIdx)
         {
             const int & value = grid.get(rowIdx, colIdx);
             if (value != BlockType_Nil)
@@ -272,10 +272,10 @@ int MakeTetrises::evaluate(const GameState & inGameState) const
 {
     const Grid & grid = inGameState.grid();
 
-    size_t c = grid.columnCount() - 1;
+    std::size_t c = grid.columnCount() - 1;
     if (grid.rowCount() >= 4)
     {
-        size_t r = grid.rowCount() - 4;
+        std::size_t r = grid.rowCount() - 4;
         for (; r != grid.rowCount(); ++r)
         {
             if (grid.get(r, c))

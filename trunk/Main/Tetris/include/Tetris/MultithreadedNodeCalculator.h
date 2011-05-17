@@ -32,8 +32,8 @@ private:
     void populateNodes(NodePtr ioNode,
                        const BlockTypes & inBlockTypes,
                        const std::vector<int> & inWidths,
-                       size_t inIndex,
-                       size_t inEndIndex);
+                       std::size_t inIndex,
+                       std::size_t inEndIndex);
 };
 
 

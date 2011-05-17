@@ -22,7 +22,7 @@ class GameState;
 class GameStateNode
 {
 public:
-    static std::auto_ptr<GameStateNode> CreateRootNode(size_t inNumRows, size_t inNumColumns);
+    static std::auto_ptr<GameStateNode> CreateRootNode(std::size_t inNumRows, std::size_t inNumColumns);
 
     GameStateNode(NodePtr inParent, GameState * inGameState, Evaluator * inEvaluator);
 

@@ -71,13 +71,13 @@ void MultithreadedNodeCalculator::generateChildNodes(NodePtr ioNode,
 void MultithreadedNodeCalculator::populateNodes(NodePtr ioNode,
                                                 const BlockTypes & inBlockTypes,
                                                 const std::vector<int> & inWidths,
-                                                size_t inIndex,
-                                                size_t inEndIndex)
+                                                std::size_t inIndex,
+                                                std::size_t inEndIndex)
 {
 
     // We want to at least perform a search of depth 1.
     if (inIndex > 0)
-    {
+    {		
         boost::this_thread::interruption_point();
     }
 
@@ -132,7 +132,7 @@ void MultithreadedNodeCalculator::populate()
     {
         // The nodes are populated using a "Iterative deepening" algorithm.
         // See: http://en.wikipedia.org/wiki/Iterative_deepening_depth-first_search for more information.
-        size_t targetDepth = 1;
+        std::size_t targetDepth = 1;
         while (targetDepth <= mBlockTypes.size())
         {
             ScopedLock lock(mNodeMutex);

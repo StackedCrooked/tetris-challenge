@@ -22,33 +22,33 @@ public:
 
     BlockType type() const;
 
-    size_t rotation() const;
+    std::size_t rotation() const;
 
-    size_t numRotations() const;
+    std::size_t numRotations() const;
 
     const Grid & grid() const;
 
-    size_t row() const;
+    std::size_t row() const;
 
-    size_t column() const;
+    std::size_t column() const;
 
-    size_t rowCount() const;
+    std::size_t rowCount() const;
 
-    size_t columnCount() const;
+    std::size_t columnCount() const;
 
     void rotate();
 
-    void setRow(size_t inRow);
+    void setRow(std::size_t inRow);
 
-    void setColumn(size_t inColumn);
+    void setColumn(std::size_t inColumn);
 
-    void setRotation(size_t inRotation);
+    void setRotation(std::size_t inRotation);
 
 private:
     BlockType mType;
-    size_t mRotation;
-    size_t mRow;
-    size_t mColumn;
+    std::size_t mRotation;
+    std::size_t mRow;
+    std::size_t mColumn;
     const Grid * mGrid;
 };
 
@@ -76,13 +76,13 @@ BlockType BlockImpl::type() const
 }
 
 
-size_t BlockImpl::rotation() const
+std::size_t BlockImpl::rotation() const
 {
     return mRotation;
 }
 
 
-size_t BlockImpl::numRotations() const
+std::size_t BlockImpl::numRotations() const
 {
     return GetBlockRotationCount(mType);
 }
@@ -94,43 +94,43 @@ const Grid & BlockImpl::grid() const
 }
 
 
-size_t BlockImpl::row() const
+std::size_t BlockImpl::row() const
 {
     return mRow;
 }
 
 
-size_t BlockImpl::column() const
+std::size_t BlockImpl::column() const
 {
     return mColumn;
 }
 
 
-size_t BlockImpl::rowCount() const
+std::size_t BlockImpl::rowCount() const
 {
     return mGrid->rowCount();
 }
 
 
-size_t BlockImpl::columnCount() const
+std::size_t BlockImpl::columnCount() const
 {
     return mGrid->columnCount();
 }
 
 
-void BlockImpl::setRow(size_t inRow)
+void BlockImpl::setRow(std::size_t inRow)
 {
     mRow = inRow;
 }
 
 
-void BlockImpl::setColumn(size_t inColumn)
+void BlockImpl::setColumn(std::size_t inColumn)
 {
     mColumn = inColumn;
 }
 
 
-void BlockImpl::setRotation(size_t inRotation)
+void BlockImpl::setRotation(std::size_t inRotation)
 {
     mRotation = inRotation % GetBlockRotationCount(mType);
     mGrid = &GetGrid(GetBlockIdentifier(mType, mRotation));
@@ -185,13 +185,13 @@ BlockType Block::type() const
 }
 
 
-size_t Block::rotation() const
+std::size_t Block::rotation() const
 {
     return mImpl->rotation();
 }
 
 
-size_t Block::numRotations() const
+std::size_t Block::numRotations() const
 {
     return mImpl->numRotations();
 }
@@ -203,43 +203,43 @@ const Grid & Block::grid() const
 }
 
 
-size_t Block::row() const
+std::size_t Block::row() const
 {
     return mImpl->row();
 }
 
 
-size_t Block::column() const
+std::size_t Block::column() const
 {
     return mImpl->column();
 }
 
 
-size_t Block::rowCount() const
+std::size_t Block::rowCount() const
 {
     return mImpl->rowCount();
 }
 
 
-size_t Block::columnCount() const
+std::size_t Block::columnCount() const
 {
     return mImpl->columnCount();
 }
 
 
-void Block::setRow(size_t inRow)
+void Block::setRow(std::size_t inRow)
 {
     mImpl->setRow(inRow);
 }
 
 
-void Block::setColumn(size_t inColumn)
+void Block::setColumn(std::size_t inColumn)
 {
     mImpl->setColumn(inColumn);
 }
 
 
-void Block::setRotation(size_t inRotation)
+void Block::setRotation(std::size_t inRotation)
 {
     mImpl->setRotation(inRotation);
 }
@@ -259,7 +259,7 @@ int GetBlockIdentifier(BlockType inType, int inRotation)
 }
 
 
-size_t GetBlockRotationCount(BlockType inType)
+std::size_t GetBlockRotationCount(BlockType inType)
 {
     Assert(inType >= BlockType_Begin || inType < BlockType_End);
     static const int fRotationCounts[] =
@@ -276,11 +276,11 @@ size_t GetBlockRotationCount(BlockType inType)
 }
 
 
-size_t GetBlockPositionCount(BlockType inType, size_t inNumColumns)
+std::size_t GetBlockPositionCount(BlockType inType, std::size_t inNumColumns)
 {
-    size_t result = 0;
-    size_t numRotations = GetBlockRotationCount(inType);
-    for (size_t idx = 0; idx != numRotations; ++idx)
+    std::size_t result = 0;
+    std::size_t numRotations = GetBlockRotationCount(inType);
+    for (std::size_t idx = 0; idx != numRotations; ++idx)
     {
         const Grid & grid = GetGrid(GetBlockIdentifier(inType, idx));
         result += inNumColumns - grid.columnCount() + 1;

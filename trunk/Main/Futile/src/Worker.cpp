@@ -46,41 +46,9 @@ void SetThreadName(DWORD inThreadId, const std::string & inThreadName)
 namespace Futile {
 
 
-std::string ToString(Worker::Status inStatus)
-{
-    switch (inStatus)
-    {
-        case Worker::Status_Initial:
-        {
-            return "Initial";
-        }
-        case Worker::Status_Scheduled:
-        {
-            return "Scheduled";
-        }
-        case Worker::Status_Waiting:
-        {
-            return "Waiting";
-        }
-        case Worker::Status_Working:
-        {
-            return "Working";
-        }
-        case Worker::Status_FinishedOne:
-        {
-            return "FinishedOne";
-        }
-        default:
-        {
-            throw std::logic_error("Invalid enum value for Worker::Status.");
-        }
-    }
-}
-
-
 Worker::Worker(const std::string & inName) :
     mName(inName),
-    mStatus(Status_Initial),
+    mStatus(WorkerStatus_Initial),
     mQuitFlag(false)
 {
     mThread.reset(new boost::thread(boost::bind(&Worker::run, this)));
@@ -117,7 +85,7 @@ bool Worker::getQuitFlag() const
 }
 
 
-void Worker::setStatus(Status inStatus)
+void Worker::setStatus(WorkerStatus inStatus)
 {
     ScopedLock lock(mStatusMutex);
     mStatus = inStatus;
@@ -125,7 +93,7 @@ void Worker::setStatus(Status inStatus)
 }
 
 
-Worker::Status Worker::status() const
+WorkerStatus Worker::status() const
 {
     ScopedLock lock(mStatusMutex);
     return mStatus;
@@ -134,11 +102,11 @@ Worker::Status Worker::status() const
 
 void Worker::wait()
 {
-    waitForStatus(Status_Waiting);
+    waitForStatus(WorkerStatus_Waiting);
 }
 
 
-void Worker::waitForStatus(Status inStatus)
+void Worker::waitForStatus(WorkerStatus inStatus)
 {
     ScopedLock lock(mStatusMutex);
     while (mStatus != inStatus)
@@ -148,20 +116,20 @@ void Worker::waitForStatus(Status inStatus)
 }
 
 
-size_t Worker::size() const
+std::size_t Worker::size() const
 {
     ScopedLock lock(mQueueMutex);
     return mQueue.size();
 }
 
 
-void Worker::interrupt(InterruptOption inInterruptOption)
+void Worker::interrupt(bool inJoin)
 {
     ScopedLock statusLock(mStatusMutex);
-    if (mStatus == Status_Working)
+    if (mStatus == WorkerStatus_Working)
     {
         mThread->interrupt();
-        if (inInterruptOption == InterruptOption_Wait)
+        if (inJoin)
         {
             mStatusCondition.wait(statusLock);
         }
@@ -169,7 +137,7 @@ void Worker::interrupt(InterruptOption inInterruptOption)
 }
 
 
-void Worker::interruptAndClearQueue(InterruptOption inInterruptOption)
+void Worker::interruptAndClearQueue(bool inJoin)
 {
     ScopedLock queueLock(mQueueMutex);
     mQueue.clear();
@@ -177,7 +145,7 @@ void Worker::interruptAndClearQueue(InterruptOption inInterruptOption)
     mThread->interrupt();
     mQueueCondition.notify_all();
     queueLock.unlock();
-    if (inInterruptOption == InterruptOption_Wait)
+    if (inJoin)
     {
         mStatusCondition.wait(statusLock);
     }
@@ -190,9 +158,9 @@ void Worker::schedule(const Worker::Task & inTask)
     mQueue.push_back(inTask);
     {
         ScopedLock statusLock(mStatusMutex);
-        if (mStatus <= Status_Waiting)
+        if (mStatus <= WorkerStatus_Waiting)
         {
-            mStatus = Status_Scheduled;
+            mStatus = WorkerStatus_Scheduled;
         }
     }
     mQueueCondition.notify_all();
@@ -204,7 +172,7 @@ Worker::Task Worker::nextTask()
     ScopedLock lock(mQueueMutex);
     while (mQueue.empty())
     {
-        setStatus(Status_Waiting);
+        setStatus(WorkerStatus_Waiting);
         mQueueCondition.wait(lock);
         boost::this_thread::interruption_point();
     }
@@ -222,14 +190,14 @@ void Worker::processTask()
         Task task = nextTask();
 
         // Run the task.
-        setStatus(Status_Working);
+        setStatus(WorkerStatus_Working);
         task();
     }
     catch (const boost::thread_interrupted &)
     {
         // Task was interrupted. Ok.
     }
-    setStatus(Status_FinishedOne);
+    setStatus(WorkerStatus_FinishedOne);
 }
 
 

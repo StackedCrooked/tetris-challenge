@@ -25,12 +25,17 @@ template<class> class ScopedReader;
 template<class> class ScopedWriter;
 
 
+// Lock/Unlock function. These could be overloaded for different mutex types.
+inline void Lock  (boost::mutex & ioMutex) { ioMutex.lock();   }
+inline void Unlock(boost::mutex & ioMutex) { ioMutex.unlock(); }
+
+
 /**
- * ThreadSafe can be used to enapsulate an object that needs to be accessed by multiple threads.
- * The object is stored as a private member variable and access can only be obtained by using
- * one of two friend classes: ScopedReader and ScopedWriter.
- * ScopedReader is a shared-read-lock and gives you const access the the object.
- * ScopedWriter is a unique lock that gives you full access to the object.
+ * ThreadSafe is a non-intrusive wrapper for adding thread-safety to objects.
+ * The object is stored as a private member variable and access can only be
+ * through  one of two friend classes: ScopedReader and ScopedWriter.
+ * ScopedReader gives you read access (via a const reference).
+ * ScopedWriter gives you full access (via a non-const reference).
  */
 template<class Variable>
 class ThreadSafe
@@ -182,7 +187,7 @@ private:
  * and error reporting.
  */
 template<class Variable,
-         class CheckLockDurationPolicy = TimeLimitMs<200>,
+         class CheckLockDurationPolicy = TimeLimitMs<400>,
          class CheckLockOrderPolicy    = VoidPolicy>
 class ConfigurableScopedAccessor : public  ScopedAccessor<Variable>,
                                    private CheckLockDurationPolicy,
@@ -305,7 +310,19 @@ LockMany<Mutex>::~LockMany()
 template<class Mutex>
 void LockMany<Mutex>::lock(Mutex & inMutex)
 {
-    inMutex.lock();
+    // Enforce the same order of locking in order to avoid deadlocks.
+    if (!mMutexes.empty())
+    {
+        if (&inMutex < mMutexes.back())
+        {
+            throw std::logic_error("Incorrect order of mutex locking. Ordering must be by address value.");
+        }
+        else if (&inMutex == mMutexes.back())
+        {
+            throw std::logic_error("Not allowed to add the same mutex twice.");
+        }
+    }
+    Lock(inMutex);
     mMutexes.push_back(&inMutex);
 }
 
@@ -315,7 +332,7 @@ void LockMany<Mutex>::unlockAll()
 {
     while (!mMutexes.empty())
     {
-        mMutexes.back()->unlock();
+        Unlock(*mMutexes.back());
         mMutexes.pop_back();
     }
 }

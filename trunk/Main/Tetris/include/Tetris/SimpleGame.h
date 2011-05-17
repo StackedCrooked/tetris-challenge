@@ -48,7 +48,7 @@ public:
         EventHandler& operator=(const EventHandler&);
     };
 
-    SimpleGame(PlayerType inPlayerType, size_t inRowCount, size_t inColumnCount);
+    SimpleGame(PlayerType inPlayerType, std::size_t inRowCount, std::size_t inColumnCount);
 
     ~SimpleGame();
 

@@ -15,8 +15,8 @@ struct Player::Impl
     Impl(PlayerType inPlayerType,
          const TeamName & inTeamName,
          const PlayerName & inPlayerName,
-         size_t inRowCount,
-         size_t inColumnCount) :
+         std::size_t inRowCount,
+         std::size_t inColumnCount) :
         mRowCount(inRowCount),
         mColumnCount(inColumnCount),
         mPlayerType(inPlayerType),
@@ -31,8 +31,8 @@ struct Player::Impl
     {
     }
 
-    size_t mRowCount;
-    size_t mColumnCount;
+    std::size_t mRowCount;
+    std::size_t mColumnCount;
     PlayerType mPlayerType;
     boost::scoped_ptr<SimpleGame> mSimpleGame;
     std::string mTeamName;
@@ -43,8 +43,8 @@ struct Player::Impl
 std::auto_ptr<Player> Player::Create(PlayerType inPlayerType,
                                      const TeamName & inTeamName,
                                      const PlayerName & inPlayerName,
-                                     size_t inRowCount,
-                                     size_t inColumnCount)
+                                     std::size_t inRowCount,
+                                     std::size_t inColumnCount)
 {
     std::auto_ptr<Player> result;
     if (inPlayerType == Computer)
@@ -66,8 +66,8 @@ std::auto_ptr<Player> Player::Create(PlayerType inPlayerType,
 Player::Player(PlayerType inPlayerType,
                const TeamName & inTeamName,
                const PlayerName & inPlayerName,
-               size_t inRowCount,
-               size_t inColumnCount) :
+               std::size_t inRowCount,
+               std::size_t inColumnCount) :
     mImpl(new Impl(inPlayerType,
                    inTeamName,
                    inPlayerName,
@@ -115,8 +115,8 @@ SimpleGame * Player::simpleGame()
 
 HumanPlayer::HumanPlayer(const TeamName & inTeamName,
                          const PlayerName & inPlayerName,
-                         size_t inRowCount,
-                         size_t inColumnCount) :
+                         std::size_t inRowCount,
+                         std::size_t inColumnCount) :
     Player(Human,
            inTeamName,
            inPlayerName,

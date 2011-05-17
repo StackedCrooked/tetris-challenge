@@ -55,8 +55,8 @@ protected:
     void populateNodesRecursively(NodePtr ioNode,
                                   const BlockTypes & inBlockTypes,
                                   const std::vector<int> & inWidths,
-                                  size_t inIndex,
-                                  size_t inMaxIndex);
+                                  std::size_t inIndex,
+                                  std::size_t inMaxIndex);
 
     void destroyInferiorChildren();
 
@@ -78,7 +78,7 @@ protected:
         inline NodePtr bestNode() const
         { return mBestNode; }
 
-        inline size_t nodeCount() const
+        inline std::size_t nodeCount() const
         { return mNodeCount; }
 
         inline bool finished() const
@@ -105,19 +105,19 @@ protected:
         NodePtr mBestNode;
         int mBestScore;
         boost::shared_ptr<Evaluator> mEvaluator;
-        size_t mNodeCount;
+        std::size_t mNodeCount;
         bool mFinished;
     };
 
     class TreeRowInfos
     {
     public:
-        TreeRowInfos(std::auto_ptr<Evaluator> inEvaluator, size_t inMaxDepth) :
+        TreeRowInfos(std::auto_ptr<Evaluator> inEvaluator, std::size_t inMaxDepth) :
             mInfos(),
             mCurrentSearchDepth(0),
             mMutex()
         {
-            for (size_t idx = 0; idx != inMaxDepth; ++idx)
+            for (std::size_t idx = 0; idx != inMaxDepth; ++idx)
             {
                 mInfos.push_back(TreeRowInfo(inEvaluator->clone()));
             }
@@ -133,7 +133,7 @@ protected:
             return mInfos.size();
         }
 
-        inline NodePtr bestNode(size_t inDepth) const
+        inline NodePtr bestNode(std::size_t inDepth) const
         {
             Futile::ScopedLock lock(mMutex);
             Assert(inDepth > 0 && inDepth <= mInfos.size());
@@ -151,25 +151,25 @@ protected:
             return result;
         }
 
-        inline size_t nodeCount(size_t inDepth) const
+        inline std::size_t nodeCount(std::size_t inDepth) const
         {
             Futile::ScopedLock lock(mMutex);
             return mInfos[inDepth - 1].nodeCount();
         }
 
-        inline bool finished(size_t inDepth) const
+        inline bool finished(std::size_t inDepth) const
         {
             Futile::ScopedLock lock(mMutex);
             return mInfos[inDepth - 1].finished();
         }
 
-        void registerNode(NodePtr inNode, size_t inDepth)
+        void registerNode(NodePtr inNode, std::size_t inDepth)
         {
             Futile::ScopedLock lock(mMutex);
             mInfos[inDepth - 1].registerNode(inNode);
         }
 
-        inline void setFinished(size_t inDepth)
+        inline void setFinished(std::size_t inDepth)
         {
             if (mInfos[inDepth - 1].bestNode())
             {
