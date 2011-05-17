@@ -2,6 +2,7 @@
 #define FUTILE_WORKERTHREAD_H_INCLUDED
 
 
+#include "Futile/Enum.h"
 #include "Futile/Threading.h"
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
@@ -14,6 +15,22 @@ namespace Futile {
 
 class Worker;
 class WorkerPool;
+
+
+/**
+ * WorkerStatus enum
+ *
+ * Utility functions:
+ *  - EnumInfo<WorkerStatus>::ToString(inWorkerStatus);
+ *   -EnumInfo<WorkerStatus>::FromString(inWorkerStatus);
+ */
+Futile_Enum(WorkerStatus, 5, ( \
+    WorkerStatus_Initial,      \
+    WorkerStatus_Waiting,      \
+    WorkerStatus_Scheduled,    \
+    WorkerStatus_Working,      \
+    WorkerStatus_FinishedOne   \
+));
 
 
 /**
@@ -40,32 +57,18 @@ public:
     void schedule(const Task & inTask);
 
     // Returns the number of pending tasks.
-    size_t size() const;
-
-    enum Status
-    {
-        Status_Initial,
-        Status_Waiting,
-        Status_Scheduled,
-        Status_Working,
-        Status_FinishedOne
-    };
+    std::size_t size() const;
 
     /**
      * Get the current status.
      */
-    Status status() const;
+    WorkerStatus status() const;
 
     // Wait for the Worker to finish all tasks.
     void wait();
 
-    void waitForStatus(Status inStatus);
-
-    enum InterruptOption
-    {
-        InterruptOption_Wait,
-        InterruptOption_DontWait
-    };
+    // Wait for a certain status.
+    void waitForStatus(WorkerStatus inStatus);
 
     /**
      * Sends an interrupt message to the current task. This method is
@@ -75,13 +78,18 @@ public:
      *
      * After this method has returned the worker starts on the next task
      * or enters the waiting state.
+     *
+     * @param    inJoin    If "true" then this call blocks until the Worker has finished.
+     *                  If "false" then this call returns immediately.
      */
-    void interrupt(InterruptOption inInterruptOption = InterruptOption_Wait);
+    void interrupt(bool inJoin = true);
 
     /**
      * Same as interrupt() but also clears the queue.
+     * @param    inJoin    If "true" then this call waits until the Worker has finished and the queue has been cleared.
+     *                  If "false" then this call returns immediately.
      */
-    void interruptAndClearQueue(InterruptOption inInterruptOption = InterruptOption_Wait);
+    void interruptAndClearQueue(bool inJoin = true);
 
 private:
     Worker(const Worker&);
@@ -91,14 +99,14 @@ private:
     void setQuitFlag();
     bool getQuitFlag() const;
 
-    void setStatus(Status inStatus);
+    void setStatus(WorkerStatus inStatus);
 
     void run();
     Task nextTask();
     void processTask();
 
     std::string mName;
-    Status mStatus;
+    WorkerStatus mStatus;
     mutable Mutex mStatusMutex;
     Condition mStatusCondition;
 
@@ -111,9 +119,6 @@ private:
 
     boost::scoped_ptr<boost::thread> mThread;
 };
-
-
-std::string ToString(Worker::Status);
 
 
 } // namespace Futile

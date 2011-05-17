@@ -51,7 +51,7 @@ void Logger::flush()
     // We just copy the items, and log them afterwards.
     {
         ScopedWriter<Queue> queue(mProtectedQueue);
-        for (size_t idx = 0; idx != queue->size(); ++idx)
+        for (std::size_t idx = 0; idx != queue->size(); ++idx)
         {
             items.push_back((*queue.get())[idx]);
         }
@@ -60,7 +60,7 @@ void Logger::flush()
 
 
     // Ok, the game object is unlocked again. We can log the items here.
-    for (size_t idx = 0; idx != items.size(); ++idx)
+    for (std::size_t idx = 0; idx != items.size(); ++idx)
     {
         logImpl(items[idx]);
     }

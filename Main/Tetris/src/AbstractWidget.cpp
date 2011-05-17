@@ -321,9 +321,9 @@ void AbstractWidget::coordinateRepaint(SimpleGame & inGame)
 
 void AbstractWidget::paintGrid(int x, int y, const Grid & inGrid)
 {
-    for (size_t c = 0; c < inGrid.columnCount(); ++c)
+    for (std::size_t c = 0; c < inGrid.columnCount(); ++c)
     {
-        for (size_t r = 0; r < inGrid.rowCount(); ++r)
+        for (std::size_t r = 0; r < inGrid.rowCount(); ++r)
         {
             BlockType blockType = inGrid.get(r, c);
             if (blockType != BlockType_Nil)
@@ -341,9 +341,9 @@ void AbstractWidget::paintGrid(int x, int y, const Grid & inGrid)
 
 void AbstractWidget::paintGrid(int x, int y, const Grid & inGrid, const RGBColor & inColor)
 {
-    for (size_t c = 0; c < inGrid.columnCount(); ++c)
+    for (std::size_t c = 0; c < inGrid.columnCount(); ++c)
     {
-        for (size_t r = 0; r < inGrid.rowCount(); ++r)
+        for (std::size_t r = 0; r < inGrid.rowCount(); ++r)
         {
             BlockType blockType = inGrid.get(r, c);
             if (blockType != BlockType_Nil)
@@ -384,8 +384,8 @@ void AbstractWidget::paintAvatar(const SimpleGame & inSimpleGame)
 
 void AbstractWidget::paintActiveBlockShadow(const SimpleGame & inSimpleGame)
 {
-    size_t colIdx(0);
-    size_t rowIdx(0);
+    std::size_t colIdx(0);
+    std::size_t rowIdx(0);
     boost::scoped_ptr<Grid> gridPtr;
 
     // Critical section. Minimize scope.

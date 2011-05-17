@@ -14,7 +14,7 @@
 namespace Tetris {
 
 
-GameState::GameState(size_t inNumRows, size_t inNumColumns) :
+GameState::GameState(std::size_t inNumRows, std::size_t inNumColumns) :
     mGrid(inNumRows, inNumColumns, BlockType_Nil),
     mOriginalBlock(BlockType_L, Rotation(0), Row(0), Column(0)),
     mIsGameOver(false),
@@ -29,11 +29,11 @@ GameState::GameState(size_t inNumRows, size_t inNumColumns) :
 }
 
 
-bool GameState::checkPositionValid(const Block & inBlock, size_t inRowIdx, size_t inColIdx) const
+bool GameState::checkPositionValid(const Block & inBlock, std::size_t inRowIdx, std::size_t inColIdx) const
 {
     const Grid & blockGrid(inBlock.grid());
-    if (inColIdx < blockGrid.columnCount() &&
-        (inRowIdx + blockGrid.rowCount()) < static_cast<size_t>(mFirstOccupiedRow))
+
+    if (inColIdx < blockGrid.columnCount() && (inRowIdx + blockGrid.rowCount()) < mFirstOccupiedRow)
     {
         return true;
     }
@@ -43,17 +43,17 @@ bool GameState::checkPositionValid(const Block & inBlock, size_t inRowIdx, size_
         return false;
     }
 
-    for (size_t r = 0; r != blockGrid.rowCount(); ++r)
+    for (std::size_t r = 0; r != blockGrid.rowCount(); ++r)
     {
-        size_t rowIdx = inRowIdx + r;
+        std::size_t rowIdx = inRowIdx + r;
         if (rowIdx >= mGrid.rowCount())
         {
             return false;
         }
 
-        for (size_t c = 0; c != blockGrid.columnCount(); ++c)
+        for (std::size_t c = 0; c != blockGrid.columnCount(); ++c)
         {
-            size_t colIdx = inColIdx + c;
+            std::size_t colIdx = inColIdx + c;
             if (colIdx >= mGrid.columnCount())
             {
                 return false;
@@ -72,14 +72,14 @@ bool GameState::checkPositionValid(const Block & inBlock, size_t inRowIdx, size_
 void GameState::solidifyBlock(const Block & inBlock)
 {
     const Grid & grid = inBlock.grid();
-    for (size_t r = 0; r != grid.rowCount(); ++r)
+    for (std::size_t r = 0; r != grid.rowCount(); ++r)
     {
-        for (size_t c = 0; c != grid.columnCount(); ++c)
+        for (std::size_t c = 0; c != grid.columnCount(); ++c)
         {
             if (grid.get(r, c) != BlockType_Nil)
             {
-                int gridRow = inBlock.row() + r;
-                int gridCol = inBlock.column() + c;
+				std::size_t gridRow = inBlock.row() + r;
+				std::size_t gridCol = inBlock.column() + c;
                 mGrid.set(gridRow, gridCol, inBlock.type());
                 if (gridRow < mFirstOccupiedRow)
                 {
@@ -93,18 +93,18 @@ void GameState::solidifyBlock(const Block & inBlock)
 
 void GameState::clearLines()
 {
-    int numLines = 0;
-    int r = mOriginalBlock.row() + mOriginalBlock.rowCount() - 1;
-    for (; r >= mFirstOccupiedRow; --r)
+	std::size_t numLines = 0;
+	int rowIndex = mOriginalBlock.row() + mOriginalBlock.rowCount() - 1;
+    for (; rowIndex >= static_cast<int>(mFirstOccupiedRow); --rowIndex)
     {
-        unsigned int c = 0;
+		std::size_t colIndex = 0;
         bool line = true;
-        for (; c < mGrid.columnCount(); ++c)
+        for (; colIndex < mGrid.columnCount(); ++colIndex)
         {
-            BlockType value = mGrid.get(r, c);
+            BlockType value = mGrid.get(rowIndex, colIndex);
             if (numLines > 0)
             {
-                mGrid.set(r + numLines, c, value);
+                mGrid.set(rowIndex + numLines, colIndex, value);
             }
 
             if (!value)
@@ -199,9 +199,9 @@ void GameState::updateCache()
     mFirstOccupiedRow = 0;
     while (mFirstOccupiedRow < mGrid.rowCount())
     {
-        for (size_t c = 0; c != mGrid.columnCount(); ++c)
+        for (std::size_t colIndex = 0; colIndex != mGrid.columnCount(); ++colIndex)
         {
-            if (mGrid.get(mFirstOccupiedRow, c) != BlockType_Nil)
+            if (mGrid.get(mFirstOccupiedRow, colIndex) != BlockType_Nil)
             {
                 return;
             }

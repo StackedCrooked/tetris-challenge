@@ -58,7 +58,7 @@ bool Game::EventHandler::Exists(Game::EventHandler * inEventHandler)
 Game::Instances Game::sInstances;
 
 
-Game::Game(size_t inNumRows, size_t inNumColumns) :
+Game::Game(std::size_t inNumRows, std::size_t inNumColumns) :
     mNumRows(inNumRows),
     mNumColumns(inNumColumns),
     mActiveBlock(),
@@ -195,7 +195,7 @@ std::vector<BlockType> Game::getGarbageRow() const
     int count = 0;
     while (count < cMinCount)
     {
-        for (size_t idx = 0; idx < mNumColumns; ++idx)
+        for (std::size_t idx = 0; idx < mNumColumns; ++idx)
         {
             if (result[idx] == BlockType_Nil && rand.nextBool())
             {
@@ -290,7 +290,7 @@ void Game::applyLinePenalty(int inLineCount)
 //}
 
 
-std::auto_ptr<Block> Game::CreateDefaultBlock(BlockType inBlockType, size_t inNumColumns)
+std::auto_ptr<Block> Game::CreateDefaultBlock(BlockType inBlockType, std::size_t inNumColumns)
 {
     return std::auto_ptr<Block>(
         new Block(inBlockType,
@@ -340,7 +340,7 @@ int Game::columnCount() const
 }
 
 
-void Game::reserveBlocks(size_t inCount)
+void Game::reserveBlocks(std::size_t inCount)
 {
     while (mBlocks.size() < inCount)
     {
@@ -362,7 +362,7 @@ const Grid & Game::gameGrid() const
 }
 
 
-void Game::getFutureBlocks(size_t inCount, BlockTypes & outBlocks)
+void Game::getFutureBlocks(std::size_t inCount, BlockTypes & outBlocks)
 {
     // Make sure we have all blocks we need.
     while (mBlocks.size() < mCurrentBlockIndex + inCount)
@@ -370,14 +370,14 @@ void Game::getFutureBlocks(size_t inCount, BlockTypes & outBlocks)
         mBlocks.push_back(mBlockFactory->getNext());
     }
 
-    for (size_t idx = 0; idx < inCount; ++idx)
+    for (std::size_t idx = 0; idx < inCount; ++idx)
     {
         outBlocks.push_back(mBlocks[mCurrentBlockIndex + idx]);
     }
 }
 
 
-void Game::getFutureBlocksWithOffset(size_t inOffset, size_t inCount, BlockTypes & outBlocks)
+void Game::getFutureBlocksWithOffset(std::size_t inOffset, std::size_t inCount, BlockTypes & outBlocks)
 {
     // Make sure we have all blocks we need.
     while (mBlocks.size() < inOffset + inCount)
@@ -385,14 +385,14 @@ void Game::getFutureBlocksWithOffset(size_t inOffset, size_t inCount, BlockTypes
         mBlocks.push_back(mBlockFactory->getNext());
     }
 
-    for (size_t idx = 0; idx < inCount; ++idx)
+    for (std::size_t idx = 0; idx < inCount; ++idx)
     {
         outBlocks.push_back(mBlocks[inOffset + idx]);
     }
 }
 
 
-size_t Game::currentBlockIndex() const
+std::size_t Game::currentBlockIndex() const
 {
     return mCurrentBlockIndex;
 }
@@ -418,7 +418,7 @@ bool Game::rotate()
     }
 
     Block & block = *mActiveBlock;
-    size_t oldRotation = block.rotation();
+    std::size_t oldRotation = block.rotation();
     block.rotate();
     if (!gameState().checkPositionValid(block, block.row(), block.column()))
     {
@@ -453,7 +453,7 @@ void Game::setStartingLevel(int inLevel)
 }
 
 
-HumanGame::HumanGame(size_t inNumRows, size_t inNumCols) :
+HumanGame::HumanGame(std::size_t inNumRows, std::size_t inNumCols) :
     Game(inNumRows, inNumCols),
     mGameState(new GameState(inNumRows, inNumCols))
 {
@@ -542,8 +542,8 @@ bool HumanGame::move(MoveDirection inDirection)
     }
 
     Block & block = *mActiveBlock;
-    size_t newRow = block.row() + GetRowDelta(inDirection);
-    size_t newCol = block.column() + GetColumnDelta(inDirection);
+    std::size_t newRow = block.row() + GetRowDelta(inDirection);
+    std::size_t newCol = block.column() + GetColumnDelta(inDirection);
     if (gameState().checkPositionValid(block, newRow, newCol))
     {
         block.setRow(newRow);
@@ -584,7 +584,7 @@ bool HumanGame::move(MoveDirection inDirection)
 }
 
 
-ComputerGame::ComputerGame(size_t inNumRows, size_t inNumCols) :
+ComputerGame::ComputerGame(std::size_t inNumRows, std::size_t inNumCols) :
     Game(inNumRows, inNumCols),
     mCurrentNode(GameStateNode::CreateRootNode(inNumRows, inNumCols).release())
 {
@@ -631,9 +631,9 @@ void ComputerGame::setCurrentNode(NodePtr inCurrentNode)
 }
 
 
-size_t ComputerGame::numPrecalculatedMoves() const
+std::size_t ComputerGame::numPrecalculatedMoves() const
 {
-    size_t countMovesAhead = 0;
+    std::size_t countMovesAhead = 0;
     const GameStateNode * tmp = mCurrentNode.get();
     while (!tmp->children().empty())
     {
@@ -699,9 +699,10 @@ bool ComputerGame::move(MoveDirection inDirection)
     }
 
     Block & block = *mActiveBlock;
-    size_t newRow = block.row() + GetRowDelta(inDirection);
-    size_t newCol = block.column() + GetColumnDelta(inDirection);
-    if (mCurrentNode->gameState().checkPositionValid(block, newRow, newCol))
+	const GameState & gameState = mCurrentNode->gameState();
+    std::size_t newRow = block.row() + GetRowDelta(inDirection);
+    std::size_t newCol = block.column() + GetColumnDelta(inDirection);
+    if (gameState.checkPositionValid(block, newRow, newCol))
     {
         block.setRow(newRow);
         block.setColumn(newCol);
@@ -711,7 +712,8 @@ bool ComputerGame::move(MoveDirection inDirection)
 
     if (inDirection != MoveDirection_Down)
     {
-        // Do nothing
+        // We failed to move to the left or to the right.
+		// Return false and let the caller decide how to respond.
         return false;
     }
 

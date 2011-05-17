@@ -73,7 +73,7 @@ struct BlockFactory::Impl : boost::noncopyable
     }
 
     BlockTypes::size_type mBagSize;
-    size_t mCurrentIndex;
+    std::size_t mCurrentIndex;
     BlockTypes mBag;
 };
 
@@ -86,9 +86,9 @@ BlockFactory::BlockFactory(int inBagSize) :
     Impl * mImpl(rwImpl.get());
     srand(RandomSeed::GetRandomSeed());
 
-    size_t totalSize = mImpl->mBagSize * cBlockTypeCount;
+    std::size_t totalSize = mImpl->mBagSize * cBlockTypeCount;
     mImpl->mBag.reserve(totalSize);
-    for (size_t idx = 0; idx != totalSize; ++idx)
+    for (std::size_t idx = 0; idx != totalSize; ++idx)
     {
         BlockType blockType = static_cast<BlockType>(1 + (idx % cBlockTypeCount));
         mImpl->mBag.push_back(blockType);

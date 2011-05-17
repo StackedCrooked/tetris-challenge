@@ -16,7 +16,6 @@ template<class T>
 class Array
 {
 public:
-
     Array() { }
 
     ~Array()
@@ -27,7 +26,7 @@ public:
             mData.pop_back();
         }
     }
-	
+    
     typedef std::vector<T*> Data;
     typedef typename Data::iterator iterator;
     typedef typename Data::const_iterator const_iterator;
@@ -100,7 +99,7 @@ public:
         delete *it;
         mData.erase(it);
     }
-	
+    
 private:
     Data mData;
 };

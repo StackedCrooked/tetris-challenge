@@ -11,9 +11,9 @@ namespace Tetris {
 
 
 // Generate the typesafe wrapper classes
-Futile_TypedWrapper(Rotation, size_t);
-Futile_TypedWrapper(Row, size_t);
-Futile_TypedWrapper(Column, size_t);
+Futile_TypedWrapper(Rotation, std::size_t);
+Futile_TypedWrapper(Row, std::size_t);
+Futile_TypedWrapper(Column, std::size_t);
 
 
 // Forward declarations.
@@ -42,36 +42,36 @@ public:
     // Get the grid associated with this block
     const Grid & grid() const;
 
-    size_t row() const;
+    std::size_t row() const;
 
-    size_t rowCount() const;
+    std::size_t rowCount() const;
 
-    size_t column() const;
+    std::size_t column() const;
 
-    size_t columnCount() const;
+    std::size_t columnCount() const;
 
-    size_t rotation() const;
+    std::size_t rotation() const;
 
-    size_t numRotations() const;
+    std::size_t numRotations() const;
 
     void rotate();
 
-    void setRow(size_t inRow);
+    void setRow(std::size_t inRow);
 
-    void setColumn(size_t inColumn);
+    void setColumn(std::size_t inColumn);
 
-    void setRotation(size_t inRotation);
+    void setRotation(std::size_t inRotation);
 
 private:
     BlockImpl * mImpl;
 };
 
 
-size_t GetBlockRotationCount(BlockType inType);
+std::size_t GetBlockRotationCount(BlockType inType);
 
 // Returns the number possible combinations of rotations and position to
 // place a certain block in a grid that has a given a number of columns.
-size_t GetBlockPositionCount(BlockType inType, size_t inNumColumns);
+std::size_t GetBlockPositionCount(BlockType inType, std::size_t inNumColumns);
 
 int GetBlockIdentifier(BlockType inType, int inRotation);
 

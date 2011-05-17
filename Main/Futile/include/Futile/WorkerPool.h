@@ -17,7 +17,7 @@ namespace Futile {
 class WorkerPool
 {
 public:
-    WorkerPool(const std::string & inName, size_t inSize);
+    WorkerPool(const std::string & inName, std::size_t inSize);
 
     ~WorkerPool();
 
@@ -26,18 +26,19 @@ public:
     void schedule(const Worker::Task & inTask);
 
     // Returns the number of workers.
-    size_t size() const;
+    std::size_t size() const;
 
     int getActiveWorkerCount() const;
 
     // Change the number of workers in the pool.
     // Setting a smaller size when there are workers active is safe, but interrupts their task.
-    void resize(size_t inSize);
+    void resize(std::size_t inSize);
 
     // Wait until all Workers have finished their queue
     void wait();
 
     // Interrupts all workers.
+    // This call is blocking until all workers have stopped.
     void interruptAndClearQueue();
 
 private:
@@ -45,10 +46,10 @@ private:
     WorkerPool(const WorkerPool&);
     WorkerPool& operator=(const WorkerPool&);
 
-    void interruptRange(size_t inBegin, size_t inCount);
+    void interruptRange(std::size_t inBegin, std::size_t inCount);
 
     std::string mName;
-    size_t mRotation;
+    std::size_t mRotation;
 
     typedef boost::shared_ptr<Worker> WorkerPtr;
     typedef std::vector<WorkerPtr> Workers;

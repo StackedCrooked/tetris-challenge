@@ -9,13 +9,13 @@
 namespace Futile {
 
 
-WorkerPool::WorkerPool(const std::string & inName, size_t inSize) :
+WorkerPool::WorkerPool(const std::string & inName, std::size_t inSize) :
     mName(inName),
     mRotation(0),
     mWorkers(),
     mMutex()
 {
-    for (size_t idx = 0; idx != inSize; ++idx)
+    for (std::size_t idx = 0; idx != inSize; ++idx)
     {
         WorkerPtr workerPtr(new Worker(MakeString() << inName << mWorkers.size()));
         mWorkers.push_back(workerPtr);
@@ -37,14 +37,14 @@ void WorkerPool::schedule(const Worker::Task & inTask)
 }
 
 
-size_t WorkerPool::size() const
+std::size_t WorkerPool::size() const
 {
     ScopedLock lock(mMutex);
     return mWorkers.size();
 }
 
 
-void WorkerPool::resize(size_t inSize)
+void WorkerPool::resize(std::size_t inSize)
 {
     ScopedLock lock(mMutex);
     if (inSize > mWorkers.size())
@@ -66,7 +66,7 @@ void WorkerPool::resize(size_t inSize)
 void WorkerPool::wait()
 {
     ScopedLock lock(mMutex);
-    for (size_t idx = 0; idx != mWorkers.size(); ++idx)
+    for (std::size_t idx = 0; idx != mWorkers.size(); ++idx)
     {
         Worker & worker = *mWorkers[idx];
         worker.wait();
@@ -74,14 +74,14 @@ void WorkerPool::wait()
 }
 
 
-void WorkerPool::interruptRange(size_t inBegin, size_t inCount)
+void WorkerPool::interruptRange(std::size_t inBegin, std::size_t inCount)
 {
     LockMany<Mutex> locker;
 
     //
     // Lock all workers' queue and status.
     //
-    for (size_t idx = inBegin; idx != inBegin + inCount; ++idx)
+    for (std::size_t idx = inBegin; idx != inBegin + inCount; ++idx)
     {
         Worker & worker = *mWorkers[idx];
         locker.lock(worker.mQueueMutex);
@@ -91,20 +91,22 @@ void WorkerPool::interruptRange(size_t inBegin, size_t inCount)
     //
     // Interrupt all threads.
     //
-    for (size_t idx = inBegin; idx != inBegin + inCount; ++idx)
+    for (std::size_t idx = inBegin; idx != inBegin + inCount; ++idx)
     {
         Worker & worker = *mWorkers[idx];
-        worker.interrupt(Worker::InterruptOption_DontWait);
+
+        // Never "join" here, because that would be wasteful.
+        worker.interrupt(false); 
     }
 
     //
     // Wait until all workers are ready.
     //
-    for (size_t idx = inBegin; idx != inBegin + inCount; ++idx)
+    for (std::size_t idx = inBegin; idx != inBegin + inCount; ++idx)
     {
         Worker & worker = *mWorkers[idx];
         ScopedLock statusLock(worker.mStatusMutex);
-        if (worker.mStatus == Worker::Status_Working)
+        if (worker.mStatus == WorkerStatus_Working)
         {
             worker.mStatusCondition.wait(statusLock);
         }
@@ -123,10 +125,10 @@ int WorkerPool::getActiveWorkerCount() const
 {
     ScopedLock lock(mMutex);
     int activeWorkerCount = 0;
-    for (size_t idx = 0; idx != mWorkers.size(); ++idx)
+    for (std::size_t idx = 0; idx != mWorkers.size(); ++idx)
     {
         const Worker & worker = *mWorkers[idx];
-        if (worker.status() == Worker::Status_Working)
+        if (worker.status() == WorkerStatus_Working)
         {
             activeWorkerCount++;
         }

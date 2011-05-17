@@ -15,7 +15,7 @@ namespace Tetris {
 class GameState
 {
 public:
-    GameState(size_t inNumRows, size_t inNumColumns);
+    GameState(std::size_t inNumRows, std::size_t inNumColumns);
 
     const Grid & grid() const;
 
@@ -33,7 +33,7 @@ public:
 
     // Checks if a activeBlock can be placed at a given location without
     // overlapping with previously placed blocks.
-    bool checkPositionValid(const Block & inBlock, size_t inRowIdx, size_t inColIdx) const;
+    bool checkPositionValid(const Block & inBlock, std::size_t inRowIdx, std::size_t inColIdx) const;
 
     // Creates a copy of the current gamestate with the given active block committed.
     // Use inGameOver = true to mark the new gamestate as "game over".
@@ -59,7 +59,7 @@ private:
     Grid mGrid;
     Block mOriginalBlock;
     bool mIsGameOver;
-    int mFirstOccupiedRow;
+	std::size_t mFirstOccupiedRow;
     int mNumLines;
     int mNumSingles;
     int mNumDoubles;

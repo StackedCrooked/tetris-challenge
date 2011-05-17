@@ -103,8 +103,8 @@ public:
 
 ComputerPlayer::ComputerPlayer(const TeamName & inTeamName,
                                const PlayerName & inPlayerName,
-                               size_t inRowCount,
-                               size_t inColumnCount) :
+                               std::size_t inRowCount,
+                               std::size_t inColumnCount) :
     Player(Computer, inTeamName, inPlayerName, inRowCount, inColumnCount),
     mImpl(new Impl())
 {
@@ -385,7 +385,7 @@ void ComputerPlayer::Impl::startNodeCalculator()
     // Fill list of search widths (using the same width for each level).
     //
     std::vector<int> widths;
-    for (size_t idx = 0; idx != futureBlocks.size(); ++idx)
+    for (std::size_t idx = 0; idx != futureBlocks.size(); ++idx)
     {
         widths.push_back(mSearchWidth);
     }

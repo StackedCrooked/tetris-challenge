@@ -62,7 +62,7 @@ public:
         static Instances sInstances;
     };
 
-    Game(size_t inNumRows, size_t inNumColumns);
+    Game(std::size_t inNumRows, std::size_t inNumColumns);
 
     virtual ~Game();
 
@@ -94,15 +94,15 @@ public:
 
     const Grid & gameGrid() const;
 
-    size_t currentBlockIndex() const;
+    std::size_t currentBlockIndex() const;
 
     int futureBlocksCount() const;
 
     void setFutureBlocksCount(int inFutureBlocksCount);
 
-    void getFutureBlocks(size_t inCount, BlockTypes & outBlocks);
+    void getFutureBlocks(std::size_t inCount, BlockTypes & outBlocks);
 
-    void getFutureBlocksWithOffset(size_t inOffset, size_t inCount, BlockTypes & outBlocks);
+    void getFutureBlocksWithOffset(std::size_t inOffset, std::size_t inCount, BlockTypes & outBlocks);
 
     virtual const GameState & gameState() const = 0;
 
@@ -123,19 +123,19 @@ protected:
     static void OnChangedImpl(Game * inGame);
     static void OnLinesClearedImpl(Game * inGame, int inLineCount);
 
-    static std::auto_ptr<Block> CreateDefaultBlock(BlockType inBlockType, size_t inNumColumns);
-    void reserveBlocks(size_t inCount);
+    static std::auto_ptr<Block> CreateDefaultBlock(BlockType inBlockType, std::size_t inNumColumns);
+    void reserveBlocks(std::size_t inCount);
     void supplyBlocks();
 
     std::vector<BlockType> getGarbageRow() const;
 
-    size_t mNumRows;
-    size_t mNumColumns;
+    std::size_t mNumRows;
+    std::size_t mNumColumns;
     boost::scoped_ptr<Block> mActiveBlock;
     boost::scoped_ptr<BlockFactory> mBlockFactory;
     BlockTypes mBlocks;
     int mFutureBlocksCount;
-    size_t mCurrentBlockIndex;
+    std::size_t mCurrentBlockIndex;
     int mStartingLevel;
     bool mPaused;
 
@@ -155,7 +155,7 @@ private:
 class HumanGame : public Game
 {
 public:
-    HumanGame(size_t inNumRows, size_t inNumCols);
+    HumanGame(std::size_t inNumRows, std::size_t inNumCols);
 
     HumanGame(const Game & inGame);
 
@@ -176,7 +176,7 @@ private:
 class ComputerGame : public Game
 {
 public:
-    ComputerGame(size_t inNumRows, size_t inNumCols);
+    ComputerGame(std::size_t inNumRows, std::size_t inNumCols);
 
     ComputerGame(const Game & inGame);
 
@@ -190,7 +190,7 @@ public:
 
     bool navigateNodeDown();
 
-    size_t numPrecalculatedMoves() const;
+    std::size_t numPrecalculatedMoves() const;
 
     void clearPrecalculatedNodes();
 

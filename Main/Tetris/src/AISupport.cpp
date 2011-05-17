@@ -41,10 +41,10 @@ bool IsGameOver(const GameState & inGameState, BlockType inBlockType, int inRota
 {
     const Grid & blockGrid = GetGrid(GetBlockIdentifier(inBlockType, inRotation));
     const Grid & gameGrid = inGameState.grid();
-    size_t initialColumn = DivideByTwo(inGameState.grid().columnCount() - blockGrid.columnCount());
-    for (size_t row = 0; row < blockGrid.rowCount(); ++row)
+    std::size_t initialColumn = DivideByTwo(inGameState.grid().columnCount() - blockGrid.columnCount());
+    for (std::size_t row = 0; row < blockGrid.rowCount(); ++row)
     {
-        for (size_t col = 0; col < blockGrid.columnCount(); ++col)
+        for (std::size_t col = 0; col < blockGrid.columnCount(); ++col)
         {
             if (blockGrid.get(row, col) != BlockType_Nil && gameGrid.get(row, initialColumn + col) != BlockType_Nil)
             {
@@ -58,7 +58,7 @@ bool IsGameOver(const GameState & inGameState, BlockType inBlockType, int inRota
 
 void GenerateOffspring(NodePtr ioGameStateNode,
                        BlockTypes inBlockTypes,
-                       size_t inOffset,
+                       std::size_t inOffset,
                        const Evaluator & inEvaluator)
 {
     Assert(inOffset < inBlockTypes.size());
@@ -98,7 +98,7 @@ void GenerateOffspring(NodePtr inNode,
     // If yes then append the final "broken" game state as only child.
     if (IsGameOver(gameState, inBlockType, 0))
     {
-        size_t initialColumn = DivideByTwo(gameGrid.columnCount() - GetGrid(GetBlockIdentifier(inBlockType, 0)).columnCount());
+        std::size_t initialColumn = DivideByTwo(gameGrid.columnCount() - GetGrid(GetBlockIdentifier(inBlockType, 0)).columnCount());
         std::auto_ptr<GameState> nextGameState = gameState.commit(Block(inBlockType, Rotation(0), Row(0), Column(initialColumn)), GameOver(true));
         NodePtr childState(new GameStateNode(inNode, nextGameState.release(), inEvaluator.clone().release()));
         Assert(childState->depth() == (inNode->depth() + 1));
@@ -107,13 +107,13 @@ void GenerateOffspring(NodePtr inNode,
     }
 
     // Generate game state for each column/rotation combination.
-    for (size_t col = 0; col != gameGrid.columnCount(); ++col)
+    for (std::size_t col = 0; col != gameGrid.columnCount(); ++col)
     {
         Block block(inBlockType, Rotation(0), Row(0), Column(col));
-        for (size_t rt = 0; rt != block.numRotations(); ++rt)
+        for (std::size_t rt = 0; rt != block.numRotations(); ++rt)
         {
             block.setRotation(rt);
-            size_t row = 0;
+            std::size_t row = 0;
             while (gameState.checkPositionValid(block, row, col))
             {
                 row++;

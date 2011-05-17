@@ -16,7 +16,7 @@ namespace Tetris {
 struct MultiplayerGame::Impl : public SimpleGame::EventHandler,
                                boost::noncopyable
 {
-    Impl(size_t inRowCount, size_t inColumnCount) :
+    Impl(std::size_t inRowCount, std::size_t inColumnCount) :
         mRowCount(inRowCount),
         mColumnCount(inColumnCount)
     {
@@ -65,12 +65,12 @@ struct MultiplayerGame::Impl : public SimpleGame::EventHandler,
     }
 
     Players mPlayers;
-    size_t mRowCount;
-    size_t mColumnCount;
+    std::size_t mRowCount;
+    std::size_t mColumnCount;
 };
 
 
-MultiplayerGame::MultiplayerGame(size_t inRowCount, size_t inColumnCount) :
+MultiplayerGame::MultiplayerGame(std::size_t inRowCount, std::size_t inColumnCount) :
     mImpl(new Impl(inRowCount, inColumnCount))
 {
 }
@@ -127,19 +127,19 @@ void MultiplayerGame::removePlayer(Player * inPlayer)
 }
 
 
-size_t MultiplayerGame::playerCount() const
+std::size_t MultiplayerGame::playerCount() const
 {
     return mImpl->mPlayers.size();
 }
 
 
-const Player * MultiplayerGame::getPlayer(size_t inIndex) const
+const Player * MultiplayerGame::getPlayer(std::size_t inIndex) const
 {
     return mImpl->mPlayers[inIndex];
 }
 
 
-Player * MultiplayerGame::getPlayer(size_t inIndex)
+Player * MultiplayerGame::getPlayer(std::size_t inIndex)
 {
     return mImpl->mPlayers[inIndex];
 }

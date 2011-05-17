@@ -24,14 +24,14 @@ public:
     static std::auto_ptr<Player> Create(PlayerType inPlayerType,
                                         const TeamName & inTeamName,
                                         const PlayerName & inPlayerName,
-                                        size_t inRowCount,
-                                        size_t inColumnCount);
+                                        std::size_t inRowCount,
+                                        std::size_t inColumnCount);
 
     Player(PlayerType inPlayerType,
            const TeamName & inTeamName,
            const PlayerName & inPlayerName,
-           size_t inRowCount,
-           size_t inColumnCount);
+           std::size_t inRowCount,
+           std::size_t inColumnCount);
 
     virtual ~Player() = 0;
 
@@ -65,8 +65,8 @@ class HumanPlayer : public Player
 public:
     HumanPlayer(const TeamName & inTeamName,
                 const PlayerName & inPlayerName,
-                size_t inRowCount,
-                size_t inColumnCount);
+                std::size_t inRowCount,
+                std::size_t inColumnCount);
 
     virtual ~HumanPlayer();
 };

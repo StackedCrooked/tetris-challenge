@@ -43,8 +43,8 @@ public:
 
     ComputerPlayer(const TeamName & inTeamName,
                    const PlayerName & inPlayerName,
-                   size_t inRowCount,
-                   size_t inColumnCount);
+                   std::size_t inRowCount,
+                   std::size_t inColumnCount);
 
     virtual ~ComputerPlayer();
 

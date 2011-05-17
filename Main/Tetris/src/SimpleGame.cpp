@@ -24,7 +24,7 @@ namespace Tetris {
 
 struct SimpleGame::Impl : public Game::EventHandler
 {
-    static std::auto_ptr<Game> CreateGame(PlayerType inPlayerType, size_t inRowCount, size_t inColumnCount)
+    static std::auto_ptr<Game> CreateGame(PlayerType inPlayerType, std::size_t inRowCount, std::size_t inColumnCount)
     {
         if (inPlayerType == Human)
         {
@@ -38,12 +38,12 @@ struct SimpleGame::Impl : public Game::EventHandler
     }
 
     Impl(PlayerType inPlayerType,
-         size_t inRowCount,
-         size_t inColumnCount) :
+         std::size_t inRowCount,
+         std::size_t inColumnCount) :
         mGame(CreateGame(inPlayerType, inRowCount, inColumnCount)),
         mPlayerType(inPlayerType),
         mGravity(new Gravity(mGame)),
-        mCenterColumn(static_cast<size_t>(0.5 + inColumnCount / 2.0)),
+        mCenterColumn(static_cast<std::size_t>(0.5 + inColumnCount / 2.0)),
         mSimpleGame(0)
     {
     }
@@ -93,7 +93,7 @@ struct SimpleGame::Impl : public Game::EventHandler
 SimpleGame::Instances SimpleGame::sInstances;
 
 
-SimpleGame::SimpleGame(PlayerType inPlayerType, size_t inRowCount, size_t inColumnCount) :
+SimpleGame::SimpleGame(PlayerType inPlayerType, std::size_t inRowCount, std::size_t inColumnCount) :
     mImpl(new Impl(inPlayerType, inRowCount, inColumnCount))
 {
     mImpl->init(this);

@@ -28,7 +28,7 @@ bool IsGameOver(const GameState & inGameState, BlockType inBlockType, int inRota
 
 void GenerateOffspring(NodePtr ioGameStateNode,
                        BlockTypes inBlockTypes,
-                       size_t inOffset,
+                       std::size_t inOffset,
                        const Evaluator & inEvaluator);
 
 void GenerateOffspring(NodePtr ioGameStateNode,

@@ -52,7 +52,7 @@ struct GameStateNode::Impl
 };
 
 
-std::auto_ptr<GameStateNode> GameStateNode::CreateRootNode(size_t inNumRows, size_t inNumColumns)
+std::auto_ptr<GameStateNode> GameStateNode::CreateRootNode(std::size_t inNumRows, std::size_t inNumColumns)
 {
     return std::auto_ptr<GameStateNode>(new GameStateNode(
         new GameState(inNumRows, inNumColumns),

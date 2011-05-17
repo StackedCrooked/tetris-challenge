@@ -44,7 +44,7 @@ void SingleThreadedNodeCalculator::populate()
     {
         // The nodes are populated using a "Iterative deepening" algorithm.
         // See: http://en.wikipedia.org/wiki/Iterative_deepening_depth-first_search for more information.
-        size_t targetDepth = 1;
+        std::size_t targetDepth = 1;
         while (targetDepth <= mBlockTypes.size())
         {
             ScopedLock lock(mNodeMutex);

@@ -113,8 +113,8 @@ void NodeCalculatorImpl::populateNodesRecursively(
     NodePtr ioNode,
     const BlockTypes & inBlockTypes,
     const std::vector<int> & inWidths,
-    size_t inIndex,
-    size_t inMaxIndex)
+    std::size_t inIndex,
+    std::size_t inMaxIndex)
 {
 
     // We want to at least perform a search of depth 1.
@@ -180,7 +180,7 @@ void NodeCalculatorImpl::populateNodesRecursively(
 
 void NodeCalculatorImpl::destroyInferiorChildren()
 {
-    size_t reachedDepth = getCurrentSearchDepth();
+    std::size_t reachedDepth = getCurrentSearchDepth();
     if (reachedDepth == 0)
     {
         Assert(getQuitFlag());

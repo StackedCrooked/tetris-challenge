@@ -21,7 +21,7 @@ class Model : public Futile::Singleton<Model>,
 public:
     bool IsGameOver();
 
-    Player * getPlayer(size_t inIndex);
+    Player * getPlayer(std::size_t inIndex);
 
     const MultiplayerGame & multiplayerGame() const;
 
@@ -34,7 +34,7 @@ public:
                                                         int & /*outMoveSpeed*/,
                                                         BlockMover::MoveDownBehavior & outMoveDownBehavior);
 
-    void newGame(const PlayerTypes & inPlayerTypes, size_t inRowCount, size_t inColumnCount);
+    void newGame(const PlayerTypes & inPlayerTypes, std::size_t inRowCount, std::size_t inColumnCount);
 
 private:
     friend class Futile::Singleton<Model>;
