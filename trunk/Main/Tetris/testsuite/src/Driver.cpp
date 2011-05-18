@@ -16,6 +16,7 @@ int RunTetrisTestSuite()
     return res;
 }
 
+
 int main(int ac, char **av)
 {
     int res = RunTetrisTestSuite();

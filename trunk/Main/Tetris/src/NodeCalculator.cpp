@@ -46,8 +46,7 @@ NodeCalculator::NodeCalculator(std::auto_ptr<GameStateNode> inNode,
 
 NodeCalculator::~NodeCalculator()
 {
-    delete mImpl;
-    mImpl = 0;
+    mImpl.reset();
 }
 
 
