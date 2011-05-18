@@ -54,7 +54,7 @@ public:
     Status status() const;
 
     // Returns the error message (in case of Status_Error).
-    const std::string & errorMessage() const;
+    std::string errorMessage() const;
 
 private:
     // non-copyable
