@@ -51,8 +51,11 @@
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories=".\;.\GeneratedFiles;&quot;.\GeneratedFiles\$(ConfigurationName)&quot;;&quot;$(SolutionDir)Tetris\include&quot;;&quot;$(SolutionDir)Futile\include&quot;;&quot;$(SolutionDir)3rdParty\Poco\Foundation\include&quot;;&quot;$(SolutionDir)3rdParty\Boost_1_46_1&quot;;&quot;$(QTDIR)\include&quot;;&quot;$(QTDIR)\include\qtmain&quot;;&quot;$(QTDIR)\include\QtCore&quot;;&quot;$(QTDIR)\include\QtGui&quot;"
 				PreprocessorDefinitions="UNICODE;WIN32;_WINDOWS;NDEBUG;QT_LARGEFILE_SUPPORT;QT_NO_DEBUG;QT_CORE_LIB;QT_GUI_LIB;POCO_STATIC;POCO_NO_AUTOMATIC_LIBS"
+				BasicRuntimeChecks="0"
 				RuntimeLibrary="2"
-				TreatWChar_tAsBuiltInType="false"
+				BufferSecurityCheck="false"
+				EnableFunctionLevelLinking="true"
+				EnableEnhancedInstructionSet="2"
 				DebugInformationFormat="0"
 			/>
 			<Tool
@@ -69,8 +72,8 @@
 				AdditionalDependencies="qtmain.lib QtCore4.lib QtGui4.lib iphlpapi.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				AdditionalLibraryDirectories="&quot;$(QTDIR)\lib&quot;;&quot;$(SolutionDir)3rdParty\Boost_1_46_1\lib\Windows-x86-vc90&quot;"
-				GenerateDebugInformation="false"
 				SubSystem="2"
+				LinkTimeCodeGeneration="1"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -127,7 +130,6 @@
 				ExceptionHandling="1"
 				BasicRuntimeChecks="0"
 				RuntimeLibrary="3"
-				TreatWChar_tAsBuiltInType="true"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 			/>
