@@ -87,7 +87,7 @@ NodeCalculator::Status NodeCalculator::status() const
 }
 
 
-const std::string & NodeCalculator::errorMessage() const
+std::string NodeCalculator::errorMessage() const
 {
     return mImpl->errorMessage();
 }

@@ -40,7 +40,7 @@ public:
 
     int status() const;
 
-    const std::string & errorMessage() const;
+    std::string errorMessage() const;
 
 protected:
     virtual void populate() = 0;
@@ -52,11 +52,11 @@ protected:
 
     void setStatus(int inStatus);
 
-    void populateNodesRecursively(NodePtr ioNode,
-                                  const BlockTypes & inBlockTypes,
-                                  const std::vector<int> & inWidths,
-                                  std::size_t inIndex,
-                                  std::size_t inMaxIndex);
+	std::size_t populateNodesRecursively(NodePtr ioNode,
+		                                 const BlockTypes & inBlockTypes,
+										 const std::vector<int> & inWidths,
+										 std::size_t inIndex,
+										 std::size_t inMaxIndex);
 
     void destroyInferiorChildren();
 
@@ -66,17 +66,18 @@ protected:
     class TreeRowInfo
     {
     public:
-        TreeRowInfo(std::auto_ptr<Evaluator> inEvaluator) :
+        TreeRowInfo(std::auto_ptr<Evaluator> inEvaluator, TreeRowInfo * inLowerTreeRow) :
             mBestNode(),
             mBestScore(0),
             mEvaluator(inEvaluator.release()),
             mNodeCount(0),
-            mFinished(false)
+            mFinished(false),
+			mLowerTreeRow(inLowerTreeRow)
         {
         }
 
         inline NodePtr bestNode() const
-        { return mBestNode; }
+		{ return mBestNode; }
 
         inline std::size_t nodeCount() const
         { return mNodeCount; }
@@ -107,6 +108,7 @@ protected:
         boost::shared_ptr<Evaluator> mEvaluator;
         std::size_t mNodeCount;
         bool mFinished;
+		TreeRowInfo * mLowerTreeRow;
     };
 
     class TreeRowInfos
@@ -119,7 +121,12 @@ protected:
         {
             for (std::size_t idx = 0; idx != inMaxDepth; ++idx)
             {
-                mInfos.push_back(TreeRowInfo(inEvaluator->clone()));
+				TreeRowInfo * previousRow = 0;
+				if (idx != 0)
+				{
+					previousRow = &mInfos.back();
+				}
+                mInfos.push_back(TreeRowInfo(inEvaluator->clone(), previousRow));
             }
         }
 

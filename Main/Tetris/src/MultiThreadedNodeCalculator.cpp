@@ -68,12 +68,13 @@ void MultithreadedNodeCalculator::generateChildNodes(NodePtr ioNode,
 }
 
 
-void MultithreadedNodeCalculator::populateNodes(NodePtr ioNode,
-                                                const BlockTypes & inBlockTypes,
-                                                const std::vector<int> & inWidths,
-                                                std::size_t inIndex,
-                                                std::size_t inEndIndex)
+std::size_t MultithreadedNodeCalculator::populateNodes(NodePtr ioNode,
+													   const BlockTypes & inBlockTypes,
+													   const std::vector<int> & inWidths,
+													   std::size_t inIndex,
+													   std::size_t inEndIndex)
 {
+	std::size_t result = inIndex;
 
     // We want to at least perform a search of depth 1.
     if (inIndex > 0)
@@ -85,7 +86,7 @@ void MultithreadedNodeCalculator::populateNodes(NodePtr ioNode,
     if (ioNode->gameState().isGameOver())
     {
         // GameOver state has no children.
-        return;
+        return result;
     }
 
     //
@@ -120,9 +121,10 @@ void MultithreadedNodeCalculator::populateNodes(NodePtr ioNode,
             NodePtr child = *it;
 
             // Start recursion.
-            populateNodes(child, inBlockTypes, inWidths, inIndex + 1, inEndIndex);
+            result = populateNodes(child, inBlockTypes, inWidths, inIndex + 1, inEndIndex);
         }
     }
+	return result;
 }
 
 
@@ -136,7 +138,8 @@ void MultithreadedNodeCalculator::populate()
         while (targetDepth <= mBlockTypes.size())
         {
             ScopedLock lock(mNodeMutex);
-            populateNodes(mNode, mBlockTypes, mWidths, 0, targetDepth);
+			std::size_t reachedDepth = populateNodes(mNode, mBlockTypes, mWidths, 0, targetDepth);
+			Assert(reachedDepth + 1 == targetDepth);
             mWorkerPool.wait();
             Assert(mWorkerPool.getActiveWorkerCount() == 0);
             mTreeRowInfos.setFinished(targetDepth);

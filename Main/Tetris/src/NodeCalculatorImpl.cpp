@@ -96,7 +96,7 @@ int NodeCalculatorImpl::status() const
 }
 
 
-const std::string & NodeCalculatorImpl::errorMessage() const
+std::string NodeCalculatorImpl::errorMessage() const
 {
     return mErrorMessage;
 }
@@ -109,13 +109,14 @@ void NodeCalculatorImpl::setStatus(int inStatus)
 }
 
 
-void NodeCalculatorImpl::populateNodesRecursively(
+std::size_t NodeCalculatorImpl::populateNodesRecursively(
     NodePtr ioNode,
     const BlockTypes & inBlockTypes,
     const std::vector<int> & inWidths,
     std::size_t inIndex,
     std::size_t inMaxIndex)
 {
+	std::size_t result = inIndex;
 
     // We want to at least perform a search of depth 1.
     if (inIndex > 0)
@@ -128,14 +129,14 @@ void NodeCalculatorImpl::populateNodesRecursively(
     //
     if (inIndex > inMaxIndex || inIndex >= inBlockTypes.size())
     {
-        return;
+        return result;
     }
 
 
     if (ioNode->gameState().isGameOver())
     {
         // GameOver state has no children.
-        return;
+        return result;
     }
 
 
@@ -172,9 +173,10 @@ void NodeCalculatorImpl::populateNodesRecursively(
         for (ChildNodes::iterator it = generatedChildNodes.begin(); it != generatedChildNodes.end(); ++it)
         {
             NodePtr child = *it;
-            populateNodesRecursively(child, inBlockTypes, inWidths, inIndex + 1, inMaxIndex);
+            result = populateNodesRecursively(child, inBlockTypes, inWidths, inIndex + 1, inMaxIndex);
         }
     }
+	return result;
 }
 
 
