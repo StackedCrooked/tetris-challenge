@@ -28,10 +28,9 @@ public:
 
     static T & Instance()
     {
-        Assert(sInstance);
         if (!sInstance)
         {
-            throw std::runtime_error("Tried to dereference null singleton instance for " + std::string(typeid(T).name()));
+			throw std::logic_error("No instance. Did you forget to create a named Singleton<T>::Initializer object?");
         }
         return *sInstance;
     }

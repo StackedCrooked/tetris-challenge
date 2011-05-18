@@ -123,6 +123,13 @@ std::size_t Worker::size() const
 }
 
 
+bool Worker::empty() const
+{
+    ScopedLock lock(mQueueMutex);
+	return mQueue.empty();
+}
+
+
 void Worker::interrupt(bool inJoin)
 {
     ScopedLock statusLock(mStatusMutex);

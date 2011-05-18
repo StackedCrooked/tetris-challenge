@@ -1,3 +1,4 @@
+#include "Futile/Logger.h"
 #include "CppUnit/TestRunner.h"
 #include "TetrisTestSuite.h"
 #include <iostream>
@@ -17,9 +18,10 @@ int RunTetrisTestSuite()
 }
 
 
-int main(int ac, char **av)
+int main(int argc, char ** argv)
 {
+	Futile::Logger::Initializer initLogger;
     int res = RunTetrisTestSuite();
+	system("pause");
     return res;    
 }
-

@@ -59,6 +59,9 @@ public:
     // Returns the number of pending tasks.
     std::size_t size() const;
 
+	// No tasks queued.
+	bool empty() const;
+
     /**
      * Get the current status.
      */
