@@ -9,7 +9,7 @@
 #include <iostream>
 
 
-using Futile::Worker;
+using namespace Futile;
 
 
 static const int cSleepTimeMs = 100;
@@ -52,7 +52,7 @@ void WorkerTest::testWorkerImpl()
 {
     Worker worker("TestWorker");
     assertEqual(worker.name(), "TestWorker");
-    Assert(worker.status() >= Worker::Status_Initial);
+    Assert(worker.status() >= WorkerStatus_Initial);
     worker.wait();
     worker.interrupt();
     worker.interruptAndClearQueue();
@@ -62,7 +62,7 @@ void WorkerTest::testWorkerImpl()
     // Test without interrupt
     mStopwatch.restart();
     worker.schedule(boost::bind(&Poco::Thread::sleep, cSleepTimeMs));
-    worker.waitForStatus(Worker::Status_Working);
+    worker.waitForStatus(WorkerStatus_Working);
     assertEqual(worker.size(), 0);
     worker.wait();
     mStopwatch.stop();
@@ -73,7 +73,7 @@ void WorkerTest::testWorkerImpl()
     // Test with interrupt
     mStopwatch.restart();
     worker.schedule(boost::bind(&WorkerTest::BeBusy));
-    worker.waitForStatus(Worker::Status_Working);
+    worker.waitForStatus(WorkerStatus_Working);
     worker.interrupt();
     assertEqual(worker.size(), 0);
     mStopwatch.stop();
@@ -87,7 +87,7 @@ void WorkerTest::testWorkerImpl()
     worker.schedule(boost::bind(&WorkerTest::BeBusy));
     worker.schedule(boost::bind(&WorkerTest::BeBusy));
     worker.schedule(boost::bind(&WorkerTest::BeBusy));
-    worker.waitForStatus(Worker::Status_Working);
+    worker.waitForStatus(WorkerStatus_Working);
     assertEqual(worker.size(), 4);
     worker.interrupt();
     Assert(mStopwatch.elapsed() / 1000 < 2 * cSleepTimeMs);

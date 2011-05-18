@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="PocoXML"
 	ProjectGUID="{9E211743-85FE-4977-82F3-4F04B40C912D}"
 	RootNamespace="XML"
@@ -40,6 +40,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/MP /D &quot;_CRT_SECURE_NO_WARNINGS&quot;"
 				Optimization="2"
 				InlineFunctionExpansion="2"
 				EnableIntrinsicFunctions="true"
@@ -118,14 +119,19 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/MP /D &quot;_HAS_ITERATOR_DEBUGGING=0&quot; /D &quot;_SECURE_SCL=0&quot;"
 				Optimization="0"
 				AdditionalIncludeDirectories=".\include;..\Foundation\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;POCO_STATIC;XML_STATIC;XML_NS;XML_DTD;HAVE_EXPAT_CONFIG_H"
-				StringPooling="true"
-				MinimalRebuild="true"
+				StringPooling="false"
+				MinimalRebuild="false"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="1"
-				BufferSecurityCheck="true"
+				RuntimeLibrary="3"
+				BufferSecurityCheck="false"
+				EnableFunctionLevelLinking="true"
+				EnableEnhancedInstructionSet="2"
+				FloatingPointModel="2"
+				DisableLanguageExtensions="false"
 				TreatWChar_tAsBuiltInType="true"
 				ForceConformanceInForLoopScope="true"
 				RuntimeTypeInfo="true"
@@ -133,80 +139,7 @@
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="4"
-				CompileAs="0"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLibrarianTool"
-				LinkLibraryDependencies="false"
-				OutputFile="$(OutDir)$(ProjectName).lib"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-		</Configuration>
-		<Configuration
-			Name="Debug_NoSecureSTL|Win32"
-			OutputDirectory="$(SolutionDir)..\Build\Windows\x86\v90\$(ConfigurationName)\$(ProjectName)\"
-			IntermediateDirectory="$(OutDir)\Intermediate\"
-			ConfigurationType="4"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
-			CharacterSet="1"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				AdditionalOptions="/D &quot;_HAS_ITERATOR_DEBUGGING=0&quot; /D &quot;_SECURE_SCL=0&quot;"
-				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\Foundation\include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;POCO_STATIC;XML_STATIC;XML_NS;XML_DTD;HAVE_EXPAT_CONFIG_H"
-				StringPooling="true"
-				MinimalRebuild="true"
-				BasicRuntimeChecks="3"
-				RuntimeLibrary="1"
-				BufferSecurityCheck="true"
-				TreatWChar_tAsBuiltInType="true"
-				ForceConformanceInForLoopScope="true"
-				RuntimeTypeInfo="true"
-				UsePrecompiledHeader="0"
-				WarningLevel="3"
-				Detect64BitPortabilityProblems="false"
-				DebugInformationFormat="4"
-				CompileAs="0"
+				ShowIncludes="false"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -915,14 +848,6 @@
 							Name="VCCLCompilerTool"
 						/>
 					</FileConfiguration>
-					<FileConfiguration
-						Name="Debug_NoSecureSTL|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-						/>
-					</FileConfiguration>
 				</File>
 				<File
 					RelativePath=".\src\xmltok_impl.h"
@@ -941,14 +866,6 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Debug|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Debug_NoSecureSTL|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool

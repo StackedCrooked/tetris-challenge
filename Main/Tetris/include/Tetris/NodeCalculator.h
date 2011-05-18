@@ -5,6 +5,7 @@
 #include "Tetris/BlockTypes.h"
 #include "Tetris/NodePtr.h"
 #include "Futile/WorkerPool.h"
+#include <boost/scoped_ptr.hpp>
 #include <vector>
 #include <memory>
 
@@ -60,7 +61,7 @@ private:
     NodeCalculator(const NodeCalculator &);
     NodeCalculator & operator=(const NodeCalculator &);
 
-    NodeCalculatorImpl * mImpl;
+	boost::scoped_ptr<NodeCalculatorImpl> mImpl;
 };
 
 } // namespace Tetris
