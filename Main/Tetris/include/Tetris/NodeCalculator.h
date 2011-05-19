@@ -24,7 +24,7 @@ public:
     NodeCalculator(std::auto_ptr<GameStateNode> inNode,
                    const BlockTypes & inBlockTypes,
                    const std::vector<int> & inWidths,
-                   std::auto_ptr<Evaluator> inEvaluator,
+                   const Evaluator & inEvaluator,
                    Futile::WorkerPool & inWorkerPool);
 
     ~NodeCalculator();

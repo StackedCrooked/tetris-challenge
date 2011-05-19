@@ -15,7 +15,7 @@ public:
     MultithreadedNodeCalculator(std::auto_ptr<GameStateNode> inNode,
                                 const BlockTypes & inBlockTypes,
                                 const std::vector<int> & inWidths,
-                                std::auto_ptr<Evaluator> inEvaluator,
+                                const Evaluator & inEvaluator,
                                 Futile::WorkerPool & inWorkerPool);
 
     virtual ~MultithreadedNodeCalculator();
@@ -24,7 +24,7 @@ private:
     virtual void populate();
 
     void generateChildNodes(NodePtr ioNode,
-                            boost::shared_ptr<Evaluator> inEvaluator,
+                            const Evaluator * inEvaluator,
                             BlockType inBlockType,
                             int inDepth,
                             int inWidth);

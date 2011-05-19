@@ -44,8 +44,10 @@ int run(int argc, char *argv[])
     QApplication a(argc, argv);
     a.setApplicationName("QtTetris");
     a.setApplicationVersion("0.0 alpha");
-    MainWindow::Initializer initMainWindow;
+
+    MainWindow::ScopedInitializer initMainWindow;
     MainWindow::Instance().show();
+
     return a.exec();
 }
 
@@ -72,10 +74,10 @@ int main(int argc, char *argv[])
     try
     {
         TestEnum();
-        Logger::Initializer initLogger;
-        LeakDetector::Initializer initLeakDetector;
-        MainThread::Initializer initMainThread;
-        Tetris::Model::Initializer initModel;
+        Logger::ScopedInitializer initLogger;
+        LeakDetector::ScopedInitializer initLeakDetector;
+        MainThread::ScopedInitializer initMainThread;
+        Tetris::Model::ScopedInitializer initModel;
         return run(argc, argv);
     }
     catch (const std::exception & exc)

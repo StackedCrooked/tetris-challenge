@@ -40,13 +40,11 @@ struct ComputerPlayer::Impl : boost::noncopyable
 public:
     typedef ComputerPlayer::Tweaker Tweaker;
 
-    MakeTetrises a;
-
     Impl() :
         mComputerPlayer(0),
         mTweaker(0),
         mWorkerPool("ComputerPlayer WorkerPool", 2), //Poco::Environment::processorCount()),
-        mEvaluator(new MakeTetrises()),
+        mEvaluator(&MakeTetrises::Instance()),
         mBlockMover(),
         mSearchDepth(6),
         mSearchWidth(4),
@@ -87,7 +85,7 @@ public:
 
     WorkerPool mWorkerPool;
     boost::scoped_ptr<NodeCalculator> mNodeCalculator;
-    boost::scoped_ptr<Evaluator> mEvaluator;
+    const Evaluator * mEvaluator;
     boost::scoped_ptr<BlockMover> mBlockMover;
     int mSearchDepth;
     int mSearchWidth;
@@ -203,13 +201,6 @@ void ComputerPlayer::setMoveSpeed(int inMoveSpeed)
 }
 
 
-void ComputerPlayer::setEvaluator(std::auto_ptr<Evaluator> inEvaluator)
-{
-    ScopedLock lock(mImpl->mMutex);
-    mImpl->mEvaluator.reset(inEvaluator.release());
-}
-
-
 int ComputerPlayer::workerCount() const
 {
     ScopedLock lock(mImpl->mMutex);
@@ -239,13 +230,13 @@ void ComputerPlayer::Impl::updateComputerBlockMoveSpeed()
         BlockMover::MoveDownBehavior moveDownBehavior = BlockMover::MoveDownBehavior_Null;
         int moveSpeed = 0;
 
-        mEvaluator.reset(
-            mTweaker->updateAIParameters(*mComputerPlayer,
-                                         mSearchDepth,
-                                         mSearchWidth,
-                                         mWorkerCount,
-                                         moveSpeed,
-                                         moveDownBehavior).release());
+        mEvaluator = &mTweaker->updateAIParameters(
+            *mComputerPlayer,
+            mSearchDepth,
+            mSearchWidth,
+            mWorkerCount,
+            moveSpeed,
+            moveDownBehavior);
 
         if (mSearchDepth < 1 || mSearchDepth > 100)
         {
@@ -403,7 +394,7 @@ void ComputerPlayer::Impl::startNodeCalculator()
     mNodeCalculator.reset(new NodeCalculator(endNode,
                                              futureBlocks,
                                              widths,
-                                             mEvaluator->clone(),
+                                             *mEvaluator,
                                              mWorkerPool));
 
     mNodeCalculator->start();

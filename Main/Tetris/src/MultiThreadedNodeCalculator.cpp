@@ -28,7 +28,7 @@ namespace Tetris {
 MultithreadedNodeCalculator::MultithreadedNodeCalculator(std::auto_ptr<GameStateNode> inNode,
                                                          const BlockTypes & inBlockTypes,
                                                          const std::vector<int> & inWidths,
-                                                         std::auto_ptr<Evaluator> inEvaluator,
+                                                         const Evaluator & inEvaluator,
                                                          WorkerPool & inWorkerPool) :
     NodeCalculatorImpl(inNode, inBlockTypes, inWidths, inEvaluator, inWorkerPool)
 {
@@ -44,12 +44,12 @@ MultithreadedNodeCalculator::~MultithreadedNodeCalculator()
 
 
 void MultithreadedNodeCalculator::generateChildNodes(NodePtr ioNode,
-                                                     boost::shared_ptr<Evaluator> inEvaluator,
+                                                     const Evaluator * inEvaluator,
                                                      BlockType inBlockType,
                                                      int inDepth,
                                                      int inWidth)
 {
-    ChildNodes childNodes = ChildNodes(GameStateComparator(inEvaluator->clone()));
+    ChildNodes childNodes;
     GenerateOffspring(ioNode, inBlockType, *inEvaluator, childNodes);
     if (childNodes.empty())
     {
@@ -95,11 +95,10 @@ void MultithreadedNodeCalculator::populateNodes(NodePtr ioNode,
     if (inIndex + 1 == inEndIndex)
     {
         Assert(ioNode->children().empty());
-        boost::shared_ptr<Evaluator> evaluator(mEvaluator->clone().release());
         Worker::Task task = boost::bind(&MultithreadedNodeCalculator::generateChildNodes,
                                         this,
                                         ioNode,
-                                        evaluator,
+                                        &mEvaluator,
                                         inBlockTypes[inIndex],
                                         inIndex + 1,
                                         inWidths[inIndex]);

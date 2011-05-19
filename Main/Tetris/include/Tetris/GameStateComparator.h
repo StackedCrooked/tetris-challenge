@@ -1,32 +1,21 @@
-#ifndef TETRIS_GAMESTATECOMPARISONFUNCTOR_H_INCLUDED
-#define TETRIS_GAMESTATECOMPARISONFUNCTOR_H_INCLUDED
+#ifndef TETRIS_GAMESTATECOMPARATOR_H
+#define TETRIS_GAMESTATECOMPARATOR_H
 
 
 #include "Tetris/NodePtr.h"
-#include <memory>
-#include <boost/shared_ptr.hpp>
 
 
 namespace Tetris {
 
 
-class Evaluator;
-
 class GameStateComparator
 {
 public:
-    GameStateComparator();
-
-    GameStateComparator(std::auto_ptr<Evaluator> inChildPtrCompare);
-
-    bool operator()(NodePtr lhs, NodePtr rhs);
-
-private:
-    boost::shared_ptr<Evaluator> mEvaluator;
+    bool operator()(NodePtr lhs, NodePtr rhs) const;
 };
 
 
 } // namespace Tetris
 
 
-#endif // TETRIS_GAMESTATECOMPARISONFUNCTOR_H_INCLUDED
+#endif // TETRIS_GAMESTATECOMPARATOR_H

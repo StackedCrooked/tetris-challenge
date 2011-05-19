@@ -33,12 +33,12 @@ public:
          *
          * WARNING: This callback will be received in a worker thread!
          */
-        virtual std::auto_ptr<Evaluator> updateAIParameters(const Player & inPlayer,
-                                                            int & outSearchDepth,
-                                                            int & outSearchWidth,
-                                                            int & outWorkerCount,
-                                                            int & outMoveSpeed,
-                                                            BlockMover::MoveDownBehavior & outMoveDownBehavior) = 0;
+        virtual const Evaluator & updateAIParameters(const Player & inPlayer,
+                                                     int & outSearchDepth,
+                                                     int & outSearchWidth,
+                                                     int & outWorkerCount,
+                                                     int & outMoveSpeed,
+                                                     BlockMover::MoveDownBehavior & outMoveDownBehavior) = 0;
     };
 
     ComputerPlayer(const TeamName & inTeamName,
@@ -64,8 +64,6 @@ public:
     int moveSpeed() const;
 
     void setMoveSpeed(int inMoveSpeed);
-
-    void setEvaluator(std::auto_ptr<Evaluator> inEvaluator);
 
     int workerCount() const;
 

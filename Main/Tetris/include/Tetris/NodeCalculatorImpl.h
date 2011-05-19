@@ -23,7 +23,7 @@ public:
     NodeCalculatorImpl(std::auto_ptr<GameStateNode> inNode,
                        const BlockTypes & inBlockTypes,
                        const std::vector<int> & inWidths,
-                       std::auto_ptr<Evaluator> inEvaluator,
+                       const Evaluator & inEvaluator,
                        Futile::WorkerPool & inWorkerPool);
 
     virtual ~NodeCalculatorImpl() = 0;
@@ -66,10 +66,10 @@ protected:
     class TreeRowInfo
     {
     public:
-        TreeRowInfo(std::auto_ptr<Evaluator> inEvaluator) :
+        TreeRowInfo(const Evaluator & inEvaluator) :
             mBestNode(),
             mBestScore(0),
-            mEvaluator(inEvaluator.release()),
+            mEvaluator(&inEvaluator),
             mNodeCount(0),
             mFinished(false)
         {
@@ -104,7 +104,7 @@ protected:
     private:
         NodePtr mBestNode;
         int mBestScore;
-        boost::shared_ptr<Evaluator> mEvaluator;
+        const Evaluator * mEvaluator;
         std::size_t mNodeCount;
         bool mFinished;
     };
@@ -112,7 +112,7 @@ protected:
     class TreeRowInfos
     {
     public:
-        TreeRowInfos(std::auto_ptr<Evaluator> inEvaluator, std::size_t inMaxDepth) :
+        TreeRowInfos(const Evaluator & inEvaluator, std::size_t inMaxDepth) :
             mInfos(),
             mCurrentSearchDepth(0),
             mMutex()
@@ -124,7 +124,7 @@ protected:
 				{
 					previousRow = &mInfos.back();
 				}
-                mInfos.push_back(TreeRowInfo(inEvaluator->clone()));
+                mInfos.push_back(TreeRowInfo(inEvaluator));
             }
         }
 
@@ -209,7 +209,7 @@ protected:
 
     BlockTypes mBlockTypes;
     std::vector<int> mWidths;
-    boost::scoped_ptr<Evaluator> mEvaluator;
+    const Evaluator & mEvaluator;
 
     int mStatus;
     mutable Futile::Mutex mStatusMutex;
