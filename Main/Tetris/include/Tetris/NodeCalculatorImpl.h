@@ -52,11 +52,11 @@ protected:
 
     void setStatus(int inStatus);
 
-	std::size_t populateNodesRecursively(NodePtr ioNode,
-		                                 const BlockTypes & inBlockTypes,
-										 const std::vector<int> & inWidths,
-										 std::size_t inIndex,
-										 std::size_t inMaxIndex);
+    void populateNodesRecursively(NodePtr ioNode,
+                                  const BlockTypes & inBlockTypes,
+                                  const std::vector<int> & inWidths,
+                                  std::size_t inIndex,
+                                  std::size_t inMaxIndex);
 
     void destroyInferiorChildren();
 
@@ -66,18 +66,17 @@ protected:
     class TreeRowInfo
     {
     public:
-        TreeRowInfo(std::auto_ptr<Evaluator> inEvaluator, TreeRowInfo * inLowerTreeRow) :
+        TreeRowInfo(std::auto_ptr<Evaluator> inEvaluator) :
             mBestNode(),
             mBestScore(0),
             mEvaluator(inEvaluator.release()),
             mNodeCount(0),
-            mFinished(false),
-			mLowerTreeRow(inLowerTreeRow)
+            mFinished(false)
         {
         }
 
         inline NodePtr bestNode() const
-		{ return mBestNode; }
+        { return mBestNode; }
 
         inline std::size_t nodeCount() const
         { return mNodeCount; }
@@ -108,7 +107,6 @@ protected:
         boost::shared_ptr<Evaluator> mEvaluator;
         std::size_t mNodeCount;
         bool mFinished;
-		TreeRowInfo * mLowerTreeRow;
     };
 
     class TreeRowInfos
@@ -126,17 +124,19 @@ protected:
 				{
 					previousRow = &mInfos.back();
 				}
-                mInfos.push_back(TreeRowInfo(inEvaluator->clone(), previousRow));
+                mInfos.push_back(TreeRowInfo(inEvaluator->clone()));
             }
         }
 
         inline int currentSearchDepth() const
         {
+            Futile::ScopedLock lock(mMutex);
             return mCurrentSearchDepth;
         }
 
         inline int maximumSearchDepth() const
         {
+            Futile::ScopedLock lock(mMutex);
             return mInfos.size();
         }
 
@@ -149,6 +149,7 @@ protected:
 
         inline NodePtr bestNode() const
         {
+            Futile::ScopedLock lock(mMutex);
             NodePtr result;
             if (mCurrentSearchDepth > 0)
             {
@@ -178,6 +179,7 @@ protected:
 
         inline void setFinished(std::size_t inDepth)
         {
+            Futile::ScopedLock lock(mMutex);
             if (mInfos[inDepth - 1].bestNode())
             {
                 mCurrentSearchDepth = inDepth;

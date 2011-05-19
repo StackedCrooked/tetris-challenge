@@ -29,11 +29,11 @@ private:
                             int inDepth,
                             int inWidth);
 
-	std::size_t populateNodes(NodePtr ioNode,
-                              const BlockTypes & inBlockTypes,
-							  const std::vector<int> & inWidths,
-							  std::size_t inIndex,
-							  std::size_t inEndIndex);
+    void populateNodes(NodePtr ioNode,
+                       const BlockTypes & inBlockTypes,
+                       const std::vector<int> & inWidths,
+                       std::size_t inIndex,
+                       std::size_t inEndIndex);
 };
 
 

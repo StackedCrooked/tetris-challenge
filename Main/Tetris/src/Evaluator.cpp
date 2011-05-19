@@ -57,7 +57,6 @@ Evaluator::Evaluator(const Evaluator& rhs) :
 
 Evaluator& Evaluator::operator=(const Evaluator& rhs)
 {
-
     if (this != &rhs)
     {
         ScopedLock rhsLock(rhs.mMutex);
