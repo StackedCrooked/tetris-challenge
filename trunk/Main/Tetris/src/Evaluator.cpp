@@ -174,28 +174,28 @@ CustomEvaluator::CustomEvaluator(GameHeightFactor inGameHeightFactor,
 
 
 Balanced::Balanced() :
-    Evaluator("Balanced",
-              GameHeightFactor(-2),
-              LastBlockHeightFactor(-1),
-              NumHolesFactor(-4),
-              NumSinglesFactor(1),
-              NumDoublesFactor(2),
-              NumTriplesFactor(4),
-              NumTetrisesFactor(8),
-              SearchDepth(6),
-              SearchWidth(6))
+    Super("Balanced",
+          GameHeightFactor(-2),
+          LastBlockHeightFactor(-1),
+          NumHolesFactor(-4),
+          NumSinglesFactor(1),
+          NumDoublesFactor(2),
+          NumTriplesFactor(4),
+          NumTetrisesFactor(8),
+          SearchDepth(6),
+          SearchWidth(6))
 {
 }
 
 
 Survival::Survival() :
-    Evaluator("Survival",
-              GameHeightFactor(-2),
-              LastBlockHeightFactor(-1),
-              NumHolesFactor(-3),
-              NumSinglesFactor(1),
-              NumDoublesFactor(2),
-              NumTriplesFactor(4),
+    Super("Survival",
+          GameHeightFactor(-2),
+          LastBlockHeightFactor(-1),
+          NumHolesFactor(-3),
+          NumSinglesFactor(1),
+          NumDoublesFactor(2),
+          NumTriplesFactor(4),
               NumTetrisesFactor(8),
               SearchDepth(6),
               SearchWidth(4))
@@ -204,7 +204,7 @@ Survival::Survival() :
 
 
 MakeTetrises::MakeTetrises() :
-    Evaluator("Make Tetrises",
+    Super("Make Tetrises",
               GameHeightFactor(-2),
               LastBlockHeightFactor(-1),
               NumHolesFactor(-4),
@@ -241,7 +241,7 @@ int MakeTetrises::evaluate(const GameState & inGameState) const
 
 
 Multiplayer::Multiplayer() :
-    Evaluator("Multiplayer",
+    Super("Multiplayer",
               GameHeightFactor(-2),
               LastBlockHeightFactor(-1),
               NumHolesFactor(-4),
@@ -256,7 +256,7 @@ Multiplayer::Multiplayer() :
 
 
 Depressed::Depressed() :
-    Evaluator("Depressed",
+    Super("Depressed",
               GameHeightFactor(0),
               LastBlockHeightFactor(0),
               NumHolesFactor(0),

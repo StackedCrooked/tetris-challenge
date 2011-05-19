@@ -27,12 +27,12 @@ public:
 
     MultiplayerGame & multiplayerGame();
 
-    virtual std::auto_ptr<Evaluator> updateAIParameters(const Player & inPlayer,
-                                                        int & outSearchDepth,
-                                                        int & outSearchWidth,
-                                                        int & outWorkerCount,
-                                                        int & /*outMoveSpeed*/,
-                                                        BlockMover::MoveDownBehavior & outMoveDownBehavior);
+    virtual const Evaluator & updateAIParameters(const Player & inPlayer,
+                                                 int & outSearchDepth,
+                                                 int & outSearchWidth,
+                                                 int & outWorkerCount,
+                                                 int & /*outMoveSpeed*/,
+                                                 BlockMover::MoveDownBehavior & outMoveDownBehavior);
 
     void newGame(const PlayerTypes & inPlayerTypes, std::size_t inRowCount, std::size_t inColumnCount);
 

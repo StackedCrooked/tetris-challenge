@@ -70,12 +70,12 @@ MultiplayerGame & Model::multiplayerGame()
 }
 
 
-std::auto_ptr<Evaluator> Model::updateAIParameters(const Player & inPlayer,
-                                                   int & outSearchDepth,
-                                                   int & outSearchWidth,
-                                                   int & outWorkerCount,
-                                                   int & /*outMoveSpeed*/,
-                                                   BlockMover::MoveDownBehavior & outMoveDownBehavior)
+const Evaluator & Model::updateAIParameters(const Player & inPlayer,
+                                            int & outSearchDepth,
+                                            int & outSearchWidth,
+                                            int & outWorkerCount,
+                                            int & /*outMoveSpeed*/,
+                                            BlockMover::MoveDownBehavior & outMoveDownBehavior)
 {
     if (!inPlayer.simpleGame())
     {
@@ -102,19 +102,19 @@ std::auto_ptr<Evaluator> Model::updateAIParameters(const Player & inPlayer,
     {
         outSearchDepth = 8;
         outSearchWidth = 5;
-        return Futile::CreatePoly<Evaluator, MakeTetrises>();
+        return MakeTetrises::Instance();
     }
     else if (currentHeight < 14)
     {
         outSearchDepth = 6;
         outSearchWidth = 4;
-        return Futile::CreatePoly<Evaluator, Multiplayer>();
+        return Multiplayer::Instance();
     }
     else
     {
         outSearchDepth = 6;
         outSearchWidth = 3;
-        return Futile::CreatePoly<Evaluator, Survival>();
+        return Survival::Instance();
     }
 }
 

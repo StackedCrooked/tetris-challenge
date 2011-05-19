@@ -593,7 +593,7 @@ ComputerGame::ComputerGame(std::size_t inNumRows, std::size_t inNumCols) :
 
 ComputerGame::ComputerGame(const Game & inGame) :
     Game(inGame.rowCount(), inGame.columnCount()),
-    mCurrentNode(new GameStateNode(new GameState(inGame.gameState()), new Balanced))
+    mCurrentNode(new GameStateNode(new GameState(inGame.gameState()), Balanced::Instance()))
 {
 }
 
@@ -760,7 +760,7 @@ bool ComputerGame::move(MoveDirection inDirection)
     // Actually commit the block
     NodePtr child(new GameStateNode(mCurrentNode,
                                     mCurrentNode->gameState().commit(block, GameOver(block.row() == 0)).release(),
-                                    new Balanced));
+                                    Balanced::Instance()));
     mCurrentNode->addChild(child);
     setCurrentNode(child);
     onChanged();

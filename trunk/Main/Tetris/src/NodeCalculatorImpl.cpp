@@ -28,17 +28,17 @@ namespace Tetris {
 NodeCalculatorImpl::NodeCalculatorImpl(std::auto_ptr<GameStateNode> inNode,
                                        const BlockTypes & inBlockTypes,
                                        const std::vector<int> & inWidths,
-                                       std::auto_ptr<Evaluator> inEvaluator,
+                                       const Evaluator & inEvaluator,
                                        WorkerPool & inWorkerPool) :
     mNode(inNode.release()),
     mResult(),
     mNodeMutex(),
     mQuitFlag(false),
     mQuitFlagMutex(),
-    mTreeRowInfos(inEvaluator->clone(), inBlockTypes.size()),
+    mTreeRowInfos(inEvaluator, inBlockTypes.size()),
     mBlockTypes(inBlockTypes),
     mWidths(inWidths),
-    mEvaluator(inEvaluator->clone()),
+    mEvaluator(inEvaluator),
     mStatus(0),
     mStatusMutex(),
     mMainWorker("NodeCalculatorImpl"),
@@ -147,9 +147,9 @@ void NodeCalculatorImpl::populateNodesRecursively(
     //
     ChildNodes generatedChildNodes = ioNode->children();
     if (generatedChildNodes.empty())
-    {
-        generatedChildNodes = ChildNodes(GameStateComparator(mEvaluator->clone()));
-        GenerateOffspring(ioNode, inBlockTypes[inIndex], *mEvaluator, generatedChildNodes);
+    {        
+        generatedChildNodes = ChildNodes(GameStateComparator());
+        GenerateOffspring(ioNode, inBlockTypes[inIndex], mEvaluator, generatedChildNodes);
 
         int count = 0;
         ChildNodes::iterator it = generatedChildNodes.begin(), end = generatedChildNodes.end();
@@ -229,7 +229,7 @@ void NodeCalculatorImpl::calculateResult()
     while (!results.empty())
     {
         currentNode = results.top();
-        NodePtr copy(new GameStateNode(currentParent, new GameState(currentNode->gameState()), currentNode->evaluator().clone().release()));
+        NodePtr copy(new GameStateNode(currentParent, new GameState(currentNode->gameState()), currentNode->evaluator()));
         if (!mResult)
         {
             mResult = copy;

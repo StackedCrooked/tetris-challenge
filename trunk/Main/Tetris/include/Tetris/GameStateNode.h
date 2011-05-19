@@ -2,6 +2,7 @@
 #define TETRIS_GAMESTATENODE_H_INCLUDED
 
 
+#include "Tetris/GameStateComparator.h"
 #include "Tetris/Grid.h"
 #include "Tetris/NodePtr.h"
 #include <boost/scoped_ptr.hpp>
@@ -12,7 +13,6 @@ namespace Tetris {
 
 
 class Evaluator;
-class GameState;
 
 
 /**
@@ -24,9 +24,9 @@ class GameStateNode
 public:
     static std::auto_ptr<GameStateNode> CreateRootNode(std::size_t inNumRows, std::size_t inNumColumns);
 
-    GameStateNode(NodePtr inParent, GameState * inGameState, Evaluator * inEvaluator);
+    GameStateNode(NodePtr inParent, GameState * inGameState, const Evaluator & inEvaluator);
 
-    GameStateNode(GameState * inGameState, Evaluator * inEvaluator);
+    GameStateNode(GameState * inGameState, const Evaluator & inEvaluator);
 
     ~GameStateNode();
 

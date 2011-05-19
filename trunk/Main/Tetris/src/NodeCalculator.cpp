@@ -14,7 +14,7 @@ namespace Tetris {
 static std::auto_ptr<NodeCalculatorImpl> CreateImpl(std::auto_ptr<GameStateNode> inNode,
                                                     const BlockTypes & inBlockTypes,
                                                     const std::vector<int> & inWidths,
-                                                    std::auto_ptr<Evaluator> inEvaluator,
+                                                    const Evaluator & inEvaluator,
                                                     WorkerPool & inWorkerPool)
 {
     if (inWorkerPool.size() > 1)
@@ -37,7 +37,7 @@ static std::auto_ptr<NodeCalculatorImpl> CreateImpl(std::auto_ptr<GameStateNode>
 NodeCalculator::NodeCalculator(std::auto_ptr<GameStateNode> inNode,
                                const BlockTypes & inBlockTypes,
                                const std::vector<int> & inWidths,
-                               std::auto_ptr<Evaluator> inEvaluator,
+                               const Evaluator & inEvaluator,
                                WorkerPool & inWorkerPool) :
     mImpl(CreateImpl(inNode, inBlockTypes, inWidths, inEvaluator, inWorkerPool).release())
 {

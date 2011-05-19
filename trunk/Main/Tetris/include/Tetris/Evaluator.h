@@ -3,6 +3,7 @@
 
 
 #include "Futile/AutoPtrSupport.h"
+#include "Futile/Singleton.h"
 #include "Futile/Threading.h"
 #include "Futile/TypedWrapper.h"
 #include <memory>
@@ -31,19 +32,6 @@ Futile_TypedWrapper(SearchWidth, int);
 class Evaluator
 {
 public:
-    Evaluator(const std::string & inName,
-              GameHeightFactor inGameHeightFactor,
-              LastBlockHeightFactor inLastBlockHeightFactor,
-              NumHolesFactor inNumHolesFactor,
-              NumSinglesFactor inNumSinglesFactor,
-              NumDoublesFactor inNumDoublesFactor,
-              NumTriplesFactor inNumTriplesFactor,
-              NumTetrisesFactor inNumTetrisesFactor,
-              SearchDepth inRecommendedSearchDepth,
-              SearchWidth inRecommendedSearchWidth);
-
-    virtual std::auto_ptr<Evaluator> clone() const = 0;
-
     virtual int evaluate(const GameState & inGameState) const;
 
     // Return by value to prevent race conditions.
@@ -67,7 +55,22 @@ public:
 
     int recommendedSearchWidth() const;
 
+protected:
+    Evaluator(const std::string & inName,
+              GameHeightFactor inGameHeightFactor,
+              LastBlockHeightFactor inLastBlockHeightFactor,
+              NumHolesFactor inNumHolesFactor,
+              NumSinglesFactor inNumSinglesFactor,
+              NumDoublesFactor inNumDoublesFactor,
+              NumTriplesFactor inNumTriplesFactor,
+              NumTetrisesFactor inNumTetrisesFactor,
+              SearchDepth inRecommendedSearchDepth,
+              SearchWidth inRecommendedSearchWidth);
+
 private:
+    Evaluator(const Evaluator &);
+    Evaluator& operator=(const Evaluator&);
+
     std::string mName;
     int mGameHeightFactor;
     int mLastBlockHeightFactor;
@@ -83,7 +86,7 @@ private:
 
 class CustomEvaluator : public Evaluator
 {
-public:
+protected:
     CustomEvaluator(GameHeightFactor inGameHeightFactor,
                     LastBlockHeightFactor inLastBlockHeightFactor,
                     NumHolesFactor inNumHolesFactor,
@@ -93,61 +96,95 @@ public:
                     NumTetrisesFactor inNumTetrisesFactor,
                     SearchDepth inRecommendedSearchDepth,
                     SearchWidth inRecommendedSearchWidth);
-
-    virtual std::auto_ptr<Evaluator> clone() const
-    { return Futile::CreatePoly<Evaluator, CustomEvaluator>(*this); }
 };
 
 
-class Balanced : public Evaluator
+template<class SubType>
+class ConcreteEvaluator : public Evaluator
 {
 public:
+    static SubType & Instance()
+    {
+        static SubType fInstance;
+        return fInstance;
+    }
+
+protected:
+    ConcreteEvaluator(const std::string & inName,
+                      GameHeightFactor inGameHeightFactor,
+                      LastBlockHeightFactor inLastBlockHeightFactor,
+                      NumHolesFactor inNumHolesFactor,
+                      NumSinglesFactor inNumSinglesFactor,
+                      NumDoublesFactor inNumDoublesFactor,
+                      NumTriplesFactor inNumTriplesFactor,
+                      NumTetrisesFactor inNumTetrisesFactor,
+                      SearchDepth inRecommendedSearchDepth,
+                      SearchWidth inRecommendedSearchWidth) :
+        Evaluator(inName,
+                  inGameHeightFactor,
+                  inLastBlockHeightFactor,
+                  inNumHolesFactor,
+                  inNumSinglesFactor,
+                  inNumDoublesFactor,
+                  inNumTriplesFactor,
+                  inNumTetrisesFactor,
+                  inRecommendedSearchDepth,
+                  inRecommendedSearchWidth)
+    {
+    }
+};
+
+
+class Balanced : public ConcreteEvaluator<Balanced>
+{
+protected:
+    typedef ConcreteEvaluator<Balanced> Super;
+    friend class ConcreteEvaluator<Balanced>;
+
     Balanced();
-
-    virtual std::auto_ptr<Evaluator> clone() const
-    { return Futile::CreatePoly<Evaluator, Balanced>(*this); }
 };
 
 
-class Survival : public Evaluator
+class Survival : public ConcreteEvaluator<Survival>
 {
-public:
+protected:
+    typedef ConcreteEvaluator<Survival> Super;
+    friend class ConcreteEvaluator<Survival>;
+
     Survival();
-
-    virtual std::auto_ptr<Evaluator> clone() const
-    { return Futile::CreatePoly<Evaluator, Survival>(*this); }
 };
 
 
-class MakeTetrises : public Evaluator
+class MakeTetrises : public ConcreteEvaluator<MakeTetrises>
 {
 public:
-    MakeTetrises();
-
-    virtual std::auto_ptr<Evaluator> clone() const
-    { return Futile::CreatePoly<Evaluator, MakeTetrises>(*this); }
-
     virtual int evaluate(const GameState & inGameState) const;
+
+protected:
+    typedef ConcreteEvaluator<MakeTetrises> Super;
+    friend class ConcreteEvaluator<MakeTetrises>;
+
+    MakeTetrises();
 };
 
 
-class Multiplayer : public Evaluator
+class Multiplayer : public ConcreteEvaluator<Multiplayer>
 {
-public:
+protected:
+    typedef ConcreteEvaluator<Multiplayer> Super;
+    friend class ConcreteEvaluator<Multiplayer>;
+
     Multiplayer();
-
-    virtual std::auto_ptr<Evaluator> clone() const
-    { return Futile::CreatePoly<Evaluator, Multiplayer>(*this); }
 };
 
 
-class Depressed : public Evaluator
+class Depressed : public ConcreteEvaluator<Depressed>
 {
-public:
-    Depressed();
+protected:
+    typedef ConcreteEvaluator<Depressed> Super;
+    friend class ConcreteEvaluator<Depressed>;
 
-    virtual std::auto_ptr<Evaluator> clone() const
-    { return Futile::CreatePoly<Evaluator, Depressed>(*this); }
+    Depressed();
 };
 
 

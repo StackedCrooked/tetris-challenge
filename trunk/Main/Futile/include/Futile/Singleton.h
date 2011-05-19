@@ -17,26 +17,23 @@ class Singleton
 public:
     typedef Singleton<T> This;
 
-    /// Create an Initializer object as a named local variable
+    /// Create an ScopedInitializer object as a named local variable
     /// to have deterministic lifetime of the singleton object.
-    struct Initializer : boost::noncopyable
+    struct ScopedInitializer : boost::noncopyable
     {
-        Initializer() { This::CreateInstance(); }
+        ScopedInitializer() { This::CreateInstance(); }
 
-        ~Initializer() { This::DestroyInstance(); }
+        ~ScopedInitializer() { This::DestroyInstance(); }
     };
 
     static T & Instance()
     {
-        if (!sInstance)
-        {
-			throw std::logic_error("No instance. Did you forget to create a named Singleton<T>::Initializer object?");
-        }
+        Assert(sInstance);
         return *sInstance;
     }
 
 protected:
-    friend struct This::Initializer;
+    friend struct This::ScopedInitializer;
 
     Singleton() { }
 
