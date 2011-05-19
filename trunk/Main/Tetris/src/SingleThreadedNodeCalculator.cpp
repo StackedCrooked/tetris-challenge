@@ -48,8 +48,7 @@ void SingleThreadedNodeCalculator::populate()
         while (targetDepth <= mBlockTypes.size())
         {
             ScopedLock lock(mNodeMutex);
-			std::size_t reachedDepth = populateNodesRecursively(mNode, mBlockTypes, mWidths, 0, targetDepth - 1);
-			Assert(reachedDepth == targetDepth);
+            populateNodesRecursively(mNode, mBlockTypes, mWidths, 0, targetDepth - 1);
             mTreeRowInfos.setFinished(targetDepth);
             targetDepth++;
         }

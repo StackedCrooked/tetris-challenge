@@ -109,14 +109,13 @@ void NodeCalculatorImpl::setStatus(int inStatus)
 }
 
 
-std::size_t NodeCalculatorImpl::populateNodesRecursively(
+void NodeCalculatorImpl::populateNodesRecursively(
     NodePtr ioNode,
     const BlockTypes & inBlockTypes,
     const std::vector<int> & inWidths,
     std::size_t inIndex,
     std::size_t inMaxIndex)
 {
-	std::size_t result = inIndex;
 
     // We want to at least perform a search of depth 1.
     if (inIndex > 0)
@@ -129,14 +128,14 @@ std::size_t NodeCalculatorImpl::populateNodesRecursively(
     //
     if (inIndex > inMaxIndex || inIndex >= inBlockTypes.size())
     {
-        return result;
+        return;
     }
 
 
     if (ioNode->gameState().isGameOver())
     {
         // GameOver state has no children.
-        return result;
+        return;
     }
 
 
@@ -173,10 +172,9 @@ std::size_t NodeCalculatorImpl::populateNodesRecursively(
         for (ChildNodes::iterator it = generatedChildNodes.begin(); it != generatedChildNodes.end(); ++it)
         {
             NodePtr child = *it;
-            result = populateNodesRecursively(child, inBlockTypes, inWidths, inIndex + 1, inMaxIndex);
+            populateNodesRecursively(child, inBlockTypes, inWidths, inIndex + 1, inMaxIndex);
         }
     }
-	return result;
 }
 
 
