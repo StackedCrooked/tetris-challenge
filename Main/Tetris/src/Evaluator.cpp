@@ -32,62 +32,13 @@ Evaluator::Evaluator(const std::string & inName,
     mNumTriplesFactor(inNumTriplesFactor.get()),
     mNumTetrisesFactor(inNumTetrisesFactor.get()),
     mRecommendedSearchDepth(inRecommendedSearchDepth.get()),
-    mRecommendedSearchWidth(inRecommendedSearchWidth.get()),
-    mMutex()
+    mRecommendedSearchWidth(inRecommendedSearchWidth.get())
 {
-}
-
-
-Evaluator::Evaluator(const Evaluator& rhs) :
-    mName(rhs.mName),
-    mGameHeightFactor(rhs.mGameHeightFactor),
-    mLastBlockHeightFactor(rhs.mLastBlockHeightFactor),
-    mNumHolesFactor(rhs.mNumHolesFactor),
-    mNumSinglesFactor(rhs.mNumSinglesFactor),
-    mNumDoublesFactor(rhs.mNumDoublesFactor),
-    mNumTriplesFactor(rhs.mNumTriplesFactor),
-    mNumTetrisesFactor(rhs.mNumTetrisesFactor),
-    mRecommendedSearchDepth(rhs.mRecommendedSearchDepth),
-    mRecommendedSearchWidth(rhs.mRecommendedSearchWidth),
-    mMutex()
-
-{
-}
-
-
-Evaluator& Evaluator::operator=(const Evaluator& rhs)
-{
-    if (this != &rhs)
-    {
-        ScopedLock rhsLock(rhs.mMutex);
-        ScopedLock lhsLock(mMutex);
-        mName = rhs.mName;
-        mGameHeightFactor = rhs.mGameHeightFactor;
-        mLastBlockHeightFactor = rhs.mLastBlockHeightFactor;
-        mNumHolesFactor = rhs.mNumHolesFactor;
-        mNumSinglesFactor = rhs.mNumSinglesFactor;
-        mNumDoublesFactor = rhs.mNumDoublesFactor;
-        mNumTriplesFactor = rhs.mNumTriplesFactor;
-        mNumTetrisesFactor = rhs.mNumTetrisesFactor;
-        mRecommendedSearchDepth = rhs.mRecommendedSearchDepth;
-        mRecommendedSearchWidth = rhs.mRecommendedSearchWidth;
-    }
-    return *this;
-}
-
-
-Evaluator::~Evaluator()
-{
-    // Wait for the other actions to complete.
-    ScopedLock lock(mMutex);
 }
 
 
 std::string Evaluator::name() const
 {
-    // This lock is necessary because one thread could destroy an
-    // Evaluator object while the main thread is painting it's name.
-    ScopedLock lock(mMutex);
     return mName;
 }
 

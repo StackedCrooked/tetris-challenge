@@ -42,14 +42,7 @@ public:
               SearchDepth inRecommendedSearchDepth,
               SearchWidth inRecommendedSearchWidth);
 
-    virtual ~Evaluator();
-
-    Evaluator(const Evaluator& rhs);
-
-    Evaluator& operator=(const Evaluator& rhs);
-
-    virtual std::auto_ptr<Evaluator> clone() const
-    { return Futile::Create<Evaluator>(*this); }
+    virtual std::auto_ptr<Evaluator> clone() const = 0;
 
     virtual int evaluate(const GameState & inGameState) const;
 
@@ -85,7 +78,6 @@ private:
     int mNumTetrisesFactor;
     int mRecommendedSearchDepth;
     int mRecommendedSearchWidth;
-    mutable Futile::Mutex mMutex;
 };
 
 
