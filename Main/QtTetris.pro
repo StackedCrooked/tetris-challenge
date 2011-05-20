@@ -8,7 +8,7 @@ INCLUDEPATH += \
     . \
     Tetris/include \
     Futile/include \
-    3rdParty/Boost_1_44_0 \
+    3rdParty/Boost \
     3rdParty/Poco/Foundation/include
 
 
