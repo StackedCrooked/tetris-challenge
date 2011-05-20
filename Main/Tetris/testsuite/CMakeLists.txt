@@ -84,10 +84,9 @@ link_directories(${POCO}lib/${PLATFORM}/${ARCH})
 #
 # Boost dependency
 #
-set(BOOST ${SOLUTIONDIR}3rdParty/Boost_1_44_0/)
-include_directories(${BOOST})
-link_directories(${BOOST}lib/${PLATFORM}/${ARCH})
-set(LIB_BOOST_THREAD boost_thread)
+set(BOOST_ROOT ${SOLUTIONDIR}3rdParty/Boost_1_46_1)
+include_directories(${BOOST_ROOT})
+set(BOOST_LIB "${BOOST_ROOT}/lib/${PLATFORM}-${ARCH}")
 
 
 #
@@ -121,14 +120,6 @@ set(TetrisTestSuite_HEADERS
 
 
 #
-# Special settings to make CMake and Qt work together
-#
-#QT4_WRAP_CPP(TetrisTestSuite_HEADERS_MOC ${TetrisTestSuite_HEADERS})
-include(${QT_USE_FILE})
-add_definitions(${QT_DEFINITIONS})
-
-
-#
 # Set the executable
 #
 add_executable(${EXECUTABLE} ${TetrisTestSuite_SOURCES} ${TetrisTestSuite_HEADERS_MOC})
@@ -138,12 +129,11 @@ add_executable(${EXECUTABLE} ${TetrisTestSuite_SOURCES} ${TetrisTestSuite_HEADER
 # Testsuite libs
 #
 target_link_libraries(${EXECUTABLE}
-    ${QT_LIBRARIES}
     Tetris
     Futile
     PocoFoundation
     CppUnit
-    ${LIB_BOOST_THREAD})
+    ${BOOST_LIB}/libboost_thread.a)
 
 
 #
