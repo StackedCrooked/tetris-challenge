@@ -22,6 +22,5 @@ int main(int argc, char ** argv)
 {
 	Futile::Logger::ScopedInitializer initLogger;
     int res = RunTetrisTestSuite();
-	system("pause");
     return res;    
 }
