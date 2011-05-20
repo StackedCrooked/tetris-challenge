@@ -34,14 +34,14 @@
    <value key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName" type="QString">Desktop</value>
    <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString">Desktop</value>
    <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">Qt4ProjectManager.Target.DesktopTarget</value>
-   <value key="ProjectExplorer.Target.ActiveBuildConfiguration" type="int">2</value>
+   <value key="ProjectExplorer.Target.ActiveBuildConfiguration" type="int">0</value>
    <value key="ProjectExplorer.Target.ActiveDeployConfiguration" type="int">0</value>
    <value key="ProjectExplorer.Target.ActiveRunConfiguration" type="int">1</value>
    <valuemap key="ProjectExplorer.Target.BuildConfiguration.0" type="QVariantMap">
     <value key="ProjectExplorer.BuildCOnfiguration.ToolChain" type="QString">ProjectExplorer.ToolChain.Gcc:/usr/bin/g++.x86-macos-generic-mach_o-64bit.</value>
     <valuemap key="ProjectExplorer.BuildConfiguration.BuildStepList.0" type="QVariantMap">
      <valuemap key="ProjectExplorer.BuildStepList.Step.0" type="QVariantMap">
-      <value key="ProjectExplorer.ProcessStep.Arguments" type="QString">configure</value>
+      <value key="ProjectExplorer.ProcessStep.Arguments" type="QString">configure-qttetris</value>
       <value key="ProjectExplorer.ProcessStep.Command" type="QString">/bin/sh</value>
       <value key="ProjectExplorer.ProcessStep.Enabled" type="bool">true</value>
       <value key="ProjectExplorer.ProcessStep.WorkingDirectory" type="QString">%{buildDir}</value>
