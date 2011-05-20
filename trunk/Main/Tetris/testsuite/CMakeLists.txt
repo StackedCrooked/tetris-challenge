@@ -59,9 +59,9 @@ set(EXECUTABLE_OUTPUT_PATH ${OUTDIR}bin/)
 #
 set(WARNING_OPTIONS         "-arch ${ARCH} ")
 set(WARNING_OPTIONS_Debug   "${WARNING_OPTIONS} -Wall -Werror -Wno-sign-compare")
-set(CXX_FLAGS         "${CXX_FLAGS} -DTETRIS_QT=1")
-set(CXX_FLAGS_Debug   "${CXX_FLAGS} ${WARNING_OPTIONS_Debug} -ggdb3")
-set(CXX_FLAGS_Release "${CXX_FLAGS} ${WARNING_OPTIONS_Release} -O3 -DNDEBUG")
+set(CXX_FLAGS         "${CXX_FLAGS} -DTETRIS_QT=1 -pthread ")
+set(CXX_FLAGS_Debug   "${CXX_FLAGS} ${WARNING_OPTIONS_Debug} -ggdb3 ")
+set(CXX_FLAGS_Release "${CXX_FLAGS} ${WARNING_OPTIONS_Release} -O3 -DNDEBUG ")
 set(FINAL_COMPILE_FLAGS "${CXX_FLAGS_${CMAKE_BUILD_TYPE}}")
 
 
@@ -84,7 +84,7 @@ link_directories(${POCO}lib/${PLATFORM}/${ARCH})
 #
 # Boost dependency
 #
-set(BOOST_ROOT ${SOLUTIONDIR}3rdParty/Boost_1_46_1)
+set(BOOST_ROOT ${SOLUTIONDIR}3rdParty/Boost)
 include_directories(${BOOST_ROOT})
 set(BOOST_LIB "${BOOST_ROOT}/lib/${PLATFORM}-${ARCH}")
 
@@ -133,10 +133,11 @@ target_link_libraries(${EXECUTABLE}
     Futile
     PocoFoundation
     CppUnit
-    ${BOOST_LIB}/libboost_thread.a)
+    "${BOOST_LIB}/libboost_thread.a")
 
 
 #
 # Target properties
 #
 set_target_properties(${EXECUTABLE} PROPERTIES COMPILE_FLAGS ${FINAL_COMPILE_FLAGS})
+
