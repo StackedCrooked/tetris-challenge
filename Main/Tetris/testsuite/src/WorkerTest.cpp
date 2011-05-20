@@ -40,11 +40,13 @@ void WorkerTest::BeBusy()
 
 void WorkerTest::testWorker()
 {
+    std::cout << std::endl;
     for (size_t idx = 0; idx != mRepeat; ++idx)
     {
-        std::cout << "Test worker iteration " << idx << std::flush << std::endl;
+        std::cout << "\rTest worker iteration " << (idx + 1) << "/" << mRepeat << std::flush;
         testWorkerImpl();
     }
+    std::cout << std::endl;
 }
 
 
