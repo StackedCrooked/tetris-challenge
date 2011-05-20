@@ -93,7 +93,7 @@ void NodeCalculatorTest::testInterrupt(Depth inDepth, Width inWidth, WorkerCount
 
     WorkerPool workerPool("NodeCalculatorTest", inWorkerCount);
 
-    NodeCalculator nodeCalculator(rootNode->clone(), blockTypes, widths, rootNode->evaluator().clone(), workerPool);
+    NodeCalculator nodeCalculator(rootNode->clone(), blockTypes, widths, rootNode->evaluator(), workerPool);
 
     Assert(nodeCalculator.getCurrentSearchDepth() == 0);
     Assert(blockTypes.size() == widths.size());
@@ -166,7 +166,7 @@ void NodeCalculatorTest::testDestroy(WorkerPool & inWorkerPool)
 
     std::vector<int> widths(cDepth, cWidth);
 
-    NodeCalculator nodeCalculator(rootNode->clone(), blockTypes, widths, rootNode->evaluator().clone(), inWorkerPool);
+    NodeCalculator nodeCalculator(rootNode->clone(), blockTypes, widths, rootNode->evaluator(), inWorkerPool);
 
     Assert(nodeCalculator.getCurrentSearchDepth() == 0);
     Assert(blockTypes.size() == widths.size());

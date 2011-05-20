@@ -102,20 +102,19 @@ endif()
 # Poco dependency
 #
 set(POCO_ROOT ${SOLUTIONDIR}3rdParty/Poco/)
-
 include_directories(
     ${POCO_ROOT}Foundation/include
     ${POCO_ROOT}CppUnit/include)
-
 link_directories(${POCO_ROOT}lib/${PLATFORM}/${ARCH})
 
 
 #
 # Boost dependency
 #
-include_directories(${SOLUTIONDIR}3rdParty/Boost)
-link_directories(${SOLUTIONDIR}3rdParty/Boost/lib/${PLATFORM}-${ARCH})
-set(LIB_BOOST_THREAD libboost_thread.a)
+set(BOOST_ROOT ${SOLUTIONDIR}3rdParty/Boost_1_46_1)
+include_directories(${BOOST_ROOT})
+set(BOOST_LIB "${BOOST_ROOT}/lib/${PLATFORM}-${ARCH}")
+set(EXTRA_LIBS "${BOOST_LIB}/libboost_thread.a ${EXTRA_LIBS}")
 
 
 #
@@ -209,8 +208,11 @@ add_custom_command(TARGET ${EXECUTABLE}
                    POST_BUILD
                    COMMAND /bin/rm                  ARGS  "-rf" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}QtTetris.app/Contents/Plugins"
                    COMMAND /bin/rm                  ARGS  "-f" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}QtTetris.app/Contents/Resources/qt.conf"
-                   COMMAND /bin/mkdir               ARGS  "-p" "${BUNDLE}/Contents/Resources"
-                   COMMAND /bin/cp                  ARGS  "${SOLUTIONDIR}Tetris/res/Tetris.icns" "${BUNDLE}/Contents/Resources/Tetris.icns"
+                   COMMAND /bin/mkdir               ARGS  "-p"
+                                                          "${BUNDLE}/Contents/Frameworks"
+                                                          "${BUNDLE}/Contents/Resources"
+                   COMMAND /bin/cp                  ARGS  "${SOLUTIONDIR}Tetris/res/Tetris.icns"
+                                                          "${BUNDLE}/Contents/Resources/Tetris.icns"
                    COMMAND /usr/libexec/PlistBuddy  ARGS  "-c" \"Set :CFBundleIconFile Tetris\" "${BUNDLE}/Contents/Info.plist"
                    COMMAND /usr/bin/macdeployqt     ARGS  "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}QtTetris.app" "${MACDEPLOYQT_OPTIONS}"
                    WORKING_DIRECTORY  ${BUILD_ROOT})
@@ -225,7 +227,7 @@ target_link_libraries(${EXECUTABLE}
     Tetris
     Futile
     PocoFoundation
-    ${LIB_BOOST_THREAD} ${EXTRA_LIBS})
+    ${EXTRA_LIBS})
 
 
 #
