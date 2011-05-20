@@ -111,10 +111,9 @@ link_directories(${POCO_ROOT}lib/${PLATFORM}/${ARCH})
 #
 # Boost dependency
 #
-set(BOOST_ROOT ${SOLUTIONDIR}3rdParty/Boost_1_46_1)
+set(BOOST_ROOT ${SOLUTIONDIR}3rdParty/Boost)
 include_directories(${BOOST_ROOT})
 set(BOOST_LIB "${BOOST_ROOT}/lib/${PLATFORM}-${ARCH}")
-set(EXTRA_LIBS "${BOOST_LIB}/libboost_thread.a ${EXTRA_LIBS}")
 
 
 #
@@ -227,7 +226,8 @@ target_link_libraries(${EXECUTABLE}
     Tetris
     Futile
     PocoFoundation
-    ${EXTRA_LIBS})
+    ${EXTRA_LIBS}
+    "${BOOST_LIB}/libboost_thread.a")
 
 
 #
