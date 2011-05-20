@@ -59,8 +59,8 @@ public:
     // Returns the number of pending tasks.
     std::size_t size() const;
 
-	// No tasks queued.
-	bool empty() const;
+    // No tasks queued.
+    bool empty() const;
 
     /**
      * Get the current status.
@@ -83,14 +83,14 @@ public:
      * or enters the waiting state.
      *
      * @param    inJoin    If "true" then this call blocks until the Worker has finished.
-     *                  If "false" then this call returns immediately.
+     *                     If "false" then this call returns immediately.
      */
     void interrupt(bool inJoin = true);
 
     /**
      * Same as interrupt() but also clears the queue.
      * @param    inJoin    If "true" then this call waits until the Worker has finished and the queue has been cleared.
-     *                  If "false" then this call returns immediately.
+     *                     If "false" then this call returns immediately.
      */
     void interruptAndClearQueue(bool inJoin = true);
 
