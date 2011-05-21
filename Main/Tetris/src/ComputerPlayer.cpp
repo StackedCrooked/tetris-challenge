@@ -69,8 +69,6 @@ public:
 
     void timerEvent();
 
-    //int calculateRemainingTimeMs(const Game & inGame) const;
-
     void updateComputerBlockMoveSpeed();
 
     void startNodeCalculator();
