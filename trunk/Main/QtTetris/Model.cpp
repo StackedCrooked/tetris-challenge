@@ -83,7 +83,13 @@ const Evaluator & Model::updateAIParameters(const Player & inPlayer,
     }
 
     const SimpleGame & game = *inPlayer.simpleGame();
+
     outWorkerCount = Poco::Environment::processorCount();
+	if (outWorkerCount > 1)
+	{
+		outWorkerCount /= 2;
+	}
+
     int currentHeight = game.stats().currentHeight();
 
     // Drop or not?
@@ -100,20 +106,20 @@ const Evaluator & Model::updateAIParameters(const Player & inPlayer,
     // Tactics adjustment
     if (currentHeight < 8)
     {
-        outSearchDepth = 8;
-        outSearchWidth = 5;
+        outSearchDepth = 6;
+        outSearchWidth = 6;
         return MakeTetrises::Instance();
     }
     else if (currentHeight < 14)
     {
-        outSearchDepth = 6;
-        outSearchWidth = 4;
+        outSearchDepth = 5;
+        outSearchWidth = 5;
         return Multiplayer::Instance();
     }
     else
     {
-        outSearchDepth = 6;
-        outSearchWidth = 3;
+        outSearchDepth = 4;
+        outSearchWidth = 4;
         return Survival::Instance();
     }
 }
