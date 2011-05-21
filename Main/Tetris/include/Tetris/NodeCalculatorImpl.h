@@ -17,6 +17,9 @@
 namespace Tetris {
 
 
+/**
+ * NodeCalculatorImpl is the base class for the singlethreaded and multithreaded node calculators.
+ */
 class NodeCalculatorImpl
 {
 public:
@@ -114,86 +117,69 @@ protected:
     public:
         TreeRowInfos(const Evaluator & inEvaluator, std::size_t inMaxDepth) :
             mInfos(),
-            mCurrentSearchDepth(0),
+            mMaxDepth(inMaxDepth),
+            mEvaluator(&inEvaluator),
             mMutex()
         {
-            for (std::size_t idx = 0; idx != inMaxDepth; ++idx)
+            mInfos.push_back(TreeRowInfo(*mEvaluator));
+        }
+
+        inline std::size_t depth() const
+        {
+            Futile::ScopedLock lock(mMutex);
+            if (mInfos.back().finished())
             {
-				TreeRowInfo * previousRow = 0;
-				if (idx != 0)
-				{
-					previousRow = &mInfos.back();
-				}
-                mInfos.push_back(TreeRowInfo(inEvaluator));
+                return mInfos.size();
+            }
+            else
+            {
+                Assert(mInfos.size() >= 1);
+                return mInfos.size() - 1;
             }
         }
 
-        inline int currentSearchDepth() const
+        inline std::size_t maxDepth() const
         {
             Futile::ScopedLock lock(mMutex);
-            return mCurrentSearchDepth;
+            return mMaxDepth;
         }
 
-        inline int maximumSearchDepth() const
+        void registerNode(NodePtr inNode)
         {
             Futile::ScopedLock lock(mMutex);
-            return mInfos.size();
-        }
-
-        inline NodePtr bestNode(std::size_t inDepth) const
-        {
-            Futile::ScopedLock lock(mMutex);
-            Assert(inDepth > 0 && inDepth <= mInfos.size());
-            return mInfos[inDepth - 1].bestNode();
+            mInfos.back().registerNode(inNode);
         }
 
         inline NodePtr bestNode() const
         {
             Futile::ScopedLock lock(mMutex);
-            NodePtr result;
-            if (mCurrentSearchDepth > 0)
+            if (mInfos.back().finished())
             {
-                result = mInfos[mCurrentSearchDepth - 1].bestNode();
-                Assert(result);
-            }
-            return result;
-        }
-
-        inline std::size_t nodeCount(std::size_t inDepth) const
-        {
-            Futile::ScopedLock lock(mMutex);
-            return mInfos[inDepth - 1].nodeCount();
-        }
-
-        inline bool finished(std::size_t inDepth) const
-        {
-            Futile::ScopedLock lock(mMutex);
-            return mInfos[inDepth - 1].finished();
-        }
-
-        void registerNode(NodePtr inNode, std::size_t inDepth)
-        {
-            Futile::ScopedLock lock(mMutex);
-            mInfos[inDepth - 1].registerNode(inNode);
-        }
-
-        inline void setFinished(std::size_t inDepth)
-        {
-            Futile::ScopedLock lock(mMutex);
-            if (mInfos[inDepth - 1].bestNode())
-            {
-                mCurrentSearchDepth = inDepth;
-                mInfos[inDepth - 1].setFinished();
+                return mInfos.back().bestNode();
             }
             else
             {
-                LogError(Futile::MakeString() << "TreeRowInfos::setFinished at depth " << inDepth << " failed because it does not contain any nodes.");
+                return mInfos[mInfos.size() - 2].bestNode();
             }
+        }
+
+        inline bool finished() const
+        {
+            Futile::ScopedLock lock(mMutex);
+            return mInfos.size() == mMaxDepth && mInfos.back().finished();
+        }
+
+        inline void setFinished()
+        {
+            Futile::ScopedLock lock(mMutex);
+            mInfos.back().setFinished();
+            mInfos.push_back(TreeRowInfo(*mEvaluator));
         }
 
     private:
         std::vector<TreeRowInfo> mInfos;
-        int mCurrentSearchDepth;
+        int mMaxDepth;
+        const Evaluator * mEvaluator;
         mutable Futile::Mutex mMutex;
     };
 
