@@ -44,7 +44,7 @@
 				AdditionalOptions="/MP /D &quot;_HAS_ITERATOR_DEBUGGING=0&quot; /D &quot;_SECURE_SCL=0&quot;"
 				Optimization="0"
 				AdditionalIncludeDirectories="&quot;$(SolutionDir)Tetris\include&quot;;&quot;$(SolutionDir)Futile\include&quot;;&quot;$(SolutionDir)3rdParty\Poco\CppUnit\include&quot;;&quot;$(SolutionDir)3rdParty\Poco\Foundation\include&quot;;&quot;$(SolutionDir)3rdParty\Boost_1_42_0&quot;"
-				PreprocessorDefinitions="_DEBUG;_WINDOWS;POCO_STATIC;POCO_NO_AUTOMATIC_LIBS"
+				PreprocessorDefinitions="BOOST_ALL_NO_LIB;_DEBUG;_WINDOWS;POCO_STATIC;POCO_NO_AUTOMATIC_LIBS"
 				StringPooling="false"
 				MinimalRebuild="false"
 				BasicRuntimeChecks="3"
@@ -70,8 +70,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="libboost_thread-vc90-mt-gd-1_42.lib"
 				ShowProgress="2"
-				AdditionalLibraryDirectories="&quot;$(SolutionDir)3rdParty\Boost_1_42_0\lib\Windows-x86-vc90&quot;"
+				AdditionalLibraryDirectories="&quot;$(SolutionDir)3rdParty\Boost_1_42_0\libs\Windows\x86\vc90&quot;"
 				GenerateDebugInformation="true"
 			/>
 			<Tool
@@ -126,7 +127,7 @@
 				InlineFunctionExpansion="2"
 				FavorSizeOrSpeed="1"
 				AdditionalIncludeDirectories="&quot;$(SolutionDir)Tetris\include&quot;;&quot;$(SolutionDir)Futile\include&quot;;&quot;$(SolutionDir)3rdParty\Poco\CppUnit\include&quot;;&quot;$(SolutionDir)3rdParty\Poco\Foundation\include&quot;;&quot;$(SolutionDir)3rdParty\Boost_1_42_0&quot;"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;POCO_STATIC;POCO_NO_AUTOMATIC_LIBS"
+				PreprocessorDefinitions="BOOST_ALL_NO_LIB;WIN32;NDEBUG;_WINDOWS;POCO_STATIC;POCO_NO_AUTOMATIC_LIBS"
 				StringPooling="false"
 				RuntimeLibrary="2"
 				BufferSecurityCheck="false"
@@ -148,8 +149,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="libboost_thread-vc90-mt-1_42.lib"
 				ShowProgress="0"
-				AdditionalLibraryDirectories="&quot;$(SolutionDir)3rdParty\Boost_1_42_0\lib\Windows-x86-vc90&quot;"
+				AdditionalLibraryDirectories="&quot;$(SolutionDir)3rdParty\Boost_1_42_0\libs\Windows\x86\vc90&quot;"
 			/>
 			<Tool
 				Name="VCALinkTool"
