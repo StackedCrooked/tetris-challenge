@@ -41,7 +41,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="/MP"
+				AdditionalOptions="/MP /D &quot;_CRT_SECURE_NO_WARNINGS&quot; /D &quot;_SCL_SECURE_NO_WARNINGS&quot; /D &quot;_SECURE_SCL=0&quot; /D &quot;_SECURE_SCL_THROWS=0&quot;"
 				Optimization="2"
 				InlineFunctionExpansion="2"
 				EnableIntrinsicFunctions="true"
@@ -121,7 +121,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="/D &quot;_HAS_ITERATOR_DEBUGGING=0&quot; /D &quot;_SECURE_SCL=0&quot; /D &quot;_SCL_SECURE_NO_WARNINGS=0&quot; /MP"
+				AdditionalOptions="/MP /D &quot;_HAS_ITERATOR_DEBUGGING=0&quot; /D &quot;_SECURE_SCL=0&quot; /D &quot;_SECURE_SCL_THROWS=0&quot;"
 				Optimization="0"
 				AdditionalIncludeDirectories=".\;.\GeneratedFiles;&quot;.\GeneratedFiles\$(ConfigurationName)&quot;;&quot;$(SolutionDir)Tetris\include&quot;;&quot;$(SolutionDir)Futile\include&quot;;&quot;$(SolutionDir)3rdParty\Poco\Foundation\include&quot;;&quot;$(SolutionDir)3rdParty\Boost_1_42_0&quot;;&quot;$(QTDIR)\include&quot;;&quot;$(QTDIR)\include\qtmain&quot;;&quot;$(QTDIR)\include\QtCore&quot;;&quot;$(QTDIR)\include\QtGui&quot;"
 				PreprocessorDefinitions="BOOST_ALL_NO_LIB;QT_LARGEFILE_SUPPORT;QT_CORE_LIB;QT_GUI_LIB;POCO_STATIC;POCO_NO_AUTOMATIC_LIBS"
