@@ -2,6 +2,7 @@
 #define FUTILE_ARRAY_H
 
 
+#include <boost/noncopyable.hpp>
 #include <vector>
 
 
@@ -13,7 +14,7 @@ namespace Futile {
  * The public interface is mostly similar to std::vector.
  */
 template<class T>
-class Array
+class Array : boost::noncopyable
 {
 public:
     Array() { }
@@ -26,7 +27,7 @@ public:
             mData.pop_back();
         }
     }
-    
+
     typedef std::vector<T*> Data;
     typedef typename Data::iterator iterator;
     typedef typename Data::const_iterator const_iterator;
@@ -99,7 +100,7 @@ public:
         delete *it;
         mData.erase(it);
     }
-    
+
 private:
     Data mData;
 };
@@ -109,4 +110,3 @@ private:
 
 
 #endif // FUTILE_ARRAY_H
-
