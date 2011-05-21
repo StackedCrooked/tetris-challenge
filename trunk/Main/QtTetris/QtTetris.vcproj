@@ -71,7 +71,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="libboost_thread-vc90-mt-1_42.lib qtmain.lib QtCore4.lib QtGui4.lib iphlpapi.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
-				AdditionalLibraryDirectories="&quot;$(QTDIR)\lib&quot;;&quot;$(SolutionDir)3rdParty\Boost_1_42_0\libs\Windows\x86\vc90&quot;"
+				AdditionalLibraryDirectories="&quot;$(QTDIR)\lib&quot;;&quot;$(SolutionDir)3rdParty\Boost_1_42_0\lib\Windows\x86\vc90&quot;"
 				SubSystem="2"
 				LinkTimeCodeGeneration="1"
 			/>
@@ -148,7 +148,7 @@
 				UseLibraryDependencyInputs="false"
 				AdditionalDependencies="libboost_thread-vc90-mt-gd-1_42.lib qtmaind.lib QtCored4.lib QtGuid4.lib iphlpapi.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
-				AdditionalLibraryDirectories="&quot;$(QTDIR)\lib&quot;;&quot;$(SolutionDir)3rdParty\Boost_1_42_0\libs\Windows\x86\vc90&quot;"
+				AdditionalLibraryDirectories="&quot;$(QTDIR)\lib&quot;;&quot;$(SolutionDir)3rdParty\Boost_1_42_0\lib\Windows\x86\vc90&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 			/>

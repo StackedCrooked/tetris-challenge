@@ -72,7 +72,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="libboost_thread-vc90-mt-gd-1_42.lib"
 				ShowProgress="2"
-				AdditionalLibraryDirectories="&quot;$(SolutionDir)3rdParty\Boost_1_42_0\libs\Windows\x86\vc90&quot;"
+				AdditionalLibraryDirectories="&quot;$(SolutionDir)3rdParty\Boost_1_42_0\lib\Windows\x86\vc90&quot;"
 				GenerateDebugInformation="true"
 			/>
 			<Tool
@@ -151,7 +151,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="libboost_thread-vc90-mt-1_42.lib"
 				ShowProgress="0"
-				AdditionalLibraryDirectories="&quot;$(SolutionDir)3rdParty\Boost_1_42_0\libs\Windows\x86\vc90&quot;"
+				AdditionalLibraryDirectories="&quot;$(SolutionDir)3rdParty\Boost_1_42_0\lib\Windows\x86\vc90&quot;"
 			/>
 			<Tool
 				Name="VCALinkTool"
