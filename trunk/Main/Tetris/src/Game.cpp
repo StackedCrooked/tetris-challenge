@@ -699,10 +699,9 @@ bool ComputerGame::move(MoveDirection inDirection)
     }
 
     Block & block = *mActiveBlock;
-	const GameState & gameState = mCurrentNode->gameState();
-    std::size_t newRow = block.row() + GetRowDelta(inDirection);
-    std::size_t newCol = block.column() + GetColumnDelta(inDirection);
-    if (gameState.checkPositionValid(block, newRow, newCol))
+    size_t newRow = block.row() + GetRowDelta(inDirection);
+    size_t newCol = block.column() + GetColumnDelta(inDirection);
+    if (mCurrentNode->gameState().checkPositionValid(block, newRow, newCol))
     {
         block.setRow(newRow);
         block.setColumn(newCol);
@@ -712,8 +711,7 @@ bool ComputerGame::move(MoveDirection inDirection)
 
     if (inDirection != MoveDirection_Down)
     {
-        // We failed to move to the left or to the right.
-		// Return false and let the caller decide how to respond.
+        // Do nothing
         return false;
     }
 
@@ -729,7 +727,6 @@ bool ComputerGame::move(MoveDirection inDirection)
     {
         const GameStateNode & precalculatedChild = **mCurrentNode->children().begin();
         const Block & nextBlock = precalculatedChild.gameState().originalBlock();
-
 
         if (!currentNode()->gameState().tainted())
         {
@@ -759,8 +756,8 @@ bool ComputerGame::move(MoveDirection inDirection)
 
     // Actually commit the block
     NodePtr child(new GameStateNode(mCurrentNode,
-                                    mCurrentNode->gameState().commit(block, GameOver(block.row() == 0)).release(),
-                                    Balanced::Instance()));
+                                    mCurrentNode->gameState().commit(block, GameOver(block.row() == 0)).release(),                                    
+                                    mCurrentNode->evaluator()));
     mCurrentNode->addChild(child);
     setCurrentNode(child);
     onChanged();

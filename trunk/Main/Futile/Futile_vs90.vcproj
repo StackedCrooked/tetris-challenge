@@ -40,7 +40,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="/MP /D &quot;_HAS_ITERATOR_DEBUGGING=0&quot; /D &quot;_SECURE_SCL=0&quot;"
+				AdditionalOptions="/MP /D &quot;_HAS_ITERATOR_DEBUGGING=0&quot; /D &quot;_SECURE_SCL=0&quot; /D &quot;_SECURE_SCL_THROWS=0&quot;"
 				Optimization="0"
 				AdditionalIncludeDirectories="&quot;$(SolutionDir)Futile\include&quot;;&quot;$(SolutionDir)3rdParty\Boost_1_42_0&quot;"
 				PreprocessorDefinitions="BOOST_ALL_NO_LIB;_DEBUG;_WINDOWS;POCO_STATIC;POCO_NO_AUTOMATIC_LIBS"
@@ -107,7 +107,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="/MP /D &quot;_CRT_SECURE_NO_WARNINGS&quot;"
+				AdditionalOptions="/MP /D &quot;_CRT_SECURE_NO_WARNINGS&quot; /D &quot;_SCL_SECURE_NO_WARNINGS&quot; /D &quot;_SECURE_SCL=0&quot; /D &quot;_SECURE_SCL_THROWS=0&quot;"
 				Optimization="2"
 				InlineFunctionExpansion="2"
 				FavorSizeOrSpeed="1"
