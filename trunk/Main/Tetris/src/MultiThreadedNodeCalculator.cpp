@@ -64,7 +64,7 @@ void MultithreadedNodeCalculator::generateChildNodes(NodePtr ioNode,
         ++count;
         ++it;
     }
-    mTreeRowInfos.registerNode(*ioNode->children().begin(), inDepth);
+    mTreeRowInfos.registerNode(*ioNode->children().begin());
 }
 
 
@@ -77,7 +77,7 @@ void MultithreadedNodeCalculator::populateNodes(NodePtr ioNode,
 
     // We want to at least perform a search of depth 1.
     if (inIndex > 0)
-    {		
+    {
         boost::this_thread::interruption_point();
     }
 
@@ -138,7 +138,7 @@ void MultithreadedNodeCalculator::populate()
             populateNodes(mNode, mBlockTypes, mWidths, 0, targetDepth);
             mWorkerPool.wait();
             Assert(mWorkerPool.getActiveWorkerCount() == 0);
-            mTreeRowInfos.setFinished(targetDepth);
+            mTreeRowInfos.setFinished();
             targetDepth++;
         }
     }

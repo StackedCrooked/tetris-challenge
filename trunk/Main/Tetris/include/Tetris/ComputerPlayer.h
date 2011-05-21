@@ -55,7 +55,7 @@ public:
     void setSearchDepth(int inSearchDepth);
 
     // Get progress
-    int currentSearchDepth() const;
+    int depth() const;
 
     int searchWidth() const;
 

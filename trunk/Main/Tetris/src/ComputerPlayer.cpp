@@ -174,7 +174,7 @@ void ComputerPlayer::setSearchWidth(int inSearchWidth)
 }
 
 
-int ComputerPlayer::currentSearchDepth() const
+int ComputerPlayer::depth() const
 {
     ScopedLock lock(mImpl->mMutex);
     if (mImpl->mNodeCalculator)

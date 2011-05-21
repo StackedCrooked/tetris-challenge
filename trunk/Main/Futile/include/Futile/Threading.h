@@ -124,6 +124,7 @@ private:
 /**
  * VoidPolicy can be used as a default type for policies that you don't want to set.
  */
+ template<int n = 0>
 class VoidPolicy
 {
 };
@@ -187,8 +188,8 @@ private:
  * and error reporting.
  */
 template<class Variable,
-         class CheckLockDurationPolicy = TimeLimitMs<500>,
-         class CheckLockOrderPolicy    = VoidPolicy>
+         class CheckLockDurationPolicy = VoidPolicy<0>,
+         class CheckLockOrderPolicy    = VoidPolicy<1> >
 class ConfigurableScopedAccessor : public  ScopedAccessor<Variable>,
                                    private CheckLockDurationPolicy,
                                    private CheckLockOrderPolicy
@@ -323,7 +324,7 @@ void LockMany<Mutex>::lock(Mutex & inMutex)
     //    }
     //}
     Lock(inMutex);
-	mMutexes.push_back(&inMutex);
+    mMutexes.push_back(&inMutex);
 }
 
 

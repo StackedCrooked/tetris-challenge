@@ -49,7 +49,7 @@ void SingleThreadedNodeCalculator::populate()
         {
             ScopedLock lock(mNodeMutex);
             populateNodesRecursively(mNode, mBlockTypes, mWidths, 0, targetDepth - 1);
-            mTreeRowInfos.setFinished(targetDepth);
+            mTreeRowInfos.setFinished();
             targetDepth++;
         }
     }

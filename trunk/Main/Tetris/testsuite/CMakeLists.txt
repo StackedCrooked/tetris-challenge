@@ -86,7 +86,7 @@ link_directories(${POCO}lib/${PLATFORM}/${ARCH})
 #
 set(BOOST_ROOT ${SOLUTIONDIR}3rdParty/Boost)
 include_directories(${BOOST_ROOT})
-set(BOOST_LIB "${BOOST_ROOT}/lib/${PLATFORM}-${ARCH}")
+set(BOOST_LIB "${BOOST_ROOT}/lib/${PLATFORM}/${ARCH}")
 
 
 #

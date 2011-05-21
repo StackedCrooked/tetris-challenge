@@ -71,7 +71,7 @@ bool NodeCalculatorImpl::getQuitFlag() const
 
 int NodeCalculatorImpl::getCurrentSearchDepth() const
 {
-    return mTreeRowInfos.currentSearchDepth();
+    return mTreeRowInfos.depth();
 }
 
 
@@ -147,7 +147,7 @@ void NodeCalculatorImpl::populateNodesRecursively(
     //
     ChildNodes generatedChildNodes = ioNode->children();
     if (generatedChildNodes.empty())
-    {        
+    {
         generatedChildNodes = ChildNodes(GameStateComparator());
         GenerateOffspring(ioNode, inBlockTypes[inIndex], mEvaluator, generatedChildNodes);
 
@@ -160,7 +160,7 @@ void NodeCalculatorImpl::populateNodesRecursively(
             ++it;
         }
         Assert(count >= 1);
-        mTreeRowInfos.registerNode(*ioNode->children().begin(), inIndex + 1);
+        mTreeRowInfos.registerNode(*ioNode->children().begin());
     }
 
 
