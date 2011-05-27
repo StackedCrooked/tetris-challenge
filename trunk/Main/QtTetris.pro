@@ -54,7 +54,9 @@ SOURCES += \
     Futile/src/Worker.cpp \
     Futile/src/WorkerPool.cpp \
     Futile/src/LeakDetector.cpp \
-    Futile/src/Enum.cpp
+    Futile/src/Enum.cpp \
+    Futile/src/MemoryPool.cpp \
+    Tetris/testsuite/src/MemoryPoolTest.cpp
 
 
 HEADERS += \
@@ -404,7 +406,9 @@ HEADERS += \
     3rdParty/Poco/Foundation/include/pocomsg.h \
     Futile/include/Futile/LeakDetector.h \
     Futile/include/Futile/Singleton.h \
-    Futile/include/Futile/Enum.h
+    Futile/include/Futile/Enum.h \
+    Futile/include/Futile/MemoryPool.h \
+    Tetris/testsuite/src/MemoryPoolTest.h
 
 
 OTHER_FILES += \

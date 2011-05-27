@@ -84,7 +84,7 @@ void GenericGridTest_TestGenericGridCopy(const std::string & inAllocatorType)
 
         // Test set/get
         c.set(0, 1);
-        Assert(c.get(0), 1);
+        Assert(c.get(0) == 1);
     }
 
     GenericGrid<int, AllocatorType> grid(4, 3, 1);

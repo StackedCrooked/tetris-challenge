@@ -18,6 +18,7 @@ add_library(Futile
     include/Futile/MainThread.h
     include/Futile/MainThreadImpl.h
     include/Futile/MakeString.h
+    include/Futile/MemoryPool.h
     include/Futile/Threading.h
     include/Futile/TypedWrapper.h
     include/Futile/Worker.h
@@ -26,6 +27,7 @@ add_library(Futile
     src/Logger.cpp
     src/Logging.cpp
     src/MainThread.cpp
+    src/MemoryPool.cpp
     src/Threading.cpp
     src/Worker.cpp
     src/WorkerPool.cpp)
