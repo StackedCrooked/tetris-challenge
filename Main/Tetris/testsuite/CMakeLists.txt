@@ -26,7 +26,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "Release")
     message("CMAKE_BUILD_TYPE is ${CMAKE_BUILD_TYPE}")
 else()
     set(CMAKE_BUILD_TYPE "Release")
-    message("CMAKE_BUILD_TYPE was not set or not correctly set. Defaulting to \"Release\"")
+    message("TETRIS_BUILD_TYPE was not set or not correctly set. Defaulting to \"Release\"")
 else()
 endif()
 
@@ -102,6 +102,7 @@ add_subdirectory(${SOLUTIONDIR}Futile ${LIBRARY_OUTPUT_PATH}/Futile)
 set(TetrisTestSuite_SOURCES
     src/Driver.cpp
     src/GenericGridTest.cpp
+    src/MemoryPoolTest.cpp
     src/NodeCalculatorTest.cpp
     src/TetrisTestSuite.cpp
     src/WorkerPoolTest.cpp
@@ -113,6 +114,7 @@ set(TetrisTestSuite_SOURCES
 #
 set(TetrisTestSuite_HEADERS
     src/GenericGridTest.h
+    src/MemoryPoolTest.h
     src/NodeCalculatorTest.h
     src/TetrisTestSuite.h
     src/WorkerPoolTest.h

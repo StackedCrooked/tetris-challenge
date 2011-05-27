@@ -14,12 +14,7 @@ NAMESPACE=$1
 CLASS=$2
 CLASS_UPCASE=`ruby -e "print \"$CLASS\".upcase"`
 
-# Create target directories
-mkdir -p "include"
-mkdir -p "src"
-
-
 # Replace it
-cat "${SCRIPT_REAL_DIR}/Template.h" | sed -e "s/CLASS_H/${CLASS_UPCASE}_H/" | sed -e "s/NAMESPACE/$NAMESPACE/g" | sed -e "s/CLASS/$CLASS/g" > "include/$CLASS.h"
-cat "${SCRIPT_REAL_DIR}/Template.cpp" | sed -e "s/NAMESPACE/$NAMESPACE/g" | sed -e "s/CLASS/$CLASS/g" > "src/$CLASS.cpp"
+cat "${SCRIPT_REAL_DIR}/Template.h" | sed -e "s/CLASS_H/${CLASS_UPCASE}_H/" | sed -e "s/NAMESPACE/$NAMESPACE/g" | sed -e "s/CLASS/$CLASS/g" > "$CLASS.h"
+cat "${SCRIPT_REAL_DIR}/Template.cpp" | sed -e "s/NAMESPACE/$NAMESPACE/g" | sed -e "s/CLASS/$CLASS/g" > "$CLASS.cpp"
 
