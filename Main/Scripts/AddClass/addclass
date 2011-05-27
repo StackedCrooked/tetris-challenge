@@ -1,0 +1,16 @@
+#!/bin/bash
+if [ $# -ne 2 ] ; then
+    echo "Usage: `basename $0` <<namespace>> <<class>>"
+    exit 65
+fi
+
+# Variables
+NAMESPACE=$1
+CLASS=$2
+CLASS_UPCASE=`ruby -e "print \"$CLASS\".upcase"`
+
+# Replace it
+head -n 4 Template.h | sed -e "s/CLASS_H/${CLASS_UPCASE}_H/"
+cat Template.h | sed -e "s/CLASS_H/${CLASS_UPCASE}_H/" | sed -e "s/NAMESPACE/$NAMESPACE/g" | sed -e "s/CLASS/$CLASS/g" > "$CLASS.h"
+cat Template.cpp | sed -e "s/NAMESPACE/$NAMESPACE/g" | sed -e "s/CLASS/$CLASS/g" > "$CLASS.cpp"
+
