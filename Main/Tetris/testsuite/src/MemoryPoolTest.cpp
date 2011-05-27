@@ -114,14 +114,12 @@ void MemoryPoolTest::testMemoryPool()
 
     std::cout << "Testing MemoryPool::ScopedPtr" << std::flush;
     {
-        typedef MemoryPool<Point> PointPool;
-        typedef PointPool::ScopedPtr PointPtr;
 
         // Pool is empty after each iteration because we store the value in ScopedPtr.
         assertEqual(pool.used(), 0);
         assertEqual(pool.available(), cItemCount);
 
-        PointPtr point(&pool, pool.acquireAndDefaultConstruct());
+        MemoryPool<Point>::ScopedPtr point(&pool, pool.acquireAndDefaultConstruct());
         assertEqual(point->x, 0);
         assertEqual(point->y, 0);
 

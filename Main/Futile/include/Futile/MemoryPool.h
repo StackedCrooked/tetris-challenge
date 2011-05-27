@@ -12,18 +12,48 @@
 namespace Futile {
 
 
+template<class MemoryPool_>
+class ScopedMemoryPoolPtr : boost::noncopyable
+{
+public:
+    typedef MemoryPool_ MemoryPool;
+    typedef typename MemoryPool::ValueType ValueType;
+
+    ScopedMemoryPoolPtr(MemoryPool * inPool, ValueType * inValue);
+
+    ~ScopedMemoryPoolPtr();
+
+    void reset();
+
+    const ValueType * get() const { return mValue; }
+
+    ValueType * get() { return mValue; }
+
+    const ValueType * operator->() const { return mValue; }
+
+    ValueType * operator->() { return mValue; }
+
+    const ValueType & operator*() const { return *mValue; }
+
+    ValueType & operator*() { return *mValue; }
+
+private:
+    MemoryPool * mPool;
+    ValueType * mValue;
+};
+
+
 /**
  * MemoryPool that priorizes fast destruction.
  * Actual memory allocated is 2x the usable size.
  *
- * Data
- *
  */
-template<class ValueType_>
+template<typename ValueType_>
 class MemoryPool : boost::noncopyable
 {
 public:
     typedef ValueType_ ValueType;
+    typedef ScopedMemoryPoolPtr< MemoryPool<ValueType> > ScopedPtr;
 
     MemoryPool(std::size_t inItemCount) :
         mData(sizeof(ValueType) * inItemCount),
@@ -44,45 +74,8 @@ public:
     {
     }
 
-    class ScopedPtr
-    {
-    public:
-        ScopedPtr(MemoryPool * inPool, ValueType * inValue) :
-            mPool(inPool),
-            mValue(inValue)
-        {
-        }
-
-        ~ScopedPtr()
-        {
-            reset();
-        }
-
-        const ValueType * get() const { return mValue; }
-
-        ValueType * get() { return mValue; }
-
-        const ValueType * operator->() const { return mValue; }
-
-        ValueType * operator->() { return mValue; }
-
-        const ValueType & operator*() const { return *mValue; }
-
-        ValueType & operator*() { return *mValue; }
-
-        void reset()
-        {
-            mValue->~ValueType();
-            mPool->release(mValue);
-        }
-
-    private:
-        MemoryPool * mPool;
-        ValueType * mValue;
-    };
-
     /**
-     * Returns the amount of memory occupied by the pool
+     * Returns the max memory size of the pool.
      */
     std::size_t size() const
     {
@@ -212,6 +205,29 @@ private:
     typedef std::vector<std::size_t> FreeItems;
     FreeItems mFreeItems;
 };
+
+
+template<class MemoryPool>
+ScopedMemoryPoolPtr<MemoryPool>::ScopedMemoryPoolPtr(MemoryPool * inPool, ValueType * inValue) :
+    mPool(inPool),
+    mValue(inValue)
+{
+}
+
+
+template<class MemoryPool>
+ScopedMemoryPoolPtr<MemoryPool>::~ScopedMemoryPoolPtr()
+{
+    reset();
+}
+
+
+template<class MemoryPool>
+void ScopedMemoryPoolPtr<MemoryPool>::reset()
+{
+    mValue->~ValueType();
+    mPool->release(mValue);
+}
 
 
 } // namespace Futile
