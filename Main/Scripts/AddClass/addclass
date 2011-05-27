@@ -4,13 +4,22 @@ if [ $# -ne 2 ] ; then
     exit 65
 fi
 
+# Find the absolute dir of the script to find location of "Template.h" and "Template.cpp"
+SCRIPT_PATH="`dirname $0`/`basename $0`"
+SCRIPT_REAL_PATH="`readlink $SCRIPT_PATH`"
+SCRIPT_REAL_DIR=`dirname $SCRIPT_REAL_PATH`
+
 # Variables
 NAMESPACE=$1
 CLASS=$2
 CLASS_UPCASE=`ruby -e "print \"$CLASS\".upcase"`
 
+# Create target directories
+mkdir -p "include"
+mkdir -p "src"
+
+
 # Replace it
-head -n 4 Template.h | sed -e "s/CLASS_H/${CLASS_UPCASE}_H/"
-cat Template.h | sed -e "s/CLASS_H/${CLASS_UPCASE}_H/" | sed -e "s/NAMESPACE/$NAMESPACE/g" | sed -e "s/CLASS/$CLASS/g" > "$CLASS.h"
-cat Template.cpp | sed -e "s/NAMESPACE/$NAMESPACE/g" | sed -e "s/CLASS/$CLASS/g" > "$CLASS.cpp"
+cat "${SCRIPT_REAL_DIR}/Template.h" | sed -e "s/CLASS_H/${CLASS_UPCASE}_H/" | sed -e "s/NAMESPACE/$NAMESPACE/g" | sed -e "s/CLASS/$CLASS/g" > "include/$CLASS.h"
+cat "${SCRIPT_REAL_DIR}/Template.cpp" | sed -e "s/NAMESPACE/$NAMESPACE/g" | sed -e "s/CLASS/$CLASS/g" > "src/$CLASS.cpp"
 
