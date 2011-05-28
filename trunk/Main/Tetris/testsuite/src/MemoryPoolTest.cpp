@@ -46,9 +46,6 @@ void MemoryPoolTest::tearDown()
 }
 
 
-namespace {
-
-
 struct Point
 {
 
@@ -64,9 +61,6 @@ static Point * CreatePoint(void * placement)
 {
     return new (placement) Point(1, 2);
 }
-
-
-} // namespace
 
 
 void MemoryPoolTest::testMemoryPool()
