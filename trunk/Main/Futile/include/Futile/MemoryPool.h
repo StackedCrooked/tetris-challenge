@@ -15,171 +15,223 @@ namespace Futile {
 
 
 template<class MemoryPoolType>
-struct BasicOwnershipStrategy
+struct ScopedPtr;
+
+template<class MemoryPoolType>
+struct SharedPtr;
+
+template<class MemoryPoolType>
+struct MovePtr;
+
+
+/**
+ * Encapsulates a pointer value and provides various ways to access it.
+ */
+template<class Value>
+struct WrappedPointer
 {
-    typedef typename MemoryPoolType::MemoryPool MemoryPool;
-    typedef typename MemoryPoolType::Value Value;
-    typedef BasicOwnershipStrategy<MemoryPool> This;
-
-    BasicOwnershipStrategy(MemoryPool & inMemoryPool) :
-        mMemoryPool(&inMemoryPool),
-        mValue(NULL)
-    {
-    }
-
-    BasicOwnershipStrategy(MemoryPool & inMemoryPool, Value * inValue) :
-        mMemoryPool(&inMemoryPool),
+    WrappedPointer(Value * inValue) :
         mValue(inValue)
     {
     }
 
-    BasicOwnershipStrategy(const This & rhs) :
-        mMemoryPool(rhs.mMemoryPool),
-        mValue(rhs.mValue)
+    void swap(WrappedPointer & rhs)
     {
+        std::swap(mValue, rhs.mValue);
     }
 
-    BasicOwnershipStrategy & operator=(This rhs)
+    inline const Value * get() const { return mValue; }
+
+    inline Value * get() { return mValue; }
+
+    inline const Value * operator->() const { return get(); }
+
+    inline Value * operator->() { return get(); }
+
+    inline const Value & operator*() const { return *get(); }
+
+    inline Value & operator*() { return *get(); }
+
+protected:
+    void setValue(Value * inValue)
     {
-        This::swap(rhs);
-        return *this;
-    }
-
-    ~BasicOwnershipStrategy() { }
-
-    const Value * get() const { return mValue; }
-
-    Value * get() { return mValue; }
-
-    void reset(Value * inValue)
-    {
-        destroy();
         mValue = inValue;
     }
 
 private:
-    void swap(This & rhs)
-    {
-        std::swap(mMemoryPool, rhs.mMemoryPool);
-        std::swap(mValue, rhs.mValue);
-    }
-
-    inline void destroy()
-    {
-        if (mValue)
-        {
-            mValue->~Value();
-        }
-        mMemoryPool->release(mValue);
-    }
-
-    MemoryPool * mMemoryPool;
     Value * mValue;
 };
 
 
-template<class MemoryPoolType, class ValueType, class OwnershipStrategyType>
-class MemoryPool_SmartPointer : public OwnershipStrategyType
+/**
+ *
+ */
+template<class MemoryPoolType>
+struct SmartPointer : public WrappedPointer<typename MemoryPoolType::Value>
 {
 public:
     typedef MemoryPoolType MemoryPool;
-    typedef ValueType Value;
-    typedef OwnershipStrategyType OwnershipStrategy;
-    typedef OwnershipStrategy Base;
-    typedef MemoryPool_SmartPointer<MemoryPool, Value, Base> This;
-
-    MemoryPool_SmartPointer(MemoryPool & inMemoryPool) :
-        OwnershipStrategy(inMemoryPool)
-    {
-    }
-
-    MemoryPool_SmartPointer(MemoryPool & inMemoryPool, Value * inValue) :
-        OwnershipStrategy(inMemoryPool, inValue)
-    {
-    }
-
-    MemoryPool_SmartPointer(const This & rhs) :
-        Base(rhs)
-    {
-    }
-
-    This & operator=(This rhs)
-    {
-        Base::swap(rhs);
-        return *this;
-    }
-
-    ~MemoryPool_SmartPointer() { }
-
-    const Value * operator->() const { return OwnershipStrategy::get(); }
-
-    Value * operator->() { return OwnershipStrategy::get(); }
-
-    const Value & operator*() const { return *OwnershipStrategy::get(); }
-
-    Value & operator*() { return *OwnershipStrategy::get(); }
+    typedef typename MemoryPoolType::Value Value;
 
 private:
-    void destroy()
+    typedef WrappedPointer<Value> Base;
+    typedef SmartPointer<MemoryPool> This;
+
+public:
+    typedef ScopedPtr<MemoryPool> ScopedPtr;
+    typedef SharedPtr<MemoryPool> SharedPtr;
+    typedef MovePtr<MemoryPool> MovePtr;
+
+    SmartPointer(MemoryPool & inMemoryPool) :
+        Base(NULL),
+        mMemoryPool(&inMemoryPool)
     {
-        Value * value = OwnershipStrategy::get();
-        value->~Value();
-        OwnershipStrategy::mMemoryPool->release(value);
     }
+
+    SmartPointer(MemoryPool & inMemoryPool, Value * inValue) :
+        Base(inValue),
+        mMemoryPool(&inMemoryPool)
+    {
+    }
+
+    void swap(SmartPointer & rhs)
+    {
+        Base::swap(rhs);
+        std::swap(mMemoryPool, rhs.mMemoryPool);
+    }
+
+    void reset(Value * inValue)
+    {
+        destroy();
+        setValue(inValue);
+    }
+
+private:
+    inline void destroy()
+    {
+        Value * value = Base::get();
+        if (value)
+        {
+            value->~Value();
+            mMemoryPool->release(value);
+        }
+    }
+
+    MemoryPool * mMemoryPool;
+};
+
+
+template<class MemoryPoolType>
+struct MovePtr : public SmartPointer<MemoryPoolType>
+{
+private:
+    typedef MovePtr<MemoryPoolType> This;
+    typedef SmartPointer<MemoryPoolType> Base;
+
+public:
+    typedef MemoryPoolType MemoryPool;
+    typedef typename MemoryPool::Value Value;
+
+    MovePtr(MemoryPool & inMemoryPool, Value * inValue) :
+        Base(inMemoryPool, inValue),
+        mOwns(true)
+    {
+    }
+
+    MovePtr(const MovePtr & rhs) :
+        Base(rhs),
+        mOwns(true)
+    {
+        rhs.mOwns = false;
+    }
+
+    ~MovePtr()
+    {
+        if (mOwns)
+        {
+            Base::destroy();
+        }
+    }
+
+    Value * release()
+    {
+        mOwns = false;
+        return Base::get();
+    }
+
+private:
+    // Disable assignment and swap
+    MovePtr & operator=(const MovePtr & rhs);
+    void swap(This & rhs);
+
+    mutable bool mOwns;
 };
 
 
 /**
- * SharedOwnershipStrategy for SharedPtr class.
+ * SharedPtr for SharedPtr class.
  */
 template<class MemoryPoolType>
-struct SharedOwnershipStrategy : public BasicOwnershipStrategy<MemoryPoolType>
+struct SharedPtr : public SmartPointer<MemoryPoolType>
 {
-    typedef BasicOwnershipStrategy<MemoryPoolType> Base;
-    typedef SharedOwnershipStrategy<MemoryPoolType> This;
+    typedef SmartPointer<MemoryPoolType> Base;
+    typedef SharedPtr<MemoryPoolType> This;
 
     typedef MemoryPoolType MemoryPool;
     typedef typename MemoryPool::Value Value;
 
-    SharedOwnershipStrategy(MemoryPool & inMemoryPool) :
+    typedef typename Base::MovePtr MovePtr;
+
+    SharedPtr(MemoryPool & inMemoryPool) :
         Base(inMemoryPool, NULL),
         mValueWithRefCount(new ValueWithRefCount(NULL))
     {
     }
 
-    SharedOwnershipStrategy(MemoryPool & inMemoryPool, Value * inValue) :
+    SharedPtr(MemoryPool & inMemoryPool, Value * inValue) :
         Base(inMemoryPool, inValue),
         mValueWithRefCount(new ValueWithRefCount(inValue))
     {
     }
 
-    SharedOwnershipStrategy(const SharedOwnershipStrategy & rhs) :
+    SharedPtr(const SharedPtr & rhs) :
         Base(rhs),
         mValueWithRefCount(rhs.mValueWithRefCount)
     {
         ++mValueWithRefCount->mRefCount;
     }
 
-    SharedOwnershipStrategy& operator=(SharedOwnershipStrategy rhs)
+    /**
+     * Constructor taking a MovePtr
+     */
+    SharedPtr(MovePtr rhs) :
+        Base(*rhs.mMemoryPool, rhs.get()),
+        mValueWithRefCount(new ValueWithRefCount(rhs.release()))
     {
-        Base::swap(rhs);
+    }
+
+
+    /**
+     * Assignment operator
+     */
+    SharedPtr & operator=(SharedPtr rhs)
+    {
         This::swap(rhs);
         return *this;
     }
 
-    ~SharedOwnershipStrategy()
+    void swap(SharedPtr & rhs)
+    {
+        Base::swap(rhs);
+        std::swap(mValueWithRefCount, rhs.mValueWithRefCount);
+    }
+
+    ~SharedPtr()
     {
         if (--mValueWithRefCount->mRefCount)
         {
             Base::destroy();
         }
-    }
-
-    void swap(SharedOwnershipStrategy & rhs)
-    {
-        ValueWithRefCount * helper = mValueWithRefCount;
-        mValueWithRefCount = rhs.mValueWithRefCount;
-        rhs.mValueWithRefCount = helper;
     }
 
 private:
@@ -196,31 +248,40 @@ private:
 
 
 template<class MemoryPoolType>
-struct ScopedOwnershipStrategy : public BasicOwnershipStrategy<MemoryPoolType>,
-                                 private boost::noncopyable
+struct ScopedPtr : public SmartPointer<MemoryPoolType>,
+                   private boost::noncopyable
 {
-    typedef ScopedOwnershipStrategy<MemoryPoolType> This;
-    typedef BasicOwnershipStrategy<MemoryPoolType> Base;
+    typedef SmartPointer<MemoryPoolType> Base;
+    typedef ScopedPtr<MemoryPoolType> This;
 
     typedef MemoryPoolType MemoryPool;
     typedef typename MemoryPool::Value Value;
 
-    ScopedOwnershipStrategy(MemoryPool & inMemoryPool, Value * inValue) :
+    ScopedPtr(MemoryPool & inMemoryPool, Value * inValue) :
         Base(inMemoryPool, inValue)
     {
     }
 
-    ~ScopedOwnershipStrategy()
+    ScopedPtr(const typename Base::MovePtr & rhs) :
+        Base(rhs)
+    {
+        rhs.mOwns = false;
+    }
+
+    ~ScopedPtr()
     {
         Base::destroy();
     }
+
+private:
+    // Disable swap and assignment operator
+    void swap(ScopedPtr & rhs);
+    ScopedPtr & operator=(ScopedPtr rhs);
 };
 
 
 /**
  * MemoryPool that priorizes fast destruction.
- * Actual memory allocated is 2x the usable size.
- *
  */
 template<typename ValueType>
 class MemoryPool : boost::noncopyable
@@ -228,8 +289,9 @@ class MemoryPool : boost::noncopyable
 public:
     typedef ValueType Value;
     typedef MemoryPool<Value> This;
-    typedef MemoryPool_SmartPointer<MemoryPool<ValueType>, Value, ScopedOwnershipStrategy<MemoryPool<ValueType> > > ScopedPtr;
-    typedef MemoryPool_SmartPointer<MemoryPool<ValueType>, Value, SharedOwnershipStrategy<MemoryPool<ValueType> > > SharedPtr;
+    typedef MovePtr<This> MovePtr;
+    typedef ScopedPtr<This> ScopedPtr;
+    typedef SharedPtr<This> SharedPtr;
 
     MemoryPool(std::size_t inItemCount) :
         mData(sizeof(Value) * inItemCount),
@@ -268,8 +330,28 @@ public:
         return mUsedItems.size();
     }
 
+    std::size_t indexOf(const Value * inValue) const
+    {
+        return inValue - reinterpret_cast<const Value*>(mData.data());
+    }
+
+    std::size_t indexOf(const WrappedPointer<Value> & inWrappedPointer) const
+    {
+        return indexOf(inWrappedPointer.get());
+    }
+
+    std::size_t offsetOf(const Value * inValue) const
+    {
+        return indexOf(inValue) * sizeof(Value);
+    }
+
+    std::size_t offsetOf(const WrappedPointer<Value> & inWrappedPointer) const
+    {
+        return offsetOf(inWrappedPointer.get());
+    }
+
     /**
-     * Gets a MyClasser to a unconstructed item on the pool.
+     * Gets a pointer to a unconstructed item on the pool.
      *
      * Acquire must be followed by placement new:
      *     MyClass * ptr = new (pool.acquire()) MyClass(3, 4);
@@ -290,38 +372,8 @@ public:
         return mItems[mUsedItems.back()].mValue;
     }
 
-    Value * acquireAndDefaultConstruct()
-    {
-        return new (acquire()) Value();
-    }
-
     /**
-     * Acquires a memory slab and constructs the object using the FactoryFunction object.
-     * The FactoryFunction signature must be "Value* (void*);" or "Value* (Value*);"
-     *
-     * Example:
-     *
-     *   // Point factory function
-     *   static Point * CreatePoint(void * placement, int x, int y)
-     *   {
-     *     return new (placement) Point(x, y);
-     *   }
-     *
-     *   Point * point = pool.acquireAndConstruct(boost::bind(CreatePoint, 3, 4));
-     *
-     */
-    template<class FactoryFunction>
-    Value * acquireAndConstruct(FactoryFunction inFactoryFunction)
-    {
-        return inFactoryFunction(acquire());
-    }
-
-    /**
-     * Returns the MyClasser to the pool.
-     *
-     * This call must be preceded by calling the destructor:
-     *     ptr->~MyClass();
-     *     pool.release(ptr);
+     * Release the pointer. The object is assuemd to be destructed already!
      */
     void release(const Value * inValue)
     {
@@ -333,25 +385,8 @@ public:
                 std::swap(mUsedItems[usedIdx], mUsedItems.back());
                 mFreeItems.push_back(mUsedItems.back());
                 mUsedItems.pop_back();
-                mItems[itemIndex].mUsed = false;
             }
         }
-    }
-
-    void destructAndRelease(const Value * inValue)
-    {
-        inValue->~Value();
-        release(inValue);
-    }
-
-    std::size_t indexOf(const Value * inValue) const
-    {
-        return inValue - reinterpret_cast<const Value*>(mData.data());
-    }
-
-    std::size_t offsetOf(const Value * inValue) const
-    {
-        return indexOf(inValue) * sizeof(Value);
     }
 
 private:
@@ -363,14 +398,12 @@ private:
     public:
         Item(Value * inValue, std::size_t inIndex) :
             mValue(inValue),
-            mIndex(inIndex),
-            mUsed(false)
+            mIndex(inIndex)
         {
         }
 
         Value * mValue;
         std::size_t mIndex;
-        bool mUsed;
     };
 
     std::vector<Item> mItems;
@@ -381,6 +414,52 @@ private:
     typedef std::vector<std::size_t> FreeItems;
     FreeItems mFreeItems;
 };
+
+
+/**
+ * Acquire and call the default constructor
+ */
+template<class MemoryPoolType>
+typename MemoryPoolType::MovePtr AcquireAndDefaultConstruct(MemoryPoolType & pool)
+{
+    typedef typename MemoryPoolType::Value Value;
+    typedef typename MemoryPoolType::MovePtr MovePtr;
+    return MovePtr(pool, new (pool.acquire()) Value());
+}
+
+/**
+ * Acquires and construct with factory function.
+ * The factory function signature must be <Value* (void*)> or <Value* (Value*)>
+ *
+ * Example:
+ *
+ *   // Factory function
+ *   static Foo * Create(void * placement, const std::string & arg0, const std::string & arg1)
+ *   {
+ *     return new (placement) Foo(arg0, arg1)
+ *   }
+ *
+ *   Point * point = pool.acquireAndConstruct(boost::bind(CreatePoint, "Hello", "World!"));
+ *
+ */
+template<class MemoryPoolType, typename FactoryFunction>
+typename MemoryPoolType::MovePtr AcquireAndConstructWithFactory(MemoryPoolType & pool, FactoryFunction function)
+{
+    typedef typename MemoryPoolType::MovePtr MovePtr;
+    return MovePtr(pool, function(pool.acquire()));
+}
+
+
+/**
+ * Destructs hte object and releases the pointer from the pool.
+ */
+template<class MemoryPoolType>
+void DestructAndRelease(MemoryPoolType & pool, const typename MemoryPoolType::Value * value)
+{
+    typedef typename MemoryPoolType::Value Value;
+    value->~Value();
+    pool.release(value);
+}
 
 
 } // namespace Futile

@@ -55,9 +55,9 @@ struct Point
     int y;
 };
 
-static Point * CreatePoint(void * placement, int x, int y)
+static Point * CreatePoint(void * placement)
 {
-    return new (placement) Point(x, y);
+    return new (placement) Point(1, 2);
 }
 
 
@@ -71,7 +71,12 @@ void MemoryPoolTest::testMemoryPool()
     const std::size_t cItemCount = 100;
     const std::size_t cByteCount = cItemCount * sizeof(Point);
 
-    Futile::MemoryPool<Point> pool(cItemCount);
+    typedef Futile::MemoryPool<Point> MemoryPool;
+    typedef MemoryPool::SharedPtr SharedPtr;
+    typedef MemoryPool::ScopedPtr ScopedPtr;
+    typedef MemoryPool::MovePtr MovePtr;
+
+    MemoryPool pool(cItemCount);
 
     std::cout << "Testing pool.size() " << std::flush;
     assertEqual(pool.size(), cByteCount);
@@ -114,16 +119,15 @@ void MemoryPoolTest::testMemoryPool()
 
     std::cout << "Testing MemoryPool::ScopedPtr " << std::flush;
     {
-        typedef MemoryPool<Point>::ScopedPtr ScopedPtr;
-        MemoryPool<Point> pool(cItemCount);
+        MemoryPool pool(cItemCount);
         assertEqual(pool.used(), 0);
         assertEqual(pool.available(), cItemCount);
         {
-            ScopedPtr ptr1(pool, pool.acquireAndDefaultConstruct());
+            MovePtr ptr1(AcquireAndDefaultConstruct(pool));
             assertEqual(pool.used(), 1);
             assertEqual(pool.available(), cItemCount - 1);
 
-            ScopedPtr ptr2(pool, pool.acquireAndDefaultConstruct());
+            MovePtr ptr2(AcquireAndDefaultConstruct(pool));
             assertEqual(pool.used(), 2);
             assertEqual(pool.available(), cItemCount - 2);
         }
@@ -134,10 +138,9 @@ void MemoryPoolTest::testMemoryPool()
 
 
     {
-        typedef MemoryPool<Point>::SharedPtr SharedPtr;
 
         std::cout << "Create the pool at most outer scope " << std::flush;
-        MemoryPool<Point> pool(cItemCount);
+        MemoryPool pool(cItemCount);
         std::cout << "OK\n";
         {
             std::cout << "Check use count is zero before creating any shared pointers " << std::flush;
@@ -154,7 +157,7 @@ void MemoryPoolTest::testMemoryPool()
             std::cout << "OK\n";
 
             std::cout << "Create a second shared pointer in outer scope, this time its set " << std::flush;
-            SharedPtr outer_1(pool, pool.acquireAndDefaultConstruct());
+            SharedPtr outer_1(AcquireAndDefaultConstruct(pool));
             assertEqual(pool.used(), 1);
             Assert(outer_1.get());
             Assert(outer_0.get() != outer_1.get());
@@ -162,7 +165,7 @@ void MemoryPoolTest::testMemoryPool()
 
             {
                 std::cout << "Create inner shared pointer and set " << std::flush;
-                SharedPtr inner_1(pool, pool.acquireAndDefaultConstruct());
+                SharedPtr inner_1(AcquireAndDefaultConstruct(pool));
                 std::cout << "OK\n";
 
                 std::cout << "Check use count " << std::flush;
@@ -176,8 +179,13 @@ void MemoryPoolTest::testMemoryPool()
                 std::cout << "Check if use count has decremented after overwriting the outer shared ptr " << std::flush;
                 assertEqual(pool.used(), 1);
 
-                std::cout << "Overwrite outer unset pointer with inner set pointer " << std::flush;
+                std::cout << "outer_1 = inner_1; " << std::flush;
+                std::size_t oldRefCount = inner_1.mValueWithRefCount->mRefCount;
                 outer_1 = inner_1;
+                std::cout << "OK\n";
+
+                std::cout << "Verify that refcount of inner_1 has incremented for  count has remained unchanged " << std::flush;
+                assertEqual(outer_1.mValueWithRefCount->mRefCount, oldRefCount + 1);
                 std::cout << "OK\n";
 
                 std::cout << "Verify that use count has remained unchanged " << std::flush;
@@ -199,9 +207,10 @@ void MemoryPoolTest::testMemoryPool()
     std::vector<Point*> points;
     for (std::size_t idx = 0; idx < cItemCount; ++idx)
     {
-        Point * point = pool.acquireAndConstruct(boost::bind(CreatePoint, _1, idx, cItemCount));
-        point->x = idx;
-        point->y = cItemCount;
+
+        MovePtr point(AcquireAndConstructWithFactory(pool, CreatePoint));
+        point->x = 1;
+        point->y = 2;
 
         assertEqual(pool.size(), cByteCount);
         assertEqual(pool.used(), idx + 1);
@@ -209,7 +218,8 @@ void MemoryPoolTest::testMemoryPool()
         assertEqual(pool.indexOf(point), idx);
         assertEqual(pool.offsetOf(point), sizeof(Point) * idx);
 
-        points.push_back(point);
+        Assert(point.get());
+        points.push_back(point.release());
     }
     std::cout << "OK\n";
 
@@ -217,8 +227,7 @@ void MemoryPoolTest::testMemoryPool()
     while (pool.used() > 0)
     {
         assertEqual(pool.used(), points.size());
-        assertEqual(points.back()->x + 1, pool.used());
-        pool.destructAndRelease(points.back());
+        DestructAndRelease(pool, points.back());
         points.pop_back();
     }
     std::cout << "OK\n";
