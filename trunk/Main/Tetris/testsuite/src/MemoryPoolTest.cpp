@@ -12,7 +12,10 @@
 #include "Futile/MemoryPool.h"
 
 
-using namespace Futile;
+using Futile::MemoryPool::MemoryPool;
+using Futile::MemoryPool::ScopedPtr;
+using Futile::MemoryPool::SharedPtr;
+using Futile::MemoryPool::MovePtr;
 
 
 static const int cSleepTimeMs = 100;
@@ -71,7 +74,7 @@ void MemoryPoolTest::testMemoryPool()
     const std::size_t cItemCount = 100;
     const std::size_t cByteCount = cItemCount * sizeof(Point);
 
-    typedef Futile::MemoryPool<Point> MemoryPool;
+    typedef MemoryPool<Point> MemoryPool;
     typedef MemoryPool::SharedPtr SharedPtr;
     typedef MemoryPool::ScopedPtr ScopedPtr;
     typedef MemoryPool::MovePtr MovePtr;
