@@ -12,6 +12,7 @@
 
 
 namespace Futile {
+namespace MemoryPool {
 
 
 template<class MemoryPoolType>
@@ -25,7 +26,7 @@ struct MovePtr;
 
 
 /**
- * Encapsulates a pointer value and provides various ways to access it.
+ * WrappedPointer encapsulates a pointer value and provides various ways to access it.
  */
 template<class Value>
 struct WrappedPointer
@@ -462,7 +463,7 @@ void DestructAndRelease(MemoryPoolType & pool, const typename MemoryPoolType::Va
 }
 
 
-} // namespace Futile
+} } // namespace Futile::MemoryPool
 
 
 #endif // MemoryPoolTypeH_INCLUDED
