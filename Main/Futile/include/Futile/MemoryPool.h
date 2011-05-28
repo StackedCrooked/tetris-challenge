@@ -15,14 +15,10 @@ namespace Futile {
 namespace MemoryPool {
 
 
-template<class MemoryPoolType>
-struct ScopedPtr;
-
-template<class MemoryPoolType>
-struct SharedPtr;
-
-template<class MemoryPoolType>
-struct MovePtr;
+template<typename ValueType> struct ScopedPtr;
+template<typename ValueType> struct SharedPtr;
+template<typename ValueType> struct MovePtr;
+template<typename ValueType> class MemoryPool;
 
 
 /**
@@ -67,21 +63,21 @@ private:
 /**
  *
  */
-template<class MemoryPoolType>
-struct SmartPointer : public WrappedPointer<typename MemoryPoolType::Value>
+template<class ValueType>
+struct SmartPointer : public WrappedPointer<ValueType>
 {
 public:
-    typedef MemoryPoolType MemoryPool;
-    typedef typename MemoryPoolType::Value Value;
+    typedef ValueType Value;
+    typedef MemoryPool<Value> MemoryPool;
 
 private:
     typedef WrappedPointer<Value> Base;
-    typedef SmartPointer<MemoryPool> This;
+    typedef SmartPointer<Value> This;
 
 public:
-    typedef ScopedPtr<MemoryPool> ScopedPtr;
-    typedef SharedPtr<MemoryPool> SharedPtr;
-    typedef MovePtr<MemoryPool> MovePtr;
+    typedef ScopedPtr<Value> ScopedPtr;
+    typedef SharedPtr<Value> SharedPtr;
+    typedef MovePtr<Value> MovePtr;
 
     SmartPointer(MemoryPool & inMemoryPool) :
         Base(NULL),
@@ -122,16 +118,16 @@ private:
 };
 
 
-template<class MemoryPoolType>
-struct MovePtr : public SmartPointer<MemoryPoolType>
+template<class ValueType>
+struct MovePtr : public SmartPointer<ValueType>
 {
 private:
-    typedef MovePtr<MemoryPoolType> This;
-    typedef SmartPointer<MemoryPoolType> Base;
+    typedef MovePtr<ValueType> This;
+    typedef SmartPointer<ValueType> Base;
 
 public:
-    typedef MemoryPoolType MemoryPool;
-    typedef typename MemoryPool::Value Value;
+    typedef ValueType Value;
+    typedef MemoryPool<Value> MemoryPool;
 
     MovePtr(MemoryPool & inMemoryPool, Value * inValue) :
         Base(inMemoryPool, inValue),
@@ -172,14 +168,16 @@ private:
 /**
  * SharedPtr for SharedPtr class.
  */
-template<class MemoryPoolType>
-struct SharedPtr : public SmartPointer<MemoryPoolType>
+template<class ValueType>
+struct SharedPtr : public SmartPointer<ValueType>
 {
-    typedef SmartPointer<MemoryPoolType> Base;
-    typedef SharedPtr<MemoryPoolType> This;
+private:
+    typedef SmartPointer<ValueType> Base;
+    typedef SharedPtr<ValueType> This;
 
-    typedef MemoryPoolType MemoryPool;
-    typedef typename MemoryPool::Value Value;
+public:
+    typedef ValueType Value;
+    typedef MemoryPool<Value> MemoryPool;
 
     typedef typename Base::MovePtr MovePtr;
 
@@ -248,15 +246,17 @@ private:
 };
 
 
-template<class MemoryPoolType>
-struct ScopedPtr : public SmartPointer<MemoryPoolType>,
+template<class ValueType>
+struct ScopedPtr : public SmartPointer<ValueType>,
                    private boost::noncopyable
 {
-    typedef SmartPointer<MemoryPoolType> Base;
-    typedef ScopedPtr<MemoryPoolType> This;
+private:
+    typedef SmartPointer<ValueType> Base;
+    typedef ScopedPtr<ValueType> This;
 
-    typedef MemoryPoolType MemoryPool;
-    typedef typename MemoryPool::Value Value;
+public:
+    typedef ValueType Value;
+    typedef MemoryPool<Value> MemoryPool;
 
     ScopedPtr(MemoryPool & inMemoryPool, Value * inValue) :
         Base(inMemoryPool, inValue)
@@ -287,12 +287,16 @@ private:
 template<typename ValueType>
 class MemoryPool : boost::noncopyable
 {
+private:
+    typedef MemoryPool<ValueType> This;
+
 public:
     typedef ValueType Value;
-    typedef MemoryPool<Value> This;
-    typedef MovePtr<This> MovePtr;
-    typedef ScopedPtr<This> ScopedPtr;
-    typedef SharedPtr<This> SharedPtr;
+
+    // Smart pointers
+    typedef MovePtr<Value> MovePtr;
+    typedef ScopedPtr<Value> ScopedPtr;
+    typedef SharedPtr<Value> SharedPtr;
 
     MemoryPool(std::size_t inItemCount) :
         mData(sizeof(Value) * inItemCount),
