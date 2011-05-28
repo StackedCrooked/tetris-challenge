@@ -1,8 +1,10 @@
-#ifndef MEMORYPOOL_H_INCLUDED
-#define MEMORYPOOL_H_INCLUDED
+#ifndef MemoryPoolTypeH_INCLUDED
+#define MemoryPoolTypeH_INCLUDED
 
 
 #include <boost/noncopyable.hpp>
+#include <boost/scoped_ptr.hpp>
+#include <boost/shared_ptr.hpp>
 #include <algorithm>
 #include <cstddef>
 #include <stdexcept>
@@ -12,34 +14,206 @@
 namespace Futile {
 
 
-template<class MemoryPool_>
-class ScopedMemoryPoolPtr : boost::noncopyable
+template<class MemoryPoolType>
+struct BasicOwnershipStrategy
 {
-public:
-    typedef MemoryPool_ MemoryPool;
-    typedef typename MemoryPool::ValueType ValueType;
+    typedef typename MemoryPoolType::MemoryPool MemoryPool;
+    typedef typename MemoryPoolType::Value Value;
+    typedef BasicOwnershipStrategy<MemoryPool> This;
 
-    ScopedMemoryPoolPtr(MemoryPool * inPool, ValueType * inValue);
+    BasicOwnershipStrategy(MemoryPool & inMemoryPool) :
+        mMemoryPool(&inMemoryPool),
+        mValue(NULL)
+    {
+    }
 
-    ~ScopedMemoryPoolPtr();
+    BasicOwnershipStrategy(MemoryPool & inMemoryPool, Value * inValue) :
+        mMemoryPool(&inMemoryPool),
+        mValue(inValue)
+    {
+    }
 
-    void reset();
+    BasicOwnershipStrategy(const This & rhs) :
+        mMemoryPool(rhs.mMemoryPool),
+        mValue(rhs.mValue)
+    {
+    }
 
-    const ValueType * get() const { return mValue; }
+    BasicOwnershipStrategy & operator=(This rhs)
+    {
+        This::swap(rhs);
+        return *this;
+    }
 
-    ValueType * get() { return mValue; }
+    ~BasicOwnershipStrategy() { }
 
-    const ValueType * operator->() const { return mValue; }
+    const Value * get() const { return mValue; }
 
-    ValueType * operator->() { return mValue; }
+    Value * get() { return mValue; }
 
-    const ValueType & operator*() const { return *mValue; }
-
-    ValueType & operator*() { return *mValue; }
+    void reset(Value * inValue)
+    {
+        destroy();
+        mValue = inValue;
+    }
 
 private:
-    MemoryPool * mPool;
-    ValueType * mValue;
+    void swap(This & rhs)
+    {
+        std::swap(mMemoryPool, rhs.mMemoryPool);
+        std::swap(mValue, rhs.mValue);
+    }
+
+    inline void destroy()
+    {
+        if (mValue)
+        {
+            mValue->~Value();
+        }
+        mMemoryPool->release(mValue);
+    }
+
+    MemoryPool * mMemoryPool;
+    Value * mValue;
+};
+
+
+template<class MemoryPoolType, class ValueType, class OwnershipStrategyType>
+class MemoryPool_SmartPointer : public OwnershipStrategyType
+{
+public:
+    typedef MemoryPoolType MemoryPool;
+    typedef ValueType Value;
+    typedef OwnershipStrategyType OwnershipStrategy;
+    typedef OwnershipStrategy Base;
+    typedef MemoryPool_SmartPointer<MemoryPool, Value, Base> This;
+
+    MemoryPool_SmartPointer(MemoryPool & inMemoryPool) :
+        OwnershipStrategy(inMemoryPool)
+    {
+    }
+
+    MemoryPool_SmartPointer(MemoryPool & inMemoryPool, Value * inValue) :
+        OwnershipStrategy(inMemoryPool, inValue)
+    {
+    }
+
+    MemoryPool_SmartPointer(const This & rhs) :
+        Base(rhs)
+    {
+    }
+
+    This & operator=(This rhs)
+    {
+        Base::swap(rhs);
+        return *this;
+    }
+
+    ~MemoryPool_SmartPointer() { }
+
+    const Value * operator->() const { return OwnershipStrategy::get(); }
+
+    Value * operator->() { return OwnershipStrategy::get(); }
+
+    const Value & operator*() const { return *OwnershipStrategy::get(); }
+
+    Value & operator*() { return *OwnershipStrategy::get(); }
+
+private:
+    void destroy()
+    {
+        Value * value = OwnershipStrategy::get();
+        value->~Value();
+        OwnershipStrategy::mMemoryPool->release(value);
+    }
+};
+
+
+/**
+ * SharedOwnershipStrategy for SharedPtr class.
+ */
+template<class MemoryPoolType>
+struct SharedOwnershipStrategy : public BasicOwnershipStrategy<MemoryPoolType>
+{
+    typedef BasicOwnershipStrategy<MemoryPoolType> Base;
+    typedef SharedOwnershipStrategy<MemoryPoolType> This;
+
+    typedef MemoryPoolType MemoryPool;
+    typedef typename MemoryPool::Value Value;
+
+    SharedOwnershipStrategy(MemoryPool & inMemoryPool) :
+        Base(inMemoryPool, NULL),
+        mValueWithRefCount(new ValueWithRefCount(NULL))
+    {
+    }
+
+    SharedOwnershipStrategy(MemoryPool & inMemoryPool, Value * inValue) :
+        Base(inMemoryPool, inValue),
+        mValueWithRefCount(new ValueWithRefCount(inValue))
+    {
+    }
+
+    SharedOwnershipStrategy(const SharedOwnershipStrategy & rhs) :
+        Base(rhs),
+        mValueWithRefCount(rhs.mValueWithRefCount)
+    {
+        ++mValueWithRefCount->mRefCount;
+    }
+
+    SharedOwnershipStrategy& operator=(SharedOwnershipStrategy rhs)
+    {
+        Base::swap(rhs);
+        This::swap(rhs);
+        return *this;
+    }
+
+    ~SharedOwnershipStrategy()
+    {
+        if (--mValueWithRefCount->mRefCount)
+        {
+            Base::destroy();
+        }
+    }
+
+    void swap(SharedOwnershipStrategy & rhs)
+    {
+        ValueWithRefCount * helper = mValueWithRefCount;
+        mValueWithRefCount = rhs.mValueWithRefCount;
+        rhs.mValueWithRefCount = helper;
+    }
+
+private:
+    struct ValueWithRefCount : boost::noncopyable
+    {
+        ValueWithRefCount(Value * inValue) : mValue(inValue), mRefCount(1) { }
+
+        Value * mValue;
+        std::size_t mRefCount;
+    };
+
+    ValueWithRefCount * mValueWithRefCount;
+};
+
+
+template<class MemoryPoolType>
+struct ScopedOwnershipStrategy : public BasicOwnershipStrategy<MemoryPoolType>,
+                                 private boost::noncopyable
+{
+    typedef ScopedOwnershipStrategy<MemoryPoolType> This;
+    typedef BasicOwnershipStrategy<MemoryPoolType> Base;
+
+    typedef MemoryPoolType MemoryPool;
+    typedef typename MemoryPool::Value Value;
+
+    ScopedOwnershipStrategy(MemoryPool & inMemoryPool, Value * inValue) :
+        Base(inMemoryPool, inValue)
+    {
+    }
+
+    ~ScopedOwnershipStrategy()
+    {
+        Base::destroy();
+    }
 };
 
 
@@ -48,23 +222,25 @@ private:
  * Actual memory allocated is 2x the usable size.
  *
  */
-template<typename ValueType_>
+template<typename ValueType>
 class MemoryPool : boost::noncopyable
 {
 public:
-    typedef ValueType_ ValueType;
-    typedef ScopedMemoryPoolPtr< MemoryPool<ValueType> > ScopedPtr;
+    typedef ValueType Value;
+    typedef MemoryPool<Value> This;
+    typedef MemoryPool_SmartPointer<MemoryPool<ValueType>, Value, ScopedOwnershipStrategy<MemoryPool<ValueType> > > ScopedPtr;
+    typedef MemoryPool_SmartPointer<MemoryPool<ValueType>, Value, SharedOwnershipStrategy<MemoryPool<ValueType> > > SharedPtr;
 
     MemoryPool(std::size_t inItemCount) :
-        mData(sizeof(ValueType) * inItemCount),
+        mData(sizeof(Value) * inItemCount),
         mItems(),
         mUsedItems(),
         mFreeItems(inItemCount, NULL)
     {
         for (std::size_t idx = 0; idx < inItemCount; ++idx)
         {
-            char * data = &mData[idx * sizeof(ValueType)];
-            ValueType * value = reinterpret_cast<ValueType*>(data);
+            char * data = &mData[idx * sizeof(Value)];
+            Value * value = reinterpret_cast<Value*>(data);
             mItems.push_back(Item(value, idx));
             mFreeItems[inItemCount - (idx + 1)] = idx;
         }
@@ -102,7 +278,7 @@ public:
      *     ptr->~MyClass();
      *     pool.release(ptr);
      */
-    ValueType * acquire()
+    Value * acquire()
     {
         if (mFreeItems.empty())
         {
@@ -114,14 +290,14 @@ public:
         return mItems[mUsedItems.back()].mValue;
     }
 
-    ValueType * acquireAndDefaultConstruct()
+    Value * acquireAndDefaultConstruct()
     {
-        return new (acquire()) ValueType();
+        return new (acquire()) Value();
     }
 
     /**
      * Acquires a memory slab and constructs the object using the FactoryFunction object.
-     * The FactoryFunction signature must be "ValueType* (void*);" or "ValueType* (ValueType*);"
+     * The FactoryFunction signature must be "Value* (void*);" or "Value* (Value*);"
      *
      * Example:
      *
@@ -135,7 +311,7 @@ public:
      *
      */
     template<class FactoryFunction>
-    ValueType * acquireAndConstruct(FactoryFunction inFactoryFunction)
+    Value * acquireAndConstruct(FactoryFunction inFactoryFunction)
     {
         return inFactoryFunction(acquire());
     }
@@ -147,7 +323,7 @@ public:
      *     ptr->~MyClass();
      *     pool.release(ptr);
      */
-    void release(const ValueType * inValue)
+    void release(const Value * inValue)
     {
         for (std::size_t usedIdx = mUsedItems.size() - 1; usedIdx != std::size_t(-1); --usedIdx)
         {
@@ -162,20 +338,20 @@ public:
         }
     }
 
-    void destructAndRelease(const ValueType * inValue)
+    void destructAndRelease(const Value * inValue)
     {
-        inValue->~ValueType();
+        inValue->~Value();
         release(inValue);
     }
 
-    std::size_t indexOf(const ValueType * inValue) const
+    std::size_t indexOf(const Value * inValue) const
     {
-        return inValue - reinterpret_cast<const ValueType*>(mData.data());
+        return inValue - reinterpret_cast<const Value*>(mData.data());
     }
 
-    std::size_t offsetOf(const ValueType * inValue) const
+    std::size_t offsetOf(const Value * inValue) const
     {
-        return indexOf(inValue) * sizeof(ValueType);
+        return indexOf(inValue) * sizeof(Value);
     }
 
 private:
@@ -185,14 +361,14 @@ private:
     class Item
     {
     public:
-        Item(ValueType * inValue, std::size_t inIndex) :
+        Item(Value * inValue, std::size_t inIndex) :
             mValue(inValue),
             mIndex(inIndex),
             mUsed(false)
         {
         }
 
-        ValueType * mValue;
+        Value * mValue;
         std::size_t mIndex;
         bool mUsed;
     };
@@ -207,30 +383,7 @@ private:
 };
 
 
-template<class MemoryPool>
-ScopedMemoryPoolPtr<MemoryPool>::ScopedMemoryPoolPtr(MemoryPool * inPool, ValueType * inValue) :
-    mPool(inPool),
-    mValue(inValue)
-{
-}
-
-
-template<class MemoryPool>
-ScopedMemoryPoolPtr<MemoryPool>::~ScopedMemoryPoolPtr()
-{
-    reset();
-}
-
-
-template<class MemoryPool>
-void ScopedMemoryPoolPtr<MemoryPool>::reset()
-{
-    mValue->~ValueType();
-    mPool->release(mValue);
-}
-
-
 } // namespace Futile
 
 
-#endif // MEMORYPOOL_H_INCLUDED
+#endif // MemoryPoolTypeH_INCLUDED

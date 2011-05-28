@@ -71,7 +71,7 @@ void MemoryPoolTest::testMemoryPool()
     const std::size_t cItemCount = 100;
     const std::size_t cByteCount = cItemCount * sizeof(Point);
 
-    Futile::MemoryPool<Point> pool(100);
+    Futile::MemoryPool<Point> pool(cItemCount);
 
     std::cout << "Testing pool.size() " << std::flush;
     assertEqual(pool.size(), cByteCount);
@@ -112,24 +112,90 @@ void MemoryPoolTest::testMemoryPool()
     std::cout << "OK\n";
 
 
-    std::cout << "Testing MemoryPool::ScopedPtr" << std::flush;
+    std::cout << "Testing MemoryPool::ScopedPtr " << std::flush;
     {
-
-        // Pool is empty after each iteration because we store the value in ScopedPtr.
+        typedef MemoryPool<Point>::ScopedPtr ScopedPtr;
+        MemoryPool<Point> pool(cItemCount);
         assertEqual(pool.used(), 0);
         assertEqual(pool.available(), cItemCount);
+        {
+            ScopedPtr ptr1(pool, pool.acquireAndDefaultConstruct());
+            assertEqual(pool.used(), 1);
+            assertEqual(pool.available(), cItemCount - 1);
 
-        MemoryPool<Point>::ScopedPtr point(&pool, pool.acquireAndDefaultConstruct());
-        assertEqual(point->x, 0);
-        assertEqual(point->y, 0);
-
-        assertEqual(pool.used(), 1);
-        assertEqual(pool.available(), cItemCount - 1);
+            ScopedPtr ptr2(pool, pool.acquireAndDefaultConstruct());
+            assertEqual(pool.used(), 2);
+            assertEqual(pool.available(), cItemCount - 2);
+        }
+        assertEqual(pool.used(), 0);
+        assertEqual(pool.available(), cItemCount);
     }
     std::cout << "OK\n";
 
 
-    std::cout << "Testing MemoryPool filling" << std::flush;
+    {
+        typedef MemoryPool<Point>::SharedPtr SharedPtr;
+
+        std::cout << "Create the pool at most outer scope " << std::flush;
+        MemoryPool<Point> pool(cItemCount);
+        std::cout << "OK\n";
+        {
+            std::cout << "Check use count is zero before creating any shared pointers " << std::flush;
+            assertEqual(pool.used(), 0);
+            std::cout << "OK\n";
+
+            std::cout << "Check use count is zero after default constructing a sharedPtr without setting it " << std::flush;
+            SharedPtr outer_0(pool);
+            assertEqual(pool.used(), 0);
+            std::cout << "OK\n";
+
+            std::cout << "Check default created shared ptr has a null value" << std::flush;
+            assertEqual(outer_0.get(), NULL);
+            std::cout << "OK\n";
+
+            std::cout << "Create a second shared pointer in outer scope, this time its set " << std::flush;
+            SharedPtr outer_1(pool, pool.acquireAndDefaultConstruct());
+            assertEqual(pool.used(), 1);
+            Assert(outer_1.get());
+            Assert(outer_0.get() != outer_1.get());
+            std::cout << "OK\n";
+
+            {
+                std::cout << "Create inner shared pointer and set " << std::flush;
+                SharedPtr inner_1(pool, pool.acquireAndDefaultConstruct());
+                std::cout << "OK\n";
+
+                std::cout << "Check use count " << std::flush;
+                assertEqual(pool.used(), 2);
+                std::cout << "OK\n";
+
+                std::cout << "Overwrite inner (set) pointer with outer (set) pointer " << std::flush;
+                inner_1.reset(outer_1.get());
+                std::cout << "OK\n";
+
+                std::cout << "Check if use count has decremented after overwriting the outer shared ptr " << std::flush;
+                assertEqual(pool.used(), 1);
+
+                std::cout << "Overwrite outer unset pointer with inner set pointer " << std::flush;
+                outer_1 = inner_1;
+                std::cout << "OK\n";
+
+                std::cout << "Verify that use count has remained unchanged " << std::flush;
+                assertEqual(pool.used(), 1);
+                std::cout << "OK\n";
+            }
+        }
+        std::cout << "Verify use count zero after destroying all shared poiters " << std::flush;
+        assertEqual(pool.used(), 0);
+        std::cout << " OK\n";
+
+        std::cout << "Verify available count equal to max after destroying all shared poiters " << std::flush;
+        assertEqual(pool.available(), cItemCount);
+        std::cout << " OK\n";
+    }
+
+
+    std::cout << "Testing MemoryPool filling " << std::flush;
     std::vector<Point*> points;
     for (std::size_t idx = 0; idx < cItemCount; ++idx)
     {
@@ -147,7 +213,7 @@ void MemoryPoolTest::testMemoryPool()
     }
     std::cout << "OK\n";
 
-
+    std::cout << "Testing MemoryPool erasing " << std::flush;
     while (pool.used() > 0)
     {
         assertEqual(pool.used(), points.size());
@@ -155,6 +221,7 @@ void MemoryPoolTest::testMemoryPool()
         pool.destructAndRelease(points.back());
         points.pop_back();
     }
+    std::cout << "OK\n";
 }
 
 
