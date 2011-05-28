@@ -8,6 +8,8 @@
 #include <iostream>
 
 
+// Give access to private variables for the MemoryPool classes.
+// This allows us to test the state of member variables.
 #define private public
 #include "Futile/MemoryPool.h"
 
