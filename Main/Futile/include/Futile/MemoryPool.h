@@ -75,9 +75,6 @@ private:
     typedef SmartPointer<Value> This;
 
 public:
-    typedef ScopedPtr<Value> ScopedPtr;
-    typedef SharedPtr<Value> SharedPtr;
-    typedef MovePtr<Value> MovePtr;
 
     SmartPointer(MemoryPool & inMemoryPool) :
         Base(NULL),
@@ -103,7 +100,7 @@ public:
         setValue(inValue);
     }
 
-private:
+protected:
     inline void destroy()
     {
         Value * value = Base::get();
@@ -113,6 +110,9 @@ private:
             mMemoryPool->release(value);
         }
     }
+
+    template<typename ValueType_>
+    friend SharedPtr<ValueType_> Share(MovePtr<ValueType_> inMovePtr);
 
     MemoryPool * mMemoryPool;
 };
@@ -146,7 +146,7 @@ public:
     {
         if (mOwns)
         {
-            Base::destroy();
+            SmartPointer<Value>::destroy();
         }
     }
 
@@ -166,6 +166,16 @@ private:
 
 
 /**
+ * MovePtr factory function
+ */
+template<typename ValueType>
+MovePtr<ValueType> Move(MemoryPool<ValueType> & pool, ValueType * inValue)
+{
+    return MovePtr<ValueType>(pool, inValue);
+}
+
+
+/**
  * SharedPtr for SharedPtr class.
  */
 template<class ValueType>
@@ -178,8 +188,6 @@ private:
 public:
     typedef ValueType Value;
     typedef MemoryPool<Value> MemoryPool;
-
-    typedef typename Base::MovePtr MovePtr;
 
     SharedPtr(MemoryPool & inMemoryPool) :
         Base(inMemoryPool, NULL),
@@ -198,15 +206,6 @@ public:
         mValueWithRefCount(rhs.mValueWithRefCount)
     {
         ++mValueWithRefCount->mRefCount;
-    }
-
-    /**
-     * Constructor taking a MovePtr
-     */
-    SharedPtr(MovePtr rhs) :
-        Base(*rhs.mMemoryPool, rhs.get()),
-        mValueWithRefCount(new ValueWithRefCount(rhs.release()))
-    {
     }
 
 
@@ -246,6 +245,26 @@ private:
 };
 
 
+/**
+* "Share" is a factory function for creating SharedPtr objects.
+ */
+template<typename ValueType>
+SharedPtr<ValueType> Share(MemoryPool<ValueType> & pool, ValueType * inValue)
+{
+    return SharedPtr<ValueType>(pool, inValue);
+}
+
+
+/**
+ * "Share" overload that creates a SharedPtr from a MovePtr.
+ */
+template<typename ValueType>
+SharedPtr<ValueType> Share(MovePtr<ValueType> inMovePtr)
+{
+    return Share(*inMovePtr.mMemoryPool, inMovePtr.release());
+}
+
+
 template<class ValueType>
 struct ScopedPtr : public SmartPointer<ValueType>,
                    private boost::noncopyable
@@ -263,7 +282,7 @@ public:
     {
     }
 
-    ScopedPtr(const typename Base::MovePtr & rhs) :
+    ScopedPtr(const MovePtr<Value> & rhs) :
         Base(rhs)
     {
         rhs.mOwns = false;
@@ -424,12 +443,10 @@ private:
 /**
  * Acquire and call the default constructor
  */
-template<class MemoryPoolType>
-typename MemoryPoolType::MovePtr AcquireAndDefaultConstruct(MemoryPoolType & pool)
+template<class ValueType>
+MovePtr<ValueType> AcquireAndDefaultConstruct(MemoryPool<ValueType> & pool)
 {
-    typedef typename MemoryPoolType::Value Value;
-    typedef typename MemoryPoolType::MovePtr MovePtr;
-    return MovePtr(pool, new (pool.acquire()) Value());
+    return Move(pool, new (pool.acquire()) ValueType());
 }
 
 /**
@@ -447,22 +464,20 @@ typename MemoryPoolType::MovePtr AcquireAndDefaultConstruct(MemoryPoolType & poo
  *   Point * point = pool.acquireAndConstruct(boost::bind(CreatePoint, "Hello", "World!"));
  *
  */
-template<class MemoryPoolType, typename FactoryFunction>
-typename MemoryPoolType::MovePtr AcquireAndConstructWithFactory(MemoryPoolType & pool, FactoryFunction function)
+template<class ValueType, typename FactoryFunction>
+MovePtr<ValueType> AcquireAndConstructWithFactory(MemoryPool<ValueType> & pool, FactoryFunction function)
 {
-    typedef typename MemoryPoolType::MovePtr MovePtr;
-    return MovePtr(pool, function(pool.acquire()));
+    return Move(pool, function(pool.acquire()));
 }
 
 
 /**
  * Destructs hte object and releases the pointer from the pool.
  */
-template<class MemoryPoolType>
-void DestructAndRelease(MemoryPoolType & pool, const typename MemoryPoolType::Value * value)
+template<class ValueType>
+void DestructAndRelease(MemoryPool<ValueType> & pool, const ValueType * value)
 {
-    typedef typename MemoryPoolType::Value Value;
-    value->~Value();
+    value->~ValueType();
     pool.release(value);
 }
 

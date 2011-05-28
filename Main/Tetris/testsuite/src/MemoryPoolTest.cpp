@@ -1,17 +1,12 @@
 #include "MemoryPoolTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
+#include "Futile/MemoryPool.h"
 #include "Futile/Threading.h"
 #include "Futile/Assert.h"
 #include "Poco/Thread.h"
 #include "Poco/Stopwatch.h"
 #include <iostream>
-
-
-// Give access to private variables for the MemoryPool classes.
-// This allows us to test the state of member variables.
-#define private public
-#include "Futile/MemoryPool.h"
 
 
 using Futile::MemoryPool::MemoryPool;
@@ -156,7 +151,7 @@ void MemoryPoolTest::testMemoryPool()
             std::cout << "OK\n";
 
             std::cout << "Create a second shared pointer in outer scope, this time its set " << std::flush;
-            SharedPtr outer_1(AcquireAndDefaultConstruct(pool));
+            SharedPtr outer_1(Share(AcquireAndDefaultConstruct(pool)));
             assertEqual(pool.used(), 1);
             Assert(outer_1.get());
             Assert(outer_0.get() != outer_1.get());
@@ -164,7 +159,7 @@ void MemoryPoolTest::testMemoryPool()
 
             {
                 std::cout << "Create inner shared pointer and set " << std::flush;
-                SharedPtr inner_1(AcquireAndDefaultConstruct(pool));
+                SharedPtr inner_1(Share(AcquireAndDefaultConstruct(pool)));
                 std::cout << "OK\n";
 
                 std::cout << "Check use count " << std::flush;
@@ -179,12 +174,7 @@ void MemoryPoolTest::testMemoryPool()
                 assertEqual(pool.used(), 1);
 
                 std::cout << "outer_1 = inner_1; " << std::flush;
-                std::size_t oldRefCount = inner_1.mValueWithRefCount->mRefCount;
                 outer_1 = inner_1;
-                std::cout << "OK\n";
-
-                std::cout << "Verify that refcount of inner_1 has incremented for  count has remained unchanged " << std::flush;
-                assertEqual(outer_1.mValueWithRefCount->mRefCount, oldRefCount + 1);
                 std::cout << "OK\n";
 
                 std::cout << "Verify that use count has remained unchanged " << std::flush;
