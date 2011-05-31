@@ -1,9 +1,6 @@
 cmake_minimum_required(VERSION 2.6)
 project(TetrisTestSuite)
 
-FIND_PACKAGE(Qt4 REQUIRED)
-
-
 #
 # Detect PLATFORM and ARCH variables
 #
@@ -59,7 +56,7 @@ set(EXECUTABLE_OUTPUT_PATH ${OUTDIR}bin/)
 #
 set(WARNING_OPTIONS         "-arch ${ARCH} ")
 set(WARNING_OPTIONS_Debug   "${WARNING_OPTIONS} -Wall -Werror -Wno-sign-compare")
-set(CXX_FLAGS         "${CXX_FLAGS} -DTETRIS_QT=1 -pthread ")
+set(CXX_FLAGS         "${CXX_FLAGS} -pthread ")
 set(CXX_FLAGS_Debug   "${CXX_FLAGS} ${WARNING_OPTIONS_Debug} -ggdb3 ")
 set(CXX_FLAGS_Release "${CXX_FLAGS} ${WARNING_OPTIONS_Release} -O3 -DNDEBUG ")
 set(FINAL_COMPILE_FLAGS "${CXX_FLAGS_${CMAKE_BUILD_TYPE}}")

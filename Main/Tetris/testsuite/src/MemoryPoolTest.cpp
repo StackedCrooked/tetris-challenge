@@ -66,9 +66,6 @@ void MemoryPoolTest::testMemoryPool()
     const std::size_t cByteCount = cItemCount * sizeof(Point);
 
     typedef MemoryPool<Point> MemoryPool;
-    typedef MemoryPool::SharedPtr SharedPtr;
-    typedef MemoryPool::ScopedPtr ScopedPtr;
-    typedef MemoryPool::MovePtr MovePtr;
 
     MemoryPool pool(cItemCount);
 
@@ -117,11 +114,11 @@ void MemoryPoolTest::testMemoryPool()
         assertEqual(pool.used(), 0);
         assertEqual(pool.available(), cItemCount);
         {
-            MovePtr ptr1(AcquireAndDefaultConstruct(pool));
+            MovePtr<Point> ptr1(AcquireAndDefaultConstruct(pool));
             assertEqual(pool.used(), 1);
             assertEqual(pool.available(), cItemCount - 1);
 
-            MovePtr ptr2(AcquireAndDefaultConstruct(pool));
+            MovePtr<Point> ptr2(AcquireAndDefaultConstruct(pool));
             assertEqual(pool.used(), 2);
             assertEqual(pool.available(), cItemCount - 2);
         }
@@ -142,7 +139,7 @@ void MemoryPoolTest::testMemoryPool()
             std::cout << "OK\n";
 
             std::cout << "Check use count is zero after default constructing a sharedPtr without setting it " << std::flush;
-            SharedPtr outer_0(pool);
+            SharedPtr<Point> outer_0(pool);
             assertEqual(pool.used(), 0);
             std::cout << "OK\n";
 
@@ -151,7 +148,7 @@ void MemoryPoolTest::testMemoryPool()
             std::cout << "OK\n";
 
             std::cout << "Create a second shared pointer in outer scope, this time its set " << std::flush;
-            SharedPtr outer_1(Share(AcquireAndDefaultConstruct(pool)));
+            SharedPtr<Point> outer_1(Share(AcquireAndDefaultConstruct(pool)));
             assertEqual(pool.used(), 1);
             Assert(outer_1.get());
             Assert(outer_0.get() != outer_1.get());
@@ -159,7 +156,7 @@ void MemoryPoolTest::testMemoryPool()
 
             {
                 std::cout << "Create inner shared pointer and set " << std::flush;
-                SharedPtr inner_1(Share(AcquireAndDefaultConstruct(pool)));
+                SharedPtr<Point> inner_1(Share(AcquireAndDefaultConstruct(pool)));
                 std::cout << "OK\n";
 
                 std::cout << "Check use count " << std::flush;
@@ -197,7 +194,7 @@ void MemoryPoolTest::testMemoryPool()
     for (std::size_t idx = 0; idx < cItemCount; ++idx)
     {
 
-        MovePtr point(AcquireAndConstructWithFactory(pool, CreatePoint));
+        MovePtr<Point> point(AcquireAndConstructWithFactory(pool, CreatePoint));
         point->x = 1;
         point->y = 2;
 
