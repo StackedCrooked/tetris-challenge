@@ -68,7 +68,6 @@ struct SmartPointer : public WrappedPointer<ValueType>
 {
 public:
     typedef ValueType Value;
-    typedef MemoryPool<Value> MemoryPool;
 
 private:
     typedef WrappedPointer<Value> Base;
@@ -76,13 +75,13 @@ private:
 
 public:
 
-    SmartPointer(MemoryPool & inMemoryPool) :
+    SmartPointer(MemoryPool<Value> & inMemoryPool) :
         Base(NULL),
         mMemoryPool(&inMemoryPool)
     {
     }
 
-    SmartPointer(MemoryPool & inMemoryPool, Value * inValue) :
+    SmartPointer(MemoryPool<Value> & inMemoryPool, Value * inValue) :
         Base(inValue),
         mMemoryPool(&inMemoryPool)
     {
@@ -114,7 +113,7 @@ protected:
     template<typename ValueType_>
     friend SharedPtr<ValueType_> Share(MovePtr<ValueType_> inMovePtr);
 
-    MemoryPool * mMemoryPool;
+    MemoryPool<Value> * mMemoryPool;
 };
 
 
@@ -127,9 +126,8 @@ private:
 
 public:
     typedef ValueType Value;
-    typedef MemoryPool<Value> MemoryPool;
 
-    MovePtr(MemoryPool & inMemoryPool, Value * inValue) :
+    MovePtr(MemoryPool<Value> & inMemoryPool, Value * inValue) :
         Base(inMemoryPool, inValue),
         mOwns(true)
     {
@@ -187,15 +185,14 @@ private:
 
 public:
     typedef ValueType Value;
-    typedef MemoryPool<Value> MemoryPool;
 
-    SharedPtr(MemoryPool & inMemoryPool) :
+    SharedPtr(MemoryPool<Value> & inMemoryPool) :
         Base(inMemoryPool, NULL),
         mValueWithRefCount(new ValueWithRefCount(NULL))
     {
     }
 
-    SharedPtr(MemoryPool & inMemoryPool, Value * inValue) :
+    SharedPtr(MemoryPool<Value> & inMemoryPool, Value * inValue) :
         Base(inMemoryPool, inValue),
         mValueWithRefCount(new ValueWithRefCount(inValue))
     {
@@ -275,9 +272,8 @@ private:
 
 public:
     typedef ValueType Value;
-    typedef MemoryPool<Value> MemoryPool;
 
-    ScopedPtr(MemoryPool & inMemoryPool, Value * inValue) :
+    ScopedPtr(MemoryPool<Value> & inMemoryPool, Value * inValue) :
         Base(inMemoryPool, inValue)
     {
     }
@@ -311,11 +307,6 @@ private:
 
 public:
     typedef ValueType Value;
-
-    // Smart pointers
-    typedef MovePtr<Value> MovePtr;
-    typedef ScopedPtr<Value> ScopedPtr;
-    typedef SharedPtr<Value> SharedPtr;
 
     MemoryPool(std::size_t inItemCount) :
         mData(sizeof(Value) * inItemCount),
