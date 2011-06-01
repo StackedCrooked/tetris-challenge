@@ -14,7 +14,6 @@
 #include <set>
 
 
-using Futile::ThreadSafe;
 
 
 namespace Tetris {
@@ -23,6 +22,7 @@ namespace Tetris {
 class Block;
 class GameStateNode;
 class GameImpl;
+using Futile::ThreadSafe;
 
 
 /**
@@ -33,6 +33,17 @@ class GameImpl;
  */
 class Game
 {
+protected:
+    /**
+     * Constructor is private. Use the factory methods defined in subtype.
+     */
+    Game(std::size_t inNumRows, std::size_t inNumColumns);
+
+    // Friendship required for destructor.
+    friend class ThreadSafe<Game>;
+
+    virtual ~Game();
+
 public:
     class EventHandler
     {
@@ -62,9 +73,7 @@ public:
         static Instances sInstances;
     };
 
-    Game(std::size_t inNumRows, std::size_t inNumColumns);
 
-    virtual ~Game();
 
     static void RegisterEventHandler(ThreadSafe<Game> inGame, EventHandler * inEventHandler);
 
@@ -155,9 +164,10 @@ private:
 class HumanGame : public Game
 {
 public:
-    HumanGame(std::size_t inNumRows, std::size_t inNumCols);
-
-    HumanGame(const Game & inGame);
+    inline static ThreadSafe<Game> Create(std::size_t inNumRows, std::size_t inNumColumns)
+    {
+        return ThreadSafe<Game>(new HumanGame(inNumRows, inNumColumns));
+    }
 
     virtual bool move(MoveDirection inDirection);
 
@@ -166,6 +176,13 @@ public:
     virtual void setGrid(const Grid & inGrid);
 
 protected:
+    // Friendship required for constructor.
+    friend class Game;
+
+    HumanGame(std::size_t inNumRows, std::size_t inNumCols);
+
+    HumanGame(const Game & inGame);
+
     GameState & gameState();
 
 private:
@@ -176,9 +193,10 @@ private:
 class ComputerGame : public Game
 {
 public:
-    ComputerGame(std::size_t inNumRows, std::size_t inNumCols);
-
-    ComputerGame(const Game & inGame);
+    inline static ThreadSafe<Game> Create(std::size_t inNumRows, std::size_t inNumColumns)
+    {
+        return ThreadSafe<Game>(new ComputerGame(inNumRows, inNumColumns));
+    }
 
     virtual bool move(MoveDirection inDirection);
 
@@ -199,6 +217,13 @@ public:
     virtual void setGrid(const Grid & inGrid);
 
 protected:
+    // Friendship required for constructor.
+    friend class Game;
+
+    ComputerGame(std::size_t inNumRows, std::size_t inNumCols);
+
+    ComputerGame(const Game & inGame);
+
     GameState & gameState();
 
 private:

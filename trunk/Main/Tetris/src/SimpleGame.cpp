@@ -12,6 +12,9 @@
 #include <stdexcept>
 
 
+namespace Tetris {
+
+
 using Futile::CreatePoly;
 using Futile::LogWarning;
 using Futile::ScopedReader;
@@ -19,20 +22,17 @@ using Futile::ScopedWriter;
 using Futile::ThreadSafe;
 
 
-namespace Tetris {
-
-
 struct SimpleGame::Impl : public Game::EventHandler
 {
-    static std::auto_ptr<Game> CreateGame(PlayerType inPlayerType, std::size_t inRowCount, std::size_t inColumnCount)
+    static Futile::ThreadSafe<Game> CreateGame(PlayerType inPlayerType, std::size_t inRowCount, std::size_t inColumnCount)
     {
         if (inPlayerType == Human)
         {
-            return CreatePoly<Game, HumanGame>(inRowCount, inColumnCount);
+            return HumanGame::Create(inRowCount, inColumnCount);
         }
         else if (inPlayerType == Computer)
         {
-            return CreatePoly<Game, ComputerGame>(inRowCount, inColumnCount);
+            return ComputerGame::Create(inRowCount, inColumnCount);
         }
         throw std::logic_error("Invalid enum value for PlayerType.");
     }

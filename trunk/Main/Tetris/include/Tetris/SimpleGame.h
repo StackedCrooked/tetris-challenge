@@ -7,7 +7,9 @@
 #include "Tetris/GameStateStats.h"
 #include "Tetris/PlayerType.h"
 #include "Futile/Threading.h"
+#include <boost/function.hpp>
 #include <boost/scoped_ptr.hpp>
+#include <boost/signals2/signal.hpp>
 #include <cstddef>
 #include <set>
 #include <stdexcept>
