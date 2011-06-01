@@ -82,7 +82,7 @@ const Evaluator & Model::updateAIParameters(const Player & inPlayer,
         throw std::runtime_error("GameState is null!");
     }
 
-    const SimpleGame & game = *inPlayer.simpleGame();
+    const Game & game = *inPlayer.simpleGame();
 
     outWorkerCount = Poco::Environment::processorCount();
 	if (outWorkerCount > 1)

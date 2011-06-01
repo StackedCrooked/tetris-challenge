@@ -6,14 +6,14 @@
 #include "Tetris/BlockTypes.h"
 #include "Tetris/Grid.h"
 #include "Tetris/Player.h"
-#include "Tetris/SimpleGame.h"
+#include "Tetris/Game.h"
 #include "Poco/Stopwatch.h"
 
 
 namespace Tetris {
 
 
-class SimpleGame;
+class Game;
 
 
 class RGBColor
@@ -72,22 +72,22 @@ private:
 };
 
 
-class AbstractWidget : public SimpleGame::EventHandler
+class AbstractWidget : public Game::EventHandler
 {
 public:
     AbstractWidget(int insquareWidth, int inSquareHeight);
 
     virtual ~AbstractWidget();
 
-    virtual void onGameStateChanged(SimpleGame * inGame);
+    virtual void onGameStateChanged(Game * inGame);
 
-    virtual void onLinesCleared(SimpleGame * inGame, int inLineCount);
+    virtual void onLinesCleared(Game * inGame, int inLineCount);
 
     void setPlayer(Player * inPlayer);
 
-    const SimpleGame * simpleGame() const;
+    const Game * simpleGame() const;
 
-    SimpleGame * simpleGame();
+    Game * simpleGame();
 
     const Player * player() const;
 
@@ -123,7 +123,7 @@ protected:
     virtual void setMinSize(const Size & inMinSize) = 0;
     virtual Size getMinSize() const = 0;
 
-    void coordinateRepaint(SimpleGame & inGame);
+    void coordinateRepaint(Game & inGame);
     virtual void paintSquare(const Rect & inRect, const RGBColor & inColor) = 0;
     virtual void paintStatItem(const Tetris::Rect & inRect, const std::string & inName, const std::string & inValue) = 0;
     virtual void paintImage(const Tetris::Rect & inRect, const std::string & inFileName) = 0;
@@ -140,8 +140,8 @@ private:
     void paintGrid(int x, int y, const Grid & inGrid, const RGBColor & inColor);
     void paintUserInfo();
     void paintGameGrid(const Grid & inGrid);
-    void paintAvatar(const SimpleGame & inSimpleGame);
-    void paintActiveBlockShadow(const SimpleGame & inSimpleGame);
+    void paintAvatar(const Game & inGame);
+    void paintActiveBlockShadow(const Game & inGame);
     void paintStats(const Rect & inRect, const GameStateStats & inStats);
     void paintFutureBlocks(const Rect & inRect, int inSpacing, const std::vector<BlockType> & inBlockTypes);
     void recalculateFPS();

@@ -1,6 +1,6 @@
 #include "Tetris/Config.h"
 #include "Tetris/MultiplayerGame.h"
-#include "Tetris/Game.h"
+#include "Tetris/GameImpl.h"
 #include "Futile/Logging.h"
 #include "Futile/Threading.h"
 #include <boost/noncopyable.hpp>
@@ -13,7 +13,7 @@
 namespace Tetris {
 
 
-struct MultiplayerGame::Impl : public SimpleGame::EventHandler,
+struct MultiplayerGame::Impl : public Game::EventHandler,
                                boost::noncopyable
 {
     Impl(std::size_t inRowCount, std::size_t inColumnCount) :
@@ -27,20 +27,20 @@ struct MultiplayerGame::Impl : public SimpleGame::EventHandler,
     }
 
 
-    virtual void onGameStateChanged(SimpleGame * )
+    virtual void onGameStateChanged(Game * )
     {
         // Not interested.
     }
 
     Player * addPlayer(PlayerType inPlayerType, const TeamName & inTeamName, const PlayerName & inPlayerName);
 
-    Player & findPlayer(SimpleGame * inSimpleGame) const
+    Player & findPlayer(Game * inGame) const
     {
         Players::const_iterator it = mPlayers.begin(), end = mPlayers.end();
         for (; it != end; ++it)
         {
             Player & player(**it);
-            if (player.simpleGame() == inSimpleGame)
+            if (player.simpleGame() == inGame)
             {
                 return player;
             }
@@ -48,10 +48,10 @@ struct MultiplayerGame::Impl : public SimpleGame::EventHandler,
         throw std::runtime_error("Player not found!");
     }
 
-    virtual void onLinesCleared(SimpleGame * inSimpleGame, int inLineCount)
+    virtual void onLinesCleared(Game * inGame, int inLineCount)
     {
         // If number of lines >= 2 then apply a line penalty to each non-allied player.
-        Player & activePlayer(findPlayer(inSimpleGame));
+        Player & activePlayer(findPlayer(inGame));
 
         Players::iterator it = mPlayers.begin(), end = mPlayers.end();
         for (; it != end; ++it)
@@ -92,7 +92,7 @@ Player * MultiplayerGame::Impl::addPlayer(PlayerType inPlayerType,
                                       mRowCount,
                                       mColumnCount).release());
     Player * player = mPlayers.back();
-    SimpleGame::RegisterEventHandler(player->simpleGame(), this);
+    Game::RegisterEventHandler(player->simpleGame(), this);
     return player;
 }
 
@@ -117,7 +117,7 @@ Player * MultiplayerGame::addComputerPlayer(const TeamName & inTeamName,
 
 void MultiplayerGame::removePlayer(Player * inPlayer)
 {
-    SimpleGame::UnregisterEventHandler(inPlayer->simpleGame(), mImpl.get());
+    Game::UnregisterEventHandler(inPlayer->simpleGame(), mImpl.get());
     Players::iterator it = std::find(mImpl->mPlayers.begin(), mImpl->mPlayers.end(), inPlayer);
     if (it == mImpl->mPlayers.end())
     {

@@ -6,7 +6,7 @@
 #include "Tetris/ComputerPlayer.h"
 #include "Tetris/NodeCalculator.h"
 #include "Tetris/MultithreadedNodeCalculator.h"
-#include "Tetris/Game.h"
+#include "Tetris/GameImpl.h"
 #include "Tetris/GameStateComparator.h"
 #include "Tetris/Evaluator.h"
 #include "Tetris/GameState.h"

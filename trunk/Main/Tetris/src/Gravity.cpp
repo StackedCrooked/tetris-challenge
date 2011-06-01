@@ -3,7 +3,7 @@
 #include "Tetris/Gravity.h"
 #include "Tetris/GameStateNode.h"
 #include "Tetris/GameState.h"
-#include "Tetris/Game.h"
+#include "Tetris/GameImpl.h"
 #include "Tetris/Direction.h"
 #include "Futile/Logging.h"
 #include "Futile/MakeString.h"
@@ -39,7 +39,7 @@ extern const int cMaxLevel = sizeof(sIntervals)/sizeof(int) - 1;
 
 struct Gravity::Impl : boost::noncopyable
 {
-    Impl(ThreadSafe<Game> inThreadSafeGame) :
+    Impl(ThreadSafe<GameImpl> inThreadSafeGame) :
         mThreadSafeGame(inThreadSafeGame),
         mLevel(0)
     {
@@ -61,17 +61,17 @@ struct Gravity::Impl : boost::noncopyable
         return static_cast<double>(1000.0 / static_cast<double>(sIntervals[inLevel]));
     }
 
-    ThreadSafe<Game> mThreadSafeGame;
+    ThreadSafe<GameImpl> mThreadSafeGame;
     int mLevel;
     Poco::Timer mTimer;
     Poco::Stopwatch mStopwatch;
 };
 
 
-Gravity::Gravity(const ThreadSafe<Game> & inThreadSafeGame) :
+Gravity::Gravity(const ThreadSafe<GameImpl> & inThreadSafeGame) :
     mImpl(new Impl(inThreadSafeGame))
 {
-    ScopedReader<Game> rgame(mImpl->mThreadSafeGame);
+    ScopedReader<GameImpl> rgame(mImpl->mThreadSafeGame);
     mImpl->mTimer.start(Poco::TimerCallback<Gravity::Impl>(*mImpl, &Gravity::Impl::onTimerEvent));
     mImpl->mTimer.setPeriodicInterval(sIntervals[rgame->level()]);
     mImpl->mStopwatch.start();
@@ -92,7 +92,7 @@ void Gravity::Impl::onTimerEvent(Poco::Timer & )
         if (mStopwatch.elapsed() > 1000  * interval())
         {
             mStopwatch.restart();
-            ScopedWriter<Game> game(mThreadSafeGame);
+            ScopedWriter<GameImpl> game(mThreadSafeGame);
             if (game->isGameOver() || game->isPaused())
             {
                 return;

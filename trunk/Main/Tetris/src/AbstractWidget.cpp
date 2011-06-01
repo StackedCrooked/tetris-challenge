@@ -1,8 +1,8 @@
 #include "Tetris/Config.h"
 #include "Tetris/AbstractWidget.h"
 #include "Tetris/Block.h"
+#include "Tetris/GameImpl.h"
 #include "Tetris/Game.h"
-#include "Tetris/SimpleGame.h"
 #include "Futile/MakeString.h"
 #include "Futile/Threading.h"
 #include <boost/bind.hpp>
@@ -78,14 +78,14 @@ AbstractWidget::~AbstractWidget()
 {
     if (mPlayer)
     {
-        SimpleGame::UnregisterEventHandler(mPlayer->simpleGame(), this);
+        Game::UnregisterEventHandler(mPlayer->simpleGame(), this);
     }
 }
 
 
-void AbstractWidget::onGameStateChanged(SimpleGame * inSimpleGame)
+void AbstractWidget::onGameStateChanged(Game * inGame)
 {
-    if (!mPlayer || mPlayer->simpleGame() != inSimpleGame)
+    if (!mPlayer || mPlayer->simpleGame() != inGame)
     {
         throw std::logic_error("AbstractWidget::onGameStateChanged: inGame != mGame");
     }
@@ -94,9 +94,9 @@ void AbstractWidget::onGameStateChanged(SimpleGame * inSimpleGame)
 }
 
 
-void AbstractWidget::onLinesCleared(SimpleGame * inSimpleGame, int )
+void AbstractWidget::onLinesCleared(Game * inGame, int )
 {
-    if (!mPlayer || mPlayer->simpleGame() != inSimpleGame)
+    if (!mPlayer || mPlayer->simpleGame() != inGame)
     {
         throw std::logic_error("AbstractWidget:: onLinesCleared: inGame != mGame");
     }
@@ -108,26 +108,26 @@ void AbstractWidget::onLinesCleared(SimpleGame * inSimpleGame, int )
 void AbstractWidget::setPlayer(Player * inPlayer)
 {
     // Stop listing to the events from the old player.
-    if (mPlayer && SimpleGame::Exists(mPlayer->simpleGame()))
+    if (mPlayer && Game::Exists(mPlayer->simpleGame()))
     {
-        SimpleGame::UnregisterEventHandler(mPlayer->simpleGame(), this);
+        Game::UnregisterEventHandler(mPlayer->simpleGame(), this);
     }
 
     // Set the new player.
     mPlayer = inPlayer;
 
     // Start listening to the events from the new player.
-    if (mPlayer && SimpleGame::Exists(mPlayer->simpleGame()))
+    if (mPlayer && Game::Exists(mPlayer->simpleGame()))
     {
         setMinSize(Size(2 * margin() + futureBlocksRect().right() - gameRect().left(),
                         2 * margin() + avatarRect().bottom() - gameRect().top()));
 
-        SimpleGame::RegisterEventHandler(mPlayer->simpleGame(), this);
+        Game::RegisterEventHandler(mPlayer->simpleGame(), this);
     }
 }
 
 
-const SimpleGame * AbstractWidget::simpleGame() const
+const Game * AbstractWidget::simpleGame() const
 {
     if (!mPlayer)
     {
@@ -137,7 +137,7 @@ const SimpleGame * AbstractWidget::simpleGame() const
 }
 
 
-SimpleGame * AbstractWidget::simpleGame()
+Game * AbstractWidget::simpleGame()
 {
     if (!mPlayer)
     {
@@ -277,7 +277,7 @@ Rect AbstractWidget::avatarRect() const
 }
 
 
-void AbstractWidget::coordinateRepaint(SimpleGame & inGame)
+void AbstractWidget::coordinateRepaint(Game & inGame)
 {
     Tetris::Size minSize = getMinSize();
     fillRect(Rect(0, 0, minSize.width(), minSize.height()), RGBColor(0, 50, 100));
@@ -375,14 +375,14 @@ void AbstractWidget::paintGameGrid(const Grid & inGrid)
 }
 
 
-void AbstractWidget::paintAvatar(const SimpleGame & inSimpleGame)
+void AbstractWidget::paintAvatar(const Game & inGame)
 {
     Rect theAvatarRect = avatarRect();
     paintImage(theAvatarRect, player()->playerName() + "_80.gif");
 }
 
 
-void AbstractWidget::paintActiveBlockShadow(const SimpleGame & inSimpleGame)
+void AbstractWidget::paintActiveBlockShadow(const Game & inGame)
 {
     std::size_t colIdx(0);
     std::size_t rowIdx(0);
@@ -390,8 +390,8 @@ void AbstractWidget::paintActiveBlockShadow(const SimpleGame & inSimpleGame)
 
     // Critical section. Minimize scope.
     {
-        ScopedReader<Game> rgame(inSimpleGame.game());
-        const Game & game = *rgame.get();
+        ScopedReader<GameImpl> rgame(inGame.game());
+        const GameImpl & game = *rgame.get();
         const Block & block = game.activeBlock();
         const GameState & gameState = game.gameState();
 

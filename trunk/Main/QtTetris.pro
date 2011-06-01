@@ -28,7 +28,6 @@ SOURCES += \
     Tetris/src/ComputerPlayer.cpp \
     Tetris/src/Evaluator.cpp \
     Tetris/src/EvilBlockFactory.cpp \
-    Tetris/src/Game.cpp \
     Tetris/src/GameState.cpp \
     Tetris/src/GameStateComparator.cpp \
     Tetris/src/GameStateNode.cpp \
@@ -38,7 +37,6 @@ SOURCES += \
     Tetris/src/NodeCalculator.cpp \
     Tetris/src/NodeCalculatorImpl.cpp \
     Tetris/src/Player.cpp \
-    Tetris/src/SimpleGame.cpp \
     Tetris/src/SingleThreadedNodeCalculator.cpp \
     Tetris/src/Unicode.cpp \
     Tetris/testsuite/src/Driver.cpp \
@@ -56,7 +54,9 @@ SOURCES += \
     Futile/src/LeakDetector.cpp \
     Futile/src/Enum.cpp \
     Futile/src/MemoryPool.cpp \
-    Tetris/testsuite/src/MemoryPoolTest.cpp
+    Tetris/testsuite/src/MemoryPoolTest.cpp \
+    Tetris/src/GameImpl.cpp \
+    Tetris/src/Game.cpp
 
 
 HEADERS += \
@@ -78,7 +78,6 @@ HEADERS += \
     Tetris/include/Tetris/Evaluator.h \
     Tetris/include/Tetris/EvilBlockFactory.h \
     Tetris/include/Tetris/ForwardDeclarations.h \
-    Tetris/include/Tetris/Game.h \
     Tetris/include/Tetris/GameOver.h \
     Tetris/include/Tetris/GameState.h \
     Tetris/include/Tetris/GameStateComparator.h \
@@ -93,7 +92,6 @@ HEADERS += \
     Tetris/include/Tetris/NodePtr.h \
     Tetris/include/Tetris/Player.h \
     Tetris/include/Tetris/PlayerType.h \
-    Tetris/include/Tetris/SimpleGame.h \
     Tetris/include/Tetris/SingleThreadedNodeCalculator.h \
     Tetris/include/Tetris/Tetris.h \
     Tetris/include/Tetris/Unicode.h \
@@ -408,7 +406,9 @@ HEADERS += \
     Futile/include/Futile/Singleton.h \
     Futile/include/Futile/Enum.h \
     Futile/include/Futile/MemoryPool.h \
-    Tetris/testsuite/src/MemoryPoolTest.h
+    Tetris/testsuite/src/MemoryPoolTest.h \
+    Tetris/include/Tetris/GameImpl.h \
+    Tetris/include/Tetris/Game.h
 
 
 OTHER_FILES += \

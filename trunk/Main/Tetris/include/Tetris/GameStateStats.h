@@ -5,6 +5,10 @@
 namespace Tetris {
 
 
+/**
+ * GameStateStats contains game statistics.
+ * Objects are immutible.
+ */
 class GameStateStats
 {
 public:

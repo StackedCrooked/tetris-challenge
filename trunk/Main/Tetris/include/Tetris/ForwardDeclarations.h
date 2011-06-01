@@ -8,7 +8,7 @@ namespace Tetris {
 class Block;
 class BlockFactory;
 class Evaluator;
-class Game;
+class GameImpl;
 class GameQualityEvaluator;
 class GameState;
 class GameStateNode;    
