@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tetris", "Tetris\Tetris_vs80.vcproj", "{EBBA3339-F507-4834-90DC-73B021DAA199}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PocoXML", "3rdParty\Poco\XML\XML_vs80.vcproj", "{9E211743-85FE-4977-82F3-4F04B40C912D}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PocoXML", "3rdParty\Poco_1_3_6_p2\XML\XML_vs80.vcproj", "{9E211743-85FE-4977-82F3-4F04B40C912D}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PocoFoundation", "3rdParty\Poco\Foundation\Foundation_vs80.vcproj", "{8164D41D-B053-405B-826C-CF37AC0EF176}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PocoFoundation", "3rdParty\Poco_1_3_6_p2\Foundation\Foundation_vs80.vcproj", "{8164D41D-B053-405B-826C-CF37AC0EF176}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "XULWin", "XULWin\XULWin_vs80.vcproj", "{BC9D86F7-C8B7-4B5A-9B01-C6FA5A2BBD30}"
 EndProject
@@ -30,7 +30,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TetrisTestSuite", "Tetris\t
 		{138BB448-808A-4FE5-A66D-78D1F8770F59} = {138BB448-808A-4FE5-A66D-78D1F8770F59}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CppUnit", "3rdParty\Poco\CppUnit\CppUnit_vs80.vcproj", "{138BB448-808A-4FE5-A66D-78D1F8770F59}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CppUnit", "3rdParty\Poco_1_3_6_p2\CppUnit\CppUnit_vs80.vcproj", "{138BB448-808A-4FE5-A66D-78D1F8770F59}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

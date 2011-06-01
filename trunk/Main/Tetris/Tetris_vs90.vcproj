@@ -43,7 +43,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP /D &quot;_HAS_ITERATOR_DEBUGGING=0&quot; /D &quot;_SECURE_SCL=0&quot; /D &quot;_SECURE_SCL_THROWS=0&quot;"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)Tetris\include&quot;;&quot;$(SolutionDir)Futile\include&quot;;&quot;$(SolutionDir)3rdParty\Poco\Foundation\include&quot;;&quot;$(SolutionDir)3rdParty\Boost_1_42_0&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)Tetris\include&quot;;&quot;$(SolutionDir)Futile\include&quot;;&quot;$(SolutionDir)3rdParty\Poco_1_3_6_p2\Foundation\include&quot;;&quot;$(SolutionDir)3rdParty\Boost_1_42_0&quot;"
 				PreprocessorDefinitions="NOMINMAX;BOOST_ALL_NO_LIB;_DEBUG;_WINDOWS;POCO_STATIC;POCO_NO_AUTOMATIC_LIBS"
 				StringPooling="false"
 				MinimalRebuild="false"
@@ -115,7 +115,7 @@
 				InlineFunctionExpansion="2"
 				FavorSizeOrSpeed="1"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)Tetris\include&quot;;&quot;$(SolutionDir)Futile\include&quot;;&quot;$(SolutionDir)3rdParty\Poco\Foundation\include&quot;;&quot;$(SolutionDir)3rdParty\Boost_1_42_0&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)Tetris\include&quot;;&quot;$(SolutionDir)Futile\include&quot;;&quot;$(SolutionDir)3rdParty\Poco_1_3_6_p2\Foundation\include&quot;;&quot;$(SolutionDir)3rdParty\Boost_1_42_0&quot;"
 				PreprocessorDefinitions="NOMINMAX;BOOST_ALL_NO_LIB;WIN32;NDEBUG;_WINDOWS;POCO_STATIC;POCO_NO_AUTOMATIC_LIBS"
 				StringPooling="false"
 				BasicRuntimeChecks="0"
@@ -208,15 +208,15 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\Tetris\EvilBlockFactory.h"
-				>
-			</File>
-			<File
 				RelativePath=".\include\Tetris\ForwardDeclarations.h"
 				>
 			</File>
 			<File
 				RelativePath=".\include\Tetris\Game.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\Tetris\GameImpl.h"
 				>
 			</File>
 			<File
@@ -276,10 +276,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\Tetris\SimpleGame.h"
-				>
-			</File>
-			<File
 				RelativePath=".\include\Tetris\SingleThreadedNodeCalculator.h"
 				>
 			</File>
@@ -332,11 +328,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\EvilBlockFactory.cpp"
+				RelativePath=".\src\Game.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\src\Game.cpp"
+				RelativePath=".\src\GameImpl.cpp"
 				>
 			</File>
 			<File
@@ -373,10 +369,6 @@
 			</File>
 			<File
 				RelativePath=".\src\Player.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\SimpleGame.cpp"
 				>
 			</File>
 			<File

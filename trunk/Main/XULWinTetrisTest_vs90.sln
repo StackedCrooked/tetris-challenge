@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual C++ Express 2008
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tetris", "Tetris\Tetris_vs90.vcproj", "{D623C05B-BDD9-4D6E-8E51-E3275608DEBE}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PocoFoundation", "3rdParty\Poco\Foundation\Foundation_vs90.vcproj", "{8164D41D-B053-405B-826C-CF37AC0EF176}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PocoFoundation", "3rdParty\Poco_1_3_6_p2\Foundation\Foundation_vs90.vcproj", "{8164D41D-B053-405B-826C-CF37AC0EF176}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "XULWinTetrisTest", "XULWinTetrisTest\XULWinTetrisTest_vs90.vcproj", "{F4F3AC1B-9535-4036-ACF0-F67E8C6C7333}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -16,13 +16,13 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "XULWinTetrisTest", "XULWinT
 		{881867C7-4FCC-46D8-9538-4E3974831573} = {881867C7-4FCC-46D8-9538-4E3974831573}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PocoXML", "3rdParty\Poco\XML\XML_vs90.vcproj", "{9E211743-85FE-4977-82F3-4F04B40C912D}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PocoXML", "3rdParty\Poco_1_3_6_p2\XML\XML_vs90.vcproj", "{9E211743-85FE-4977-82F3-4F04B40C912D}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "XULWin", "XULWin\XULWin_vs90.vcproj", "{82864729-DFC2-4F6D-A1AE-984D82CF81E1}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TetrisTestSuite", "Tetris\testsuite\TestSuite_vs90.vcproj", "{881867C7-4FCC-46D8-9538-4E3974831573}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PocoCppUnit", "3rdParty\Poco\CppUnit\CppUnit_vs90.vcproj", "{138BB448-808A-4FE5-A66D-78D1F8770F59}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PocoCppUnit", "3rdParty\Poco_1_3_6_p2\CppUnit\CppUnit_vs90.vcproj", "{138BB448-808A-4FE5-A66D-78D1F8770F59}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "XULWinTetris", "XULWinTetris\XULWinTetris_vs90.vcproj", "{B2480335-73B3-46C5-8B8D-3BDEF912B161}"
 EndProject

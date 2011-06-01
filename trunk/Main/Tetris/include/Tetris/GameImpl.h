@@ -44,9 +44,9 @@ protected:
     // Friendship required for destructor.
     friend class ThreadSafe<GameImpl>;
 
+public:
     virtual ~GameImpl();
 
-public:
     class EventHandler
     {
     public:

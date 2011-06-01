@@ -12,7 +12,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Futile", "Futile\Futile_vs9
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tetris", "Tetris\Tetris_vs90.vcproj", "{D623C05B-BDD9-4D6E-8E51-E3275608DEBE}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PocoFoundation", "3rdParty\Poco\Foundation\Foundation_vs90.vcproj", "{8164D41D-B053-405B-826C-CF37AC0EF176}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PocoFoundation", "3rdParty\Poco_1_3_6_p2\Foundation\Foundation_vs90.vcproj", "{8164D41D-B053-405B-826C-CF37AC0EF176}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
