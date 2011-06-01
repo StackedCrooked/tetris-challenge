@@ -3,5 +3,5 @@ rm -rf Build
 mkdir -p Build/QtTetris
 cd Build/QtTetris
 cmake ../../Main/QtTetris
-make VERBOSE=0 -j8
+make -j8
 
