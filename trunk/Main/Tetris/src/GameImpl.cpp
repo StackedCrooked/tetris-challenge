@@ -67,7 +67,9 @@ GameImpl::GameImpl(std::size_t inNumRows, std::size_t inNumColumns) :
     mFutureBlocksCount(3),
     mCurrentBlockIndex(0),
     mStartingLevel(-1),
-    mPaused(false)
+    mPaused(false),
+    mEventHandlers(),
+    mMuteEvents(false)
 {
     if (mBlocks.empty())
     {
@@ -114,8 +116,11 @@ void GameImpl::UnregisterEventHandler(ThreadSafe<GameImpl> inGame, EventHandler 
 
 void GameImpl::onChanged()
 {
-    // Invoke on main tread
-    InvokeLater(boost::bind(&GameImpl::OnChangedImpl, this));
+    if (!mMuteEvents)
+    {
+        // Invoke on main tread
+        InvokeLater(boost::bind(&GameImpl::OnChangedImpl, this));
+    }
 }
 
 
@@ -148,8 +153,11 @@ void GameImpl::OnChangedImpl(GameImpl * inGame)
 
 void GameImpl::onLinesCleared(int inLineCount)
 {
-    // Invoke on main thread
-    InvokeLater(boost::bind(&GameImpl::OnLinesClearedImpl, this, inLineCount));
+    if (!mMuteEvents)
+    {
+        // Invoke on main thread
+        InvokeLater(boost::bind(&GameImpl::OnLinesClearedImpl, this, inLineCount));
+    }
 }
 
 
@@ -255,10 +263,12 @@ void GameImpl::applyLinePenalty(int inLineCount)
 
     // Check if the active block has been caught in the penalty lines that were added.
     // If yes then call drop() to normalize the situation.
+
     const Block & block(activeBlock());
     if (!gameState().checkPositionValid(block, block.row(), block.column()))
     {
-        drop();
+        bool result = move(MoveDirection_Down);
+        Assert(!result); // check commit
     }
     onChanged();
 }
@@ -311,6 +321,60 @@ int GameImpl::rowCount() const
 int GameImpl::columnCount() const
 {
     return mNumColumns;
+}
+
+
+int GameImpl::GetRowDelta(MoveDirection inDirection)
+{
+    switch (inDirection)
+    {
+        case MoveDirection_Up:
+        {
+            return -1;
+        }
+        case MoveDirection_Down:
+        {
+            return 1;
+        }
+        default:
+        {
+            return 0;
+        }
+    }
+}
+
+
+int GameImpl::GetColumnDelta(MoveDirection inDirection)
+{
+    switch (inDirection)
+    {
+        case MoveDirection_Left:
+        {
+            return -1;
+        }
+        case MoveDirection_Right:
+        {
+            return 1;
+        }
+        default:
+        {
+            return 0;
+        }
+    }
+}
+
+
+bool GameImpl::canMove(MoveDirection inDirection)
+{
+    if (isGameOver())
+    {
+        return false;
+    }
+
+    Block & block = *mActiveBlock;
+    std::size_t newRow = block.row()    + GetRowDelta(inDirection);
+    std::size_t newCol = block.column() + GetColumnDelta(inDirection);
+    return gameState().checkPositionValid(block, newRow, newCol);
 }
 
 
@@ -404,13 +468,31 @@ bool GameImpl::rotate()
 }
 
 
-void GameImpl::drop()
+void GameImpl::dropAndCommit()
 {
-    if (isGameOver())
+    // Local scope for ScopedMute
     {
-        return;
+        ScopedMute scopedMute(mMuteEvents);
+        dropWithoutCommit();
+        bool result = move(MoveDirection_Down);
+        Assert(!result); // check commit
     }
-    while(move(MoveDirection_Down));
+    onChanged();
+}
+
+
+void GameImpl::dropWithoutCommit()
+{
+    // Local scope for ScopedMute
+    {
+        ScopedMute scopedMute(mMuteEvents);
+        while (canMove(MoveDirection_Down))
+        {
+            bool result = move(MoveDirection_Down);
+            Assert(result); // no commit
+        }
+    }
+    onChanged();
 }
 
 
@@ -465,46 +547,6 @@ void HumanGame::setGrid(const Grid & inGrid)
 {
     mGameState->setGrid(inGrid);
     onChanged();
-}
-
-
-static int GetRowDelta(MoveDirection inDirection)
-{
-    switch (inDirection)
-    {
-        case MoveDirection_Up:
-        {
-            return -1;
-        }
-        case MoveDirection_Down:
-        {
-            return 1;
-        }
-        default:
-        {
-            return 0;
-        }
-    }
-}
-
-
-static int GetColumnDelta(MoveDirection inDirection)
-{
-    switch (inDirection)
-    {
-        case MoveDirection_Left:
-        {
-            return -1;
-        }
-        case MoveDirection_Right:
-        {
-            return 1;
-        }
-        default:
-        {
-            return 0;
-        }
-    }
 }
 
 
@@ -708,7 +750,15 @@ bool ComputerGame::move(MoveDirection inDirection)
             if (block.column() == nextBlock.column() && nextBlock.identification() == block.identification())
             {
                 // Swap the current gamestate with the next precalculated one.
-                return navigateNodeDown();
+                if (navigateNodeDown())
+                {
+                    return false;
+                }
+                else
+                {
+                    LogError("NavigateNodeDown failed for unknown reason.");
+                    mCurrentNode->clearChildren();
+                }
             }
             else
             {
