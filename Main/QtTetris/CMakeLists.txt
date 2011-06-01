@@ -90,7 +90,13 @@ set(POCO_ROOT ${SOLUTIONDIR}3rdParty/Poco/)
 include_directories(
     ${POCO_ROOT}Foundation/include
     ${POCO_ROOT}CppUnit/include)
-link_directories(${POCO_ROOT}lib/${PLATFORM}/${ARCH})
+set(POCO_LIB "${POCO_ROOT}lib/${PLATFORM}/${ARCH}")
+if (NOT EXISTS ${POCO_LIB})
+    execute_process(
+        COMMAND "svn" "up" "${PLATFORM}"
+        WORKING_DIRECTORY "${POCO_ROOT}/lib")
+endif()
+link_directories(${POCO_LIB})
 
 
 #
@@ -99,6 +105,11 @@ link_directories(${POCO_ROOT}lib/${PLATFORM}/${ARCH})
 set(BOOST_ROOT ${SOLUTIONDIR}3rdParty/Boost)
 include_directories(${BOOST_ROOT})
 set(BOOST_LIB "${BOOST_ROOT}/lib/${PLATFORM}/${ARCH}")
+if (NOT EXISTS ${BOOST_LIB})
+    execute_process(
+        COMMAND "svn" "up" "${PLATFORM}"
+        WORKING_DIRECTORY "${BOOST_ROOT}/lib")
+endif()
 
 
 #
@@ -185,7 +196,7 @@ endif()
 #
 if(APPLE)
 set(BUNDLE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}QtTetris.app")
-if($ENV{TETRIS_DEPLOY_DMG} STREQUAL "Yes")
+if("$ENV{TETRIS_DEPLOY_DMG}" STREQUAL "Yes")
 set(MACDEPLOYQT_OPTIONS "-dmg")
 else()
 set(MACDEPLOYQT_OPTIONS "")
