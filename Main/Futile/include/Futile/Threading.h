@@ -42,19 +42,19 @@ class ThreadSafe
 {
 public:
     // Constructor that takes an autoptr object.
-    ThreadSafe(std::auto_ptr<Variable> inVariable) :
+    explicit ThreadSafe(std::auto_ptr<Variable> inVariable) :
         mImpl(new Impl(inVariable))
     {
     }
 
     // Constructor that takes the new object.
-    ThreadSafe(Variable * inVariable) :
+    explicit ThreadSafe(Variable * inVariable) :
         mImpl(new Impl(inVariable))
     {
     }
 
     // Default constructor can only be used if Variable has a default constructor.
-    ThreadSafe() :
+    explicit ThreadSafe() :
         mImpl(new Impl(new Variable))
     {
     }

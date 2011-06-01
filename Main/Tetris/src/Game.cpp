@@ -756,7 +756,7 @@ bool ComputerGame::move(MoveDirection inDirection)
 
     // Actually commit the block
     NodePtr child(new GameStateNode(mCurrentNode,
-                                    mCurrentNode->gameState().commit(block, GameOver(block.row() == 0)).release(),                                    
+                                    mCurrentNode->gameState().commit(block, GameOver(block.row() == 0)).release(),
                                     mCurrentNode->evaluator()));
     mCurrentNode->addChild(child);
     setCurrentNode(child);
