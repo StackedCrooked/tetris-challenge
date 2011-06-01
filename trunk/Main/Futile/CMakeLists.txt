@@ -27,7 +27,6 @@ add_library(Futile
     src/Logger.cpp
     src/Logging.cpp
     src/MainThread.cpp
-    src/MemoryPool.cpp
     src/Threading.cpp
     src/Worker.cpp
     src/WorkerPool.cpp)

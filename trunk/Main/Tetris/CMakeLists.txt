@@ -17,7 +17,6 @@ add_library(Tetris
     include/Tetris/Config.h
     include/Tetris/Direction.h
     include/Tetris/Evaluator.h
-    include/Tetris/EvilBlockFactory.h
     include/Tetris/ForwardDeclarations.h
     include/Tetris/Game.h
     include/Tetris/GameImpl.h
@@ -47,7 +46,6 @@ add_library(Tetris
     src/BlockType.cpp
     src/ComputerPlayer.cpp
     src/Evaluator.cpp
-    src/EvilBlockFactory.cpp
     src/Game.cpp
     src/GameImpl.cpp
     src/GameState.cpp

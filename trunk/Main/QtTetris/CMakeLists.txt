@@ -143,7 +143,6 @@ set(QtTetris_HEADERS ${QtTetris_QT_HEADERS} ${QtTetris_REGULAR_HEADERS})
 # Qt resources
 #
 QT4_ADD_RESOURCES(QtTetris_Resources "QtTetris.qrc")
-message("QtTetris_Resources: ${QtTetris_Resources}")
 
 
 #
