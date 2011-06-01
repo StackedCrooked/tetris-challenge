@@ -9,6 +9,7 @@
 #include "Tetris/Grid.h"
 #include "Tetris/NodePtr.h"
 #include "Futile/Threading.h"
+#include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <memory>
 #include <set>
@@ -75,8 +76,6 @@ public:
         static Instances sInstances;
     };
 
-
-
     static void RegisterEventHandler(ThreadSafe<GameImpl> inGame, EventHandler * inEventHandler);
 
     static void UnregisterEventHandler(ThreadSafe<GameImpl> inGame, EventHandler * inEventHandler);
@@ -91,11 +90,15 @@ public:
 
     int columnCount() const;
 
+    bool canMove(MoveDirection inDirection);
+
     virtual bool move(MoveDirection inDirection) = 0;
 
     bool rotate();
 
-    void drop();
+    void dropWithoutCommit();
+
+    void dropAndCommit();
 
     int level() const;
 
@@ -125,6 +128,9 @@ public:
     //void swapActiveBlock(Game & other);
 
 protected:
+    static int GetRowDelta(MoveDirection inDirection);
+    static int GetColumnDelta(MoveDirection inDirection);
+
     virtual GameState & gameState() = 0;
 
     void onChanged();
@@ -152,6 +158,28 @@ protected:
 
     typedef std::set<EventHandler*> EventHandlers;
     EventHandlers mEventHandlers;
+    bool mMuteEvents;
+
+    /**
+     * Create an instance to make the mMuteEvents false over a certain scope.
+     * This is handy when we are running a loop and don't want to trigger for
+     * for each event.
+     */
+    struct ScopedMute : boost::noncopyable
+    {
+        ScopedMute(bool & value) :
+            mValue(value)
+        {
+            mValue = true;
+        }
+
+        ~ScopedMute()
+        {
+            mValue = false;
+        }
+
+        bool & mValue;
+    };
 
 private:
     // non-copyable

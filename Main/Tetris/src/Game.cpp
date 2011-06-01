@@ -237,7 +237,7 @@ void Game::rotate()
 void Game::drop()
 {
     ScopedWriter<GameImpl> game(mImpl->mGameImpl);
-    game->drop();
+    game->dropAndCommit();
 }
 
 

@@ -164,7 +164,6 @@ void BlockMover::Impl::onTimer(Poco::Timer &)
 
 void BlockMover::Impl::move()
 {
-
     ScopedWriter<GameImpl> wGame(mGame);
     ComputerGame & game = dynamic_cast<ComputerGame&>(*wGame.get());
     if (game.isPaused())
@@ -191,7 +190,7 @@ void BlockMover::Impl::move()
         {
             // Damn we can't rotate.
             // Give up on this block.
-            game.drop();
+            game.dropAndCommit();
         }
     }
     else if (block.column() < targetBlock.column())
@@ -200,7 +199,7 @@ void BlockMover::Impl::move()
         {
             // Damn we can't move this block anymore.
             // Give up on this block.
-            game.drop();
+            game.dropAndCommit();
         }
     }
     else if (block.column() > targetBlock.column())
@@ -209,7 +208,7 @@ void BlockMover::Impl::move()
         {
             // Damn we can't move this block anymore.
             // Give up on this block.
-            game.drop();
+            game.dropAndCommit();
         }
     }
     else if (mMoveDownBehavior == BlockMover::MoveDownBehavior_Move)
@@ -218,7 +217,7 @@ void BlockMover::Impl::move()
     }
     else if (mMoveDownBehavior == BlockMover::MoveDownBehavior_Drop)
     {
-        game.drop();
+        game.dropAndCommit();
     }
     else
     {
