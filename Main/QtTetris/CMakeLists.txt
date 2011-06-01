@@ -86,16 +86,11 @@ endif()
 #
 # Poco dependency
 #
-set(POCO_ROOT ${SOLUTIONDIR}3rdParty/Poco/)
+set(POCO_ROOT "${SOLUTIONDIR}3rdParty/Poco/")
+set(POCO_LIB "${SOLUTIONDIR}3rdParty/Poco/lib/${PLATFORM}/${ARCH}")
 include_directories(
     ${POCO_ROOT}Foundation/include
     ${POCO_ROOT}CppUnit/include)
-set(POCO_LIB "${POCO_ROOT}lib/${PLATFORM}/${ARCH}")
-if (NOT EXISTS ${POCO_LIB})
-    execute_process(
-        COMMAND "svn" "up" "${PLATFORM}"
-        WORKING_DIRECTORY "${POCO_ROOT}/lib")
-endif()
 link_directories(${POCO_LIB})
 
 
@@ -105,9 +100,10 @@ link_directories(${POCO_LIB})
 set(BOOST_ROOT ${SOLUTIONDIR}3rdParty/Boost)
 include_directories(${BOOST_ROOT})
 set(BOOST_LIB "${BOOST_ROOT}/lib/${PLATFORM}/${ARCH}")
+set(BOOST_LIB_URL "https://tetris-challenge.googlecode.com/svn/attic/Boost_1_42_0/lib")
 if (NOT EXISTS ${BOOST_LIB})
     execute_process(
-        COMMAND "svn" "up" "${PLATFORM}"
+        COMMAND "svn" "co" "${BOOST_LIB_URL}/${PLATFORM}"
         WORKING_DIRECTORY "${BOOST_ROOT}/lib")
 endif()
 
