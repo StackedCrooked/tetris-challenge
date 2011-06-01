@@ -18,7 +18,7 @@ class Timer;
 namespace Tetris {
 
 
-class Game;
+class GameImpl;
 class GameState;
 
 

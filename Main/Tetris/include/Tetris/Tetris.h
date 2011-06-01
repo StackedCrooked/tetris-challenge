@@ -7,7 +7,7 @@
 #include "Tetris/BlockMover.h"
 #include "Tetris/ComputerPlayer.h"
 #include "Tetris/Evaluator.h"
-#include "Tetris/Game.h"
+#include "Tetris/GameImpl.h"
 #include "Tetris/GameState.h"
 #include "Tetris/GameStateNode.h"
 #include "Tetris/Gravity.h"

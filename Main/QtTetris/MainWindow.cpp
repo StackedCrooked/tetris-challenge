@@ -2,7 +2,7 @@
 #include "NewGameDialog.h"
 #include "Tetris/BlockMover.h"
 #include "Tetris/ComputerPlayer.h"
-#include "Tetris/Game.h"
+#include "Tetris/GameImpl.h"
 #include "Poco/Path.h"
 #include "Tetris/Utilities.h"
 #include "Futile/Assert.h"
@@ -40,7 +40,7 @@ int Tetris_GetSquareWidth();
 int Tetris_GetSquareHeight();
 
 
-typedef Futile::Boost::shared_ptr<SimpleGame> SimpleGamePtr;
+typedef Futile::Boost::shared_ptr<Game> GamePtr;
 
 
 void MainWindow::onTimerEvent()

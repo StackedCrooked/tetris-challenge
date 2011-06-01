@@ -6,7 +6,7 @@
 
 
 #include "Tetris/BlockFactory.h"
-#include "Tetris/Game.h"
+#include "Tetris/GameImpl.h"
 #include "Tetris/GameState.h"
 #include "Tetris/GameStateNode.h"
 #include "Tetris/NodeCalculator.h"

@@ -20,6 +20,7 @@ add_library(Tetris
     include/Tetris/EvilBlockFactory.h
     include/Tetris/ForwardDeclarations.h
     include/Tetris/Game.h
+    include/Tetris/GameImpl.h
     include/Tetris/GameOver.h
     include/Tetris/GameState.h
     include/Tetris/GameStateComparator.h
@@ -34,7 +35,6 @@ add_library(Tetris
     include/Tetris/NodePtr.h
     include/Tetris/Player.h
     include/Tetris/PlayerType.h
-    include/Tetris/SimpleGame.h
     include/Tetris/SingleThreadedNodeCalculator.h
     include/Tetris/Tetris.h
     include/Tetris/Unicode.h
@@ -49,6 +49,7 @@ add_library(Tetris
     src/Evaluator.cpp
     src/EvilBlockFactory.cpp
     src/Game.cpp
+    src/GameImpl.cpp
     src/GameState.cpp
     src/GameStateComparator.cpp
     src/GameStateNode.cpp
@@ -58,7 +59,6 @@ add_library(Tetris
     src/NodeCalculator.cpp
     src/NodeCalculatorImpl.cpp
     src/Player.cpp
-    src/SimpleGame.cpp
     src/SingleThreadedNodeCalculator.cpp
     src/Unicode.cpp)
 

@@ -3,7 +3,7 @@
 
 
 #include "Tetris/PlayerType.h"
-#include "Tetris/SimpleGame.h"
+#include "Tetris/Game.h"
 #include "Futile/Array.h"
 #include "Futile/TypedWrapper.h"
 #include <boost/scoped_ptr.hpp>
@@ -41,9 +41,9 @@ public:
 
     const std::string & playerName() const;
 
-    const SimpleGame * simpleGame() const;
+    const Game * simpleGame() const;
 
-    SimpleGame * simpleGame();
+    Game * simpleGame();
 
 private:
     Player(const Player&);

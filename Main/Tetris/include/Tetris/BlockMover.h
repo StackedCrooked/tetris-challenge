@@ -11,7 +11,7 @@
 namespace Tetris {
 
 
-class Game;
+class GameImpl;
 class BlockMover;
 
 typedef boost::function<void(BlockMover *)> BlockMoverCallback;
@@ -26,7 +26,7 @@ typedef boost::function<void(BlockMover *)> BlockMoverCallback;
 class BlockMover
 {
 public:
-    BlockMover(Futile::ThreadSafe<Game> inGame);
+    BlockMover(Futile::ThreadSafe<GameImpl> inGame);
 
     ~BlockMover();
 

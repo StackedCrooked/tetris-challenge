@@ -1,7 +1,7 @@
 #include "Poco/Foundation.h"
 #include "Tetris/Config.h"
 #include "Tetris/BlockMover.h"
-#include "Tetris/Game.h"
+#include "Tetris/GameImpl.h"
 #include "Tetris/GameStateNode.h"
 #include "Tetris/GameStateComparator.h"
 #include "Tetris/GameState.h"
@@ -28,7 +28,7 @@ namespace Tetris {
 
 struct BlockMover::Impl
 {
-    Impl(ThreadSafe<Game> inGame) :
+    Impl(ThreadSafe<GameImpl> inGame) :
         mGame(inGame),
         mTimer(),
         mStopwatch(),
@@ -66,7 +66,7 @@ struct BlockMover::Impl
 
     void move();
 
-    ThreadSafe<Game> mGame;
+    ThreadSafe<GameImpl> mGame;
     boost::scoped_ptr<Poco::Timer> mTimer;
     Poco::Stopwatch mStopwatch;
     int mNumMovesPerSecond;
@@ -76,7 +76,7 @@ struct BlockMover::Impl
 };
 
 
-BlockMover::BlockMover(ThreadSafe<Game> inGame) :
+BlockMover::BlockMover(ThreadSafe<GameImpl> inGame) :
     mImpl(new Impl(inGame))
 {
     mImpl->mTimer.reset(new Poco::Timer(10, 10));
@@ -165,7 +165,7 @@ void BlockMover::Impl::onTimer(Poco::Timer &)
 void BlockMover::Impl::move()
 {
 
-    ScopedWriter<Game> wGame(mGame);
+    ScopedWriter<GameImpl> wGame(mGame);
     ComputerGame & game = dynamic_cast<ComputerGame&>(*wGame.get());
     if (game.isPaused())
     {

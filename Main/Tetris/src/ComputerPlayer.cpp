@@ -4,7 +4,7 @@
 #include "Tetris/NodeCalculator.h"
 #include "Tetris/AISupport.h"
 #include "Tetris/Gravity.h"
-#include "Tetris/Game.h"
+#include "Tetris/GameImpl.h"
 #include "Tetris/GameStateComparator.h"
 #include "Tetris/Evaluator.h"
 #include "Tetris/GameStateNode.h"
@@ -340,7 +340,7 @@ void ComputerPlayer::Impl::startNodeCalculator()
 
     // Critical section
     {
-        ScopedWriter<Game> wgame(mComputerPlayer->simpleGame()->game());
+        ScopedWriter<GameImpl> wgame(mComputerPlayer->simpleGame()->game());
         ComputerGame & game(dynamic_cast<ComputerGame&>(*wgame.get()));
 
 
@@ -408,7 +408,7 @@ void ComputerPlayer::Impl::onStarted()
 
 void ComputerPlayer::Impl::onWorking()
 {
-    ScopedReader<Game> wgame(mComputerPlayer->simpleGame()->game());
+    ScopedReader<GameImpl> wgame(mComputerPlayer->simpleGame()->game());
     const ComputerGame & game(dynamic_cast<const ComputerGame&>(*wgame.get()));
 
     if (mGameDepth < game.endNode()->depth())
@@ -445,7 +445,7 @@ void ComputerPlayer::Impl::onFinished()
         return;
     }
 
-    ScopedWriter<Game> wgame(mComputerPlayer->simpleGame()->game());
+    ScopedWriter<GameImpl> wgame(mComputerPlayer->simpleGame()->game());
     ComputerGame & game(dynamic_cast<ComputerGame&>(*wgame.get()));
 
     // Check for sync problems.

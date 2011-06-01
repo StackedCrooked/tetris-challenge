@@ -20,7 +20,7 @@ struct Player::Impl
         mRowCount(inRowCount),
         mColumnCount(inColumnCount),
         mPlayerType(inPlayerType),
-        mSimpleGame(new SimpleGame(inPlayerType, inRowCount, inColumnCount)),
+        mGame(new Game(inPlayerType, inRowCount, inColumnCount)),
         mTeamName(inTeamName.get()),
         mPlayerName(inPlayerName.get())
     {
@@ -34,7 +34,7 @@ struct Player::Impl
     std::size_t mRowCount;
     std::size_t mColumnCount;
     PlayerType mPlayerType;
-    boost::scoped_ptr<SimpleGame> mSimpleGame;
+    boost::scoped_ptr<Game> mGame;
     std::string mTeamName;
     std::string mPlayerName;
 };
@@ -101,15 +101,15 @@ const std::string & Player::playerName() const
 }
 
 
-const SimpleGame * Player::simpleGame() const
+const Game * Player::simpleGame() const
 {
-    return mImpl->mSimpleGame.get();
+    return mImpl->mGame.get();
 }
 
 
-SimpleGame * Player::simpleGame()
+Game * Player::simpleGame()
 {
-    return mImpl->mSimpleGame.get();
+    return mImpl->mGame.get();
 }
 
 
