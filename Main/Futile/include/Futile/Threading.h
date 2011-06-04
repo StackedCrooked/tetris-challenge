@@ -238,8 +238,7 @@ protected:
 
 
 /**
- * ScopedUpgradeToWriter creates is a ScopedWriter that
- * is created by upgrading a ScopedReader object.
+ * ScopedUpgradeToWriter upgrades a read-lock to write-lock.
  */
 template<class Variable>
 class ScopedUpgradeToWriter : public ConfigurableScopedAccessor<Variable>
