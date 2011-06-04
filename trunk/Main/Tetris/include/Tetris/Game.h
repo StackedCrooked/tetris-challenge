@@ -27,7 +27,7 @@ class GameState;
 
 
 /**
- * Game is an easy to use and thread-safe wrapper for the Game class.
+ * Game is an easy to use and thread-safe wrapper for the GameImpl class.
  */
 class Game
 {
@@ -64,7 +64,7 @@ public:
 
     GameStateStats stats() const;
 
-    ThreadSafe<GameImpl> game() const;
+    ThreadSafe<GameImpl> gameImpl() const;
 
     void setPaused(bool inPaused);
 

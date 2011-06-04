@@ -411,7 +411,7 @@ void AbstractWidget::paintActiveBlockShadow(const Game & inGame)
 
     // Critical section. Minimize scope.
     {
-        ScopedReader<GameImpl> rgame(inGame.game());
+        ScopedReader<GameImpl> rgame(inGame.gameImpl());
         const GameImpl & game = *rgame.get();
         const Block & block = game.activeBlock();
         const GameState & gameState = game.gameState();
