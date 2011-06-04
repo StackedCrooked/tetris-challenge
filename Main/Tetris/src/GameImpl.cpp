@@ -234,10 +234,12 @@ void GameImpl::applyLinePenalty(int inLineCount)
         newFirstOccupiedRow = 0;
     }
 
+    // Work with a copy of the current grid.
     Grid grid = gameGrid();
+
     int garbageStart = grid.rowCount() - lineIncrement;
 
-    std::vector<BlockType> garbageRow(getGarbageRow());
+    std::vector<BlockType> garbageRow;
 
     for (int r = newFirstOccupiedRow; r < grid.rowCount(); ++r)
     {
@@ -258,18 +260,19 @@ void GameImpl::applyLinePenalty(int inLineCount)
         }
     }
 
-    // Set the grid
+    // Overwrite the grid with our copy.
     setGrid(grid);
 
     // Check if the active block has been caught in the penalty lines that were added.
-    // If yes then call drop() to normalize the situation.
-
+    // If yes then we need to commit the current gamestate.
     const Block & block(activeBlock());
     if (!gameState().checkPositionValid(block, block.row(), block.column()))
     {
+        // Commit the game state.
         bool result = move(MoveDirection_Down);
-        Assert(!result); // check commit
+        Assert(!result); // verify commit
     }
+
     onChanged();
 }
 
