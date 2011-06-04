@@ -16,6 +16,7 @@
 
 using Futile::LogError;
 using Futile::ScopedReader;
+using Futile::ScopedUpgradeToWriter;
 using Futile::ScopedWriter;
 using Futile::ThreadSafe;
 
@@ -92,13 +93,15 @@ void Gravity::Impl::onTimerEvent(Poco::Timer & )
         if (mStopwatch.elapsed() > 1000  * interval())
         {
             mStopwatch.restart();
-            ScopedWriter<GameImpl> game(mThreadSafeGame);
-            if (game->isGameOver() || game->isPaused())
+            ScopedReader<GameImpl> rGame(mThreadSafeGame);
+            if (rGame->isGameOver() || rGame->isPaused())
             {
                 return;
             }
-            game->move(MoveDirection_Down);
-            mLevel = game->level();
+
+            ScopedUpgradeToWriter<GameImpl> wGame(rGame);
+            wGame->move(MoveDirection_Down);
+            mLevel = wGame->level();
             if (mLevel > cMaxLevel)
             {
                 mLevel = cMaxLevel;
