@@ -35,8 +35,7 @@ struct BlockMover::Impl
         mNumMovesPerSecond(1),
         mMoveCount(0),
         mActualSpeed(0),
-        mMoveDownBehavior(MoveDownBehavior_Move),
-        mNumFailedRotations(0)
+        mMoveDownBehavior(MoveDownBehavior_Move)
     {
     }
 
@@ -74,7 +73,6 @@ struct BlockMover::Impl
     Poco::AtomicCounter mMoveCount;
     int mActualSpeed;
     MoveDownBehavior mMoveDownBehavior;
-    int mNumFailedRotations;
 };
 
 
@@ -186,24 +184,14 @@ void BlockMover::Impl::move()
 
     Assert(block.type() == targetBlock.type());
 
+    // Try rotation first, if it fails then skip rotation and try horizontal move
     if (block.rotation() != targetBlock.rotation())
     {
-        if (!game.rotate())
+        if (game.rotate())
         {
-            // If the rotation failed then we increment the mNumFailedRotatons field.
-            if (++mNumFailedRotations > (game.gameGrid().columnCount() / 2))
-            {
-                game.dropAndCommit();
-                mNumFailedRotations = 0;
-            }
-            // else: continue to try to move left or right
+            return;
         }
-        else
-        {
-            // Rotation succeeded!
-            // Reset the counter.
-            mNumFailedRotations = 0;
-        }
+        // else: try left or right move below
     }
 
     if (block.column() < targetBlock.column())
@@ -214,8 +202,10 @@ void BlockMover::Impl::move()
             // Give up on this block.
             game.dropAndCommit();
         }
+        return;
     }
-    else if (block.column() > targetBlock.column())
+
+    if (block.column() > targetBlock.column())
     {
         if (!game.move(MoveDirection_Left))
         {
@@ -223,8 +213,25 @@ void BlockMover::Impl::move()
             // Give up on this block.
             game.dropAndCommit();
         }
+        return;
     }
-    else if (mMoveDownBehavior == BlockMover::MoveDownBehavior_Move)
+
+    // Horizontal position is OK.
+    // Retry rotation again. If it fails here then drop the block.
+    if (block.rotation() != targetBlock.rotation())
+    {
+        if (!game.rotate())
+        {
+            game.dropAndCommit();
+        }
+        return;
+    }
+
+    //
+    // If we get arrive here then horizontal position and rotation are OK.
+    // Start lowering the block.
+    //
+    if (mMoveDownBehavior == BlockMover::MoveDownBehavior_Move)
     {
         game.move(MoveDirection_Down);
     }
