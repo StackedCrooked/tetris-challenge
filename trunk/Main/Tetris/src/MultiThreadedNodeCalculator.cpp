@@ -16,13 +16,13 @@
 #include <stdexcept>
 
 
+namespace Tetris {
+
+
 using Futile::LogWarning;
 using Futile::ScopedLock;
 using Futile::Worker;
 using Futile::WorkerPool;
-
-
-namespace Tetris {
 
 
 MultithreadedNodeCalculator::MultithreadedNodeCalculator(std::auto_ptr<GameStateNode> inNode,
@@ -153,5 +153,6 @@ void MultithreadedNodeCalculator::populate()
     mWorkerPool.interruptAndClearQueue();
     mWorkerPool.wait();
 }
+
 
 } // namespace Tetris

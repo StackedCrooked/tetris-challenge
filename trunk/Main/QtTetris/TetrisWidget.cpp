@@ -10,6 +10,7 @@
 #include <QtGui/QPainter>
 #include <QtCore/QMutexLocker>
 #include <QtCore/QTimer>
+#include <boost/noncopyable.hpp>
 #include <stdexcept>
 #include <iostream>
 
@@ -18,6 +19,33 @@ using namespace Tetris;
 
 
 std::set<TetrisWidget*> TetrisWidget::sInstances;
+
+
+namespace { // anonymous namespace
+
+
+struct RestorePainter : boost::noncopyable
+{
+    RestorePainter(QPainter & inPainter) :
+        mPainter(inPainter),
+        mFont(inPainter.font()),
+        mPen(inPainter.pen())
+    {
+    }
+
+    ~RestorePainter()
+    {
+        mPainter.setFont(mFont);
+        mPainter.setPen(mPen);
+    }
+
+    QPainter & mPainter;
+    QFont mFont;
+    QPen mPen;
+};
+
+
+} // anomymous namespace
 
 
 TetrisWidget::TetrisWidget(QWidget * inParent, int inSquareWidth, int inSquareHeight) :
@@ -126,6 +154,7 @@ void TetrisWidget::drawRect(const Tetris::Rect & inRect, const Tetris::RGBColor 
     {
         throw std::logic_error("Painter is not set.");
     }
+    RestorePainter restorePainter(*mPainter);
 
     QColor color(inColor.red(), inColor.green(), inColor.blue());
     int x = inRect.x();
@@ -145,6 +174,7 @@ void TetrisWidget::paintSquare(const Rect & inRect, const RGBColor & inColor)
         throw std::logic_error("Painter is not set.");
     }
 
+    RestorePainter restorePainter(*mPainter);
 
     QColor color(inColor.red(), inColor.green(), inColor.blue());
     int x = inRect.x();
@@ -170,6 +200,7 @@ void TetrisWidget::paintStatItem(const Tetris::Rect & inRect, const std::string 
     {
         throw std::logic_error("Painter is not set.");
     }
+    RestorePainter restorePainter(*mPainter);
 
     QPainter & painter(*mPainter);
     QFont oldFont(painter.font());
@@ -207,6 +238,8 @@ void TetrisWidget::paintImage(const Tetris::Rect & inRect, const std::string & i
     if (!mImage->isNull())
     {
         QPainter & painter(*mPainter);
+        RestorePainter restorePainter(*mPainter);
+
         QRectF rectF(inRect.left(), inRect.top(), inRect.width(), inRect.height());
         painter.fillRect(rectF, QColor(255, 255, 255));
         painter.drawImage(rectF, *mImage);
@@ -220,6 +253,7 @@ void TetrisWidget::drawLine(int x1, int y1, int x2, int y2, int inPenWidth, cons
     {
         throw std::logic_error("Painter is not set.");
     }
+    RestorePainter restorePainter(*mPainter);
 
     mPainter->setPen(QColor(inColor.red(), inColor.green(), inColor.blue()));
     mPainter->drawLine(x1, y1, x2, y2);
@@ -233,7 +267,9 @@ void TetrisWidget::drawText(int x, int y, const std::string & inText)
         throw std::logic_error("Painter is not set.");
     }
 
+    RestorePainter restorePainter(*mPainter);
     QPainter & painter(*mPainter);
+
     painter.setPen(QColor(0, 0, 0));
     painter.drawText(QRect(x, y, simpleGame()->gameGrid().columnCount() * squareWidth(), squareHeight()), inText.c_str());
 }
@@ -246,7 +282,10 @@ void TetrisWidget::drawTextCentered(const Rect & inRect, const std::string & inT
         throw std::logic_error("Painter is not set.");
     }
 
+    RestorePainter restorePainter(*mPainter);
     QPainter & painter(*mPainter);
+
+    // Set the new pen
     painter.setPen(QColor(inColor.red(), inColor.green(), inColor.blue()));
 
     // Paint the stats title
@@ -260,7 +299,8 @@ void TetrisWidget::drawTextCentered(const Rect & inRect, const std::string & inT
 
     int x = inRect.left() + (inRect.width()  - textWidth)/2;
     int y = inRect.top()  + (inRect.height() - textHeight)/2;
-    drawText(x, y, inText);
+    QRect theTextRect(x, y, simpleGame()->gameGrid().columnCount() * squareWidth(),squareHeight());
+    painter.drawText(theTextRect, inText.c_str());
 }
 
 
@@ -271,7 +311,9 @@ void TetrisWidget::drawTextRightAligned(const Rect & inRect, const std::string &
         throw std::logic_error("Painter is not set.");
     }
 
+    RestorePainter restorePainter(*mPainter);
     QPainter & painter(*mPainter);
+
     painter.setPen(QColor(inColor.red(), inColor.green(), inColor.blue()));
 
     // Paint the stats title

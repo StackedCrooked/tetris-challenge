@@ -64,40 +64,6 @@ void MainWindow::timerEvent()
     {
         return;
     }
-
-
-    if (Model::Instance().IsGameOver())
-    {
-        mGameOver = true;
-
-        MultiplayerGame & mgame = Model::Instance().multiplayerGame();
-        if (mgame.playerCount() == 1)
-        {
-            QMessageBox msgBox;
-            msgBox.setWindowTitle("QtTetris");
-            std::string text = "And the winner is: Gravity!";
-            msgBox.setText(text.c_str());
-            msgBox.exec();
-            return;
-        }
-
-
-        for (std::size_t idx = 0; idx < mgame.playerCount(); ++idx)
-        {
-            Player * player(mgame.getPlayer(idx));
-            if (!player->simpleGame()->isGameOver())
-            {
-                player->simpleGame()->setPaused(true);
-                QMessageBox msgBox;
-                msgBox.setWindowTitle("QtTetris");
-                std::string text = "And the winner is: " + player->playerName() + "!";
-                msgBox.setText(text.c_str());
-                msgBox.exec();
-                return;
-            }
-        }
-    }
-
 }
 
 
