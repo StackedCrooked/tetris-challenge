@@ -286,6 +286,11 @@ void AbstractWidget::coordinateRepaint(Game & inGame)
     // Paint the game
     paintGameGrid(inGame.gameGrid());
 
+    if (inGame.isGameOver())
+    {
+        paintGameOver();
+    }
+
     // Paint future blocks
     std::vector<Block> futureBlocks(inGame.getNextBlocks());
     std::vector<BlockType> blockTypes;
@@ -372,6 +377,22 @@ void AbstractWidget::paintGameGrid(const Grid & inGrid)
     Rect theGameRect = gameRect();
     fillRect(theGameRect, RGBColor(255, 255, 255));
     paintGrid(theGameRect.x(), theGameRect.y(), inGrid);
+}
+
+
+void AbstractWidget::paintGameOver()
+{
+    Rect theGameRect = gameRect();
+
+    int theBoxHeight = 40;
+    int theBoxWidth = static_cast<int>(0.5 + 0.75 * theGameRect.width());
+    int theBoxLeft = (theGameRect.width() - theBoxWidth) / 2;
+    int theBoxTop = theGameRect.top() + ((theGameRect.height() - theBoxHeight) / 2);
+
+    Rect theTextRect = Rect(theBoxLeft, theBoxTop, theBoxWidth, theBoxHeight);
+    fillRect(theTextRect, RGBColor(255, 255, 255));
+    drawRect(theTextRect, RGBColor(0, 0, 0));
+    drawTextCentered(theTextRect, "Game Over", 18, RGBColor(0, 0, 0));
 }
 
 
