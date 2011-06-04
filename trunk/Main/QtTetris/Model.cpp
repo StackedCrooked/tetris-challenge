@@ -85,10 +85,10 @@ const Evaluator & Model::updateAIParameters(const Player & inPlayer,
     const Game & game = *inPlayer.simpleGame();
 
     outWorkerCount = Poco::Environment::processorCount();
-	if (outWorkerCount > 1)
-	{
-		outWorkerCount /= 2;
-	}
+    if (outWorkerCount > 1)
+    {
+        outWorkerCount /= 2;
+    }
 
     int currentHeight = game.stats().currentHeight();
 
@@ -162,7 +162,7 @@ void Model::newGame(const PlayerTypes & inPlayerTypes, std::size_t inRowCount, s
                                                          this);
             if (ComputerPlayer * computerPlayer = dynamic_cast<ComputerPlayer*>(player))
             {
-                computerPlayer->setMoveSpeed(allComputer ? 50 : 20);
+                computerPlayer->setMoveSpeed(allComputer ? 60 : 20);
             }
         }
         else

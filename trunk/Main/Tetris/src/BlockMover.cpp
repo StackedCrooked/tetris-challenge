@@ -35,7 +35,8 @@ struct BlockMover::Impl
         mNumMovesPerSecond(1),
         mMoveCount(0),
         mActualSpeed(0),
-        mMoveDownBehavior(MoveDownBehavior_Move)
+        mMoveDownBehavior(MoveDownBehavior_Move),
+        mNumFailedRotations(0)
     {
     }
 
@@ -73,6 +74,7 @@ struct BlockMover::Impl
     Poco::AtomicCounter mMoveCount;
     int mActualSpeed;
     MoveDownBehavior mMoveDownBehavior;
+    int mNumFailedRotations;
 };
 
 
@@ -188,12 +190,23 @@ void BlockMover::Impl::move()
     {
         if (!game.rotate())
         {
-            // Damn we can't rotate.
-            // Give up on this block.
-            game.dropAndCommit();
+            // If the rotation failed then we increment the mNumFailedRotatons field.
+            if (++mNumFailedRotations > (game.gameGrid().columnCount() / 2))
+            {
+                game.dropAndCommit();
+                mNumFailedRotations = 0;
+            }
+            // else: continue to try to move left or right
+        }
+        else
+        {
+            // Rotation succeeded!
+            // Reset the counter.
+            mNumFailedRotations = 0;
         }
     }
-    else if (block.column() < targetBlock.column())
+
+    if (block.column() < targetBlock.column())
     {
         if (!game.move(MoveDirection_Right))
         {
