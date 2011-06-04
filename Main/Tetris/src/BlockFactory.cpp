@@ -27,44 +27,14 @@ AbstractBlockFactory::~AbstractBlockFactory()
 }
 
 
-class RandomSeed
-{
-public:
-    typedef unsigned seed_t;
-    static const seed_t cMaxSeed = 1000000; // I don't need that many
-
-    RandomSeed() :
-        mSeed(0)
-    {
-        Poco::Timestamp ts;
-        Poco::Timestamp::TimeVal theMax(cMaxSeed);
-        mSeed = static_cast<seed_t>(ts.epochMicroseconds() % theMax);
-    }
-
-    seed_t get()
-    {
-        mSeed = (mSeed + 1) % cMaxSeed;
-        return mSeed;
-    }
-
-    static seed_t GetRandomSeed()
-    {
-        static Mutex fMutex;
-        ScopedLock lock(fMutex);
-        static RandomSeed fRandomSeed;
-        return fRandomSeed.get();
-    }
-
-private:
-    seed_t mSeed;
-};
-
-
 struct BlockFactory::Impl : boost::noncopyable
 {
+    typedef unsigned seed_t;
+
     Impl(int inBagSize) :
         mBagSize(inBagSize),
-        mCurrentIndex(0)
+        mCurrentIndex(0),
+        mSeed(static_cast<seed_t>(Poco::Timestamp().epochMicroseconds()))
     {
     }
 
@@ -75,6 +45,7 @@ struct BlockFactory::Impl : boost::noncopyable
     BlockTypes::size_type mBagSize;
     std::size_t mCurrentIndex;
     BlockTypes mBag;
+    seed_t mSeed;
 };
 
 
@@ -84,7 +55,7 @@ BlockFactory::BlockFactory(int inBagSize) :
 {
     ScopedWriter<Impl> rwImpl(mThreadSafeImpl);
     Impl * mImpl(rwImpl.get());
-    srand(RandomSeed::GetRandomSeed());
+    srand(mImpl->mSeed);
 
     std::size_t totalSize = mImpl->mBagSize * cBlockTypeCount;
     mImpl->mBag.reserve(totalSize);

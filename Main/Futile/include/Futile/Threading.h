@@ -22,6 +22,7 @@ typedef boost::condition_variable Condition;
 // Forward declarations
 template<class> class ScopedAccessor;
 template<class> class ScopedReader;
+template<class> class ScopedUpgradeToWriter;
 template<class> class ScopedWriter;
 
 
@@ -177,7 +178,6 @@ protected:
         return mProtectedVariable.mImpl->mVariable;
     }
 
-private:
     ThreadSafe<Variable> mProtectedVariable;
 };
 
@@ -231,8 +231,40 @@ public:
 
 protected:
     typedef ConfigurableScopedAccessor<Variable> Super;
-    boost::upgrade_lock<SharedMutex> mReadLock;
+    friend class ScopedUpgradeToWriter<Variable>;
 
+    boost::upgrade_lock<SharedMutex> mReadLock;
+};
+
+
+/**
+ * ScopedUpgradeToWriter creates is a ScopedWriter that
+ * is created by upgrading a ScopedReader object.
+ */
+template<class Variable>
+class ScopedUpgradeToWriter : public ConfigurableScopedAccessor<Variable>
+{
+public:
+    ScopedUpgradeToWriter(ScopedReader<Variable> & inScopedReader) :
+        Super(inScopedReader.mProtectedVariable),
+        mScopedReader(inScopedReader),
+        mWriteLock(mScopedReader.mReadLock)
+    {
+    }
+
+    Variable & operator *()
+    { return *ScopedAccessor<Variable>::getVariable(); }
+
+    Variable * get()
+    { return ScopedAccessor<Variable>::getVariable(); }
+
+    Variable * operator->()
+    { return ScopedAccessor<Variable>::getVariable(); }
+
+private:
+    typedef ConfigurableScopedAccessor<Variable> Super;
+    ScopedReader<Variable> & mScopedReader;
+    boost::upgrade_to_unique_lock<SharedMutex> mWriteLock;
 };
 
 

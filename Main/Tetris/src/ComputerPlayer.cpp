@@ -28,6 +28,7 @@ using Futile::MakeString;
 using Futile::Mutex;
 using Futile::ScopedLock;
 using Futile::ScopedReader;
+using Futile::ScopedUpgradeToWriter;
 using Futile::ScopedWriter;
 using Futile::WorkerPool;
 
@@ -340,11 +341,11 @@ void ComputerPlayer::Impl::startNodeCalculator()
 
     // Critical section
     {
-        ScopedWriter<GameImpl> wgame(mComputerPlayer->simpleGame()->gameImpl());
-        ComputerGame & game(dynamic_cast<ComputerGame&>(*wgame.get()));
+        ScopedReader<GameImpl> rgame(mComputerPlayer->simpleGame()->gameImpl());
+        const ComputerGame & constComputerGame(dynamic_cast<const ComputerGame&>(*rgame.get()));
 
 
-        if (game.numPrecalculatedMoves() > 8)
+        if (constComputerGame.numPrecalculatedMoves() > 8)
         {
             // We're fine for now.
             return;
@@ -352,7 +353,7 @@ void ComputerPlayer::Impl::startNodeCalculator()
 
         // Clone the starting node
         // The end node becomes the new start node. It's like... a vantage point!
-        endNode = game.endNode()->clone();
+        endNode = constComputerGame.endNode()->clone();
         if (endNode->gameState().isGameOver())
         {
             return;
@@ -360,13 +361,15 @@ void ComputerPlayer::Impl::startNodeCalculator()
 
         mGameDepth = endNode->depth();
         Assert(endNode->children().empty());
-        Assert(endNode->depth() >= game.currentNode()->depth());
+        Assert(endNode->depth() >= constComputerGame.currentNode()->depth());
 
 
         //
         // Create the list of future blocks
         //
-        game.getFutureBlocksWithOffset(endNode->depth(), mSearchDepth, futureBlocks);
+        ScopedUpgradeToWriter<GameImpl> rwGame(rgame);
+        ComputerGame & computerGame(dynamic_cast<ComputerGame&>(*rwGame.get()));
+        computerGame.getFutureBlocksWithOffset(endNode->depth(), mSearchDepth, futureBlocks);
     }
 
 
