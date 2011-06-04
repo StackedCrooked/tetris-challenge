@@ -143,7 +143,7 @@ bool Game::Exists(Game * inGame)
     return sInstances.find(inGame) != sInstances.end();
 }
 
-ThreadSafe<GameImpl> Game::game() const
+ThreadSafe<GameImpl> Game::gameImpl() const
 {
     return mImpl->mGameImpl;
 }

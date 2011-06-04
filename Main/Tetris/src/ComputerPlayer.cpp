@@ -105,7 +105,7 @@ ComputerPlayer::ComputerPlayer(const TeamName & inTeamName,
     mImpl(new Impl())
 {
     mImpl->mComputerPlayer = this;
-    mImpl->mBlockMover.reset(new BlockMover(simpleGame()->game()));
+    mImpl->mBlockMover.reset(new BlockMover(simpleGame()->gameImpl()));
     mImpl->mTimer.start(Poco::TimerCallback<ComputerPlayer>(*this, &ComputerPlayer::onTimerEvent));
 }
 
@@ -340,7 +340,7 @@ void ComputerPlayer::Impl::startNodeCalculator()
 
     // Critical section
     {
-        ScopedWriter<GameImpl> wgame(mComputerPlayer->simpleGame()->game());
+        ScopedWriter<GameImpl> wgame(mComputerPlayer->simpleGame()->gameImpl());
         ComputerGame & game(dynamic_cast<ComputerGame&>(*wgame.get()));
 
 
@@ -408,7 +408,7 @@ void ComputerPlayer::Impl::onStarted()
 
 void ComputerPlayer::Impl::onWorking()
 {
-    ScopedReader<GameImpl> wgame(mComputerPlayer->simpleGame()->game());
+    ScopedReader<GameImpl> wgame(mComputerPlayer->simpleGame()->gameImpl());
     const ComputerGame & game(dynamic_cast<const ComputerGame&>(*wgame.get()));
 
     if (mGameDepth < game.endNode()->depth())
@@ -445,7 +445,7 @@ void ComputerPlayer::Impl::onFinished()
         return;
     }
 
-    ScopedWriter<GameImpl> wgame(mComputerPlayer->simpleGame()->game());
+    ScopedWriter<GameImpl> wgame(mComputerPlayer->simpleGame()->gameImpl());
     ComputerGame & game(dynamic_cast<ComputerGame&>(*wgame.get()));
 
     // Check for sync problems.
