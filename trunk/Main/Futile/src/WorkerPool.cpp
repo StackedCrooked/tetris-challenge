@@ -79,24 +79,27 @@ void WorkerPool::interruptRange(std::size_t inBegin, std::size_t inCount)
     LockMany<Mutex> locker;
 
     //
-    // Lock all workers' queue and status.
+    // Lock all workers.
     //
     for (std::size_t idx = inBegin; idx != inBegin + inCount; ++idx)
     {
         Worker & worker = *mWorkers[idx];
         locker.lock(worker.mQueueMutex);
-        worker.mQueue.clear();
+
+        // Keep queue locked for now.
     }
 
     //
-    // Interrupt all threads.
+    // Clear queues and interrupt the work.
     //
     for (std::size_t idx = inBegin; idx != inBegin + inCount; ++idx)
     {
         Worker & worker = *mWorkers[idx];
 
-        // Never "join" here, because that would be wasteful.
-        worker.interrupt(false); 
+        worker.mQueue.clear();
+        worker.interrupt(false);
+
+        // NOTE: don't wait here, because that would be wasteful.
     }
 
     //
