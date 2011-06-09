@@ -344,18 +344,6 @@ LockMany<Mutex>::~LockMany()
 template<class Mutex>
 void LockMany<Mutex>::lock(Mutex & inMutex)
 {
-    //// Enforce the same order of locking in order to avoid deadlocks.
-    //if (!mMutexes.empty())
-    //{
-    //    if (&inMutex < mMutexes.back())
-    //    {
-    //        throw std::logic_error("Incorrect order of mutex locking. Ordering must be by address value.");
-    //    }
-    //    else if (&inMutex == mMutexes.back())
-    //    {
-    //        throw std::logic_error("Not allowed to add the same mutex twice.");
-    //    }
-    //}
     Lock(inMutex);
     mMutexes.push_back(&inMutex);
 }
