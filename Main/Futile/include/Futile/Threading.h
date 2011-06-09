@@ -69,7 +69,7 @@ public:
     { return !(*this == rhs); }
 
     bool compare(const ThreadSafe<Variable> & inOther)
-    { return mImpl.get() < inOther.mImpl.get(); }
+    { return mImpl < inOther.mImpl; }
 
 private:
     // This is the base class for the ScopedReader and ScopedWriter classes.
