@@ -32,11 +32,13 @@ inline void Unlock(boost::mutex & ioMutex) { ioMutex.unlock(); }
 
 
 /**
- * ThreadSafe is a non-intrusive wrapper for adding thread-safety to objects.
- * The object is stored as a private member variable and access can only be
- * through  one of two friend classes: ScopedReader and ScopedWriter.
- * ScopedReader gives you read access (via a const reference).
- * ScopedWriter gives you full access (via a non-const reference).
+ * ThreadSafe can be used to add a thread-safe wrapper around an object.
+ * The object is stored as a private member variable along with a rw-mutex.
+ * Access can be obtained by creating a ScopedReader or ScopedWriter object.
+ * These helper classes keep the mutex locked during their lifetimes and
+ * allow access to the contained object as follows:
+ * - ScopedReader provides a const getter to the contained object
+ * - ScopedWriter provides a non-const getter to the contained object
  */
 template<class Variable>
 class ThreadSafe
