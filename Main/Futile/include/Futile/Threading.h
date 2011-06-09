@@ -197,11 +197,13 @@ class ConfigurableScopedAccessor : public  ScopedAccessor<Variable>,
                                    private CheckLockOrderPolicy
 {
 public:
-    typedef ScopedAccessor<Variable> Super;
     ConfigurableScopedAccessor(ThreadSafe<Variable> inProtectedVariable) :
         Super(inProtectedVariable)
     {
     }
+
+private:
+    typedef ScopedAccessor<Variable> Super;
 };
 
 
@@ -231,10 +233,11 @@ public:
     const Variable * operator->() const
     { return ScopedAccessor<Variable>::getVariable(); }
 
-protected:
+private:
     typedef ConfigurableScopedAccessor<Variable> Super;
     friend class ScopedUpgradeToWriter<Variable>;
 
+protected:
     boost::upgrade_lock<SharedMutex> mReadLock;
 };
 
