@@ -320,10 +320,6 @@ public:
 
     void unlockAll();
 
-    const Mutex & get(size_type inIndex) const;
-
-    Mutex & get(size_type inIndex);
-
     size_type size() const;
 
 private:
@@ -360,20 +356,6 @@ void LockMany<Mutex>::unlockAll()
         Unlock(*mMutexes.back());
         mMutexes.pop_back();
     }
-}
-
-
-template<class Mutex>
-const Mutex & LockMany<Mutex>::get(size_type inIndex) const
-{
-    return mMutexes[inIndex];
-}
-
-
-template<class Mutex>
-Mutex & LockMany<Mutex>::get(size_type inIndex)
-{
-    return mMutexes[inIndex];
 }
 
 
