@@ -1,5 +1,5 @@
-#ifndef MemoryPoolTypeH_INCLUDED
-#define MemoryPoolTypeH_INCLUDED
+#ifndef MEMORYPOOL_H_INCLUDED
+#define MEMORYPOOL_H_INCLUDED
 
 
 #include <boost/noncopyable.hpp>
@@ -12,7 +12,8 @@
 
 
 namespace Futile {
-namespace MemoryPool {
+namespace Memory {
+namespace Pool {
 
 
 template<typename ValueType> struct ScopedPtr;
@@ -155,6 +156,8 @@ public:
     }
 
 private:
+    friend class ScopedPtr<Value>;
+
     // Disable assignment and swap
     MovePtr & operator=(const MovePtr & rhs);
     void swap(This & rhs);
@@ -473,7 +476,7 @@ void DestructAndRelease(MemoryPool<ValueType> & pool, const ValueType * value)
 }
 
 
-} } // namespace Futile::MemoryPool
+} } } // namespace Futile::Memory::Pool
 
 
-#endif // MemoryPoolTypeH_INCLUDED
+#endif // MEMORYPOOL_H_INCLUDED
