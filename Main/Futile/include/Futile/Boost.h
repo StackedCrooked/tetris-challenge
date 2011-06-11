@@ -4,8 +4,6 @@
 
 /**
  * This is my a mini-boost implementation that may be useful when want to avoid the big boost dependency.
- * This simple code is also more debugger-friendly than the orignal (very complicated) boost code.
- * May contain bugs though :/
  */
 namespace Futile {
 namespace Boost {

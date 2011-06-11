@@ -113,6 +113,7 @@ endif()
 # Tetris & Futile dependencies
 #
 add_subdirectory(${SOLUTIONDIR}Tetris ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Tetris)
+add_subdirectory(${SOLUTIONDIR}Tetris/testsuite ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Tetris/testsuite)
 add_subdirectory(${SOLUTIONDIR}Futile ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Futile)
 include_directories(
     ${SOLUTIONDIR}Futile/include
