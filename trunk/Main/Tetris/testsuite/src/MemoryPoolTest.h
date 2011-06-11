@@ -16,6 +16,8 @@ public:
 
     void testMemoryPool();
 
+    void testMemoryPoolPerformance();
+
     void setUp();
 
     void tearDown();

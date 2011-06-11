@@ -116,7 +116,7 @@ public:
 
     ~Stopwatch();
 
-    int elapsedTimeMs() const;
+    unsigned elapsedTimeMs() const;
 
 private:
     struct Impl;
