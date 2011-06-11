@@ -87,18 +87,12 @@ set(BOOST_LIB "${BOOST_ROOT}/lib/${PLATFORM}/${ARCH}")
 
 
 #
-# Add Tetris project to our build
-#
-add_subdirectory(${SOLUTIONDIR}Tetris ${LIBRARY_OUTPUT_PATH}/Tetris)
-add_subdirectory(${SOLUTIONDIR}Futile ${LIBRARY_OUTPUT_PATH}/Futile)
-
-
-#
 # Testsuite source files
 #
 set(TetrisTestSuite_SOURCES
     src/Driver.cpp
     src/GenericGridTest.cpp
+    src/NodeTest.cpp
     src/MemoryPoolTest.cpp
     src/NodeCalculatorTest.cpp
     src/TetrisTestSuite.cpp

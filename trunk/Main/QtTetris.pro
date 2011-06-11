@@ -41,6 +41,12 @@ SOURCES += \
     Tetris/src/Unicode.cpp \
     Tetris/testsuite/src/Driver.cpp \
     Tetris/testsuite/src/GenericGridTest.cpp \
+    Tetris/testsuite/src/NodeTest.cpp \
+    Tetris/testsuite/src/WorkerTest.cpp \
+    Tetris/testsuite/src/WorkerPoolTest.cpp \
+    Tetris/testsuite/src/TetrisTestSuite.cpp \
+    Tetris/testsuite/src/NodeCalculatorTest.cpp \
+    Tetris/testsuite/src/MemoryPoolTest.cpp
     Tetris/testsuite/src/NodeCalculatorTest.cpp \
     Tetris/testsuite/src/TetrisTestSuite.cpp \
     Tetris/testsuite/src/WorkerPoolTest.cpp \
@@ -56,7 +62,7 @@ SOURCES += \
     Futile/src/MemoryPool.cpp \
     Tetris/testsuite/src/MemoryPoolTest.cpp \
     Tetris/src/GameImpl.cpp \
-    Tetris/src/Game.cpp
+    Tetris/src/Game.cpp \
 
 
 HEADERS += \
@@ -408,7 +414,9 @@ HEADERS += \
     Futile/include/Futile/MemoryPool.h \
     Tetris/testsuite/src/MemoryPoolTest.h \
     Tetris/include/Tetris/GameImpl.h \
-    Tetris/include/Tetris/Game.h
+    Tetris/include/Tetris/Game.h \
+    Futile/include/Futile/Node.h \
+    Tetris/testsuite/src/NodeTest.h
 
 
 OTHER_FILES += \
