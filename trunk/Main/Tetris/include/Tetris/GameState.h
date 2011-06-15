@@ -20,10 +20,10 @@ public:
     const Grid & grid() const;
 
     // Modifies the grid bypassing Tetris rules.
-    // This is added to enable for multiplayer features.
+    // This is required to enable certain multiplayer features.
     void setGrid(const Grid & inGrid);
 
-    // Returns true if setGrid() has been called.
+    // Returns true if setGrid() has been called in the passed.
     bool tainted() const;
 
     // The Block that was used in the commit(...) call.
@@ -31,8 +31,8 @@ public:
 
     bool isGameOver() const;
 
-    // Checks if a activeBlock can be placed at a given location without
-    // overlapping with previously placed blocks.
+    // Checks if a Block can be placed at a given location
+    // without overlapping with previously placed blocks.
     bool checkPositionValid(const Block & inBlock, std::size_t inRowIdx, std::size_t inColIdx) const;
 
     // Creates a copy of the current gamestate with the given active block committed.
@@ -59,7 +59,7 @@ private:
     Grid mGrid;
     Block mOriginalBlock;
     bool mIsGameOver;
-	std::size_t mFirstOccupiedRow;
+    std::size_t mFirstOccupiedRow;
     int mNumLines;
     int mNumSingles;
     int mNumDoubles;

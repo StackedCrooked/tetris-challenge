@@ -186,7 +186,7 @@ class LockerBase
 
 
 /**
- * Locker is the base class for the Locker and ScopedReadedAndWriter classes.
+ * Locker is used get access to the object wrapped by the ThreadSafe class.
  */
 template<class Variable>
 class Locker : public LockerBase
