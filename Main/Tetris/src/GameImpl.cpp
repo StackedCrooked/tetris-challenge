@@ -26,8 +26,7 @@ using Futile::LogError;
 using Futile::LogWarning;
 using Futile::MakeString;
 using Futile::Mutex;
-using Futile::ScopedReader;
-using Futile::ScopedWriter;
+using Futile::ScopedAccessor;
 using Futile::ThreadSafe;
 
 
@@ -89,7 +88,7 @@ GameImpl::~GameImpl()
 
 void GameImpl::RegisterEventHandler(ThreadSafe<GameImpl> inGame, EventHandler * inEventHandler)
 {
-    ScopedWriter<GameImpl> rwgame(inGame);
+    ScopedAccessor<GameImpl> rwgame(inGame);
     GameImpl * game(rwgame.get());
     if (sInstances.find(game) == sInstances.end())
     {
@@ -103,7 +102,7 @@ void GameImpl::RegisterEventHandler(ThreadSafe<GameImpl> inGame, EventHandler * 
 
 void GameImpl::UnregisterEventHandler(ThreadSafe<GameImpl> inGame, EventHandler * inEventHandler)
 {
-    ScopedWriter<GameImpl> rwgame(inGame);
+    ScopedAccessor<GameImpl> rwgame(inGame);
     GameImpl * game(rwgame.get());
     if (sInstances.find(game) == sInstances.end())
     {

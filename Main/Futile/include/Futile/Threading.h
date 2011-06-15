@@ -15,15 +15,11 @@ namespace Futile {
 
 typedef boost::mutex Mutex;
 typedef boost::mutex::scoped_lock ScopedLock;
-typedef boost::shared_mutex SharedMutex;
 typedef boost::condition_variable Condition;
 
 
 // Forward declarations
 template<class> class ScopedAccessor;
-template<class> class ScopedReader;
-template<class> class ScopedUpgradeToWriter;
-template<class> class ScopedWriter;
 
 
 // Lock/Unlock function. These could be overloaded for different mutex types.
@@ -33,12 +29,9 @@ inline void Unlock(boost::mutex & ioMutex) { ioMutex.unlock(); }
 
 /**
  * ThreadSafe can be used to add a thread-safe wrapper around an object.
- * The object is stored as a private member variable along with a rw-mutex.
- * Access can be obtained by creating a ScopedReader or ScopedWriter object.
- * These helper classes keep the mutex locked during their lifetimes and
- * allow access to the contained object as follows:
- * - ScopedReader provides a const getter to the contained object
- * - ScopedWriter provides a non-const getter to the contained object
+ *
+ * The protected object is stored as a private member variable along with a mutex.
+ * A ScopedAccessor object can be used to obtain access to the protected object.
  */
 template<class Variable>
 class ThreadSafe
@@ -72,7 +65,6 @@ public:
     { return mImpl < inOther.mImpl; }
 
 private:
-    // This is the base class for the ScopedReader and ScopedWriter classes.
     friend class ScopedAccessor<Variable>;
 
     struct Impl : boost::noncopyable
@@ -80,11 +72,13 @@ private:
         Impl(std::auto_ptr<Variable> inVariable) :
             mVariable(inVariable.release())
         {
+            Assert(mVariable);
         }
 
         Impl(Variable * inVariable) :
             mVariable(inVariable)
         {
+            Assert(mVariable);
         }
 
         ~Impl()
@@ -93,7 +87,7 @@ private:
         }
 
         Variable * mVariable;
-        SharedMutex mSharedMutex;
+        Mutex mSharedMutex;
     };
 
     boost::shared_ptr<Impl> mImpl;
@@ -108,7 +102,7 @@ bool operator< (const ThreadSafe<Variable> & lhs, const ThreadSafe<Variable> & r
 
 
 // Simple stopwatch class.
-// Used by the TimeLimitPolicy class of the ScopedWriter and ScopedReader classes.
+// Used by the TimeLimitPolicy class of the ScopedAccessor and ScopedAccessor classes.
 class Stopwatch : boost::noncopyable
 {
 public:
@@ -153,7 +147,7 @@ struct TimeLimitMs
 
 
 /**
- * ScopedAccessor is the base class for the ScopedReader and ScopedReadedAndWriter classes.
+ * ScopedAccessor is the base class for the ScopedAccessor and ScopedReadedAndWriter classes.
  */
 template<class Variable>
 class ScopedAccessor : boost::noncopyable
@@ -164,141 +158,16 @@ public:
     {
     }
 
-protected:
-    SharedMutex & getSharedMutex()
-    {
-        return mProtectedVariable.mImpl->mSharedMutex;
-    }
+    const Variable * get() const { return mProtectedVariable.mImpl->mVariable; }
 
-    const Variable * getVariable() const
-    {
-        return mProtectedVariable.mImpl->mVariable;
-    }
+    Variable * get() { return mProtectedVariable.mImpl->mVariable; }
 
-    Variable * getVariable()
-    {
-        return mProtectedVariable.mImpl->mVariable;
-    }
+    const Variable * operator->() const { return get(); }
 
+    Variable * operator->() { return get(); }
+
+private:
     ThreadSafe<Variable> mProtectedVariable;
-};
-
-
-/**
- * ConfigurableScopedAccessor sits between the ScopedReader/ScopedReadAndWriter and the ScopedAccessor classes.
- * The policy template arguments can be used to specify whether and how the class should do extra runtime checking
- * and error reporting.
- */
-template<class Variable,
-         class CheckLockDurationPolicy = VoidPolicy<0>,
-         class CheckLockOrderPolicy    = VoidPolicy<1> >
-class ConfigurableScopedAccessor : public  ScopedAccessor<Variable>,
-                                   private CheckLockDurationPolicy,
-                                   private CheckLockOrderPolicy
-{
-public:
-    ConfigurableScopedAccessor(ThreadSafe<Variable> inProtectedVariable) :
-        Super(inProtectedVariable)
-    {
-    }
-
-private:
-    typedef ScopedAccessor<Variable> Super;
-};
-
-
-/**
- * ScopedReader creates a read-lock during the lifetime of its object.
- * Access to the wrapped object is restricted to const-ref.
- *
- * Be careful if your object has mutable data!
- */
-template<class Variable>
-class ScopedReader : public ConfigurableScopedAccessor<Variable>
-{
-public:
-    ScopedReader(ThreadSafe<Variable> inProtectedVariable) :
-        Super(inProtectedVariable),
-        mReadLock(ScopedAccessor<Variable>::getSharedMutex())
-    {
-    }
-
-    // Access is limited to const-ref.
-    const Variable & operator *() const
-    { return *ScopedAccessor<Variable>::getVariable(); }
-
-    const Variable * get() const
-    { return ScopedAccessor<Variable>::getVariable(); }
-
-    const Variable * operator->() const
-    { return ScopedAccessor<Variable>::getVariable(); }
-
-private:
-    typedef ConfigurableScopedAccessor<Variable> Super;
-    friend class ScopedUpgradeToWriter<Variable>;
-
-protected:
-    boost::upgrade_lock<SharedMutex> mReadLock;
-};
-
-
-/**
- * ScopedUpgradeToWriter upgrades a read-lock to write-lock.
- */
-template<class Variable>
-class ScopedUpgradeToWriter : public ConfigurableScopedAccessor<Variable>
-{
-public:
-    ScopedUpgradeToWriter(ScopedReader<Variable> & inScopedReader) :
-        Super(inScopedReader.mProtectedVariable),
-        mScopedReader(inScopedReader),
-        mWriteLock(mScopedReader.mReadLock)
-    {
-    }
-
-    Variable & operator *()
-    { return *ScopedAccessor<Variable>::getVariable(); }
-
-    Variable * get()
-    { return ScopedAccessor<Variable>::getVariable(); }
-
-    Variable * operator->()
-    { return ScopedAccessor<Variable>::getVariable(); }
-
-private:
-    typedef ConfigurableScopedAccessor<Variable> Super;
-    ScopedReader<Variable> & mScopedReader;
-    boost::upgrade_to_unique_lock<SharedMutex> mWriteLock;
-};
-
-
-/**
- * ScopedWriter creates, during it's lifetime, a unique-lock on
- * the C++ object and provides both read and write access to it.
- */
-template<class Variable>
-class ScopedWriter : public ScopedReader<Variable>
-{
-public:
-    ScopedWriter(ThreadSafe<Variable> inProtectedVariable) :
-        Super(inProtectedVariable),
-        mWriteLock(ScopedReader<Variable>::mReadLock)
-    {
-    }
-
-    Variable & operator *()
-    { return *ScopedAccessor<Variable>::getVariable(); }
-
-    Variable * get()
-    { return ScopedAccessor<Variable>::getVariable(); }
-
-    Variable * operator->()
-    { return ScopedAccessor<Variable>::getVariable(); }
-
-
-private:
-    typedef ScopedReader<Variable> Super;
-    boost::upgrade_to_unique_lock<SharedMutex> mWriteLock;
 };
 
 

@@ -27,9 +27,7 @@ using Futile::LogError;
 using Futile::MakeString;
 using Futile::Mutex;
 using Futile::ScopedLock;
-using Futile::ScopedReader;
-using Futile::ScopedUpgradeToWriter;
-using Futile::ScopedWriter;
+using Futile::ScopedAccessor;
 using Futile::WorkerPool;
 
 
@@ -341,7 +339,7 @@ void ComputerPlayer::Impl::startNodeCalculator()
 
     // Critical section
     {
-        ScopedReader<GameImpl> rgame(mComputerPlayer->simpleGame()->gameImpl());
+        ScopedAccessor<GameImpl> rgame(mComputerPlayer->simpleGame()->gameImpl());
         const ComputerGame & constComputerGame(dynamic_cast<const ComputerGame&>(*rgame.get()));
 
 
@@ -367,8 +365,7 @@ void ComputerPlayer::Impl::startNodeCalculator()
         //
         // Create the list of future blocks
         //
-        ScopedUpgradeToWriter<GameImpl> rwGame(rgame);
-        ComputerGame & computerGame(dynamic_cast<ComputerGame&>(*rwGame.get()));
+        ComputerGame & computerGame(dynamic_cast<ComputerGame&>(*rgame.get()));
         computerGame.getFutureBlocksWithOffset(endNode->depth(), mSearchDepth, futureBlocks);
     }
 
@@ -411,7 +408,7 @@ void ComputerPlayer::Impl::onStarted()
 
 void ComputerPlayer::Impl::onWorking()
 {
-    ScopedReader<GameImpl> wgame(mComputerPlayer->simpleGame()->gameImpl());
+    ScopedAccessor<GameImpl> wgame(mComputerPlayer->simpleGame()->gameImpl());
     const ComputerGame & game(dynamic_cast<const ComputerGame&>(*wgame.get()));
 
     if (mGameDepth < game.endNode()->depth())
@@ -448,7 +445,7 @@ void ComputerPlayer::Impl::onFinished()
         return;
     }
 
-    ScopedWriter<GameImpl> wgame(mComputerPlayer->simpleGame()->gameImpl());
+    ScopedAccessor<GameImpl> wgame(mComputerPlayer->simpleGame()->gameImpl());
     ComputerGame & game(dynamic_cast<ComputerGame&>(*wgame.get()));
 
     // Check for sync problems.
