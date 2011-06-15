@@ -23,6 +23,69 @@ typedef boost::mutex::scoped_lock ScopedLock;
 typedef boost::condition_variable Condition;
 
 
+/**
+ * LockMany is a mutex lock that can lock multiple mutexes.
+ */
+template<class Mutex>
+class LockMany : boost::noncopyable
+{
+public:
+    typedef std::vector<Mutex*> Mutexes;
+    typedef typename Mutexes::size_type size_type;
+
+    LockMany();
+
+    ~LockMany();
+
+    void lock(Mutex & inMutex);
+
+    void unlockAll();
+
+    size_type size() const;
+
+private:
+    Mutexes mMutexes;
+};
+
+
+template<class Mutex>
+LockMany<Mutex>::LockMany()
+{
+}
+
+
+template<class Mutex>
+LockMany<Mutex>::~LockMany()
+{
+    unlockAll();
+}
+
+
+template<class Mutex>
+void LockMany<Mutex>::lock(Mutex & inMutex)
+{
+    inMutex.lock();
+    mMutexes.push_back(&inMutex);
+}
+
+
+template<class Mutex>
+void LockMany<Mutex>::unlockAll()
+{
+    while (!mMutexes.empty())
+    {
+        mMutexes.back()->unlock();
+        mMutexes.pop_back();
+    }
+}
+
+
+template<class Mutex>
+typename LockMany<Mutex>::size_type LockMany<Mutex>::size() const
+{
+    return mMutexes.size();
+}
+
 
 // Forward declarations
 class LockerBase;
@@ -116,54 +179,10 @@ bool operator< (const ThreadSafe<Variable> & lhs, const ThreadSafe<Variable> & r
 }
 
 
-// Simple stopwatch class.
-// Used by the TimeLimitPolicy class of the Locker and Locker classes.
-class Stopwatch : boost::noncopyable
-{
-public:
-    Stopwatch();
-
-    ~Stopwatch();
-
-    unsigned elapsedTimeMs() const;
-
-private:
-    struct Impl;
-    boost::scoped_ptr<Impl> mImpl;
-};
-
-
-/**
- * VoidPolicy can be used as a default type for policies that you don't want to set.
- */
- template<int n = 0>
-class VoidPolicy
+// This base class is used for the ScopeGuard trick in the FUTILE_LOCK macro.
+class LockerBase
 {
 };
-
-
-/**
- * TimeLimitMs checks the duration of its own object lifetime.
- * During destruction it is checked if the maximum allowed duration
- * (which is specified as a value-type template argument) was exceeded.
- * If yes, then an assert/exception will result.
- */
-template<time_t MaxDurationMs>
-struct TimeLimitMs
-{
-    ~TimeLimitMs()
-    {
-        Assert(mStopwatch.elapsedTimeMs() < MaxDurationMs);
-    }
-
-    // Stopwatch starts during construction.
-    Stopwatch mStopwatch;
-};
-
-
-// Helper for the FUTILE_LOCK macro
-class LockerBase {};
-template<class> class Locker;
 
 
 /**
@@ -258,68 +277,21 @@ T & Unwrap(const Futile::LockerBase & inLockerBase, const Futile::ThreadSafe<T> 
         FUTILE_FOR_BLOCK(DECL = Futile::Helper::Unwrap(theLockerBase, TSV))
 
 
-/**
- * LockMany is a mutex lock that can lock multiple mutexes.
- */
-template<class Mutex>
-class LockMany : boost::noncopyable
+// Simple stopwatch class.
+// Used by the TimeLimitPolicy class of the Locker and Locker classes.
+class Stopwatch : boost::noncopyable
 {
 public:
-    typedef std::vector<Mutex*> Mutexes;
-    typedef typename Mutexes::size_type size_type;
+    Stopwatch();
 
-    LockMany();
+    ~Stopwatch();
 
-    ~LockMany();
-
-    void lock(Mutex & inMutex);
-
-    void unlockAll();
-
-    size_type size() const;
+    unsigned elapsedTimeMs() const;
 
 private:
-    Mutexes mMutexes;
+    struct Impl;
+    boost::scoped_ptr<Impl> mImpl;
 };
-
-
-template<class Mutex>
-LockMany<Mutex>::LockMany()
-{
-}
-
-
-template<class Mutex>
-LockMany<Mutex>::~LockMany()
-{
-    unlockAll();
-}
-
-
-template<class Mutex>
-void LockMany<Mutex>::lock(Mutex & inMutex)
-{
-    inMutex.lock();
-    mMutexes.push_back(&inMutex);
-}
-
-
-template<class Mutex>
-void LockMany<Mutex>::unlockAll()
-{
-    while (!mMutexes.empty())
-    {
-        mMutexes.back()->unlock();
-        mMutexes.pop_back();
-    }
-}
-
-
-template<class Mutex>
-typename LockMany<Mutex>::size_type LockMany<Mutex>::size() const
-{
-    return mMutexes.size();
-}
 
 
 } // namespace Futile

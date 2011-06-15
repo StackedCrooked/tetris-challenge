@@ -96,7 +96,7 @@ void GameImpl::RegisterEventHandler(ThreadSafe<GameImpl> inGame, EventHandler * 
 {
     FUTILE_LOCK(GameImpl & game, inGame)
     {
-        if (Exists(game))
+        if (Exists(game)) // The game may have ended by the time this event arrives.
         {
             game.mEventHandlers.insert(inEventHandler);
         }
@@ -108,7 +108,7 @@ void GameImpl::UnregisterEventHandler(ThreadSafe<GameImpl> inGame, EventHandler 
 {
     FUTILE_LOCK(GameImpl & game, inGame)
     {
-        if (Exists(game))
+        if (Exists(game)) // The game may have ended by the time this event arrives.
         {
             game.mEventHandlers.erase(inEventHandler);
         }
