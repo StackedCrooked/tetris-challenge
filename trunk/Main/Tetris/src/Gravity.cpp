@@ -15,9 +15,7 @@
 
 
 using Futile::LogError;
-using Futile::ScopedReader;
-using Futile::ScopedUpgradeToWriter;
-using Futile::ScopedWriter;
+using Futile::ScopedAccessor;
 using Futile::ThreadSafe;
 
 
@@ -72,7 +70,7 @@ struct Gravity::Impl : boost::noncopyable
 Gravity::Gravity(const ThreadSafe<GameImpl> & inThreadSafeGame) :
     mImpl(new Impl(inThreadSafeGame))
 {
-    ScopedReader<GameImpl> rgame(mImpl->mThreadSafeGame);
+    ScopedAccessor<GameImpl> rgame(mImpl->mThreadSafeGame);
     mImpl->mTimer.start(Poco::TimerCallback<Gravity::Impl>(*mImpl, &Gravity::Impl::onTimerEvent));
     mImpl->mTimer.setPeriodicInterval(sIntervals[rgame->level()]);
     mImpl->mStopwatch.start();
@@ -93,13 +91,12 @@ void Gravity::Impl::onTimerEvent(Poco::Timer & )
         if (mStopwatch.elapsed() > 1000  * interval())
         {
             mStopwatch.restart();
-            ScopedReader<GameImpl> rGame(mThreadSafeGame);
-            if (rGame->isGameOver() || rGame->isPaused())
+            ScopedAccessor<GameImpl> wGame(mThreadSafeGame);
+            if (wGame->isGameOver() || wGame->isPaused())
             {
                 return;
             }
 
-            ScopedUpgradeToWriter<GameImpl> wGame(rGame);
             wGame->move(MoveDirection_Down);
             mLevel = wGame->level();
             if (mLevel > cMaxLevel)

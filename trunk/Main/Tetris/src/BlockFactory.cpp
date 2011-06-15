@@ -10,8 +10,7 @@
 
 using Futile::Mutex;
 using Futile::ScopedLock;
-using Futile::ScopedReader;
-using Futile::ScopedWriter;
+using Futile::ScopedAccessor;
 
 
 namespace Tetris {
@@ -53,7 +52,7 @@ BlockFactory::BlockFactory(int inBagSize) :
     AbstractBlockFactory(),
     mThreadSafeImpl(new Impl(inBagSize))
 {
-    ScopedWriter<Impl> rwImpl(mThreadSafeImpl);
+    ScopedAccessor<Impl> rwImpl(mThreadSafeImpl);
     Impl * mImpl(rwImpl.get());
     srand(mImpl->mSeed);
 
@@ -75,7 +74,7 @@ BlockFactory::~BlockFactory()
 
 BlockType BlockFactory::getNext() const
 {
-    ScopedWriter<Impl> rwImpl(mThreadSafeImpl);
+    ScopedAccessor<Impl> rwImpl(mThreadSafeImpl);
     Impl * mImpl(rwImpl.get());
     if (mImpl->mCurrentIndex >= mImpl->mBag.size())
     {

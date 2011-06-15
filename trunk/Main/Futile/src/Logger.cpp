@@ -50,7 +50,7 @@ void Logger::flush()
     // Since the logging can be a slow operation we don't keep the Game object locked heere.
     // We just copy the items, and log them afterwards.
     {
-        ScopedWriter<Queue> queue(mProtectedQueue);
+        ScopedAccessor<Queue> queue(mProtectedQueue);
         for (std::size_t idx = 0; idx != queue->size(); ++idx)
         {
             items.push_back((*queue.get())[idx]);
@@ -78,7 +78,7 @@ void Logger::logImpl(const std::string & inMessage)
 
 void Logger::log(LogLevel inLogLevel, const std::string & inMessage)
 {
-    ScopedWriter<Queue> queue(mProtectedQueue);
+    ScopedAccessor<Queue> queue(mProtectedQueue);
     queue->push_back(GetMessage(inLogLevel, inMessage));
 }
 

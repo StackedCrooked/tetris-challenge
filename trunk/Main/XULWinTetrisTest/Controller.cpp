@@ -238,7 +238,7 @@ Controller::~Controller()
 
 //    {
 //        mComputerPlayer.reset();
-//        ScopedWriter<Game> wgame(*mProtectedGame.get());
+//        ScopedAccessor<Game> wgame(*mProtectedGame.get());
 //        Game & game(*wgame.get());
 //        game.clearPrecalculatedNodes();
 
@@ -455,7 +455,7 @@ void Controller::gameState(TetrisComponent * tetrisComponent,
 {
     if (tetrisComponent == mTetrisComponent)
     {
-        ScopedWriter<Game> wgame(*mProtectedGame);
+        ScopedAccessor<Game> wgame(*mProtectedGame);
         Game & game = *wgame.get();
         Grid gridCopy = game.gameGrid();
         outGrid = gridCopy;
@@ -469,7 +469,7 @@ bool Controller::move(TetrisComponent * tetrisComponent, MoveDirection inDirecti
 {
     if (mPlayerIsHuman->isSelected())
     {
-        ScopedWriter<Game> wgame(*mProtectedGame);
+        ScopedAccessor<Game> wgame(*mProtectedGame);
         Game & game = *wgame.get();
         return game.move(inDirection);
     }
@@ -481,7 +481,7 @@ void Controller::drop(TetrisComponent * tetrisComponent)
 {
     if (mPlayerIsHuman->isSelected())
     {
-        ScopedWriter<Game> wgame(*mProtectedGame);
+        ScopedAccessor<Game> wgame(*mProtectedGame);
         Game & game = *wgame.get();
         game.drop();
     }
@@ -492,7 +492,7 @@ bool Controller::rotate(TetrisComponent * tetrisComponent)
 {
     if (mPlayerIsHuman->isSelected())
     {
-        ScopedWriter<Game> wgame(*mProtectedGame);
+        ScopedAccessor<Game> wgame(*mProtectedGame);
         Game & game = *wgame.get();
         return game.rotate();
     }
@@ -545,7 +545,7 @@ void Controller::refresh()
     bool hasPrecalculatedNodes = false;
     int numPrecalculatedMoves = 0;
     {
-        ScopedReader<Game> gameReader(*mProtectedGame);
+        ScopedAccessor<Game> gameReader(*mProtectedGame);
         const Game & game(*gameReader.get());
         const ComputerGame & computerGame = dynamic_cast<const ComputerGame&>(game);
         gameState.reset(new GameState(game.gameState()));
