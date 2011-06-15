@@ -48,7 +48,15 @@ SOURCES += \
     Tetris/testsuite/src/NodeCalculatorTest.cpp \
     Tetris/testsuite/src/MemoryPoolTest.cpp \
     Tetris/src/GameImpl.cpp \
-    Tetris/src/Game.cpp
+    Tetris/src/Game.cpp \
+    Futile/src/WorkerPool.cpp \
+    Futile/src/Worker.cpp \
+    Futile/src/Threading.cpp \
+    Futile/src/MainThread.cpp \
+    Futile/src/Logging.cpp \
+    Futile/src/Logger.cpp \
+    Futile/src/LeakDetector.cpp \
+    Futile/src/Enum.cpp
     Tetris/testsuite/src/NodeCalculatorTest.cpp \
     Tetris/testsuite/src/TetrisTestSuite.cpp \
     Tetris/testsuite/src/WorkerPoolTest.cpp \
@@ -2959,4 +2967,3 @@ OTHER_FILES += \
 
 RESOURCES += \
     QtTetris/QtTetris.qrc
-

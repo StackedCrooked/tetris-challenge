@@ -111,7 +111,7 @@ private:
     std::string mName;
     WorkerStatus mStatus;
     mutable Mutex mStatusMutex;
-    Condition mStatusCondition;
+    Futile::Condition mStatusCondition;
 
     std::list<Task> mQueue;
     mutable Mutex mQueueMutex;

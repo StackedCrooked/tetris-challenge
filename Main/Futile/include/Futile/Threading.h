@@ -4,19 +4,43 @@
 
 #include "Futile/Assert.h"
 #include <boost/noncopyable.hpp>
-#include <boost/thread/pthread/mutex.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread.hpp>
 #include <memory>
 #include <set>
 
 
+#ifndef _WIN32 //
+#include <boost/thread/pthread/mutex.hpp>
+#endif
+
+
 namespace Futile {
+
+
+class Condition;
+class Mutex;
+class ScopedLock;
+void Lock(Mutex & ioMutex);
+void Unlock(Mutex & ioMutex);
 
 
 class Mutex : boost::noncopyable
 {
 public:
+    Mutex() :
+        mMutex(),
+        mIsLocked(false)
+    {
+    }
+
+    inline bool isLocked() const { return mIsLocked; }
+
+private:
+    friend void Futile::Lock(Mutex &);
+    friend void Futile::Unlock(Mutex &);
+    friend class ScopedLock;
+
     inline void lock()
     {
         mMutex.lock();
@@ -29,19 +53,6 @@ public:
         mMutex.unlock();
     }
 
-    bool locked() const
-    {
-        return mIsLocked;
-    }
-
-    void setLocked(bool inLocked)
-    {
-        mIsLocked = inLocked;
-    }
-
-    boost::mutex & getNativeMutex() { return mMutex; }
-
-private:
     boost::mutex mMutex;
     volatile bool mIsLocked;
 };
@@ -55,35 +66,46 @@ class ScopedLock : boost::noncopyable
 {
 public:
     ScopedLock(Mutex & inMutex) :
-        mScopedLock(inMutex.getNativeMutex()),
-        mMutex(inMutex)
+        mMutex(inMutex),
+        mScopedLock(inMutex.mMutex)
     {
-        mMutex.setLocked(true);
     }
 
     ~ScopedLock()
     {
-        mMutex.setLocked(false);
     }
 
-    operator boost::mutex::scoped_lock & ()
-    {
-        return mScopedLock;
-    }
+    inline bool isLocked() const { return mScopedLock.owns_lock(); }
 
-    void unlock()
+    inline void unlock()
     {
         mScopedLock.unlock();
-        mMutex.setLocked(false);
     }
 
 private:
-    boost::mutex::scoped_lock mScopedLock;
+    friend class Condition;
     Mutex & mMutex;
+    boost::mutex::scoped_lock mScopedLock;
 };
 
 
-typedef boost::condition_variable Condition;
+class Condition
+{
+public:
+    inline void wait(ScopedLock & inScopedLock)
+    {
+        mConditionVariable.wait(inScopedLock.mScopedLock);
+    }
+
+    inline void notify_all()
+    {
+        mConditionVariable.notify_all();
+    }
+
+private:
+    boost::condition_variable mConditionVariable;
+};
+
 
 
 // Forward declarations
@@ -239,14 +261,14 @@ public:
         mThreadSafe(inTSV)
     {
         Lock(mThreadSafe.getMutex());
-        Assert(mThreadSafe.getMutex().locked());
+        Assert(mThreadSafe.getMutex().isLocked());
     }
 
     // Allow copy to enable move semantics
     Locker(const Locker & rhs) :
         mThreadSafe(rhs.mThreadSafe)
     {
-        Assert(mThreadSafe.getMutex().locked());
+        Assert(mThreadSafe.getMutex().isLocked());
         rhs.invalidate();
     }
 
@@ -254,7 +276,7 @@ public:
     {
         if (mThreadSafe.mImpl)
         {
-            Assert(mThreadSafe.getMutex().locked());
+            Assert(mThreadSafe.getMutex().isLocked());
             Unlock(mThreadSafe.getMutex());
         }
     }
