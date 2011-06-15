@@ -1,5 +1,5 @@
-#ifndef FUTILE_THREADING_H_INCLUDED
-#define FUTILE_THREADING_H_INCLUDED
+#ifndef THREADING_H_INCLUDED
+#define THREADING_H_INCLUDED
 
 
 #include "Futile/Assert.h"
@@ -19,7 +19,8 @@ typedef boost::condition_variable Condition;
 
 
 // Forward declarations
-template<class> class ScopedAccessor;
+class LockerBase;
+template<class> class Locker;
 
 
 // Lock/Unlock function. These could be overloaded for different mutex types.
@@ -31,7 +32,7 @@ inline void Unlock(boost::mutex & ioMutex) { ioMutex.unlock(); }
  * ThreadSafe can be used to add a thread-safe wrapper around an object.
  *
  * The protected object is stored as a private member variable along with a mutex.
- * A ScopedAccessor object can be used to obtain access to the protected object.
+ * A Locker object can be used to obtain access to the protected object.
  */
 template<class Variable>
 class ThreadSafe
@@ -55,6 +56,8 @@ public:
     {
     }
 
+    Locker<Variable> lock();
+
     bool operator== (const ThreadSafe<Variable> & rhs) const
     { return mImpl.get() == rhs.mImpl.get(); }
 
@@ -65,7 +68,8 @@ public:
     { return mImpl < inOther.mImpl; }
 
 private:
-    friend class ScopedAccessor<Variable>;
+    friend class Locker<Variable>;
+    friend class LockerBase;
 
     struct Impl : boost::noncopyable
     {
@@ -102,7 +106,7 @@ bool operator< (const ThreadSafe<Variable> & lhs, const ThreadSafe<Variable> & r
 
 
 // Simple stopwatch class.
-// Used by the TimeLimitPolicy class of the ScopedAccessor and ScopedAccessor classes.
+// Used by the TimeLimitPolicy class of the Locker and Locker classes.
 class Stopwatch : boost::noncopyable
 {
 public:
@@ -146,15 +150,27 @@ struct TimeLimitMs
 };
 
 
+// Helper for the LOCK macro
+class LockerBase
+{
+};
+
+
 /**
- * ScopedAccessor is the base class for the ScopedAccessor and ScopedReadedAndWriter classes.
+ * Locker is the base class for the Locker and ScopedReadedAndWriter classes.
  */
 template<class Variable>
-class ScopedAccessor : boost::noncopyable
+class Locker : public LockerBase
 {
 public:
-    ScopedAccessor(ThreadSafe<Variable> inProtectedVariable) :
+    Locker(ThreadSafe<Variable> inProtectedVariable) :
         mProtectedVariable(inProtectedVariable)
+    {
+    }
+
+    // Allow copy to enable move semantics
+    Locker(const Locker & rhs) :
+        mProtectedVariable(rhs.mProtectedVariable)
     {
     }
 
@@ -167,8 +183,62 @@ public:
     Variable * operator->() { return get(); }
 
 private:
+    // disallow assignment
+    Locker& operator=(const Locker&);
     ThreadSafe<Variable> mProtectedVariable;
 };
+
+
+template<class Variable>
+Locker<Variable> ThreadSafe<Variable>::lock()
+{
+    return Locker<Variable>(*this);
+}
+
+
+template<class Variable>
+Locker<Variable> TSLock(ThreadSafe<Variable> inTSV)
+{
+    return Locker<Variable>(inTSV);
+}
+
+
+namespace Helper {
+
+
+using namespace Futile;
+
+
+template<class Variable>
+static Locker<Variable> Create(ThreadSafe<Variable> & inVariable)
+{
+    return Locker<Variable>(inVariable);
+}
+
+template<class Variable>
+static Variable & GetVariable(const LockerBase & base, ThreadSafe<Variable> & tsv)
+{
+    const Variable & var = *static_cast< const Locker<Variable> & >(base).get();
+    return const_cast<Variable&>(var);
+}
+
+
+} // namespace Helper
+
+
+/**
+ * Helper
+ */
+#define FUTILE_FOR_BLOCK(DECL) \
+    if(bool _c_ = false) ; else for(DECL;!_c_;_c_=true)
+
+
+/**
+ * LOCK helps with the creation of locks.
+ */
+#define FUTILE_LOCK(DECL, TSV) \
+    FUTILE_FOR_BLOCK(const Futile::Helper::LockerBase & base = Futile::Helper::Create(TSV)) \
+        FUTILE_FOR_BLOCK(DECL = Futile::Helper::GetVariable(base, TSV))
 
 
 /**
@@ -238,4 +308,4 @@ typename LockMany<Mutex>::size_type LockMany<Mutex>::size() const
 } // namespace Futile
 
 
-#endif // FUTILE_THREADING_H_INCLUDED
+#endif // THREADING_H_INCLUDED

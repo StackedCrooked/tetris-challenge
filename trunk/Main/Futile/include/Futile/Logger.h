@@ -1,5 +1,5 @@
-#ifndef FUTILE_LOGGER_H_INCLUDED
-#define FUTILE_LOGGER_H_INCLUDED
+#ifndef LOGGER_H_INCLUDED
+#define LOGGER_H_INCLUDED
 
 
 #include "Futile/LeakDetector.h"
@@ -57,4 +57,4 @@ private:
 } // namespace Futile
 
 
-#endif // FUTILE_LOGGER_H_INCLUDED
+#endif // LOGGER_H_INCLUDED

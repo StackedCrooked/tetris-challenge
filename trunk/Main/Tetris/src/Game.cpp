@@ -15,10 +15,7 @@
 namespace Tetris {
 
 
-using Futile::CreatePoly;
-using Futile::LogWarning;
-using Futile::ScopedAccessor;
-using Futile::ThreadSafe;
+using namespace Futile;
 
 
 struct Game::Impl : public GameImpl::EventHandler
@@ -142,6 +139,7 @@ bool Game::Exists(Game * inGame)
     return sInstances.find(inGame) != sInstances.end();
 }
 
+
 ThreadSafe<GameImpl> Game::gameImpl() const
 {
     return mImpl->mGameImpl;
@@ -150,23 +148,20 @@ ThreadSafe<GameImpl> Game::gameImpl() const
 
 void Game::setPaused(bool inPaused)
 {
-    ScopedAccessor<GameImpl> rwgame(mImpl->mGameImpl);
-    return rwgame->setPaused(inPaused);
+    gameImpl().lock()->setPaused(inPaused);
 }
 
 
 bool Game::isPaused() const
 {
-    ScopedAccessor<GameImpl> rgame(mImpl->mGameImpl);
-    return rgame->isPaused();
+    return gameImpl().lock()->isPaused();
 }
 
 
 GameStateStats Game::stats() const
 {
-    Futile::ScopedAccessor<GameImpl> game(mImpl->mGameImpl);
-    const GameImpl & gameImpl = *game.get();
-    const GameState & gameState = gameImpl.gameState();
+    const Locker & locker = gameImpl().lock();
+    const GameState & gameState = locker->gameState();
     return GameStateStats(gameState.numLines(),
                           gameState.numSingles(),
                           gameState.numDoubles(),
@@ -178,101 +173,74 @@ GameStateStats Game::stats() const
 
 void Game::applyLinePenalty(int inNumberOfLinesMadeByOpponent)
 {
-    ScopedAccessor<GameImpl> rwgame(mImpl->mGameImpl);
-    rwgame->applyLinePenalty(inNumberOfLinesMadeByOpponent);
+    return gameImpl().lock()->applyLinePenalty(inNumberOfLinesMadeByOpponent);
 }
-
-
-//void Game::setActiveBlock(const Block & inBlock)
-//{
-//    ScopedAccessor<Game> rwgame(mImpl->mGame);
-//    Game & game(*rwgame.get());
-//    game.setActiveBlock(inBlock);
-//}
-
-
-//void Game::setGameGrid(const Grid & inGrid)
-//{
-//    ScopedAccessor<Game> rwgame(mImpl->mGame);
-//    Game & game(*rwgame.get());
-//    game.setGrid(inGrid);
-//}
 
 
 bool Game::isGameOver() const
 {
-    ScopedAccessor<GameImpl> game(mImpl->mGameImpl);
-    return game->isGameOver();
+    return gameImpl().lock()->isGameOver();
 }
 
 
 int Game::rowCount() const
 {
-    ScopedAccessor<GameImpl> game(mImpl->mGameImpl);
-    return game->rowCount();
+    return gameImpl().lock()->rowCount();
 }
 
 
 int Game::columnCount() const
 {
-    ScopedAccessor<GameImpl> game(mImpl->mGameImpl);
-    return game->columnCount();
+    return gameImpl().lock()->columnCount();
 }
 
 
 void Game::move(MoveDirection inDirection)
 {
-    ScopedAccessor<GameImpl> game(mImpl->mGameImpl);
-    game->move(inDirection);
+    gameImpl().lock()->move(inDirection);
 }
 
 
 void Game::rotate()
 {
-    ScopedAccessor<GameImpl> game(mImpl->mGameImpl);
-    game->rotate();
+    gameImpl().lock()->rotate();
 }
 
 
 void Game::drop()
 {
-    ScopedAccessor<GameImpl> game(mImpl->mGameImpl);
-    game->dropAndCommit();
+    gameImpl().lock()->dropAndCommit();
 }
 
 
 void Game::setStartingLevel(int inLevel)
 {
-    ScopedAccessor<GameImpl> rwgame(mImpl->mGameImpl);
-    rwgame->setStartingLevel(inLevel);
+    gameImpl().lock()->setStartingLevel(inLevel);
 }
 
 
 int Game::level() const
 {
-    return ScopedAccessor<GameImpl>(mImpl->mGameImpl)->level();
+    return gameImpl().lock()->level();
 }
 
 
 Block Game::activeBlock() const
 {
-    return ScopedAccessor<GameImpl>(mImpl->mGameImpl)->activeBlock();
+    return gameImpl().lock()->activeBlock();
 }
 
 
 Grid Game::gameGrid() const
 {
-    return ScopedAccessor<GameImpl>(mImpl->mGameImpl)->gameGrid();
+    return gameImpl().lock()->gameGrid();
 }
 
 
 Block Game::getNextBlock()
 {
     std::vector<BlockType> blockTypes;
-    {
-        ScopedAccessor<GameImpl> game(mImpl->mGameImpl);
-        game->getFutureBlocks(2, blockTypes);
-    }
+    gameImpl().lock()->getFutureBlocks(2, blockTypes);
 
     if (blockTypes.size() != 2)
     {
@@ -287,10 +255,8 @@ std::vector<Block> Game::getNextBlocks()
 {
     std::vector<BlockType> blockTypes;
     int numFutureBlocks = futureBlocksCount();
-    {
-        ScopedAccessor<GameImpl> game(mImpl->mGameImpl);
-        game->getFutureBlocks(1 + numFutureBlocks, blockTypes);
-    }
+
+    gameImpl().lock()->getFutureBlocks(1 + numFutureBlocks, blockTypes);
 
     if (blockTypes.size() != (1 + numFutureBlocks))
     {
@@ -311,7 +277,7 @@ std::vector<Block> Game::getNextBlocks()
 
 int Game::futureBlocksCount() const
 {
-    return ScopedAccessor<GameImpl>(mImpl->mGameImpl)->futureBlocksCount();
+    return gameImpl().lock()->futureBlocksCount();
 }
 
 

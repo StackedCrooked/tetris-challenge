@@ -1,5 +1,5 @@
-#ifndef FUTILE_ALLOCATOR_H_INCLUDED
-#define FUTILE_ALLOCATOR_H_INCLUDED
+#ifndef ALLOCATOR_H_INCLUDED
+#define ALLOCATOR_H_INCLUDED
 
 
 #include "Futile/Assert.h"
@@ -338,4 +338,4 @@ std::size_t Allocator_New<T>::size() const
 } // namespace Futile
 
 
-#endif // FUTILE_ALLOCATOR_H_INCLUDED
+#endif // ALLOCATOR_H_INCLUDED

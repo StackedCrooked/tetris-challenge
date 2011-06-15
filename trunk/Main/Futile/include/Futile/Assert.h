@@ -1,5 +1,5 @@
-#ifndef FUTILE_ASSERT_H_INCLUDED
-#define FUTILE_ASSERT_H_INCLUDED
+#ifndef ASSERT_H_INCLUDED
+#define ASSERT_H_INCLUDED
 
 
 #if defined (NDEBUG)
@@ -14,4 +14,4 @@
 #endif
 
 
-#endif // FUTILE_ASSERT_H_INCLUDED
+#endif // ASSERT_H_INCLUDED

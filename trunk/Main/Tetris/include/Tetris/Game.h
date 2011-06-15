@@ -108,6 +108,8 @@ private:
     Game(const Game & );
     Game & operator=(const Game&);
 
+    typedef Futile::Locker<GameImpl> Locker;
+
     struct Impl;
     boost::scoped_ptr<Impl> mImpl;
 

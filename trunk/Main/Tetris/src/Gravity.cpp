@@ -15,7 +15,7 @@
 
 
 using Futile::LogError;
-using Futile::ScopedAccessor;
+using Futile::Locker;
 using Futile::ThreadSafe;
 
 
@@ -70,7 +70,7 @@ struct Gravity::Impl : boost::noncopyable
 Gravity::Gravity(const ThreadSafe<GameImpl> & inThreadSafeGame) :
     mImpl(new Impl(inThreadSafeGame))
 {
-    ScopedAccessor<GameImpl> rgame(mImpl->mThreadSafeGame);
+    Locker<GameImpl> rgame(mImpl->mThreadSafeGame);
     mImpl->mTimer.start(Poco::TimerCallback<Gravity::Impl>(*mImpl, &Gravity::Impl::onTimerEvent));
     mImpl->mTimer.setPeriodicInterval(sIntervals[rgame->level()]);
     mImpl->mStopwatch.start();
@@ -91,7 +91,7 @@ void Gravity::Impl::onTimerEvent(Poco::Timer & )
         if (mStopwatch.elapsed() > 1000  * interval())
         {
             mStopwatch.restart();
-            ScopedAccessor<GameImpl> wGame(mThreadSafeGame);
+            Locker<GameImpl> wGame(mThreadSafeGame);
             if (wGame->isGameOver() || wGame->isPaused())
             {
                 return;

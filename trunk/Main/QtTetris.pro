@@ -46,7 +46,9 @@ SOURCES += \
     Tetris/testsuite/src/WorkerPoolTest.cpp \
     Tetris/testsuite/src/TetrisTestSuite.cpp \
     Tetris/testsuite/src/NodeCalculatorTest.cpp \
-    Tetris/testsuite/src/MemoryPoolTest.cpp
+    Tetris/testsuite/src/MemoryPoolTest.cpp \
+    Tetris/src/GameImpl.cpp \
+    Tetris/src/Game.cpp
     Tetris/testsuite/src/NodeCalculatorTest.cpp \
     Tetris/testsuite/src/TetrisTestSuite.cpp \
     Tetris/testsuite/src/WorkerPoolTest.cpp \

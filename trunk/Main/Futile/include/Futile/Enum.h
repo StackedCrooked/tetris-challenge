@@ -1,5 +1,5 @@
-#ifndef FUTILE_ENUM_H
-#define FUTILE_ENUM_H
+#ifndef ENUM_H
+#define ENUM_H
 
 
 #include <boost/lexical_cast.hpp>
@@ -191,4 +191,4 @@
     };
 
 
-#endif // FUTILE_ENUM_H
+#endif // ENUM_H
