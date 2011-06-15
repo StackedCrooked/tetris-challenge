@@ -39,7 +39,7 @@ public:
 
     virtual void postAction(Action inAction)
     {
-        ScopedAccessor<Actions> wactions(mActions);
+        Locker<Actions> wactions(mActions);
         Actions & actions = *wactions.get();
         actions.push_back(inAction);
     }
@@ -47,7 +47,7 @@ public:
 private:
     void processActions()
     {
-        ScopedAccessor<Actions> wactions(mActions);
+        Locker<Actions> wactions(mActions);
         Actions & actions = *wactions.get();
         while (!actions.empty())
         {

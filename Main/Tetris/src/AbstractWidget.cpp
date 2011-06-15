@@ -8,7 +8,7 @@
 #include <boost/bind.hpp>
 
 
-using Futile::ScopedAccessor;
+using Futile::Locker;
 using Futile::MakeString;
 
 
@@ -411,7 +411,7 @@ void AbstractWidget::paintActiveBlockShadow(const Game & inGame)
 
     // Critical section. Minimize scope.
     {
-        ScopedAccessor<GameImpl> rgame(inGame.gameImpl());
+        Locker<GameImpl> rgame(inGame.gameImpl());
         const GameImpl & game = *rgame.get();
         const Block & block = game.activeBlock();
         const GameState & gameState = game.gameState();

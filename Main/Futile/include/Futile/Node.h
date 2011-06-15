@@ -1,5 +1,5 @@
-#ifndef FUTILE_NODE_H
-#define FUTILE_NODE_H
+#ifndef NODE_H
+#define NODE_H
 
 
 #include <boost/shared_ptr.hpp>
@@ -226,4 +226,4 @@ bool HasCycles(const GenericNode<T, C, P> & inNode)
 }
 
 
-#endif // FUTILE_NODE_H
+#endif // NODE_H

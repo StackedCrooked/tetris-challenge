@@ -1,5 +1,5 @@
-#ifndef FUTILE_MAINTHREAD_H_INCLUDED
-#define FUTILE_MAINTHREAD_H_INCLUDED
+#ifndef MAINTHREAD_H_INCLUDED
+#define MAINTHREAD_H_INCLUDED
 
 
 #include "Futile/Singleton.h"
@@ -48,4 +48,4 @@ inline void InvokeLater(const Action & inAction)
 } // namespace Futile
 
 
-#endif // FUTILE_MAINTHREAD_H_INCLUDED
+#endif // MAINTHREAD_H_INCLUDED

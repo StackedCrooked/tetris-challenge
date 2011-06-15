@@ -1,5 +1,5 @@
-#ifndef FUTILE_ARRAY_H
-#define FUTILE_ARRAY_H
+#ifndef ARRAY_H
+#define ARRAY_H
 
 
 #include <boost/noncopyable.hpp>
@@ -109,4 +109,4 @@ private:
 } // namespace Futile
 
 
-#endif // FUTILE_ARRAY_H
+#endif // ARRAY_H

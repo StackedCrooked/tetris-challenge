@@ -1,5 +1,5 @@
-#ifndef FUTILE_SINGLETON_H
-#define FUTILE_SINGLETON_H
+#ifndef SINGLETON_H
+#define SINGLETON_H
 
 
 #include "Futile/Assert.h"
@@ -62,4 +62,4 @@ T * Singleton<T>::sInstance(0);
 } // namespace Futile
 
 
-#endif // FUTILE_SINGLETON_H
+#endif // SINGLETON_H

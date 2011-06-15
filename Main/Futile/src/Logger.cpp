@@ -29,6 +29,7 @@ std::string ToString(LogLevel inLogLevel)
     }
 }
 
+
 std::string GetMessage(LogLevel inLogLevel, const std::string & inMessage)
 {
     return ToString(inLogLevel) + ": " + inMessage;
@@ -50,7 +51,7 @@ void Logger::flush()
     // Since the logging can be a slow operation we don't keep the Game object locked heere.
     // We just copy the items, and log them afterwards.
     {
-        ScopedAccessor<Queue> queue(mProtectedQueue);
+        Locker<Queue> queue(mProtectedQueue);
         for (std::size_t idx = 0; idx != queue->size(); ++idx)
         {
             items.push_back((*queue.get())[idx]);
@@ -78,7 +79,7 @@ void Logger::logImpl(const std::string & inMessage)
 
 void Logger::log(LogLevel inLogLevel, const std::string & inMessage)
 {
-    ScopedAccessor<Queue> queue(mProtectedQueue);
+    Locker<Queue> queue(mProtectedQueue);
     queue->push_back(GetMessage(inLogLevel, inMessage));
 }
 

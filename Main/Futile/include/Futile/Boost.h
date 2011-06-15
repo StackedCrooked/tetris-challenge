@@ -1,5 +1,5 @@
-#ifndef FUTILE_BOOST_H_INCLUDED
-#define FUTILE_BOOST_H_INCLUDED
+#ifndef BOOST_H_INCLUDED
+#define BOOST_H_INCLUDED
 
 
 /**
@@ -122,4 +122,4 @@ private:
 } } // namespace Futile::Boost
 
 
-#endif // FUTILE_BOOST_H_INCLUDED
+#endif // BOOST_H_INCLUDED

@@ -26,7 +26,7 @@ using Futile::LogError;
 using Futile::LogWarning;
 using Futile::MakeString;
 using Futile::Mutex;
-using Futile::ScopedAccessor;
+using Futile::Locker;
 using Futile::ThreadSafe;
 
 
@@ -86,30 +86,33 @@ GameImpl::~GameImpl()
 }
 
 
+bool GameImpl::Exists(const GameImpl & inGame)
+{
+    return sInstances.find(&inGame) != sInstances.end();
+}
+
+
 void GameImpl::RegisterEventHandler(ThreadSafe<GameImpl> inGame, EventHandler * inEventHandler)
 {
-    ScopedAccessor<GameImpl> rwgame(inGame);
-    GameImpl * game(rwgame.get());
-    if (sInstances.find(game) == sInstances.end())
+    FUTILE_LOCK(GameImpl & game, inGame)
     {
-        LogWarning("Game::RegisterEventHandler: This game object does not exist!");
-        return;
+        if (Exists(game))
+        {
+            game.mEventHandlers.insert(inEventHandler);
+        }
     }
-
-    game->mEventHandlers.insert(inEventHandler);
 }
 
 
 void GameImpl::UnregisterEventHandler(ThreadSafe<GameImpl> inGame, EventHandler * inEventHandler)
 {
-    ScopedAccessor<GameImpl> rwgame(inGame);
-    GameImpl * game(rwgame.get());
-    if (sInstances.find(game) == sInstances.end())
+    FUTILE_LOCK(GameImpl & game, inGame)
     {
-        return;
+        if (Exists(game))
+        {
+            game.mEventHandlers.erase(inEventHandler);
+        }
     }
-
-    game->mEventHandlers.erase(inEventHandler);
 }
 
 

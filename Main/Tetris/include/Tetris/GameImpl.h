@@ -186,7 +186,9 @@ private:
     GameImpl(const GameImpl&);
     GameImpl& operator=(const GameImpl&);
 
-    typedef std::set<GameImpl*> Instances;
+    static bool Exists(const GameImpl & inGame);
+
+    typedef std::set<const GameImpl*> Instances;
     static Instances sInstances;
 };
 

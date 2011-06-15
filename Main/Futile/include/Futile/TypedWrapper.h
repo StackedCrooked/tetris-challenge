@@ -1,5 +1,5 @@
-#ifndef FUTILE_TYPEDWRAPPER_H_INCLUDED
-#define FUTILE_TYPEDWRAPPER_H_INCLUDED
+#ifndef TYPEDWRAPPER_H_INCLUDED
+#define TYPEDWRAPPER_H_INCLUDED
 
 
 /**
@@ -34,4 +34,4 @@
     } // semi-colon must be typed when calling the macro
 
 
-#endif // FUTILE_TYPEDWRAPPER_H_INCLUDED
+#endif // TYPEDWRAPPER_H_INCLUDED

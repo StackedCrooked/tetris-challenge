@@ -27,7 +27,7 @@ using Futile::LogError;
 using Futile::MakeString;
 using Futile::Mutex;
 using Futile::ScopedLock;
-using Futile::ScopedAccessor;
+using Futile::Locker;
 using Futile::WorkerPool;
 
 
@@ -339,7 +339,7 @@ void ComputerPlayer::Impl::startNodeCalculator()
 
     // Critical section
     {
-        ScopedAccessor<GameImpl> rgame(mComputerPlayer->simpleGame()->gameImpl());
+        Locker<GameImpl> rgame(mComputerPlayer->simpleGame()->gameImpl());
         const ComputerGame & constComputerGame(dynamic_cast<const ComputerGame&>(*rgame.get()));
 
 
@@ -408,7 +408,7 @@ void ComputerPlayer::Impl::onStarted()
 
 void ComputerPlayer::Impl::onWorking()
 {
-    ScopedAccessor<GameImpl> wgame(mComputerPlayer->simpleGame()->gameImpl());
+    Locker<GameImpl> wgame(mComputerPlayer->simpleGame()->gameImpl());
     const ComputerGame & game(dynamic_cast<const ComputerGame&>(*wgame.get()));
 
     if (mGameDepth < game.endNode()->depth())
@@ -445,7 +445,7 @@ void ComputerPlayer::Impl::onFinished()
         return;
     }
 
-    ScopedAccessor<GameImpl> wgame(mComputerPlayer->simpleGame()->gameImpl());
+    Locker<GameImpl> wgame(mComputerPlayer->simpleGame()->gameImpl());
     ComputerGame & game(dynamic_cast<ComputerGame&>(*wgame.get()));
 
     // Check for sync problems.

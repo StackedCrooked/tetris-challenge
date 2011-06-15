@@ -1,5 +1,5 @@
-#ifndef FUTILE_GENERICGRID_H_INCLUDED
-#define FUTILE_GENERICGRID_H_INCLUDED
+#ifndef GENERICGRID_H_INCLUDED
+#define GENERICGRID_H_INCLUDED
 
 
 #include "Futile/Allocator.h"
@@ -91,4 +91,4 @@ void GenericGrid<T, Allocator>::set(std::size_t inRow, std::size_t inColumn, con
 } // namespace Futile
 
 
-#endif // FUTILE_GENERICGRID_H_INCLUDED
+#endif // GENERICGRID_H_INCLUDED

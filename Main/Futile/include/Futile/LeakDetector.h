@@ -1,5 +1,5 @@
-#ifndef FUTILE_LEAKDETECTOR_H
-#define FUTILE_LEAKDETECTOR_H
+#ifndef LEAKDETECTOR_H
+#define LEAKDETECTOR_H
 
 
 #include "Futile/Singleton.h"
@@ -76,4 +76,4 @@ public:
 } // namespace Futile
 
 
-#endif // FUTILE_LEAKDETECTOR_H
+#endif // LEAKDETECTOR_H

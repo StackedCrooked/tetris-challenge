@@ -1,5 +1,5 @@
-#ifndef FUTILE_AUTOPTRSUPPORT_H_INCLUDED
-#define FUTILE_AUTOPTRSUPPORT_H_INCLUDED
+#ifndef AUTOPTRSUPPORT_H_INCLUDED
+#define AUTOPTRSUPPORT_H_INCLUDED
 
 
 #include <memory>
@@ -103,5 +103,5 @@ std::auto_ptr<T> CreatePoly(Arg0 arg0, Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg
 } // namespace Futile
 
 
-#endif // FUTILE_AUTOPTRSUPPORT_H_INCLUDED
+#endif // AUTOPTRSUPPORT_H_INCLUDED
 

@@ -1,5 +1,5 @@
-#ifndef FUTILE_WORKERTHREAD_H_INCLUDED
-#define FUTILE_WORKERTHREAD_H_INCLUDED
+#ifndef WORKERTHREAD_H_INCLUDED
+#define WORKERTHREAD_H_INCLUDED
 
 
 #include "Futile/Enum.h"
@@ -127,4 +127,4 @@ private:
 } // namespace Futile
 
 
-#endif // FUTILE_WORKERTHREAD_H_INCLUDED
+#endif // WORKERTHREAD_H_INCLUDED
