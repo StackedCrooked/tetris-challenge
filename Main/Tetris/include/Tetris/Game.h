@@ -33,8 +33,8 @@ class Game
 {
 public:
     /**
-     * EventHandler allows you to register callback method for game events.
-     * All callbacks are invoked on the main thread.
+     * EventHandler allows you to listen to game events.
+     * All callbacks arrive in the main threads.
      */
     class EventHandler
     {
@@ -92,12 +92,13 @@ public:
     // Returns a copy to avoid race conditions.
     Grid gameGrid() const;
 
-    // Gets the currently active block and any blocks that follow.
+    // Gets the currently active block.
     Block getNextBlock();
 
-    // Gets the next blocks. The length of the resulting vector is the same as futureBlocksCount().
+    // Gets the next scheduled blocks.
     std::vector<Block> getNextBlocks();
 
+    // The number next blocks that can be obtained.
     int futureBlocksCount() const;
 
     // For multiplayer crazyness.

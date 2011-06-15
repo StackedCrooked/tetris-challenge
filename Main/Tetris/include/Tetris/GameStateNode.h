@@ -16,7 +16,7 @@ class Evaluator;
 
 
 /**
- * GameStateNode is a tree of game states.
+ * GameStateNode is a tree of gamestates. It is used as the search tree for the AI.
  * Each node object contains one GameState object and a collection of child nodes.
  */
 class GameStateNode
