@@ -18,93 +18,9 @@
 namespace Futile {
 
 
-class Condition;
-class Mutex;
-class ScopedLock;
-void Lock(Mutex & ioMutex);
-void Unlock(Mutex & ioMutex);
-
-
-class Mutex : boost::noncopyable
-{
-public:
-    Mutex() :
-        mMutex(),
-        mIsLocked(false)
-    {
-    }
-
-    inline bool isLocked() const { return mIsLocked; }
-
-private:
-    friend void Futile::Lock(Mutex &);
-    friend void Futile::Unlock(Mutex &);
-    friend class ScopedLock;
-
-    inline void lock()
-    {
-        mMutex.lock();
-        mIsLocked = true;
-    }
-
-    inline void unlock()
-    {
-        mIsLocked = false;
-        mMutex.unlock();
-    }
-
-    boost::mutex mMutex;
-    volatile bool mIsLocked;
-};
-
-
-inline void Lock  (Mutex & ioMutex) { ioMutex.lock();   }
-inline void Unlock(Mutex & ioMutex) { ioMutex.unlock(); }
-
-
-class ScopedLock : boost::noncopyable
-{
-public:
-    ScopedLock(Mutex & inMutex) :
-        mMutex(inMutex),
-        mScopedLock(inMutex.mMutex)
-    {
-    }
-
-    ~ScopedLock()
-    {
-    }
-
-    inline bool isLocked() const { return mScopedLock.owns_lock(); }
-
-    inline void unlock()
-    {
-        mScopedLock.unlock();
-    }
-
-private:
-    friend class Condition;
-    Mutex & mMutex;
-    boost::mutex::scoped_lock mScopedLock;
-};
-
-
-class Condition
-{
-public:
-    inline void wait(ScopedLock & inScopedLock)
-    {
-        mConditionVariable.wait(inScopedLock.mScopedLock);
-    }
-
-    inline void notify_all()
-    {
-        mConditionVariable.notify_all();
-    }
-
-private:
-    boost::condition_variable mConditionVariable;
-};
+typedef boost::mutex Mutex;
+typedef boost::mutex::scoped_lock ScopedLock;
+typedef boost::condition_variable Condition;
 
 
 
@@ -260,15 +176,13 @@ public:
     Locker(ThreadSafe<Variable> inTSV) :
         mThreadSafe(inTSV)
     {
-        Lock(mThreadSafe.getMutex());
-        Assert(mThreadSafe.getMutex().isLocked());
+        mThreadSafe.getMutex().lock();
     }
 
     // Allow copy to enable move semantics
     Locker(const Locker & rhs) :
         mThreadSafe(rhs.mThreadSafe)
     {
-        Assert(mThreadSafe.getMutex().isLocked());
         rhs.invalidate();
     }
 
@@ -276,8 +190,7 @@ public:
     {
         if (mThreadSafe.mImpl)
         {
-            Assert(mThreadSafe.getMutex().isLocked());
-            Unlock(mThreadSafe.getMutex());
+            mThreadSafe.getMutex().unlock();
         }
     }
 
@@ -386,7 +299,7 @@ LockMany<Mutex>::~LockMany()
 template<class Mutex>
 void LockMany<Mutex>::lock(Mutex & inMutex)
 {
-    Lock(inMutex);
+    inMutex.lock();
     mMutexes.push_back(&inMutex);
 }
 
@@ -396,7 +309,7 @@ void LockMany<Mutex>::unlockAll()
 {
     while (!mMutexes.empty())
     {
-        Unlock(*mMutexes.back());
+        mMutexes.back()->unlock();
         mMutexes.pop_back();
     }
 }
