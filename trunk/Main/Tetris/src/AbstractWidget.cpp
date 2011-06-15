@@ -375,7 +375,7 @@ void AbstractWidget::paintUserInfo()
 void AbstractWidget::paintGameGrid(const Grid & inGrid)
 {
     Rect theGameRect = gameRect();
-    fillRect(theGameRect, RGBColor(255, 255, 255));
+    fillRect(theGameRect, RGBColor(222, 255, 255));
     paintGrid(theGameRect.x(), theGameRect.y(), inGrid);
 }
 
