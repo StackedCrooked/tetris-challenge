@@ -4,6 +4,7 @@
 
 #include "Futile/Assert.h"
 #include <boost/noncopyable.hpp>
+#include <boost/thread/pthread/mutex.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread.hpp>
 #include <memory>
@@ -13,19 +14,81 @@
 namespace Futile {
 
 
-typedef boost::mutex Mutex;
-typedef boost::mutex::scoped_lock ScopedLock;
+class Mutex : boost::noncopyable
+{
+public:
+    inline void lock()
+    {
+        mMutex.lock();
+        mIsLocked = true;
+    }
+
+    inline void unlock()
+    {
+        mIsLocked = false;
+        mMutex.unlock();
+    }
+
+    bool locked() const
+    {
+        return mIsLocked;
+    }
+
+    void setLocked(bool inLocked)
+    {
+        mIsLocked = inLocked;
+    }
+
+    boost::mutex & getNativeMutex() { return mMutex; }
+
+private:
+    boost::mutex mMutex;
+    volatile bool mIsLocked;
+};
+
+
+inline void Lock  (Mutex & ioMutex) { ioMutex.lock();   }
+inline void Unlock(Mutex & ioMutex) { ioMutex.unlock(); }
+
+
+class ScopedLock : boost::noncopyable
+{
+public:
+    ScopedLock(Mutex & inMutex) :
+        mScopedLock(inMutex.getNativeMutex()),
+        mMutex(inMutex)
+    {
+        mMutex.setLocked(true);
+    }
+
+    ~ScopedLock()
+    {
+        mMutex.setLocked(false);
+    }
+
+    operator boost::mutex::scoped_lock & ()
+    {
+        return mScopedLock;
+    }
+
+    void unlock()
+    {
+        mScopedLock.unlock();
+        mMutex.setLocked(false);
+    }
+
+private:
+    boost::mutex::scoped_lock mScopedLock;
+    Mutex & mMutex;
+};
+
+
 typedef boost::condition_variable Condition;
 
 
 // Forward declarations
 class LockerBase;
 template<class> class Locker;
-
-
-// Lock/Unlock function. These could be overloaded for different mutex types.
-inline void Lock  (boost::mutex & ioMutex) { ioMutex.lock();   }
-inline void Unlock(boost::mutex & ioMutex) { ioMutex.unlock(); }
 
 
 /**
@@ -71,6 +134,16 @@ private:
     friend class Locker<Variable>;
     friend class LockerBase;
 
+    Mutex & getMutex() const
+    {
+        return mImpl->mMutex;
+    }
+
+    Variable * getVariable() const
+    {
+        return mImpl->mVariable;
+    }
+
     struct Impl : boost::noncopyable
     {
         Impl(std::auto_ptr<Variable> inVariable) :
@@ -90,8 +163,8 @@ private:
             delete mVariable;
         }
 
-        Variable * mVariable;
-        Mutex mSharedMutex;
+        mutable Variable * mVariable;
+        Mutex mMutex;
     };
 
     boost::shared_ptr<Impl> mImpl;
@@ -150,10 +223,9 @@ struct TimeLimitMs
 };
 
 
-// Helper for the LOCK macro
-class LockerBase
-{
-};
+// Helper for the FUTILE_LOCK macro
+class LockerBase {};
+template<class> class Locker;
 
 
 /**
@@ -163,20 +235,33 @@ template<class Variable>
 class Locker : public LockerBase
 {
 public:
-    Locker(ThreadSafe<Variable> inProtectedVariable) :
-        mProtectedVariable(inProtectedVariable)
+    Locker(ThreadSafe<Variable> inTSV) :
+        mThreadSafe(inTSV)
     {
+        Lock(mThreadSafe.getMutex());
+        Assert(mThreadSafe.getMutex().locked());
     }
 
     // Allow copy to enable move semantics
     Locker(const Locker & rhs) :
-        mProtectedVariable(rhs.mProtectedVariable)
+        mThreadSafe(rhs.mThreadSafe)
     {
+        Assert(mThreadSafe.getMutex().locked());
+        rhs.invalidate();
     }
 
-    const Variable * get() const { return mProtectedVariable.mImpl->mVariable; }
+    ~Locker()
+    {
+        if (mThreadSafe.mImpl)
+        {
+            Assert(mThreadSafe.getMutex().locked());
+            Unlock(mThreadSafe.getMutex());
+        }
+    }
 
-    Variable * get() { return mProtectedVariable.mImpl->mVariable; }
+    const Variable * get() const { return mThreadSafe.getVariable(); }
+
+    Variable * get() { return mThreadSafe.getVariable(); }
 
     const Variable * operator->() const { return get(); }
 
@@ -185,7 +270,13 @@ public:
 private:
     // disallow assignment
     Locker& operator=(const Locker&);
-    ThreadSafe<Variable> mProtectedVariable;
+
+    void invalidate() const
+    {
+        mThreadSafe.mImpl.reset();
+    }
+
+    mutable ThreadSafe<Variable> mThreadSafe;
 };
 
 
@@ -196,30 +287,21 @@ Locker<Variable> ThreadSafe<Variable>::lock()
 }
 
 
-template<class Variable>
-Locker<Variable> TSLock(ThreadSafe<Variable> inTSV)
-{
-    return Locker<Variable>(inTSV);
-}
-
-
 namespace Helper {
 
 
-using namespace Futile;
-
-
-template<class Variable>
-static Locker<Variable> Create(ThreadSafe<Variable> & inVariable)
+template<class T>
+Futile::Locker<T> Lock(const Futile::ThreadSafe<T> & inTSV)
 {
-    return Locker<Variable>(inVariable);
+    return Futile::Locker<T>(inTSV);
 }
 
-template<class Variable>
-static Variable & GetVariable(const LockerBase & base, ThreadSafe<Variable> & tsv)
+
+template<class T>
+T & Unwrap(const Futile::LockerBase & inLockerBase, const Futile::ThreadSafe<T> &)
 {
-    const Variable & var = *static_cast< const Locker<Variable> & >(base).get();
-    return const_cast<Variable&>(var);
+    const T * result = static_cast< const Futile::Locker<T> & >(inLockerBase).get();
+    return const_cast<T&>(*result);
 }
 
 
@@ -227,18 +309,18 @@ static Variable & GetVariable(const LockerBase & base, ThreadSafe<Variable> & ts
 
 
 /**
- * Helper
+ * Macro for creating conflict-free scopes
  */
 #define FUTILE_FOR_BLOCK(DECL) \
-    if(bool _c_ = false) ; else for(DECL;!_c_;_c_=true)
+    if (bool _c_ = false) ; else for(DECL;!_c_;_c_=true)
 
 
 /**
  * LOCK helps with the creation of locks.
  */
 #define FUTILE_LOCK(DECL, TSV) \
-    FUTILE_FOR_BLOCK(const Futile::Helper::LockerBase & base = Futile::Helper::Create(TSV)) \
-        FUTILE_FOR_BLOCK(DECL = Futile::Helper::GetVariable(base, TSV))
+    FUTILE_FOR_BLOCK(const Futile::LockerBase & theLockerBase = Futile::Helper::Lock(TSV)) \
+        FUTILE_FOR_BLOCK(DECL = Futile::Helper::Unwrap(theLockerBase, TSV))
 
 
 /**
