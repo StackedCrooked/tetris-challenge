@@ -183,17 +183,11 @@ bool operator< (const ThreadSafe<Variable> & lhs, const ThreadSafe<Variable> & r
 }
 
 
-// This base class is used for the ScopeGuard trick in the FUTILE_LOCK macro.
-class LockerBase
-{
-};
-
-
 /**
  * Locker is used get access to the object wrapped by the ThreadSafe class.
  */
 template<class Variable>
-class Locker : public LockerBase
+class Locker
 {
 public:
     Locker(ThreadSafe<Variable> inTSV) :
@@ -255,58 +249,6 @@ Locker<Variable> ThreadSafe<Variable>::lock()
 {
     return Locker<Variable>(*this);
 }
-
-
-namespace Helper {
-
-
-template<class T>
-struct Identity
-{
-    typedef T Type;
-};
-
-
-template<class T>
-Identity<T> EncodeType(const T &)
-{
-    return Identity<T>();
-}
-
-
-struct CamelionType
-{
-    template<class T>
-    operator Identity<T>() const
-    {
-        return Identity<T>();
-    }
-};
-
-
-template<class T>
-Futile::Locker<T> Lock(const Futile::ThreadSafe<T> & inTSV)
-{
-    return Futile::Locker<T>(inTSV);
-}
-
-
-template<class T>
-T & Unwrap(const LockerBase & inLockerBase, const Identity< ThreadSafe<T> > &)
-{
-    const T * result = static_cast< const Locker<T> & >(inLockerBase).get();
-    return const_cast<T &>(*result);
-}
-
-
-} // namespace Helper
-
-
-/**
- * Macro that returns the type of an expression (as Identity<T>) without evaluating it.
- */
-#define FUTILE_ENCODEDTYPEOF(EXPRESSION) \
-  (true ? Futile::Helper::CamelionType() : Futile::Helper::EncodeType(EXPRESSION))
 
 
 /**
