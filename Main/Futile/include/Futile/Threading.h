@@ -6,6 +6,7 @@
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread.hpp>
+#include <boost/typeof/typeof.hpp>
 #include <memory>
 #include <set>
 
@@ -329,8 +330,8 @@ T & Unwrap(const LockerBase & inLockerBase, const Identity< ThreadSafe<T> > &)
  *   FUTILE_LOCK(Foo & foo, GetFoo()) { foo.bar(); }
  */
 #define FUTILE_LOCK(DECL, TSV) \
-    FUTILE_FOR_BLOCK(const Futile::LockerBase & theLockerBase = Futile::Helper::Lock(TSV)) \
-        FUTILE_FOR_BLOCK(DECL = Futile::Helper::Unwrap(theLockerBase, FUTILE_ENCODEDTYPEOF(TSV)))
+    FUTILE_FOR_BLOCK(BOOST_TYPEOF(Futile::Helper::Lock(TSV)) locker = Futile::Helper::Lock(TSV)) \
+        FUTILE_FOR_BLOCK(DECL = *locker.get())
 
 
 // Simple stopwatch class.
