@@ -30,7 +30,7 @@ template<class Mutex>
 class LockMany : boost::noncopyable
 {
 public:
-    typedef std::vector<Mutex*> Mutexes;
+    typedef std::vector<Mutex *> Mutexes;
     typedef typename Mutexes::size_type size_type;
 
     LockMany();
@@ -123,13 +123,19 @@ public:
     Locker<Variable> lock();
 
     bool operator== (const ThreadSafe<Variable> & rhs) const
-    { return mImpl.get() == rhs.mImpl.get(); }
+    {
+        return mImpl.get() == rhs.mImpl.get();
+    }
 
     bool operator!= (const ThreadSafe<Variable> & rhs) const
-    { return !(*this == rhs); }
+    {
+        return !(*this == rhs);
+    }
 
     bool compare(const ThreadSafe<Variable> & inOther)
-    { return mImpl < inOther.mImpl; }
+    {
+        return mImpl < inOther.mImpl;
+    }
 
 private:
     friend class Locker<Variable>;
@@ -213,17 +219,29 @@ public:
         }
     }
 
-    const Variable * get() const { return mThreadSafe.getVariable(); }
+    const Variable * get() const
+    {
+        return mThreadSafe.getVariable();
+    }
 
-    Variable * get() { return mThreadSafe.getVariable(); }
+    Variable * get()
+    {
+        return mThreadSafe.getVariable();
+    }
 
-    const Variable * operator->() const { return get(); }
+    const Variable * operator->() const
+    {
+        return get();
+    }
 
-    Variable * operator->() { return get(); }
+    Variable * operator->()
+    {
+        return get();
+    }
 
 private:
     // disallow assignment
-    Locker& operator=(const Locker&);
+    Locker & operator=(const Locker &);
 
     void invalidate() const
     {
@@ -279,7 +297,7 @@ template<class T>
 T & Unwrap(const LockerBase & inLockerBase, const Identity< ThreadSafe<T> > &)
 {
     const T * result = static_cast< const Locker<T> & >(inLockerBase).get();
-    return const_cast<T&>(*result);
+    return const_cast<T &>(*result);
 }
 
 
