@@ -245,14 +245,20 @@ namespace Helper {
 
 
 template<class T>
-struct Identity { typedef T Type; };
+struct Identity
+{
+    typedef T Type;
+};
 
 
 template<class T>
-Identity<T> EncodeType(const T &) { return Identity<T>(); }
+Identity<T> EncodeType(const T &)
+{
+    return Identity<T>();
+}
 
 
-struct Camelion
+struct CamelionType
 {
     template<class T>
     operator Identity<T>() const
@@ -280,8 +286,11 @@ T & Unwrap(const LockerBase & inLockerBase, const Identity< ThreadSafe<T> > &)
 } // namespace Helper
 
 
+/**
+ * Macro that returns the type of an expression (as Identity<T>) without evaluating it.
+ */
 #define FUTILE_ENCODEDTYPEOF(EXPRESSION) \
-  (true ? Futile::Helper::Camelion() : Futile::Helper::EncodeType(EXPRESSION))
+  (true ? Futile::Helper::CamelionType() : Futile::Helper::EncodeType(EXPRESSION))
 
 
 /**
@@ -292,7 +301,14 @@ T & Unwrap(const LockerBase & inLockerBase, const Identity< ThreadSafe<T> > &)
 
 
 /**
- * LOCK helps with the creation of locks.
+ * FUTILE_LOCK can be used to create an atomic scope for accessing a thread-safe object.
+ *
+ * Usage example:
+ *   ThreadSafe<Foo> theFoo = GetFoo();
+ *   FUTILE_LOCK(Foo & foo, theFoo) { foo.bar(); }
+ *
+ *   // Shorter:
+ *   FUTILE_LOCK(Foo & foo, GetFoo()) { foo.bar(); }
  */
 #define FUTILE_LOCK(DECL, TSV) \
     FUTILE_FOR_BLOCK(const Futile::LockerBase & theLockerBase = Futile::Helper::Lock(TSV)) \
