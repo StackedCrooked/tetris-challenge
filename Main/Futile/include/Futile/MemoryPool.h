@@ -26,7 +26,7 @@ struct PtrBase
     {
     }
 
-    ~PtrBase() {}
+    virtual ~PtrBase() {}
 
     std::size_t size() const { return mTypeSize; }
     
