@@ -11,11 +11,6 @@
 #include <set>
 
 
-#ifndef _WIN32 //
-#include <boost/thread/pthread/mutex.hpp>
-#endif
-
-
 namespace Futile {
 
 
@@ -99,10 +94,12 @@ template<class> class Locker;
  * The protected object is stored as a private member variable along with a mutex.
  * A Locker object can be used to obtain access to the protected object.
  */
-template<class Variable>
+template<class VariableType>
 class ThreadSafe
 {
 public:
+    typedef VariableType Variable;
+
     // Constructor that takes an autoptr object.
     explicit ThreadSafe(std::auto_ptr<Variable> inVariable) :
         mImpl(new Impl(inVariable))
@@ -336,8 +333,8 @@ BOOST_TYPEOF_REGISTER_TEMPLATE(Futile::ThreadSafe, 1)
  *   FUTILE_LOCK(Foo & foo, GetFoo()) { foo.bar(); }
  */
 #define FUTILE_LOCK(DECL, TSV) \
-    FUTILE_FOR_BLOCK(BOOST_TYPEOF(Futile::Helper::Lock(TSV)) locker = Futile::Helper::Lock(TSV)) \
-        FUTILE_FOR_BLOCK(DECL = *locker.get())
+    FUTILE_FOR_BLOCK(Futile::Locker< BOOST_TYPEOF(TSV)::Variable > theLocker(TSV)) \
+        FUTILE_FOR_BLOCK(DECL = *theLocker.get())
 
 
 // Simple stopwatch class.
