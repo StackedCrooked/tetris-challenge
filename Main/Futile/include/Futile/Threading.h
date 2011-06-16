@@ -245,6 +245,24 @@ namespace Helper {
 
 
 template<class T>
+struct Identity { typedef T Type; };
+
+
+template<class T>
+Identity<T> EncodeType(const T &) { return Identity<T>(); }
+
+
+struct Camelion
+{
+    template<class T>
+    operator Identity<T>() const
+    {
+        return Identity<T>();
+    }
+};
+
+
+template<class T>
 Futile::Locker<T> Lock(const Futile::ThreadSafe<T> & inTSV)
 {
     return Futile::Locker<T>(inTSV);
@@ -252,14 +270,18 @@ Futile::Locker<T> Lock(const Futile::ThreadSafe<T> & inTSV)
 
 
 template<class T>
-T & Unwrap(const Futile::LockerBase & inLockerBase, const Futile::ThreadSafe<T> &)
+T & Unwrap(const LockerBase & inLockerBase, const Identity< ThreadSafe<T> > &)
 {
-    const T * result = static_cast< const Futile::Locker<T> & >(inLockerBase).get();
+    const T * result = static_cast< const Locker<T> & >(inLockerBase).get();
     return const_cast<T&>(*result);
 }
 
 
 } // namespace Helper
+
+
+#define FUTILE_ENCODEDTYPEOF(EXPRESSION) \
+  (true ? Futile::Helper::Camelion() : Futile::Helper::EncodeType(EXPRESSION))
 
 
 /**
@@ -274,7 +296,7 @@ T & Unwrap(const Futile::LockerBase & inLockerBase, const Futile::ThreadSafe<T> 
  */
 #define FUTILE_LOCK(DECL, TSV) \
     FUTILE_FOR_BLOCK(const Futile::LockerBase & theLockerBase = Futile::Helper::Lock(TSV)) \
-        FUTILE_FOR_BLOCK(DECL = Futile::Helper::Unwrap(theLockerBase, TSV))
+        FUTILE_FOR_BLOCK(DECL = Futile::Helper::Unwrap(theLockerBase, FUTILE_ENCODEDTYPEOF(TSV)))
 
 
 // Simple stopwatch class.
