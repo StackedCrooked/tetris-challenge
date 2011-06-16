@@ -320,6 +320,12 @@ T & Unwrap(const LockerBase & inLockerBase, const Identity< ThreadSafe<T> > &)
 
 
 /**
+ * Register the ThreadSafe class for use with BOOST_TYPEOF.
+ */
+BOOST_TYPEOF_REGISTER_TEMPLATE(Futile::ThreadSafe, 1)
+
+
+/**
  * FUTILE_LOCK can be used to create an atomic scope for accessing a thread-safe object.
  *
  * Usage example:
