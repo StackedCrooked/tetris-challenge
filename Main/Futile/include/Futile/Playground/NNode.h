@@ -1,11 +1,15 @@
 #ifndef FUTILE_NNODE_H_INCLUDED
 #define FUTILE_NNODE_H_INCLUDED
 
+
 namespace Futile {
 
 
 template<typename T, unsigned N, unsigned H, unsigned D>
 struct NNode;
+
+
+namespace Private {
 
 
 template<typename T, unsigned N, unsigned H, unsigned D>
@@ -44,10 +48,15 @@ struct NNodeWithChildren
 };
 
 
-template<typename T>
-struct NNodeWithData
+template<typename T, unsigned H, unsigned D>
+struct NNodeCore
 {
-    NNodeWithData() :
+    enum
+    {
+        Height = H,
+        Depth = D
+    };
+    NNodeCore() :
         mData()
     {
     }
@@ -56,17 +65,20 @@ struct NNodeWithData
 };
 
 
+} // namespace Private
+
+
 /**
  * Partial specialization for D == 0 represents the root node.
  * The root node has no parent node.
  */
 template<typename T, unsigned N, unsigned H>
-struct NNode<T, N, H, 0> : NNodeWithData<T>,
-                           NNodeWithChildren<T, N, H, 1>
+struct NNode<T, N, H, 0> : Private::NNodeCore<T, H, 0>,
+                           Private::NNodeWithChildren<T, N, H, 0>
 {
     NNode() :
-        NNodeWithData<T>(),
-        NNodeWithChildren<T, N, H, 1>()
+        Private::NNodeCore<T, H, 0>(),
+        Private::NNodeWithChildren<T, N, H, 0>()
     {
     }
 };
@@ -77,12 +89,12 @@ struct NNode<T, N, H, 0> : NNodeWithData<T>,
  * Leaf nodes have no children.
  */
 template<typename T, unsigned N, unsigned H>
-struct NNode<T, N, H, H> : NNodeWithParent<T, N, H, H>,
-                           NNodeWithData<T>
+struct NNode<T, N, H, H> : Private::NNodeWithParent<T, N, H, H>,
+                           Private::NNodeCore<T, H, H>
 {
     NNode() :
-        NNodeWithParent<T, N, H, H>(),
-        NNodeWithData<T>()
+        Private::NNodeWithParent<T, N, H, H>(),
+        Private::NNodeCore<T, H, H>()
     {
     }
 };
@@ -98,17 +110,19 @@ struct NNode<T, N, H, H> : NNodeWithParent<T, N, H, H>,
  * The entire tree is contained in a single segement of contiguous memory.
  */
 template<typename T, unsigned N, unsigned H, unsigned D>
-struct NNode : NNodeWithParent<T, N, H, D>,
-               NNodeWithData<T>,
-               NNodeWithChildren<T, N, H, D>
+struct NNode : Private::NNodeWithParent<T, N, H, D>,
+               Private::NNodeCore<T, H, D>,
+               Private::NNodeWithChildren<T, N, H, D>
 {
     NNode() :
-        NNodeWithParent<T, N, H, D>(),
-        NNodeWithData<T>(),
-        NNodeWithChildren<T, N, H, D>()
+        Private::NNodeWithParent<T, N, H, D>(),
+        Private::NNodeCore<T, H, D>(),
+        Private::NNodeWithChildren<T, N, H, D>()
     {
     }
 };
+
+
 
 
 } // namespace Futile
