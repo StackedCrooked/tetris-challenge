@@ -23,7 +23,7 @@ add_library(Futile
     include/Futile/TypedWrapper.h
     include/Futile/Worker.h
     include/Futile/WorkerPool.h
-    include/Futile/Playground/Node.h
+    include/Futile/Playground/GenericNode.h
     src/LeakDetector.cpp
     src/Logger.cpp
     src/Logging.cpp
