@@ -74,8 +74,8 @@ struct NNodeCore
 
 /**
  * Root node:
- * -> Depth = 0
- * -> No parent
+ * -> node depth = 0
+ * -> no parent
  */
 template<typename T, unsigned N, unsigned H>
 struct NNode<T, N, H, 0> : Private::NNodeCore<T, H, 0>,
@@ -91,8 +91,8 @@ struct NNode<T, N, H, 0> : Private::NNodeCore<T, H, 0>,
 
 /**
  * Leaf node:
- * -> Depth = Height
- * -> No children
+ * -> node depth = tree height
+ * -> no children
  */
 template<typename T, unsigned N, unsigned H>
 struct NNode<T, N, H, H> : Private::NNodeWithParent<T, N, H, H>,
