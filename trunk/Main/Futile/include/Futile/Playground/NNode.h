@@ -59,6 +59,7 @@ struct NNodeCore
         Height = H,
         Depth = D
     };
+
     NNodeCore() :
         mData()
     {
@@ -72,8 +73,9 @@ struct NNodeCore
 
 
 /**
- * Partial specialization for D == 0 represents the root node.
- * The root node has no parent node.
+ * Root node:
+ * -> Depth = 0
+ * -> No parent
  */
 template<typename T, unsigned N, unsigned H>
 struct NNode<T, N, H, 0> : Private::NNodeCore<T, H, 0>,
@@ -88,8 +90,9 @@ struct NNode<T, N, H, 0> : Private::NNodeCore<T, H, 0>,
 
 
 /**
- * Partial specialization for H == D represents the leaf node.
- * Leaf nodes have no children.
+ * Leaf node:
+ * -> Depth = Height
+ * -> No children
  */
 template<typename T, unsigned N, unsigned H>
 struct NNode<T, N, H, H> : Private::NNodeWithParent<T, N, H, H>,
@@ -124,8 +127,6 @@ struct NNode : Private::NNodeWithParent<T, N, H, D>,
     {
     }
 };
-
-
 
 
 } // namespace Futile
