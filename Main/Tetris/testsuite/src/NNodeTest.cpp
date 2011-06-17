@@ -95,6 +95,7 @@ void NNodeTest::testNode()
     std::cout << "The size of the Tree is  " << cSizeMB << " MB" << std::endl;
     boost::scoped_ptr<GameStateNode> theGameStateNode(new GameStateNode);
     GameStateNode & node = *theGameStateNode.get();
+    node.getChild(0);
 }
 
 
