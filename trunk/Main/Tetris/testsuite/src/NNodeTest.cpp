@@ -5,7 +5,9 @@
 #include "Futile/Allocator.h"
 #include "Futile/Assert.h"
 #include <boost/scoped_ptr.hpp>
+#include <iomanip>
 #include <iostream>
+#include <sstream>
 
 
 using namespace Futile;
@@ -61,7 +63,7 @@ struct GameState
 };
 
 
-struct GameStateNode : NNode<GameState, 5, 2, 0>
+struct GameStateNode : NNode<GameState, 5, 8, 0>
 {
 
     GameStateNode()
@@ -85,17 +87,65 @@ struct GameStateNode : NNode<GameState, 5, 2, 0>
 };
 
 
+unsigned ConvertToMB(unsigned inByteCount)
+{
+    return static_cast<unsigned>(0.5 + static_cast<double>(inByteCount) / (1024.0 * 1024.0));
+}
+
+
+unsigned ConvertToKB(unsigned inByteCount)
+{
+    return static_cast<unsigned>(0.5 + static_cast<double>(inByteCount) / 1024.0);
+}
+
+
+
+std::string ConvertToUnit(unsigned inByteCount)
+{
+    std::stringstream ss;
+    if (inByteCount > 1024 * 1024)
+    {
+        ss << ConvertToMB(inByteCount) << " MB";
+    }
+    else if (inByteCount > 1024)
+    {
+        ss << ConvertToKB(inByteCount) << " KB";
+    }
+    else
+    {
+        ss << sizeof(inByteCount) << " B";
+    }
+    return ss.str();
+}
+
+
+
+template<typename Node>
+void PrintInfo()
+{
+    std::cout << "depth: "  << Node::Depth  << ", "
+              << "height: " << Node::Height << ", "
+              << "size: "   << std::setw(6) << ConvertToUnit(sizeof(Node)) << std::endl;
+}
+
+
 
 } // anonymous namespace
 
 
 void NNodeTest::testNode()
 {
-    const unsigned cSizeMB = static_cast<int>(0.5 + (sizeof(GameStateNode) / (1024.0 * 1024.0)));
-    std::cout << "The size of the Tree is  " << cSizeMB << " MB" << std::endl;
-    boost::scoped_ptr<GameStateNode> theGameStateNode(new GameStateNode);
-    GameStateNode & node = *theGameStateNode.get();
-    node.getChild(0);
+    std::cout << "\n";
+    std::cout << "Size of the node: " << std::endl;
+    PrintInfo<GameStateNode>();
+    PrintInfo<GameStateNode::Child>();
+    PrintInfo<GameStateNode::Child::Child>();
+    PrintInfo<GameStateNode::Child::Child::Child>();
+    PrintInfo<GameStateNode::Child::Child::Child::Child>();
+    PrintInfo<GameStateNode::Child::Child::Child::Child::Child>();
+    PrintInfo<GameStateNode::Child::Child::Child::Child::Child::Child>();
+    PrintInfo<GameStateNode::Child::Child::Child::Child::Child::Child::Child>();
+    boost::scoped_ptr<GameStateNode> test(new GameStateNode);
 }
 
 
