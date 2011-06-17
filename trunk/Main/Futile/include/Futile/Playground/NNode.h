@@ -8,23 +8,36 @@ template<typename T, unsigned N, unsigned H, unsigned D>
 struct NNode;
 
 
+template<typename T, unsigned N, unsigned H, unsigned D>
+struct NNodeWithParent
+{
+    typedef NNode<T, N, H, D - 1> Parent;
+    Parent * mParent;
+};
+
+
+template<typename T, unsigned N, unsigned H, unsigned D>
+struct NNodeWithChildren
+{
+    typedef NNode<T, N, H, D + 1> Child;
+    Child mChildren[N];
+};
+
+
 /**
  * Partial specialization for D == 0 represents the root node.
  * The root node has no parent node.
  */
 template<typename T, unsigned N, unsigned H>
-struct NNode<T, N, H, 0>
+struct NNode<T, N, H, 0> : NNodeWithChildren<T, N, H, 1>
 {
     NNode() :
-        mData(),
-        mChildren()
+        NNodeWithChildren<T, N, H, 1>(),
+        mData()
     {
     }
 
     T mData;
-
-    typedef NNode<T, N, H, 1> Child;
-    Child mChildren[N];
 };
 
 
@@ -33,16 +46,13 @@ struct NNode<T, N, H, 0>
  * Leaf nodes have no children.
  */
 template<typename T, unsigned N, unsigned H>
-struct NNode<T, N, H, H>
+struct NNode<T, N, H, H> : NNodeWithParent<T, N, H, H>
 {
     NNode() :
-        mParent(NULL),
+        NNodeWithParent<T, N, H, H>(),
         mData()
     {
     }
-
-    typedef NNode<T, N, H, H - 1> Parent;
-    Parent * mParent;
 
     T mData;
 };
@@ -58,23 +68,17 @@ struct NNode<T, N, H, H>
  * The entire tree is contained in a single segement of contiguous memory.
  */
 template<typename T, unsigned N, unsigned H, unsigned D>
-struct NNode
+struct NNode : NNodeWithParent<T, N, H, D>,
+               NNodeWithChildren<T, N, H, D>
 {
     NNode() :
-        mParent(NULL),
-        mData(),
-        mChildren()
+        NNodeWithParent<T, N, H, D>(),
+        NNodeWithChildren<T, N, H, D>(),
+        mData()
     {
     }
 
-
-    typedef NNode<T, N, H, D - 1> Parent;
-    Parent * mParent;
-
     T mData;
-
-    typedef NNode<T, N, H, D + 1> Child;
-    Child mChildren[N];
 };
 
 
