@@ -117,7 +117,7 @@
     <value key="ProjectExplorer.BuildConfiguration.BuildStepListCount" type="int">2</value>
     <value key="ProjectExplorer.BuildConfiguration.ClearSystemEnvironment" type="bool">true</value>
     <valuelist key="ProjectExplorer.BuildConfiguration.UserEnvironmentChanges" type="QVariantList">
-     <value type="QString">PATH=$HOME/bin:/Developer/Tools/Qt:/opt/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</value>
+     <value type="QString">PATH=/Users/francis/bin:/Developer/Tools/Qt:/opt/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</value>
     </valuelist>
     <value key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName" type="QString">Make</value>
     <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString">Make</value>

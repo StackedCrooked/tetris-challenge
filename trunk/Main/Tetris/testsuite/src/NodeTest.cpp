@@ -1,8 +1,8 @@
 #include "NodeTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
+#include "Futile/Playground/Node.h"
 #include "Futile/Allocator.h"
-#include "Futile/Node.h"
 #include "Futile/Assert.h"
 #include <iostream>
 
