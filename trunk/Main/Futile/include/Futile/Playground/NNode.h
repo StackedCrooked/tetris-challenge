@@ -11,6 +11,11 @@ struct NNode;
 template<typename T, unsigned N, unsigned H, unsigned D>
 struct NNodeWithParent
 {
+    NNodeWithParent() :
+        mParent()
+    {
+    }
+
     typedef NNode<T, N, H, D - 1> Parent;
     Parent * mParent;
 };
@@ -19,8 +24,25 @@ struct NNodeWithParent
 template<typename T, unsigned N, unsigned H, unsigned D>
 struct NNodeWithChildren
 {
+    NNodeWithChildren() :
+        mChildren()
+    {
+    }
+
     typedef NNode<T, N, H, D + 1> Child;
     Child mChildren[N];
+};
+
+
+template<typename T>
+struct NNodeWithData
+{
+    NNodeWithData() :
+        mData()
+    {
+    }
+
+    T mData;
 };
 
 
@@ -29,15 +51,14 @@ struct NNodeWithChildren
  * The root node has no parent node.
  */
 template<typename T, unsigned N, unsigned H>
-struct NNode<T, N, H, 0> : NNodeWithChildren<T, N, H, 1>
+struct NNode<T, N, H, 0> : NNodeWithData<T>,
+                           NNodeWithChildren<T, N, H, 1>
 {
     NNode() :
-        NNodeWithChildren<T, N, H, 1>(),
-        mData()
+        NNodeWithData<T>(),
+        NNodeWithChildren<T, N, H, 1>()
     {
     }
-
-    T mData;
 };
 
 
@@ -46,15 +67,14 @@ struct NNode<T, N, H, 0> : NNodeWithChildren<T, N, H, 1>
  * Leaf nodes have no children.
  */
 template<typename T, unsigned N, unsigned H>
-struct NNode<T, N, H, H> : NNodeWithParent<T, N, H, H>
+struct NNode<T, N, H, H> : NNodeWithParent<T, N, H, H>,
+                           NNodeWithData<T>
 {
     NNode() :
         NNodeWithParent<T, N, H, H>(),
-        mData()
+        NNodeWithData<T>()
     {
     }
-
-    T mData;
 };
 
 
@@ -69,16 +89,15 @@ struct NNode<T, N, H, H> : NNodeWithParent<T, N, H, H>
  */
 template<typename T, unsigned N, unsigned H, unsigned D>
 struct NNode : NNodeWithParent<T, N, H, D>,
+               NNodeWithData<T>,
                NNodeWithChildren<T, N, H, D>
 {
     NNode() :
         NNodeWithParent<T, N, H, D>(),
-        NNodeWithChildren<T, N, H, D>(),
-        mData()
+        NNodeWithData<T>(),
+        NNodeWithChildren<T, N, H, D>()
     {
     }
-
-    T mData;
 };
 
 
