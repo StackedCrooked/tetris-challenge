@@ -11,12 +11,17 @@ struct NNode;
 template<typename T, unsigned N, unsigned H, unsigned D>
 struct NNodeWithParent
 {
+    typedef NNode<T, N, H, D - 1> Parent;
+
     NNodeWithParent() :
         mParent()
     {
     }
 
-    typedef NNode<T, N, H, D - 1> Parent;
+    const Parent * parent() const { return mParent; }
+
+    Parent * parent() { return mParent; }
+
     Parent * mParent;
 };
 
@@ -24,12 +29,17 @@ struct NNodeWithParent
 template<typename T, unsigned N, unsigned H, unsigned D>
 struct NNodeWithChildren
 {
+    typedef NNode<T, N, H, D + 1> Child;
+
     NNodeWithChildren() :
         mChildren()
     {
     }
 
-    typedef NNode<T, N, H, D + 1> Child;
+    const Child & getChild(unsigned idx) const { return mChildren[idx]; }
+
+    Child & getChild(unsigned idx) { return mChildren[idx]; }
+
     Child mChildren[N];
 };
 
