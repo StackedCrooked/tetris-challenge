@@ -4,25 +4,61 @@
 namespace Futile {
 
 
+template<typename T, unsigned N, unsigned H, unsigned D>
+struct NNode;
+
+
 /**
- * Base class can be used to refer to the parent.
+ * Partial specialization for D == 0 represents the root node.
+ * The root node has no parent node.
  */
-struct NNodeBase
+template<typename T, unsigned N, unsigned H>
+struct NNode<T, N, H, 0>
 {
+    NNode() :
+        mData(),
+        mChildren()
+    {
+    }
+
+    T mData;
+
+    typedef NNode<T, N, H, 1> Child;
+    Child mChildren[N];
+};
+
+
+/**
+ * Partial specialization for H == D represents the leaf node.
+ * Leaf nodes have no children.
+ */
+template<typename T, unsigned N, unsigned H>
+struct NNode<T, N, H, H>
+{
+    NNode() :
+        mParent(NULL),
+        mData()
+    {
+    }
+
+    typedef NNode<T, N, H, H - 1> Parent;
+    Parent * mParent;
+
+    T mData;
 };
 
 
 /**
  * NNode represents a node in an n-ary tree.
  * T = data type
- * N = maximum number of children per node
+ * N = number of children per node
  * H = tree height
  * D = node depth (distance from the root node)
  *
  * The entire tree is contained in a single segement of contiguous memory.
  */
-template<typename T, unsigned N, unsigned H, unsigned D = 0>
-struct NNode : public NNodeBase
+template<typename T, unsigned N, unsigned H, unsigned D>
+struct NNode
 {
     NNode() :
         mParent(NULL),
@@ -31,27 +67,14 @@ struct NNode : public NNodeBase
     {
     }
 
-    NNodeBase * mParent;
+
+    typedef NNode<T, N, H, D - 1> Parent;
+    Parent * mParent;
+
     T mData;
+
     typedef NNode<T, N, H, D + 1> Child;
     Child mChildren[N];
-};
-
-
-/**
- * Partial specialization for H == D represents the leaf node.
- */
-template<typename T, unsigned N, unsigned H>
-struct NNode<T, N, H, H> : public NNodeBase
-{
-    NNode() :
-        mParent(NULL),
-        mData()
-    {
-    }
-
-    NNodeBase * mParent;
-    T mData;
 };
 
 

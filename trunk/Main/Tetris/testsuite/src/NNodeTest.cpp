@@ -61,12 +61,10 @@ struct GameState
 };
 
 
-struct GameStateNode : NNode<GameState, 5, 8, 0>
+struct GameStateNode : NNode<GameState, 5, 2, 0>
 {
-    typedef NNode<GameState, 5, 8, 0> Base;
 
-    GameStateNode() :
-        Base()
+    GameStateNode()
     {
     }
 
@@ -97,6 +95,7 @@ void NNodeTest::testNode()
     std::cout << "The size of the Tree is  " << cSizeMB << " MB" << std::endl;
     boost::scoped_ptr<GameStateNode> theGameStateNode(new GameStateNode);
     GameStateNode & node = *theGameStateNode.get();
+
 }
 
 
