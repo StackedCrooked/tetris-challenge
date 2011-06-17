@@ -35,6 +35,11 @@ struct NNodeWithChildren
 {
     typedef NNode<T, N, H, D + 1> Child;
 
+    enum
+    {
+        ChildCount = N
+    };
+
     NNodeWithChildren() :
         mChildren()
     {
@@ -42,9 +47,7 @@ struct NNodeWithChildren
 
     const Child & getChild(unsigned idx) const { return mChildren[idx]; }
 
-    Child & getChild(unsigned idx) { return mChildren[idx]; }
-
-    Child mChildren[N];
+    Child mChildren[ChildCount];
 };
 
 
