@@ -2957,7 +2957,10 @@ HEADERS += \
     3rdParty/Boost_1_42_0/boost/utility.hpp \
     3rdParty/Boost_1_42_0/boost/version.hpp \
     3rdParty/Boost_1_42_0/boost/visit_each.hpp \
-    3rdParty/Boost_1_42_0/boost/weak_ptr.hpp
+    3rdParty/Boost_1_42_0/boost/weak_ptr.hpp \
+    Futile/include/Futile/Playground/Node.h \
+    Futile/include/Futile/Playground/MemoryPool.h \
+    Futile/include/Futile/Playground/Enum.h
 
 OTHER_FILES += \
     Futile/CMakeLists.txt \

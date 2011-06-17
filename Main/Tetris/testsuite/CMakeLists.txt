@@ -93,7 +93,6 @@ set(TetrisTestSuite_SOURCES
     src/Driver.cpp
     src/GenericGridTest.cpp
     src/NodeTest.cpp
-    src/MemoryPoolTest.cpp
     src/NodeCalculatorTest.cpp
     src/TetrisTestSuite.cpp
     src/WorkerPoolTest.cpp
@@ -105,7 +104,6 @@ set(TetrisTestSuite_SOURCES
 #
 set(TetrisTestSuite_HEADERS
     src/GenericGridTest.h
-    src/MemoryPoolTest.h
     src/NodeCalculatorTest.h
     src/TetrisTestSuite.h
     src/WorkerPoolTest.h
