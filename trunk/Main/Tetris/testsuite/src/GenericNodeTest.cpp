@@ -1,24 +1,24 @@
-#include "NodeTest.h"
+#include "GenericNodeTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Futile/Playground/Node.h"
+#include "Futile/Playground/GenericNode.h"
 #include "Futile/Allocator.h"
 #include "Futile/Assert.h"
 #include <iostream>
 
 
-NodeTest::NodeTest(const std::string & inName):
+GenericNodeTest::GenericNodeTest(const std::string & inName):
     CppUnit::TestCase(inName)
 {
 }
 
 
-NodeTest::~NodeTest()
+GenericNodeTest::~GenericNodeTest()
 {
 }
 
 
-void NodeTest::testNode()
+void GenericNodeTest::testNode()
 {
     typedef GenericNode<int> Node;
     Node node;
@@ -43,19 +43,19 @@ void NodeTest::testNode()
 }
 
 
-void NodeTest::setUp()
+void GenericNodeTest::setUp()
 {
 }
 
 
-void NodeTest::tearDown()
+void GenericNodeTest::tearDown()
 {
 }
 
 
-CppUnit::Test * NodeTest::suite()
+CppUnit::Test * GenericNodeTest::suite()
 {
     CppUnit::TestSuite * suite(new CppUnit::TestSuite("NodeTest"));
-    CppUnit_addTest(suite, NodeTest, testNode);
+    CppUnit_addTest(suite, GenericNodeTest, testNode);
     return suite;
 }
