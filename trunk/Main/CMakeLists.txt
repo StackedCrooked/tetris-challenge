@@ -37,8 +37,8 @@ message("ARCH:     ${ARCH}")
 #
 set(EXECUTABLE QtTetris)
 set(CMAKE_OSX_ARCHITECTURES ${ARCH})
-set(SOLUTIONDIR "${QtTetris_SOURCE_DIR}/../")
-set(BUILD_ROOT ${SOLUTIONDIR}../Build/)
+set(SOLUTIONDIR "${QtTetris_SOURCE_DIR}/")
+set(BUILD_ROOT ${SOLUTIONDIR})
 
 
 #
@@ -124,26 +124,26 @@ include_directories(
 # QtTetris source files
 #
 set(QtTetris_SOURCES
-    main.cpp
-    MainWindow.cpp
-    Model.cpp
-    NewGameDialog.cpp
-    TetrisWidget.cpp
-    QtMainThread.cpp)
+    QtTetris/main.cpp
+    QtTetris/MainWindow.cpp
+    QtTetris/Model.cpp
+    QtTetris/NewGameDialog.cpp
+    QtTetris/TetrisWidget.cpp
+    QtTetris/QtMainThread.cpp)
 
 
 #
 # QtTetris header files
 #
-set(QtTetris_QT_HEADERS MainWindow.h TetrisWidget.h NewGameDialog.h)
-set(QtTetris_REGULAR_HEADERS MainWindow.h)
+set(QtTetris_QT_HEADERS QtTetris/MainWindow.h QtTetris/TetrisWidget.h QtTetris/NewGameDialog.h)
+set(QtTetris_REGULAR_HEADERS QtTetris/MainWindow.h)
 set(QtTetris_HEADERS ${QtTetris_QT_HEADERS} ${QtTetris_REGULAR_HEADERS})
 
 
 #
 # Qt resources
 #
-QT4_ADD_RESOURCES(QtTetris_Resources "QtTetris.qrc")
+QT4_ADD_RESOURCES(QtTetris_Resources "QtTetris/QtTetris.qrc")
 
 
 #

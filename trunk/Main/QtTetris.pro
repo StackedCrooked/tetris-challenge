@@ -7,10 +7,10 @@ DEFINES += "BOOST_THREAD_PLATFORM_PTHREAD=1"
 
 INCLUDEPATH += \
     . \
-    Tetris/include \
-    Futile/include \
-    3rdParty/Boost_1_42_0 \
-    3rdParty/Poco/Foundation/include
+    Main/Tetris/include \
+    Main/Futile/include \
+    Main/3rdParty/Boost_1_42_0 \
+    Main/3rdParty/Poco/Foundation/include
 
 SOURCES += \
     QtTetris/main.cpp \
@@ -56,7 +56,9 @@ SOURCES += \
     Futile/src/Logging.cpp \
     Futile/src/Logger.cpp \
     Futile/src/LeakDetector.cpp \
-    Futile/src/Enum.cpp
+    Futile/src/Enum.cpp \
+    Tetris/testsuite/src/GenericNodeTest.cpp \
+    Tetris/testsuite/src/NNodeTest.cpp
     Tetris/testsuite/src/NodeCalculatorTest.cpp \
     Tetris/testsuite/src/TetrisTestSuite.cpp \
     Tetris/testsuite/src/WorkerPoolTest.cpp \
@@ -2961,7 +2963,10 @@ HEADERS += \
     Futile/include/Futile/Playground/Node.h \
     Futile/include/Futile/Playground/MemoryPool.h \
     Futile/include/Futile/Playground/Enum.h \
-    Futile/include/Futile/Playground/GenericNode.h
+    Futile/include/Futile/Playground/GenericNode.h \
+    Tetris/testsuite/src/GenericNodeTest.h \
+    Futile/include/Futile/Playground/NNode.h \
+    Tetris/testsuite/src/NNodeTest.h
 
 OTHER_FILES += \
     Futile/CMakeLists.txt \
