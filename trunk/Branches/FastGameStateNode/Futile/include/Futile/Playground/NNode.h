@@ -51,25 +51,39 @@ struct NNodeWithChildren
 };
 
 
-template<typename T, unsigned H, unsigned D>
+template<unsigned D>
 struct NNodeCore
 {
     enum
     {
-        Height = H,
         Depth = D
     };
-
-    NNodeCore() :
-        mData()
-    {
-    }
-
-    T mData;
 };
 
 
 } // namespace Private
+
+
+
+/**
+ * NNodeBase
+ */
+template<typename T, unsigned N, unsigned H>
+struct NNodeBase
+{
+    typedef T DataType;
+    enum {
+        ChildCount = N,
+        TreeHeight = H
+    };
+
+    NNodeBase() :
+        mData()
+    {
+    }
+
+    DataType mData;
+};
 
 
 /**
@@ -78,11 +92,12 @@ struct NNodeCore
  * -> no parent
  */
 template<typename T, unsigned N, unsigned H>
-struct NNode<T, N, H, 0> : Private::NNodeCore<T, H, 0>,
+struct NNode<T, N, H, 0> : NNodeBase<T, N, H>,
+                           Private::NNodeCore<0>,
                            Private::NNodeWithChildren<T, N, H, 0>
 {
     NNode() :
-        Private::NNodeCore<T, H, 0>(),
+        Private::NNodeCore<0>(),
         Private::NNodeWithChildren<T, N, H, 0>()
     {
     }
@@ -95,12 +110,13 @@ struct NNode<T, N, H, 0> : Private::NNodeCore<T, H, 0>,
  * -> no children
  */
 template<typename T, unsigned N, unsigned H>
-struct NNode<T, N, H, H> : Private::NNodeWithParent<T, N, H, H>,
-                           Private::NNodeCore<T, H, H>
+struct NNode<T, N, H, H> : NNodeBase<T, N, H>,
+                           Private::NNodeWithParent<T, N, H, H>,
+                           Private::NNodeCore<H>
 {
     NNode() :
         Private::NNodeWithParent<T, N, H, H>(),
-        Private::NNodeCore<T, H, H>()
+        Private::NNodeCore<H>()
     {
     }
 };
@@ -116,16 +132,28 @@ struct NNode<T, N, H, H> : Private::NNodeWithParent<T, N, H, H>,
  * The entire tree is contained in a single segement of contiguous memory.
  */
 template<typename T, unsigned N, unsigned H, unsigned D>
-struct NNode : Private::NNodeWithParent<T, N, H, D>,
-               Private::NNodeCore<T, H, D>,
+struct NNode : NNodeBase<T, N, H>,
+               Private::NNodeWithParent<T, N, H, D>,
+               Private::NNodeCore<D>,
                Private::NNodeWithChildren<T, N, H, D>
 {
     NNode() :
         Private::NNodeWithParent<T, N, H, D>(),
-        Private::NNodeCore<T, H, D>(),
+        Private::NNodeCore<D>(),
         Private::NNodeWithChildren<T, N, H, D>()
     {
     }
+};
+
+
+/**
+ * For the root node you can either use:
+ * - NNode<T, N, H, 0>
+ * - RootNode<R, N, H>
+ */
+template<typename T, unsigned N, unsigned H>
+struct RootNode : public Private::NNodeWithChildren<T, N, H, 0>
+{
 };
 
 

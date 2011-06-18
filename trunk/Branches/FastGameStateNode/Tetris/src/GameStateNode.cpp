@@ -6,12 +6,28 @@
 #include "Tetris/Block.h"
 #include "Tetris/Utilities.h"
 #include "Futile/Assert.h"
+#include "Futile/Playground/NNode.h"
 #include <set>
 #include <boost/scoped_ptr.hpp>
 #include <boost/weak_ptr.hpp>
 
 
 namespace Tetris {
+
+
+struct GameStateNodeData
+{
+};
+
+
+typedef Futile::RootNode<GameStateNodeData, 5, 8> GameStateTree;
+
+
+GameStateTree & GetGameStateTree()
+{
+    static boost::scoped_ptr<GameStateTree> fGameStateTree(new GameStateTree);
+    return *fGameStateTree;
+}
 
 
 static int GetIdentifier(const GameState & inGameState)
