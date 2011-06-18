@@ -254,8 +254,6 @@ protected:
 
     ComputerGame(std::size_t inNumRows, std::size_t inNumCols);
 
-    ComputerGame(const GameImpl & inGame);
-
     GameState & gameState();
 
 private:
