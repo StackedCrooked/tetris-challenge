@@ -15,19 +15,7 @@
 namespace Tetris {
 
 
-struct GameStateNodeData
-{
-};
-
-
-typedef Futile::RootNode<GameStateNodeData, 5, 8> GameStateTree;
-
-
-GameStateTree & GetGameStateTree()
-{
-    static boost::scoped_ptr<GameStateTree> fGameStateTree(new GameStateTree);
-    return *fGameStateTree;
-}
+using namespace Futile;
 
 
 static int GetIdentifier(const GameState & inGameState)
@@ -37,37 +25,131 @@ static int GetIdentifier(const GameState & inGameState)
 }
 
 
-struct GameStateNode::Impl
+struct GameStateNodeData
 {
-    Impl(NodePtr inParent, GameState *  inGameState, const Evaluator & inEvaluator) :
-        mParent(inParent),
-        mIdentifier(GetIdentifier(*inGameState)),
-        mDepth(inParent->depth() + 1),
-        mEvaluatedGameState(),
-        mEvaluator(inEvaluator),
-        mChildren()
+    enum {
+        N = 5,
+        H = 8,
+        MaxDepth = 8,
+        RowCount = 20,   // }
+        ColumnCount = 10 // } => For now put these here
+    };
+
+    GameStateNodeData() :
+        mNodeBase(),
+        mGameStateNode(new GameStateNode(new GameState(RowCount, ColumnCount), MakeTetrises::Instance()))
     {
-        mEvaluatedGameState.reset(new EvaluatedGameState(inGameState, inEvaluator.evaluate(*inGameState)));
     }
 
-    Impl(GameState *  inGameState, const Evaluator & inEvaluator) :
+
+    NNodeBase<GameStateNodeData, N, H> * mNodeBase;
+    boost::shared_ptr<GameStateNode> mGameStateNode;
+};
+
+
+struct GameStateNode::Impl
+{
+    Impl(GameState * inGameState, const Evaluator & inEvaluator) :
         mParent(),
-        mIdentifier(GetIdentifier(*inGameState)),
-        mDepth(0),
-        mEvaluatedGameState(),
+        mGameState(inGameState),
         mEvaluator(inEvaluator),
+        mNodeData(),
+        mIdentifier(GetIdentifier(*inGameState)),
+        mScore(),
+        mDepth(0),
         mChildren()
     {
-        mEvaluatedGameState.reset(new EvaluatedGameState(inGameState, inEvaluator.evaluate(*inGameState)));
+    }
+
+    Impl(NodePtr inParent, GameState *  inGameState, const Evaluator &  inEvaluator) :
+        mParent(inParent),
+        mGameState(inGameState),
+        mEvaluator(inEvaluator),
+        mNodeData(),
+        mIdentifier(GetIdentifier(*inGameState)),
+        mScore(),
+        mDepth(inParent->depth() + 1),
+        mChildren()
+    {
     }
 
     boost::weak_ptr<GameStateNode> mParent;
+    boost::scoped_ptr<GameState> mGameState;
+    const Evaluator & mEvaluator;
+    GameStateNodeData * mNodeData;
     int mIdentifier;
+    int mScore;
     int mDepth;
-    boost::scoped_ptr<EvaluatedGameState> mEvaluatedGameState;
-    const Evaluator & mEvaluator;            // }
-    ChildNodes mChildren;                    // } => Order matters!
+    ChildNodes mChildren;
 };
+
+
+typedef RootNode<GameStateNodeData, GameStateNodeData::N, GameStateNodeData::H> FastGameStateNode;
+typedef NNodeBase<GameStateNodeData, GameStateNodeData::N, GameStateNodeData::H> BaseNode;
+typedef NNode<GameStateNodeData, GameStateNodeData::N, GameStateNodeData::H, GameStateNodeData::H> LeafNode;
+
+
+template<typename T, unsigned N, unsigned H, unsigned D>
+void InitNodeData(NNode<T, N, H, D> & node)
+{
+    GameStateNodeData & data = node.mData;
+    data.mNodeBase = &node;
+
+//    if (node.parent())
+//    {
+//        GameStateNodeData & parentData = node.parent()->mData;
+//        data.mGameStateNode.reset(parentData.mGameStateNode->clone());
+//    }
+//    else
+//    {
+//        data.mGameStateNode.reset(new GameStateNode(new GameState(GameStateNodeData::RowCount, GameStateNodeData::ColumnCount), MakeTetrises::Instance().Instance()));
+//    }
+    GameStateNode & gameStateNode = *data.mGameStateNode.get();
+    GameStateNode::Impl & impl = *gameStateNode.mImpl;
+    impl.mDepth = node.Depth;
+    impl.mScore = impl.mEvaluator.evaluate(*impl.mGameState);
+}
+
+
+/**
+ * Leaf nodes are processed here.
+ */
+template<typename T, unsigned N, unsigned H>
+void InitNode(NNode<T, N, H, H> & node)
+{
+    InitNodeData(node);
+}
+
+
+/**
+ * Non-leaf nodes are processed here
+ */
+template<typename T, unsigned N, unsigned H, unsigned D>
+void InitNode(NNode<T, N, H, D> & node)
+{
+    InitNodeData(node);
+    for (std::size_t idx = 0; idx < node.ChildCount; ++idx)
+    {
+        Futile::NNode<T, N, H, D + 1> & child = node.mChildren[idx];
+        InitNode(child);
+        GameStateNodeData & nodeData = node.mData;
+        GameStateNodeData & childData = child.mData;
+        nodeData.mGameStateNode->mImpl->mChildren.insert(childData.mGameStateNode);
+    }
+}
+
+
+FastGameStateNode & GetGameStateTree()
+{
+    static boost::scoped_ptr<FastGameStateNode> fGameStateTree;
+    if (!fGameStateTree)
+    {
+        fGameStateTree.reset(new FastGameStateNode);
+        FastGameStateNode & root = *fGameStateTree;
+        InitNode(root);
+    }
+    return *fGameStateTree;
+}
 
 
 std::auto_ptr<GameStateNode> GameStateNode::CreateRootNode(std::size_t inNumRows, std::size_t inNumColumns)
@@ -78,7 +160,7 @@ std::auto_ptr<GameStateNode> GameStateNode::CreateRootNode(std::size_t inNumRows
 }
 
 
-GameStateNode::GameStateNode(GameState *  inGameState, const Evaluator &  inEvaluator) :
+GameStateNode::GameStateNode(GameState * inGameState, const Evaluator &  inEvaluator) :
     mImpl(new Impl(inGameState, inEvaluator))
 {
 }
@@ -99,8 +181,8 @@ GameStateNode::~GameStateNode()
 std::auto_ptr<GameStateNode> GameStateNode::clone() const
 {
     NodePtr parent = mImpl->mParent.lock();
-    std::auto_ptr<GameStateNode> result(parent ? new GameStateNode(parent, new GameState(mImpl->mEvaluatedGameState->gameState()), mImpl->mEvaluator)
-                                               : new GameStateNode(new GameState(mImpl->mEvaluatedGameState->gameState()), mImpl->mEvaluator));
+    std::auto_ptr<GameStateNode> result(parent ? new GameStateNode(parent, new GameState(gameState()), mImpl->mEvaluator)
+                                               : new GameStateNode(new GameState(gameState()), mImpl->mEvaluator));
     result->mImpl->mDepth = mImpl->mDepth;
 
     ChildNodes::const_iterator it = mImpl->mChildren.begin(), end = mImpl->mChildren.end();
@@ -129,13 +211,13 @@ const Evaluator & GameStateNode::evaluator() const
 
 const GameState & GameStateNode::gameState() const
 {
-    return mImpl->mEvaluatedGameState->gameState();
+    return *mImpl->mGameState;
 }
 
 
 int GameStateNode::quality() const
 {
-    return mImpl->mEvaluatedGameState->quality();
+    return mImpl->mScore;
 }
 
 
