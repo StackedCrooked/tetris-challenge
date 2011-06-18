@@ -34,20 +34,18 @@ template<typename T, unsigned N, unsigned H, unsigned D>
 struct NNodeWithChildren
 {
     typedef NNode<T, N, H, D + 1> Child;
-
-    enum
+    NNodeWithChildren()
     {
-        ChildCount = N
-    };
-
-    NNodeWithChildren() :
-        mChildren()
-    {
+        for (std::size_t idx = 0; idx < N; ++idx)
+        {
+            Child & child = mChildren[idx];
+            child.mParent = static_cast< NNode<T, N, H, D>* >(this);
+        }
     }
 
     const Child & getChild(unsigned idx) const { return mChildren[idx]; }
 
-    Child mChildren[ChildCount];
+    Child mChildren[N];
 };
 
 
@@ -114,6 +112,7 @@ struct NNode<T, N, H, H> : NNodeBase<T, N, H>,
                            Private::NNodeWithParent<T, N, H, H>,
                            Private::NNodeCore<H>
 {
+    typedef NNode<T, N, H, H - 1> Parent;
     NNode() :
         Private::NNodeWithParent<T, N, H, H>(),
         Private::NNodeCore<H>()
@@ -137,6 +136,8 @@ struct NNode : NNodeBase<T, N, H>,
                Private::NNodeCore<D>,
                Private::NNodeWithChildren<T, N, H, D>
 {
+    typedef NNode<T, N, H, D - 1> Parent;
+
     NNode() :
         Private::NNodeWithParent<T, N, H, D>(),
         Private::NNodeCore<D>(),
@@ -149,11 +150,12 @@ struct NNode : NNodeBase<T, N, H>,
 /**
  * For the root node you can either use:
  * - NNode<T, N, H, 0>
- * - RootNode<R, N, H>
+ * - RootNode<T, N, H>
  */
 template<typename T, unsigned N, unsigned H>
-struct RootNode : public Private::NNodeWithChildren<T, N, H, 0>
+struct RootNode : public NNode<T, N, H, 0>
 {
+
 };
 
 

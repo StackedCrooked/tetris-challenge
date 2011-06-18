@@ -64,7 +64,6 @@ public:
 
     int quality() const;
 
-private:
     struct Impl;
     boost::scoped_ptr<Impl> mImpl;
 };
