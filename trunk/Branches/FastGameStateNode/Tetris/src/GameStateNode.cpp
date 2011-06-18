@@ -18,13 +18,6 @@ namespace Tetris {
 using namespace Futile;
 
 
-static int GetIdentifier(const GameState & inGameState)
-{
-    const Block & block = inGameState.originalBlock();
-    return block.numRotations() * block.column() + block.rotation();
-}
-
-
 struct GameStateNodeData
 {
     enum {
@@ -37,7 +30,7 @@ struct GameStateNodeData
 
     GameStateNodeData() :
         mNodeBase(),
-        mGameStateNode(new GameStateNode(new GameState(RowCount, ColumnCount), MakeTetrises::Instance()))
+        mGameStateNode(GameStateNode::CreateRootNode(RowCount, ColumnCount))
     {
     }
 
@@ -47,6 +40,10 @@ struct GameStateNodeData
 };
 
 
+typedef RootNode<GameStateNodeData, GameStateNodeData::N, GameStateNodeData::H> FastGameStateNode;
+FastGameStateNode & GetGameStateTree();
+
+
 struct GameStateNode::Impl
 {
     Impl(GameState * inGameState, const Evaluator & inEvaluator) :
@@ -54,7 +51,6 @@ struct GameStateNode::Impl
         mGameState(inGameState),
         mEvaluator(inEvaluator),
         mNodeData(),
-        mIdentifier(GetIdentifier(*inGameState)),
         mScore(),
         mDepth(0),
         mChildren()
@@ -66,7 +62,6 @@ struct GameStateNode::Impl
         mGameState(inGameState),
         mEvaluator(inEvaluator),
         mNodeData(),
-        mIdentifier(GetIdentifier(*inGameState)),
         mScore(),
         mDepth(inParent->depth() + 1),
         mChildren()
@@ -77,16 +72,46 @@ struct GameStateNode::Impl
     boost::scoped_ptr<GameState> mGameState;
     const Evaluator & mEvaluator;
     GameStateNodeData * mNodeData;
-    int mIdentifier;
     int mScore;
     int mDepth;
     ChildNodes mChildren;
 };
 
 
+static GameStateNode::Impl * CreateImpl(NodePtr inParent, GameState *  inGameState, const Evaluator &  inEvaluator)
+{
+    GameStateNodeData & parentData = *inParent->mImpl->mNodeData;
+
+    Assert(inParent == parentData.mGameStateNode);
+
+    ChildNodes children = parentData.mGameStateNode->children();
+    Assert(inParent->children().size() == GameStateNodeData::N);
+    Assert(children.size() == GameStateNodeData::N);
+
+    return children.begin()->get()->mImpl.get();
+}
+
+
 typedef RootNode<GameStateNodeData, GameStateNodeData::N, GameStateNodeData::H> FastGameStateNode;
 typedef NNodeBase<GameStateNodeData, GameStateNodeData::N, GameStateNodeData::H> BaseNode;
 typedef NNode<GameStateNodeData, GameStateNodeData::N, GameStateNodeData::H, GameStateNodeData::H> LeafNode;
+
+
+template<typename T, unsigned N, unsigned H, unsigned D>
+void InitNode(NNode<T, N, H, D> & node);
+
+
+FastGameStateNode & GetGameStateTree()
+{
+    static boost::scoped_ptr<FastGameStateNode> fGameStateTree;
+    if (!fGameStateTree)
+    {
+        fGameStateTree.reset(new FastGameStateNode);
+        FastGameStateNode & root = *fGameStateTree;
+        InitNode(root);
+    }
+    return *fGameStateTree;
+}
 
 
 template<typename T, unsigned N, unsigned H>
@@ -95,8 +120,8 @@ void InitNodeData(NNode<T, N, H, 0> & node)
     GameStateNodeData & data = node.mData;
     data.mNodeBase = &node;
 
-    // Has a parent (because D == 0)
-    data.mGameStateNode.reset(new GameStateNode(new GameState(GameStateNodeData::RowCount, GameStateNodeData::ColumnCount), MakeTetrises::Instance().Instance()));
+    // Is root node (because D == 0)
+    data.mGameStateNode.reset(GameStateNode::CreateRootNode(GameStateNodeData::RowCount, GameStateNodeData::ColumnCount).release());
 
     GameStateNode & gameStateNode = *data.mGameStateNode.get();
     GameStateNode::Impl & impl = *gameStateNode.mImpl;
@@ -150,24 +175,12 @@ void InitNode(NNode<T, N, H, D> & node)
 }
 
 
-FastGameStateNode & GetGameStateTree()
-{
-    static boost::scoped_ptr<FastGameStateNode> fGameStateTree;
-    if (!fGameStateTree)
-    {
-        fGameStateTree.reset(new FastGameStateNode);
-        FastGameStateNode & root = *fGameStateTree;
-        InitNode(root);
-    }
-    return *fGameStateTree;
-}
-
-
 std::auto_ptr<GameStateNode> GameStateNode::CreateRootNode(std::size_t inNumRows, std::size_t inNumColumns)
 {
-    return std::auto_ptr<GameStateNode>(new GameStateNode(
-        new GameState(inNumRows, inNumColumns),
-        Balanced::Instance()));
+    return std::auto_ptr<GameStateNode>(
+        new GameStateNode(
+            new GameState(inNumRows, inNumColumns),
+            Tetris::MakeTetrises::Instance()));
 }
 
 
@@ -178,7 +191,7 @@ GameStateNode::GameStateNode(GameState * inGameState, const Evaluator &  inEvalu
 
 
 GameStateNode::GameStateNode(NodePtr inParent, GameState *  inGameState, const Evaluator &  inEvaluator) :
-    mImpl(new Impl(inParent, inGameState, inEvaluator))
+    mImpl(CreateImpl(inParent, inGameState, inEvaluator))
 {
 }
 
@@ -205,12 +218,6 @@ std::auto_ptr<GameStateNode> GameStateNode::clone() const
         result->mImpl->mChildren.insert(newChild);
     }
     return result;
-}
-
-
-int GameStateNode::identifier() const
-{
-    return mImpl->mIdentifier;
 }
 
 

@@ -5,6 +5,15 @@
 namespace Futile {
 
 
+/**
+ * NNode represents a node in an n-ary tree.
+ * T = data type
+ * N = number of children per node
+ * H = tree height
+ * D = node depth (distance from the root node)
+ *
+ * The entire tree is contained in a single segement of contiguous memory.
+ */
 template<typename T, unsigned N, unsigned H, unsigned D>
 struct NNode;
 

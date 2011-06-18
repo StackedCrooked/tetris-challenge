@@ -612,13 +612,6 @@ ComputerGame::ComputerGame(std::size_t inNumRows, std::size_t inNumCols) :
 }
 
 
-ComputerGame::ComputerGame(const GameImpl & inGame) :
-    GameImpl(inGame.rowCount(), inGame.columnCount()),
-    mCurrentNode(new GameStateNode(new GameState(inGame.gameState()), Balanced::Instance()))
-{
-}
-
-
 GameState & ComputerGame::gameState()
 {
     return const_cast<GameState&>(mCurrentNode->gameState());
