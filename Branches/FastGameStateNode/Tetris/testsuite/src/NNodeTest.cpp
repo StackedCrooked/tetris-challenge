@@ -124,7 +124,7 @@ template<typename Node>
 void PrintInfo()
 {
     std::cout << "depth: "  << Node::Depth  << ", "
-              << "height: " << Node::Height << ", "
+              << "height: " << Node::TreeHeight << ", "
               << "size: "   << std::setw(6) << ConvertToUnit(sizeof(Node)) << std::endl;
 }
 
