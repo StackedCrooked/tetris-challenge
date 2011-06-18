@@ -1,0 +1,177 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectName>Tetris</ProjectName>
+    <ProjectGuid>{D623C05B-BDD9-4D6E-8E51-E3275608DEBE}</ProjectGuid>
+    <RootNamespace>Tetris</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)..\Build\Windows\$(PROCESSOR_ARCHITECTURE)\$(PlatformToolset)\$(Configuration)\$(ProjectName)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)Intermediate\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)..\Build\Windows\$(PROCESSOR_ARCHITECTURE)\$(PlatformToolset)\$(Configuration)\$(ProjectName)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)Intermediate\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(SolutionDir)Tetris\include;$(SolutionDir)3rdParty\Poco\Foundation\include;$(SolutionDir)3rdParty\Boost_1_44_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <BrowseInformation>true</BrowseInformation>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+    <Lib>
+      <OutputFile>$(OutDir)$(ProjectName).lib</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <AdditionalIncludeDirectories>$(SolutionDir)Tetris\include;$(SolutionDir)3rdParty\Poco\Foundation\include;$(SolutionDir)3rdParty\Boost_1_44_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+    <Lib>
+      <OutputFile>$(OutDir)$(ProjectName).lib</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <None Include="Todo.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Tetris\AbstractWidget.h" />
+    <ClInclude Include="include\Tetris\AISupport.h" />
+    <ClInclude Include="include\Tetris\Allocator.h" />
+    <ClInclude Include="include\Tetris\Array.h" />
+    <ClInclude Include="include\Tetris\Assert.h" />
+    <ClInclude Include="include\Tetris\AutoPtrSupport.h" />
+    <ClInclude Include="include\Tetris\Block.h" />
+    <ClInclude Include="include\Tetris\BlockFactory.h" />
+    <ClInclude Include="include\Tetris\BlockMover.h" />
+    <ClInclude Include="include\Tetris\BlockType.h" />
+    <ClInclude Include="include\Tetris\BlockTypes.h" />
+    <ClInclude Include="include\Tetris\ComputerPlayer.h" />
+    <ClInclude Include="include\Tetris\Config.h" />
+    <ClInclude Include="include\Tetris\Direction.h" />
+    <ClInclude Include="include\Tetris\Evaluator.h" />
+    <ClInclude Include="include\Tetris\ForwardDeclarations.h" />
+    <ClInclude Include="include\Tetris\Game.h" />
+    <ClInclude Include="include\Tetris\GameOver.h" />
+    <ClInclude Include="include\Tetris\GameState.h" />
+    <ClInclude Include="include\Tetris\GameStateComparator.h" />
+    <ClInclude Include="include\Tetris\GameStateNode.h" />
+    <ClInclude Include="include\Tetris\GameStateStats.h" />
+    <ClInclude Include="include\Tetris\GenericGrid.h" />
+    <ClInclude Include="include\Tetris\Gravity.h" />
+    <ClInclude Include="include\Tetris\Grid.h" />
+    <ClInclude Include="include\Tetris\Logger.h" />
+    <ClInclude Include="include\Tetris\Logging.h" />
+    <ClInclude Include="include\Tetris\MainThread.h" />
+    <ClInclude Include="include\Tetris\MainThreadImpl.h" />
+    <ClInclude Include="include\Tetris\MakeString.h" />
+    <ClInclude Include="include\Tetris\MultiplayerGame.h" />
+    <ClInclude Include="include\Tetris\MultithreadedNodeCalculator.h" />
+    <ClInclude Include="include\Tetris\NodeCalculator.h" />
+    <ClInclude Include="include\Tetris\NodeCalculatorImpl.h" />
+    <ClInclude Include="include\Tetris\NodePtr.h" />
+    <ClInclude Include="include\Tetris\Player.h" />
+    <ClInclude Include="include\Tetris\PlayerType.h" />
+    <ClInclude Include="include\Tetris\SimpleGame.h" />
+    <ClInclude Include="include\Tetris\SingleThreadedNodeCalculator.h" />
+    <ClInclude Include="include\Tetris\Tetris.h" />
+    <ClInclude Include="include\Tetris\Threading.h" />
+    <ClInclude Include="include\Tetris\TypedWrapper.h" />
+    <ClInclude Include="include\Tetris\Unicode.h" />
+    <ClInclude Include="include\Tetris\Utilities.h" />
+    <ClInclude Include="include\Tetris\Worker.h" />
+    <ClInclude Include="include\Tetris\WorkerPool.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\AbstractWidget.cpp" />
+    <ClCompile Include="src\AISupport.cpp" />
+    <ClCompile Include="src\Block.cpp" />
+    <ClCompile Include="src\BlockFactory.cpp" />
+    <ClCompile Include="src\BlockMover.cpp" />
+    <ClCompile Include="src\BlockType.cpp" />
+    <ClCompile Include="src\ComputerPlayer.cpp" />
+    <ClCompile Include="src\Evaluator.cpp" />
+    <ClCompile Include="src\Game.cpp" />
+    <ClCompile Include="src\GameState.cpp" />
+    <ClCompile Include="src\GameStateComparator.cpp" />
+    <ClCompile Include="src\GameStateNode.cpp" />
+    <ClCompile Include="src\Gravity.cpp" />
+    <ClCompile Include="src\Logger.cpp" />
+    <ClCompile Include="src\Logging.cpp" />
+    <ClCompile Include="src\MainThread.cpp" />
+    <ClCompile Include="src\MultiplayerGame.cpp" />
+    <ClCompile Include="src\MultiThreadedNodeCalculator.cpp" />
+    <ClCompile Include="src\NodeCalculator.cpp" />
+    <ClCompile Include="src\NodeCalculatorImpl.cpp" />
+    <ClCompile Include="src\Player.cpp" />
+    <ClCompile Include="src\SimpleGame.cpp" />
+    <ClCompile Include="src\SingleThreadedNodeCalculator.cpp" />
+    <ClCompile Include="src\Threading.cpp" />
+    <ClCompile Include="src\Unicode.cpp" />
+    <ClCompile Include="src\Worker.cpp" />
+    <ClCompile Include="src\WorkerPool.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
