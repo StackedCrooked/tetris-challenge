@@ -89,21 +89,32 @@ typedef NNodeBase<GameStateNodeData, GameStateNodeData::N, GameStateNodeData::H>
 typedef NNode<GameStateNodeData, GameStateNodeData::N, GameStateNodeData::H, GameStateNodeData::H> LeafNode;
 
 
+template<typename T, unsigned N, unsigned H>
+void InitNodeData(NNode<T, N, H, 0> & node)
+{
+    GameStateNodeData & data = node.mData;
+    data.mNodeBase = &node;
+
+    // Has a parent (because D == 0)
+    data.mGameStateNode.reset(new GameStateNode(new GameState(GameStateNodeData::RowCount, GameStateNodeData::ColumnCount), MakeTetrises::Instance().Instance()));
+
+    GameStateNode & gameStateNode = *data.mGameStateNode.get();
+    GameStateNode::Impl & impl = *gameStateNode.mImpl;
+    impl.mDepth = node.Depth;
+    impl.mScore = impl.mEvaluator.evaluate(*impl.mGameState);
+}
+
+
 template<typename T, unsigned N, unsigned H, unsigned D>
 void InitNodeData(NNode<T, N, H, D> & node)
 {
     GameStateNodeData & data = node.mData;
     data.mNodeBase = &node;
 
-//    if (node.parent())
-//    {
-//        GameStateNodeData & parentData = node.parent()->mData;
-//        data.mGameStateNode.reset(parentData.mGameStateNode->clone());
-//    }
-//    else
-//    {
-//        data.mGameStateNode.reset(new GameStateNode(new GameState(GameStateNodeData::RowCount, GameStateNodeData::ColumnCount), MakeTetrises::Instance().Instance()));
-//    }
+    // Has a parent (because D > 0)
+    GameStateNodeData & parentData = node.parent()->mData;
+    data.mGameStateNode.reset(parentData.mGameStateNode->clone().release());
+
     GameStateNode & gameStateNode = *data.mGameStateNode.get();
     GameStateNode::Impl & impl = *gameStateNode.mImpl;
     impl.mDepth = node.Depth;
