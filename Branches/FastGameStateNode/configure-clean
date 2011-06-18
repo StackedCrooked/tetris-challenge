@@ -1,0 +1,2 @@
+#!/bin/sh
+svn st | grep -e ^? | sed 's_^?[ ]*__' | grep -v "Poco_1_3_6_p2/lib" | grep -v "Boost_1_42_0/lib" | xargs rm -rf
