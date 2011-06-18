@@ -1,0 +1,64 @@
+include_directories(
+    ${SOLUTIONDIR}Futile/include
+    ${SOLUTIONDIR}Tetris/include
+    ${SOLUTIONDIR}3rdPary/Boost
+    ${SOLUTIONDIR}3rdPary/Poco/Foundation/include)
+
+
+add_library(Tetris
+    include/Tetris/AbstractWidget.h
+    include/Tetris/AISupport.h
+    include/Tetris/Block.h
+    include/Tetris/BlockFactory.h
+    include/Tetris/BlockMover.h
+    include/Tetris/BlockType.h
+    include/Tetris/BlockTypes.h
+    include/Tetris/ComputerPlayer.h
+    include/Tetris/Config.h
+    include/Tetris/Direction.h
+    include/Tetris/Evaluator.h
+    include/Tetris/ForwardDeclarations.h
+    include/Tetris/Game.h
+    include/Tetris/GameImpl.h
+    include/Tetris/GameOver.h
+    include/Tetris/GameState.h
+    include/Tetris/GameStateComparator.h
+    include/Tetris/GameStateNode.h
+    include/Tetris/GameStateStats.h
+    include/Tetris/Gravity.h
+    include/Tetris/Grid.h
+    include/Tetris/MultiplayerGame.h
+    include/Tetris/MultithreadedNodeCalculator.h
+    include/Tetris/NodeCalculator.h
+    include/Tetris/NodeCalculatorImpl.h
+    include/Tetris/NodePtr.h
+    include/Tetris/Player.h
+    include/Tetris/PlayerType.h
+    include/Tetris/SingleThreadedNodeCalculator.h
+    include/Tetris/Tetris.h
+    include/Tetris/Unicode.h
+    include/Tetris/Utilities.h
+    src/AbstractWidget.cpp
+    src/AISupport.cpp
+    src/Block.cpp
+    src/BlockFactory.cpp
+    src/BlockMover.cpp
+    src/BlockType.cpp
+    src/ComputerPlayer.cpp
+    src/Evaluator.cpp
+    src/Game.cpp
+    src/GameImpl.cpp
+    src/GameState.cpp
+    src/GameStateComparator.cpp
+    src/GameStateNode.cpp
+    src/Gravity.cpp
+    src/MultiplayerGame.cpp
+    src/MultiThreadedNodeCalculator.cpp
+    src/NodeCalculator.cpp
+    src/NodeCalculatorImpl.cpp
+    src/Player.cpp
+    src/SingleThreadedNodeCalculator.cpp
+    src/Unicode.cpp)
+
+set_target_properties(Tetris PROPERTIES COMPILE_FLAGS ${FINAL_COMPILE_FLAGS})
+

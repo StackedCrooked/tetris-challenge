@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<dialog xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+        xmlns:html="http://www.w3.org/1999/xhtml"
+        id="AboutDialog"
+        orient="vertical"
+        align="stretch"
+        title="About"
+>
+  <grid>
+    <columns>
+      <column flex="0" />
+      <column flex="1" />
+    </columns>
+    <rows>
+      <row align="center">
+        <label value="Author:" style="text-align:right" />
+        <html:a href="http://code.google.com/u/francis.rammeloo/" style="text-align:center">Francis Rammeloo</html:a>
+      </row>
+      <row align="center">
+        <label value="Sources:" style="text-align:right" />
+        <html:a href="http://code.google.com/p/tetris-challenge" style="text-align:center">http://code.google.com/p/tetris-challenge</html:a>
+      </row>
+      <row align="center">
+        <label value="Tetris Icon (LGPL):" style="text:align:right" />
+        <html:a href="http://www.everaldo.com/">Everaldo Coelho</html:a>
+      </row>
+    </rows>
+  </grid>
+  <spacer height="23" />
+  <hbox>
+    <spacer flex="1" />
+    <button label="OK" id="okButton" />
+  </hbox>
+</dialog>
