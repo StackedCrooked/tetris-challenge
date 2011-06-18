@@ -3531,7 +3531,6 @@ QtTetris/resources/Tetris_16.png
 QtTetris/resources/Tetris_32.png
 QtTetris/TetrisWidget.cpp
 QtTetris/TetrisWidget.h
-QtTetris.pro
 Scripts/AddClass/Template.cpp
 Scripts/AddClass/Template.h
 Scripts/Format/AStyle.exe
