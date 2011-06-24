@@ -15,13 +15,8 @@ echo "TETRIS_DEPLOY_DMG: $TETRIS_DEPLOY_DMG"
 
 # First clean the previous builds
 rm -rf Build
-
-# Start CMake
-CMAKE_DIR=Build/CMake/QtTetris
-mkdir -p $CMAKE_DIR
-cd $CMAKE_DIR
-cmake ../../../QtTetris
-
-cd Build/CMake/QtTetris
-make VERBOSE=1 -w -j8
+mkdir -p Build
+cd Build
+cmake ../QtTetris
+make -w -j8
 
