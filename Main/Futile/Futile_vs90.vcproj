@@ -160,10 +160,6 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\src\Enum.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\src\LeakDetector.cpp"
 				>
 			</File>
@@ -222,10 +218,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\Futile\Enum.h"
-				>
-			</File>
-			<File
 				RelativePath=".\include\Futile\GenericGrid.h"
 				>
 			</File>
@@ -251,14 +243,6 @@
 			</File>
 			<File
 				RelativePath=".\include\Futile\MakeString.h"
-				>
-			</File>
-			<File
-				RelativePath=".\include\Futile\MemoryPool.h"
-				>
-			</File>
-			<File
-				RelativePath=".\include\Futile\Node.h"
 				>
 			</File>
 			<File
