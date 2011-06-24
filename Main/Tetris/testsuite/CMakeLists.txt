@@ -34,7 +34,7 @@ endif()
 set(EXECUTABLE TetrisTestSuite)
 set(CMAKE_OSX_ARCHITECTURES ${ARCH})
 set(SOLUTIONDIR ${TetrisTestSuite_SOURCE_DIR}/../../)
-set(BUILD_ROOT ${SOLUTIONDIR}../Build/)
+set(BUILD_ROOT ${SOLUTIONDIR}Build/)
 set(POCO ${SOLUTIONDIR}3rdParty/Poco/)
 
 

@@ -38,7 +38,7 @@ message("ARCH:     ${ARCH}")
 set(EXECUTABLE QtTetris)
 set(CMAKE_OSX_ARCHITECTURES ${ARCH})
 set(SOLUTIONDIR "${QtTetris_SOURCE_DIR}/../")
-set(BUILD_ROOT ${SOLUTIONDIR}../Build/)
+set(BUILD_ROOT ${SOLUTIONDIR}Build/)
 
 
 #

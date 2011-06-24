@@ -1,8 +1,5 @@
 #!/bin/sh
-MAIN_DIR=`pwd`
-BUILD_DIR=$MAIN_DIR/../Build
-rm -rf $BUILD_DIR
+rm -rf Build
 ./configure
-cd $BUILD_DIR/CMake/QtTetris
-make VERBOSE=1 -w -j8
-
+cd Build
+make -j8
