@@ -15,4 +15,5 @@ rm -f Makefile
 echo "all:\n\tcd Build ; make $*" >> Makefile
 echo "\nclean:\n\tcd Build ; make clean" >> Makefile
 
+echo "Delete the \"Build\" directory to erase all configure and build files."
 echo "Type \"make\" to start building QtTetris"
