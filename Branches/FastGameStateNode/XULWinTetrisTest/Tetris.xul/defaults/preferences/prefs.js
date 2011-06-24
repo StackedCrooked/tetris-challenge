@@ -1,1 +1,0 @@
-pref("toolkit.defaultChromeURI", "chrome://tetris/content/tetris.xul");

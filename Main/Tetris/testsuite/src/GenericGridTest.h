@@ -1,5 +1,5 @@
-#ifndef GENERICGRIDTEST_H_INCLUDED
-#define GENERICGRIDTEST_H_INCLUDED
+#ifndef GENERICNODETEST_H_INCLUDED
+#define GENERICNODETEST_H_INCLUDED
 
 
 #include "CppUnit/TestCase.h"
@@ -10,18 +10,18 @@
 class GenericGridTest: public CppUnit::TestCase
 {
 public:
-    GenericGridTest(const std::string & name);
+	GenericGridTest(const std::string & name);
 
-    ~GenericGridTest();
+	~GenericGridTest();
 
-    void testGenericGrid();
+    void testGenericGrid();    
+	
+	void setUp();
 
-    void setUp();
+	void tearDown();
 
-    void tearDown();
-
-    static CppUnit::Test* suite();
+	static CppUnit::Test* suite();
 };
 
 
-#endif // GENERICGRIDTEST_H_INCLUDED
+#endif // GENERICNODETEST_H_INCLUDED

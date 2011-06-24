@@ -1,9 +1,0 @@
-<RCC>
-    <qresource prefix="/">
-        <file>resources/avatar/Chopper_80.gif</file>
-        <file>resources/avatar/Luffy_80.gif</file>
-        <file>resources/avatar/Nami_80.gif</file>
-        <file>resources/avatar/Sanji_80.gif</file>
-        <file>resources/avatar/Zoro_80.gif</file>
-    </qresource>
-</RCC>
