@@ -34,7 +34,7 @@ endif()
 set(EXECUTABLE TetrisTestSuite)
 set(CMAKE_OSX_ARCHITECTURES ${ARCH})
 set(SOLUTIONDIR ${TetrisTestSuite_SOURCE_DIR}/../../)
-set(BUILD_ROOT ${SOLUTIONDIR})
+set(BUILD_ROOT ${SOLUTIONDIR}../Build/)
 set(POCO ${SOLUTIONDIR}3rdParty/Poco/)
 
 
@@ -92,8 +92,8 @@ set(BOOST_LIB "${BOOST_ROOT}/lib/${PLATFORM}/${ARCH}")
 set(TetrisTestSuite_SOURCES
     src/Driver.cpp
     src/GenericGridTest.cpp
-    src/GenericNodeTest.cpp
-    src/NNodeTest.cpp
+    src/NodeTest.cpp
+    src/MemoryPoolTest.cpp
     src/NodeCalculatorTest.cpp
     src/TetrisTestSuite.cpp
     src/WorkerPoolTest.cpp
@@ -105,8 +105,7 @@ set(TetrisTestSuite_SOURCES
 #
 set(TetrisTestSuite_HEADERS
     src/GenericGridTest.h
-    src/GenericNodeTest.h
-    src/NNodeTest.h
+    src/MemoryPoolTest.h
     src/NodeCalculatorTest.h
     src/TetrisTestSuite.h
     src/WorkerPoolTest.h

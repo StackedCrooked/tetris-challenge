@@ -1,5 +1,3 @@
-# CMakeLists.txt for the Futile library
-
 include_directories(
     ${SOLUTIONDIR}Futile/include
     ${SOLUTIONDIR}Tetris/include
@@ -20,13 +18,12 @@ add_library(Futile
     include/Futile/MainThread.h
     include/Futile/MainThreadImpl.h
     include/Futile/MakeString.h
-    include/Futile/Singleton.h
+    include/Futile/MemoryPool.h
+    include/Futile/Node.h
     include/Futile/Threading.h
     include/Futile/TypedWrapper.h
     include/Futile/Worker.h
     include/Futile/WorkerPool.h
-    include/Futile/Playground/GenericNode.h
-    include/Futile/Playground/NNode.h
     src/LeakDetector.cpp
     src/Logger.cpp
     src/Logging.cpp
