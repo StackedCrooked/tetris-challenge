@@ -1,3 +1,0 @@
-The Tetris.icns file was generated from a set of png images using the makeicns tool as follows:
-
-    ./makeicns -128 Tetris_128.png -32 Tetris_32.png -16 Tetris_16.png -out Tetris.icns
