@@ -5,7 +5,6 @@ export TETRIS_BUILD_TYPE=${TETRIS_BUILD_TYPE:-Release}
 export TETRIS_DEPLOY_DMG=${TETRIS_DEPLOY_DMG:-No}
 export TETRIS_MINGW=${TETRIS_MINGW:-No}
 
-
 mkdir -p Build
 cd Build
 cmake ../QtTetris
