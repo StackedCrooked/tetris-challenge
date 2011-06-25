@@ -126,6 +126,7 @@ target_link_libraries(${EXECUTABLE}
     Futile
     PocoFoundation
     CppUnit
+    pthread
     "${BOOST_LIB}/libboost_thread.a")
 
 

@@ -79,7 +79,7 @@ endif()
 if(WIN32)
     set(EXTRA_LIBS "-lIphlpapi ${EXTRA_LIBS}")
 else()
-    set(EXTRA_LIBS "")
+    set(EXTRA_LIBS "pthread")
 endif()
 
 
