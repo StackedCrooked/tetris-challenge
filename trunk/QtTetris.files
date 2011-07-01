@@ -14,7 +14,6 @@ Futile/include/Futile/Logging.h
 Futile/include/Futile/MainThread.h
 Futile/include/Futile/MainThreadImpl.h
 Futile/include/Futile/MakeString.h
-Futile/include/Futile/MemoryPool.h
 Futile/include/Futile/Node.h
 Futile/include/Futile/Singleton.h
 Futile/include/Futile/Threading.h
@@ -112,8 +111,6 @@ Tetris/testsuite/CMakeLists.txt
 Tetris/testsuite/src/Driver.cpp
 Tetris/testsuite/src/GenericGridTest.cpp
 Tetris/testsuite/src/GenericGridTest.h
-Tetris/testsuite/src/MemoryPoolTest.cpp
-Tetris/testsuite/src/MemoryPoolTest.h
 Tetris/testsuite/src/NodeCalculatorTest.cpp
 Tetris/testsuite/src/NodeCalculatorTest.h
 Tetris/testsuite/src/NodeTest.cpp
