@@ -10,11 +10,6 @@
 #include <set>
 
 
-#ifndef _WIN32 //
-#include <boost/thread/pthread/mutex.hpp>
-#endif
-
-
 namespace Futile {
 
 
