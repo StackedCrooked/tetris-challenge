@@ -271,10 +271,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\Tetris\Allocator.h"
-				>
-			</File>
-			<File
 				RelativePath=".\include\Tetris\Array.h"
 				>
 			</File>

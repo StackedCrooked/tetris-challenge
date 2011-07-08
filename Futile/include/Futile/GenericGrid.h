@@ -2,7 +2,6 @@
 #define GENERICGRID_H_INCLUDED
 
 
-#include "Futile/Allocator.h"
 #include <cstring>
 #include <vector>
 #include <memory>

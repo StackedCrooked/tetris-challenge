@@ -4,7 +4,6 @@ include_directories(
     ${SOLUTIONDIR}3rdParty/Boost)
 
 add_library(Futile
-    include/Futile/Allocator.h
     include/Futile/Array.h
     include/Futile/Assert.h
     include/Futile/AutoPtrSupport.h
