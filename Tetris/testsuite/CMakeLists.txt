@@ -91,7 +91,6 @@ set(BOOST_LIB "${BOOST_ROOT}/lib/${PLATFORM}/${ARCH}")
 #
 set(TetrisTestSuite_SOURCES
     src/Driver.cpp
-    src/GenericGridTest.cpp
     src/NodeTest.cpp
     src/NodeCalculatorTest.cpp
     src/TetrisTestSuite.cpp
@@ -103,7 +102,6 @@ set(TetrisTestSuite_SOURCES
 # Testsuite header files
 #
 set(TetrisTestSuite_HEADERS
-    src/GenericGridTest.h
     src/NodeCalculatorTest.h
     src/TetrisTestSuite.h
     src/WorkerPoolTest.h
