@@ -2,7 +2,6 @@
 #define WORKERTHREAD_H_INCLUDED
 
 
-#include "Futile/Enum.h"
 #include "Futile/Threading.h"
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
@@ -24,13 +23,14 @@ class WorkerPool;
  *  - EnumInfo<WorkerStatus>::ToString(inWorkerStatus);
  *   -EnumInfo<WorkerStatus>::FromString(inWorkerStatus);
  */
-Futile_Enum(WorkerStatus, 5, ( \
-    WorkerStatus_Initial,      \
-    WorkerStatus_Waiting,      \
-    WorkerStatus_Scheduled,    \
-    WorkerStatus_Working,      \
-    WorkerStatus_FinishedOne   \
-));
+enum WorkerStatus
+{
+    WorkerStatus_Initial,
+    WorkerStatus_Waiting,
+    WorkerStatus_Scheduled,
+    WorkerStatus_Working,
+    WorkerStatus_FinishedOne
+};
 
 
 /**

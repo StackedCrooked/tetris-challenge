@@ -57,9 +57,6 @@ private:
 };
 
 
-typedef Futile::Array<Player> Players;
-
-
 class HumanPlayer : public Player
 {
 public:

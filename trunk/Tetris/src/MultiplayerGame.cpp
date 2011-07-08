@@ -64,6 +64,8 @@ struct MultiplayerGame::Impl : public Game::EventHandler,
         }
     }
 
+    typedef boost::shared_ptr<Player> PlayerPtr;
+    typedef std::vector<PlayerPtr> Players;
     Players mPlayers;
     std::size_t mRowCount;
     std::size_t mColumnCount;
@@ -78,7 +80,6 @@ MultiplayerGame::MultiplayerGame(std::size_t inRowCount, std::size_t inColumnCou
 
 MultiplayerGame::~MultiplayerGame()
 {
-    mImpl.reset();
 }
 
 
@@ -86,21 +87,21 @@ Player * MultiplayerGame::Impl::addPlayer(PlayerType inPlayerType,
                                           const TeamName & inTeamName,
                                           const PlayerName & inPlayerName)
 {
-    mPlayers.push_back(Player::Create(inPlayerType,
-                                      inTeamName,
-                                      inPlayerName,
-                                      mRowCount,
-                                      mColumnCount).release());
-    Player * player = mPlayers.back();
-    Game::RegisterEventHandler(player->simpleGame(), this);
-    return player;
+    PlayerPtr playerPtr(Player::Create(inPlayerType,
+                                       inTeamName,
+                                       inPlayerName,
+                                       mRowCount,
+                                       mColumnCount).release());
+    mPlayers.push_back(playerPtr);
+    Game::RegisterEventHandler(playerPtr->simpleGame(), this);
+    return playerPtr.get();
 }
 
 
 Player * MultiplayerGame::addHumanPlayer(const TeamName & inTeamName,
                                          const PlayerName & inPlayerName)
 {
-    return mImpl->addPlayer(Human, inTeamName, inPlayerName);
+    return mImpl->addPlayer(PlayerType_Human, inTeamName, inPlayerName);
 }
 
 
@@ -108,7 +109,7 @@ Player * MultiplayerGame::addComputerPlayer(const TeamName & inTeamName,
                                             const PlayerName & inPlayerName,
                                             ComputerPlayer::Tweaker * inTweaker)
 {
-    Player * result = mImpl->addPlayer(Computer, inTeamName, inPlayerName);
+    Player * result = mImpl->addPlayer(PlayerType_Computer, inTeamName, inPlayerName);
     ComputerPlayer & computerPlayer = dynamic_cast<ComputerPlayer&>(*result);
     computerPlayer.setTweaker(inTweaker);
     return result;
@@ -118,7 +119,7 @@ Player * MultiplayerGame::addComputerPlayer(const TeamName & inTeamName,
 void MultiplayerGame::removePlayer(Player * inPlayer)
 {
     Game::UnregisterEventHandler(inPlayer->simpleGame(), mImpl.get());
-    Players::iterator it = std::find(mImpl->mPlayers.begin(), mImpl->mPlayers.end(), inPlayer);
+    Impl::Players::iterator it = std::find_if(mImpl->mPlayers.begin(), mImpl->mPlayers.end(), boost::bind(&Impl::PlayerPtr::get, _1) == inPlayer);
     if (it == mImpl->mPlayers.end())
     {
         throw std::runtime_error("This Player was not found in the list of players.");
@@ -135,13 +136,13 @@ std::size_t MultiplayerGame::playerCount() const
 
 const Player * MultiplayerGame::getPlayer(std::size_t inIndex) const
 {
-    return mImpl->mPlayers[inIndex];
+    return mImpl->mPlayers[inIndex].get();
 }
 
 
 Player * MultiplayerGame::getPlayer(std::size_t inIndex)
 {
-    return mImpl->mPlayers[inIndex];
+    return mImpl->mPlayers[inIndex].get();
 }
 
 

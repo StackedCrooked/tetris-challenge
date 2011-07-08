@@ -24,15 +24,15 @@ Evaluator::Evaluator(const std::string & inName,
                      SearchDepth inRecommendedSearchDepth,
                      SearchWidth inRecommendedSearchWidth) :
     mName(inName),
-    mGameHeightFactor(inGameHeightFactor.get()),
-    mLastBlockHeightFactor(inLastBlockHeightFactor.get()),
-    mNumHolesFactor(inNumHolesFactor.get()),
-    mNumSinglesFactor(inNumSinglesFactor.get()),
-    mNumDoublesFactor(inNumDoublesFactor.get()),
-    mNumTriplesFactor(inNumTriplesFactor.get()),
-    mNumTetrisesFactor(inNumTetrisesFactor.get()),
-    mRecommendedSearchDepth(inRecommendedSearchDepth.get()),
-    mRecommendedSearchWidth(inRecommendedSearchWidth.get())
+    mGameHeightFactor(inGameHeightFactor),
+    mLastBlockHeightFactor(inLastBlockHeightFactor),
+    mNumHolesFactor(inNumHolesFactor),
+    mNumSinglesFactor(inNumSinglesFactor),
+    mNumDoublesFactor(inNumDoublesFactor),
+    mNumTriplesFactor(inNumTriplesFactor),
+    mNumTetrisesFactor(inNumTetrisesFactor),
+    mRecommendedSearchDepth(inRecommendedSearchDepth),
+    mRecommendedSearchWidth(inRecommendedSearchWidth)
 {
 }
 

@@ -21,8 +21,8 @@ struct Player::Impl
         mColumnCount(inColumnCount),
         mPlayerType(inPlayerType),
         mGame(new Game(inPlayerType, inRowCount, inColumnCount)),
-        mTeamName(inTeamName.get()),
-        mPlayerName(inPlayerName.get())
+        mTeamName(inTeamName),
+        mPlayerName(inPlayerName)
     {
     }
 
@@ -47,11 +47,11 @@ std::auto_ptr<Player> Player::Create(PlayerType inPlayerType,
                                      std::size_t inColumnCount)
 {
     std::auto_ptr<Player> result;
-    if (inPlayerType == Computer)
+    if (inPlayerType == PlayerType_Computer)
     {
         result.reset(new ComputerPlayer(inTeamName, inPlayerName, inRowCount, inColumnCount));
     }
-    else if (inPlayerType == Human)
+    else if (inPlayerType == PlayerType_Human)
     {
         result.reset(new HumanPlayer(inTeamName, inPlayerName, inRowCount, inColumnCount));
     }
@@ -117,7 +117,7 @@ HumanPlayer::HumanPlayer(const TeamName & inTeamName,
                          const PlayerName & inPlayerName,
                          std::size_t inRowCount,
                          std::size_t inColumnCount) :
-    Player(Human,
+    Player(PlayerType_Human,
            inTeamName,
            inPlayerName,
            inRowCount,

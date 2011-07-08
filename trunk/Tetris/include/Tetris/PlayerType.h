@@ -2,14 +2,19 @@
 #define TETRIS_PLAYERTYPE_H_INCLUDED
 
 
-#include "Futile/Enum.h"
 #include <vector>
 
 
 namespace Tetris {
 
 
-Futile_Enum(PlayerType, 2, (Human, Computer));
+enum PlayerType
+{
+    PlayerType_Human,
+    PlayerType_Computer
+};
+
+
 typedef std::vector<PlayerType> PlayerTypes;
 
 
