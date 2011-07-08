@@ -12,13 +12,10 @@ namespace Futile {
 
 
 /**
- * GenericGrid can be used for simple matrices or 2D arrays.
- * It provides nothing more than simple get/set methods.
- * The Allocator template argument allows you to choose a different memory allocation implementation.]
- * Check the Allocators.h header for other available options.
+ * GenericGrid represents a grid or table structure.
  */
-template<class T, template <class> class Allocator = Allocator_Malloc>
-class GenericGrid : private Allocator<T>
+template<class T>
+class GenericGrid
 {
 public:
     GenericGrid(std::size_t inRowCount, std::size_t inColumnCount);
@@ -34,6 +31,8 @@ public:
     void set(std::size_t inRow, std::size_t inColumn, const T & inValue);
 
 private:
+    typedef std::vector<T> Data;
+    Data mData;
     std::size_t mRowCount;
     std::size_t mColumnCount;
 };
@@ -42,49 +41,49 @@ private:
 //
 // Inlines
 //
-template<class T, template <class> class Allocator>
-GenericGrid<T, Allocator>::GenericGrid(std::size_t inRowCount, std::size_t inColumnCount) :
-    Allocator<T>(inRowCount * inColumnCount),
+template<class T>
+GenericGrid<T>::GenericGrid(std::size_t inRowCount, std::size_t inColumnCount) :
+    mData(inRowCount * inColumnCount),
     mRowCount(inRowCount),
     mColumnCount(inColumnCount)
 {
 }
 
 
-template<class T, template <class> class Allocator>
-GenericGrid<T, Allocator>::GenericGrid(std::size_t inRowCount, std::size_t inColumnCount, const T & inInitialValue) :
-    Allocator<T>(inRowCount * inColumnCount, inInitialValue),
+template<class T>
+GenericGrid<T>::GenericGrid(std::size_t inRowCount, std::size_t inColumnCount, const T & inInitialValue) :
+    mData(inRowCount * inColumnCount, inInitialValue),
     mRowCount(inRowCount),
     mColumnCount(inColumnCount)
 {
 }
 
 
-template<class T, template <class> class Allocator>
-std::size_t GenericGrid<T, Allocator>::rowCount() const
+template<class T>
+std::size_t GenericGrid<T>::rowCount() const
 {
     return mRowCount;
 }
 
 
-template<class T, template <class> class Allocator>
-std::size_t GenericGrid<T, Allocator>::columnCount() const
+template<class T>
+std::size_t GenericGrid<T>::columnCount() const
 {
     return mColumnCount;
 }
 
 
-template<class T, template <class> class Allocator>
-const T & GenericGrid<T, Allocator>::get(std::size_t inRow, std::size_t inColumn) const
+template<class T>
+const T & GenericGrid<T>::get(std::size_t inRow, std::size_t inColumn) const
 {
-    return Allocator<T>::get(inRow * mColumnCount + inColumn);
+    return mData[inRow * mColumnCount + inColumn];
 }
 
 
-template<class T, template <class> class Allocator>
-void GenericGrid<T, Allocator>::set(std::size_t inRow, std::size_t inColumn, const T & inValue)
+template<class T>
+void GenericGrid<T>::set(std::size_t inRow, std::size_t inColumn, const T & inValue)
 {
-    Allocator<T>::set(inRow * mColumnCount + inColumn, inValue);
+    mData[inRow * mColumnCount + inColumn] = inValue;
 }
 
 
