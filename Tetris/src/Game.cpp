@@ -22,11 +22,11 @@ struct Game::Impl : public GameImpl::EventHandler
 {
     static Futile::ThreadSafe<GameImpl> CreateGame(PlayerType inPlayerType, std::size_t inRowCount, std::size_t inColumnCount)
     {
-        if (inPlayerType == Human)
+        if (inPlayerType == PlayerType_Human)
         {
             return HumanGame::Create(inRowCount, inColumnCount);
         }
-        else if (inPlayerType == Computer)
+        else if (inPlayerType == PlayerType_Computer)
         {
             return ComputerGame::Create(inRowCount, inColumnCount);
         }

@@ -78,8 +78,8 @@ void GameState::solidifyBlock(const Block & inBlock)
         {
             if (grid.get(r, c) != BlockType_Nil)
             {
-				std::size_t gridRow = inBlock.row() + r;
-				std::size_t gridCol = inBlock.column() + c;
+                std::size_t gridRow = inBlock.row() + r;
+                std::size_t gridCol = inBlock.column() + c;
                 mGrid.set(gridRow, gridCol, inBlock.type());
                 if (gridRow < mFirstOccupiedRow)
                 {
@@ -93,11 +93,11 @@ void GameState::solidifyBlock(const Block & inBlock)
 
 void GameState::clearLines()
 {
-	std::size_t numLines = 0;
-	int rowIndex = mOriginalBlock.row() + mOriginalBlock.rowCount() - 1;
+    std::size_t numLines = 0;
+    int rowIndex = mOriginalBlock.row() + mOriginalBlock.rowCount() - 1;
     for (; rowIndex >= static_cast<int>(mFirstOccupiedRow); --rowIndex)
     {
-		std::size_t colIndex = 0;
+        std::size_t colIndex = 0;
         bool line = true;
         for (; colIndex < mGrid.columnCount(); ++colIndex)
         {
@@ -229,9 +229,9 @@ const Block & GameState::originalBlock() const
 std::auto_ptr<GameState> GameState::commit(const Block & inBlock, GameOver inGameOver) const
 {
     std::auto_ptr<GameState> result(new GameState(*this));
-    result->mIsGameOver = inGameOver.get();
+    result->mIsGameOver = inGameOver;
     result->mTainted = false; // a new generation, a new start
-    if (!inGameOver.get())
+    if (!inGameOver)
     {
         result->solidifyBlock(inBlock);
     }

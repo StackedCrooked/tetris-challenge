@@ -21,6 +21,10 @@ class Model : public Futile::Singleton<Model>,
 public:
     bool IsGameOver();
 
+    std::size_t playerCount() const;
+
+    std::size_t computerPlayerCount() const;
+
     Player * getPlayer(std::size_t inIndex);
 
     const MultiplayerGame & multiplayerGame() const;

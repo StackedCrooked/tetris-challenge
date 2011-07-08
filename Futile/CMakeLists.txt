@@ -10,7 +10,6 @@ add_library(Futile
     include/Futile/AutoPtrSupport.h
     include/Futile/Boost.h
     include/Futile/Config.h
-    include/Futile/Enum.h
     include/Futile/GenericGrid.h
     include/Futile/LeakDetector.h
     include/Futile/Logger.h

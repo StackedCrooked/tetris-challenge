@@ -52,6 +52,11 @@ public:
         return mData.end();
     }
 
+    bool empty() const
+    {
+        return mData.empty();
+    }
+
     T * operator [] (typename Data::size_type inIndex)
     {
         return mData[inIndex];

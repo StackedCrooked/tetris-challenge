@@ -55,10 +55,10 @@ private:
 
 BlockImpl::BlockImpl(BlockType inType, Rotation inRotation, Row inRow, Column inColumn) :
     mType(inType),
-    mRotation(inRotation.get()),
-    mRow(inRow.get()),
-    mColumn(inColumn.get()),
-    mGrid(&GetGrid(GetBlockIdentifier(inType, inRotation.get())))
+    mRotation(inRotation),
+    mRow(inRow),
+    mColumn(inColumn),
+    mGrid(&GetGrid(GetBlockIdentifier(inType, inRotation)))
 {
     Assert(mRotation >= 0 && mRotation <= 3);
 }

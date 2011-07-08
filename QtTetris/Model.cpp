@@ -48,6 +48,27 @@ bool Model::IsGameOver()
 }
 
 
+std::size_t Model::playerCount() const
+{
+    return mMultiplayerGame->playerCount();
+}
+
+
+std::size_t Model::computerPlayerCount() const
+{
+    std::size_t result = 0;
+    for (std::size_t idx = 0; idx < playerCount(); ++idx)
+    {
+        Player * player = mMultiplayerGame->getPlayer(idx);
+        if (player->type() == PlayerType_Computer)
+        {
+            result++;
+        }
+    }
+    return result;
+}
+
+
 Player * Model::getPlayer(std::size_t inIndex)
 {
     return mMultiplayerGame->getPlayer(inIndex);
@@ -84,10 +105,23 @@ const Evaluator & Model::updateAIParameters(const Player & inPlayer,
 
     const Game & game = *inPlayer.simpleGame();
 
-    outWorkerCount = Poco::Environment::processorCount();
-    if (outWorkerCount > 1)
+    if (mMultiplayerGame)
     {
-        outWorkerCount /= 2;
+        std::size_t numComputerPlayers = computerPlayerCount();
+        if (numComputerPlayers == 0)
+        {
+            numComputerPlayers = 1;
+        }
+
+        outWorkerCount = Poco::Environment::processorCount() / numComputerPlayers;
+        if (outWorkerCount == 0)
+        {
+            outWorkerCount = 1;
+        }
+    }
+    else
+    {
+        outWorkerCount = 1;
     }
 
     int currentHeight = game.stats().currentHeight();
@@ -104,17 +138,11 @@ const Evaluator & Model::updateAIParameters(const Player & inPlayer,
 
 
     // Tactics adjustment
-    if (currentHeight < 8)
+    if (currentHeight < 10)
     {
-        outSearchDepth = 6;
-        outSearchWidth = 6;
-        return MakeTetrises::Instance();
-    }
-    else if (currentHeight < 14)
-    {
-        outSearchDepth = 5;
+        outSearchDepth = 8;
         outSearchWidth = 5;
-        return Multiplayer::Instance();
+        return MakeTetrises::Instance();
     }
     else
     {
@@ -133,7 +161,7 @@ void Model::newGame(const PlayerTypes & inPlayerTypes, std::size_t inRowCount, s
     bool allComputer = true;
     for (PlayerTypes::size_type idx = 0; idx < inPlayerTypes.size(); ++idx)
     {
-        if (inPlayerTypes[idx] != Computer)
+        if (inPlayerTypes[idx] != PlayerType_Computer)
         {
             allComputer = false;
             break;
@@ -150,12 +178,12 @@ void Model::newGame(const PlayerTypes & inPlayerTypes, std::size_t inRowCount, s
 
         Player * player(0);
         PlayerType playerType = inPlayerTypes[idx];
-        if (playerType == Human)
+        if (playerType == PlayerType_Human)
         {
             player = mMultiplayerGame->addHumanPlayer(TeamName(teamName),
                                                       PlayerName(GetPlayerName(inPlayerTypes[idx])));
         }
-        else if (playerType == Computer)
+        else if (playerType == PlayerType_Computer)
         {
             player = mMultiplayerGame->addComputerPlayer(TeamName(teamName),
                                                          PlayerName(GetPlayerName(inPlayerTypes[idx])),
@@ -181,7 +209,7 @@ std::string Model::GetHumanPlayerName()
 
 std::string Model::GetPlayerName(PlayerType inPlayerType)
 {
-    if (inPlayerType == Human)
+    if (inPlayerType == PlayerType_Human)
     {
         if (mHumanName.empty())
         {

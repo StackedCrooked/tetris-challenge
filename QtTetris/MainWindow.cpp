@@ -73,7 +73,7 @@ MainWindow::MainWindow(QWidget *parent) :
     mTetrisWidgets(),
     mSpacing(12),
     mLogField(0),
-    mShowLog(true),
+    mShowLog(false),
     mGameOver(false)
 {
     setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum));
@@ -182,7 +182,7 @@ void MainWindow::onNewGame(const PlayerTypes & inPlayerTypes)
         TetrisWidget * tetrisWidget = mTetrisWidgets[idx];
         tetrisWidget->setPlayer(player);
         tetrisWidget->show();
-        if (player->type() == Human)
+        if (player->type() == PlayerType_Human)
         {
             tetrisWidget->setFocus();
         }
@@ -220,7 +220,7 @@ void MainWindow::onNew()
 void MainWindow::onNewSingleHumanPlayerGame()
 {
     PlayerTypes playerTypes;
-    playerTypes.push_back(Human);
+    playerTypes.push_back(PlayerType_Human);
     onNewGame(playerTypes);
 }
 
@@ -228,7 +228,7 @@ void MainWindow::onNewSingleHumanPlayerGame()
 void MainWindow::onNewSingleComputerPlayerGame()
 {
     PlayerTypes playerTypes;
-    playerTypes.push_back(Computer);
+    playerTypes.push_back(PlayerType_Computer);
     onNewGame(playerTypes);
 }
 
@@ -236,8 +236,8 @@ void MainWindow::onNewSingleComputerPlayerGame()
 void MainWindow::onNewHumanVsComputerGame()
 {
     PlayerTypes playerTypes;
-    playerTypes.push_back(Human);
-    playerTypes.push_back(Computer);
+    playerTypes.push_back(PlayerType_Human);
+    playerTypes.push_back(PlayerType_Computer);
     onNewGame(playerTypes);
 }
 
@@ -245,8 +245,8 @@ void MainWindow::onNewHumanVsComputerGame()
 void MainWindow::onNewComputerVsComputerGame()
 {
     PlayerTypes playerTypes;
-    playerTypes.push_back(Computer);
-    playerTypes.push_back(Computer);
+    playerTypes.push_back(PlayerType_Computer);
+    playerTypes.push_back(PlayerType_Computer);
     onNewGame(playerTypes);
 }
 
@@ -254,10 +254,10 @@ void MainWindow::onNewComputerVsComputerGame()
 void MainWindow::on2v2Game()
 {
     PlayerTypes playerTypes;
-    playerTypes.push_back(Human);
-    playerTypes.push_back(Computer);
-    playerTypes.push_back(Computer);
-    playerTypes.push_back(Computer);
+    playerTypes.push_back(PlayerType_Human);
+    playerTypes.push_back(PlayerType_Computer);
+    playerTypes.push_back(PlayerType_Computer);
+    playerTypes.push_back(PlayerType_Computer);
     onNewGame(playerTypes);
 
 }

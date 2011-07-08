@@ -20,17 +20,12 @@
  *     // Signature is: 'SetSize(Width width, Height height);'
  *     SetSize(height, width); // => compiler error
  */
-#define Futile_TypedWrapper(ClassName, WrappedType)                           \
-    class ClassName                                                           \
-    {                                                                         \
-    public:                                                                   \
-        explicit ClassName(WrappedType inValue) : mValue(inValue) {}          \
-        WrappedType get() const                                               \
-        { return mValue; }                                                    \
-        operator WrappedType() const                                          \
-        { return mValue; }                                                    \
-    private:                                                                  \
-        WrappedType mValue;                                                   \
+#define Futile_TypedWrapper(ClassName, Type)     \
+    struct ClassName {                           \
+        explicit ClassName(Type inValue) :       \
+            mValue(inValue) {}                   \
+        operator Type() const { return mValue; } \
+        Type mValue;                             \
     } // semi-colon must be typed when calling the macro
 
 
