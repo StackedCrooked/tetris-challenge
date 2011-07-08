@@ -12,13 +12,7 @@ namespace Futile {
 
 
 /**
- * This singleton implementation requires the user to declare a ScopedInitializer object
- * to create the actual instance and define the lifetime scope of the object. This can
- * be done at the beginning of the application's main function.
- *
- * This approach sacrifices lazy instantiation in favor of deterministic lifetime of the
- * singleton object. I think this design is more congruent with the C++ way of doing
- * things.
+ * Singleton implementation with deterministic lifetime and non-lazy instantiation.
  */
 template<class T>
 class Singleton
