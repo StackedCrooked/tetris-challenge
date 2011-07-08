@@ -97,7 +97,6 @@
   <ItemGroup>
     <ClInclude Include="include\Tetris\AbstractWidget.h" />
     <ClInclude Include="include\Tetris\AISupport.h" />
-    <ClInclude Include="include\Tetris\Allocator.h" />
     <ClInclude Include="include\Tetris\Array.h" />
     <ClInclude Include="include\Tetris\Assert.h" />
     <ClInclude Include="include\Tetris\AutoPtrSupport.h" />

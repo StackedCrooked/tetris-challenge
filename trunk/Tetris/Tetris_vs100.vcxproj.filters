@@ -114,9 +114,6 @@
     <ClInclude Include="include\Tetris\AISupport.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Tetris\Allocator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Tetris\Array.h">
       <Filter>Header Files</Filter>
     </ClInclude>

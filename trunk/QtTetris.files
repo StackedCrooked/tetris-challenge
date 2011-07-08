@@ -1,6 +1,5 @@
 configure
 Futile/CMakeLists.txt
-Futile/include/Futile/Allocator.h
 Futile/include/Futile/Array.h
 Futile/include/Futile/Assert.h
 Futile/include/Futile/AutoPtrSupport.h
