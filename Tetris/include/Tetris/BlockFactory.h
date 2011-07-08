@@ -46,7 +46,7 @@ private:
     BlockFactory& operator=(const BlockFactory&);
 
     struct Impl;
-    Futile::ThreadSafe<Impl> mThreadSafeImpl;
+    boost::scoped_ptr<Impl> mImpl;
 };
 
 

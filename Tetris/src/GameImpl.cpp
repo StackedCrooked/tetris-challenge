@@ -62,6 +62,7 @@ GameImpl::GameImpl(std::size_t inNumRows, std::size_t inNumColumns) :
     mNumColumns(inNumColumns),
     mActiveBlock(),
     mBlockFactory(new BlockFactory),
+    mGarbageFactory(new BlockFactory),
     mBlocks(),
     mFutureBlocksCount(3),
     mCurrentBlockIndex(0),
@@ -198,7 +199,6 @@ std::vector<BlockType> GameImpl::getGarbageRow() const
     fSeed = (fSeed + 1) % Poco::UInt32(-1);
     Poco::Random rand;
     rand.seed(fSeed);
-    BlockFactory blockFactory(1);
 
     static const int cMinCount = 4;
     static const int cMaxCount = 8;
@@ -209,7 +209,7 @@ std::vector<BlockType> GameImpl::getGarbageRow() const
         {
             if (result[idx] == BlockType_Nil && rand.nextBool())
             {
-                result[idx] = blockFactory.getNext();
+                result[idx] = mGarbageFactory->getNext();
                 if (++count >= cMaxCount)
                 {
                     break;

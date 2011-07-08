@@ -150,6 +150,7 @@ protected:
     std::size_t mNumColumns;
     boost::scoped_ptr<Block> mActiveBlock;
     boost::scoped_ptr<BlockFactory> mBlockFactory;
+    boost::scoped_ptr<BlockFactory> mGarbageFactory;
     BlockTypes mBlocks;
     int mFutureBlocksCount;
     std::size_t mCurrentBlockIndex;
