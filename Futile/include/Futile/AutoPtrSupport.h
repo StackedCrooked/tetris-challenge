@@ -24,31 +24,31 @@ std::auto_ptr<T> Create()
 }
 
 template<class T, class Arg0>
-std::auto_ptr<T> Create(Arg0 arg0)
+std::auto_ptr<T> Create(const Arg0 & arg0)
 {
     return std::auto_ptr<T>(new T(arg0));
 }
 
 template<class T, class Arg0, class Arg1>
-std::auto_ptr<T> Create(Arg0 arg0, Arg1 arg1)
+std::auto_ptr<T> Create(const Arg0 & arg0, const Arg1 & arg1)
 {
     return std::auto_ptr<T>(new T(arg0, arg1));
 }
 
 template<class T, class Arg0, class Arg1, class Arg2>
-std::auto_ptr<T> Create(Arg0 arg0, Arg1 arg1, Arg2 arg2)
+std::auto_ptr<T> Create(const Arg0 & arg0, const Arg1 & arg1, const Arg2 & arg2)
 {
     return std::auto_ptr<T>(new T(arg0, arg1, arg2));
 }
 
 template<class T, class Arg0, class Arg1, class Arg2, class Arg3>
-std::auto_ptr<T> Create(Arg0 arg0, Arg1 arg1, Arg2 arg2, Arg3 arg3)
+std::auto_ptr<T> Create(const Arg0 & arg0, const Arg1 & arg1, const Arg2 & arg2, const Arg3 & arg3)
 {
     return std::auto_ptr<T>(new T(arg0, arg1, arg2, arg3));
 }
 
 template<class T, class Arg0, class Arg1, class Arg2, class Arg3, class Arg4>
-std::auto_ptr<T> Create(Arg0 arg0, Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4)
+std::auto_ptr<T> Create(const Arg0 & arg0, const Arg1 & arg1, const Arg2 & arg2, const Arg3 & arg3, const Arg4 & arg4)
 {
     return std::auto_ptr<T>(new T(arg0, arg1, arg2, arg3, arg4));
 }
@@ -69,32 +69,32 @@ std::auto_ptr<T> CreatePoly()
 }
 
 template<class T, class U, class Arg0>
-std::auto_ptr<T> CreatePoly(Arg0 arg0)
+std::auto_ptr<T> CreatePoly(const Arg0 & arg0)
 {
     return std::auto_ptr<T>(new U(arg0));
 }
 
 template<class T, class U, class Arg0, class Arg1>
-std::auto_ptr<T> CreatePoly(Arg0 arg0, Arg1 arg1)
+std::auto_ptr<T> CreatePoly(const Arg0 & arg0, const Arg1 & arg1)
 {
     return std::auto_ptr<T>(new U(arg0, arg1));
 }
 
 template<class T, class U, class Arg0, class Arg1, class Arg2>
-std::auto_ptr<T> CreatePoly(Arg0 arg0, Arg1 arg1, Arg2 arg2)
+std::auto_ptr<T> CreatePoly(const Arg0 & arg0, const Arg1 & arg1, const Arg2 & arg2)
 {
     return std::auto_ptr<T>(new U(arg0, arg1, arg2));
 }
 
 template<class T, class U, class Arg0, class Arg1, class Arg2, class Arg3>
-std::auto_ptr<T> CreatePoly(Arg0 arg0, Arg1 arg1, Arg2 arg2, Arg3 arg3)
+std::auto_ptr<T> CreatePoly(const Arg0 & arg0, const Arg1 & arg1, const Arg2 & arg2, const Arg3 & arg3)
 {
     return std::auto_ptr<T>(new U(arg0, arg1, arg2, arg3));
 }
 
 
 template<class T, class U, class Arg0, class Arg1, class Arg2, class Arg3, class Arg4>
-std::auto_ptr<T> CreatePoly(Arg0 arg0, Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4)
+std::auto_ptr<T> CreatePoly(const Arg0 & arg0, const Arg1 & arg1, const Arg2 & arg2, const Arg3 & arg3, const Arg4 & arg4)
 {
     return std::auto_ptr<T>(new U(arg0, arg1, arg2, arg3, arg4));
 }
