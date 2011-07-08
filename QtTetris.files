@@ -18,7 +18,6 @@ Futile/include/Futile/Threading.h
 Futile/include/Futile/TypedWrapper.h
 Futile/include/Futile/Worker.h
 Futile/include/Futile/WorkerPool.h
-Futile/src/Enum.cpp
 Futile/src/LeakDetector.cpp
 Futile/src/Logger.cpp
 Futile/src/Logging.cpp
