@@ -19,7 +19,9 @@ enum LogLevel
     LogLevel_Error
 };
 
-std::string ToString(LogLevel inLogLevel);
+
+std::string ConvertLogLevelToString(LogLevel inLogLevel);
+
 
 class Logger : public Singleton<Logger>
 {

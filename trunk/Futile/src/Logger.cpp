@@ -6,7 +6,7 @@
 namespace Futile {
 
 
-std::string ToString(LogLevel inLogLevel)
+std::string ConvertLogLevelToString(LogLevel inLogLevel)
 {
     switch (inLogLevel)
     {
@@ -32,7 +32,7 @@ std::string ToString(LogLevel inLogLevel)
 
 std::string GetMessage(LogLevel inLogLevel, const std::string & inMessage)
 {
-    return ToString(inLogLevel) + ": " + inMessage;
+    return ConvertLogLevelToString(inLogLevel) + ": " + inMessage;
 }
 
 
