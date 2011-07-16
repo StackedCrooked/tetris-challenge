@@ -1,17 +1,23 @@
 #include "Model.h"
+#include "Futile/Assert.h"
 #include "Futile/AutoPtrSupport.h"
+#include "Futile/Logging.h"
 #include "Poco/Environment.h"
 
 
-namespace Tetris {
+namespace QtTetris {
+
+
+using namespace Futile;
 
 
 Model::Model() :
+    mQuit(false),
     mNames(),
     mNamesIndex(0),
     mHumanName(),
     mCPUCount(Poco::Environment::processorCount()),
-    mGameOver(true)
+    mGameOver(true)    
 {
     mNames.push_back("Luffy");
     mNames.push_back("Zoro");
@@ -25,6 +31,14 @@ Model::Model() :
 
 Model::~Model()
 {
+    Assert(mQuit);
+}
+
+
+void Model::quit()
+{
+    mMultiplayerGame.reset();
+    mQuit = true;
 }
 
 
@@ -225,4 +239,4 @@ std::string Model::GetPlayerName(PlayerType inPlayerType)
 }
 
 
-} // namespace Tetris
+} // namespace QtTetris
