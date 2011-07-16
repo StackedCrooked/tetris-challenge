@@ -27,7 +27,7 @@
 			<Tool
 				Name="VCPreBuildEventTool"
 				Description="Checkout libs"
-				CommandLine="echo &quot;Checkout boost libs.&quot;&#x0D;&#x0A;cd &quot;$(SolutionDir)3rdParty\Boost_1_42_0\lib&quot;&#x0D;&#x0A;CheckoutLibs.bat&#x0D;&#x0A;&#x0D;&#x0A;echo &quot;Checkout Poco libs.&quot;&#x0D;&#x0A;cd &quot;$(SolutionDir)3rdParty\Poco_1_3_6_p2\lib&quot;&#x0D;&#x0A;CheckoutLibs.bat&#x0D;&#x0A;"
+				CommandLine="cd &quot;$(SolutionDir)3rdParty\Boost_1_42_0\lib&quot;&#x0D;&#x0A;CheckoutLibs.bat&#x0D;&#x0A;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
