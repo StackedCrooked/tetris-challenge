@@ -9,9 +9,9 @@
 #include <stdexcept>
 
 
-using Futile::Logger;
-using Futile::LeakDetector;
-using Futile::MainThread;
+using namespace Futile;
+using namespace Tetris;
+using namespace QtTetris;
 
 
 int Tetris_RowCount()
@@ -38,28 +38,67 @@ int Tetris_GetSquareHeight()
 }
 
 
-int run(int argc, char *argv[])
+enum Error
 {
-    QApplication a(argc, argv);
-    a.setApplicationName("QtTetris");
-    a.setApplicationVersion("0.0 alpha");
+    Error_None,
+    Error_MainScope,
+    Error_ModelScope,
+    Error_ViewScope
+};
 
-    MainWindow::ScopedInitializer initMainWindow;
-    MainWindow::Instance().show();
 
-    return a.exec();
+// EnterViewScope creates the view scope.
+int EnterViewScope(int argc, char *argv[], Model & model)
+{
+    int result = Error_ViewScope;
+    try
+    {
+        QApplication a(argc, argv);
+        a.setApplicationName("QtTetris");
+        a.setApplicationVersion("0.0 alpha");
+        a.setActiveWindow(new MainWindow(NULL, model));
+        a.activeWindow()->show();
+        result = a.exec();
+    }
+    catch (const std::exception & exc)
+    {
+        std::cerr << "Exception caught from Qt application: " << exc.what() << std::endl;
+    }
+    return result;
+}
+
+
+// EnterModelScope creates the model scope.
+int EnterModelScope(int argc, char * argv[])
+{
+    int result = Error_ModelScope;    
+    try
+    {
+        Model model;
+        int err = EnterViewScope(argc, argv, model);
+        model.quit();
+        result = err;
+    }
+    catch (const std::exception & exc)
+    {
+        std::cerr << "Exception caught from Tetris application: " << exc.what() << std::endl;
+    }
+    return result;
 }
 
 
 int main(int argc, char *argv[])
 {
+    int result = Error_MainScope;
     try
     {
+        // Define the lifetime scope for the singleton objects.
         Logger::ScopedInitializer initLogger;
         LeakDetector::ScopedInitializer initLeakDetector;
         MainThread::ScopedInitializer initMainThread;
-        Tetris::Model::ScopedInitializer initModel;
-        return run(argc, argv);
+
+        // Enter application scope.
+        result = EnterModelScope(argc, argv);
     }
     catch (const std::exception & exc)
     {
@@ -69,5 +108,5 @@ int main(int argc, char *argv[])
     {
         std::cerr << "Anonymous exception caught in main. Exiting program." << std::endl;
     }
-    return 1;
+    return result;
 }

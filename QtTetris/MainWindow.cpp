@@ -21,26 +21,16 @@
 #include <sstream>
 
 
-using Futile::Create;
-using Futile::CreatePoly;
-using Futile::LogError;
-using Futile::LogInfo;
-using Futile::Logger;
-using Futile::MakeString;
-using Futile::Str;
-using Futile::Singleton;
-
-
-using namespace Tetris;
-
-
 int Tetris_RowCount();
 int Tetris_ColumnCount();
 int Tetris_GetSquareWidth();
 int Tetris_GetSquareHeight();
 
 
-typedef Futile::Boost::shared_ptr<Game> GamePtr;
+namespace QtTetris {
+
+
+using namespace Futile;
 
 
 void MainWindow::onTimerEvent()
@@ -67,8 +57,9 @@ void MainWindow::timerEvent()
 }
 
 
-MainWindow::MainWindow(QWidget *parent) :
+MainWindow::MainWindow(QWidget *parent, Model & inModel) :
     QMainWindow(parent),
+    mModel(inModel),
     mTetrisWidgetHolder(0),
     mTetrisWidgets(),
     mSpacing(12),
@@ -79,15 +70,18 @@ MainWindow::MainWindow(QWidget *parent) :
     setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum));
     setWindowTitle("QtTetris");
 
-    QMenu * tetrisMenu = menuBar()->addMenu("Tetris");
-    QAction * newGame = tetrisMenu->addAction("New");
-    newGame->setShortcut(QKeySequence("Ctrl+N"));
+    QMenu * tetrisMenu = menuBar()->addMenu("&Tetris");
 
+    QAction * newGame = tetrisMenu->addAction("&New");
+    newGame->setShortcut(QKeySequence("Ctrl+N"));
     connect(newGame, SIGNAL(triggered()), this, SLOT(onNew()));
 
-    QAction * pauseGame = tetrisMenu->addAction("Pause");
-    connect(pauseGame, SIGNAL(triggered()), this, SLOT(onPaused()));
+    QAction * pauseGame = tetrisMenu->addAction("&Pause");
     pauseGame->setShortcut(QKeySequence("Ctrl+P"));
+    connect(pauseGame, SIGNAL(triggered()), this, SLOT(onPaused()));
+
+    QAction * quitGame = tetrisMenu->addAction("E&xit");
+    connect(quitGame, SIGNAL(triggered()), this, SLOT(onExit()));
 
     QWidget * theCentralWidget(new QWidget);
     setCentralWidget(theCentralWidget);
@@ -172,10 +166,10 @@ void MainWindow::onNewGame(const PlayerTypes & inPlayerTypes)
     }
 
     // Reset the game.
-    Model::Instance().newGame(inPlayerTypes, Tetris_RowCount(), Tetris_ColumnCount());
+    mModel.newGame(inPlayerTypes, Tetris_RowCount(), Tetris_ColumnCount());
 
     // Add the players.
-    MultiplayerGame & mgame = Model::Instance().multiplayerGame();
+    MultiplayerGame & mgame = mModel.multiplayerGame();
     for (std::size_t idx = 0; idx < mgame.playerCount(); ++idx)
     {
         Player * player = mgame.getPlayer(idx);
@@ -265,7 +259,7 @@ void MainWindow::on2v2Game()
 
 void MainWindow::onPaused()
 {
-    MultiplayerGame & mgame = Model::Instance().multiplayerGame();
+    MultiplayerGame & mgame = mModel.multiplayerGame();
     for (std::size_t idx = 0; idx < mgame.playerCount(); ++idx)
     {
         Player * player = mgame.getPlayer(idx);
@@ -277,7 +271,7 @@ void MainWindow::onPaused()
 
 void MainWindow::onPenalty()
 {
-    MultiplayerGame & mgame = Model::Instance().multiplayerGame();
+    MultiplayerGame & mgame = mModel.multiplayerGame();
     for (std::size_t idx = 0; idx < mgame.playerCount(); ++idx)
     {
         Player * player = mgame.getPlayer(idx);
@@ -285,3 +279,12 @@ void MainWindow::onPenalty()
         break;
     }
 }
+
+
+void MainWindow::onExit()
+{
+    close();
+}
+
+
+} // namespace QtTetris

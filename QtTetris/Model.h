@@ -7,18 +7,29 @@
 #include "Tetris/Evaluator.h"
 #include "Tetris/MultiplayerGame.h"
 #include "Tetris/Player.h"
-#include "Futile/Singleton.h"
 #include <string>
 #include <vector>
 
 
-namespace Tetris {
+namespace QtTetris {
 
 
-class Model : public Futile::Singleton<Model>,
-              public ComputerPlayer::Tweaker
+using namespace Tetris;
+
+
+class Model;
+typedef boost::shared_ptr<Model> ModelPtr;
+
+
+class Model : public ComputerPlayer::Tweaker
 {
 public:
+    Model();
+
+    ~Model();
+
+    void quit();
+
     bool IsGameOver();
 
     std::size_t playerCount() const;
@@ -41,11 +52,6 @@ public:
     void newGame(const PlayerTypes & inPlayerTypes, std::size_t inRowCount, std::size_t inColumnCount);
 
 private:
-    friend class Futile::Singleton<Model>;
-
-    Model();
-
-    ~Model();
 
     std::string GetHumanPlayerName();
 
@@ -57,13 +63,14 @@ private:
     Names mNames;
     Names::size_type mNamesIndex;
 
+    bool mQuit;
     std::string mHumanName;
     int mCPUCount;
     bool mGameOver;
 };
 
 
-} // namespace Tetris
+} // namespace QtTetris
 
 
 #endif // QTTETRIS_MODEL_H

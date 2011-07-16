@@ -9,17 +9,24 @@
 #include "Tetris/MultiplayerGame.h"
 #include "Tetris/Player.h"
 #include "Tetris/PlayerType.h"
-#include "Futile/Singleton.h"
 #include "Poco/Stopwatch.h"
 #include <boost/scoped_ptr.hpp>
 
 
-class MainWindow : public QMainWindow,
-                   public Futile::Singleton<MainWindow>
+namespace QtTetris {
+
+
+using namespace Tetris;
+
+
+class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
+    MainWindow(QWidget * inParent, Model & inModel);
+
+    ~MainWindow();
 
     virtual bool event(QEvent * inEvent);
 
@@ -45,20 +52,17 @@ private slots:
 
     void onPenalty();
 
+    void onExit();
+
     void onTimerEvent();
 
 private:
-    friend class Futile::Singleton<MainWindow>;
-
-    MainWindow(QWidget *parent = 0);
-
-    ~MainWindow();
-
     void onNewGame(const Tetris::PlayerTypes & inPlayerTypes);
 
     void timerEvent();
 
 private:
+    Model & mModel;
     typedef std::vector<TetrisWidget *> TetrisWidgets;
     QHBoxLayout * mTetrisWidgetHolder;
     TetrisWidgets mTetrisWidgets;
@@ -66,8 +70,10 @@ private:
     QTextEdit * mLogField;
     bool mShowLog;
     bool mGameOver;
-    Poco::Stopwatch mStopwatch;
 };
+
+
+} // namespace QtTetris
 
 
 #endif // MAINWINDOW_H
