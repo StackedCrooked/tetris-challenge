@@ -60,7 +60,7 @@ BlockImpl::BlockImpl(BlockType inType, Rotation inRotation, Row inRow, Column in
     mColumn(inColumn),
     mGrid(&GetGrid(GetBlockIdentifier(inType, inRotation)))
 {
-    Assert(mRotation >= 0 && mRotation <= 3);
+    Assert(mRotation <= 3);
 }
 
 
