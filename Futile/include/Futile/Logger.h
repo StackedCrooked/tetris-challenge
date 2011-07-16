@@ -32,7 +32,7 @@ public:
 
     void log(LogLevel inLogLevel, const std::string & inMessage);
 
-    // Messages posted from worker threads are stored in a queue.
+    // MessageList posted from worker threads are stored in a queue.
     // The actual logging is delayed until:
     //   - a log message is posted from the main thread
     //   - flush() is called
@@ -51,8 +51,8 @@ private:
     void logImpl(const std::string & inMessage);
 
     LogHandler mHandler;
-    typedef std::vector<std::string> Queue;
-    ThreadSafe<Queue> mProtectedQueue;
+    typedef std::vector<std::string> MessageList;
+    ThreadSafe<MessageList> mMessageList;
 };
 
 

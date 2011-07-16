@@ -124,7 +124,7 @@ const Evaluator & Model::updateAIParameters(const Player & inPlayer,
         std::size_t numComputerPlayers = computerPlayerCount();
         if (numComputerPlayers == 0)
         {
-            numComputerPlayers = 1;
+            throw std::logic_error("Model::updateAIParameters: There are no computer players.");
         }
 
         outWorkerCount = Poco::Environment::processorCount() / numComputerPlayers;
@@ -154,8 +154,8 @@ const Evaluator & Model::updateAIParameters(const Player & inPlayer,
     // Tactics adjustment
     if (currentHeight < 10)
     {
-        outSearchDepth = 8;
-        outSearchWidth = 5;
+        outSearchDepth = 6;
+        outSearchWidth = 6;
         return MakeTetrises::Instance();
     }
     else
@@ -189,19 +189,21 @@ void Model::newGame(const PlayerTypes & inPlayerTypes, std::size_t inRowCount, s
         {
             teamName = "Team 2";
         }
-
-        Player * player(0);
+        
         PlayerType playerType = inPlayerTypes[idx];
         if (playerType == PlayerType_Human)
         {
-            player = mMultiplayerGame->addHumanPlayer(TeamName(teamName),
-                                                      PlayerName(GetPlayerName(inPlayerTypes[idx])));
+            mMultiplayerGame->addHumanPlayer(
+                TeamName(teamName),
+                PlayerName(GetPlayerName(inPlayerTypes[idx])));
         }
         else if (playerType == PlayerType_Computer)
         {
-            player = mMultiplayerGame->addComputerPlayer(TeamName(teamName),
-                                                         PlayerName(GetPlayerName(inPlayerTypes[idx])),
-                                                         this);
+            Player * player = mMultiplayerGame->addComputerPlayer(
+                TeamName(teamName),
+                PlayerName(GetPlayerName(inPlayerTypes[idx])),
+                this);
+
             if (ComputerPlayer * computerPlayer = dynamic_cast<ComputerPlayer*>(player))
             {
                 computerPlayer->setMoveSpeed(allComputer ? 60 : 20);

@@ -1,5 +1,7 @@
 #include "Futile/Config.h"
 #include "Futile/Logger.h"
+#include <boost/bind.hpp>
+#include <algorithm>
 #include <stdexcept>
 
 
@@ -45,42 +47,23 @@ void Logger::setLogHandler(const LogHandler & inHandler)
 void Logger::flush()
 {
     std::vector<std::string> items;
-    items.reserve(100);
 
-
-    // Since the logging can be a slow operation we don't keep the Game object locked heere.
-    // We just copy the items, and log them afterwards.
+    // We don't want to perform the logging during the lock.
+    // Therefore we make a local copy of the messages.
+    FUTILE_LOCK(MessageList & messageList, mMessageList)
     {
-        Locker<Queue> queue(mProtectedQueue);
-        for (std::size_t idx = 0; idx != queue->size(); ++idx)
-        {
-            items.push_back((*queue.get())[idx]);
-        }
-        queue->clear();
+        items = messageList;
+        messageList.clear();
     }
 
-
-    // Ok, the game object is unlocked again. We can log the items here.
-    for (std::size_t idx = 0; idx != items.size(); ++idx)
-    {
-        logImpl(items[idx]);
-    }
-}
-
-
-void Logger::logImpl(const std::string & inMessage)
-{
-    if (mHandler)
-    {
-        mHandler(inMessage);
-    }
+    // Do the actual logging.
+    std::for_each(items.begin(), items.end(), mHandler);
 }
 
 
 void Logger::log(LogLevel inLogLevel, const std::string & inMessage)
 {
-    Locker<Queue> queue(mProtectedQueue);
-    queue->push_back(GetMessage(inLogLevel, inMessage));
+    mMessageList.lock()->push_back(GetMessage(inLogLevel, inMessage));
 }
 
 
