@@ -17,10 +17,7 @@
 #include <iostream>
 
 
-using Futile::MakeString;
-using Futile::WorkerPool;
-
-
+using namespace Futile;
 using namespace Tetris;
 
 
@@ -52,8 +49,9 @@ void NodeCalculatorTest::testNodeCalculator()
     {
         for (size_t workerCount = 1; workerCount < 12; ++workerCount)
         {
+            Worker mainWorker("Main Worker");
             WorkerPool workerPool("NodeCalculatorTest", workerCount);
-            testDestroy(workerPool);
+            testDestroy(mainWorker, workerPool);
         }
     }
 	
@@ -91,9 +89,10 @@ void NodeCalculatorTest::testInterrupt(Depth inDepth, Width inWidth, WorkerCount
 
     std::vector<int> widths(inDepth, inWidth);
 
-    WorkerPool workerPool("NodeCalculatorTest", inWorkerCount);
+    WorkerPool workerPool("Worker Pool", inWorkerCount);
+    Worker mainWorker("Main Worker");
 
-    NodeCalculator nodeCalculator(rootNode->clone(), blockTypes, widths, rootNode->evaluator(), workerPool);
+    NodeCalculator nodeCalculator(rootNode->clone(), blockTypes, widths, rootNode->evaluator(), mainWorker, workerPool);
 
     Assert(nodeCalculator.getCurrentSearchDepth() == 0);
     Assert(blockTypes.size() == widths.size());
@@ -150,7 +149,7 @@ void NodeCalculatorTest::testInterrupt(Depth inDepth, Width inWidth, WorkerCount
 }
 
 
-void NodeCalculatorTest::testDestroy(WorkerPool & inWorkerPool)
+void NodeCalculatorTest::testDestroy(Worker & inMainWorker, WorkerPool & inWorkerPool)
 {
     const int cWidth = 6;
     const int cDepth = 6;
@@ -166,7 +165,7 @@ void NodeCalculatorTest::testDestroy(WorkerPool & inWorkerPool)
 
     std::vector<int> widths(cDepth, cWidth);
 
-    NodeCalculator nodeCalculator(rootNode->clone(), blockTypes, widths, rootNode->evaluator(), inWorkerPool);
+    NodeCalculator nodeCalculator(rootNode->clone(), blockTypes, widths, rootNode->evaluator(), inMainWorker, inWorkerPool);
 
     Assert(nodeCalculator.getCurrentSearchDepth() == 0);
     Assert(blockTypes.size() == widths.size());

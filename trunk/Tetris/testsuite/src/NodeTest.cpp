@@ -6,6 +6,10 @@
 #include <iostream>
 
 
+using Futile::GenericNode;
+using Futile::HasCycles;
+
+
 NodeTest::NodeTest(const std::string & inName):
     CppUnit::TestCase(inName)
 {
