@@ -2,9 +2,6 @@
 #define NODECALCULATORTEST_H_INCLUDED
 
 
-#define TETRIS_ALWAYS_ASSERT
-
-
 #include "CppUnit/TestCase.h"
 #include "Futile/TypedWrapper.h"
 #include "Futile/WorkerPool.h"
