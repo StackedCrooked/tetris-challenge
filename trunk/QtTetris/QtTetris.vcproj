@@ -26,8 +26,6 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				Description="Checkout libs"
-				CommandLine="cd &quot;$(SolutionDir)3rdParty\Boost\lib&quot;&#x0D;&#x0A;CheckoutLibs.bat&#x0D;&#x0A;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -71,7 +69,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libboost_thread-vc90-mt-1_42.lib qtmain.lib QtCore4.lib QtGui4.lib iphlpapi.lib"
+				AdditionalDependencies="libboost_thread.lib qtmain.lib QtCore4.lib QtGui4.lib iphlpapi.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				AdditionalLibraryDirectories="&quot;$(QTDIR)\lib&quot;;&quot;$(SolutionDir)3rdParty\Boost\lib\Windows\x86\vc90&quot;"
 				SubSystem="2"
@@ -108,8 +106,6 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				Description="Checkout libs"
-				CommandLine="cd &quot;$(SolutionDir)3rdParty\Boost\lib&quot;&#x0D;&#x0A;CheckoutLibs.bat&#x0D;&#x0A;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -150,7 +146,7 @@
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="true"
 				UseLibraryDependencyInputs="false"
-				AdditionalDependencies="libboost_thread-vc90-mt-gd-1_42.lib qtmaind.lib QtCored4.lib QtGuid4.lib iphlpapi.lib"
+				AdditionalDependencies="libboost_thread.lib qtmaind.lib QtCored4.lib QtGuid4.lib iphlpapi.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				AdditionalLibraryDirectories="&quot;$(QTDIR)\lib&quot;;&quot;$(SolutionDir)3rdParty\Boost\lib\Windows\x86\vc90&quot;"
 				GenerateDebugInformation="true"
