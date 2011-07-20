@@ -5,27 +5,28 @@
 #include "Tetris/SingleThreadedNodeCalculator.h"
 
 
-using Futile::WorkerPool;
-
-
 namespace Tetris {
+
+
+using namespace Futile;
 
 
 static std::auto_ptr<NodeCalculatorImpl> CreateImpl(std::auto_ptr<GameStateNode> inNode,
                                                     const BlockTypes & inBlockTypes,
                                                     const std::vector<int> & inWidths,
                                                     const Evaluator & inEvaluator,
+                                                    Worker & inMainWorker,
                                                     WorkerPool & inWorkerPool)
 {
     if (inWorkerPool.size() > 1)
     {
         return std::auto_ptr<NodeCalculatorImpl>(
-            new MultithreadedNodeCalculator(inNode, inBlockTypes, inWidths, inEvaluator, inWorkerPool));
+            new MultithreadedNodeCalculator(inNode, inBlockTypes, inWidths, inEvaluator, inMainWorker, inWorkerPool));
     }
     else if (inWorkerPool.size() == 1)
     {
         return std::auto_ptr<NodeCalculatorImpl>(
-            new SingleThreadedNodeCalculator(inNode, inBlockTypes, inWidths, inEvaluator, inWorkerPool));
+            new SingleThreadedNodeCalculator(inNode, inBlockTypes, inWidths, inEvaluator, inMainWorker, inWorkerPool));
     }
     else
     {
@@ -38,8 +39,9 @@ NodeCalculator::NodeCalculator(std::auto_ptr<GameStateNode> inNode,
                                const BlockTypes & inBlockTypes,
                                const std::vector<int> & inWidths,
                                const Evaluator & inEvaluator,
+                               Worker & inMainWorker,
                                WorkerPool & inWorkerPool) :
-    mImpl(CreateImpl(inNode, inBlockTypes, inWidths, inEvaluator, inWorkerPool).release())
+    mImpl(CreateImpl(inNode, inBlockTypes, inWidths, inEvaluator, inMainWorker, inWorkerPool).release())
 {
 }
 
