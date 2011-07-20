@@ -28,7 +28,7 @@ public:
 
     void testInterrupt(Depth inDepth, Width inWidth, WorkerCount inWorkerCount, TimeMs inTimeMs);
 
-    void testDestroy(Futile::WorkerPool & inWorkerPool);
+    void testDestroy(Futile::Worker & inMainWorker, Futile::WorkerPool & inWorkerPool);
 	
 	void setUp();
 

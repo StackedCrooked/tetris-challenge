@@ -70,7 +70,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libboost_thread-vc90-mt-gd-1_42.lib"
+				AdditionalDependencies="libboost_thread.lib"
 				ShowProgress="2"
 				AdditionalLibraryDirectories="&quot;$(SolutionDir)3rdParty\Boost\lib\Windows\x86\vc90&quot;"
 				GenerateDebugInformation="true"
@@ -149,7 +149,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libboost_thread-vc90-mt-1_42.lib"
+				AdditionalDependencies="libboost_thread.lib"
 				ShowProgress="0"
 				AdditionalLibraryDirectories="&quot;$(SolutionDir)3rdParty\Boost\lib\Windows\x86\vc90&quot;"
 			/>
@@ -194,6 +194,14 @@
 			</File>
 			<File
 				RelativePath=".\src\NodeCalculatorTest.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\NodeTest.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\NodeTest.h"
 				>
 			</File>
 			<File

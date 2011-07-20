@@ -1,10 +1,13 @@
-#ifndef NODE_H
-#define NODE_H
+#ifndef FUTILE_NODE_H
+#define FUTILE_NODE_H
 
 
 #include <boost/shared_ptr.hpp>
 #include <set>
 #include <vector>
+
+
+namespace Futile {
 
 
 template<class ValueType>
@@ -102,9 +105,15 @@ class GenericNode
 public:
     typedef TDataType DataType;
 
-    GenericNode() { }
+    GenericNode() :
+        mData()
+    {
+    }
 
-    GenericNode(const DataType & inData) : mData(inData) { }
+    GenericNode(const DataType & inData) :
+        mData(inData)
+    {
+    }
 
     typedef GenericNode<DataType, ContainerPolicy, PointerPolicy> This;
     typedef typename PointerPolicy<This>::PointerType ChildPtr;
@@ -179,7 +188,23 @@ private:
 };
 
 
-template<class T,
+template<typename T>
+bool Contains(const std::vector<const T*> & inContainer, const T & inData)
+{
+    for (std::vector<const T*>::const_iterator it = inContainer.begin(), end = inContainer.end();
+         it != end; ++it)
+    {
+        const T & data = **it;
+        if (data == inData)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+
+template<typename T,
          template<class> class C,
          template<class> class P>
 bool HasCycles(const GenericNode<T, C, P> & inNode,
@@ -195,18 +220,18 @@ bool HasCycles(const GenericNode<T, C, P> & inNode,
              it != end;
              ++it)
         {
-            GenericNode<T, C, P> & child = **it;
-            if (std::find(inPreviousNodes.begin(), inPreviousNodes.end(), &child.data()) != inPreviousNodes.end())
+            GenericNode<T, C, P> & childNode = **it;
+            if (Contains(inPreviousNodes, childNode.data()))
             {
                 return true;
             }
             else
             {
-                inPreviousNodes.push_back(&inNode.data());
+                inPreviousNodes.push_back(&childNode.data());
 
                 // Previous nodes object is passed by value!
                 // This is an important aspect of the algorithm!
-                if (HasCycles(child, inPreviousNodes))
+                if (HasCycles(childNode, inPreviousNodes))
                 {
                     return true;
                 }
@@ -217,7 +242,7 @@ bool HasCycles(const GenericNode<T, C, P> & inNode,
 }
 
 
-template<class T,
+template<typename T,
          template<class> class C,
          template<class> class P>
 bool HasCycles(const GenericNode<T, C, P> & inNode)
@@ -226,4 +251,7 @@ bool HasCycles(const GenericNode<T, C, P> & inNode)
 }
 
 
-#endif // NODE_H
+} // namespace Futile
+
+
+#endif // FUTILE_NODE_H
