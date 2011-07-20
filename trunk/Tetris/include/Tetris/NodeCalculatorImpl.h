@@ -27,6 +27,7 @@ public:
                        const BlockTypes & inBlockTypes,
                        const std::vector<int> & inWidths,
                        const Evaluator & inEvaluator,
+                       Futile::Worker & inMainWorker,
                        Futile::WorkerPool & inWorkerPool);
 
     virtual ~NodeCalculatorImpl() = 0;
@@ -201,7 +202,7 @@ protected:
     mutable Futile::Mutex mStatusMutex;
     std::string mErrorMessage;
 
-    Futile::Worker mMainWorker;
+    Futile::Worker & mMainWorker;
     Futile::WorkerPool & mWorkerPool;
 };
 

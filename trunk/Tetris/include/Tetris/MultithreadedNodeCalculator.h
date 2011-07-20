@@ -16,6 +16,7 @@ public:
                                 const BlockTypes & inBlockTypes,
                                 const std::vector<int> & inWidths,
                                 const Evaluator & inEvaluator,
+                                Futile::Worker & inMainWorker,
                                 Futile::WorkerPool & inWorkerPool);
 
     virtual ~MultithreadedNodeCalculator();

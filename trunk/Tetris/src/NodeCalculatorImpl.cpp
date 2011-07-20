@@ -18,17 +18,17 @@
 #include <stdexcept>
 
 
-using Futile::ScopedLock;
-using Futile::WorkerPool;
-
-
 namespace Tetris {
+
+
+using namespace Futile;
 
 
 NodeCalculatorImpl::NodeCalculatorImpl(std::auto_ptr<GameStateNode> inNode,
                                        const BlockTypes & inBlockTypes,
                                        const std::vector<int> & inWidths,
                                        const Evaluator & inEvaluator,
+                                       Worker & inMainWorker,
                                        WorkerPool & inWorkerPool) :
     mNode(inNode.release()),
     mResult(),
@@ -41,7 +41,7 @@ NodeCalculatorImpl::NodeCalculatorImpl(std::auto_ptr<GameStateNode> inNode,
     mEvaluator(inEvaluator),
     mStatus(0),
     mStatusMutex(),
-    mMainWorker("NodeCalculatorImpl"),
+    mMainWorker(inMainWorker),
     mWorkerPool(inWorkerPool)
 {
     Assert(!mNode->gameState().isGameOver());

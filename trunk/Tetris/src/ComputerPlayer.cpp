@@ -23,15 +23,13 @@
 #include <set>
 
 
-using Futile::LogError;
-using Futile::MakeString;
-using Futile::Mutex;
-using Futile::ScopedLock;
-using Futile::Locker;
-using Futile::WorkerPool;
-
-
 namespace Tetris {
+
+
+using namespace Futile;
+
+
+static const unsigned cDefaultWorkerCount = 2;
 
 
 struct ComputerPlayer::Impl : boost::noncopyable
@@ -42,12 +40,13 @@ public:
     Impl() :
         mComputerPlayer(0),
         mTweaker(0),
-        mWorkerPool("ComputerPlayer WorkerPool", 2), //Poco::Environment::processorCount()),
+        mMainWorker("ComputerPlayer: MainWorker"),
+        mWorkerPool("ComputerPlayer: WorkerPool", cDefaultWorkerCount),
         mEvaluator(&MakeTetrises::Instance()),
         mBlockMover(),
         mSearchDepth(6),
         mSearchWidth(4),
-        mWorkerCount(2), //Poco::Environment::processorCount()),
+        mWorkerCount(cDefaultWorkerCount),
         mGameDepth(0),
         mStop(false),
         mReset(false),
@@ -80,6 +79,7 @@ public:
     ComputerPlayer * mComputerPlayer;
     Tweaker * mTweaker;
 
+    Worker mMainWorker;
     WorkerPool mWorkerPool;
     boost::scoped_ptr<NodeCalculator> mNodeCalculator;
     const Evaluator * mEvaluator;
@@ -210,7 +210,7 @@ void ComputerPlayer::setWorkerCount(int inWorkerCount)
     ScopedLock lock(mImpl->mMutex);
     if (inWorkerCount == 0)
     {
-        mImpl->mWorkerCount = 2; //Poco::Environment::processorCount();
+        mImpl->mWorkerCount = cDefaultWorkerCount;
     }
     else
     {
@@ -386,13 +386,14 @@ void ComputerPlayer::Impl::startNodeCalculator()
     Assert(mWorkerPool.getActiveWorkerCount() == 0);
     if (mWorkerCount == 0)
     {
-        mWorkerCount = 2; // Poco::Environment::processorCount();
+        mWorkerCount = cDefaultWorkerCount;
     }
     mWorkerPool.resize(mWorkerCount);
     mNodeCalculator.reset(new NodeCalculator(endNode,
                                              futureBlocks,
                                              widths,
                                              *mEvaluator,
+                                             mMainWorker,
                                              mWorkerPool));
 
     mNodeCalculator->start();

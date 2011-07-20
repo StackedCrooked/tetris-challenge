@@ -29,8 +29,9 @@ MultithreadedNodeCalculator::MultithreadedNodeCalculator(std::auto_ptr<GameState
                                                          const BlockTypes & inBlockTypes,
                                                          const std::vector<int> & inWidths,
                                                          const Evaluator & inEvaluator,
+                                                         Futile::Worker & inMainWorker,
                                                          WorkerPool & inWorkerPool) :
-    NodeCalculatorImpl(inNode, inBlockTypes, inWidths, inEvaluator, inWorkerPool)
+    NodeCalculatorImpl(inNode, inBlockTypes, inWidths, inEvaluator, inMainWorker, inWorkerPool)
 {
 }
 
