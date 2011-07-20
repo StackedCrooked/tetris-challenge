@@ -17,7 +17,7 @@ static const int cMargin = 200; // ms
 
 WorkerPoolTest::WorkerPoolTest(const std::string & inName):
     CppUnit::TestCase(inName),
-    mIterationCount(20)
+    mIterationCount(10)
 {
 }
 

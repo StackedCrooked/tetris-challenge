@@ -49,7 +49,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="/MP /D &quot;_HAS_ITERATOR_DEBUGGING=0&quot; /D &quot;_SECURE_SCL=0&quot;"
+				AdditionalOptions="/MP /D &quot;_HAS_ITERATOR_DEBUGGING=0&quot; /D &quot;_SECURE_SCL=0&quot; /D &quot;_SECURE_SCL_THROWS=0&quot;"
 				Optimization="0"
 				InlineFunctionExpansion="0"
 				EnableIntrinsicFunctions="false"
@@ -142,7 +142,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="/MP /D &quot;_CRT_SECURE_NO_WARNINGS&quot;"
+				AdditionalOptions="/MP /D &quot;_CRT_SECURE_NO_WARNINGS&quot; /D &quot;_SCL_SECURE_NO_WARNINGS&quot; /D &quot;_SECURE_SCL=0&quot; /D &quot;_SECURE_SCL_THROWS=0&quot;"
 				Optimization="2"
 				InlineFunctionExpansion="2"
 				FavorSizeOrSpeed="1"
