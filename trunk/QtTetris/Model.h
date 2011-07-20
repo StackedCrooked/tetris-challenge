@@ -59,11 +59,10 @@ private:
 
     boost::scoped_ptr<MultiplayerGame> mMultiplayerGame;
 
+    bool mQuit;
     typedef std::vector<std::string> Names;
     Names mNames;
     Names::size_type mNamesIndex;
-
-    bool mQuit;
     std::string mHumanName;
     int mCPUCount;
     bool mGameOver;
