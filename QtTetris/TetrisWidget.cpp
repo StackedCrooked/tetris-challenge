@@ -231,7 +231,6 @@ void TetrisWidget::paintImage(const Tetris::Rect & inRect, const std::string & i
     if (!mImage || mImageFileName != inFileName)
     {
         mImageFileName = inFileName;
-        Futile::LogInfo(mImageFileName);
         mImage.reset(new QImage(std::string(":/resources/avatar/" + mImageFileName).c_str()));
     }
 
