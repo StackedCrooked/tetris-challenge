@@ -19,11 +19,16 @@ Model::Model() :
     mCPUCount(Poco::Environment::processorCount()),
     mGameOver(true)    
 {
-    mNames.push_back("Luffy");
-    mNames.push_back("Zoro");
-    mNames.push_back("Nami");
-    mNames.push_back("Sanji");
     mNames.push_back("Chopper");
+    mNames.push_back("Dragon");
+    mNames.push_back("Luffy");
+    mNames.push_back("Nami");
+    mNames.push_back("Robin");
+    mNames.push_back("Sanji");
+    mNames.push_back("Shanks");
+    mNames.push_back("Usopp");
+    mNames.push_back("Zoro");
+
     srand(static_cast<unsigned int>(time(0)));
     std::random_shuffle(mNames.begin(), mNames.end());
 }

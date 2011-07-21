@@ -1,9 +1,13 @@
 <RCC>
     <qresource prefix="/">
         <file>resources/avatar/Chopper_80.gif</file>
+        <file>resources/avatar/Dragon_80.gif</file>
         <file>resources/avatar/Luffy_80.gif</file>
         <file>resources/avatar/Nami_80.gif</file>
+        <file>resources/avatar/Robin_80.gif</file>
         <file>resources/avatar/Sanji_80.gif</file>
+        <file>resources/avatar/Shanks_80.gif</file>
+        <file>resources/avatar/Usopp_80.gif</file>
         <file>resources/avatar/Zoro_80.gif</file>
     </qresource>
 </RCC>
