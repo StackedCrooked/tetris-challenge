@@ -392,7 +392,7 @@ void AbstractWidget::paintGameOver()
     Rect theTextRect = Rect(theBoxLeft, theBoxTop, theBoxWidth, theBoxHeight);
     fillRect(theTextRect, RGBColor(255, 255, 255));
     drawRect(theTextRect, RGBColor(0, 0, 0));
-    drawTextCentered(theTextRect, "Game Over", 18, RGBColor(0, 0, 0));
+    drawTextCentered(theTextRect, "Game Over", 14, RGBColor(0, 0, 0));
 }
 
 
