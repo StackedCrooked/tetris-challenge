@@ -300,7 +300,8 @@ T & Unwrap(const LockerBase & inLockerBase, const Identity< ThreadSafe<T> > &)
 
 
 /**
- * Macro that returns the type of an expression (as Identity<T>) without evaluating it.
+ * Macro that returns the type of an expression
+ * without evaluating the expression.
  */
 #define FUTILE_ENCODEDTYPEOF(EXPRESSION) \
   (true ? Futile::Helper::CamelionType() : Futile::Helper::EncodeType(EXPRESSION))
@@ -317,11 +318,15 @@ T & Unwrap(const LockerBase & inLockerBase, const Identity< ThreadSafe<T> > &)
  * FUTILE_LOCK can be used to create an atomic scope for accessing a thread-safe object.
  *
  * Usage example:
- *   ThreadSafe<Foo> theFoo = GetFoo();
- *   FUTILE_LOCK(Foo & foo, theFoo) { foo.bar(); }
  *
- *   // Shorter:
- *   FUTILE_LOCK(Foo & foo, GetFoo()) { foo.bar(); }
+ *   ThreadSafe<Foo> theFoo = ...;
+ *
+ *   // Get access to Foo object in
+ *   // an atomic thread-safe scope:
+ *   FUTILE_LOCK(Foo & foo, theFoo)
+ *   {
+ *       foo.bar();
+ *   }
  */
 #define FUTILE_LOCK(DECL, TSV) \
     FUTILE_FOR_BLOCK(const Futile::LockerBase & theLockerBase = Futile::Helper::Lock(TSV)) \
