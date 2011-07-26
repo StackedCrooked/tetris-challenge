@@ -57,7 +57,10 @@ void Logger::flush()
     }
 
     // Do the actual logging.
-    std::for_each(items.begin(), items.end(), mHandler);
+    if (mHandler)
+    {
+        std::for_each(items.begin(), items.end(), mHandler);
+    }
 }
 
 
