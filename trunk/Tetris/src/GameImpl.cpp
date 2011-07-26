@@ -700,7 +700,7 @@ bool ComputerGame::navigateNodeDown()
     Assert(nextNode->depth() == mCurrentNode->depth() + 1);
 
     int lineDifference = nextNode->gameState().numLines() - mCurrentNode->gameState().numLines();
-    Assert(lineDifference >= 0);
+    Assert(lineDifference >= 0 && lineDifference <= 4);
     if (lineDifference > 0)
     {
         onLinesCleared(lineDifference);
