@@ -38,58 +38,26 @@ int Tetris_GetSquareHeight()
 }
 
 
-enum Error
+int RunGUI(int argc, char *argv[], Model & model)
 {
-    Error_None,
-    Error_MainScope,
-    Error_ModelScope,
-    Error_ViewScope
-};
-
-
-// EnterViewScope creates the view scope.
-int EnterViewScope(int argc, char *argv[], Model & model)
-{
-    int result = Error_ViewScope;
-    try
-    {
-        QApplication a(argc, argv);
-        a.setApplicationName("QtTetris");
-        a.setApplicationVersion("0.0 alpha");
-        a.setActiveWindow(new MainWindow(NULL, model));
-        a.activeWindow()->show();
-        result = a.exec();
-    }
-    catch (const std::exception & exc)
-    {
-        std::cerr << "Exception caught from Qt application: " << exc.what() << std::endl;
-    }
-    return result;
+    QApplication a(argc, argv);
+    a.setApplicationName("QtTetris");
+    a.setApplicationVersion("0.0 alpha");
+    a.setActiveWindow(new MainWindow(NULL, model));
+    a.activeWindow()->show();
+    return a.exec();
 }
 
 
-// EnterModelScope creates the model scope.
-int EnterModelScope(int argc, char * argv[])
+int RunApp(int argc, char * argv[])
 {
-    int result = Error_ModelScope;    
-    try
-    {
-        Model model;
-        int err = EnterViewScope(argc, argv, model);
-        model.quit();
-        result = err;
-    }
-    catch (const std::exception & exc)
-    {
-        std::cerr << "Exception caught from Tetris application: " << exc.what() << std::endl;
-    }
-    return result;
+    Model model;
+    return RunGUI(argc, argv, model);
 }
 
 
 int main(int argc, char *argv[])
 {
-    int result = Error_MainScope;
     try
     {
         // Define the lifetime scope for the singleton objects.
@@ -98,7 +66,7 @@ int main(int argc, char *argv[])
         MainThread::ScopedInitializer initMainThread;
 
         // Enter application scope.
-        result = EnterModelScope(argc, argv);
+        return RunApp(argc, argv);
     }
     catch (const std::exception & exc)
     {
@@ -108,5 +76,5 @@ int main(int argc, char *argv[])
     {
         std::cerr << "Anonymous exception caught in main. Exiting program." << std::endl;
     }
-    return result;
+    return 1;
 }

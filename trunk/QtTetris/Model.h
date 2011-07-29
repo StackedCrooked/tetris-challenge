@@ -7,6 +7,7 @@
 #include "Tetris/Evaluator.h"
 #include "Tetris/MultiplayerGame.h"
 #include "Tetris/Player.h"
+#include <boost/noncopyable.hpp>
 #include <string>
 #include <vector>
 
@@ -21,14 +22,13 @@ class Model;
 typedef boost::shared_ptr<Model> ModelPtr;
 
 
-class Model : public ComputerPlayer::Tweaker
+class Model : public ComputerPlayer::Tweaker,
+              boost::noncopyable
 {
 public:
     Model();
 
     ~Model();
-
-    void quit();
 
     bool IsGameOver();
 
@@ -52,14 +52,12 @@ public:
     void newGame(const PlayerTypes & inPlayerTypes, std::size_t inRowCount, std::size_t inColumnCount);
 
 private:
-
     std::string GetHumanPlayerName();
 
     std::string GetPlayerName(PlayerType inPlayerType);
 
     boost::scoped_ptr<MultiplayerGame> mMultiplayerGame;
 
-    bool mQuit;
     typedef std::vector<std::string> Names;
     Names mNames;
     Names::size_type mNamesIndex;
