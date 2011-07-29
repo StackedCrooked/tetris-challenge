@@ -12,12 +12,11 @@ using namespace Futile;
 
 
 Model::Model() :
-    mQuit(false),
     mNames(),
     mNamesIndex(0),
     mHumanName(),
     mCPUCount(Poco::Environment::processorCount()),
-    mGameOver(true)    
+    mGameOver(true)
 {
     mNames.push_back("Chopper");
     mNames.push_back("Dragon");
@@ -36,14 +35,7 @@ Model::Model() :
 
 Model::~Model()
 {
-    Assert(mQuit);
-}
-
-
-void Model::quit()
-{
     mMultiplayerGame.reset();
-    mQuit = true;
 }
 
 
@@ -194,7 +186,7 @@ void Model::newGame(const PlayerTypes & inPlayerTypes, std::size_t inRowCount, s
         {
             teamName = "Team 2";
         }
-        
+
         PlayerType playerType = inPlayerTypes[idx];
         if (playerType == PlayerType_Human)
         {
