@@ -115,6 +115,8 @@ public:
     {
     }
 
+    const Locker<Variable> lock() const;
+
     Locker<Variable> lock();
 
     bool operator== (const ThreadSafe<Variable> & rhs) const
@@ -245,6 +247,13 @@ private:
 
     mutable ThreadSafe<Variable> mThreadSafe;
 };
+
+
+template<class Variable>
+const Locker<Variable> ThreadSafe<Variable>::lock() const
+{
+    return Locker<Variable>(*this);
+}
 
 
 template<class Variable>

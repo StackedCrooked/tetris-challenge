@@ -59,7 +59,6 @@ public:
 
     ~Impl()
     {
-        ScopedLock lock(mMutex);
         if (mNodeCalculator)
         {
             mNodeCalculator->stop();
@@ -73,7 +72,7 @@ public:
         if (PlayerPtr playerPtr = weakPlayer.lock())
         {
             ComputerPlayer & cp = dynamic_cast<ComputerPlayer&>(*playerPtr);
-            cp.mImpl->updateComputerBlockMoveSpeed();
+            cp.mImpl.lock()->updateComputerBlockMoveSpeed();
         }
     }
 
@@ -101,7 +100,6 @@ public:
     bool mStop;
     bool mReset;
     bool mQuitFlag;
-    Mutex mMutex;
     Poco::Timer mTimer;
 };
 
@@ -124,21 +122,23 @@ ComputerPlayer::ComputerPlayer(const TeamName & inTeamName,
     Player(PlayerType_Computer, inTeamName, inPlayerName, inRowCount, inColumnCount),
     mImpl(new Impl())
 {
-    mImpl->mComputerPlayer = this;
-    mImpl->mBlockMover.reset(new BlockMover(simpleGame()->gameImpl()));
-    mImpl->mTimer.start(Poco::TimerCallback<ComputerPlayer>(*this, &ComputerPlayer::onTimerEvent));
+    FUTILE_LOCK(Impl & impl, mImpl)
+    {
+        impl.mComputerPlayer = this;
+        impl.mBlockMover.reset(new BlockMover(simpleGame()->gameImpl()));
+        impl.mTimer.start(Poco::TimerCallback<ComputerPlayer>(*this, &ComputerPlayer::onTimerEvent));
+    }
 }
 
 
 ComputerPlayer::~ComputerPlayer()
 {
+    FUTILE_LOCK(Impl & impl, mImpl)
     {
-        ScopedLock lock(mImpl->mMutex);
-        mImpl->mQuitFlag = true;
+        impl.mQuitFlag = true;
+        impl.mBlockMover.reset();
+        impl.mTimer.stop();
     }
-    mImpl->mBlockMover.reset();
-    mImpl->mTimer.stop();
-    mImpl.reset();
 }
 
 
@@ -146,10 +146,12 @@ void ComputerPlayer::onTimerEvent(Poco::Timer & )
 {
     try
     {
-        ScopedLock lock(mImpl->mMutex);
-        if (!mImpl->mQuitFlag)
+        FUTILE_LOCK(Impl & impl, mImpl)
         {
-            mImpl->timerEvent();
+            if (!impl.mQuitFlag)
+            {
+                impl.timerEvent();
+            }
         }
     }
     catch (const std::exception & exc)
@@ -161,45 +163,51 @@ void ComputerPlayer::onTimerEvent(Poco::Timer & )
 
 void ComputerPlayer::setTweaker(Tweaker *inTweaker)
 {
-    ScopedLock lock(mImpl->mMutex);
-    mImpl->mTweaker = inTweaker;
+    FUTILE_LOCK(Impl & impl, mImpl)
+    {
+        impl.mTweaker = inTweaker;
+    }
 }
 
 
 int ComputerPlayer::searchDepth() const
 {
-    ScopedLock lock(mImpl->mMutex);
-    return mImpl->mSearchDepth;
+    return mImpl.lock()->mSearchDepth;
 }
 
 
 void ComputerPlayer::setSearchDepth(int inSearchDepth)
 {
-    ScopedLock lock(mImpl->mMutex);
-    mImpl->mSearchDepth = inSearchDepth;
+    FUTILE_LOCK(Impl & impl, mImpl)
+    {
+        impl.mSearchDepth = inSearchDepth;
+    }
 }
 
 
 int ComputerPlayer::searchWidth() const
 {
-    ScopedLock lock(mImpl->mMutex);
-    return mImpl->mSearchWidth;
+    return mImpl.lock()->mSearchWidth;
 }
 
 
 void ComputerPlayer::setSearchWidth(int inSearchWidth)
 {
-    ScopedLock lock(mImpl->mMutex);
-    mImpl->mSearchWidth = inSearchWidth;
+    FUTILE_LOCK(Impl & impl, mImpl)
+    {
+        impl.mSearchWidth = inSearchWidth;
+    }
 }
 
 
 int ComputerPlayer::depth() const
-{
-    ScopedLock lock(mImpl->mMutex);
-    if (mImpl->mNodeCalculator)
+{   
+    FUTILE_LOCK(Impl & impl, mImpl)
     {
-        return mImpl->mNodeCalculator->getCurrentSearchDepth();
+        if (impl.mNodeCalculator)
+        {
+            return impl.mNodeCalculator->getCurrentSearchDepth();
+        }
     }
     return 0;
 }
@@ -207,35 +215,37 @@ int ComputerPlayer::depth() const
 
 int ComputerPlayer::moveSpeed() const
 {
-    ScopedLock lock(mImpl->mMutex);
-    return mImpl->mBlockMover->speed();
+    return mImpl.lock()->mBlockMover->speed();
 }
 
 
 void ComputerPlayer::setMoveSpeed(int inMoveSpeed)
 {
-    ScopedLock lock(mImpl->mMutex);
-    mImpl->mBlockMover->setSpeed(inMoveSpeed);
+    FUTILE_LOCK(Impl & impl, mImpl)
+    {
+        impl.mBlockMover->setSpeed(inMoveSpeed);
+    }
 }
 
 
 int ComputerPlayer::workerCount() const
 {
-    ScopedLock lock(mImpl->mMutex);
-    return mImpl->mWorkerCount;
+    return mImpl.lock()->mWorkerCount;
 }
 
 
 void ComputerPlayer::setWorkerCount(int inWorkerCount)
 {
-    ScopedLock lock(mImpl->mMutex);
-    if (inWorkerCount == 0)
+    FUTILE_LOCK(Impl & impl, mImpl)
     {
-        mImpl->mWorkerCount = cDefaultWorkerCount;
-    }
-    else
-    {
-        mImpl->mWorkerCount = inWorkerCount;
+        if (inWorkerCount == 0)
+        {
+            impl.mWorkerCount = cDefaultWorkerCount;
+        }
+        else
+        {
+            impl.mWorkerCount = inWorkerCount;
+        }
     }
 }
 
