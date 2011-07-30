@@ -263,8 +263,8 @@ void MainWindow::onPaused()
     for (std::size_t idx = 0; idx < mgame.playerCount(); ++idx)
     {
         Player * player = mgame.getPlayer(idx);
-        bool isPaused = player->simpleGame()->isPaused();
-        player->simpleGame()->setPaused(!isPaused);
+        bool isPaused = player->game()->isPaused();
+        player->game()->setPaused(!isPaused);
     }
 }
 
@@ -275,7 +275,7 @@ void MainWindow::onPenalty()
     for (std::size_t idx = 0; idx < mgame.playerCount(); ++idx)
     {
         Player * player = mgame.getPlayer(idx);
-        player->simpleGame()->applyLinePenalty(4);
+        player->game()->applyLinePenalty(4);
         break;
     }
 }

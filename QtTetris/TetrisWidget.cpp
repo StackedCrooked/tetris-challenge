@@ -74,10 +74,10 @@ void TetrisWidget::refresh()
 
 void TetrisWidget::keyPressEvent(QKeyEvent * inEvent)
 {
-    if (!simpleGame() ||
-         simpleGame()->isPaused() ||
-         simpleGame()->isGameOver() ||
-         simpleGame()->playerType() == PlayerType_Computer)
+    if (!game() ||
+         game()->isPaused() ||
+         game()->isGameOver() ||
+         game()->playerType() == PlayerType_Computer)
     {
         QWidget::keyPressEvent(inEvent);
         return;
@@ -87,27 +87,27 @@ void TetrisWidget::keyPressEvent(QKeyEvent * inEvent)
     {
         case Qt::Key_Left:
         {
-            simpleGame()->move(MoveDirection_Left);
+            game()->move(MoveDirection_Left);
             break;
         }
         case Qt::Key_Right:
         {
-            simpleGame()->move(MoveDirection_Right);
+            game()->move(MoveDirection_Right);
             break;
         }
         case Qt::Key_Down:
         {
-            simpleGame()->move(MoveDirection_Down);
+            game()->move(MoveDirection_Down);
             break;
         }
         case Qt::Key_Up:
         {
-            simpleGame()->rotate();
+            game()->rotate();
             break;
         }
         case Qt::Key_Space:
         {
-            simpleGame()->drop();
+            game()->drop();
             break;
         }
         default:
@@ -270,7 +270,7 @@ void TetrisWidget::drawText(int x, int y, const std::string & inText)
     QPainter & painter(*mPainter);
 
     painter.setPen(QColor(0, 0, 0));
-    painter.drawText(QRect(x, y, simpleGame()->gameGrid().columnCount() * squareWidth(), squareHeight()), inText.c_str());
+    painter.drawText(QRect(x, y, game()->gameGrid().columnCount() * squareWidth(), squareHeight()), inText.c_str());
 }
 
 
@@ -298,7 +298,7 @@ void TetrisWidget::drawTextCentered(const Rect & inRect, const std::string & inT
 
     int x = inRect.left() + (inRect.width()  - textWidth)/2;
     int y = inRect.top()  + (inRect.height() - textHeight)/2;
-    QRect theTextRect(x, y, simpleGame()->gameGrid().columnCount() * squareWidth(),squareHeight());
+    QRect theTextRect(x, y, game()->gameGrid().columnCount() * squareWidth(),squareHeight());
     painter.drawText(theTextRect, inText.c_str());
 }
 
@@ -332,13 +332,13 @@ void TetrisWidget::drawTextRightAligned(const Rect & inRect, const std::string &
 
 void TetrisWidget::paintEvent(QPaintEvent * )
 {
-    if (!simpleGame())
+    if (!game())
     {
         return;
     }
 
     mPainter.reset(new QPainter(this));
-    coordinateRepaint(*simpleGame());
+    coordinateRepaint(*game());
     mPainter.reset();
 }
 

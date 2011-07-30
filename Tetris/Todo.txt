@@ -1,5 +1,13 @@
 Todo
 ----
+- Object hiearchy
+
+
+Model, MultiplayerGame, Player, Game, GameState
+
+
+
+
 - Seamless cross-platform builds: Mac OS X, Linux and Windows.
 - Fix the resource system.
 - Release a next version. Nothing fancy yet. Doesn't need to be very public (SO chat..)

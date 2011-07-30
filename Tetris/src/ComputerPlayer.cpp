@@ -125,7 +125,7 @@ ComputerPlayer::ComputerPlayer(const TeamName & inTeamName,
     FUTILE_LOCK(Impl & impl, mImpl)
     {
         impl.mComputerPlayer = this;
-        impl.mBlockMover.reset(new BlockMover(simpleGame()->gameImpl()));
+        impl.mBlockMover.reset(new BlockMover(game()->gameImpl()));
         impl.mTimer.start(Poco::TimerCallback<ComputerPlayer>(*this, &ComputerPlayer::onTimerEvent));
     }
 }
@@ -371,7 +371,7 @@ void ComputerPlayer::Impl::startNodeCalculator()
 
     // Critical section
     {
-        Locker<GameImpl> rgame(mComputerPlayer->simpleGame()->gameImpl());
+        Locker<GameImpl> rgame(mComputerPlayer->game()->gameImpl());
         const ComputerGame & constComputerGame(dynamic_cast<const ComputerGame&>(*rgame.get()));
 
 
@@ -441,7 +441,7 @@ void ComputerPlayer::Impl::onStarted()
 
 void ComputerPlayer::Impl::onWorking()
 {
-    Locker<GameImpl> wgame(mComputerPlayer->simpleGame()->gameImpl());
+    Locker<GameImpl> wgame(mComputerPlayer->game()->gameImpl());
     const ComputerGame & game(dynamic_cast<const ComputerGame&>(*wgame.get()));
 
     if (mGameDepth < game.endNode()->depth())
@@ -478,7 +478,7 @@ void ComputerPlayer::Impl::onFinished()
         return;
     }
 
-    Locker<GameImpl> wgame(mComputerPlayer->simpleGame()->gameImpl());
+    Locker<GameImpl> wgame(mComputerPlayer->game()->gameImpl());
     ComputerGame & game(dynamic_cast<ComputerGame&>(*wgame.get()));
 
     // Check for sync problems.

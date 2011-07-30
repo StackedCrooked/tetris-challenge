@@ -50,7 +50,7 @@ bool Model::IsGameOver()
     for (std::size_t idx = 0; idx < mMultiplayerGame->playerCount(); ++idx)
     {
         Player * player = mMultiplayerGame->getPlayer(idx);
-        if (player->simpleGame()->isGameOver())
+        if (player->game()->isGameOver())
         {
             mGameOver = true;
         }
@@ -109,12 +109,12 @@ const Evaluator & Model::updateAIParameters(const Player & inPlayer,
                                             int & /*outMoveSpeed*/,
                                             BlockMover::MoveDownBehavior & outMoveDownBehavior)
 {
-    if (!inPlayer.simpleGame())
+    if (!inPlayer.game())
     {
         throw std::runtime_error("GameState is null!");
     }
 
-    const Game & game = *inPlayer.simpleGame();
+    const Game & game = *inPlayer.game();
 
     if (mMultiplayerGame)
     {

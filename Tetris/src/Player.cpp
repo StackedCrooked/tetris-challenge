@@ -96,13 +96,13 @@ const std::string & Player::playerName() const
 }
 
 
-const Game * Player::simpleGame() const
+const Game * Player::game() const
 {
     return mImpl->mGame.get();
 }
 
 
-Game * Player::simpleGame()
+Game * Player::game()
 {
     return mImpl->mGame.get();
 }
