@@ -40,26 +40,21 @@ struct Player::Impl
 };
 
 
-std::auto_ptr<Player> Player::Create(PlayerType inPlayerType,
-                                     const TeamName & inTeamName,
-                                     const PlayerName & inPlayerName,
-                                     std::size_t inRowCount,
-                                     std::size_t inColumnCount)
+PlayerPtr Player::Create(PlayerType inPlayerType,
+                         const TeamName & inTeamName,
+                         const PlayerName & inPlayerName,
+                         std::size_t inRowCount,
+                         std::size_t inColumnCount)
 {
-    std::auto_ptr<Player> result;
     if (inPlayerType == PlayerType_Computer)
     {
-        result.reset(new ComputerPlayer(inTeamName, inPlayerName, inRowCount, inColumnCount));
+        return ComputerPlayer::Create(inTeamName, inPlayerName, inRowCount, inColumnCount);
     }
     else if (inPlayerType == PlayerType_Human)
     {
-        result.reset(new HumanPlayer(inTeamName, inPlayerName, inRowCount, inColumnCount));
+        return HumanPlayer::Create(inTeamName, inPlayerName, inRowCount, inColumnCount);
     }
-    else
-    {
-        throw std::logic_error(MakeString() << "PlayerType: invalid enum value: " << inPlayerType);
-    }
-    return result;
+    throw std::logic_error(MakeString() << "PlayerType: invalid enum value: " << inPlayerType);
 }
 
 
@@ -110,6 +105,16 @@ const Game * Player::simpleGame() const
 Game * Player::simpleGame()
 {
     return mImpl->mGame.get();
+}
+
+
+PlayerPtr HumanPlayer::Create(const TeamName & inTeamName,
+                              const PlayerName & inPlayerName,
+                              std::size_t inRowCount,
+                              std::size_t inColumnCount)
+{
+    PlayerPtr result(new HumanPlayer(inTeamName, inPlayerName, inRowCount, inColumnCount));
+    return result;
 }
 
 

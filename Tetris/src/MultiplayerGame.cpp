@@ -91,7 +91,7 @@ Player * MultiplayerGame::Impl::addPlayer(PlayerType inPlayerType,
                                        inTeamName,
                                        inPlayerName,
                                        mRowCount,
-                                       mColumnCount).release());
+                                       mColumnCount));
     mPlayers.push_back(playerPtr);
     Game::RegisterEventHandler(playerPtr->simpleGame(), this);
     return playerPtr.get();

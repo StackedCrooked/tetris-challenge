@@ -41,10 +41,10 @@ public:
                                                      BlockMover::MoveDownBehavior & outMoveDownBehavior) = 0;
     };
 
-    ComputerPlayer(const TeamName & inTeamName,
-                   const PlayerName & inPlayerName,
-                   std::size_t inRowCount,
-                   std::size_t inColumnCount);
+    static PlayerPtr Create(const TeamName & inTeamName,
+                            const PlayerName & inPlayerName,
+                            std::size_t inRowCount,
+                            std::size_t inColumnCount);
 
     virtual ~ComputerPlayer();
 
@@ -71,12 +71,15 @@ public:
     void setWorkerCount(int inWorkerCount);
 
 private:
-    ComputerPlayer(const ComputerPlayer &);
-    ComputerPlayer & operator= (const ComputerPlayer&);
+    ComputerPlayer(const TeamName & inTeamName,
+                   const PlayerName & inPlayerName,
+                   std::size_t inRowCount,
+                   std::size_t inColumnCount);
 
     void onTimerEvent(Poco::Timer & );
 
     struct Impl;
+    friend struct Impl;
     boost::scoped_ptr<Impl> mImpl;
 };
 
