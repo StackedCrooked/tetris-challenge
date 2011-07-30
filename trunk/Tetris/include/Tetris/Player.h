@@ -6,7 +6,10 @@
 #include "Tetris/Game.h"
 #include "Futile/Array.h"
 #include "Futile/TypedWrapper.h"
+#include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/enable_shared_from_this.hpp>
 #include <string>
 #include <vector>
 
@@ -18,20 +21,19 @@ Futile_TypedWrapper(TeamName, std::string);
 Futile_TypedWrapper(PlayerName, std::string);
 
 
-class Player
+class Player;
+typedef boost::shared_ptr<Player> PlayerPtr;
+
+
+class Player : public boost::enable_shared_from_this<Player>,
+               boost::noncopyable
 {
 public:
-    static std::auto_ptr<Player> Create(PlayerType inPlayerType,
-                                        const TeamName & inTeamName,
-                                        const PlayerName & inPlayerName,
-                                        std::size_t inRowCount,
-                                        std::size_t inColumnCount);
-
-    Player(PlayerType inPlayerType,
-           const TeamName & inTeamName,
-           const PlayerName & inPlayerName,
-           std::size_t inRowCount,
-           std::size_t inColumnCount);
+    static PlayerPtr Create(PlayerType inPlayerType,
+                            const TeamName & inTeamName,
+                            const PlayerName & inPlayerName,
+                            std::size_t inRowCount,
+                            std::size_t inColumnCount);
 
     virtual ~Player() = 0;
 
@@ -45,10 +47,14 @@ public:
 
     Game * simpleGame();
 
-private:
-    Player(const Player&);
-    Player& operator=(const Player&);
+protected:
+    Player(PlayerType inPlayerType,
+           const TeamName & inTeamName,
+           const PlayerName & inPlayerName,
+           std::size_t inRowCount,
+           std::size_t inColumnCount);
 
+private:
     friend bool operator==(const Player & lhs, const Player & rhs);
     friend bool operator<(const Player & lhs, const Player & rhs);
 
@@ -60,12 +66,18 @@ private:
 class HumanPlayer : public Player
 {
 public:
+    static PlayerPtr Create(const TeamName & inTeamName,
+                            const PlayerName & inPlayerName,
+                            std::size_t inRowCount,
+                            std::size_t inColumnCount);
+
+    virtual ~HumanPlayer();
+
+private:
     HumanPlayer(const TeamName & inTeamName,
                 const PlayerName & inPlayerName,
                 std::size_t inRowCount,
                 std::size_t inColumnCount);
-
-    virtual ~HumanPlayer();
 };
 
 

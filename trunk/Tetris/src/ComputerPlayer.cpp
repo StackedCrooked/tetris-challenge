@@ -10,6 +10,7 @@
 #include "Tetris/GameStateNode.h"
 #include "Tetris/GameState.h"
 #include "Tetris/Block.h"
+#include "Futile/MainThread.h"
 #include "Futile/WorkerPool.h"
 #include "Futile/Worker.h"
 #include "Futile/Threading.h"
@@ -20,6 +21,7 @@
 #include "Poco/Timer.h"
 #include <boost/bind.hpp>
 #include <boost/noncopyable.hpp>
+#include <boost/weak_ptr.hpp>
 #include <set>
 
 
@@ -67,6 +69,14 @@ public:
 
     void timerEvent();
 
+    static void UpdateComputerBlockMoveSpeed(boost::weak_ptr<Player> weakPlayer) {
+        if (PlayerPtr playerPtr = weakPlayer.lock())
+        {
+            ComputerPlayer & cp = dynamic_cast<ComputerPlayer&>(*playerPtr);
+            cp.mImpl->updateComputerBlockMoveSpeed();
+        }
+    }
+
     void updateComputerBlockMoveSpeed();
 
     void startNodeCalculator();
@@ -94,6 +104,17 @@ public:
     Mutex mMutex;
     Poco::Timer mTimer;
 };
+
+
+
+PlayerPtr ComputerPlayer::Create(const TeamName & inTeamName,
+                                 const PlayerName & inPlayerName,
+                                 std::size_t inRowCount,
+                                 std::size_t inColumnCount)
+{
+    PlayerPtr result(new ComputerPlayer(inTeamName, inPlayerName, inRowCount, inColumnCount));
+    return result;
+}
 
 
 ComputerPlayer::ComputerPlayer(const TeamName & inTeamName,
@@ -227,13 +248,12 @@ void ComputerPlayer::Impl::updateComputerBlockMoveSpeed()
         BlockMover::MoveDownBehavior moveDownBehavior = BlockMover::MoveDownBehavior_Null;
         int moveSpeed = 0;
 
-        mEvaluator = &mTweaker->updateAIParameters(
-            *mComputerPlayer,
-            mSearchDepth,
-            mSearchWidth,
-            mWorkerCount,
-            moveSpeed,
-            moveDownBehavior);
+        mEvaluator = &mTweaker->updateAIParameters(*mComputerPlayer,
+                                                   mSearchDepth,
+                                                   mSearchWidth,
+                                                   mWorkerCount,
+                                                   moveSpeed,
+                                                   moveDownBehavior);
 
         if (mSearchDepth < 1 || mSearchDepth > 100)
         {
@@ -283,8 +303,10 @@ void ComputerPlayer::Impl::timerEvent()
         return;
     }
 
-    // Consult the tweaker.
-    updateComputerBlockMoveSpeed();
+    // Consult the tweaker.    
+    PlayerPtr playerPtr = mComputerPlayer->shared_from_this();
+    boost::weak_ptr<Player> weakPtr(playerPtr);
+    InvokeLater(boost::bind(&ComputerPlayer::Impl::UpdateComputerBlockMoveSpeed, weakPtr));
 
     if (!mNodeCalculator)
     {
