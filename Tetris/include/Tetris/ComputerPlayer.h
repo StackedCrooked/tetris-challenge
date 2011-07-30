@@ -5,9 +5,7 @@
 #include "Tetris/BlockMover.h"
 #include "Tetris/Evaluator.h"
 #include "Tetris/Player.h"
-#include "Futile/AutoPtrSupport.h"
 #include "Futile/Threading.h"
-#include <boost/scoped_ptr.hpp>
 
 
 namespace Poco {
@@ -80,7 +78,7 @@ private:
 
     struct Impl;
     friend struct Impl;
-    boost::scoped_ptr<Impl> mImpl;
+    ThreadSafe<Impl> mImpl;
 };
 
 } // namespace Tetris
