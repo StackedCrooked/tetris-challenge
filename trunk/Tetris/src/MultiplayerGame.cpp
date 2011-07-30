@@ -40,7 +40,7 @@ struct MultiplayerGame::Impl : public Game::EventHandler,
         for (; it != end; ++it)
         {
             Player & player(**it);
-            if (player.simpleGame() == inGame)
+            if (player.game() == inGame)
             {
                 return player;
             }
@@ -59,7 +59,7 @@ struct MultiplayerGame::Impl : public Game::EventHandler,
             Player & player(**it);
             if (player.teamName() != activePlayer.teamName())
             {
-                player.simpleGame()->applyLinePenalty(inLineCount);
+                player.game()->applyLinePenalty(inLineCount);
             }
         }
     }
@@ -93,7 +93,7 @@ Player * MultiplayerGame::Impl::addPlayer(PlayerType inPlayerType,
                                        mRowCount,
                                        mColumnCount));
     mPlayers.push_back(playerPtr);
-    Game::RegisterEventHandler(playerPtr->simpleGame(), this);
+    Game::RegisterEventHandler(playerPtr->game(), this);
     return playerPtr.get();
 }
 
@@ -118,7 +118,7 @@ Player * MultiplayerGame::addComputerPlayer(const TeamName & inTeamName,
 
 void MultiplayerGame::removePlayer(Player * inPlayer)
 {
-    Game::UnregisterEventHandler(inPlayer->simpleGame(), mImpl.get());
+    Game::UnregisterEventHandler(inPlayer->game(), mImpl.get());
     Impl::Players::iterator it = std::find_if(mImpl->mPlayers.begin(), mImpl->mPlayers.end(), boost::bind(&Impl::PlayerPtr::get, _1) == inPlayer);
     if (it == mImpl->mPlayers.end())
     {

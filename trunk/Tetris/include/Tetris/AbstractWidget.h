@@ -85,9 +85,9 @@ public:
 
     void setPlayer(Player * inPlayer);
 
-    const Game * simpleGame() const;
+    const Game * game() const;
 
-    Game * simpleGame();
+    Game * game();
 
     const Player * player() const;
 

@@ -78,14 +78,14 @@ AbstractWidget::~AbstractWidget()
 {
     if (mPlayer)
     {
-        Game::UnregisterEventHandler(mPlayer->simpleGame(), this);
+        Game::UnregisterEventHandler(mPlayer->game(), this);
     }
 }
 
 
 void AbstractWidget::onGameStateChanged(Game * inGame)
 {
-    if (!mPlayer || mPlayer->simpleGame() != inGame)
+    if (!mPlayer || mPlayer->game() != inGame)
     {
         throw std::logic_error("AbstractWidget::onGameStateChanged: inGame != mGame");
     }
@@ -96,7 +96,7 @@ void AbstractWidget::onGameStateChanged(Game * inGame)
 
 void AbstractWidget::onLinesCleared(Game * inGame, int )
 {
-    if (!mPlayer || mPlayer->simpleGame() != inGame)
+    if (!mPlayer || mPlayer->game() != inGame)
     {
         throw std::logic_error("AbstractWidget:: onLinesCleared: inGame != mGame");
     }
@@ -108,42 +108,42 @@ void AbstractWidget::onLinesCleared(Game * inGame, int )
 void AbstractWidget::setPlayer(Player * inPlayer)
 {
     // Stop listing to the events from the old player.
-    if (mPlayer && Game::Exists(mPlayer->simpleGame()))
+    if (mPlayer && Game::Exists(mPlayer->game()))
     {
-        Game::UnregisterEventHandler(mPlayer->simpleGame(), this);
+        Game::UnregisterEventHandler(mPlayer->game(), this);
     }
 
     // Set the new player.
     mPlayer = inPlayer;
 
     // Start listening to the events from the new player.
-    if (mPlayer && Game::Exists(mPlayer->simpleGame()))
+    if (mPlayer && Game::Exists(mPlayer->game()))
     {
         setMinSize(Size(2 * margin() + futureBlocksRect().right() - gameRect().left(),
                         2 * margin() + avatarRect().bottom() - gameRect().top()));
 
-        Game::RegisterEventHandler(mPlayer->simpleGame(), this);
+        Game::RegisterEventHandler(mPlayer->game(), this);
     }
 }
 
 
-const Game * AbstractWidget::simpleGame() const
+const Game * AbstractWidget::game() const
 {
     if (!mPlayer)
     {
         return NULL;
     }
-    return mPlayer->simpleGame();
+    return mPlayer->game();
 }
 
 
-Game * AbstractWidget::simpleGame()
+Game * AbstractWidget::game()
 {
     if (!mPlayer)
     {
         return NULL;
     }
-    return mPlayer->simpleGame();
+    return mPlayer->game();
 }
 
 
@@ -215,8 +215,8 @@ Rect AbstractWidget::gameRect() const
 {
     int x = margin();
     int y = margin();
-    int w = simpleGame()->gameGrid().columnCount() * squareWidth();
-    int h = simpleGame()->gameGrid().rowCount() * squareHeight();
+    int w = game()->gameGrid().columnCount() * squareWidth();
+    int h = game()->gameGrid().rowCount() * squareHeight();
     return Rect(x, y, w, h);
 }
 
@@ -235,7 +235,7 @@ Rect AbstractWidget::userInfoRect() const
 
 Rect AbstractWidget::futureBlocksRect() const
 {
-    int numFutureBlocks = simpleGame()->futureBlocksCount();
+    int numFutureBlocks = game()->futureBlocksCount();
     int blockHeight = 2 * squareHeight();
     int totalHeight = 2 * margin() + numFutureBlocks * blockHeight;
     if (numFutureBlocks > 1)
@@ -454,7 +454,7 @@ void AbstractWidget::paintStats(const Rect & inRect, const GameStateStats & inSt
 
     rect = Rect(rect.left(), rect.bottom() + margin(), rect.width(), rect.height());
     fillRect(rect, RGBColor(255, 255, 255));
-    paintStatItem(rect, "Level", MakeString() << simpleGame()->level());
+    paintStatItem(rect, "Level", MakeString() << game()->level());
 
     rect = Rect(rect.left(), rect.bottom() + margin(), rect.width(), rect.height());
     fillRect(rect, RGBColor(255, 255, 255));
