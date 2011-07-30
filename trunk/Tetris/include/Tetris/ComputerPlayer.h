@@ -27,9 +27,8 @@ public:
     {
     public:
         /**
-         * Gets new parametrs from the tweaker object.
-         *
-         * WARNING: This callback will be received in a worker thread!
+         * Gets updated parameters from the tweaker object.
+         * This message will be called in the main thread.
          */
         virtual const Evaluator & updateAIParameters(const Player & inPlayer,
                                                      int & outSearchDepth,
