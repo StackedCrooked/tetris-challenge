@@ -5,11 +5,11 @@
 #include "Tetris/GameState.h"
 #include "Tetris/GameImpl.h"
 #include "Tetris/Direction.h"
+#include "Futile/Stopwatch.h"
 #include "Futile/Logging.h"
 #include "Futile/MakeString.h"
 #include "Futile/Assert.h"
 #include "Poco/Timer.h"
-#include "Poco/Stopwatch.h"
 #include <boost/noncopyable.hpp>
 #include <algorithm>
 
@@ -50,7 +50,7 @@ struct Gravity::Impl : boost::noncopyable
 
     void onTimerEvent(Poco::Timer & timer);
 
-    int interval() const
+    int intervalMs() const
     {
         return static_cast<int>(0.5 + CalculateSpeed(mLevel) / 1000.0);
     }
@@ -63,7 +63,7 @@ struct Gravity::Impl : boost::noncopyable
     ThreadSafe<GameImpl> mThreadSafeGame;
     int mLevel;
     Poco::Timer mTimer;
-    Poco::Stopwatch mStopwatch;
+    Futile::Stopwatch mStopwatch;
 };
 
 
@@ -73,7 +73,6 @@ Gravity::Gravity(const ThreadSafe<GameImpl> & inThreadSafeGame) :
     Locker<GameImpl> rgame(mImpl->mThreadSafeGame);
     mImpl->mTimer.start(Poco::TimerCallback<Gravity::Impl>(*mImpl, &Gravity::Impl::onTimerEvent));
     mImpl->mTimer.setPeriodicInterval(sIntervals[rgame->level()]);
-    mImpl->mStopwatch.start();
 }
 
 
@@ -88,7 +87,7 @@ void Gravity::Impl::onTimerEvent(Poco::Timer & )
     try
     {
         int oldLevel = mLevel;
-        if (mStopwatch.elapsed() > 1000  * interval())
+        if (mStopwatch.elapsedMs() > intervalMs())
         {
             mStopwatch.restart();
             Locker<GameImpl> wGame(mThreadSafeGame);
