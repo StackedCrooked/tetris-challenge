@@ -23,7 +23,6 @@ namespace Tetris {
 class Block;
 class GameStateNode;
 class GameImpl;
-using Futile::ThreadSafe;
 
 
 /**
@@ -43,7 +42,7 @@ protected:
     GameImpl(std::size_t inNumRows, std::size_t inNumColumns);
 
     // Friendship required for destructor.
-    friend class ThreadSafe<GameImpl>;
+    friend class Futile::ThreadSafe<GameImpl>;
 
 public:
     virtual ~GameImpl();
@@ -76,9 +75,9 @@ public:
         static Instances sInstances;
     };
 
-    static void RegisterEventHandler(ThreadSafe<GameImpl> inGame, EventHandler * inEventHandler);
+    static void RegisterEventHandler(Futile::ThreadSafe<GameImpl> inGame, EventHandler * inEventHandler);
 
-    static void UnregisterEventHandler(ThreadSafe<GameImpl> inGame, EventHandler * inEventHandler);
+    static void UnregisterEventHandler(Futile::ThreadSafe<GameImpl> inGame, EventHandler * inEventHandler);
 
     void setPaused(bool inPause);
 
@@ -197,9 +196,9 @@ private:
 class HumanGame : public GameImpl
 {
 public:
-    inline static ThreadSafe<GameImpl> Create(std::size_t inNumRows, std::size_t inNumColumns)
+    inline static Futile::ThreadSafe<GameImpl> Create(std::size_t inNumRows, std::size_t inNumColumns)
     {
-        return ThreadSafe<GameImpl>(new HumanGame(inNumRows, inNumColumns));
+        return Futile::ThreadSafe<GameImpl>(new HumanGame(inNumRows, inNumColumns));
     }
 
     virtual bool move(MoveDirection inDirection);
@@ -226,9 +225,9 @@ private:
 class ComputerGame : public GameImpl
 {
 public:
-    inline static ThreadSafe<GameImpl> Create(std::size_t inNumRows, std::size_t inNumColumns)
+    inline static Futile::ThreadSafe<GameImpl> Create(std::size_t inNumRows, std::size_t inNumColumns)
     {
-        return ThreadSafe<GameImpl>(new ComputerGame(inNumRows, inNumColumns));
+        return Futile::ThreadSafe<GameImpl>(new ComputerGame(inNumRows, inNumColumns));
     }
 
     virtual bool move(MoveDirection inDirection);

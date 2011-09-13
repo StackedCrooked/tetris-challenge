@@ -9,12 +9,10 @@
 #include <boost/bind.hpp>
 
 
-using Futile::Locker;
-using Futile::MakeString;
-
-
 namespace Tetris {
 
+
+using namespace Futile;
 
 
 RGBColor::RGBColor(int red, int green, int blue) :

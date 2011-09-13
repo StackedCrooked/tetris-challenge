@@ -19,10 +19,7 @@
 namespace Tetris {
 
 
-using Futile::LogWarning;
-using Futile::ScopedLock;
-using Futile::Worker;
-using Futile::WorkerPool;
+using namespace Futile;
 
 
 MultithreadedNodeCalculator::MultithreadedNodeCalculator(std::auto_ptr<GameStateNode> inNode,

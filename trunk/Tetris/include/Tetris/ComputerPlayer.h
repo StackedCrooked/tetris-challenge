@@ -78,7 +78,7 @@ private:
 
     struct Impl;
     friend struct Impl;
-    ThreadSafe<Impl> mImpl;
+    Futile::ThreadSafe<Impl> mImpl;
     boost::scoped_ptr<Poco::Timer> mTimer;
 };
 

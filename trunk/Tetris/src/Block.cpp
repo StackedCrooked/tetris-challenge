@@ -6,11 +6,10 @@
 #include <stdexcept>
 
 
-using Futile::Create;
-using Futile::CreatePoly;
-
-
 namespace Tetris {
+
+
+using namespace Futile;
 
 
 class BlockImpl

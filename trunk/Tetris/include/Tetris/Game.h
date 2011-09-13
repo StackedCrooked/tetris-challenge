@@ -16,9 +16,6 @@
 #include <vector>
 
 
-using Futile::ThreadSafe;
-
-
 namespace Tetris {
 
 
@@ -64,7 +61,7 @@ public:
 
     GameStateStats stats() const;
 
-    ThreadSafe<GameImpl> gameImpl() const;
+    Futile::ThreadSafe<GameImpl> gameImpl() const;
 
     void setPaused(bool inPaused);
 

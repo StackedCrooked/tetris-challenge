@@ -21,13 +21,7 @@
 namespace Tetris {
 
 
-using Futile::InvokeLater;
-using Futile::LogError;
-using Futile::LogWarning;
-using Futile::MakeString;
-using Futile::Mutex;
-using Futile::Locker;
-using Futile::ThreadSafe;
+using namespace Futile;
 
 
 extern const int cMaxLevel;

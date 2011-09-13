@@ -8,12 +8,10 @@
 #include <ctime>
 
 
-using Futile::Mutex;
-using Futile::ScopedLock;
-using Futile::Locker;
-
-
 namespace Tetris {
+
+
+using namespace Futile;
 
 
 AbstractBlockFactory::AbstractBlockFactory()
