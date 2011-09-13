@@ -14,6 +14,7 @@ Futile/include/Futile/MainThreadImpl.h
 Futile/include/Futile/MakeString.h
 Futile/include/Futile/Node.h
 Futile/include/Futile/Singleton.h
+Futile/include/Futile/Stopwatch.h
 Futile/include/Futile/Threading.h
 Futile/include/Futile/TypedWrapper.h
 Futile/include/Futile/Worker.h
@@ -22,6 +23,7 @@ Futile/src/LeakDetector.cpp
 Futile/src/Logger.cpp
 Futile/src/Logging.cpp
 Futile/src/MainThread.cpp
+Futile/src/Stopwatch.cpp
 Futile/src/Threading.cpp
 Futile/src/Worker.cpp
 Futile/src/WorkerPool.cpp
