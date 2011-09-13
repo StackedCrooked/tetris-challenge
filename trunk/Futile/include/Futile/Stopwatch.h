@@ -12,7 +12,7 @@ namespace Futile {
 class Stopwatch : boost::noncopyable
 {
 public:
-    /// Starts the stopwatch.
+    /// Creates and starts the stopwatch.
     Stopwatch();
 
     /// Resets and starts the stopwatch.
