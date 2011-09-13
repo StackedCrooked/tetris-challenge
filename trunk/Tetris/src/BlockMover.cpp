@@ -8,10 +8,10 @@
 #include "Tetris/Block.h"
 #include "Futile/Logging.h"
 #include "Futile/MakeString.h"
+#include "Futile/Stopwatch.h"
 #include "Futile/Threading.h"
 #include "Futile/Assert.h"
 #include "Poco/AtomicCounter.h"
-#include "Poco/Stopwatch.h"
 #include "Poco/Timer.h"
 #include <iostream>
 #include <boost/bind.hpp>
@@ -67,7 +67,7 @@ struct BlockMover::Impl
 
     ThreadSafe<GameImpl> mGame;
     boost::scoped_ptr<Poco::Timer> mTimer;
-    Poco::Stopwatch mStopwatch;
+    Futile::Stopwatch mStopwatch;
     int mNumMovesPerSecond;
     Poco::AtomicCounter mMoveCount;
     int mActualSpeed;
@@ -81,7 +81,6 @@ BlockMover::BlockMover(ThreadSafe<GameImpl> inGame) :
     mImpl->mTimer.reset(new Poco::Timer(10, 10));
     Poco::TimerCallback<Impl> timerCallback(*mImpl, &Impl::onTimer);
     mImpl->mTimer->start(timerCallback);
-    mImpl->mStopwatch.start();
 }
 
 
@@ -146,8 +145,7 @@ void BlockMover::Impl::onTimer(Poco::Timer &)
         move();
         ++mMoveCount;
 
-        static const Poco::UInt64 cOneSecond = 1000 * 1000;
-        if (mStopwatch.elapsed() >= 4 * cOneSecond)
+        if (mStopwatch.elapsedMs() >= 4000)
         {
             mActualSpeed = mMoveCount / 4;
             mMoveCount = 0;
