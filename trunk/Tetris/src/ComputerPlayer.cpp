@@ -52,8 +52,7 @@ public:
         mGameDepth(0),
         mStop(false),
         mReset(false),
-        mQuitFlag(false),
-        mTimer(10, 10)
+        mQuitFlag(false)
     {
     }
 
@@ -100,7 +99,6 @@ public:
     bool mStop;
     bool mReset;
     bool mQuitFlag;
-    Poco::Timer mTimer;
 };
 
 
@@ -120,24 +118,25 @@ ComputerPlayer::ComputerPlayer(const TeamName & inTeamName,
                                std::size_t inRowCount,
                                std::size_t inColumnCount) :
     Player(PlayerType_Computer, inTeamName, inPlayerName, inRowCount, inColumnCount),
-    mImpl(new Impl())
+    mImpl(new Impl()),
+    mTimer(new Poco::Timer(10, 10))
 {
     FUTILE_LOCK(Impl & impl, mImpl)
     {
         impl.mComputerPlayer = this;
         impl.mBlockMover.reset(new BlockMover(game()->gameImpl()));
-        impl.mTimer.start(Poco::TimerCallback<ComputerPlayer>(*this, &ComputerPlayer::onTimerEvent));
     }
+    mTimer->start(Poco::TimerCallback<ComputerPlayer>(*this, &ComputerPlayer::onTimerEvent));
 }
 
 
 ComputerPlayer::~ComputerPlayer()
 {
+    mTimer->stop();
     FUTILE_LOCK(Impl & impl, mImpl)
     {
         impl.mQuitFlag = true;
         impl.mBlockMover.reset();
-        impl.mTimer.stop();
     }
 }
 
@@ -201,7 +200,7 @@ void ComputerPlayer::setSearchWidth(int inSearchWidth)
 
 
 int ComputerPlayer::depth() const
-{   
+{
     FUTILE_LOCK(Impl & impl, mImpl)
     {
         if (impl.mNodeCalculator)
@@ -313,7 +312,7 @@ void ComputerPlayer::Impl::timerEvent()
         return;
     }
 
-    // Consult the tweaker.    
+    // Consult the tweaker.
     PlayerPtr playerPtr = mComputerPlayer->shared_from_this();
     boost::weak_ptr<Player> weakPtr(playerPtr);
     InvokeLater(boost::bind(&ComputerPlayer::Impl::UpdateComputerBlockMoveSpeed, weakPtr));
