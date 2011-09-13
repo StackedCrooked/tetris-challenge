@@ -3,6 +3,7 @@
 #include "Tetris/Block.h"
 #include "Tetris/GameImpl.h"
 #include "Tetris/Game.h"
+#include "Futile/Logging.h"
 #include "Futile/MakeString.h"
 #include "Futile/Threading.h"
 #include <boost/bind.hpp>
@@ -70,7 +71,6 @@ AbstractWidget::AbstractWidget(int inSquareWidth, int inSquareHeight) :
     mFrameCount(0),
     mFPS(0)
 {
-    mFPSStopwatch.start();
 }
 
 
@@ -489,12 +489,12 @@ void AbstractWidget::paintFutureBlocks(const Rect & inRect, int inSpacing, const
 void AbstractWidget::recalculateFPS()
 {
     mFrameCount++;
-
-    if (mFPSStopwatch.elapsed() > 1 * 1000.0 * 1000.0)
+    if (mFPSStopwatch.elapsedMs() > 10000)
     {
-        mFPS = (1000.0 * 1000.0 * mFrameCount) / static_cast<double>(mFPSStopwatch.elapsed());
+        mFPS = mFrameCount / 10;
         mFrameCount = 0;
         mFPSStopwatch.restart();
+        Futile::LogInfo(MakeString() << player()->playerName() << " fps: " << mFPS);
     }
 }
 

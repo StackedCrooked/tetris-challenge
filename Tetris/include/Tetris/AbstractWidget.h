@@ -7,7 +7,7 @@
 #include "Tetris/Grid.h"
 #include "Tetris/Player.h"
 #include "Tetris/Game.h"
-#include "Poco/Stopwatch.h"
+#include "Futile/Stopwatch.h"
 
 
 namespace Tetris {
@@ -160,7 +160,7 @@ private:
     int mMargin;
     bool mPaintActiveBlockShadow;
     unsigned int mFrameCount;
-    Poco::Stopwatch mFPSStopwatch;
+    Futile::Stopwatch mFPSStopwatch;
     double mFPS;
 };
 
