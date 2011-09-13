@@ -60,39 +60,47 @@ struct Gravity::Impl : boost::noncopyable
 
     ThreadSafe<GameImpl> mThreadSafeGame;
     int mLevel;
-    Poco::Timer mTimer;
     Futile::Stopwatch mStopwatch;
 };
 
 
 Gravity::Gravity(const ThreadSafe<GameImpl> & inThreadSafeGame) :
-    mImpl(new Impl(inThreadSafeGame))
+    mImpl(new Impl(inThreadSafeGame)),
+    mTimer(new Poco::Timer)
 {
-    Locker<GameImpl> rgame(mImpl->mThreadSafeGame);
-    mImpl->mTimer.start(Poco::TimerCallback<Gravity::Impl>(*mImpl, &Gravity::Impl::onTimerEvent));
-    mImpl->mTimer.setPeriodicInterval(sIntervals[rgame->level()]);
+    mTimer->start(Poco::TimerCallback<Gravity>(*this, &Gravity::onTimerEvent));
+    mTimer->setPeriodicInterval(sIntervals[inThreadSafeGame.lock()->level()]);
 }
 
 
 Gravity::~Gravity()
 {
+    // Don't allow exceptions to escape from the destructor.
     try
     {
         // Stopping the timer ensures that the timer callback
         // has completed before destroying the Impl object.
-        mImpl->mTimer.stop();
+        mTimer->stop();
         mImpl.reset();
     }
     catch (const std::exception & exc)
     {
-        // Don't allow exceptions to escape from the destructor.
         // Log any errors.
         LogError(MakeString() << "~Gravity throws: " << exc.what());
     }
 }
 
 
-void Gravity::Impl::onTimerEvent(Poco::Timer & )
+void Gravity::onTimerEvent(Poco::Timer & timer)
+{
+    FUTILE_LOCK(Impl & impl, mImpl)
+    {
+        impl.onTimerEvent(timer);
+    }
+}
+
+
+void Gravity::Impl::onTimerEvent(Poco::Timer & timer)
 {
     try
     {
@@ -116,7 +124,7 @@ void Gravity::Impl::onTimerEvent(Poco::Timer & )
         if (mLevel != oldLevel)
         {
             Assert(mLevel < cIntervalCount);
-            mTimer.setPeriodicInterval(sIntervals[mLevel]);
+            timer.setPeriodicInterval(sIntervals[mLevel]);
         }
     }
     catch (const std::exception & inException)
@@ -128,7 +136,7 @@ void Gravity::Impl::onTimerEvent(Poco::Timer & )
 
 double Gravity::speed() const
 {
-    return CalculateSpeed(mImpl->mLevel);
+    return CalculateSpeed(mImpl.lock()->mLevel);
 }
 
 

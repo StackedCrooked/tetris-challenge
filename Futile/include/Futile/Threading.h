@@ -134,6 +134,11 @@ public:
         return mImpl < inOther.mImpl;
     }
 
+    void reset()
+    {
+        mImpl.reset();
+    }
+
 private:
     friend class Locker<Variable>;
     friend class LockerBase;

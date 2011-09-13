@@ -6,6 +6,11 @@
 #include <boost/scoped_ptr.hpp>
 
 
+namespace Poco {
+    class Timer;
+}
+
+
 namespace Tetris {
 
 
@@ -35,8 +40,11 @@ private:
     Gravity(const Gravity &);
     Gravity & operator=(const Gravity &);
 
+    void onTimerEvent(Poco::Timer & timer);
+
     struct Impl;
-    boost::scoped_ptr<Impl> mImpl;
+    Futile::ThreadSafe<Impl> mImpl;
+    boost::scoped_ptr<Poco::Timer> mTimer;
 };
 
 
