@@ -11,7 +11,6 @@
 #include "Futile/Stopwatch.h"
 #include "Futile/Threading.h"
 #include "Futile/Assert.h"
-#include "Poco/AtomicCounter.h"
 #include "Poco/Timer.h"
 #include <iostream>
 #include <boost/bind.hpp>
@@ -25,17 +24,29 @@ using namespace Futile;
 
 struct BlockMover::Impl
 {
+    struct Data
+    {
+        Data() :
+            mStopwatch(),
+            mNumMovesPerSecond(1),
+            mMoveCount(0),
+            mActualSpeed(0),
+            mMoveDownBehavior(MoveDownBehavior_Move)
+        {
+        }
+
+        Futile::Stopwatch mStopwatch;
+        unsigned mNumMovesPerSecond;
+        unsigned mMoveCount;
+        unsigned mActualSpeed;
+        MoveDownBehavior mMoveDownBehavior;
+    };
+
     Impl(ThreadSafe<GameImpl> inGame) :
         mGame(inGame),
         mTimer(10, 10), // frequency is 100/s
-        mStopwatch(),
-        mNumMovesPerSecond(1),
-        mMoveCount(0),
-        mActualSpeed(0),
-        mMoveDownBehavior(MoveDownBehavior_Move)
+        mData(new Data)
     {
-        Poco::TimerCallback<Impl> timerCallback(*this, &Impl::onTimer);
-        mTimer.start(timerCallback);
     }
 
     ~Impl()
@@ -44,27 +55,56 @@ struct BlockMover::Impl
 
     void onTimer(Poco::Timer & inTimer);
 
-    int periodicInterval() const
+    static unsigned GetTimerIntervalMs(unsigned & inNumMovesPerSecond)
     {
-        Assert(mNumMovesPerSecond != 0);
-        return static_cast<int>(0.5 + 1000.0 / static_cast<double>(mNumMovesPerSecond));
+        return static_cast<unsigned>(0.5 + 1000.0 / static_cast<double>(inNumMovesPerSecond));
     }
 
-    void move();
+    void setNumMovesPerSecond(unsigned n)
+    {
+        FUTILE_LOCK(Data & data, mData)
+        {
+            data.mNumMovesPerSecond = n;
+        }
+        mTimer.setPeriodicInterval(GetTimerIntervalMs(n));
+    }
+
+    unsigned speed() const
+    {
+        return mData.lock()->mNumMovesPerSecond;
+    }
+
+    unsigned actualSpeed() const
+    {
+        return mData.lock()->mActualSpeed;
+    }
+
+    void setMoveDownBehavior(MoveDownBehavior inMoveDownBehavior)
+    {
+        FUTILE_LOCK(Data & data, mData)
+        {
+            data.mMoveDownBehavior = inMoveDownBehavior;
+        }
+    }
+
+    MoveDownBehavior moveDownBehavior() const
+    {
+        return mData.lock()->mMoveDownBehavior;
+    }
+
+    void move(Data & data);
 
     ThreadSafe<GameImpl> mGame;
     Poco::Timer mTimer;
-    Futile::Stopwatch mStopwatch;
-    int mNumMovesPerSecond;
-    Poco::AtomicCounter mMoveCount;
-    int mActualSpeed;
-    MoveDownBehavior mMoveDownBehavior;
+    ThreadSafe<Data> mData;
 };
 
 
 BlockMover::BlockMover(ThreadSafe<GameImpl> inGame) :
     mImpl(new Impl(inGame))
 {
+    Poco::TimerCallback<Impl> timerCallback(*mImpl, &Impl::onTimer);
+    mImpl->mTimer.start(timerCallback);
 }
 
 
@@ -91,38 +131,38 @@ void BlockMover::setSpeed(unsigned inNumMovesPerSecond)
     {
         inNumMovesPerSecond = 1000;
     }
-    else if (inNumMovesPerSecond < 1)
+
+    if (inNumMovesPerSecond < 1)
     {
         inNumMovesPerSecond = 1;
     }
 
-    mImpl->mNumMovesPerSecond = inNumMovesPerSecond;
-    mImpl->mTimer.setPeriodicInterval(mImpl->periodicInterval());
+    mImpl->setNumMovesPerSecond(inNumMovesPerSecond);
 }
 
 
 int BlockMover::speed() const
 {
-    return mImpl->mNumMovesPerSecond;
+    return mImpl->speed();
 }
 
 
 
 int BlockMover::actualSpeed() const
 {
-    return mImpl->mActualSpeed;
+    return mImpl->actualSpeed();
 }
 
 
 void BlockMover::setMoveDownBehavior(MoveDownBehavior inMoveDownBehavior)
 {
-    mImpl->mMoveDownBehavior = inMoveDownBehavior;
+    mImpl->setMoveDownBehavior(inMoveDownBehavior);
 }
 
 
 BlockMover::MoveDownBehavior BlockMover::moveDownBehavior() const
 {
-    return mImpl->mMoveDownBehavior;
+    return mImpl->moveDownBehavior();
 }
 
 
@@ -130,14 +170,17 @@ void BlockMover::Impl::onTimer(Poco::Timer &)
 {
     try
     {
-        move();
-        ++mMoveCount;
-
-        if (mStopwatch.elapsedMs() >= 4000)
+        FUTILE_LOCK(Data & data, mData)
         {
-            mActualSpeed = mMoveCount / 4;
-            mMoveCount = 0;
-            mStopwatch.restart();
+            move(data);
+            ++data.mMoveCount;
+
+            if (data.mStopwatch.elapsedMs() >= 4000)
+            {
+                data.mActualSpeed = data.mMoveCount / 4;
+                data.mMoveCount = 0;
+                data.mStopwatch.restart();
+            }
         }
     }
     catch (const std::exception & inException)
@@ -147,7 +190,7 @@ void BlockMover::Impl::onTimer(Poco::Timer &)
 }
 
 
-void BlockMover::Impl::move()
+void BlockMover::Impl::move(Data & data)
 {
     Locker<GameImpl> wGame(mGame);
     ComputerGame & game = dynamic_cast<ComputerGame&>(*wGame.get());
@@ -216,17 +259,17 @@ void BlockMover::Impl::move()
     // If we get arrive here then horizontal position and rotation are OK.
     // Start lowering the block.
     //
-    if (mMoveDownBehavior == BlockMover::MoveDownBehavior_Move)
+    if (data.mMoveDownBehavior == BlockMover::MoveDownBehavior_Move)
     {
         game.move(MoveDirection_Down);
     }
-    else if (mMoveDownBehavior == BlockMover::MoveDownBehavior_Drop)
+    else if (data.mMoveDownBehavior == BlockMover::MoveDownBehavior_Drop)
     {
         game.dropAndCommit();
     }
     else
     {
-        throw std::logic_error(MakeString() << "MoveDownBehavior: invalid enum value: " << mMoveDownBehavior);
+        throw std::logic_error(MakeString() << "MoveDownBehavior: invalid enum value: " << data.mMoveDownBehavior);
     }
 }
 
