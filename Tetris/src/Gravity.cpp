@@ -14,12 +14,10 @@
 #include <algorithm>
 
 
-using Futile::LogError;
-using Futile::Locker;
-using Futile::ThreadSafe;
-
-
 namespace Tetris {
+
+
+using namespace Futile;
 
 
 // Number of milliseconds between two drops.
@@ -78,7 +76,19 @@ Gravity::Gravity(const ThreadSafe<GameImpl> & inThreadSafeGame) :
 
 Gravity::~Gravity()
 {
-    mImpl.reset();
+    try
+    {
+        // Stopping the timer ensures that the timer callback
+        // has completed before destroying the Impl object.
+        mImpl->mTimer.stop();
+        mImpl.reset();
+    }
+    catch (const std::exception & exc)
+    {
+        // Don't allow exceptions to escape from the destructor.
+        // Log any errors.
+        LogError(MakeString() << "~Gravity throws: " << exc.what());
+    }
 }
 
 
