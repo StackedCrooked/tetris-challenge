@@ -4,10 +4,10 @@
 #include "Futile/MakeString.h"
 
 
-using Futile::MakeString;
-
-
 namespace Tetris {
+
+
+using namespace Futile;
 
 
 struct Player::Impl

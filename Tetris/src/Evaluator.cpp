@@ -6,11 +6,10 @@
 #include "Tetris/Grid.h"
 #include "Futile/Threading.h"
 
-
-using Futile::ScopedLock;
-
-
 namespace Tetris {
+
+
+using namespace Futile;
 
 
 Evaluator::Evaluator(const std::string & inName,
