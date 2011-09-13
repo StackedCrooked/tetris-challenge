@@ -6,17 +6,17 @@ Todo
 Model, MultiplayerGame, Player, Game, GameState
 
 
-
-
-- Seamless cross-platform builds: Mac OS X, Linux and Windows.
-- Fix the resource system.
-- Release a next version. Nothing fancy yet. Doesn't need to be very public (SO chat..)
-- Paint GameOver instead of showing a MessageBox
-- Online highscores.
+- Remove Poco dependencies
+- Console application to test AI
+- Report the boost deadlock when version > 1.42
+- Use googletest
+- Highscores (offline or online)
+- Seamless cross-platform builds: Mac OS X, Linux and Windows
 - Associate computer names with strategies.
 - Use a single shared timer.
 - Game state comparator could shuffle in case of equal
-- Game concept: Computer is allowed to make a move after the player made one.
+? Game concept: Computer is allowed to make a move after the player made one.
+v Paint GameOver instead of showing a MessageBox
 v Use Ctrl-P for pause.
 v On startup the new game dialog should popup.
 v Use a "New game"-dialog with game options.

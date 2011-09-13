@@ -342,23 +342,6 @@ T & Unwrap(const LockerBase & inLockerBase, const Identity< ThreadSafe<T> > &)
         FUTILE_FOR_BLOCK(DECL = Futile::Helper::Unwrap(theLockerBase, FUTILE_ENCODEDTYPEOF(TSV)))
 
 
-// Simple stopwatch class.
-// Used by the TimeLimitPolicy class of the Locker and Locker classes.
-class Stopwatch : boost::noncopyable
-{
-public:
-    Stopwatch();
-
-    ~Stopwatch();
-
-    unsigned elapsedTimeMs() const;
-
-private:
-    struct Impl;
-    boost::scoped_ptr<Impl> mImpl;
-};
-
-
 } // namespace Futile
 
 
