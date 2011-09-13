@@ -17,42 +17,29 @@
 #include <boost/bind.hpp>
 
 
-using Futile::LogError;
-using Futile::MakeString;
-using Futile::Locker;
-
-
 namespace Tetris {
+
+
+using namespace Futile;
 
 
 struct BlockMover::Impl
 {
     Impl(ThreadSafe<GameImpl> inGame) :
         mGame(inGame),
-        mTimer(),
+        mTimer(10, 10), // frequency is 100/s
         mStopwatch(),
         mNumMovesPerSecond(1),
         mMoveCount(0),
         mActualSpeed(0),
         mMoveDownBehavior(MoveDownBehavior_Move)
     {
+        Poco::TimerCallback<Impl> timerCallback(*this, &Impl::onTimer);
+        mTimer.start(timerCallback);
     }
 
     ~Impl()
     {
-        try
-        {
-            mTimer->stop();
-            mTimer.reset();
-        }
-        catch (Poco::Exception & exc)
-        {
-            std::cerr << exc.what();
-        }
-        catch (const std::exception & exc)
-        {
-            std::cerr << exc.what();
-        }
     }
 
     void onTimer(Poco::Timer & inTimer);
@@ -66,7 +53,7 @@ struct BlockMover::Impl
     void move();
 
     ThreadSafe<GameImpl> mGame;
-    boost::scoped_ptr<Poco::Timer> mTimer;
+    Poco::Timer mTimer;
     Futile::Stopwatch mStopwatch;
     int mNumMovesPerSecond;
     Poco::AtomicCounter mMoveCount;
@@ -78,38 +65,39 @@ struct BlockMover::Impl
 BlockMover::BlockMover(ThreadSafe<GameImpl> inGame) :
     mImpl(new Impl(inGame))
 {
-    mImpl->mTimer.reset(new Poco::Timer(10, 10));
-    Poco::TimerCallback<Impl> timerCallback(*mImpl, &Impl::onTimer);
-    mImpl->mTimer->start(timerCallback);
 }
 
 
 BlockMover::~BlockMover()
 {
-    mImpl.reset();
+    // Don't allow exceptions to escape the constructor.
+    try
+    {
+        // Stopping the timer ensures that any callbacks finish
+        // before the implementation object is destructed.
+        mImpl->mTimer.stop();
+        mImpl.reset();
+    }
+    catch (const std::exception & exc)
+    {
+        LogError(MakeString() << "~BlockMover throws: " << exc.what());
+    }
 }
 
 
-void BlockMover::setSpeed(int inNumMovesPerSecond)
+void BlockMover::setSpeed(unsigned inNumMovesPerSecond)
 {
-    if (inNumMovesPerSecond <= 0)
-    {
-        throw std::invalid_argument("Number of moves per second must be different from 0.");
-    }
     if (inNumMovesPerSecond > 1000)
     {
-        throw std::runtime_error(MakeString() << "Max move speed exceeded: " << inNumMovesPerSecond << "/1000");
+        inNumMovesPerSecond = 1000;
+    }
+    else if (inNumMovesPerSecond < 1)
+    {
+        inNumMovesPerSecond = 1;
     }
 
     mImpl->mNumMovesPerSecond = inNumMovesPerSecond;
-    if (mImpl->mNumMovesPerSecond < 1)
-    {
-        mImpl->mNumMovesPerSecond = 1;
-    }
-    if (mImpl->mTimer)
-    {
-        mImpl->mTimer->setPeriodicInterval(mImpl->periodicInterval());
-    }
+    mImpl->mTimer.setPeriodicInterval(mImpl->periodicInterval());
 }
 
 

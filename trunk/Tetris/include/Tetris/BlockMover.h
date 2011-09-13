@@ -30,7 +30,7 @@ public:
 
     ~BlockMover();
 
-    void setSpeed(int inNumMovesPerSecond);
+    void setSpeed(unsigned inNumMovesPerSecond);
 
     int speed() const;
 
