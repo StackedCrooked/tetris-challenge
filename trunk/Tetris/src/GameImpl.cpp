@@ -294,7 +294,7 @@ void GameImpl::supplyBlocks()
 
 void GameImpl::setPaused(bool inPaused)
 {
-    LogInfo(MakeString() << "GameImpl::setPaused: " << inPaused);
+    LogInfo(SS() << "GameImpl::setPaused: " << inPaused);
     mPaused = inPaused;
 }
 

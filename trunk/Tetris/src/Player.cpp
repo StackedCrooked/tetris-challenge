@@ -54,7 +54,7 @@ PlayerPtr Player::Create(PlayerType inPlayerType,
     {
         return HumanPlayer::Create(inTeamName, inPlayerName, inRowCount, inColumnCount);
     }
-    throw std::logic_error(MakeString() << "PlayerType: invalid enum value: " << inPlayerType);
+    throw std::logic_error(SS() << "PlayerType: invalid enum value: " << inPlayerType);
 }
 
 

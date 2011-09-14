@@ -129,7 +129,7 @@ void NodeCalculatorTest::testInterrupt(Depth inDepth, Width inWidth, WorkerCount
         Assert(overtime < 500);
     }
 
-    std::cout << (interrupted ? " -> Timeout" : std::string(MakeString() << " -> Succeeded in " << duration << "ms"));
+    std::cout << (interrupted ? " -> Timeout" : std::string(SS() << " -> Succeeded in " << duration << "ms"));
 
     NodePtr resultPtr = nodeCalculator.result();
     GameStateNode & result(*resultPtr);

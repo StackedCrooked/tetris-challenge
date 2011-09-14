@@ -120,7 +120,7 @@ BlockMover::~BlockMover()
     }
     catch (const std::exception & exc)
     {
-        LogError(MakeString() << "~BlockMover throws: " << exc.what());
+        LogError(SS() << "~BlockMover throws: " << exc.what());
     }
 }
 
@@ -185,7 +185,7 @@ void BlockMover::Impl::onTimer(Poco::Timer &)
     }
     catch (const std::exception & inException)
     {
-        LogError(MakeString() << "Unanticipated exception thrown in Impl::move(). Details: " << inException.what());
+        LogError(SS() << "Unanticipated exception thrown in Impl::move(). Details: " << inException.what());
     }
 }
 
@@ -269,7 +269,7 @@ void BlockMover::Impl::move(Data & data)
     }
     else
     {
-        throw std::logic_error(MakeString() << "MoveDownBehavior: invalid enum value: " << data.mMoveDownBehavior);
+        throw std::logic_error(SS() << "MoveDownBehavior: invalid enum value: " << data.mMoveDownBehavior);
     }
 }
 

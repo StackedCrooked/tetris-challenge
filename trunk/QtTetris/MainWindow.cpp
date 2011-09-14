@@ -150,7 +150,7 @@ void MainWindow::onNewGame(const PlayerTypes & inPlayerTypes)
 {
     if (inPlayerTypes.size() > mTetrisWidgets.size())
     {
-        throw std::runtime_error(Str() << "Too make players: " << inPlayerTypes.size() << ". View only supports " << mTetrisWidgets.size() << " players.");
+        throw std::runtime_error(SS() << "Too make players: " << inPlayerTypes.size() << ". View only supports " << mTetrisWidgets.size() << " players.");
     }
 
     // Unset the GameOver state.

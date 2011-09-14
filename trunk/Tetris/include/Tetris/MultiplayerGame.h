@@ -5,8 +5,6 @@
 #include "Tetris/Player.h"
 #include "Tetris/ComputerPlayer.h"
 #include <boost/scoped_ptr.hpp>
-#include <memory>
-#include <set>
 
 
 namespace Tetris {
