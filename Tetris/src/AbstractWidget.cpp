@@ -448,20 +448,20 @@ void AbstractWidget::paintStats(const Rect & inRect, const GameStateStats & inSt
 {
     Rect rect = Rect(inRect.x(), inRect.y(), inRect.width(), mStatItemHeight);
     fillRect(rect, RGBColor(255, 255, 255));
-    paintStatItem(rect, "Score", MakeString() << inStats.score());
+    paintStatItem(rect, "Score", SS() << inStats.score());
 
     rect = Rect(rect.left(), rect.bottom() + margin(), rect.width(), rect.height());
     fillRect(rect, RGBColor(255, 255, 255));
-    paintStatItem(rect, "Level", MakeString() << game()->level());
+    paintStatItem(rect, "Level", SS() << game()->level());
 
     rect = Rect(rect.left(), rect.bottom() + margin(), rect.width(), rect.height());
     fillRect(rect, RGBColor(255, 255, 255));
-    paintStatItem(rect, "Lines", MakeString() << inStats.numLines());
+    paintStatItem(rect, "Lines", SS() << inStats.numLines());
 
     rect = Rect(rect.left(), rect.bottom() + margin(), rect.width(), rect.height());
     fillRect(rect, RGBColor(255, 255, 255));
 
-    paintStatItem(rect, "Fps", MakeString() << static_cast<int>(0.5 + mFPS));
+    paintStatItem(rect, "Fps", SS() << static_cast<int>(0.5 + mFPS));
 }
 
 
@@ -492,7 +492,7 @@ void AbstractWidget::recalculateFPS()
         mFPS = mFrameCount / 10;
         mFrameCount = 0;
         mFPSStopwatch.restart();
-        Futile::LogInfo(MakeString() << player()->playerName() << " fps: " << mFPS);
+        Futile::LogInfo(SS() << player()->playerName() << " fps: " << mFPS);
     }
 }
 

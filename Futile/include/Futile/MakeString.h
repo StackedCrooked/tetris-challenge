@@ -14,7 +14,7 @@ namespace Futile {
  *
  * Enables logging like this:
  *
- *   LogError(MakeString() << "The index " << i << " exceeds the max length of " << max << ".");
+ *   LogError(SS() << "The index " << i << " exceeds the max length of " << max << ".");
  *
  */
 class MakeString
@@ -35,7 +35,7 @@ private:
 };
 
 
-typedef MakeString Str;
+typedef MakeString SS;
 
 
 } // namespace Futile

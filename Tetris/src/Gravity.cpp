@@ -86,7 +86,7 @@ Gravity::~Gravity()
     catch (const std::exception & exc)
     {
         // Log any errors.
-        LogError(MakeString() << "~Gravity throws: " << exc.what());
+        LogError(SS() << "~Gravity throws: " << exc.what());
     }
 }
 

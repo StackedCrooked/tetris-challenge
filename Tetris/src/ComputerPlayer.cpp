@@ -155,7 +155,7 @@ void ComputerPlayer::onTimerEvent(Poco::Timer & )
     }
     catch (const std::exception & exc)
     {
-        LogError(MakeString() << "Exception caught during ComputerPlayer timerEvent. Details: " << exc.what());
+        LogError(SS() << "Exception caught during ComputerPlayer timerEvent. Details: " << exc.what());
     }
 }
 
@@ -266,24 +266,24 @@ void ComputerPlayer::Impl::updateComputerBlockMoveSpeed()
 
         if (mSearchDepth < 1 || mSearchDepth > 100)
         {
-            throw std::runtime_error(MakeString() << "Invalid search depth: " << mSearchDepth);
+            throw std::runtime_error(SS() << "Invalid search depth: " << mSearchDepth);
         }
 
         if (mSearchWidth < 1 || mSearchWidth > 100)
         {
-            throw std::runtime_error(MakeString() << "Invalid search width: " << mSearchWidth);
+            throw std::runtime_error(SS() << "Invalid search width: " << mSearchWidth);
         }
 
         if (mWorkerCount < 1 || mWorkerCount > 128)
         {
-            throw std::runtime_error(MakeString() << "Invalid worker count: " << mWorkerCount);
+            throw std::runtime_error(SS() << "Invalid worker count: " << mWorkerCount);
         }
 
         if (moveSpeed != 0)
         {
             if (moveSpeed < 0)
             {
-                throw std::runtime_error(MakeString() << "Invalid move speed: " << moveSpeed);
+                throw std::runtime_error(SS() << "Invalid move speed: " << moveSpeed);
             }
             mBlockMover->setSpeed(moveSpeed);
         }

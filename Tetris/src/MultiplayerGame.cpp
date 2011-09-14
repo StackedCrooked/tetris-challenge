@@ -2,6 +2,7 @@
 #include "Tetris/MultiplayerGame.h"
 #include "Tetris/GameImpl.h"
 #include "Futile/Logging.h"
+#include "Futile/MakeString.h"
 #include "Futile/Threading.h"
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
@@ -11,6 +12,9 @@
 
 
 namespace Tetris {
+
+
+using namespace Futile;
 
 
 struct MultiplayerGame::Impl : public Game::EventHandler,
@@ -80,6 +84,15 @@ MultiplayerGame::MultiplayerGame(std::size_t inRowCount, std::size_t inColumnCou
 
 MultiplayerGame::~MultiplayerGame()
 {
+    // Don't allow exceptions to escape from the destructor.
+    try
+    {
+        mImpl.reset();
+    }
+    catch (const std::exception & exc)
+    {
+        LogError(SS() << "~MultiplayerGame throws: " << exc.what());
+    }
 }
 
 

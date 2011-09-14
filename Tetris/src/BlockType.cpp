@@ -45,7 +45,7 @@ std::string ToString(const BlockType & inBlockType)
         }
         default:
         {
-            throw std::logic_error(Futile::MakeString() << "Invalid enum value for BlockType: " << static_cast<int>(inBlockType));
+            throw std::logic_error(Futile::SS() << "Invalid enum value for BlockType: " << static_cast<int>(inBlockType));
         }
     }
 }
