@@ -1,5 +1,6 @@
 #include "Futile/Stopwatch.h"
 #include <stdexcept>
+#include <iostream>
 
 
 namespace Futile {
@@ -19,8 +20,7 @@ void Stopwatch::restart()
 
 unsigned Stopwatch::elapsedMs() const
 {
-    static const clock_t CLOCKS_PER_MS = CLOCKS_PER_SEC / 1000;
-    return static_cast<unsigned>((clock() - mStart) / CLOCKS_PER_MS);
+    return static_cast<unsigned>(0.5 + 10.0 * (clock() - mStart));
 }
 
 

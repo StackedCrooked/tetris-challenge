@@ -19,6 +19,7 @@ add_library(Futile
     include/Futile/Node.h
     include/Futile/Stopwatch.h
     include/Futile/Threading.h
+    include/Futile/Timer.h
     include/Futile/TypedWrapper.h
     include/Futile/Worker.h
     include/Futile/WorkerPool.h
@@ -28,5 +29,6 @@ add_library(Futile
     src/MainThread.cpp
     src/Stopwatch.cpp
     src/Threading.cpp
+    src/Timer.cpp
     src/Worker.cpp
     src/WorkerPool.cpp)
