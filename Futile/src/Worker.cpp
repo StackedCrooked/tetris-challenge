@@ -48,7 +48,7 @@ namespace Futile {
 
 Worker::Worker(const std::string & inName) :
     mName(inName),
-    mStatus(WorkerStatus_Initial),
+    mStatus(WorkerStatus_Waiting),
     mQuitFlag(false)
 {
     mThread.reset(new boost::thread(boost::bind(&Worker::run, this)));

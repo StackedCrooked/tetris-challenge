@@ -15,7 +15,7 @@ public:
     /// Creates and starts the stopwatch.
     Stopwatch();
 
-    /// Resets and starts the stopwatch.
+    /// Reset and start the stopwatch.
     void restart();
 
     /// Returns the elapsed time in milliseconds.
