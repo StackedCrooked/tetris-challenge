@@ -17,7 +17,6 @@ add_library(Tetris
     include/Tetris/Config.h
     include/Tetris/Direction.h
     include/Tetris/Evaluator.h
-    include/Tetris/ForwardDeclarations.h
     include/Tetris/Game.h
     include/Tetris/GameImpl.h
     include/Tetris/GameOver.h
