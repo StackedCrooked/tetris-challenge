@@ -22,8 +22,6 @@ public:
     /// Returns the elapsed time in milliseconds.
     boost::uint64_t elapsedMs() const;
 
-    static unsigned long long GetCurrentTimeMs();
-
 private:
     boost::uint64_t mStart;
 };

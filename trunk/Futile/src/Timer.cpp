@@ -59,14 +59,14 @@ struct Timer::Impl : boost::noncopyable
     {
         if (!isStopped())
         {
-            boost::this_thread::sleep(boost::posix_time::milliseconds(mStartInterval));
+            Sleep(mStartInterval);
             invokeCallback();
         }
 
         // Periodic interval
         while (!isStopped())
         {
-            boost::this_thread::sleep(boost::posix_time::milliseconds(mPeriodicInterval));
+            Sleep(mPeriodicInterval);
             invokeCallback();
         }
     }
