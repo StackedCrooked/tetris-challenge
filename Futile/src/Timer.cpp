@@ -12,8 +12,8 @@ struct Timer::Impl : boost::noncopyable
 {
     Impl(Timer * inTimer,
          const Action & inAction,
-         unsigned inStartInterval,
-         unsigned inPeriodicInterval) :
+         boost::uint64_t inStartInterval,
+         boost::uint64_t inPeriodicInterval) :
         mTimer(inTimer),
         mMainWorker("Timer"),
         mAction(inAction),
@@ -57,17 +57,27 @@ struct Timer::Impl : boost::noncopyable
 
     void poll()
     {
-        if (!isStopped())
+        boost::uint64_t startTime = GetCurrentTimeMs();
+        while (!isStopped())
         {
-            Sleep(mStartInterval);
-            invokeCallback();
+            if (GetCurrentTimeMs() - startTime >= mStartInterval)
+            {
+                invokeCallback();
+                break;
+            }
+            Sleep(1);
         }
 
         // Periodic interval
+        startTime = GetCurrentTimeMs();
         while (!isStopped())
         {
-            Sleep(mPeriodicInterval);
-            invokeCallback();
+            if (GetCurrentTimeMs() - startTime >= mPeriodicInterval)
+            {
+                invokeCallback();
+                startTime = GetCurrentTimeMs();
+            }
+            Sleep(1);
         }
     }
 
@@ -88,14 +98,14 @@ struct Timer::Impl : boost::noncopyable
     Action mAction;
     bool mStop;
     mutable Mutex mStopMutex;
-    unsigned mStartInterval;
-    unsigned mPeriodicInterval;
+    boost::uint64_t mStartInterval;
+    boost::uint64_t mPeriodicInterval;
 };
 
 
 Timer::Timer(const Action & inAction,
-             unsigned inStartInterval,
-             unsigned inPeriodicInterval) :
+             boost::uint64_t inStartInterval,
+             boost::uint64_t inPeriodicInterval) :
     mImpl(new Impl(this, inAction, inStartInterval, inPeriodicInterval))
 {
 }

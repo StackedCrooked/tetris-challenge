@@ -5,6 +5,7 @@
 #include "Futile/Stopwatch.h"
 #include "Futile/Threading.h"
 #include "Futile/WorkerPool.h"
+#include <boost/cstdint.hpp>
 #include <boost/function.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
@@ -22,8 +23,8 @@ public:
     typedef boost::function<void()> Action;
 
     Timer(const Action & inAction,
-          unsigned inStartInterval,
-          unsigned inPeriodicInterval);
+          boost::uint64_t inStartInterval,
+          boost::uint64_t inPeriodicInterval);
 
     ~Timer();
 
