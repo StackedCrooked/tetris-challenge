@@ -44,7 +44,7 @@ struct BlockMover::Impl
 
     Impl(ThreadSafe<GameImpl> inGame) :
         mGame(inGame),
-        mTimer(10, 10), // frequency is 100/s
+        mTimer(10), // frequency is 100/s
         mData(new Data)
     {
     }
@@ -66,7 +66,7 @@ struct BlockMover::Impl
         {
             data.mNumMovesPerSecond = n;
         }
-        mTimer.setPeriodicInterval(GetTimerIntervalMs(n));
+        mTimer.setInterval(GetTimerIntervalMs(n));
     }
 
     unsigned speed() const

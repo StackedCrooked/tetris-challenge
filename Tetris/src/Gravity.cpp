@@ -70,8 +70,7 @@ Gravity::Gravity(const ThreadSafe<GameImpl> & inThreadSafeGame) :
     mImpl(new Impl(this, inThreadSafeGame)),
     mTimer()
 {
-    unsigned duration = sIntervals[inThreadSafeGame.lock()->level()];
-    mTimer.reset(new Futile::Timer(duration, duration));
+    mTimer.reset(new Timer(sIntervals[inThreadSafeGame.lock()->level()]));
     mTimer->start(boost::bind(&Gravity::onTimerEvent, this));
 }
 
@@ -127,7 +126,7 @@ void Gravity::Impl::onTimerEvent()
         if (mLevel != oldLevel)
         {
             Assert(mLevel < cIntervalCount);
-            mGravity->mTimer->setPeriodicInterval(sIntervals[mLevel]);
+            mGravity->mTimer->setInterval(sIntervals[mLevel]);
         }
     }
     catch (const std::exception & inException)

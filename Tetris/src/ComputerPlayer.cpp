@@ -119,7 +119,7 @@ ComputerPlayer::ComputerPlayer(const TeamName & inTeamName,
                                std::size_t inColumnCount) :
     Player(PlayerType_Computer, inTeamName, inPlayerName, inRowCount, inColumnCount),
     mImpl(new Impl()),
-    mTimer(new Futile::Timer(10, 10))
+    mTimer(new Futile::Timer(10))
 {
     FUTILE_LOCK(Impl & impl, mImpl)
     {

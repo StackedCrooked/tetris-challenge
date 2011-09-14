@@ -11,15 +11,13 @@ namespace Futile {
 struct Timer::Impl : boost::noncopyable
 {
     Impl(Timer * inTimer,
-         boost::uint64_t inStartInterval,
-         boost::uint64_t inPeriodicInterval) :
+         boost::uint64_t inInterval) :
         mTimer(inTimer),
         mMainWorker("Timer"),
         mAction(),
         mStopMutex(),
         mStop(false),
-        mStartInterval(inStartInterval),
-        mPeriodicInterval_(inPeriodicInterval)
+        mInterval(inInterval)
     {
     }
 
@@ -58,16 +56,16 @@ struct Timer::Impl : boost::noncopyable
         mMainWorker.wait();
     }
 
-    void setPeriodicInterval(boost::uint64_t inPeriodicInterval)
+    void setInterval(boost::uint64_t inInterval)
     {
-        ScopedLock lock(mPeriodicIntervalMutex);
-        mPeriodicInterval_ = inPeriodicInterval;
+        ScopedLock lock(mIntervalMutex);
+        mInterval = inInterval;
     }
 
-    boost::uint64_t getPeriodicInterval()
+    boost::uint64_t getInterval()
     {
-        ScopedLock lock(mPeriodicIntervalMutex);
-        return mPeriodicInterval_;
+        ScopedLock lock(mIntervalMutex);
+        return mInterval;
     }
 
     void poll()
@@ -75,24 +73,13 @@ struct Timer::Impl : boost::noncopyable
         boost::uint64_t startTime = GetCurrentTimeMs();
         while (!isStopped())
         {
-            if (GetCurrentTimeMs() - startTime >= mStartInterval)
+            boost::uint64_t currentTimeMs = GetCurrentTimeMs();
+            if (currentTimeMs - startTime >= getInterval())
             {
                 invokeCallback();
-                break;
+                startTime = currentTimeMs;
             }
-            Sleep(1);
-        }
-
-        // Periodic interval
-        startTime = GetCurrentTimeMs();
-        while (!isStopped())
-        {
-            if (GetCurrentTimeMs() - startTime >= getPeriodicInterval())
-            {
-                invokeCallback();
-                startTime = GetCurrentTimeMs();
-            }
-            Sleep(1);
+            Sleep(2);
         }
     }
 
@@ -100,7 +87,10 @@ struct Timer::Impl : boost::noncopyable
     {
         try
         {
-            mAction();
+            if (mAction)
+            {
+                mAction();
+            }
         }
         catch (const std::exception & exc)
         {
@@ -111,19 +101,17 @@ struct Timer::Impl : boost::noncopyable
     Timer * mTimer;
     Worker mMainWorker;
     Action mAction;
-    boost::uint64_t mStartInterval;
 
-    mutable Mutex mPeriodicIntervalMutex;
-    boost::uint64_t mPeriodicInterval_;
+    mutable Mutex mIntervalMutex;
+    boost::uint64_t mInterval;
 
     mutable Mutex mStopMutex;
     bool mStop;
 };
 
 
-Timer::Timer(boost::uint64_t inStartInterval,
-             boost::uint64_t inPeriodicInterval) :
-    mImpl(new Impl(this, inStartInterval, inPeriodicInterval))
+Timer::Timer(boost::uint64_t inInterval) :
+    mImpl(new Impl(this, inInterval))
 {
 }
 
@@ -154,9 +142,9 @@ void Timer::stop()
 }
 
 
-void Timer::setPeriodicInterval(boost::uint64_t inPeriodicInterval)
+void Timer::setInterval(boost::uint64_t inInterval)
 {
-    mImpl->setPeriodicInterval(inPeriodicInterval);
+    mImpl->setInterval(inInterval);
 }
 
 
