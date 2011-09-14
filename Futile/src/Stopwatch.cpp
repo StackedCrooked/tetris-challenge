@@ -21,7 +21,7 @@ void Stopwatch::restart()
 
 boost::uint64_t Stopwatch::elapsedMs() const
 {
-    return static_cast<unsigned>(0.5 + 10.0 * (GetCurrentTimeMs() - mStart));
+    return static_cast<boost::uint64_t>(0.5 + 1.0 * (GetCurrentTimeMs() - mStart));
 }
 
 
