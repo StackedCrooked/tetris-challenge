@@ -17,6 +17,7 @@ struct Timer::Impl : boost::noncopyable
         mTimer(inTimer),
         mMainWorker("Timer"),
         mAction(inAction),
+        mStopMutex(),
         mStop(false),
         mStartInterval(inStartInterval),
         mPeriodicInterval(inPeriodicInterval)
@@ -96,10 +97,10 @@ struct Timer::Impl : boost::noncopyable
     Timer * mTimer;
     Worker mMainWorker;
     Action mAction;
-    bool mStop;
-    mutable Mutex mStopMutex;
     boost::uint64_t mStartInterval;
     boost::uint64_t mPeriodicInterval;
+    mutable Mutex mStopMutex;
+    bool mStop;
 };
 
 
