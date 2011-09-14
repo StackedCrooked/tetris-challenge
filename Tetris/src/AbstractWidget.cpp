@@ -7,7 +7,6 @@
 #include "Futile/MakeString.h"
 #include "Futile/Threading.h"
 #include <boost/bind.hpp>
-#include <iostream>
 
 
 namespace Tetris {
@@ -487,13 +486,12 @@ void AbstractWidget::paintFutureBlocks(const Rect & inRect, int inSpacing, const
 
 void AbstractWidget::recalculateFPS()
 {
-    static const boost::uint64_t cDurationMs = 3000;
+    static const boost::uint64_t cDurationMs = 2000;
     boost::uint64_t elapsedMs = mFPSStopwatch.elapsedMs();
     mFrameCount++;
     if (elapsedMs >= cDurationMs)
     {
         mFPS = static_cast<unsigned>(0.5 + (1000.0 * double(mFrameCount) / double(elapsedMs)));
-        std::cout << player()->playerName() << ", Elapsed: " << elapsedMs << ", FrameCount: " << mFrameCount << ", FPS: " << mFPS << std::endl << std::flush;
         mFrameCount = 0;
         mFPSStopwatch.restart();
     }
