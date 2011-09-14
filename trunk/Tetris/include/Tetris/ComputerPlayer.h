@@ -6,11 +6,7 @@
 #include "Tetris/Evaluator.h"
 #include "Tetris/Player.h"
 #include "Futile/Threading.h"
-
-
-namespace Poco {
-class Timer;
-}
+#include "Futile/Timer.h"
 
 
 namespace Tetris {
@@ -73,13 +69,13 @@ private:
                    std::size_t inRowCount,
                    std::size_t inColumnCount);
 
-    void onTimerEvent(Poco::Timer & );
+    void onTimerEvent();
 
 
     struct Impl;
     friend struct Impl;
     Futile::ThreadSafe<Impl> mImpl;
-    boost::scoped_ptr<Poco::Timer> mTimer;
+    boost::scoped_ptr<Futile::Timer> mTimer;
 };
 
 } // namespace Tetris

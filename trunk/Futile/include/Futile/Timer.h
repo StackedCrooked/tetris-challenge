@@ -22,18 +22,19 @@ class Timer : boost::noncopyable
 public:
     typedef boost::function<void()> Action;
 
-    Timer(const Action & inAction,
-          boost::uint64_t inStartInterval,
+    Timer(boost::uint64_t inStartInterval,
           boost::uint64_t inPeriodicInterval);
 
     ~Timer();
 
     /// Starts the timer.
     /// Throws std::runtime_error if the timer was already started.
-    void start();
+    void start(const Action & inAction);
 
     /// Stops the timer and waits for the current action to finish.
     void stop();
+
+    void setPeriodicInterval(boost::uint64_t inPeriodicInterval);
 
 private:
     struct Impl;

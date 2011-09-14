@@ -11,16 +11,15 @@ namespace Futile {
 struct Timer::Impl : boost::noncopyable
 {
     Impl(Timer * inTimer,
-         const Action & inAction,
          boost::uint64_t inStartInterval,
          boost::uint64_t inPeriodicInterval) :
         mTimer(inTimer),
         mMainWorker("Timer"),
-        mAction(inAction),
+        mAction(),
         mStopMutex(),
         mStop(false),
         mStartInterval(inStartInterval),
-        mPeriodicInterval(inPeriodicInterval)
+        mPeriodicInterval_(inPeriodicInterval)
     {
     }
 
@@ -41,12 +40,15 @@ struct Timer::Impl : boost::noncopyable
         mStop = true;
     }
 
-    void start()
+    void start(const Action & inAction)
     {
-        if (mMainWorker.status() == WorkerStatus_Waiting)
+        if (mMainWorker.status() != WorkerStatus_Waiting)
         {
-            mMainWorker.schedule(boost::bind(&Impl::poll, this));
+            throw std::logic_error("Timer is busy.");
         }
+
+        mAction = inAction;
+        mMainWorker.schedule(boost::bind(&Impl::poll, this));
     }
 
     void stop()
@@ -54,6 +56,18 @@ struct Timer::Impl : boost::noncopyable
         setStopped();
         mMainWorker.interruptAndClearQueue();
         mMainWorker.wait();
+    }
+
+    void setPeriodicInterval(boost::uint64_t inPeriodicInterval)
+    {
+        ScopedLock lock(mPeriodicIntervalMutex);
+        mPeriodicInterval_ = inPeriodicInterval;
+    }
+
+    boost::uint64_t getPeriodicInterval()
+    {
+        ScopedLock lock(mPeriodicIntervalMutex);
+        return mPeriodicInterval_;
     }
 
     void poll()
@@ -73,7 +87,7 @@ struct Timer::Impl : boost::noncopyable
         startTime = GetCurrentTimeMs();
         while (!isStopped())
         {
-            if (GetCurrentTimeMs() - startTime >= mPeriodicInterval)
+            if (GetCurrentTimeMs() - startTime >= getPeriodicInterval())
             {
                 invokeCallback();
                 startTime = GetCurrentTimeMs();
@@ -98,16 +112,18 @@ struct Timer::Impl : boost::noncopyable
     Worker mMainWorker;
     Action mAction;
     boost::uint64_t mStartInterval;
-    boost::uint64_t mPeriodicInterval;
+
+    mutable Mutex mPeriodicIntervalMutex;
+    boost::uint64_t mPeriodicInterval_;
+
     mutable Mutex mStopMutex;
     bool mStop;
 };
 
 
-Timer::Timer(const Action & inAction,
-             boost::uint64_t inStartInterval,
+Timer::Timer(boost::uint64_t inStartInterval,
              boost::uint64_t inPeriodicInterval) :
-    mImpl(new Impl(this, inAction, inStartInterval, inPeriodicInterval))
+    mImpl(new Impl(this, inStartInterval, inPeriodicInterval))
 {
 }
 
@@ -126,15 +142,21 @@ Timer::~Timer()
 }
 
 
-void Timer::start()
+void Timer::start(const Action & inAction)
 {
-    mImpl->start();
+    mImpl->start(inAction);
 }
 
 
 void Timer::stop()
 {
     mImpl->stop();
+}
+
+
+void Timer::setPeriodicInterval(boost::uint64_t inPeriodicInterval)
+{
+    mImpl->setPeriodicInterval(inPeriodicInterval);
 }
 
 

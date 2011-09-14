@@ -3,12 +3,8 @@
 
 
 #include "Futile/Threading.h"
+#include "Futile/Timer.h"
 #include <boost/scoped_ptr.hpp>
-
-
-namespace Poco {
-    class Timer;
-}
 
 
 namespace Tetris {
@@ -40,11 +36,11 @@ private:
     Gravity(const Gravity &);
     Gravity & operator=(const Gravity &);
 
-    void onTimerEvent(Poco::Timer & timer);
+    void onTimerEvent();
 
     struct Impl;
     Futile::ThreadSafe<Impl> mImpl;
-    boost::scoped_ptr<Poco::Timer> mTimer;
+    boost::scoped_ptr<Futile::Timer> mTimer;
 };
 
 
