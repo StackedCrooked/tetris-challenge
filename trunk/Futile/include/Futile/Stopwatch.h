@@ -2,6 +2,7 @@
 #define FUTILE_STOPWATCH_H
 
 
+#include <boost/cstdint.hpp>
 #include <boost/noncopyable.hpp>
 #include <ctime>
 
@@ -19,10 +20,12 @@ public:
     void restart();
 
     /// Returns the elapsed time in milliseconds.
-    unsigned elapsedMs() const;
+    boost::uint64_t elapsedMs() const;
+
+    static unsigned long long GetCurrentTimeMs();
 
 private:
-    clock_t mStart;
+    boost::uint64_t mStart;
 };
 
 
