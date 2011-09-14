@@ -18,7 +18,7 @@
 #include "Futile/MakeString.h"
 #include "Futile/Assert.h"
 #include "Poco/Environment.h"
-#include "Poco/Timer.h"
+#include "Futile/Timer.h"
 #include <boost/bind.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/weak_ptr.hpp>
@@ -119,14 +119,16 @@ ComputerPlayer::ComputerPlayer(const TeamName & inTeamName,
                                std::size_t inColumnCount) :
     Player(PlayerType_Computer, inTeamName, inPlayerName, inRowCount, inColumnCount),
     mImpl(new Impl()),
-    mTimer(new Poco::Timer(10, 10))
+    mTimer(new Futile::Timer(10, 10))
 {
     FUTILE_LOCK(Impl & impl, mImpl)
     {
         impl.mComputerPlayer = this;
         impl.mBlockMover.reset(new BlockMover(game()->gameImpl()));
     }
-    mTimer->start(Poco::TimerCallback<ComputerPlayer>(*this, &ComputerPlayer::onTimerEvent));
+
+
+    mTimer->start(boost::bind(&ComputerPlayer::onTimerEvent, this));
 }
 
 
@@ -141,7 +143,7 @@ ComputerPlayer::~ComputerPlayer()
 }
 
 
-void ComputerPlayer::onTimerEvent(Poco::Timer & )
+void ComputerPlayer::onTimerEvent()
 {
     try
     {

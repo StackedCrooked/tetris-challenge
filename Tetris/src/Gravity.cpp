@@ -9,7 +9,7 @@
 #include "Futile/Logging.h"
 #include "Futile/MakeString.h"
 #include "Futile/Assert.h"
-#include "Poco/Timer.h"
+#include "Futile/Timer.h"
 #include <boost/noncopyable.hpp>
 #include <algorithm>
 
@@ -36,7 +36,8 @@ extern const int cMaxLevel = sizeof(sIntervals)/sizeof(int) - 1;
 
 struct Gravity::Impl : boost::noncopyable
 {
-    Impl(ThreadSafe<GameImpl> inThreadSafeGame) :
+    Impl(Gravity * inGravity, ThreadSafe<GameImpl> inThreadSafeGame) :
+        mGravity(inGravity),
         mThreadSafeGame(inThreadSafeGame),
         mLevel(0)
     {
@@ -46,7 +47,7 @@ struct Gravity::Impl : boost::noncopyable
     {
     }
 
-    void onTimerEvent(Poco::Timer & timer);
+    void onTimerEvent();
 
     int intervalMs() const
     {
@@ -58,6 +59,7 @@ struct Gravity::Impl : boost::noncopyable
         return static_cast<double>(1000.0 / static_cast<double>(sIntervals[inLevel]));
     }
 
+    Gravity * mGravity;
     ThreadSafe<GameImpl> mThreadSafeGame;
     int mLevel;
     Futile::Stopwatch mStopwatch;
@@ -65,11 +67,12 @@ struct Gravity::Impl : boost::noncopyable
 
 
 Gravity::Gravity(const ThreadSafe<GameImpl> & inThreadSafeGame) :
-    mImpl(new Impl(inThreadSafeGame)),
-    mTimer(new Poco::Timer)
+    mImpl(new Impl(this, inThreadSafeGame)),
+    mTimer()
 {
-    mTimer->start(Poco::TimerCallback<Gravity>(*this, &Gravity::onTimerEvent));
-    mTimer->setPeriodicInterval(sIntervals[inThreadSafeGame.lock()->level()]);
+    unsigned duration = sIntervals[inThreadSafeGame.lock()->level()];
+    mTimer.reset(new Futile::Timer(duration, duration));
+    mTimer->start(boost::bind(&Gravity::onTimerEvent, this));
 }
 
 
@@ -91,16 +94,16 @@ Gravity::~Gravity()
 }
 
 
-void Gravity::onTimerEvent(Poco::Timer & timer)
+void Gravity::onTimerEvent()
 {
     FUTILE_LOCK(Impl & impl, mImpl)
     {
-        impl.onTimerEvent(timer);
+        impl.onTimerEvent();
     }
 }
 
 
-void Gravity::Impl::onTimerEvent(Poco::Timer & timer)
+void Gravity::Impl::onTimerEvent()
 {
     try
     {
@@ -124,7 +127,7 @@ void Gravity::Impl::onTimerEvent(Poco::Timer & timer)
         if (mLevel != oldLevel)
         {
             Assert(mLevel < cIntervalCount);
-            timer.setPeriodicInterval(sIntervals[mLevel]);
+            mGravity->mTimer->setPeriodicInterval(sIntervals[mLevel]);
         }
     }
     catch (const std::exception & inException)

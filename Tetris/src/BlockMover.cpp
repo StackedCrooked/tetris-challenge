@@ -11,7 +11,7 @@
 #include "Futile/Stopwatch.h"
 #include "Futile/Threading.h"
 #include "Futile/Assert.h"
-#include "Poco/Timer.h"
+#include "Futile/Timer.h"
 #include <iostream>
 #include <boost/bind.hpp>
 
@@ -53,7 +53,7 @@ struct BlockMover::Impl
     {
     }
 
-    void onTimer(Poco::Timer & inTimer);
+    void onTimerEvent();
 
     static unsigned GetTimerIntervalMs(unsigned & inNumMovesPerSecond)
     {
@@ -95,7 +95,7 @@ struct BlockMover::Impl
     void move(Data & data);
 
     ThreadSafe<GameImpl> mGame;
-    Poco::Timer mTimer;
+    Futile::Timer mTimer;
     ThreadSafe<Data> mData;
 };
 
@@ -103,8 +103,7 @@ struct BlockMover::Impl
 BlockMover::BlockMover(ThreadSafe<GameImpl> inGame) :
     mImpl(new Impl(inGame))
 {
-    Poco::TimerCallback<Impl> timerCallback(*mImpl, &Impl::onTimer);
-    mImpl->mTimer.start(timerCallback);
+    mImpl->mTimer.start(boost::bind(&Impl::onTimerEvent, mImpl.get()));
 }
 
 
@@ -166,7 +165,7 @@ BlockMover::MoveDownBehavior BlockMover::moveDownBehavior() const
 }
 
 
-void BlockMover::Impl::onTimer(Poco::Timer &)
+void BlockMover::Impl::onTimerEvent()
 {
     try
     {
