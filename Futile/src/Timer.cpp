@@ -57,7 +57,6 @@ struct Timer::Impl : boost::noncopyable
 
     void poll()
     {
-
         if (!isStopped())
         {
             boost::this_thread::sleep(boost::posix_time::milliseconds(mStartInterval));
