@@ -13,6 +13,22 @@
 namespace Futile {
 
 
+/**
+ * Sleep
+ *
+ * Suspends the current thread for the given duration in milliseconds.
+ */
+void Sleep(boost::uint64_t inMilliseconds);
+
+
+/**
+ * GetCurrentTimeMs
+ *
+ * Returns the current time in milliseconds.
+ */
+boost::uint64_t GetCurrentTimeMs();
+
+
 typedef boost::mutex Mutex;
 typedef boost::mutex::scoped_lock ScopedLock;
 typedef boost::condition_variable Condition;
