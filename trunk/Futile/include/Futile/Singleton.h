@@ -20,8 +20,12 @@ class Singleton
 public:
     typedef Singleton<T> This;
 
-    /// Create an ScopedInitializer object as a named local variable
-    /// to have deterministic lifetime of the singleton object.
+    /// Create an ScopedInitializer object somewhere
+    /// in the beginning of your program to create
+    /// the singleton object.
+    ///
+    /// The scope of this object defines the lifetime
+    /// of the singleton instance.
     struct ScopedInitializer : boost::noncopyable
     {
         ScopedInitializer() { This::CreateInstance(); }
