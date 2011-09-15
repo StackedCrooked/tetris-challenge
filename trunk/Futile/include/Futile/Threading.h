@@ -350,10 +350,9 @@ T & Unwrap(const LockerBase & inLockerBase, const Identity< ThreadSafe<T> > &)
  *
  * Usage example:
  *
- *   ThreadSafe<Foo> theFoo = ...;
+ *   ThreadSafe<Foo> theFoo(new Foo);
  *
- *   // Get access to Foo object in
- *   // an atomic thread-safe scope:
+ *   // Atomic scope
  *   FUTILE_LOCK(Foo & foo, theFoo)
  *   {
  *       foo.bar();
