@@ -123,3 +123,4 @@ Tetris/testsuite/src/WorkerPoolTest.h
 Tetris/testsuite/src/WorkerTest.cpp
 Tetris/testsuite/src/WorkerTest.h
 configure
+Futile/include/Futile/Atomic.h

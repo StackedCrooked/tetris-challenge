@@ -58,7 +58,7 @@ Worker::Worker(const std::string & inName) :
 Worker::~Worker()
 {
     {
-        setQuitFlag();
+        mQuitFlag.set(true);
         ScopedLock queueLock(mQueueMutex);
         ScopedLock statusLock(mStatusMutex);
         mQueue.clear();
@@ -68,20 +68,6 @@ Worker::~Worker()
     }
     mThread->join();
     mThread.reset();
-}
-
-
-void Worker::setQuitFlag()
-{
-    ScopedLock lock(mQuitFlagMutex);
-    mQuitFlag = true;
-}
-
-
-bool Worker::getQuitFlag() const
-{
-    ScopedLock lock(mQuitFlagMutex);
-    return mQuitFlag;
 }
 
 
@@ -214,7 +200,7 @@ void Worker::run()
     try
     {
         SetThreadName(::GetCurrentThreadId(), mName);
-        while (!getQuitFlag())
+        while (!mQuitFlag.get())
         {
             processTask();
         }
