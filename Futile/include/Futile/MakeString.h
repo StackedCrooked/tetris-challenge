@@ -1,5 +1,5 @@
-#ifndef MAKESTRING_H_INCLUDED
-#define MAKESTRING_H_INCLUDED
+#ifndef MAKESTRING_H
+#define MAKESTRING_H
 
 
 #include <sstream>
@@ -41,4 +41,4 @@ typedef MakeString SS;
 } // namespace Futile
 
 
-#endif // MAKESTRING_H_INCLUDED
+#endif // MAKESTRING_H

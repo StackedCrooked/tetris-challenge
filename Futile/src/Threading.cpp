@@ -7,13 +7,13 @@
 namespace Futile {
 
 
-void Sleep(boost::uint64_t inMilliseconds)
+void Sleep(UInt64 inMilliseconds)
 {
     boost::this_thread::sleep(boost::posix_time::milliseconds(inMilliseconds));
 }
 
 
-boost::uint64_t GetCurrentTimeMs()
+UInt64 GetCurrentTimeMs()
 {
     boost::posix_time::ptime time = boost::posix_time::microsec_clock::local_time();
     boost::posix_time::time_duration duration( time.time_of_day() );

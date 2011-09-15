@@ -11,7 +11,7 @@ namespace Futile {
 struct Timer::Impl : boost::noncopyable
 {
     Impl(Timer * inTimer,
-         boost::uint64_t inInterval) :
+         UInt64 inInterval) :
         mTimer(inTimer),
         mMainWorker("Timer"),
         mAction(),
@@ -56,13 +56,13 @@ struct Timer::Impl : boost::noncopyable
         mMainWorker.wait();
     }
 
-    void setInterval(boost::uint64_t inInterval)
+    void setInterval(UInt64 inInterval)
     {
         ScopedLock lock(mIntervalMutex);
         mInterval = inInterval;
     }
 
-    boost::uint64_t getInterval()
+    UInt64 getInterval()
     {
         ScopedLock lock(mIntervalMutex);
         return mInterval;
@@ -70,10 +70,10 @@ struct Timer::Impl : boost::noncopyable
 
     void poll()
     {
-        boost::uint64_t startTime = GetCurrentTimeMs();
+        UInt64 startTime = GetCurrentTimeMs();
         while (!isStopped())
         {
-            boost::uint64_t currentTimeMs = GetCurrentTimeMs();
+            UInt64 currentTimeMs = GetCurrentTimeMs();
             if (currentTimeMs - startTime >= getInterval())
             {
                 invokeCallback();
@@ -103,14 +103,14 @@ struct Timer::Impl : boost::noncopyable
     Action mAction;
 
     mutable Mutex mIntervalMutex;
-    boost::uint64_t mInterval;
+    UInt64 mInterval;
 
     mutable Mutex mStopMutex;
     bool mStop;
 };
 
 
-Timer::Timer(boost::uint64_t inInterval) :
+Timer::Timer(UInt64 inInterval) :
     mImpl(new Impl(this, inInterval))
 {
 }
@@ -142,7 +142,7 @@ void Timer::stop()
 }
 
 
-void Timer::setInterval(boost::uint64_t inInterval)
+void Timer::setInterval(UInt64 inInterval)
 {
     mImpl->setInterval(inInterval);
 }

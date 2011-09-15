@@ -1,5 +1,5 @@
-#ifndef WORKERTHREAD_H_INCLUDED
-#define WORKERTHREAD_H_INCLUDED
+#ifndef WORKERTHREAD_H
+#define WORKERTHREAD_H
 
 
 #include "Futile/Threading.h"
@@ -126,4 +126,4 @@ private:
 } // namespace Futile
 
 
-#endif // WORKERTHREAD_H_INCLUDED
+#endif // WORKERTHREAD_H

@@ -1,5 +1,5 @@
-#ifndef GENERICGRID_H_INCLUDED
-#define GENERICGRID_H_INCLUDED
+#ifndef GENERICGRID_H
+#define GENERICGRID_H
 
 
 #include <cstring>
@@ -89,4 +89,4 @@ void GenericGrid<T>::set(std::size_t inRow, std::size_t inColumn, const T & inVa
 } // namespace Futile
 
 
-#endif // GENERICGRID_H_INCLUDED
+#endif // GENERICGRID_H

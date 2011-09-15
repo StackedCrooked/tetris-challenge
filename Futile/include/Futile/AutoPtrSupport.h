@@ -1,5 +1,5 @@
-#ifndef AUTOPTRSUPPORT_H_INCLUDED
-#define AUTOPTRSUPPORT_H_INCLUDED
+#ifndef AUTOPTRSUPPORT_H
+#define AUTOPTRSUPPORT_H
 
 
 #include <memory>
@@ -103,5 +103,5 @@ std::auto_ptr<T> CreatePoly(const Arg0 & arg0, const Arg1 & arg1, const Arg2 & a
 } // namespace Futile
 
 
-#endif // AUTOPTRSUPPORT_H_INCLUDED
+#endif // AUTOPTRSUPPORT_H
 

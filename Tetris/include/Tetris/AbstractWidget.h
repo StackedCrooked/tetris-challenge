@@ -137,7 +137,6 @@ protected:
                                   const RGBColor & inColor) = 0;
     virtual void drawTextRightAligned(const Rect & inRect, const std::string & inText, int inFontSize, const RGBColor & inColor) = 0;
 
-
 private:
     void paintGrid(int x, int y, const Grid & inGrid);
     void paintGrid(int x, int y, const Grid & inGrid, const RGBColor & inColor);

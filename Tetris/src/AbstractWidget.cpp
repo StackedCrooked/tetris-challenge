@@ -6,6 +6,7 @@
 #include "Futile/Logging.h"
 #include "Futile/MakeString.h"
 #include "Futile/Threading.h"
+#include "Futile/Types.h"
 #include <boost/bind.hpp>
 
 
@@ -486,8 +487,8 @@ void AbstractWidget::paintFutureBlocks(const Rect & inRect, int inSpacing, const
 
 void AbstractWidget::recalculateFPS()
 {
-    static const boost::uint64_t cDurationMs = 2000;
-    boost::uint64_t elapsedMs = mFPSStopwatch.elapsedMs();
+    static const UInt64 cDurationMs = 2000;
+    UInt64 elapsedMs = mFPSStopwatch.elapsedMs();
     mFrameCount++;
     if (elapsedMs >= cDurationMs)
     {

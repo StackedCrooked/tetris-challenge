@@ -1,5 +1,5 @@
-#ifndef MAINTHREADIMPL_H_INCLUDED
-#define MAINTHREADIMPL_H_INCLUDED
+#ifndef MAINTHREADIMPL_H
+#define MAINTHREADIMPL_H
 
 
 #include <boost/function.hpp>
@@ -27,4 +27,4 @@ public:
 } // namespace Futile
 
 
-#endif // MAINTHREADIMPL_H_INCLUDED
+#endif // MAINTHREADIMPL_H

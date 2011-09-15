@@ -17,6 +17,7 @@ Futile/include/Futile/Stopwatch.h
 Futile/include/Futile/Threading.h
 Futile/include/Futile/Timer.h
 Futile/include/Futile/TypedWrapper.h
+Futile/include/Futile/Types.h
 Futile/include/Futile/Worker.h
 Futile/include/Futile/WorkerPool.h
 Futile/src/LeakDetector.cpp
