@@ -3,6 +3,7 @@
 
 
 #include "Futile/Threading.h"
+#include "Futile/Atomic.h"
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
 #include <boost/scoped_ptr.hpp>
@@ -98,8 +99,6 @@ private:
     Worker& operator=(const Worker&);
 
     friend class WorkerPool;
-    void setQuitFlag();
-    bool getQuitFlag() const;
 
     void setStatus(WorkerStatus inStatus);
 
@@ -116,8 +115,7 @@ private:
     mutable Mutex mQueueMutex;
     Condition mQueueCondition;
 
-    mutable Mutex mQuitFlagMutex;
-    bool mQuitFlag;
+    Atomic<bool> mQuitFlag;
 
     boost::scoped_ptr<boost::thread> mThread;
 };
