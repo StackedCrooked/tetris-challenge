@@ -1,8 +1,9 @@
-#ifndef THREADING_H_INCLUDED
-#define THREADING_H_INCLUDED
+#ifndef THREADING_H
+#define THREADING_H
 
 
 #include "Futile/Assert.h"
+#include "Futile/Types.h"
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread.hpp>
@@ -18,7 +19,7 @@ namespace Futile {
  *
  * Suspends the current thread for the given duration in milliseconds.
  */
-void Sleep(boost::uint64_t inMilliseconds);
+void Sleep(UInt64 inMilliseconds);
 
 
 /**
@@ -26,7 +27,7 @@ void Sleep(boost::uint64_t inMilliseconds);
  *
  * Returns the current time in milliseconds.
  */
-boost::uint64_t GetCurrentTimeMs();
+UInt64 GetCurrentTimeMs();
 
 
 typedef boost::mutex Mutex;
@@ -366,4 +367,4 @@ T & Unwrap(const LockerBase & inLockerBase, const Identity< ThreadSafe<T> > &)
 } // namespace Futile
 
 
-#endif // THREADING_H_INCLUDED
+#endif // THREADING_H

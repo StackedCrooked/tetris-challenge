@@ -19,9 +19,9 @@ void Stopwatch::restart()
 }
 
 
-boost::uint64_t Stopwatch::elapsedMs() const
+UInt64 Stopwatch::elapsedMs() const
 {
-    return static_cast<boost::uint64_t>(0.5 + 1.0 * (GetCurrentTimeMs() - mStart));
+    return static_cast<UInt64>(0.5 + 1.0 * (GetCurrentTimeMs() - mStart));
 }
 
 

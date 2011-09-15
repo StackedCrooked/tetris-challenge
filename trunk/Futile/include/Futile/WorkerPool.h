@@ -1,5 +1,5 @@
-#ifndef WORKERPOOL_H_INCLUDED
-#define WORKERPOOL_H_INCLUDED
+#ifndef WORKERPOOL_H
+#define WORKERPOOL_H
 
 
 #include "Futile/Array.h"
@@ -62,4 +62,4 @@ private:
 } // namespace Futile
 
 
-#endif // WORKERPOOL_H_INCLUDED
+#endif // WORKERPOOL_H

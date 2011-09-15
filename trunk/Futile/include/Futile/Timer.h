@@ -3,9 +3,9 @@
 
 
 #include "Futile/Stopwatch.h"
-#include "Futile/Threading.h"
 #include "Futile/WorkerPool.h"
-#include <boost/cstdint.hpp>
+#include "Futile/Threading.h"
+#include "Futile/Types.h"
 #include <boost/function.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
@@ -22,7 +22,7 @@ class Timer : boost::noncopyable
 public:
     typedef boost::function<void()> Action;
 
-    Timer(boost::uint64_t inInterval);
+    Timer(UInt64 inInterval);
 
     ~Timer();
 
@@ -34,7 +34,7 @@ public:
     void stop();
 
     /// Sets the timer interval.
-    void setInterval(boost::uint64_t inInterval);
+    void setInterval(UInt64 inInterval);
 
 private:
     struct Impl;

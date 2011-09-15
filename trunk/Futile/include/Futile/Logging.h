@@ -1,5 +1,5 @@
-#ifndef LOGGING_H_INCLUDED
-#define LOGGING_H_INCLUDED
+#ifndef LOGGING_H
+#define LOGGING_H
 
 
 #include "Futile/MakeString.h"
@@ -19,4 +19,4 @@ void LogError(const std::string & inMessage);
 } // namespace Futile
 
 
-#endif // LOGGING_H_INCLUDED
+#endif // LOGGING_H
