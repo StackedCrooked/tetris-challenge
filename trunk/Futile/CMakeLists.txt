@@ -17,7 +17,6 @@ add_library(Futile
     include/Futile/MainThread.h
     include/Futile/MainThreadImpl.h
     include/Futile/MakeString.h
-    include/Futile/Node.h
     include/Futile/Stopwatch.h
     include/Futile/Threading.h
     include/Futile/Timer.h
