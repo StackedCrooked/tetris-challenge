@@ -31,7 +31,7 @@ namespace Tetris {
 using namespace Futile;
 
 
-static const unsigned cDefaultWorkerCount = 2;
+static const unsigned cDefaultWorkerCount = 1;
 
 
 struct ComputerPlayer::Impl : boost::noncopyable

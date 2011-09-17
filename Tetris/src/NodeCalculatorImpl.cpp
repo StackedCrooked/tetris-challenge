@@ -117,8 +117,8 @@ void NodeCalculatorImpl::populateNodesRecursively(
     std::size_t inMaxIndex)
 {
 
-    // We want to at least perform a search of depth 1.
-    if (inIndex > 0)
+    // We want to at least perform a search of depth 4.
+    if (inIndex >= 4)
     {
         boost::this_thread::interruption_point();
     }
