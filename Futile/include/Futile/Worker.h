@@ -26,7 +26,7 @@ class WorkerPool;
  */
 enum WorkerStatus
 {
-    WorkerStatus_Waiting,
+    WorkerStatus_Idle,
     WorkerStatus_Scheduled,
     WorkerStatus_Working,
     WorkerStatus_FinishedOne

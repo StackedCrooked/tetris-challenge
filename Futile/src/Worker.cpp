@@ -48,7 +48,7 @@ namespace Futile {
 
 Worker::Worker(const std::string & inName) :
     mName(inName),
-    mStatus(WorkerStatus_Waiting),
+    mStatus(WorkerStatus_Idle),
     mQuitFlag(false)
 {
     mThread.reset(new boost::thread(boost::bind(&Worker::run, this)));
@@ -88,7 +88,7 @@ WorkerStatus Worker::status() const
 
 void Worker::wait()
 {
-    waitForStatus(WorkerStatus_Waiting);
+    waitForStatus(WorkerStatus_Idle);
 }
 
 
@@ -151,7 +151,7 @@ void Worker::schedule(const Worker::Task & inTask)
     mQueue.push_back(inTask);
     {
         ScopedLock statusLock(mStatusMutex);
-        if (mStatus <= WorkerStatus_Waiting)
+        if (mStatus <= WorkerStatus_Idle)
         {
             mStatus = WorkerStatus_Scheduled;
         }
@@ -165,7 +165,7 @@ Worker::Task Worker::nextTask()
     ScopedLock lock(mQueueMutex);
     while (mQueue.empty())
     {
-        setStatus(WorkerStatus_Waiting);
+        setStatus(WorkerStatus_Idle);
         mQueueCondition.wait(lock);
         boost::this_thread::interruption_point();
     }

@@ -40,7 +40,7 @@ struct Timer::Impl : boost::noncopyable
 
     void start(const Action & inAction)
     {
-        if (mMainWorker.status() != WorkerStatus_Waiting)
+        if (mMainWorker.status() != WorkerStatus_Idle)
         {
             throw std::logic_error("Timer is busy.");
         }
