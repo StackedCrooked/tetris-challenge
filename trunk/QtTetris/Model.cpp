@@ -3,6 +3,7 @@
 #include "Futile/AutoPtrSupport.h"
 #include "Futile/Logging.h"
 #include "Poco/Environment.h"
+#include <algorithm>
 
 
 namespace QtTetris {
@@ -102,6 +103,24 @@ MultiplayerGame & Model::multiplayerGame()
 }
 
 
+namespace {
+
+
+unsigned CalculateOptimalWorkerCount(std::size_t numComputerPlayers)
+{
+    if (numComputerPlayers == 0)
+    {
+        throw std::invalid_argument("numComputerPlayers == 0");
+    }
+
+    return std::max<unsigned>(Poco::Environment::processorCount() / numComputerPlayers, 1);
+    //return 1; // only one CPU
+}
+
+
+} // anonymous namespace
+
+
 const Evaluator & Model::updateAIParameters(const Player & inPlayer,
                                             int & outSearchDepth,
                                             int & outSearchWidth,
@@ -116,24 +135,7 @@ const Evaluator & Model::updateAIParameters(const Player & inPlayer,
 
     const Game & game = *inPlayer.game();
 
-    if (mMultiplayerGame)
-    {
-        std::size_t numComputerPlayers = computerPlayerCount();
-        if (numComputerPlayers == 0)
-        {
-            throw std::logic_error("Model::updateAIParameters: There are no computer players.");
-        }
-
-        outWorkerCount = Poco::Environment::processorCount() / numComputerPlayers;
-        if (outWorkerCount == 0)
-        {
-            outWorkerCount = 1;
-        }
-    }
-    else
-    {
-        outWorkerCount = 1;
-    }
+    outWorkerCount = CalculateOptimalWorkerCount(computerPlayerCount());
 
     int currentHeight = game.stats().currentHeight();
 

@@ -100,7 +100,7 @@ Tetris/src/GameState.cpp
 Tetris/src/GameStateComparator.cpp
 Tetris/src/GameStateNode.cpp
 Tetris/src/Gravity.cpp
-Tetris/src/MultiThreadedNodeCalculator.cpp
+Tetris/src/MultithreadedNodeCalculator.cpp
 Tetris/src/MultiplayerGame.cpp
 Tetris/src/NodeCalculator.cpp
 Tetris/src/NodeCalculatorImpl.cpp
