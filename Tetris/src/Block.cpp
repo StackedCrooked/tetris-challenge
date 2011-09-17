@@ -190,7 +190,7 @@ std::size_t Block::rotation() const
 }
 
 
-std::size_t Block::numRotations() const
+std::size_t Block::rotationCount() const
 {
     return mImpl->numRotations();
 }
