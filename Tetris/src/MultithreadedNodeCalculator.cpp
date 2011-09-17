@@ -73,8 +73,8 @@ void MultithreadedNodeCalculator::populateNodes(NodePtr ioNode,
                                                 std::size_t inEndIndex)
 {
 
-    // We want to at least perform a search of depth 1.
-    if (inIndex > 0)
+    // We want to at least perform a search of depth 4.
+    if (inIndex >= 4)
     {
         boost::this_thread::interruption_point();
     }
