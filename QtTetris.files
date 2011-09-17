@@ -109,7 +109,6 @@ Tetris/src/SingleThreadedNodeCalculator.cpp
 Tetris/src/Unicode.cpp
 Tetris/testsuite/CMakeLists.txt
 Tetris/testsuite/src/Driver.cpp
-Tetris/testsuite/src/GenericGridTest.h
 Tetris/testsuite/src/NodeCalculatorTest.cpp
 Tetris/testsuite/src/NodeCalculatorTest.h
 Tetris/testsuite/src/TetrisTestSuite.cpp
