@@ -110,7 +110,7 @@ void GenerateOffspring(NodePtr inNode,
     for (std::size_t col = 0; col != gameGrid.columnCount(); ++col)
     {
         Block block(inBlockType, Rotation(0), Row(0), Column(col));
-        for (std::size_t rt = 0; rt != block.numRotations(); ++rt)
+        for (std::size_t rt = 0; rt != block.rotationCount(); ++rt)
         {
             block.setRotation(rt);
             std::size_t row = 0;

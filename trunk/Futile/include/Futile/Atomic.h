@@ -10,7 +10,7 @@ namespace Futile {
 
 
 template<typename T>
-class Atomic
+class Atomic : boost::noncopyable
 {
 public:
     Atomic(T inValue = T()) :
@@ -38,7 +38,7 @@ private:
 
 
 template<typename T>
-class Synchronized
+class Synchronized : boost::noncopyable
 {
 public:
     Synchronized(T inValue = T()) :

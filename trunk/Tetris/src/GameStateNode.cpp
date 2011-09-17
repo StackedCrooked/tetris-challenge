@@ -17,7 +17,7 @@ namespace Tetris {
 static int GetIdentifier(const GameState & inGameState)
 {
     const Block & block = inGameState.originalBlock();
-    return block.numRotations() * block.column() + block.rotation();
+    return block.rotationCount() * block.column() + block.rotation();
 }
 
 
