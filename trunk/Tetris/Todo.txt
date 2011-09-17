@@ -1,20 +1,11 @@
 Todo
 ----
-- Object hiearchy
-
-
-Model, MultiplayerGame, Player, Game, GameState
-
-
-- Remove Poco dependencies
+- Restore unit test. Use googletest.
 - Console application to test AI
 - Report the boost deadlock when version > 1.42
-- Use googletest
 - Highscores (offline or online)
-- Seamless cross-platform builds: Mac OS X, Linux and Windows
-- Associate computer names with strategies.
-- Use a single shared timer.
-- Game state comparator could shuffle in case of equal
+- Produce cross-platform builds: Mac OS X, Linux and Windows
+- If the AI finds multiple best moves then it should pick one at random instead of always picking the first one.
 ? Game concept: Computer is allowed to make a move after the player made one.
 v Paint GameOver instead of showing a MessageBox
 v Use Ctrl-P for pause.
