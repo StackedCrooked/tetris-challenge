@@ -52,7 +52,7 @@ public:
 
     std::size_t rotation() const;
 
-    std::size_t numRotations() const;
+    std::size_t rotationCount() const;
 
     void rotate();
 
