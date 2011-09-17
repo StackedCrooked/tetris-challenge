@@ -114,7 +114,6 @@ unsigned CalculateOptimalWorkerCount(std::size_t numComputerPlayers)
     }
 
     return std::max<unsigned>(Poco::Environment::processorCount() / numComputerPlayers, 1);
-    //return 1; // only one CPU
 }
 
 
