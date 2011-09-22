@@ -247,12 +247,20 @@ void NodeCalculatorImpl::calculateResult()
 
 void NodeCalculatorImpl::stop()
 {
-    if (status() == NodeCalculator::Status_Started || status() == NodeCalculator::Status_Working)
+    switch (status())
     {
-        setStatus(NodeCalculator::Status_Stopped);
-        Assert(mMainWorker.size() <= 1);
-        mMainWorker.interruptAndClearQueue();
-        mWorkerPool.interruptAndClearQueue();
+        case NodeCalculator::Status_Started:
+        case NodeCalculator::Status_Working:
+        {
+            setStatus(NodeCalculator::Status_Stopped);
+            Assert(mMainWorker.size() <= 1);
+            mMainWorker.interruptAndClearQueue();
+            mWorkerPool.interruptAndClearQueue();
+        }
+        default:
+        {
+            // No action required.
+        }
     }
 }
 
