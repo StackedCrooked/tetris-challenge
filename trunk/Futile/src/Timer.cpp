@@ -45,13 +45,20 @@ struct Timer::Impl : boost::noncopyable
             throw std::logic_error("Timer is busy.");
         }
 
-        mAction = inAction;
+        {
+            ScopedLock lock(mMutex);
+            mAction = inAction;
+        }
         mMainWorker.schedule(boost::bind(&Impl::poll, this));
     }
 
     void stop()
     {
         setStopped();
+        {
+            ScopedLock lock(mMutex);
+            mCondition.notify_one();
+        }
         mMainWorker.interruptAndClearQueue();
         mMainWorker.wait();
     }
@@ -70,36 +77,58 @@ struct Timer::Impl : boost::noncopyable
 
     void poll()
     {
-        UInt64 startTime = GetCurrentTimeMs();
-        while (!isStopped())
-        {
-            UInt64 currentTimeMs = GetCurrentTimeMs();
-            if (currentTimeMs - startTime >= getInterval())
-            {
-                invokeCallback();
-                startTime = currentTimeMs;
-            }
-            Sleep(2);
-        }
-    }
-
-    void invokeCallback()
-    {
         try
         {
-            if (mAction)
-            {
-                mAction();
-            }
+            pollImpl();
+        }
+        catch (const boost::thread_interrupted &)
+        {
+            // OK
         }
         catch (const std::exception & exc)
         {
-            LogError(SS() << "Timer callback throws: " << exc.what());
+            LogError(SS() << "Timer poll throws: " << exc.what());
         }
     }
 
+    void pollImpl()
+    {
+        while (!isStopped())
+        {
+            boost::system_time duration = boost::get_system_time() + boost::posix_time::milliseconds(getInterval());
+
+            {
+                ScopedLock lock(mMutex);
+                if (mCondition.timed_wait(lock, duration))
+                {
+                    return;
+                }
+            }
+
+            if (isStopped())
+            {
+                return;
+            }
+
+
+            {
+                ScopedLock lock(mMutex);
+                if (mAction)
+                {
+                    mAction();
+                }
+            }
+        }
+    }
+
+
     Timer * mTimer;
+
     Worker mMainWorker;
+
+    Condition mCondition;
+    Mutex mMutex;
+
     Action mAction;
 
     mutable Mutex mIntervalMutex;
