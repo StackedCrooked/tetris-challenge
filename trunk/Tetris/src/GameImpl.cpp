@@ -751,11 +751,13 @@ bool ComputerGame::move(MoveDirection inDirection)
                 // Swap the current gamestate with the next precalculated one.
                 if (navigateNodeDown())
                 {
+                    // Return false because the block has not
+                    // moved down (it was solidified).
                     return false;
                 }
                 else
                 {
-                    LogError("NavigateNodeDown failed for unknown reason.");
+                    LogError("NavigateNodeDown failed for unknown reason (untainted).");
                     mCurrentNode->clearChildren();
                 }
             }
@@ -770,9 +772,28 @@ bool ComputerGame::move(MoveDirection inDirection)
         {
             // The game is 'tainted'. Meaning that the gamestate was force changed.
             // Usually this is caused by a multiplayer feature (add penalty lines for example).
-            // If the game is tainted then all our work is for naught because the precalculated
-            // blocks are no longer correct.
-            mCurrentNode->clearChildren();
+            // However, our precalculated blocks might still line up correctly, in which case they can still be used.
+            if (block.column() == nextBlock.column() && nextBlock.identification() == block.identification())
+            {
+                // Swap the current gamestate with the next precalculated one.
+                if (navigateNodeDown())
+                {
+                    // Return false because the block has not
+                    // moved down (it was solidified).
+                    return false;
+                }
+                else
+                {
+                    LogError("NavigateNodeDown failed for unknown reason (tainted).");
+                    mCurrentNode->clearChildren();
+                }
+            }
+            else
+            {
+                LogInfo("Tainted beyond repair!");
+                // The precalculated blocks are no longer correct.
+                mCurrentNode->clearChildren();
+            }
         }
     }
 
