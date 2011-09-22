@@ -138,28 +138,35 @@ const Evaluator & Model::updateAIParameters(const Player & inPlayer,
 
     int currentHeight = game.stats().currentHeight();
 
-    // Drop or not?
-    if (currentHeight < 10)
-    {
-        outMoveDownBehavior = BlockMover::MoveDownBehavior_Move;
-    }
-    else
-    {
-        outMoveDownBehavior = BlockMover::MoveDownBehavior_Drop;
-    }
-
-
     // Tactics adjustment
     if (currentHeight < 10)
     {
-        outSearchDepth = 6;
-        outSearchWidth = 6;
+        if (computerPlayerCount() == 1)
+        {
+            outSearchDepth = 10;
+            outSearchWidth = 5;
+        }
+        else
+        {
+            outSearchDepth = 8;
+            outSearchWidth = 4;
+        }
+        outMoveDownBehavior = BlockMover::MoveDownBehavior_Move;
         return MakeTetrises::Instance();
     }
     else
     {
-        outSearchDepth = 4;
-        outSearchWidth = 4;
+        if (computerPlayerCount() == 1)
+        {
+            outSearchDepth = 6;
+            outSearchWidth = 6;
+        }
+        else
+        {
+            outSearchDepth = 4;
+            outSearchWidth = 4;
+        }
+        outMoveDownBehavior = BlockMover::MoveDownBehavior_Drop;
         return Survival::Instance();
     }
 }
