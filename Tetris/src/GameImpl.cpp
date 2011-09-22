@@ -765,6 +765,7 @@ bool ComputerGame::move(MoveDirection inDirection)
             {
                 // The current block has already been solidified and our calculations are no
                 // longer valid. Clear all invalid precalcualted nodes.
+                LogInfo(SS() << "Too late! Lost nodes: " << (mCurrentNode->endNode()->depth() - mCurrentNode->depth()) << " (untained)");
                 mCurrentNode->clearChildren();
             }
         }
@@ -772,26 +773,10 @@ bool ComputerGame::move(MoveDirection inDirection)
         {
             // The game is 'tainted'. Meaning that the gamestate was force changed.
             // Usually this is caused by a multiplayer feature (add penalty lines for example).
-            // However, our precalculated blocks might still line up correctly, in which case they can still be used.
-            if (block.column() == nextBlock.column() && nextBlock.identification() == block.identification())
+            if (block.column() != nextBlock.column() || nextBlock.identification() != block.identification())
             {
-                // Swap the current gamestate with the next precalculated one.
-                if (navigateNodeDown())
-                {
-                    // Return false because the block has not
-                    // moved down (it was solidified).
-                    return false;
-                }
-                else
-                {
-                    LogError("NavigateNodeDown failed for unknown reason (tainted).");
-                    mCurrentNode->clearChildren();
-                }
-            }
-            else
-            {
-                LogInfo("Tainted beyond repair!");
                 // The precalculated blocks are no longer correct.
+                LogInfo(SS() << "Too late! Lost nodes: " << (mCurrentNode->endNode()->depth() - mCurrentNode->depth()) << " (tained)");
                 mCurrentNode->clearChildren();
             }
         }
