@@ -141,31 +141,15 @@ const Evaluator & Model::updateAIParameters(const Player & inPlayer,
     // Tactics adjustment
     if (currentHeight < 10)
     {
-        if (computerPlayerCount() == 1)
-        {
-            outSearchDepth = 10;
-            outSearchWidth = 5;
-        }
-        else
-        {
-            outSearchDepth = 8;
-            outSearchWidth = 4;
-        }
+        outSearchDepth = 8;
+        outSearchWidth = 4;
         outMoveDownBehavior = BlockMover::MoveDownBehavior_Move;
         return MakeTetrises::Instance();
     }
     else
     {
-        if (computerPlayerCount() == 1)
-        {
-            outSearchDepth = 6;
-            outSearchWidth = 6;
-        }
-        else
-        {
-            outSearchDepth = 4;
-            outSearchWidth = 4;
-        }
+        outSearchDepth = 4;
+        outSearchWidth = 4;
         outMoveDownBehavior = BlockMover::MoveDownBehavior_Drop;
         return Survival::Instance();
     }
@@ -190,7 +174,7 @@ void Model::newGame(const PlayerTypes & inPlayerTypes, std::size_t inRowCount, s
     std::string teamName = "Team 1";
     for (PlayerTypes::size_type idx = 0; idx < inPlayerTypes.size(); ++idx)
     {
-        if (idx >= inPlayerTypes.size() / 2)
+        if (idx != 0 && idx >= inPlayerTypes.size() / 2)
         {
             teamName = "Team 2";
         }
