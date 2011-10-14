@@ -38,18 +38,18 @@ typedef boost::condition_variable Condition;
 /**
  * LockMany is a mutex lock that can lock multiple mutexes.
  */
-template<class Mutex>
+template<class MutexType>
 class LockMany : boost::noncopyable
 {
 public:
-    typedef std::vector<Mutex *> Mutexes;
+    typedef std::vector<MutexType *> Mutexes;
     typedef typename Mutexes::size_type size_type;
 
     LockMany();
 
     ~LockMany();
 
-    void lock(Mutex & inMutex);
+    void lock(MutexType & inMutex);
 
     void unlockAll();
 
@@ -60,29 +60,29 @@ private:
 };
 
 
-template<class Mutex>
-LockMany<Mutex>::LockMany()
+template<class MutexType>
+LockMany<MutexType>::LockMany()
 {
 }
 
 
-template<class Mutex>
-LockMany<Mutex>::~LockMany()
+template<class MutexType>
+LockMany<MutexType>::~LockMany()
 {
     unlockAll();
 }
 
 
-template<class Mutex>
-void LockMany<Mutex>::lock(Mutex & inMutex)
+template<class MutexType>
+void LockMany<MutexType>::lock(MutexType & inMutex)
 {
     inMutex.lock();
     mMutexes.push_back(&inMutex);
 }
 
 
-template<class Mutex>
-void LockMany<Mutex>::unlockAll()
+template<class MutexType>
+void LockMany<MutexType>::unlockAll()
 {
     while (!mMutexes.empty())
     {
@@ -92,8 +92,8 @@ void LockMany<Mutex>::unlockAll()
 }
 
 
-template<class Mutex>
-typename LockMany<Mutex>::size_type LockMany<Mutex>::size() const
+template<class MutexType>
+typename LockMany<MutexType>::size_type LockMany<MutexType>::size() const
 {
     return mMutexes.size();
 }
