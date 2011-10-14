@@ -417,7 +417,7 @@ void AbstractWidget::paintActiveBlockShadow(const Game & inGame)
 
         colIdx = block.column();
         gridPtr.reset(new Grid(block.grid()));
-        for (; rowIdx < game.rowCount(); ++rowIdx)
+        for (; rowIdx < std::size_t(game.rowCount()); ++rowIdx)
         {
             if (!gameState.checkPositionValid(block, rowIdx, colIdx))
             {

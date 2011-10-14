@@ -176,7 +176,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\Stopwatch.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\src\Threading.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\Timer.cpp"
 				>
 			</File>
 			<File
