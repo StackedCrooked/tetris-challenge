@@ -1,5 +1,6 @@
 Todo
 ----
+- Automate Windows deployment.
 - Restore unit test. Use googletest.
 - Console application to test AI
 - Report the boost deadlock when version > 1.42
