@@ -144,9 +144,7 @@ void MultithreadedNodeCalculator::populate()
     {
         // Task was interrupted. Ok.
     }
-    //
-    // catch: allow other exceptions pass to the parent handler
-    //
+    // don't catch other exceptions here
 
     mWorkerPool.interruptAndClearQueue();
     mWorkerPool.wait();
