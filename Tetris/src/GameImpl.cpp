@@ -233,17 +233,17 @@ void GameImpl::applyLinePenalty(int inLineCount)
     // Work with a copy of the current grid.
     Grid grid = gameGrid();
 
-    int garbageStart = grid.rowCount() - lineIncrement;
+    std::size_t garbageStart = grid.rowCount() - lineIncrement;
 
     std::vector<BlockType> garbageRow;
 
-    for (int r = newFirstOccupiedRow; r < grid.rowCount(); ++r)
+    for (std::size_t r = newFirstOccupiedRow; r < grid.rowCount(); ++r)
     {
         if (r >= garbageStart)
         {
             garbageRow = getGarbageRow();
         }
-        for (int c = 0; c < grid.columnCount(); ++c)
+        for (std::size_t c = 0; c < grid.columnCount(); ++c)
         {
             if (r < garbageStart)
             {

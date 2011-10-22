@@ -96,7 +96,7 @@ public:
     std::vector<Block> getNextBlocks();
 
     // The number next blocks that can be obtained.
-    int futureBlocksCount() const;
+    std::size_t futureBlocksCount() const;
 
     // For multiplayer crazyness.
     void applyLinePenalty(int inNumberOfLinesMadeByOpponent);

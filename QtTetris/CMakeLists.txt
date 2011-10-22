@@ -57,7 +57,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OUTDIR}bin/)
 #
 # Compile flags
 #
-set(WARNING_OPTIONS         "-Wall -Wno-sign-compare")
+set(WARNING_OPTIONS         "-Wall ")
 set(WARNING_OPTIONS_Debug   "${WARNING_OPTIONS} -Werror ")
 set(CXX_FLAGS         "${CXX_FLAGS} -DTETRIS_QT=1")
 set(CXX_FLAGS_Debug   "${CXX_FLAGS} ${WARNING_OPTIONS_Debug} -ggdb3")

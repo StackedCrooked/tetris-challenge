@@ -179,7 +179,7 @@ protected:
 
     private:
         std::vector<TreeRowInfo> mInfos;
-        int mMaxDepth;
+        std::size_t mMaxDepth;
         const Evaluator * mEvaluator;
         mutable Futile::Mutex mMutex;
     };
