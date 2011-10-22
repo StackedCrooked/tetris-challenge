@@ -146,7 +146,7 @@ public:
         return !(*this == rhs);
     }
 
-    bool compare(const ThreadSafe<Variable> & inOther)
+    bool compare(const ThreadSafe<Variable> & inOther) const
     {
         return mImpl < inOther.mImpl;
     }
