@@ -267,6 +267,7 @@ void GameImpl::applyLinePenalty(int inLineCount)
         // Commit the game state.
         bool result = move(MoveDirection_Down);
         Assert(!result); // verify commit
+        (void)result; // silence compiler warning about unused variable
     }
 
     onChanged();
@@ -475,6 +476,7 @@ void GameImpl::dropAndCommit()
         dropWithoutCommit();
         bool result = move(MoveDirection_Down);
         Assert(!result); // check commit
+        (void)result; // silence unused variable warning
     }
     onChanged();
 }
@@ -489,6 +491,7 @@ void GameImpl::dropWithoutCommit()
         {
             bool result = move(MoveDirection_Down);
             Assert(result); // no commit
+            (void)result; // silence unused variable warning
         }
     }
     onChanged();
