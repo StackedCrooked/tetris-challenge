@@ -62,13 +62,13 @@ std::auto_ptr<GameStateNode> GameStateNode::CreateRootNode(std::size_t inNumRows
 }
 
 
-GameStateNode::GameStateNode(GameState *  inGameState, const Evaluator &  inEvaluator) :
+GameStateNode::GameStateNode(GameState *  inGameState, const Evaluator & inEvaluator) :
     mImpl(new Impl(inGameState, inEvaluator))
 {
 }
 
 
-GameStateNode::GameStateNode(NodePtr inParent, GameState *  inGameState, const Evaluator &  inEvaluator) :
+GameStateNode::GameStateNode(NodePtr inParent, GameState *  inGameState, const Evaluator & inEvaluator) :
     mImpl(new Impl(inParent, inGameState, inEvaluator))
 {
 }
