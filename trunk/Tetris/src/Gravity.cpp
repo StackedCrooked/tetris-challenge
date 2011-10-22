@@ -30,8 +30,8 @@ static const int sIntervals[] =
 };
 
 
-const int cIntervalCount = sizeof(sIntervals)/sizeof(int);
-extern const int cMaxLevel = sizeof(sIntervals)/sizeof(int) - 1;
+const std::size_t cIntervalCount = sizeof(sIntervals)/sizeof(int);
+extern const std::size_t cMaxLevel = sizeof(sIntervals)/sizeof(int) - 1;
 
 
 struct Gravity::Impl : boost::noncopyable
@@ -49,7 +49,7 @@ struct Gravity::Impl : boost::noncopyable
 
     void onTimerEvent();
 
-    int intervalMs() const
+    std::size_t intervalMs() const
     {
         return static_cast<int>(0.5 + CalculateSpeed(mLevel) / 1000.0);
     }
@@ -61,7 +61,7 @@ struct Gravity::Impl : boost::noncopyable
 
     Gravity * mGravity;
     ThreadSafe<GameImpl> mThreadSafeGame;
-    int mLevel;
+    std::size_t mLevel;
     Futile::Stopwatch mStopwatch;
 };
 
@@ -106,7 +106,7 @@ void Gravity::Impl::onTimerEvent()
 {
     try
     {
-        int oldLevel = mLevel;
+        std::size_t oldLevel = mLevel;
         if (mStopwatch.elapsedMs() > intervalMs())
         {
             mStopwatch.restart();

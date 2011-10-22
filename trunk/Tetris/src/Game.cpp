@@ -254,7 +254,7 @@ Block Game::getNextBlock()
 std::vector<Block> Game::getNextBlocks()
 {
     std::vector<BlockType> blockTypes;
-    int numFutureBlocks = futureBlocksCount();
+    std::size_t numFutureBlocks = futureBlocksCount();
 
     gameImpl().lock()->getFutureBlocks(1 + numFutureBlocks, blockTypes);
 
@@ -275,7 +275,7 @@ std::vector<Block> Game::getNextBlocks()
 }
 
 
-int Game::futureBlocksCount() const
+std::size_t Game::futureBlocksCount() const
 {
     return gameImpl().lock()->futureBlocksCount();
 }
