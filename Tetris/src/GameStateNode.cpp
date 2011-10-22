@@ -49,8 +49,8 @@ struct GameStateNode::Impl
     int mIdentifier;
     int mDepth;
     boost::scoped_ptr<EvaluatedGameState> mEvaluatedGameState;
-    const Evaluator & mEvaluator;            // }
-    ChildNodes mChildren;                    // } => Order matters!
+    const Evaluator & mEvaluator; // } => Order matters!
+    ChildNodes mChildren;         // }    (Evaluator must outlive mChildren)
 };
 
 
