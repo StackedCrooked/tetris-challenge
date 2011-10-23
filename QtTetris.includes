@@ -1,8 +1,7 @@
-QtTetris
 Tetris/testsuite/src
 Tetris/include
 Futile/include
-3rdParty/Poco/Foundation/include
+QtTetris
 3rdParty/Boost
-/opt/local/include
-/Developer/SDKs/MacOSX10.6.sdk/usr/include/c++/4.2.1
+3rdParty/Poco/Foundation/include
+3rdParty/Poco/CppUnit/include

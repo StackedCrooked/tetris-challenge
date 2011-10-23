@@ -132,7 +132,7 @@ const Evaluator & Model::updateAIParameters(const Player & inPlayer,
         throw std::runtime_error("GameState is null!");
     }
 
-    const SimpleGame & game = *inPlayer.game();
+    const Game & game = *inPlayer.game();
 
     outWorkerCount = CalculateOptimalWorkerCount(computerPlayerCount());
 
