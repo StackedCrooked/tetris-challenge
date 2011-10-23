@@ -78,6 +78,7 @@ private:
     boost::scoped_ptr<Futile::Timer> mTimer;
 };
 
+
 } // namespace Tetris
 
 
