@@ -1,6 +1,6 @@
 #include "Tetris/AbstractWidget.h"
 #include "Tetris/Block.h"
-#include "Tetris/GameImpl.h"
+#include "Tetris/Game.h"
 #include "Tetris/SimpleGame.h"
 #include "Futile/Logging.h"
 #include "Futile/MakeString.h"
@@ -409,8 +409,8 @@ void AbstractWidget::paintActiveBlockShadow(const SimpleGame & inGame)
 
     // Critical section. Minimize scope.
     {
-        Locker<GameImpl> rgame(inGame.gameImpl());
-        const GameImpl & game = *rgame.get();
+        Locker<Game> rgame(inGame.gameImpl());
+        const Game & game = *rgame.get();
         const Block & block = game.activeBlock();
         const GameState & gameState = game.gameState();
 

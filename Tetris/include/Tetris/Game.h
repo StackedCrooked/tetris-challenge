@@ -22,30 +22,30 @@ namespace Tetris {
 
 class Block;
 class GameStateNode;
-class GameImpl;
+class Game;
 
 
 /**
- * GameImpl is the base class for HumanGame and ComputerGame subclasses.
+ * Game is the base class for HumanGame and ComputerGame subclasses.
  *
  * It manages the following things:
  *   - the currently active block
  *   - the list of future blocks
  *   - the root gamestate node
  */
-class GameImpl
+class Game
 {
 protected:
     /**
      * Constructor is private. Use the factory methods defined in subtype.
      */
-    GameImpl(std::size_t inNumRows, std::size_t inNumColumns);
+    Game(std::size_t inNumRows, std::size_t inNumColumns);
 
     // Friendship required for destructor.
-    friend class Futile::ThreadSafe<GameImpl>;
+    friend class Futile::ThreadSafe<Game>;
 
 public:
-    virtual ~GameImpl();
+    virtual ~Game();
 
     class EventHandler
     {
@@ -60,12 +60,12 @@ public:
         // Notifies that the game state has changed.
         // This method arrives in the main thread.
         //
-        // The GameImpl* pointer is unlocked at this moment. The
+        // The Game* pointer is unlocked at this moment. The
         // user is responsible for locking the corresponding
         // ThreadSafe<Game> object!
-        virtual void onGameStateChanged(GameImpl * inGame) = 0;
+        virtual void onGameStateChanged(Game * inGame) = 0;
 
-        virtual void onLinesCleared(GameImpl * inGame, int inLineCount) = 0;
+        virtual void onLinesCleared(Game * inGame, int inLineCount) = 0;
 
     private:
         EventHandler(const EventHandler&);
@@ -75,9 +75,9 @@ public:
         static Instances sInstances;
     };
 
-    static void RegisterEventHandler(Futile::ThreadSafe<GameImpl> inGame, EventHandler * inEventHandler);
+    static void RegisterEventHandler(Futile::ThreadSafe<Game> inGame, EventHandler * inEventHandler);
 
-    static void UnregisterEventHandler(Futile::ThreadSafe<GameImpl> inGame, EventHandler * inEventHandler);
+    static void UnregisterEventHandler(Futile::ThreadSafe<Game> inGame, EventHandler * inEventHandler);
 
     void setPaused(bool inPause);
 
@@ -135,9 +135,9 @@ protected:
     void onChanged();
     void onLinesCleared(int inLineCount);
 
-    static bool Exists(GameImpl * inGame);
-    static void OnChangedImpl(GameImpl * inGame);
-    static void OnLinesClearedImpl(GameImpl * inGame, int inLineCount);
+    static bool Exists(Game * inGame);
+    static void OnChangedImpl(Game * inGame);
+    static void OnLinesClearedImpl(Game * inGame, int inLineCount);
 
     static std::auto_ptr<Block> CreateDefaultBlock(BlockType inBlockType, std::size_t inNumColumns);
     void reserveBlocks(std::size_t inCount);
@@ -185,22 +185,22 @@ protected:
 
 private:
     // non-copyable
-    GameImpl(const GameImpl&);
-    GameImpl& operator=(const GameImpl&);
+    Game(const Game&);
+    Game& operator=(const Game&);
 
-    static bool Exists(const GameImpl & inGame);
+    static bool Exists(const Game & inGame);
 
-    typedef std::set<const GameImpl*> Instances;
+    typedef std::set<const Game*> Instances;
     static Instances sInstances;
 };
 
 
-class HumanGame : public GameImpl
+class HumanGame : public Game
 {
 public:
-    inline static Futile::ThreadSafe<GameImpl> Create(std::size_t inNumRows, std::size_t inNumColumns)
+    inline static Futile::ThreadSafe<Game> Create(std::size_t inNumRows, std::size_t inNumColumns)
     {
-        return Futile::ThreadSafe<GameImpl>(new HumanGame(inNumRows, inNumColumns));
+        return Futile::ThreadSafe<Game>(new HumanGame(inNumRows, inNumColumns));
     }
 
     virtual bool move(MoveDirection inDirection);
@@ -211,11 +211,11 @@ public:
 
 protected:
     // Friendship required for constructor.
-    friend class GameImpl;
+    friend class Game;
 
     HumanGame(std::size_t inNumRows, std::size_t inNumCols);
 
-    HumanGame(const GameImpl & inGame);
+    HumanGame(const Game & inGame);
 
     GameState & gameState();
 
@@ -224,12 +224,12 @@ private:
 };
 
 
-class ComputerGame : public GameImpl
+class ComputerGame : public Game
 {
 public:
-    inline static Futile::ThreadSafe<GameImpl> Create(std::size_t inNumRows, std::size_t inNumColumns)
+    inline static Futile::ThreadSafe<Game> Create(std::size_t inNumRows, std::size_t inNumColumns)
     {
-        return Futile::ThreadSafe<GameImpl>(new ComputerGame(inNumRows, inNumColumns));
+        return Futile::ThreadSafe<Game>(new ComputerGame(inNumRows, inNumColumns));
     }
 
     virtual bool move(MoveDirection inDirection);
@@ -252,11 +252,11 @@ public:
 
 protected:
     // Friendship required for constructor.
-    friend class GameImpl;
+    friend class Game;
 
     ComputerGame(std::size_t inNumRows, std::size_t inNumCols);
 
-    ComputerGame(const GameImpl & inGame);
+    ComputerGame(const Game & inGame);
 
     GameState & gameState();
 

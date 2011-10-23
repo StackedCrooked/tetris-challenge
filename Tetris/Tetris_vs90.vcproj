@@ -212,7 +212,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\Tetris\GameImpl.h"
+				RelativePath=".\include\Tetris\Game.h"
 				>
 			</File>
 			<File
@@ -328,7 +328,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\GameImpl.cpp"
+				RelativePath=".\src\Game.cpp"
 				>
 			</File>
 			<File

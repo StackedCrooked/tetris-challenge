@@ -1,5 +1,5 @@
 #include "TetrisWidget.h"
-#include "Tetris/GameImpl.h"
+#include "Tetris/Game.h"
 #include "Tetris/SimpleGame.h"
 #include "Futile/AutoPtrSupport.h"
 #include "Futile/Logging.h"

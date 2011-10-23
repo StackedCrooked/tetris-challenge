@@ -1,5 +1,5 @@
 #include "Tetris/MultiplayerGame.h"
-#include "Tetris/GameImpl.h"
+#include "Tetris/Game.h"
 #include "Futile/Logging.h"
 #include "Futile/MakeString.h"
 #include "Futile/Threading.h"
