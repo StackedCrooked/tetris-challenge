@@ -80,7 +80,6 @@ Tetris/include/Tetris/NodePtr.h
 Tetris/include/Tetris/Player.h
 Tetris/include/Tetris/PlayerType.h
 Tetris/include/Tetris/SingleThreadedNodeCalculator.h
-Tetris/include/Tetris/Tetris.h
 Tetris/include/Tetris/Unicode.h
 Tetris/include/Tetris/Utilities.h
 Tetris/res/Tetris_128.png
