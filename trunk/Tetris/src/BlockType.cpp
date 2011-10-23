@@ -1,3 +1,4 @@
+#include "Tetris/Config.h"
 #include "Tetris/BlockType.h"
 #include "Futile/MakeString.h"
 #include <stdexcept>

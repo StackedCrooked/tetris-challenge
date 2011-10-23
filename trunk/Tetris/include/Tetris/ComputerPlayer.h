@@ -12,7 +12,7 @@
 namespace Tetris {
 
 
-class Game;
+class GameImpl;
 class GameState;
 
 
@@ -77,7 +77,6 @@ private:
     Futile::ThreadSafe<Impl> mImpl;
     boost::scoped_ptr<Futile::Timer> mTimer;
 };
-
 
 } // namespace Tetris
 

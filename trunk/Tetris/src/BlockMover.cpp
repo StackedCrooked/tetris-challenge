@@ -1,6 +1,7 @@
 #include "Poco/Foundation.h"
+#include "Tetris/Config.h"
 #include "Tetris/BlockMover.h"
-#include "Tetris/Game.h"
+#include "Tetris/GameImpl.h"
 #include "Tetris/GameStateNode.h"
 #include "Tetris/GameStateComparator.h"
 #include "Tetris/GameState.h"
@@ -41,7 +42,7 @@ struct BlockMover::Impl
         MoveDownBehavior mMoveDownBehavior;
     };
 
-    Impl(ThreadSafe<Game> inGame) :
+    Impl(ThreadSafe<GameImpl> inGame) :
         mGame(inGame),
         mTimer(10), // frequency is 100/s
         mData(new Data)
@@ -93,13 +94,13 @@ struct BlockMover::Impl
 
     void move(Data & data);
 
-    ThreadSafe<Game> mGame;
+    ThreadSafe<GameImpl> mGame;
     Futile::Timer mTimer;
     ThreadSafe<Data> mData;
 };
 
 
-BlockMover::BlockMover(ThreadSafe<Game> inGame) :
+BlockMover::BlockMover(ThreadSafe<GameImpl> inGame) :
     mImpl(new Impl(inGame))
 {
     mImpl->mTimer.start(boost::bind(&Impl::onTimerEvent, mImpl.get()));
@@ -190,7 +191,7 @@ void BlockMover::Impl::onTimerEvent()
 
 void BlockMover::Impl::move(Data & data)
 {
-    Locker<Game> wGame(mGame);
+    Locker<GameImpl> wGame(mGame);
     ComputerGame & game = dynamic_cast<ComputerGame&>(*wGame.get());
     if (game.isPaused())
     {

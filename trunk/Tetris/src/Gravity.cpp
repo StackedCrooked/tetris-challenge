@@ -1,8 +1,9 @@
 #include "Poco/Foundation.h"
+#include "Tetris/Config.h"
 #include "Tetris/Gravity.h"
 #include "Tetris/GameStateNode.h"
 #include "Tetris/GameState.h"
-#include "Tetris/Game.h"
+#include "Tetris/GameImpl.h"
 #include "Tetris/Direction.h"
 #include "Futile/Stopwatch.h"
 #include "Futile/Logging.h"
@@ -35,7 +36,7 @@ extern const std::size_t cMaxLevel = sizeof(sIntervals)/sizeof(int) - 1;
 
 struct Gravity::Impl : boost::noncopyable
 {
-    Impl(Gravity * inGravity, ThreadSafe<Game> inThreadSafeGame) :
+    Impl(Gravity * inGravity, ThreadSafe<GameImpl> inThreadSafeGame) :
         mGravity(inGravity),
         mThreadSafeGame(inThreadSafeGame),
         mLevel(0)
@@ -59,13 +60,13 @@ struct Gravity::Impl : boost::noncopyable
     }
 
     Gravity * mGravity;
-    ThreadSafe<Game> mThreadSafeGame;
+    ThreadSafe<GameImpl> mThreadSafeGame;
     std::size_t mLevel;
     Futile::Stopwatch mStopwatch;
 };
 
 
-Gravity::Gravity(const ThreadSafe<Game> & inThreadSafeGame) :
+Gravity::Gravity(const ThreadSafe<GameImpl> & inThreadSafeGame) :
     mImpl(new Impl(this, inThreadSafeGame)),
     mTimer()
 {
@@ -109,7 +110,7 @@ void Gravity::Impl::onTimerEvent()
         if (mStopwatch.elapsedMs() > intervalMs())
         {
             mStopwatch.restart();
-            Locker<Game> wGame(mThreadSafeGame);
+            Locker<GameImpl> wGame(mThreadSafeGame);
             if (wGame->isGameOver() || wGame->isPaused())
             {
                 return;

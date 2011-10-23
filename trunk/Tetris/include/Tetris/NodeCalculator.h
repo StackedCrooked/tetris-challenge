@@ -62,9 +62,8 @@ private:
     NodeCalculator(const NodeCalculator &);
     NodeCalculator & operator=(const NodeCalculator &);
 
-    boost::scoped_ptr<NodeCalculatorImpl> mImpl;
+	boost::scoped_ptr<NodeCalculatorImpl> mImpl;
 };
-
 
 } // namespace Tetris
 

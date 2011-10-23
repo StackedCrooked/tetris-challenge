@@ -1,18 +1,13 @@
+#include "Tetris/Config.h"
+#include "Tetris/ComputerPlayer.h"
 #include "Tetris/Game.h"
-#include "Tetris/GameStateNode.h"
-#include "Tetris/GameStateComparator.h"
-#include "Tetris/GameState.h"
 #include "Tetris/Evaluator.h"
-#include "Tetris/Block.h"
-#include "Tetris/Utilities.h"
-#include "Futile/Assert.h"
+#include "Tetris/GameImpl.h"
+#include "Tetris/Gravity.h"
 #include "Futile/Logging.h"
-#include "Futile/MainThread.h"
 #include "Futile/Threading.h"
-#include "Poco/Exception.h"
-#include "Poco/Random.h"
-#include <algorithm>
-#include <ctime>
+#include "Futile/AutoPtrSupport.h"
+#include <boost/bind.hpp>
 #include <set>
 #include <stdexcept>
 
@@ -23,53 +18,81 @@ namespace Tetris {
 using namespace Futile;
 
 
-extern const int cMaxLevel;
-
-
-Game::EventHandler::Instances Game::EventHandler::sInstances;
-
-
-Game::EventHandler::EventHandler()
+struct Game::Impl : public GameImpl::EventHandler
 {
-    sInstances.insert(this);
-}
+    static Futile::ThreadSafe<GameImpl> CreateGame(PlayerType inPlayerType, std::size_t inRowCount, std::size_t inColumnCount)
+    {
+        if (inPlayerType == PlayerType_Human)
+        {
+            return HumanGame::Create(inRowCount, inColumnCount);
+        }
+        else if (inPlayerType == PlayerType_Computer)
+        {
+            return ComputerGame::Create(inRowCount, inColumnCount);
+        }
+        throw std::logic_error("Invalid enum value for PlayerType.");
+    }
 
+    Impl(PlayerType inPlayerType,
+         std::size_t inRowCount,
+         std::size_t inColumnCount) :
+        mGameImpl(CreateGame(inPlayerType, inRowCount, inColumnCount)),
+        mPlayerType(inPlayerType),
+        mGravity(new Gravity(mGameImpl)),
+        mCenterColumn(static_cast<std::size_t>(0.5 + inColumnCount / 2.0)),
+        mBackPtr(0)
+    {
+    }
 
-Game::EventHandler::~EventHandler()
-{
-    sInstances.erase(this);
-}
+    ~Impl()
+    {
+        GameImpl::UnregisterEventHandler(mGameImpl, this);
+    }
 
+    void init(Game * inGame)
+    {
+        mBackPtr = inGame;
+        GameImpl::RegisterEventHandler(mGameImpl, this);
+    }
 
-bool Game::EventHandler::Exists(Game::EventHandler * inEventHandler)
-{
-    return sInstances.find(inEventHandler) != sInstances.end();
-}
+    virtual void onGameStateChanged(GameImpl * )
+    {
+        EventHandlers::iterator it = mEventHandlers.begin(), end = mEventHandlers.end();
+        for (; it != end; ++it)
+        {
+            Game::EventHandler * eventHandler(*it);
+            eventHandler->onGameStateChanged(mBackPtr);
+        }
+    }
+
+    virtual void onLinesCleared(GameImpl * , int inLineCount)
+    {
+        EventHandlers::iterator it = mEventHandlers.begin(), end = mEventHandlers.end();
+        for (; it != end; ++it)
+        {
+            Game::EventHandler * eventHandler(*it);
+            eventHandler->onLinesCleared(mBackPtr, inLineCount);
+        }
+    }
+
+    std::string mName;
+    ThreadSafe<GameImpl> mGameImpl;
+    PlayerType mPlayerType;
+    boost::scoped_ptr<Gravity> mGravity;
+    std::size_t mCenterColumn;
+    Game * mBackPtr;
+    typedef std::set<Game::EventHandler*> EventHandlers;
+    EventHandlers mEventHandlers;
+};
 
 
 Game::Instances Game::sInstances;
 
 
-Game::Game(std::size_t inNumRows, std::size_t inNumColumns) :
-    mNumRows(inNumRows),
-    mNumColumns(inNumColumns),
-    mActiveBlock(),
-    mBlockFactory(new BlockFactory),
-    mGarbageFactory(new BlockFactory),
-    mBlocks(),
-    mFutureBlocksCount(3),
-    mCurrentBlockIndex(0),
-    mStartingLevel(-1),
-    mPaused(false),
-    mEventHandlers(),
-    mMuteEvents(false)
+Game::Game(PlayerType inPlayerType, std::size_t inRowCount, std::size_t inColumnCount) :
+    mImpl(new Impl(inPlayerType, inRowCount, inColumnCount))
 {
-    if (mBlocks.empty())
-    {
-        mBlocks.push_back(mBlockFactory->getNext());
-    }
-    mActiveBlock.reset(CreateDefaultBlock(mBlocks.front(), inNumColumns).release());
-
+    mImpl->init(this);
     sInstances.insert(this);
 }
 
@@ -77,45 +100,37 @@ Game::Game(std::size_t inNumRows, std::size_t inNumColumns) :
 Game::~Game()
 {
     sInstances.erase(this);
+    mImpl.reset();
 }
 
 
-bool Game::Exists(const Game & inGame)
+PlayerType Game::playerType() const
 {
-    return sInstances.find(&inGame) != sInstances.end();
+    return mImpl->mPlayerType;
 }
 
 
-void Game::RegisterEventHandler(ThreadSafe<Game> inGame, EventHandler * inEventHandler)
+void Game::RegisterEventHandler(Game * inGame, EventHandler * inEventHandler)
 {
-    FUTILE_LOCK(Game & game, inGame)
+    if (sInstances.find(inGame) == sInstances.end())
     {
-        if (Exists(game)) // The game may have ended by the time this event arrives.
-        {
-            game.mEventHandlers.insert(inEventHandler);
-        }
+        LogWarning("Game::RegisterEventHandler: The Game object does not exist!");
+        return;
     }
+
+    inGame->mImpl->mEventHandlers.insert(inEventHandler);
 }
 
 
-void Game::UnregisterEventHandler(ThreadSafe<Game> inGame, EventHandler * inEventHandler)
+void Game::UnregisterEventHandler(Game * inGame, EventHandler * inEventHandler)
 {
-    FUTILE_LOCK(Game & game, inGame)
+    if (sInstances.find(inGame) == sInstances.end())
     {
-        if (Exists(game)) // The game may have ended by the time this event arrives.
-        {
-            game.mEventHandlers.erase(inEventHandler);
-        }
+        LogWarning("Game::UnregisterEventHandler: The Game no longer exists!");
+        return;
     }
-}
 
-
-void Game::onChanged()
-{
-    if (!mMuteEvents)
-    {
-        OnChangedImpl(this);
-    }
+    inGame->mImpl->mEventHandlers.erase(inEventHandler);
 }
 
 
@@ -125,658 +140,144 @@ bool Game::Exists(Game * inGame)
 }
 
 
-void Game::OnChangedImpl(Game * inGame)
+ThreadSafe<GameImpl> Game::gameImpl() const
 {
-    if (!Exists(inGame))
-    {
-        return;
-    }
-
-    EventHandlers::iterator it = inGame->mEventHandlers.begin(), end = inGame->mEventHandlers.end();
-    for (; it != end; ++it)
-    {
-        Game::EventHandler * eventHandler(*it);
-        if (!EventHandler::Exists(eventHandler))
-        {
-            return;
-        }
-
-        eventHandler->onGameStateChanged(inGame);
-    }
-}
-
-
-void Game::onLinesCleared(int inLineCount)
-{
-    if (!mMuteEvents)
-    {
-        OnLinesClearedImpl(this, inLineCount);
-    }
-}
-
-
-void Game::OnLinesClearedImpl(Game * inGame, int inLineCount)
-{
-
-    for (EventHandlers::iterator it = inGame->mEventHandlers.begin(),
-                                 end = inGame->mEventHandlers.end();
-         it != end; ++it)
-    {
-        Game::EventHandler & eventHandler(**it);
-        eventHandler.onLinesCleared(inGame, inLineCount);
-    }
-}
-
-
-std::vector<BlockType> Game::getGarbageRow() const
-{
-    BlockTypes result(mNumColumns, BlockType_Nil);
-
-    static Poco::UInt32 fSeed = static_cast<Poco::UInt32>(time(0) % Poco::UInt32(-1));
-    fSeed = (fSeed + 1) % Poco::UInt32(-1);
-    Poco::Random rand;
-    rand.seed(fSeed);
-
-    static const int cMinCount = 4;
-    static const int cMaxCount = 8;
-    int count = 0;
-    while (count < cMinCount)
-    {
-        for (std::size_t idx = 0; idx < mNumColumns; ++idx)
-        {
-            if (result[idx] == BlockType_Nil && rand.nextBool())
-            {
-                result[idx] = mGarbageFactory->getNext();
-                if (++count >= cMaxCount)
-                {
-                    break;
-                }
-            }
-        }
-    }
-    return result;
-}
-
-
-void Game::applyLinePenalty(int inLineCount)
-{
-    if (inLineCount < 2 || isGameOver())
-    {
-        return;
-    }
-
-    int lineIncrement = inLineCount < 4 ? (inLineCount - 1) : inLineCount;
-
-    int newFirstOccupiedRow = gameState().firstOccupiedRow() - lineIncrement;
-    if (newFirstOccupiedRow < 0)
-    {
-        newFirstOccupiedRow = 0;
-    }
-
-    // Work with a copy of the current grid.
-    Grid grid = gameGrid();
-
-    std::size_t garbageStart = grid.rowCount() - lineIncrement;
-
-    std::vector<BlockType> garbageRow;
-
-    for (std::size_t r = newFirstOccupiedRow; r < grid.rowCount(); ++r)
-    {
-        if (r >= garbageStart)
-        {
-            garbageRow = getGarbageRow();
-        }
-        for (std::size_t c = 0; c < grid.columnCount(); ++c)
-        {
-            if (r < garbageStart)
-            {
-                grid.set(r, c, grid.get(r + lineIncrement, c));
-            }
-            else
-            {
-                grid.set(r, c, garbageRow[c]);
-            }
-        }
-    }
-
-    // Overwrite the grid with our copy.
-    setGrid(grid);
-
-    // Check if the active block has been caught in the penalty lines that were added.
-    // If yes then we need to commit the current gamestate.
-    const Block & block(activeBlock());
-    if (!gameState().checkPositionValid(block, block.row(), block.column()))
-    {
-        // Commit the game state.
-        bool result = move(MoveDirection_Down);
-        Assert(!result); // verify commit
-        (void)result; // silence compiler warning about unused variable
-    }
-
-    onChanged();
-}
-
-
-std::auto_ptr<Block> Game::CreateDefaultBlock(BlockType inBlockType, std::size_t inNumColumns)
-{
-    return std::auto_ptr<Block>(
-        new Block(inBlockType,
-                    Rotation(0),
-                    Row(0),
-                    Column(DivideByTwo(inNumColumns - GetGrid(GetBlockIdentifier(inBlockType, 0)).columnCount()))));
-}
-
-
-void Game::supplyBlocks()
-{
-    while (mCurrentBlockIndex >= mBlocks.size())
-    {
-        mBlocks.push_back(mBlockFactory->getNext());
-    }
+    return mImpl->mGameImpl;
 }
 
 
 void Game::setPaused(bool inPaused)
 {
-    LogInfo(SS() << "Game::setPaused: " << inPaused);
-    mPaused = inPaused;
+    gameImpl().lock()->setPaused(inPaused);
 }
 
 
 bool Game::isPaused() const
 {
-    return mPaused;
+    return gameImpl().lock()->isPaused();
+}
+
+
+GameStateStats Game::stats() const
+{
+    const Locker locker(gameImpl());
+    const GameState & gameState = locker->gameState();
+    return GameStateStats(gameState.numLines(),
+                          gameState.numSingles(),
+                          gameState.numDoubles(),
+                          gameState.numTriples(),
+                          gameState.numTetrises(),
+                          gameState.currentHeight());
+}
+
+
+void Game::applyLinePenalty(int inNumberOfLinesMadeByOpponent)
+{
+    return gameImpl().lock()->applyLinePenalty(inNumberOfLinesMadeByOpponent);
 }
 
 
 bool Game::isGameOver() const
 {
-    return gameState().isGameOver();
+    return gameImpl().lock()->isGameOver();
 }
 
 
 int Game::rowCount() const
 {
-    return mNumRows;
+    return gameImpl().lock()->rowCount();
 }
 
 
 int Game::columnCount() const
 {
-    return mNumColumns;
+    return gameImpl().lock()->columnCount();
 }
 
 
-int Game::GetRowDelta(MoveDirection inDirection)
+void Game::move(MoveDirection inDirection)
 {
-    switch (inDirection)
-    {
-        case MoveDirection_Up:
-        {
-            return -1;
-        }
-        case MoveDirection_Down:
-        {
-            return 1;
-        }
-        default:
-        {
-            return 0;
-        }
-    }
+    gameImpl().lock()->move(inDirection);
 }
 
 
-int Game::GetColumnDelta(MoveDirection inDirection)
+void Game::rotate()
 {
-    switch (inDirection)
-    {
-        case MoveDirection_Left:
-        {
-            return -1;
-        }
-        case MoveDirection_Right:
-        {
-            return 1;
-        }
-        default:
-        {
-            return 0;
-        }
-    }
+    gameImpl().lock()->rotate();
 }
 
 
-bool Game::canMove(MoveDirection inDirection)
+void Game::drop()
 {
-    if (isGameOver())
-    {
-        return false;
-    }
-
-    Block & block = *mActiveBlock;
-    std::size_t newRow = block.row()    + GetRowDelta(inDirection);
-    std::size_t newCol = block.column() + GetColumnDelta(inDirection);
-    return gameState().checkPositionValid(block, newRow, newCol);
-}
-
-
-void Game::reserveBlocks(std::size_t inCount)
-{
-    while (mBlocks.size() < inCount)
-    {
-        mBlocks.push_back(mBlockFactory->getNext());
-    }
-}
-
-
-const Block & Game::activeBlock() const
-{
-    Assert(mActiveBlock);
-    return *mActiveBlock;
-}
-
-
-const Grid & Game::gameGrid() const
-{
-    return gameState().grid();
-}
-
-
-void Game::getFutureBlocks(std::size_t inCount, BlockTypes & outBlocks)
-{
-    // Make sure we have all blocks we need.
-    while (mBlocks.size() < mCurrentBlockIndex + inCount)
-    {
-        mBlocks.push_back(mBlockFactory->getNext());
-    }
-
-    for (std::size_t idx = 0; idx < inCount; ++idx)
-    {
-        outBlocks.push_back(mBlocks[mCurrentBlockIndex + idx]);
-    }
-}
-
-
-void Game::getFutureBlocksWithOffset(std::size_t inOffset, std::size_t inCount, BlockTypes & outBlocks)
-{
-    // Make sure we have all blocks we need.
-    while (mBlocks.size() < inOffset + inCount)
-    {
-        mBlocks.push_back(mBlockFactory->getNext());
-    }
-
-    for (std::size_t idx = 0; idx < inCount; ++idx)
-    {
-        outBlocks.push_back(mBlocks[inOffset + idx]);
-    }
-}
-
-
-std::size_t Game::currentBlockIndex() const
-{
-    return mCurrentBlockIndex;
-}
-
-
-int Game::futureBlocksCount() const
-{
-    return mFutureBlocksCount;
-}
-
-
-void Game::setFutureBlocksCount(int inFutureBlocksCount)
-{
-    mFutureBlocksCount = inFutureBlocksCount;
-}
-
-
-bool Game::rotate()
-{
-    if (isGameOver())
-    {
-        return false;
-    }
-
-    Block & block = *mActiveBlock;
-    std::size_t oldRotation = block.rotation();
-    block.rotate();
-    if (!gameState().checkPositionValid(block, block.row(), block.column()))
-    {
-        block.setRotation(oldRotation);
-        return false;
-    }
-    onChanged();
-    return true;
-}
-
-
-void Game::dropAndCommit()
-{
-    // Local scope for ScopedMute
-    {
-        ScopedMute scopedMute(mMuteEvents);
-        dropWithoutCommit();
-        bool result = move(MoveDirection_Down);
-        Assert(!result); // check commit
-        (void)result; // silence unused variable warning
-    }
-    onChanged();
-}
-
-
-void Game::dropWithoutCommit()
-{
-    // Local scope for ScopedMute
-    {
-        ScopedMute scopedMute(mMuteEvents);
-        while (canMove(MoveDirection_Down))
-        {
-            bool result = move(MoveDirection_Down);
-            Assert(result); // no commit
-            (void)result; // silence unused variable warning
-        }
-    }
-    onChanged();
-}
-
-
-int Game::level() const
-{
-    return std::max<int>(gameState().numLines() / 10, mStartingLevel);
+    gameImpl().lock()->dropAndCommit();
 }
 
 
 void Game::setStartingLevel(int inLevel)
 {
-    mStartingLevel = inLevel;
-    onChanged();
+    gameImpl().lock()->setStartingLevel(inLevel);
 }
 
 
-HumanGame::HumanGame(std::size_t inNumRows, std::size_t inNumCols) :
-    Game(inNumRows, inNumCols),
-    mGameState(new GameState(inNumRows, inNumCols))
+int Game::level() const
 {
+    return gameImpl().lock()->level();
 }
 
 
-HumanGame::HumanGame(const Game & inGame) :
-    Game(inGame.rowCount(), inGame.columnCount()),
-    mGameState(new GameState(inGame.gameState()))
+Block Game::activeBlock() const
 {
+    return gameImpl().lock()->activeBlock();
 }
 
 
-GameState & HumanGame::gameState()
+Grid Game::gameGrid() const
 {
-    if (!mGameState.get())
+    return gameImpl().lock()->gameGrid();
+}
+
+
+Block Game::getNextBlock()
+{
+    std::vector<BlockType> blockTypes;
+    gameImpl().lock()->getFutureBlocks(2, blockTypes);
+
+    if (blockTypes.size() != 2)
     {
-        throw std::logic_error("Null pointer deref: mGameState");
-    }
-    return *mGameState;
-}
-
-
-const GameState & HumanGame::gameState() const
-{
-    if (!mGameState.get())
-    {
-        throw std::logic_error("Null pointer deref: mGameState");
-    }
-    return *mGameState;
-}
-
-
-void HumanGame::setGrid(const Grid & inGrid)
-{
-    mGameState->setGrid(inGrid);
-    onChanged();
-}
-
-
-bool HumanGame::move(MoveDirection inDirection)
-{
-    if (isGameOver())
-    {
-        return false;
+        throw std::logic_error("Failed to get the next block from the factory.");
     }
 
-    Block & block = *mActiveBlock;
-    std::size_t newRow = block.row() + GetRowDelta(inDirection);
-    std::size_t newCol = block.column() + GetColumnDelta(inDirection);
-    if (gameState().checkPositionValid(block, newRow, newCol))
+    return Block(blockTypes.back(), Rotation(0), Row(0), Column((columnCount() - mImpl->mCenterColumn)/2));
+}
+
+
+std::vector<Block> Game::getNextBlocks()
+{
+    std::vector<BlockType> blockTypes;
+    std::size_t numFutureBlocks = futureBlocksCount();
+
+    gameImpl().lock()->getFutureBlocks(1 + numFutureBlocks, blockTypes);
+
+    if (blockTypes.size() != (1 + numFutureBlocks))
     {
-        block.setRow(newRow);
-        block.setColumn(newCol);
-        onChanged();
-        return true;
+        throw std::logic_error("Failed to get the next block from the factory.");
     }
 
-    if (inDirection != MoveDirection_Down)
+    std::vector<Block> result;
+    for (std::vector<BlockType>::size_type idx = 1; idx < blockTypes.size(); ++idx)
     {
-        // Do nothing
-        return false;
+        result.push_back(Block(blockTypes[idx],
+                               Rotation(0),
+                               Row(0),
+                               Column((columnCount() - mImpl->mCenterColumn)/2)));
     }
-
-    // Remember the number of lines in the current game state.
-    int oldLineCount = mGameState->numLines();
-
-    // Commit the block. This returns a new GameState object
-    // where any full lines have already been cleared.
-    mGameState.reset(mGameState->commit(block, GameOver(block.row() == 0)).release());
-
-    // Count the number of lines that were made in  the commit call.
-    int linesCleared = mGameState->numLines() - oldLineCount;
-    Assert(linesCleared >= 0);
-
-    // Notify the listeners.
-    if (linesCleared > 0)
-    {
-        onLinesCleared(linesCleared);
-    }
-
-    mCurrentBlockIndex++;
-    supplyBlocks();
-    mActiveBlock.reset(CreateDefaultBlock(mBlocks[mCurrentBlockIndex], mNumColumns).release());
-
-    onChanged();
-    return false;
+    return result;
 }
 
 
-ComputerGame::ComputerGame(std::size_t inNumRows, std::size_t inNumCols) :
-    Game(inNumRows, inNumCols),
-    mCurrentNode(GameStateNode::CreateRootNode(inNumRows, inNumCols).release())
+std::size_t Game::futureBlocksCount() const
 {
-}
-
-
-ComputerGame::ComputerGame(const Game & inGame) :
-    Game(inGame.rowCount(), inGame.columnCount()),
-    mCurrentNode(new GameStateNode(new GameState(inGame.gameState()), Balanced::Instance()))
-{
-}
-
-
-GameState & ComputerGame::gameState()
-{
-    return const_cast<GameState&>(mCurrentNode->gameState());
-}
-
-
-const GameState & ComputerGame::gameState() const
-{
-    return mCurrentNode->gameState();
-}
-
-
-void ComputerGame::setGrid(const Grid & inGrid)
-{
-    mCurrentNode->clearChildren();
-    gameState().setGrid(inGrid);
-    onChanged();
-}
-
-
-void ComputerGame::setCurrentNode(NodePtr inCurrentNode)
-{
-    Assert(inCurrentNode->depth() == mCurrentNode->depth() + 1);
-
-    mCurrentNode = inCurrentNode;
-    mCurrentBlockIndex = mCurrentNode->depth();
-    supplyBlocks();
-
-    mActiveBlock.reset(CreateDefaultBlock(mBlocks[mCurrentBlockIndex], mNumColumns).release());
-    onChanged();
-}
-
-
-std::size_t ComputerGame::numPrecalculatedMoves() const
-{
-    std::size_t countMovesAhead = 0;
-    const GameStateNode * tmp = mCurrentNode.get();
-    while (!tmp->children().empty())
-    {
-        tmp = tmp->children().begin()->get();
-        countMovesAhead++;
-    }
-    return countMovesAhead;
-}
-
-
-void ComputerGame::clearPrecalculatedNodes()
-{
-    mCurrentNode->clearChildren();
-}
-
-
-const GameStateNode * ComputerGame::currentNode() const
-{
-    return mCurrentNode.get();
-}
-
-
-const GameStateNode * ComputerGame::endNode() const
-{
-    return mCurrentNode->endNode();
-}
-
-
-void ComputerGame::appendPrecalculatedNode(NodePtr inNode)
-{
-    mCurrentNode->endNode()->addChild(inNode);
-}
-
-
-bool ComputerGame::navigateNodeDown()
-{
-    if (mCurrentNode->children().empty())
-    {
-        return false;
-    }
-
-    NodePtr nextNode = *mCurrentNode->children().begin();
-    Assert(nextNode->depth() == mCurrentNode->depth() + 1);
-
-    int lineDifference = nextNode->gameState().numLines() - mCurrentNode->gameState().numLines();
-    Assert(lineDifference >= 0 && lineDifference <= 4);
-    if (lineDifference > 0)
-    {
-        onLinesCleared(lineDifference);
-    }
-
-    setCurrentNode(nextNode);
-    onChanged();
-    return true;
-}
-
-
-bool ComputerGame::move(MoveDirection inDirection)
-{
-    if (isGameOver())
-    {
-        return false;
-    }
-
-    Block & block = *mActiveBlock;
-    size_t newRow = block.row() + GetRowDelta(inDirection);
-    size_t newCol = block.column() + GetColumnDelta(inDirection);
-    if (mCurrentNode->gameState().checkPositionValid(block, newRow, newCol))
-    {
-        block.setRow(newRow);
-        block.setColumn(newCol);
-        onChanged();
-        return true;
-    }
-
-    if (inDirection != MoveDirection_Down)
-    {
-        // Do nothing
-        return false;
-    }
-
-
-    //
-    // We can't move the block down any further => we hit the bottom => commit the block
-    //
-
-    // Hitting the bottom isn't always a good thing. Especially if the block falls on a place
-    // that wasn't planned for. Here we check if the location we're falling to is the location
-    // we planned.
-    if (!mCurrentNode->children().empty())
-    {
-        const GameStateNode & precalculatedChild = **mCurrentNode->children().begin();
-        const Block & nextBlock = precalculatedChild.gameState().originalBlock();
-
-        if (!currentNode()->gameState().tainted())
-        {
-            // The game is untainted. Good, now check if the blocks line up correctly.
-            if (block.column() == nextBlock.column() && nextBlock.identification() == block.identification())
-            {
-                // Swap the current gamestate with the next precalculated one.
-                if (navigateNodeDown())
-                {
-                    // Return false because the block has not
-                    // moved down (it was solidified).
-                    return false;
-                }
-                else
-                {
-                    LogError("NavigateNodeDown failed for unknown reason (untainted).");
-                    mCurrentNode->clearChildren();
-                }
-            }
-            else
-            {
-                // The current block has already been solidified and our calculations are no
-                // longer valid. Clear all invalid precalcualted nodes.
-                LogInfo(SS() << "Too late! Lost nodes: " << (mCurrentNode->endNode()->depth() - mCurrentNode->depth()) << " (untained)");
-                mCurrentNode->clearChildren();
-            }
-        }
-        else
-        {
-            // The game is 'tainted'. Meaning that the gamestate was force changed.
-            // Usually this is caused by a multiplayer feature (add penalty lines for example).
-            if (block.column() != nextBlock.column() || nextBlock.identification() != block.identification())
-            {
-                // The precalculated blocks are no longer correct.
-                LogInfo(SS() << "Too late! Lost nodes: " << (mCurrentNode->endNode()->depth() - mCurrentNode->depth()) << " (tained)");
-                mCurrentNode->clearChildren();
-            }
-        }
-    }
-
-
-    // Actually commit the block
-    NodePtr child(new GameStateNode(mCurrentNode,
-                                    mCurrentNode->gameState().commit(block, GameOver(block.row() == 0)).release(),
-                                    mCurrentNode->evaluator()));
-    mCurrentNode->addChild(child);
-    setCurrentNode(child);
-    onChanged();
-    return false;
+    return gameImpl().lock()->futureBlocksCount();
 }
 
 

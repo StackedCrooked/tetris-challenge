@@ -1,3 +1,4 @@
+#include "Tetris/Config.h"
 #include "Tetris/MultithreadedNodeCalculator.h"
 #include "Tetris/AISupport.h"
 #include "Tetris/GameStateComparator.h"
