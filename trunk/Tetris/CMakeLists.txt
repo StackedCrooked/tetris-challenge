@@ -14,7 +14,6 @@ add_library(Tetris
     include/Tetris/BlockType.h
     include/Tetris/BlockTypes.h
     include/Tetris/ComputerPlayer.h
-    include/Tetris/Config.h
     include/Tetris/Direction.h
     include/Tetris/Evaluator.h
     include/Tetris/Game.h

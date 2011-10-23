@@ -1,5 +1,4 @@
 #include "Poco/Foundation.h"
-#include "Tetris/Config.h"
 #include "Tetris/Gravity.h"
 #include "Tetris/GameStateNode.h"
 #include "Tetris/GameState.h"

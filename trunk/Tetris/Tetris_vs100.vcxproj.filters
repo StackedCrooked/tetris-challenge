@@ -141,9 +141,6 @@
     <ClInclude Include="include\Tetris\ComputerPlayer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Tetris\Config.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Tetris\Direction.h">
       <Filter>Header Files</Filter>
     </ClInclude>

@@ -60,7 +60,6 @@ Tetris/include/Tetris/BlockMover.h
 Tetris/include/Tetris/BlockType.h
 Tetris/include/Tetris/BlockTypes.h
 Tetris/include/Tetris/ComputerPlayer.h
-Tetris/include/Tetris/Config.h
 Tetris/include/Tetris/Direction.h
 Tetris/include/Tetris/Evaluator.h
 Tetris/include/Tetris/Game.h

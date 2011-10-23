@@ -106,7 +106,6 @@
     <ClInclude Include="include\Tetris\BlockType.h" />
     <ClInclude Include="include\Tetris\BlockTypes.h" />
     <ClInclude Include="include\Tetris\ComputerPlayer.h" />
-    <ClInclude Include="include\Tetris\Config.h" />
     <ClInclude Include="include\Tetris\Direction.h" />
     <ClInclude Include="include\Tetris\Evaluator.h" />
     <ClInclude Include="include\Tetris\ForwardDeclarations.h" />
