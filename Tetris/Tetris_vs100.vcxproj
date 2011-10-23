@@ -109,7 +109,7 @@
     <ClInclude Include="include\Tetris\Direction.h" />
     <ClInclude Include="include\Tetris\Evaluator.h" />
     <ClInclude Include="include\Tetris\ForwardDeclarations.h" />
-    <ClInclude Include="include\Tetris\Game.h" />
+    <ClInclude Include="include\Tetris\SimpleGame.h" />
     <ClInclude Include="include\Tetris\GameOver.h" />
     <ClInclude Include="include\Tetris\GameState.h" />
     <ClInclude Include="include\Tetris\GameStateComparator.h" />
@@ -123,7 +123,7 @@
     <ClInclude Include="include\Tetris\MainThread.h" />
     <ClInclude Include="include\Tetris\MainThreadImpl.h" />
     <ClInclude Include="include\Tetris\MakeString.h" />
-    <ClInclude Include="include\Tetris\MultiplayerGame.h" />
+    <ClInclude Include="include\Tetris\MultiplayerSimpleGame.h" />
     <ClInclude Include="include\Tetris\MultithreadedNodeCalculator.h" />
     <ClInclude Include="include\Tetris\NodeCalculator.h" />
     <ClInclude Include="include\Tetris\NodeCalculatorImpl.h" />

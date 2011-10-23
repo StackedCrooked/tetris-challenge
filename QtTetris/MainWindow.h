@@ -5,7 +5,7 @@
 #include <QtGui/QtGui>
 #include "Model.h"
 #include "TetrisWidget.h"
-#include "Tetris/Game.h"
+#include "Tetris/SimpleGame.h"
 #include "Tetris/MultiplayerGame.h"
 #include "Tetris/Player.h"
 #include "Tetris/PlayerType.h"

@@ -16,7 +16,7 @@ add_library(Tetris
     include/Tetris/ComputerPlayer.h
     include/Tetris/Direction.h
     include/Tetris/Evaluator.h
-    include/Tetris/Game.h
+    include/Tetris/SimpleGame.h
     include/Tetris/GameImpl.h
     include/Tetris/GameOver.h
     include/Tetris/GameState.h
@@ -43,7 +43,7 @@ add_library(Tetris
     src/BlockType.cpp
     src/ComputerPlayer.cpp
     src/Evaluator.cpp
-    src/Game.cpp
+    src/SimpleGame.cpp
     src/GameImpl.cpp
     src/GameState.cpp
     src/GameStateComparator.cpp

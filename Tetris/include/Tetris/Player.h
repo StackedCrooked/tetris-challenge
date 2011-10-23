@@ -3,7 +3,7 @@
 
 
 #include "Tetris/PlayerType.h"
-#include "Tetris/Game.h"
+#include "Tetris/SimpleGame.h"
 #include "Futile/Array.h"
 #include "Futile/TypedWrapper.h"
 #include <boost/noncopyable.hpp>

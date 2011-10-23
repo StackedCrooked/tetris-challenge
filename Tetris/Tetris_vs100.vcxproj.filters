@@ -18,7 +18,7 @@
     <ClInclude Include="include\Tetris\ForwardDeclarations.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Tetris\Game.h">
+    <ClInclude Include="include\Tetris\SimpleGame.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Tetris\GameOver.h">
@@ -60,7 +60,7 @@
     <ClInclude Include="include\Tetris\MakeString.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Tetris\MultiplayerGame.h">
+    <ClInclude Include="include\Tetris\MultiplayerSimpleGame.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Tetris\MultithreadedNodeCalculator.h">
