@@ -1,7 +1,7 @@
 #include "Tetris/AbstractWidget.h"
 #include "Tetris/Block.h"
 #include "Tetris/GameImpl.h"
-#include "Tetris/Game.h"
+#include "Tetris/SimpleGame.h"
 #include "Futile/Logging.h"
 #include "Futile/MakeString.h"
 #include "Futile/Threading.h"

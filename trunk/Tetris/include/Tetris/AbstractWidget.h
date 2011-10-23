@@ -6,7 +6,7 @@
 #include "Tetris/BlockTypes.h"
 #include "Tetris/Grid.h"
 #include "Tetris/Player.h"
-#include "Tetris/Game.h"
+#include "Tetris/SimpleGame.h"
 #include "Futile/Stopwatch.h"
 
 

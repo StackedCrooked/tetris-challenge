@@ -61,7 +61,7 @@ Tetris/include/Tetris/BlockTypes.h
 Tetris/include/Tetris/ComputerPlayer.h
 Tetris/include/Tetris/Direction.h
 Tetris/include/Tetris/Evaluator.h
-Tetris/include/Tetris/Game.h
+Tetris/include/Tetris/SimpleGame.h
 Tetris/include/Tetris/GameImpl.h
 Tetris/include/Tetris/GameOver.h
 Tetris/include/Tetris/GameState.h
@@ -70,7 +70,7 @@ Tetris/include/Tetris/GameStateNode.h
 Tetris/include/Tetris/GameStateStats.h
 Tetris/include/Tetris/Gravity.h
 Tetris/include/Tetris/Grid.h
-Tetris/include/Tetris/MultiplayerGame.h
+Tetris/include/Tetris/MultiplayerSimpleGame.h
 Tetris/include/Tetris/MultithreadedNodeCalculator.h
 Tetris/include/Tetris/NodeCalculator.h
 Tetris/include/Tetris/NodeCalculatorImpl.h

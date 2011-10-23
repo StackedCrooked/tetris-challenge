@@ -1,5 +1,5 @@
 #include "Tetris/ComputerPlayer.h"
-#include "Tetris/Game.h"
+#include "Tetris/SimpleGame.h"
 #include "Tetris/Evaluator.h"
 #include "Tetris/GameImpl.h"
 #include "Tetris/Gravity.h"
