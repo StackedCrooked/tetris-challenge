@@ -13,7 +13,7 @@
 namespace Tetris {
 
 
-class Game;
+class SimpleGame;
 
 
 class RGBColor
@@ -72,22 +72,22 @@ private:
 };
 
 
-class AbstractWidget : public Game::EventHandler
+class AbstractWidget : public SimpleGame::EventHandler
 {
 public:
     AbstractWidget(int insquareWidth, int inSquareHeight);
 
     virtual ~AbstractWidget();
 
-    virtual void onGameStateChanged(Game * inGame);
+    virtual void onGameStateChanged(SimpleGame * inGame);
 
-    virtual void onLinesCleared(Game * inGame, int inLineCount);
+    virtual void onLinesCleared(SimpleGame * inGame, int inLineCount);
 
     void setPlayer(Player * inPlayer);
 
-    const Game * game() const;
+    const SimpleGame * game() const;
 
-    Game * game();
+    SimpleGame * game();
 
     const Player * player() const;
 
@@ -123,7 +123,7 @@ protected:
     virtual void setMinSize(const Size & inMinSize) = 0;
     virtual Size getMinSize() const = 0;
 
-    void coordinateRepaint(Game & inGame);
+    void coordinateRepaint(SimpleGame & inGame);
     virtual void paintSquare(const Rect & inRect, const RGBColor & inColor) = 0;
     virtual void paintStatItem(const Tetris::Rect & inRect, const std::string & inName, const std::string & inValue) = 0;
     virtual void paintImage(const Tetris::Rect & inRect, const std::string & inFileName) = 0;
@@ -143,8 +143,8 @@ private:
     void paintUserInfo();
     void paintGameGrid(const Grid & inGrid);
     void paintGameOver();
-    void paintAvatar(const Game & inGame);
-    void paintActiveBlockShadow(const Game & inGame);
+    void paintAvatar(const SimpleGame & inGame);
+    void paintActiveBlockShadow(const SimpleGame & inGame);
     void paintStats(const Rect & inRect, const GameStateStats & inStats);
     void paintFutureBlocks(const Rect & inRect, int inSpacing, const std::vector<BlockType> & inBlockTypes);
 

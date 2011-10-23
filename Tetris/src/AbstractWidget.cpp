@@ -76,12 +76,12 @@ AbstractWidget::~AbstractWidget()
 {
     if (mPlayer)
     {
-        Game::UnregisterEventHandler(mPlayer->game(), this);
+        SimpleGame::UnregisterEventHandler(mPlayer->game(), this);
     }
 }
 
 
-void AbstractWidget::onGameStateChanged(Game * inGame)
+void AbstractWidget::onGameStateChanged(SimpleGame * inGame)
 {
     if (!mPlayer || mPlayer->game() != inGame)
     {
@@ -92,7 +92,7 @@ void AbstractWidget::onGameStateChanged(Game * inGame)
 }
 
 
-void AbstractWidget::onLinesCleared(Game * inGame, int )
+void AbstractWidget::onLinesCleared(SimpleGame * inGame, int )
 {
     if (!mPlayer || mPlayer->game() != inGame)
     {
@@ -106,26 +106,26 @@ void AbstractWidget::onLinesCleared(Game * inGame, int )
 void AbstractWidget::setPlayer(Player * inPlayer)
 {
     // Stop listing to the events from the old player.
-    if (mPlayer && Game::Exists(mPlayer->game()))
+    if (mPlayer && SimpleGame::Exists(mPlayer->game()))
     {
-        Game::UnregisterEventHandler(mPlayer->game(), this);
+        SimpleGame::UnregisterEventHandler(mPlayer->game(), this);
     }
 
     // Set the new player.
     mPlayer = inPlayer;
 
     // Start listening to the events from the new player.
-    if (mPlayer && Game::Exists(mPlayer->game()))
+    if (mPlayer && SimpleGame::Exists(mPlayer->game()))
     {
         setMinSize(Size(2 * margin() + futureBlocksRect().right() - gameRect().left(),
                         2 * margin() + avatarRect().bottom() - gameRect().top()));
 
-        Game::RegisterEventHandler(mPlayer->game(), this);
+        SimpleGame::RegisterEventHandler(mPlayer->game(), this);
     }
 }
 
 
-const Game * AbstractWidget::game() const
+const SimpleGame * AbstractWidget::game() const
 {
     if (!mPlayer)
     {
@@ -135,7 +135,7 @@ const Game * AbstractWidget::game() const
 }
 
 
-Game * AbstractWidget::game()
+SimpleGame * AbstractWidget::game()
 {
     if (!mPlayer)
     {
@@ -275,7 +275,7 @@ Rect AbstractWidget::avatarRect() const
 }
 
 
-void AbstractWidget::coordinateRepaint(Game & inGame)
+void AbstractWidget::coordinateRepaint(SimpleGame & inGame)
 {
     Tetris::Size minSize = getMinSize();
     fillRect(Rect(0, 0, minSize.width(), minSize.height()), RGBColor(0, 50, 100));
@@ -394,14 +394,14 @@ void AbstractWidget::paintGameOver()
 }
 
 
-void AbstractWidget::paintAvatar(const Game & inGame)
+void AbstractWidget::paintAvatar(const SimpleGame & inGame)
 {
     Rect theAvatarRect = avatarRect();
     paintImage(theAvatarRect, player()->playerName() + "_80.gif");
 }
 
 
-void AbstractWidget::paintActiveBlockShadow(const Game & inGame)
+void AbstractWidget::paintActiveBlockShadow(const SimpleGame & inGame)
 {
     std::size_t colIdx(0);
     std::size_t rowIdx(0);

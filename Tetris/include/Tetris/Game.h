@@ -26,7 +26,7 @@ class GameState;
 /**
  * Game is an easy to use and thread-safe wrapper for the GameImpl class.
  */
-class Game
+class SimpleGame
 {
 public:
     /**
@@ -38,24 +38,24 @@ public:
     public:
         EventHandler() {}
 
-        virtual void onGameStateChanged(Game * inGame) = 0;
+        virtual void onGameStateChanged(SimpleGame * inGame) = 0;
 
-        virtual void onLinesCleared(Game * inGame, int inLineCount) = 0;
+        virtual void onLinesCleared(SimpleGame * inGame, int inLineCount) = 0;
 
     private:
         EventHandler(const EventHandler&);
         EventHandler& operator=(const EventHandler&);
     };
 
-    Game(PlayerType inPlayerType, std::size_t inRowCount, std::size_t inColumnCount);
+    SimpleGame(PlayerType inPlayerType, std::size_t inRowCount, std::size_t inColumnCount);
 
-    ~Game();
+    ~SimpleGame();
 
-    static void RegisterEventHandler(Game * inGame, EventHandler * inEventHandler);
+    static void RegisterEventHandler(SimpleGame * inGame, EventHandler * inEventHandler);
 
-    static void UnregisterEventHandler(Game * inGame, EventHandler * inEventHandler);
+    static void UnregisterEventHandler(SimpleGame * inGame, EventHandler * inEventHandler);
 
-    static bool Exists(Game * inGame);
+    static bool Exists(SimpleGame * inGame);
 
     PlayerType playerType() const;
 
@@ -103,15 +103,15 @@ public:
 
 private:
     // non-copyable
-    Game(const Game & );
-    Game & operator=(const Game&);
+    SimpleGame(const SimpleGame & );
+    SimpleGame & operator=(const SimpleGame&);
 
     typedef Futile::Locker<GameImpl> Locker;
 
     struct Impl;
     boost::scoped_ptr<Impl> mImpl;
 
-    typedef std::set<Game*> Instances;
+    typedef std::set<SimpleGame*> Instances;
     static Instances sInstances;
 };
 
