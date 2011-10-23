@@ -48,4 +48,3 @@ private:
 
 
 #endif // GRAVITY_H_INCLUDED
-
