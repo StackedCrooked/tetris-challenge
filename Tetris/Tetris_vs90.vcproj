@@ -196,10 +196,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\Tetris\Config.h"
-				>
-			</File>
-			<File
 				RelativePath=".\include\Tetris\Direction.h"
 				>
 			</File>

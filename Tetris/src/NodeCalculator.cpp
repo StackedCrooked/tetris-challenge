@@ -1,4 +1,3 @@
-#include "Tetris/Config.h"
 #include "Tetris/NodeCalculator.h"
 #include "Tetris/NodeCalculatorImpl.h"
 #include "Tetris/MultithreadedNodeCalculator.h"

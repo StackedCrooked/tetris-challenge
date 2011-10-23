@@ -1,4 +1,3 @@
-#include "Tetris/Config.h"
 #include "Tetris/Player.h"
 #include "Tetris/ComputerPlayer.h"
 #include "Futile/MakeString.h"

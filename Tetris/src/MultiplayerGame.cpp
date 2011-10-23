@@ -1,4 +1,3 @@
-#include "Tetris/Config.h"
 #include "Tetris/MultiplayerGame.h"
 #include "Tetris/GameImpl.h"
 #include "Futile/Logging.h"
