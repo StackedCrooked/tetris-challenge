@@ -1,4 +1,3 @@
-#include "Futile/Config.h"
 #include "Futile/Logger.h"
 #include <boost/bind.hpp>
 #include <algorithm>

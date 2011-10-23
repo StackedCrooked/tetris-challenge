@@ -1,4 +1,3 @@
-#include "Futile/Config.h"
 #include "Futile/Logging.h"
 #include "Futile/Logger.h"
 

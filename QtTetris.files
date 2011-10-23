@@ -3,7 +3,6 @@ Futile/include/Futile/Array.h
 Futile/include/Futile/Assert.h
 Futile/include/Futile/AutoPtrSupport.h
 Futile/include/Futile/Boost.h
-Futile/include/Futile/Config.h
 Futile/include/Futile/GenericGrid.h
 Futile/include/Futile/LeakDetector.h
 Futile/include/Futile/Logger.h
