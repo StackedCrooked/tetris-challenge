@@ -24,7 +24,12 @@ class GameState;
 
 
 /**
- * Game is an easy to use and thread-safe wrapper for the GameImpl class.
+ * SimpleGame provides a "simple" interface to the more advanced Game class.
+ *
+ * Simplifications include:
+ * - No need locking
+ * - Event callbacks always arrive in the main thread.
+ * - Returns game attributes by value (copy) to avoid race conditions.
  */
 class SimpleGame
 {

@@ -1,6 +1,7 @@
 Futile/CMakeLists.txt
 Futile/include/Futile/Array.h
 Futile/include/Futile/Assert.h
+Futile/include/Futile/Atomic.h
 Futile/include/Futile/AutoPtrSupport.h
 Futile/include/Futile/Boost.h
 Futile/include/Futile/GenericGrid.h
@@ -61,7 +62,6 @@ Tetris/include/Tetris/BlockTypes.h
 Tetris/include/Tetris/ComputerPlayer.h
 Tetris/include/Tetris/Direction.h
 Tetris/include/Tetris/Evaluator.h
-Tetris/include/Tetris/SimpleGame.h
 Tetris/include/Tetris/GameImpl.h
 Tetris/include/Tetris/GameOver.h
 Tetris/include/Tetris/GameState.h
@@ -77,6 +77,7 @@ Tetris/include/Tetris/NodeCalculatorImpl.h
 Tetris/include/Tetris/NodePtr.h
 Tetris/include/Tetris/Player.h
 Tetris/include/Tetris/PlayerType.h
+Tetris/include/Tetris/SimpleGame.h
 Tetris/include/Tetris/SingleThreadedNodeCalculator.h
 Tetris/include/Tetris/Unicode.h
 Tetris/include/Tetris/Utilities.h
@@ -91,17 +92,17 @@ Tetris/src/BlockMover.cpp
 Tetris/src/BlockType.cpp
 Tetris/src/ComputerPlayer.cpp
 Tetris/src/Evaluator.cpp
-Tetris/src/Game.cpp
 Tetris/src/GameImpl.cpp
 Tetris/src/GameState.cpp
 Tetris/src/GameStateComparator.cpp
 Tetris/src/GameStateNode.cpp
 Tetris/src/Gravity.cpp
-Tetris/src/MultithreadedNodeCalculator.cpp
 Tetris/src/MultiplayerGame.cpp
+Tetris/src/MultithreadedNodeCalculator.cpp
 Tetris/src/NodeCalculator.cpp
 Tetris/src/NodeCalculatorImpl.cpp
 Tetris/src/Player.cpp
+Tetris/src/SimpleGame.cpp
 Tetris/src/SingleThreadedNodeCalculator.cpp
 Tetris/src/Unicode.cpp
 Tetris/testsuite/CMakeLists.txt
@@ -115,4 +116,3 @@ Tetris/testsuite/src/WorkerPoolTest.h
 Tetris/testsuite/src/WorkerTest.cpp
 Tetris/testsuite/src/WorkerTest.h
 configure
-Futile/include/Futile/Atomic.h
