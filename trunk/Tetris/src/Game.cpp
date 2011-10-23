@@ -1,4 +1,4 @@
-#include "Tetris/GameImpl.h"
+#include "Tetris/Game.h"
 #include "Tetris/GameStateNode.h"
 #include "Tetris/GameStateComparator.h"
 #include "Tetris/GameState.h"
@@ -26,31 +26,31 @@ using namespace Futile;
 extern const int cMaxLevel;
 
 
-GameImpl::EventHandler::Instances GameImpl::EventHandler::sInstances;
+Game::EventHandler::Instances Game::EventHandler::sInstances;
 
 
-GameImpl::EventHandler::EventHandler()
+Game::EventHandler::EventHandler()
 {
     sInstances.insert(this);
 }
 
 
-GameImpl::EventHandler::~EventHandler()
+Game::EventHandler::~EventHandler()
 {
     sInstances.erase(this);
 }
 
 
-bool GameImpl::EventHandler::Exists(GameImpl::EventHandler * inEventHandler)
+bool Game::EventHandler::Exists(Game::EventHandler * inEventHandler)
 {
     return sInstances.find(inEventHandler) != sInstances.end();
 }
 
 
-GameImpl::Instances GameImpl::sInstances;
+Game::Instances Game::sInstances;
 
 
-GameImpl::GameImpl(std::size_t inNumRows, std::size_t inNumColumns) :
+Game::Game(std::size_t inNumRows, std::size_t inNumColumns) :
     mNumRows(inNumRows),
     mNumColumns(inNumColumns),
     mActiveBlock(),
@@ -74,21 +74,21 @@ GameImpl::GameImpl(std::size_t inNumRows, std::size_t inNumColumns) :
 }
 
 
-GameImpl::~GameImpl()
+Game::~Game()
 {
     sInstances.erase(this);
 }
 
 
-bool GameImpl::Exists(const GameImpl & inGame)
+bool Game::Exists(const Game & inGame)
 {
     return sInstances.find(&inGame) != sInstances.end();
 }
 
 
-void GameImpl::RegisterEventHandler(ThreadSafe<GameImpl> inGame, EventHandler * inEventHandler)
+void Game::RegisterEventHandler(ThreadSafe<Game> inGame, EventHandler * inEventHandler)
 {
-    FUTILE_LOCK(GameImpl & game, inGame)
+    FUTILE_LOCK(Game & game, inGame)
     {
         if (Exists(game)) // The game may have ended by the time this event arrives.
         {
@@ -98,9 +98,9 @@ void GameImpl::RegisterEventHandler(ThreadSafe<GameImpl> inGame, EventHandler * 
 }
 
 
-void GameImpl::UnregisterEventHandler(ThreadSafe<GameImpl> inGame, EventHandler * inEventHandler)
+void Game::UnregisterEventHandler(ThreadSafe<Game> inGame, EventHandler * inEventHandler)
 {
-    FUTILE_LOCK(GameImpl & game, inGame)
+    FUTILE_LOCK(Game & game, inGame)
     {
         if (Exists(game)) // The game may have ended by the time this event arrives.
         {
@@ -110,7 +110,7 @@ void GameImpl::UnregisterEventHandler(ThreadSafe<GameImpl> inGame, EventHandler 
 }
 
 
-void GameImpl::onChanged()
+void Game::onChanged()
 {
     if (!mMuteEvents)
     {
@@ -119,13 +119,13 @@ void GameImpl::onChanged()
 }
 
 
-bool GameImpl::Exists(GameImpl * inGame)
+bool Game::Exists(Game * inGame)
 {
     return sInstances.find(inGame) != sInstances.end();
 }
 
 
-void GameImpl::OnChangedImpl(GameImpl * inGame)
+void Game::OnChangedImpl(Game * inGame)
 {
     if (!Exists(inGame))
     {
@@ -135,7 +135,7 @@ void GameImpl::OnChangedImpl(GameImpl * inGame)
     EventHandlers::iterator it = inGame->mEventHandlers.begin(), end = inGame->mEventHandlers.end();
     for (; it != end; ++it)
     {
-        GameImpl::EventHandler * eventHandler(*it);
+        Game::EventHandler * eventHandler(*it);
         if (!EventHandler::Exists(eventHandler))
         {
             return;
@@ -146,7 +146,7 @@ void GameImpl::OnChangedImpl(GameImpl * inGame)
 }
 
 
-void GameImpl::onLinesCleared(int inLineCount)
+void Game::onLinesCleared(int inLineCount)
 {
     if (!mMuteEvents)
     {
@@ -155,20 +155,20 @@ void GameImpl::onLinesCleared(int inLineCount)
 }
 
 
-void GameImpl::OnLinesClearedImpl(GameImpl * inGame, int inLineCount)
+void Game::OnLinesClearedImpl(Game * inGame, int inLineCount)
 {
 
     for (EventHandlers::iterator it = inGame->mEventHandlers.begin(),
                                  end = inGame->mEventHandlers.end();
          it != end; ++it)
     {
-        GameImpl::EventHandler & eventHandler(**it);
+        Game::EventHandler & eventHandler(**it);
         eventHandler.onLinesCleared(inGame, inLineCount);
     }
 }
 
 
-std::vector<BlockType> GameImpl::getGarbageRow() const
+std::vector<BlockType> Game::getGarbageRow() const
 {
     BlockTypes result(mNumColumns, BlockType_Nil);
 
@@ -198,7 +198,7 @@ std::vector<BlockType> GameImpl::getGarbageRow() const
 }
 
 
-void GameImpl::applyLinePenalty(int inLineCount)
+void Game::applyLinePenalty(int inLineCount)
 {
     if (inLineCount < 2 || isGameOver())
     {
@@ -257,7 +257,7 @@ void GameImpl::applyLinePenalty(int inLineCount)
 }
 
 
-std::auto_ptr<Block> GameImpl::CreateDefaultBlock(BlockType inBlockType, std::size_t inNumColumns)
+std::auto_ptr<Block> Game::CreateDefaultBlock(BlockType inBlockType, std::size_t inNumColumns)
 {
     return std::auto_ptr<Block>(
         new Block(inBlockType,
@@ -267,7 +267,7 @@ std::auto_ptr<Block> GameImpl::CreateDefaultBlock(BlockType inBlockType, std::si
 }
 
 
-void GameImpl::supplyBlocks()
+void Game::supplyBlocks()
 {
     while (mCurrentBlockIndex >= mBlocks.size())
     {
@@ -276,38 +276,38 @@ void GameImpl::supplyBlocks()
 }
 
 
-void GameImpl::setPaused(bool inPaused)
+void Game::setPaused(bool inPaused)
 {
-    LogInfo(SS() << "GameImpl::setPaused: " << inPaused);
+    LogInfo(SS() << "Game::setPaused: " << inPaused);
     mPaused = inPaused;
 }
 
 
-bool GameImpl::isPaused() const
+bool Game::isPaused() const
 {
     return mPaused;
 }
 
 
-bool GameImpl::isGameOver() const
+bool Game::isGameOver() const
 {
     return gameState().isGameOver();
 }
 
 
-int GameImpl::rowCount() const
+int Game::rowCount() const
 {
     return mNumRows;
 }
 
 
-int GameImpl::columnCount() const
+int Game::columnCount() const
 {
     return mNumColumns;
 }
 
 
-int GameImpl::GetRowDelta(MoveDirection inDirection)
+int Game::GetRowDelta(MoveDirection inDirection)
 {
     switch (inDirection)
     {
@@ -327,7 +327,7 @@ int GameImpl::GetRowDelta(MoveDirection inDirection)
 }
 
 
-int GameImpl::GetColumnDelta(MoveDirection inDirection)
+int Game::GetColumnDelta(MoveDirection inDirection)
 {
     switch (inDirection)
     {
@@ -347,7 +347,7 @@ int GameImpl::GetColumnDelta(MoveDirection inDirection)
 }
 
 
-bool GameImpl::canMove(MoveDirection inDirection)
+bool Game::canMove(MoveDirection inDirection)
 {
     if (isGameOver())
     {
@@ -361,7 +361,7 @@ bool GameImpl::canMove(MoveDirection inDirection)
 }
 
 
-void GameImpl::reserveBlocks(std::size_t inCount)
+void Game::reserveBlocks(std::size_t inCount)
 {
     while (mBlocks.size() < inCount)
     {
@@ -370,20 +370,20 @@ void GameImpl::reserveBlocks(std::size_t inCount)
 }
 
 
-const Block & GameImpl::activeBlock() const
+const Block & Game::activeBlock() const
 {
     Assert(mActiveBlock);
     return *mActiveBlock;
 }
 
 
-const Grid & GameImpl::gameGrid() const
+const Grid & Game::gameGrid() const
 {
     return gameState().grid();
 }
 
 
-void GameImpl::getFutureBlocks(std::size_t inCount, BlockTypes & outBlocks)
+void Game::getFutureBlocks(std::size_t inCount, BlockTypes & outBlocks)
 {
     // Make sure we have all blocks we need.
     while (mBlocks.size() < mCurrentBlockIndex + inCount)
@@ -398,7 +398,7 @@ void GameImpl::getFutureBlocks(std::size_t inCount, BlockTypes & outBlocks)
 }
 
 
-void GameImpl::getFutureBlocksWithOffset(std::size_t inOffset, std::size_t inCount, BlockTypes & outBlocks)
+void Game::getFutureBlocksWithOffset(std::size_t inOffset, std::size_t inCount, BlockTypes & outBlocks)
 {
     // Make sure we have all blocks we need.
     while (mBlocks.size() < inOffset + inCount)
@@ -413,25 +413,25 @@ void GameImpl::getFutureBlocksWithOffset(std::size_t inOffset, std::size_t inCou
 }
 
 
-std::size_t GameImpl::currentBlockIndex() const
+std::size_t Game::currentBlockIndex() const
 {
     return mCurrentBlockIndex;
 }
 
 
-int GameImpl::futureBlocksCount() const
+int Game::futureBlocksCount() const
 {
     return mFutureBlocksCount;
 }
 
 
-void GameImpl::setFutureBlocksCount(int inFutureBlocksCount)
+void Game::setFutureBlocksCount(int inFutureBlocksCount)
 {
     mFutureBlocksCount = inFutureBlocksCount;
 }
 
 
-bool GameImpl::rotate()
+bool Game::rotate()
 {
     if (isGameOver())
     {
@@ -451,7 +451,7 @@ bool GameImpl::rotate()
 }
 
 
-void GameImpl::dropAndCommit()
+void Game::dropAndCommit()
 {
     // Local scope for ScopedMute
     {
@@ -465,7 +465,7 @@ void GameImpl::dropAndCommit()
 }
 
 
-void GameImpl::dropWithoutCommit()
+void Game::dropWithoutCommit()
 {
     // Local scope for ScopedMute
     {
@@ -481,13 +481,13 @@ void GameImpl::dropWithoutCommit()
 }
 
 
-int GameImpl::level() const
+int Game::level() const
 {
     return std::max<int>(gameState().numLines() / 10, mStartingLevel);
 }
 
 
-void GameImpl::setStartingLevel(int inLevel)
+void Game::setStartingLevel(int inLevel)
 {
     mStartingLevel = inLevel;
     onChanged();
@@ -495,14 +495,14 @@ void GameImpl::setStartingLevel(int inLevel)
 
 
 HumanGame::HumanGame(std::size_t inNumRows, std::size_t inNumCols) :
-    GameImpl(inNumRows, inNumCols),
+    Game(inNumRows, inNumCols),
     mGameState(new GameState(inNumRows, inNumCols))
 {
 }
 
 
-HumanGame::HumanGame(const GameImpl & inGame) :
-    GameImpl(inGame.rowCount(), inGame.columnCount()),
+HumanGame::HumanGame(const Game & inGame) :
+    Game(inGame.rowCount(), inGame.columnCount()),
     mGameState(new GameState(inGame.gameState()))
 {
 }
@@ -586,14 +586,14 @@ bool HumanGame::move(MoveDirection inDirection)
 
 
 ComputerGame::ComputerGame(std::size_t inNumRows, std::size_t inNumCols) :
-    GameImpl(inNumRows, inNumCols),
+    Game(inNumRows, inNumCols),
     mCurrentNode(GameStateNode::CreateRootNode(inNumRows, inNumCols).release())
 {
 }
 
 
-ComputerGame::ComputerGame(const GameImpl & inGame) :
-    GameImpl(inGame.rowCount(), inGame.columnCount()),
+ComputerGame::ComputerGame(const Game & inGame) :
+    Game(inGame.rowCount(), inGame.columnCount()),
     mCurrentNode(new GameStateNode(new GameState(inGame.gameState()), Balanced::Instance()))
 {
 }

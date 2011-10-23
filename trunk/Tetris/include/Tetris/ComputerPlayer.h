@@ -12,7 +12,7 @@
 namespace Tetris {
 
 
-class GameImpl;
+class Game;
 class GameState;
 
 

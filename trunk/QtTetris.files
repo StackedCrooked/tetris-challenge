@@ -62,7 +62,7 @@ Tetris/include/Tetris/BlockTypes.h
 Tetris/include/Tetris/ComputerPlayer.h
 Tetris/include/Tetris/Direction.h
 Tetris/include/Tetris/Evaluator.h
-Tetris/include/Tetris/GameImpl.h
+Tetris/include/Tetris/Game.h
 Tetris/include/Tetris/GameOver.h
 Tetris/include/Tetris/GameState.h
 Tetris/include/Tetris/GameStateComparator.h
@@ -92,7 +92,7 @@ Tetris/src/BlockMover.cpp
 Tetris/src/BlockType.cpp
 Tetris/src/ComputerPlayer.cpp
 Tetris/src/Evaluator.cpp
-Tetris/src/GameImpl.cpp
+Tetris/src/Game.cpp
 Tetris/src/GameState.cpp
 Tetris/src/GameStateComparator.cpp
 Tetris/src/GameStateNode.cpp

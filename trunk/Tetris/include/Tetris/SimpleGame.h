@@ -19,7 +19,7 @@
 namespace Tetris {
 
 
-class GameImpl;
+class Game;
 class GameState;
 
 
@@ -66,7 +66,7 @@ public:
 
     GameStateStats stats() const;
 
-    Futile::ThreadSafe<GameImpl> gameImpl() const;
+    Futile::ThreadSafe<Game> gameImpl() const;
 
     void setPaused(bool inPaused);
 
@@ -111,7 +111,7 @@ private:
     SimpleGame(const SimpleGame & );
     SimpleGame & operator=(const SimpleGame&);
 
-    typedef Futile::Locker<GameImpl> Locker;
+    typedef Futile::Locker<Game> Locker;
 
     struct Impl;
     boost::scoped_ptr<Impl> mImpl;

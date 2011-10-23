@@ -1,7 +1,7 @@
 #include "Tetris/ComputerPlayer.h"
 #include "Tetris/SimpleGame.h"
 #include "Tetris/Evaluator.h"
-#include "Tetris/GameImpl.h"
+#include "Tetris/Game.h"
 #include "Tetris/Gravity.h"
 #include "Futile/Logging.h"
 #include "Futile/Threading.h"
@@ -17,9 +17,9 @@ namespace Tetris {
 using namespace Futile;
 
 
-struct SimpleGame::Impl : public GameImpl::EventHandler
+struct SimpleGame::Impl : public Game::EventHandler
 {
-    static Futile::ThreadSafe<GameImpl> CreateGame(PlayerType inPlayerType, std::size_t inRowCount, std::size_t inColumnCount)
+    static Futile::ThreadSafe<Game> CreateGame(PlayerType inPlayerType, std::size_t inRowCount, std::size_t inColumnCount)
     {
         if (inPlayerType == PlayerType_Human)
         {
@@ -35,9 +35,9 @@ struct SimpleGame::Impl : public GameImpl::EventHandler
     Impl(PlayerType inPlayerType,
          std::size_t inRowCount,
          std::size_t inColumnCount) :
-        mGameImpl(CreateGame(inPlayerType, inRowCount, inColumnCount)),
+        mGame(CreateGame(inPlayerType, inRowCount, inColumnCount)),
         mPlayerType(inPlayerType),
-        mGravity(new Gravity(mGameImpl)),
+        mGravity(new Gravity(mGame)),
         mCenterColumn(static_cast<std::size_t>(0.5 + inColumnCount / 2.0)),
         mBackPtr(0)
     {
@@ -45,16 +45,16 @@ struct SimpleGame::Impl : public GameImpl::EventHandler
 
     ~Impl()
     {
-        GameImpl::UnregisterEventHandler(mGameImpl, this);
+        Game::UnregisterEventHandler(mGame, this);
     }
 
     void init(SimpleGame * inGame)
     {
         mBackPtr = inGame;
-        GameImpl::RegisterEventHandler(mGameImpl, this);
+        Game::RegisterEventHandler(mGame, this);
     }
 
-    virtual void onGameStateChanged(GameImpl * )
+    virtual void onGameStateChanged(Game * )
     {
         EventHandlers::iterator it = mEventHandlers.begin(), end = mEventHandlers.end();
         for (; it != end; ++it)
@@ -64,7 +64,7 @@ struct SimpleGame::Impl : public GameImpl::EventHandler
         }
     }
 
-    virtual void onLinesCleared(GameImpl * , int inLineCount)
+    virtual void onLinesCleared(Game * , int inLineCount)
     {
         EventHandlers::iterator it = mEventHandlers.begin(), end = mEventHandlers.end();
         for (; it != end; ++it)
@@ -75,7 +75,7 @@ struct SimpleGame::Impl : public GameImpl::EventHandler
     }
 
     std::string mName;
-    ThreadSafe<GameImpl> mGameImpl;
+    ThreadSafe<Game> mGame;
     PlayerType mPlayerType;
     boost::scoped_ptr<Gravity> mGravity;
     std::size_t mCenterColumn;
@@ -139,9 +139,9 @@ bool SimpleGame::Exists(SimpleGame * inGame)
 }
 
 
-ThreadSafe<GameImpl> SimpleGame::gameImpl() const
+ThreadSafe<Game> SimpleGame::gameImpl() const
 {
-    return mImpl->mGameImpl;
+    return mImpl->mGame;
 }
 
 
