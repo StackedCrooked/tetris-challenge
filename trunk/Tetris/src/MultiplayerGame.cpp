@@ -16,7 +16,7 @@ namespace Tetris {
 using namespace Futile;
 
 
-struct MultiplayerGame::Impl : public Game::EventHandler,
+struct MultiplayerGame::Impl : public SimpleGame::EventHandler,
                                boost::noncopyable
 {
     Impl(std::size_t inRowCount, std::size_t inColumnCount) :
@@ -30,14 +30,14 @@ struct MultiplayerGame::Impl : public Game::EventHandler,
     }
 
 
-    virtual void onGameStateChanged(Game * )
+    virtual void onGameStateChanged(SimpleGame * )
     {
         // Not interested.
     }
 
     Player * addPlayer(PlayerType inPlayerType, const TeamName & inTeamName, const PlayerName & inPlayerName);
 
-    Player & findPlayer(Game * inGame) const
+    Player & findPlayer(SimpleGame * inGame) const
     {
         Players::const_iterator it = mPlayers.begin(), end = mPlayers.end();
         for (; it != end; ++it)
@@ -51,7 +51,7 @@ struct MultiplayerGame::Impl : public Game::EventHandler,
         throw std::runtime_error("Player not found!");
     }
 
-    virtual void onLinesCleared(Game * inGame, int inLineCount)
+    virtual void onLinesCleared(SimpleGame * inGame, int inLineCount)
     {
         // If number of lines >= 2 then apply a line penalty to each non-allied player.
         Player & activePlayer(findPlayer(inGame));
@@ -105,7 +105,7 @@ Player * MultiplayerGame::Impl::addPlayer(PlayerType inPlayerType,
                                        mRowCount,
                                        mColumnCount));
     mPlayers.push_back(playerPtr);
-    Game::RegisterEventHandler(playerPtr->game(), this);
+    SimpleGame::RegisterEventHandler(playerPtr->game(), this);
     return playerPtr.get();
 }
 
@@ -130,7 +130,7 @@ Player * MultiplayerGame::addComputerPlayer(const TeamName & inTeamName,
 
 void MultiplayerGame::removePlayer(Player * inPlayer)
 {
-    Game::UnregisterEventHandler(inPlayer->game(), mImpl.get());
+    SimpleGame::UnregisterEventHandler(inPlayer->game(), mImpl.get());
     Impl::Players::iterator it = std::find_if(mImpl->mPlayers.begin(), mImpl->mPlayers.end(), boost::bind(&Impl::PlayerPtr::get, _1) == inPlayer);
     if (it == mImpl->mPlayers.end())
     {

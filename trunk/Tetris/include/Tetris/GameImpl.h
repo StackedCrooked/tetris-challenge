@@ -158,6 +158,8 @@ protected:
 
     typedef std::set<EventHandler*> EventHandlers;
     EventHandlers mEventHandlers;
+
+    // In order to avoid flooding the queue in certain situations.
     bool mMuteEvents;
 
     /**

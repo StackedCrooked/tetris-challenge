@@ -43,9 +43,9 @@ public:
 
     const std::string & playerName() const;
 
-    const Game * game() const;
+    const SimpleGame * game() const;
 
-    Game * game();
+    SimpleGame * game();
 
 protected:
     Player(PlayerType inPlayerType,

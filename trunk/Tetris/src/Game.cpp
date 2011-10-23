@@ -17,7 +17,7 @@ namespace Tetris {
 using namespace Futile;
 
 
-struct Game::Impl : public GameImpl::EventHandler
+struct SimpleGame::Impl : public GameImpl::EventHandler
 {
     static Futile::ThreadSafe<GameImpl> CreateGame(PlayerType inPlayerType, std::size_t inRowCount, std::size_t inColumnCount)
     {
@@ -48,7 +48,7 @@ struct Game::Impl : public GameImpl::EventHandler
         GameImpl::UnregisterEventHandler(mGameImpl, this);
     }
 
-    void init(Game * inGame)
+    void init(SimpleGame * inGame)
     {
         mBackPtr = inGame;
         GameImpl::RegisterEventHandler(mGameImpl, this);
@@ -59,7 +59,7 @@ struct Game::Impl : public GameImpl::EventHandler
         EventHandlers::iterator it = mEventHandlers.begin(), end = mEventHandlers.end();
         for (; it != end; ++it)
         {
-            Game::EventHandler * eventHandler(*it);
+            SimpleGame::EventHandler * eventHandler(*it);
             eventHandler->onGameStateChanged(mBackPtr);
         }
     }
@@ -69,7 +69,7 @@ struct Game::Impl : public GameImpl::EventHandler
         EventHandlers::iterator it = mEventHandlers.begin(), end = mEventHandlers.end();
         for (; it != end; ++it)
         {
-            Game::EventHandler * eventHandler(*it);
+            SimpleGame::EventHandler * eventHandler(*it);
             eventHandler->onLinesCleared(mBackPtr, inLineCount);
         }
     }
@@ -79,16 +79,16 @@ struct Game::Impl : public GameImpl::EventHandler
     PlayerType mPlayerType;
     boost::scoped_ptr<Gravity> mGravity;
     std::size_t mCenterColumn;
-    Game * mBackPtr;
-    typedef std::set<Game::EventHandler*> EventHandlers;
+    SimpleGame * mBackPtr;
+    typedef std::set<SimpleGame::EventHandler*> EventHandlers;
     EventHandlers mEventHandlers;
 };
 
 
-Game::Instances Game::sInstances;
+SimpleGame::Instances SimpleGame::sInstances;
 
 
-Game::Game(PlayerType inPlayerType, std::size_t inRowCount, std::size_t inColumnCount) :
+SimpleGame::SimpleGame(PlayerType inPlayerType, std::size_t inRowCount, std::size_t inColumnCount) :
     mImpl(new Impl(inPlayerType, inRowCount, inColumnCount))
 {
     mImpl->init(this);
@@ -96,20 +96,20 @@ Game::Game(PlayerType inPlayerType, std::size_t inRowCount, std::size_t inColumn
 }
 
 
-Game::~Game()
+SimpleGame::~SimpleGame()
 {
     sInstances.erase(this);
     mImpl.reset();
 }
 
 
-PlayerType Game::playerType() const
+PlayerType SimpleGame::playerType() const
 {
     return mImpl->mPlayerType;
 }
 
 
-void Game::RegisterEventHandler(Game * inGame, EventHandler * inEventHandler)
+void SimpleGame::RegisterEventHandler(SimpleGame * inGame, EventHandler * inEventHandler)
 {
     if (sInstances.find(inGame) == sInstances.end())
     {
@@ -121,7 +121,7 @@ void Game::RegisterEventHandler(Game * inGame, EventHandler * inEventHandler)
 }
 
 
-void Game::UnregisterEventHandler(Game * inGame, EventHandler * inEventHandler)
+void SimpleGame::UnregisterEventHandler(SimpleGame * inGame, EventHandler * inEventHandler)
 {
     if (sInstances.find(inGame) == sInstances.end())
     {
@@ -133,31 +133,31 @@ void Game::UnregisterEventHandler(Game * inGame, EventHandler * inEventHandler)
 }
 
 
-bool Game::Exists(Game * inGame)
+bool SimpleGame::Exists(SimpleGame * inGame)
 {
     return sInstances.find(inGame) != sInstances.end();
 }
 
 
-ThreadSafe<GameImpl> Game::gameImpl() const
+ThreadSafe<GameImpl> SimpleGame::gameImpl() const
 {
     return mImpl->mGameImpl;
 }
 
 
-void Game::setPaused(bool inPaused)
+void SimpleGame::setPaused(bool inPaused)
 {
     gameImpl().lock()->setPaused(inPaused);
 }
 
 
-bool Game::isPaused() const
+bool SimpleGame::isPaused() const
 {
     return gameImpl().lock()->isPaused();
 }
 
 
-GameStateStats Game::stats() const
+GameStateStats SimpleGame::stats() const
 {
     const Locker locker(gameImpl());
     const GameState & gameState = locker->gameState();
@@ -170,73 +170,73 @@ GameStateStats Game::stats() const
 }
 
 
-void Game::applyLinePenalty(int inNumberOfLinesMadeByOpponent)
+void SimpleGame::applyLinePenalty(int inNumberOfLinesMadeByOpponent)
 {
     return gameImpl().lock()->applyLinePenalty(inNumberOfLinesMadeByOpponent);
 }
 
 
-bool Game::isGameOver() const
+bool SimpleGame::isGameOver() const
 {
     return gameImpl().lock()->isGameOver();
 }
 
 
-int Game::rowCount() const
+int SimpleGame::rowCount() const
 {
     return gameImpl().lock()->rowCount();
 }
 
 
-int Game::columnCount() const
+int SimpleGame::columnCount() const
 {
     return gameImpl().lock()->columnCount();
 }
 
 
-void Game::move(MoveDirection inDirection)
+void SimpleGame::move(MoveDirection inDirection)
 {
     gameImpl().lock()->move(inDirection);
 }
 
 
-void Game::rotate()
+void SimpleGame::rotate()
 {
     gameImpl().lock()->rotate();
 }
 
 
-void Game::drop()
+void SimpleGame::drop()
 {
     gameImpl().lock()->dropAndCommit();
 }
 
 
-void Game::setStartingLevel(int inLevel)
+void SimpleGame::setStartingLevel(int inLevel)
 {
     gameImpl().lock()->setStartingLevel(inLevel);
 }
 
 
-int Game::level() const
+int SimpleGame::level() const
 {
     return gameImpl().lock()->level();
 }
 
 
-Block Game::activeBlock() const
+Block SimpleGame::activeBlock() const
 {
     return gameImpl().lock()->activeBlock();
 }
 
 
-Grid Game::gameGrid() const
+Grid SimpleGame::gameGrid() const
 {
     return gameImpl().lock()->gameGrid();
 }
 
 
-Block Game::getNextBlock()
+Block SimpleGame::getNextBlock()
 {
     std::vector<BlockType> blockTypes;
     gameImpl().lock()->getFutureBlocks(2, blockTypes);
@@ -250,7 +250,7 @@ Block Game::getNextBlock()
 }
 
 
-std::vector<Block> Game::getNextBlocks()
+std::vector<Block> SimpleGame::getNextBlocks()
 {
     std::vector<BlockType> blockTypes;
     std::size_t numFutureBlocks = futureBlocksCount();
@@ -274,7 +274,7 @@ std::vector<Block> Game::getNextBlocks()
 }
 
 
-std::size_t Game::futureBlocksCount() const
+std::size_t SimpleGame::futureBlocksCount() const
 {
     return gameImpl().lock()->futureBlocksCount();
 }

@@ -114,8 +114,7 @@ void GameImpl::onChanged()
 {
     if (!mMuteEvents)
     {
-        // Invoke on main tread
-        InvokeLater(boost::bind(&GameImpl::OnChangedImpl, this));
+        OnChangedImpl(this);
     }
 }
 
@@ -151,35 +150,20 @@ void GameImpl::onLinesCleared(int inLineCount)
 {
     if (!mMuteEvents)
     {
-        // Invoke on main thread
-        InvokeLater(boost::bind(&GameImpl::OnLinesClearedImpl, this, inLineCount));
+        OnLinesClearedImpl(this, inLineCount);
     }
 }
 
 
 void GameImpl::OnLinesClearedImpl(GameImpl * inGame, int inLineCount)
 {
-    //
-    // This code runs in the main thread.
-    // No synchronization should be required.
-    //
 
-    if (!Exists(inGame))
+    for (EventHandlers::iterator it = inGame->mEventHandlers.begin(),
+                                 end = inGame->mEventHandlers.end();
+         it != end; ++it)
     {
-        LogWarning("Game::OnLinesCleared: The game object no longer exists!");
-        return;
-    }
-
-    EventHandlers::iterator it = inGame->mEventHandlers.begin(), end = inGame->mEventHandlers.end();
-    for (; it != end; ++it)
-    {
-        GameImpl::EventHandler * eventHandler(*it);
-        if (!EventHandler::Exists(eventHandler))
-        {
-            LogWarning("OnLinesClearedImpl: This event handler no longer exists.");
-            return;
-        }
-        eventHandler->onLinesCleared(inGame, inLineCount);
+        GameImpl::EventHandler & eventHandler(**it);
+        eventHandler.onLinesCleared(inGame, inLineCount);
     }
 }
 
