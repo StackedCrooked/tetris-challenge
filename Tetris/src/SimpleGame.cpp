@@ -250,7 +250,7 @@ Grid SimpleGame::gameGrid() const
 }
 
 
-Block SimpleGame::getNextBlock()
+Block SimpleGame::getNextBlock() const
 {
     std::vector<BlockType> blockTypes;
     gameImpl().lock()->getFutureBlocks(2, blockTypes);
@@ -264,7 +264,7 @@ Block SimpleGame::getNextBlock()
 }
 
 
-std::vector<Block> SimpleGame::getNextBlocks(std::size_t inCount)
+std::vector<Block> SimpleGame::getNextBlocks(std::size_t inCount) const
 {
     std::vector<BlockType> blockTypes;
 

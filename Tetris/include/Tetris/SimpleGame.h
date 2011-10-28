@@ -89,10 +89,10 @@ public:
     Grid gameGrid() const;
 
     // Get the next block
-    Block getNextBlock();
+    Block getNextBlock() const;
 
     // Gets the next scheduled blocks.
-    std::vector<Block> getNextBlocks(std::size_t inCount);
+    std::vector<Block> getNextBlocks(std::size_t inCount) const;
 
     // For multiplayer crazyness.
     void applyLinePenalty(int inNumberOfLinesMadeByOpponent);
