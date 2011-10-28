@@ -2,6 +2,9 @@
 #define QTMAINTHREAD_H
 
 
+#define QT_NO_KEYWORDS
+
+
 #include "Futile/MainThreadImpl.h"
 #include <QtCore/QtCore>
 

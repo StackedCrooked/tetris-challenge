@@ -2,6 +2,9 @@
 #define NEWGAMEDIALOG_H
 
 
+#define QT_NO_KEYWORDS
+
+
 #include <QtGui/QtGui>
 
 

@@ -2,6 +2,9 @@
 #define MAINWINDOW_H
 
 
+#define QT_NO_KEYWORDS
+
+
 #include <QtGui/QtGui>
 #include "Model.h"
 #include "TetrisWidget.h"
@@ -35,7 +38,7 @@ public:
 protected:
     void closeEvent(QCloseEvent*);
 
-private slots:
+private Q_SLOTS:
     void onNew();
 
     void onNewSingleHumanPlayerGame();
