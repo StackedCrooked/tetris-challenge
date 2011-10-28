@@ -105,7 +105,7 @@ Player * MultiplayerGame::Impl::addPlayer(PlayerType inPlayerType,
                                        mRowCount,
                                        mColumnCount));
     mPlayers.push_back(playerPtr);
-    SimpleGame::RegisterEventHandler(playerPtr->game(), this);
+    playerPtr->game()->registerEventHandler(this);
     return playerPtr.get();
 }
 
@@ -130,7 +130,7 @@ Player * MultiplayerGame::addComputerPlayer(const TeamName & inTeamName,
 
 void MultiplayerGame::removePlayer(Player * inPlayer)
 {
-    SimpleGame::UnregisterEventHandler(inPlayer->game(), mImpl.get());
+    inPlayer->game()->unregisterEventHandler(mImpl.get());
     Impl::Players::iterator it = std::find_if(mImpl->mPlayers.begin(), mImpl->mPlayers.end(), boost::bind(&Impl::PlayerPtr::get, _1) == inPlayer);
     if (it == mImpl->mPlayers.end())
     {

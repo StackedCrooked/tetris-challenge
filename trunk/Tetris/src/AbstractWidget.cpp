@@ -76,7 +76,7 @@ AbstractWidget::~AbstractWidget()
 {
     if (mPlayer)
     {
-        SimpleGame::UnregisterEventHandler(mPlayer->game(), this);
+        mPlayer->game()->unregisterEventHandler(this);
     }
 }
 
@@ -106,21 +106,21 @@ void AbstractWidget::onLinesCleared(SimpleGame * inGame, int )
 void AbstractWidget::setPlayer(Player * inPlayer)
 {
     // Stop listing to the events from the old player.
-    if (mPlayer && SimpleGame::Exists(mPlayer->game()))
+    if (mPlayer && mPlayer->game())
     {
-        SimpleGame::UnregisterEventHandler(mPlayer->game(), this);
+        mPlayer->game()->unregisterEventHandler(this);
     }
 
     // Set the new player.
     mPlayer = inPlayer;
 
     // Start listening to the events from the new player.
-    if (mPlayer && SimpleGame::Exists(mPlayer->game()))
+    if (mPlayer && mPlayer->game())
     {
         setMinSize(Size(2 * margin() + futureBlocksRect().right() - gameRect().left(),
                         2 * margin() + avatarRect().bottom() - gameRect().top()));
 
-        SimpleGame::RegisterEventHandler(mPlayer->game(), this);
+        mPlayer->game()->registerEventHandler(this);
     }
 }
 
