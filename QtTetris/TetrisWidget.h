@@ -2,6 +2,9 @@
 #define TETRISWIDGET_H
 
 
+#define QT_NO_KEYWORDS
+
+
 #include "Tetris/AbstractWidget.h"
 #include "Futile/MainThread.h"
 #include "Futile/Threading.h"

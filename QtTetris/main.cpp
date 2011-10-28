@@ -1,3 +1,6 @@
+#define QT_NO_KEYWORDS
+
+
 #include <QtGui/QApplication>
 #include "Model.h"
 #include "MainWindow.h"
