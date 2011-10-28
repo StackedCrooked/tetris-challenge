@@ -86,7 +86,7 @@ public:
     virtual const GameState & gameState() const = 0;
 
     // For multiplayer crazyness
-    virtual void applyLinePenalty(int inNumberOfLinesMadeByOpponent);
+    virtual void applyLinePenalty(std::size_t inLineCount);
     //virtual void setActiveBlock(const Block & inBlock);
     virtual void setGrid(const Grid & inGrid) = 0;
     //void swapGrid(Game & other);
@@ -99,7 +99,7 @@ protected:
     virtual GameState & gameState() = 0;
 
     void onChanged();
-    void onLinesCleared(int inLineCount);
+    void onLinesCleared(std::size_t inLineCount);
 
     static std::auto_ptr<Block> CreateDefaultBlock(BlockType inBlockType, std::size_t inNumColumns);
     void reserveBlocks(std::size_t inCount);

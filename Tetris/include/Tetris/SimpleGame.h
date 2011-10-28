@@ -39,7 +39,7 @@ public:
 
         virtual void onGameStateChanged(SimpleGame * inGame) = 0;
 
-        virtual void onLinesCleared(SimpleGame * inGame, int inLineCount) = 0;
+        virtual void onLinesCleared(SimpleGame * inGame, std::size_t inLineCount) = 0;
 
     private:
         EventHandler(const EventHandler&);

@@ -84,7 +84,7 @@ struct SimpleGame::Impl : boost::enable_shared_from_this<SimpleGame::Impl>
         }
     }
 
-    virtual void onLinesCleared(Game * inGame, int inLineCount)
+    virtual void onLinesCleared(Game * inGame, std::size_t inLineCount)
     {
         (void)inGame;
         // This method is triggered in a worker thread. Dispatch to main thread.
@@ -92,7 +92,7 @@ struct SimpleGame::Impl : boost::enable_shared_from_this<SimpleGame::Impl>
         InvokeLater(boost::bind(&Impl::OnLinesClearedLater, weakSelf, inLineCount));
     }
 
-    static void OnLinesClearedLater(boost::weak_ptr<Impl> inWeakImpl, int inLineCount)
+    static void OnLinesClearedLater(boost::weak_ptr<Impl> inWeakImpl, std::size_t inLineCount)
     {
         if (boost::shared_ptr<Impl> impl = inWeakImpl.lock())
         {
@@ -100,7 +100,7 @@ struct SimpleGame::Impl : boost::enable_shared_from_this<SimpleGame::Impl>
         }
     }
 
-    void handleLinesCleared(int inLineCount)
+    void handleLinesCleared(std::size_t inLineCount)
     {
         EventHandlers::iterator it = mEventHandlers.begin(), end = mEventHandlers.end();
         for (; it != end; ++it)

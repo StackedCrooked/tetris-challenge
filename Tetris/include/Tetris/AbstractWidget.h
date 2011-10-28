@@ -81,7 +81,7 @@ public:
 
     virtual void onGameStateChanged(SimpleGame * inGame);
 
-    virtual void onLinesCleared(SimpleGame * inGame, int inLineCount);
+    virtual void onLinesCleared(SimpleGame * inGame, std::size_t inLineCount);
 
     void setPlayer(Player * inPlayer);
 
