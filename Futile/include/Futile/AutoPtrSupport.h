@@ -8,7 +8,7 @@
 namespace Futile {
 
 
-// Helper functions to reduce the typing involed when creating auto_ptr objects.
+// Helper functions to reduce the typing required to create auto_ptr objects.
 // For example:
 //
 //   std::auto_ptr<Point>(new Point(x, y));
