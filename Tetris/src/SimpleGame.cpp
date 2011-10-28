@@ -8,6 +8,7 @@
 #include "Futile/AutoPtrSupport.h"
 #include "Futile/MainThread.h"
 #include <boost/bind.hpp>
+#include <boost/signals.hpp>
 #include <boost/weak_ptr.hpp>
 #include <set>
 #include <stdexcept>
@@ -19,8 +20,7 @@ namespace Tetris {
 using namespace Futile;
 
 
-struct SimpleGame::Impl : public Game::EventHandler,
-                          boost::enable_shared_from_this<SimpleGame::Impl>
+struct SimpleGame::Impl : boost::enable_shared_from_this<SimpleGame::Impl>
 {
     static Futile::ThreadSafe<Game> CreateGame(PlayerType inPlayerType, std::size_t inRowCount, std::size_t inColumnCount)
     {
@@ -35,26 +35,31 @@ struct SimpleGame::Impl : public Game::EventHandler,
         throw std::logic_error("Invalid enum value for PlayerType.");
     }
 
-    Impl(PlayerType inPlayerType,
+    Impl(SimpleGame * inSimpleGame,
+         PlayerType inPlayerType,
          std::size_t inRowCount,
          std::size_t inColumnCount) :
         mGame(CreateGame(inPlayerType, inRowCount, inColumnCount)),
         mPlayerType(inPlayerType),
         mGravity(new Gravity(mGame)),
         mCenterColumn(static_cast<std::size_t>(0.5 + inColumnCount / 2.0)),
-        mBackPtr(0)
+        mBackPtr(inSimpleGame)
     {
+        FUTILE_LOCK(Game & game, mGame)
+        {
+            game.GameStateChanged.connect(boost::bind(&Impl::onGameStateChanged, this, _1));
+            game.LinesCleared.connect(boost::bind(&Impl::onLinesCleared, this, _1, _2));
+        }
     }
 
     ~Impl()
     {
-        Game::UnregisterEventHandler(mGame, this);
-    }
-
-    void init(SimpleGame * inGame)
-    {
-        mBackPtr = inGame;
-        Game::RegisterEventHandler(mGame, this);
+        FUTILE_LOCK(Game & game, mGame)
+        {
+            (void)game;
+            mGameStateChanged.disconnect();
+            mLinesCleared.disconnect();
+        }
     }
 
     virtual void onGameStateChanged(Game * inGame)
@@ -85,8 +90,9 @@ struct SimpleGame::Impl : public Game::EventHandler,
         }
     }
 
-    virtual void onLinesCleared(Game * , int inLineCount)
+    virtual void onLinesCleared(Game * inGame, int inLineCount)
     {
+        (void)inGame;
         // This method is triggered in a worker thread. Dispatch to main thread.
         boost::weak_ptr<Impl> weakSelf(shared_from_this());
         InvokeLater(boost::bind(&Impl::OnLinesClearedLater, weakSelf, inLineCount));
@@ -116,14 +122,15 @@ struct SimpleGame::Impl : public Game::EventHandler,
     boost::scoped_ptr<Gravity> mGravity;
     std::size_t mCenterColumn;
     SimpleGame * mBackPtr;
+    boost::signals::connection mGameStateChanged;
+    boost::signals::connection mLinesCleared;
     EventHandlers mEventHandlers;
 };
 
 
 SimpleGame::SimpleGame(PlayerType inPlayerType, std::size_t inRowCount, std::size_t inColumnCount) :
-    mImpl(new Impl(inPlayerType, inRowCount, inColumnCount))
+    mImpl(new Impl(this, inPlayerType, inRowCount, inColumnCount))
 {
-    mImpl->init(this);
 }
 
 

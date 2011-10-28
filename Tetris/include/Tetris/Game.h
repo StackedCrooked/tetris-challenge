@@ -11,6 +11,7 @@
 #include "Futile/Threading.h"
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
+#include <boost/signals.hpp>
 #include <memory>
 #include <set>
 
@@ -45,37 +46,8 @@ protected:
 public:
     virtual ~Game();
 
-    class EventHandler
-    {
-    public:
-        EventHandler();
-
-        virtual ~EventHandler();
-
-        // Check if the give EventHandler object still exists
-        static bool Exists(EventHandler * inEventHandler);
-
-        // Notifies that the game state has changed.
-        // This method arrives in the main thread.
-        //
-        // The Game* pointer is unlocked at this moment. The
-        // user is responsible for locking the corresponding
-        // ThreadSafe<Game> object!
-        virtual void onGameStateChanged(Game * inGame) = 0;
-
-        virtual void onLinesCleared(Game * inGame, int inLineCount) = 0;
-
-    private:
-        EventHandler(const EventHandler&);
-        EventHandler& operator=(const EventHandler&);
-
-        typedef std::set<EventHandler*> Instances;
-        static Instances sInstances;
-    };
-
-    static void RegisterEventHandler(Futile::ThreadSafe<Game> inGame, EventHandler * inEventHandler);
-
-    static void UnregisterEventHandler(Futile::ThreadSafe<Game> inGame, EventHandler * inEventHandler);
+    boost::signal<void(Game *)> GameStateChanged;
+    boost::signal<void(Game *, int)> LinesCleared;
 
     void setPaused(bool inPause);
 
@@ -133,10 +105,6 @@ protected:
     void onChanged();
     void onLinesCleared(int inLineCount);
 
-    static bool Exists(Game * inGame);
-    static void OnChangedImpl(Game * inGame);
-    static void OnLinesClearedImpl(Game * inGame, int inLineCount);
-
     static std::auto_ptr<Block> CreateDefaultBlock(BlockType inBlockType, std::size_t inNumColumns);
     void reserveBlocks(std::size_t inCount);
     void supplyBlocks();
@@ -153,9 +121,6 @@ protected:
     std::size_t mCurrentBlockIndex;
     int mStartingLevel;
     bool mPaused;
-
-    typedef std::set<EventHandler*> EventHandlers;
-    EventHandlers mEventHandlers;
 
     // In order to avoid flooding the queue in certain situations.
     bool mMuteEvents;
@@ -185,11 +150,6 @@ private:
     // non-copyable
     Game(const Game&);
     Game& operator=(const Game&);
-
-    static bool Exists(const Game & inGame);
-
-    typedef std::set<const Game*> Instances;
-    static Instances sInstances;
 };
 
 
