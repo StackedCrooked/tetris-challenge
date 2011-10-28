@@ -54,12 +54,6 @@ struct SimpleGame::Impl : boost::enable_shared_from_this<SimpleGame::Impl>
 
     ~Impl()
     {
-        FUTILE_LOCK(Game & game, mGame)
-        {
-            (void)game;
-            mGameStateChanged.disconnect();
-            mLinesCleared.disconnect();
-        }
     }
 
     virtual void onGameStateChanged(Game * inGame)
@@ -122,8 +116,9 @@ struct SimpleGame::Impl : boost::enable_shared_from_this<SimpleGame::Impl>
     boost::scoped_ptr<Gravity> mGravity;
     std::size_t mCenterColumn;
     SimpleGame * mBackPtr;
-    boost::signals::connection mGameStateChanged;
-    boost::signals::connection mLinesCleared;
+    typedef boost::signals::scoped_connection ScopedConnection;
+    ScopedConnection mGameStateChanged;
+    ScopedConnection mLinesCleared;
     EventHandlers mEventHandlers;
 };
 
