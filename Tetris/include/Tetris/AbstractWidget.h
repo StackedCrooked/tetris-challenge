@@ -151,6 +151,7 @@ private:
     void recalculateFPS();
 
     Tetris::Player * mPlayer;
+    int mFutureBlockCount;
     int mSquareWidth;
     int mSquareHeight;
     int mStatItemHeight;

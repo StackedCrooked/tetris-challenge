@@ -24,19 +24,13 @@ class GameState;
 
 
 /**
- * SimpleGame provides a "simple" interface to the more advanced Game class.
- *
- * Simplifications include:
- * - No need locking
- * - Event callbacks always arrive in the main thread.
- * - Returns game attributes by value (copy) to avoid race conditions.
+ * SimpleGame is a simplified wrapper for the Game class.
  */
 class SimpleGame
 {
 public:
     /**
      * EventHandler allows you to listen to game events.
-     * All callbacks arrive in the main threads.
      */
     class EventHandler
     {
@@ -52,7 +46,9 @@ public:
         EventHandler& operator=(const EventHandler&);
     };
 
-    SimpleGame(PlayerType inPlayerType, std::size_t inRowCount, std::size_t inColumnCount);
+    SimpleGame(PlayerType inPlayerType,
+               std::size_t inRowCount,
+               std::size_t inColumnCount);
 
     ~SimpleGame();
 
@@ -92,14 +88,11 @@ public:
     // Returns a copy to avoid race conditions.
     Grid gameGrid() const;
 
-    // Gets the currently active block.
+    // Get the next block
     Block getNextBlock();
 
     // Gets the next scheduled blocks.
-    std::vector<Block> getNextBlocks();
-
-    // The number next blocks that can be obtained.
-    std::size_t futureBlocksCount() const;
+    std::vector<Block> getNextBlocks(std::size_t inCount);
 
     // For multiplayer crazyness.
     void applyLinePenalty(int inNumberOfLinesMadeByOpponent);

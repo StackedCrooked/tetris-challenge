@@ -79,10 +79,6 @@ public:
 
     std::size_t currentBlockIndex() const;
 
-    int futureBlocksCount() const;
-
-    void setFutureBlocksCount(int inFutureBlocksCount);
-
     void getFutureBlocks(std::size_t inCount, BlockTypes & outBlocks);
 
     void getFutureBlocksWithOffset(std::size_t inOffset, std::size_t inCount, BlockTypes & outBlocks);
@@ -117,7 +113,6 @@ protected:
     boost::scoped_ptr<BlockFactory> mBlockFactory;
     boost::scoped_ptr<BlockFactory> mGarbageFactory;
     BlockTypes mBlocks;
-    int mFutureBlocksCount;
     std::size_t mCurrentBlockIndex;
     int mStartingLevel;
     bool mPaused;

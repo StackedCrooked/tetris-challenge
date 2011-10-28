@@ -264,14 +264,13 @@ Block SimpleGame::getNextBlock()
 }
 
 
-std::vector<Block> SimpleGame::getNextBlocks()
+std::vector<Block> SimpleGame::getNextBlocks(std::size_t inCount)
 {
     std::vector<BlockType> blockTypes;
-    std::size_t numFutureBlocks = futureBlocksCount();
 
-    gameImpl().lock()->getFutureBlocks(1 + numFutureBlocks, blockTypes);
+    gameImpl().lock()->getFutureBlocks(1 + inCount, blockTypes);
 
-    if (blockTypes.size() != (1 + numFutureBlocks))
+    if (blockTypes.size() != (1 + inCount))
     {
         throw std::logic_error("Failed to get the next block from the factory.");
     }
@@ -285,12 +284,6 @@ std::vector<Block> SimpleGame::getNextBlocks()
                                Column((columnCount() - mImpl->mCenterColumn)/2)));
     }
     return result;
-}
-
-
-std::size_t SimpleGame::futureBlocksCount() const
-{
-    return gameImpl().lock()->futureBlocksCount();
 }
 
 
