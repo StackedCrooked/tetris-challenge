@@ -1,10 +1,9 @@
 #include "Poco/Foundation.h"
-#include "Tetris/Config.h"
 #include "Tetris/ComputerPlayer.h"
 #include "Tetris/NodeCalculator.h"
 #include "Tetris/AISupport.h"
 #include "Tetris/Gravity.h"
-#include "Tetris/GameImpl.h"
+#include "Tetris/Game.h"
 #include "Tetris/GameStateComparator.h"
 #include "Tetris/Evaluator.h"
 #include "Tetris/GameStateNode.h"
@@ -372,7 +371,7 @@ void ComputerPlayer::Impl::startNodeCalculator()
 
     // Critical section
     {
-        Locker<GameImpl> rgame(mComputerPlayer->game()->gameImpl());
+        Locker<Game> rgame(mComputerPlayer->game()->gameImpl());
         const ComputerGame & constComputerGame(dynamic_cast<const ComputerGame&>(*rgame.get()));
 
 
@@ -442,7 +441,7 @@ void ComputerPlayer::Impl::onStarted()
 
 void ComputerPlayer::Impl::onWorking()
 {
-    Locker<GameImpl> wgame(mComputerPlayer->game()->gameImpl());
+    Locker<Game> wgame(mComputerPlayer->game()->gameImpl());
     const ComputerGame & game(dynamic_cast<const ComputerGame&>(*wgame.get()));
 
     if (mGameDepth < game.endNode()->depth())
@@ -479,7 +478,7 @@ void ComputerPlayer::Impl::onFinished()
         return;
     }
 
-    Locker<GameImpl> wgame(mComputerPlayer->game()->gameImpl());
+    Locker<Game> wgame(mComputerPlayer->game()->gameImpl());
     ComputerGame & game(dynamic_cast<ComputerGame&>(*wgame.get()));
 
     // Check for sync problems.

@@ -58,7 +58,7 @@ v Hyperlink in about dialog
 v About dialog
 v Window icon
 v Show menu with "New game", "About", etc..
-v Use Tetris/Game.h include structure.
+v Use Tetris/SimpleGame.h include structure.
 v Replace ThreadSafe<Game> with ThreadSafe<Game>.
 v Stop cheating
 v Logger scroll to bottom

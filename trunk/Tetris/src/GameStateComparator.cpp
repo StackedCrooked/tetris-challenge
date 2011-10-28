@@ -1,4 +1,3 @@
-#include "Tetris/Config.h"
 #include "Tetris/GameStateComparator.h"
 #include "Tetris/Evaluator.h"
 #include "Tetris/GameStateNode.h"

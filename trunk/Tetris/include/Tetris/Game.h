@@ -1,43 +1,66 @@
-#ifndef TETRIS_SIMPLEGAME_H_INCLUDED
-#define TETRIS_SIMPLEGAME_H_INCLUDED
+#ifndef TETRIS_GAME_H_INCLUDED
+#define TETRIS_GAME_H_INCLUDED
 
 
+#include "Tetris/BlockFactory.h"
+#include "Tetris/BlockTypes.h"
 #include "Tetris/Direction.h"
-#include "Tetris/Block.h"
-#include "Tetris/GameStateStats.h"
-#include "Tetris/PlayerType.h"
+#include "Tetris/GameState.h"
+#include "Tetris/Grid.h"
+#include "Tetris/NodePtr.h"
 #include "Futile/Threading.h"
-#include <boost/function.hpp>
+#include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
-#include <boost/signals2/signal.hpp>
-#include <cstddef>
+#include <memory>
 #include <set>
-#include <stdexcept>
-#include <vector>
 
 
 namespace Tetris {
 
 
-class GameImpl;
-class GameState;
+class Block;
+class GameStateNode;
+class Game;
 
 
 /**
- * Game is an easy to use and thread-safe wrapper for the GameImpl class.
+ * Game is the base class for HumanGame and ComputerGame subclasses.
+ *
+ * It manages the following things:
+ *   - the currently active block
+ *   - the list of future blocks
+ *   - the root gamestate node
  */
 class Game
 {
-public:
+protected:
     /**
-     * EventHandler allows you to listen to game events.
-     * All callbacks arrive in the main threads.
+     * Constructor is private. Use the factory methods defined in subtype.
      */
+    Game(std::size_t inNumRows, std::size_t inNumColumns);
+
+    // Friendship required for destructor.
+    friend class Futile::ThreadSafe<Game>;
+
+public:
+    virtual ~Game();
+
     class EventHandler
     {
     public:
-        EventHandler() {}
+        EventHandler();
 
+        virtual ~EventHandler();
+
+        // Check if the give EventHandler object still exists
+        static bool Exists(EventHandler * inEventHandler);
+
+        // Notifies that the game state has changed.
+        // This method arrives in the main thread.
+        //
+        // The Game* pointer is unlocked at this moment. The
+        // user is responsible for locking the corresponding
+        // ThreadSafe<Game> object!
         virtual void onGameStateChanged(Game * inGame) = 0;
 
         virtual void onLinesCleared(Game * inGame, int inLineCount) = 0;
@@ -45,25 +68,16 @@ public:
     private:
         EventHandler(const EventHandler&);
         EventHandler& operator=(const EventHandler&);
+
+        typedef std::set<EventHandler*> Instances;
+        static Instances sInstances;
     };
 
-    Game(PlayerType inPlayerType, std::size_t inRowCount, std::size_t inColumnCount);
+    static void RegisterEventHandler(Futile::ThreadSafe<Game> inGame, EventHandler * inEventHandler);
 
-    ~Game();
+    static void UnregisterEventHandler(Futile::ThreadSafe<Game> inGame, EventHandler * inEventHandler);
 
-    static void RegisterEventHandler(Game * inGame, EventHandler * inEventHandler);
-
-    static void UnregisterEventHandler(Game * inGame, EventHandler * inEventHandler);
-
-    static bool Exists(Game * inGame);
-
-    PlayerType playerType() const;
-
-    GameStateStats stats() const;
-
-    Futile::ThreadSafe<GameImpl> gameImpl() const;
-
-    void setPaused(bool inPaused);
+    void setPaused(bool inPause);
 
     bool isPaused() const;
 
@@ -73,50 +87,185 @@ public:
 
     int columnCount() const;
 
-    void move(MoveDirection inDirection);
+    bool canMove(MoveDirection inDirection);
 
-    void rotate();
+    virtual bool move(MoveDirection inDirection) = 0;
 
-    void drop();
+    bool rotate();
 
-    void setStartingLevel(int inLevel);
+    void dropWithoutCommit();
+
+    void dropAndCommit();
 
     int level() const;
 
-    // Returns a copy to avoid race conditions.
-    Block activeBlock() const;
+    void setStartingLevel(int inLevel);
 
-    // Returns a copy to avoid race conditions.
-    Grid gameGrid() const;
+    const Block & activeBlock() const;
 
-    // Gets the currently active block.
-    Block getNextBlock();
+    const Grid & gameGrid() const;
 
-    // Gets the next scheduled blocks.
-    std::vector<Block> getNextBlocks();
+    std::size_t currentBlockIndex() const;
 
-    // The number next blocks that can be obtained.
-    std::size_t futureBlocksCount() const;
+    int futureBlocksCount() const;
 
-    // For multiplayer crazyness.
-    void applyLinePenalty(int inNumberOfLinesMadeByOpponent);
+    void setFutureBlocksCount(int inFutureBlocksCount);
+
+    void getFutureBlocks(std::size_t inCount, BlockTypes & outBlocks);
+
+    void getFutureBlocksWithOffset(std::size_t inOffset, std::size_t inCount, BlockTypes & outBlocks);
+
+    virtual const GameState & gameState() const = 0;
+
+    // For multiplayer crazyness
+    virtual void applyLinePenalty(int inNumberOfLinesMadeByOpponent);
+    //virtual void setActiveBlock(const Block & inBlock);
+    virtual void setGrid(const Grid & inGrid) = 0;
+    //void swapGrid(Game & other);
+    //void swapActiveBlock(Game & other);
+
+protected:
+    static int GetRowDelta(MoveDirection inDirection);
+    static int GetColumnDelta(MoveDirection inDirection);
+
+    virtual GameState & gameState() = 0;
+
+    void onChanged();
+    void onLinesCleared(int inLineCount);
+
+    static bool Exists(Game * inGame);
+    static void OnChangedImpl(Game * inGame);
+    static void OnLinesClearedImpl(Game * inGame, int inLineCount);
+
+    static std::auto_ptr<Block> CreateDefaultBlock(BlockType inBlockType, std::size_t inNumColumns);
+    void reserveBlocks(std::size_t inCount);
+    void supplyBlocks();
+
+    std::vector<BlockType> getGarbageRow() const;
+
+    std::size_t mNumRows;
+    std::size_t mNumColumns;
+    boost::scoped_ptr<Block> mActiveBlock;
+    boost::scoped_ptr<BlockFactory> mBlockFactory;
+    boost::scoped_ptr<BlockFactory> mGarbageFactory;
+    BlockTypes mBlocks;
+    int mFutureBlocksCount;
+    std::size_t mCurrentBlockIndex;
+    int mStartingLevel;
+    bool mPaused;
+
+    typedef std::set<EventHandler*> EventHandlers;
+    EventHandlers mEventHandlers;
+
+    // In order to avoid flooding the queue in certain situations.
+    bool mMuteEvents;
+
+    /**
+     * Create an instance to make the mMuteEvents false over a certain scope.
+     * This is handy when we are running a loop and don't want to trigger for
+     * for each event.
+     */
+    struct ScopedMute : boost::noncopyable
+    {
+        ScopedMute(bool & value) :
+            mValue(value)
+        {
+            mValue = true;
+        }
+
+        ~ScopedMute()
+        {
+            mValue = false;
+        }
+
+        bool & mValue;
+    };
 
 private:
     // non-copyable
-    Game(const Game & );
-    Game & operator=(const Game&);
+    Game(const Game&);
+    Game& operator=(const Game&);
 
-    typedef Futile::Locker<GameImpl> Locker;
+    static bool Exists(const Game & inGame);
 
-    struct Impl;
-    boost::scoped_ptr<Impl> mImpl;
-
-    typedef std::set<Game*> Instances;
+    typedef std::set<const Game*> Instances;
     static Instances sInstances;
+};
+
+
+class HumanGame : public Game
+{
+public:
+    inline static Futile::ThreadSafe<Game> Create(std::size_t inNumRows, std::size_t inNumColumns)
+    {
+        return Futile::ThreadSafe<Game>(new HumanGame(inNumRows, inNumColumns));
+    }
+
+    virtual bool move(MoveDirection inDirection);
+
+    const GameState & gameState() const;
+
+    virtual void setGrid(const Grid & inGrid);
+
+protected:
+    // Friendship required for constructor.
+    friend class Game;
+
+    HumanGame(std::size_t inNumRows, std::size_t inNumCols);
+
+    HumanGame(const Game & inGame);
+
+    GameState & gameState();
+
+private:
+    boost::scoped_ptr<GameState> mGameState;
+};
+
+
+class ComputerGame : public Game
+{
+public:
+    inline static Futile::ThreadSafe<Game> Create(std::size_t inNumRows, std::size_t inNumColumns)
+    {
+        return Futile::ThreadSafe<Game>(new ComputerGame(inNumRows, inNumColumns));
+    }
+
+    virtual bool move(MoveDirection inDirection);
+
+    void appendPrecalculatedNode(NodePtr inNode);
+
+    const GameStateNode * currentNode() const;
+
+    const GameStateNode * endNode() const;
+
+    bool navigateNodeDown();
+
+    std::size_t numPrecalculatedMoves() const;
+
+    void clearPrecalculatedNodes();
+
+    const GameState & gameState() const;
+
+    virtual void setGrid(const Grid & inGrid);
+
+protected:
+    // Friendship required for constructor.
+    friend class Game;
+
+    ComputerGame(std::size_t inNumRows, std::size_t inNumCols);
+
+    ComputerGame(const Game & inGame);
+
+    GameState & gameState();
+
+private:
+    void setCurrentNode(NodePtr inCurrentNode);
+
+    NodePtr mCurrentNode;
 };
 
 
 } // namespace Tetris
 
 
-#endif // TETRIS_SIMPLEGAME_H_INCLUDED
+#endif // GAME_H_INCLUDED

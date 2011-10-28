@@ -10,7 +10,7 @@
 namespace Tetris {
 
 
-class GameImpl;
+class Game;
 class Gravity;
 
 
@@ -23,7 +23,7 @@ class Gravity;
 class Gravity
 {
 public:
-    Gravity(const Futile::ThreadSafe<GameImpl> & inGame);
+    Gravity(const Futile::ThreadSafe<Game> & inGame);
 
     ~Gravity();
 
@@ -48,4 +48,3 @@ private:
 
 
 #endif // GRAVITY_H_INCLUDED
-
