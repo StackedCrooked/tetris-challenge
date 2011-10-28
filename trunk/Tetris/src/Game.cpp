@@ -26,30 +26,6 @@ using namespace Futile;
 extern const int cMaxLevel;
 
 
-Game::EventHandler::Instances Game::EventHandler::sInstances;
-
-
-Game::EventHandler::EventHandler()
-{
-    sInstances.insert(this);
-}
-
-
-Game::EventHandler::~EventHandler()
-{
-    sInstances.erase(this);
-}
-
-
-bool Game::EventHandler::Exists(Game::EventHandler * inEventHandler)
-{
-    return sInstances.find(inEventHandler) != sInstances.end();
-}
-
-
-Game::Instances Game::sInstances;
-
-
 Game::Game(std::size_t inNumRows, std::size_t inNumColumns) :
     mNumRows(inNumRows),
     mNumColumns(inNumColumns),
@@ -61,7 +37,6 @@ Game::Game(std::size_t inNumRows, std::size_t inNumColumns) :
     mCurrentBlockIndex(0),
     mStartingLevel(-1),
     mPaused(false),
-    mEventHandlers(),
     mMuteEvents(false)
 {
     if (mBlocks.empty())
@@ -69,44 +44,11 @@ Game::Game(std::size_t inNumRows, std::size_t inNumColumns) :
         mBlocks.push_back(mBlockFactory->getNext());
     }
     mActiveBlock.reset(CreateDefaultBlock(mBlocks.front(), inNumColumns).release());
-
-    sInstances.insert(this);
 }
 
 
 Game::~Game()
 {
-    sInstances.erase(this);
-}
-
-
-bool Game::Exists(const Game & inGame)
-{
-    return sInstances.find(&inGame) != sInstances.end();
-}
-
-
-void Game::RegisterEventHandler(ThreadSafe<Game> inGame, EventHandler * inEventHandler)
-{
-    FUTILE_LOCK(Game & game, inGame)
-    {
-        if (Exists(game)) // The game may have ended by the time this event arrives.
-        {
-            game.mEventHandlers.insert(inEventHandler);
-        }
-    }
-}
-
-
-void Game::UnregisterEventHandler(ThreadSafe<Game> inGame, EventHandler * inEventHandler)
-{
-    FUTILE_LOCK(Game & game, inGame)
-    {
-        if (Exists(game)) // The game may have ended by the time this event arrives.
-        {
-            game.mEventHandlers.erase(inEventHandler);
-        }
-    }
 }
 
 
@@ -114,56 +56,15 @@ void Game::onChanged()
 {
     if (!mMuteEvents)
     {
-        OnChangedImpl(this);
+        GameStateChanged(this);
     }
 }
-
-
-bool Game::Exists(Game * inGame)
-{
-    return sInstances.find(inGame) != sInstances.end();
-}
-
-
-void Game::OnChangedImpl(Game * inGame)
-{
-    if (!Exists(inGame))
-    {
-        return;
-    }
-
-    EventHandlers::iterator it = inGame->mEventHandlers.begin(), end = inGame->mEventHandlers.end();
-    for (; it != end; ++it)
-    {
-        Game::EventHandler * eventHandler(*it);
-        if (!EventHandler::Exists(eventHandler))
-        {
-            return;
-        }
-
-        eventHandler->onGameStateChanged(inGame);
-    }
-}
-
 
 void Game::onLinesCleared(int inLineCount)
 {
     if (!mMuteEvents)
     {
-        OnLinesClearedImpl(this, inLineCount);
-    }
-}
-
-
-void Game::OnLinesClearedImpl(Game * inGame, int inLineCount)
-{
-
-    for (EventHandlers::iterator it = inGame->mEventHandlers.begin(),
-                                 end = inGame->mEventHandlers.end();
-         it != end; ++it)
-    {
-        Game::EventHandler & eventHandler(**it);
-        eventHandler.onLinesCleared(inGame, inLineCount);
+        LinesCleared(this, inLineCount);
     }
 }
 

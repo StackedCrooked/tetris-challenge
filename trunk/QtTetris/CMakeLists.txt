@@ -213,7 +213,8 @@ target_link_libraries(${EXECUTABLE}
     Futile
     PocoFoundation
     ${EXTRA_LIBS}
-    "${BOOST_LIB}/libboost_thread.a")
+    "${BOOST_LIB}/libboost_thread.a"
+    "${BOOST_LIB}/libboost_signals.a")
 
 
 #

@@ -2,7 +2,6 @@
 #include "NewGameDialog.h"
 #include "Tetris/BlockMover.h"
 #include "Tetris/ComputerPlayer.h"
-#include "Tetris/Game.h"
 #include "Poco/Path.h"
 #include "Tetris/Utilities.h"
 #include "Futile/Assert.h"

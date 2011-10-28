@@ -9,7 +9,6 @@
 #include "Futile/Threading.h"
 #include <boost/function.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/signals2/signal.hpp>
 #include <cstddef>
 #include <set>
 #include <stdexcept>
