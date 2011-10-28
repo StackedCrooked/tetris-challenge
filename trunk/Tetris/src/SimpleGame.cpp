@@ -39,11 +39,11 @@ struct SimpleGame::Impl : boost::enable_shared_from_this<SimpleGame::Impl>
          PlayerType inPlayerType,
          std::size_t inRowCount,
          std::size_t inColumnCount) :
+        mSimpleGame(inSimpleGame),
         mGame(CreateGame(inPlayerType, inRowCount, inColumnCount)),
         mPlayerType(inPlayerType),
         mGravity(new Gravity(mGame)),
-        mCenterColumn(static_cast<std::size_t>(0.5 + inColumnCount / 2.0)),
-        mBackPtr(inSimpleGame)
+        mCenterColumn(static_cast<std::size_t>(0.5 + inColumnCount / 2.0))
     {
         FUTILE_LOCK(Game & game, mGame)
         {
@@ -80,7 +80,7 @@ struct SimpleGame::Impl : boost::enable_shared_from_this<SimpleGame::Impl>
         for (; it != end; ++it)
         {
             SimpleGame::EventHandler * eventHandler(*it);
-            eventHandler->onGameStateChanged(mBackPtr);
+            eventHandler->onGameStateChanged(mSimpleGame);
         }
     }
 
@@ -106,16 +106,16 @@ struct SimpleGame::Impl : boost::enable_shared_from_this<SimpleGame::Impl>
         for (; it != end; ++it)
         {
             SimpleGame::EventHandler * eventHandler(*it);
-            eventHandler->onLinesCleared(mBackPtr, inLineCount);
+            eventHandler->onLinesCleared(mSimpleGame, inLineCount);
         }
     }
 
+    SimpleGame * mSimpleGame;
     std::string mName;
     ThreadSafe<Game> mGame;
     PlayerType mPlayerType;
     boost::scoped_ptr<Gravity> mGravity;
     std::size_t mCenterColumn;
-    SimpleGame * mBackPtr;
     typedef boost::signals::scoped_connection ScopedConnection;
     ScopedConnection mGameStateChanged;
     ScopedConnection mLinesCleared;
