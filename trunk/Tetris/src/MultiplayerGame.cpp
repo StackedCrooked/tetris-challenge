@@ -51,7 +51,7 @@ struct MultiplayerGame::Impl : public SimpleGame::EventHandler,
         throw std::runtime_error("Player not found!");
     }
 
-    virtual void onLinesCleared(SimpleGame * inGame, int inLineCount)
+    virtual void onLinesCleared(SimpleGame * inGame, std::size_t inLineCount)
     {
         // If number of lines >= 2 then apply a line penalty to each non-allied player.
         Player & activePlayer(findPlayer(inGame));

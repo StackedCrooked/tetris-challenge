@@ -84,22 +84,13 @@ AbstractWidget::~AbstractWidget()
 
 void AbstractWidget::onGameStateChanged(SimpleGame * inGame)
 {
-    if (!mPlayer || mPlayer->game() != inGame)
-    {
-        throw std::logic_error("AbstractWidget::onGameStateChanged: inGame != mGame");
-    }
-
     refresh();
 }
 
 
-void AbstractWidget::onLinesCleared(SimpleGame * inGame, int )
+void AbstractWidget::onLinesCleared(SimpleGame * inGame, std::size_t inLineCount)
 {
-    if (!mPlayer || mPlayer->game() != inGame)
-    {
-        throw std::logic_error("AbstractWidget:: onLinesCleared: inGame != mGame");
-    }
-
+    (void)inLineCount;
     refresh();
 }
 

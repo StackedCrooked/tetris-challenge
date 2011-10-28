@@ -59,7 +59,7 @@ void Game::onChanged()
     }
 }
 
-void Game::onLinesCleared(int inLineCount)
+void Game::onLinesCleared(std::size_t inLineCount)
 {
     if (!mMuteEvents)
     {
@@ -98,7 +98,7 @@ std::vector<BlockType> Game::getGarbageRow() const
 }
 
 
-void Game::applyLinePenalty(int inLineCount)
+void Game::applyLinePenalty(std::size_t inLineCount)
 {
     if (inLineCount < 2 || isGameOver())
     {
