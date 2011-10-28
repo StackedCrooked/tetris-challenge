@@ -59,6 +59,7 @@ Size::Size(int width, int height) :
 
 AbstractWidget::AbstractWidget(int inSquareWidth, int inSquareHeight) :
     mPlayer(0),
+    mFutureBlockCount(3),
     mSquareWidth(inSquareWidth),
     mSquareHeight(inSquareHeight),
     mStatItemHeight(45),
@@ -233,12 +234,11 @@ Rect AbstractWidget::userInfoRect() const
 
 Rect AbstractWidget::futureBlocksRect() const
 {
-    int numFutureBlocks = game()->futureBlocksCount();
     int blockHeight = 2 * squareHeight();
-    int totalHeight = 2 * margin() + numFutureBlocks * blockHeight;
-    if (numFutureBlocks > 1)
+    int totalHeight = 2 * margin() + mFutureBlockCount * blockHeight;
+    if (mFutureBlockCount > 1)
     {
-        totalHeight += (numFutureBlocks - 1) * squareHeight();
+        totalHeight += (mFutureBlockCount - 1) * squareHeight();
     }
     Rect theGameRect = gameRect();
     int x = theGameRect.right() + margin();
@@ -290,7 +290,7 @@ void AbstractWidget::coordinateRepaint(SimpleGame & inGame)
     }
 
     // Paint future blocks
-    std::vector<Block> futureBlocks(inGame.getNextBlocks());
+    std::vector<Block> futureBlocks(inGame.getNextBlocks(mFutureBlockCount));
     std::vector<BlockType> blockTypes;
     for (std::vector<Block>::size_type idx = 0; idx < futureBlocks.size(); ++idx)
     {

@@ -33,7 +33,6 @@ Game::Game(std::size_t inNumRows, std::size_t inNumColumns) :
     mBlockFactory(new BlockFactory),
     mGarbageFactory(new BlockFactory),
     mBlocks(),
-    mFutureBlocksCount(3),
     mCurrentBlockIndex(0),
     mStartingLevel(-1),
     mPaused(false),
@@ -317,18 +316,6 @@ void Game::getFutureBlocksWithOffset(std::size_t inOffset, std::size_t inCount, 
 std::size_t Game::currentBlockIndex() const
 {
     return mCurrentBlockIndex;
-}
-
-
-int Game::futureBlocksCount() const
-{
-    return mFutureBlocksCount;
-}
-
-
-void Game::setFutureBlocksCount(int inFutureBlocksCount)
-{
-    mFutureBlocksCount = inFutureBlocksCount;
 }
 
 
