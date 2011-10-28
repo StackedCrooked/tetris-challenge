@@ -60,7 +60,7 @@ std::auto_ptr<T> Create(const Arg0 & arg0, const Arg1 & arg1, const Arg2 & arg2,
 //
 // can be written as:
 //
-//   Create<Shape, Triangle>(p1, p2, p3);
+//   CreatePoly<Shape, Triangle>(p1, p2, p3);
 //
 template<class T, class U>
 std::auto_ptr<T> CreatePoly()
