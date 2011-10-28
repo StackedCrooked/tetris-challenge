@@ -1,4 +1,3 @@
-#include "Tetris/Config.h"
 #include "Tetris/Player.h"
 #include "Tetris/ComputerPlayer.h"
 #include "Futile/MakeString.h"
@@ -20,7 +19,7 @@ struct Player::Impl
         mRowCount(inRowCount),
         mColumnCount(inColumnCount),
         mPlayerType(inPlayerType),
-        mGame(new Game(inPlayerType, inRowCount, inColumnCount)),
+        mGame(new SimpleGame(inPlayerType, inRowCount, inColumnCount)),
         mTeamName(inTeamName),
         mPlayerName(inPlayerName)
     {
@@ -34,7 +33,7 @@ struct Player::Impl
     std::size_t mRowCount;
     std::size_t mColumnCount;
     PlayerType mPlayerType;
-    boost::scoped_ptr<Game> mGame;
+    boost::scoped_ptr<SimpleGame> mGame;
     std::string mTeamName;
     std::string mPlayerName;
 };
@@ -96,13 +95,13 @@ const std::string & Player::playerName() const
 }
 
 
-const Game * Player::game() const
+const SimpleGame * Player::game() const
 {
     return mImpl->mGame.get();
 }
 
 
-Game * Player::game()
+SimpleGame * Player::game()
 {
     return mImpl->mGame.get();
 }

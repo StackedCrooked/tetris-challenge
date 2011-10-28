@@ -1,4 +1,3 @@
-#include "Futile/Config.h"
 #include "Futile/Threading.h"
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <ctime>

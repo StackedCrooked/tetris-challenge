@@ -1,4 +1,3 @@
-#include "Tetris/Config.h"
 #include "Tetris/Evaluator.h"
 #include "Tetris/GameState.h"
 #include "Tetris/Block.h"

@@ -15,4 +15,3 @@ Futile_TypedWrapper(GameOver, bool);
 
 
 #endif // TETRIS_GAMEOVER_H_INCLUDED
-

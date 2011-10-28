@@ -196,10 +196,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\Tetris\Config.h"
-				>
-			</File>
-			<File
 				RelativePath=".\include\Tetris\Direction.h"
 				>
 			</File>
@@ -212,11 +208,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\Tetris\Game.h"
+				RelativePath=".\include\Tetris\SimpleGame.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\Tetris\GameImpl.h"
+				RelativePath=".\include\Tetris\Game.h"
 				>
 			</File>
 			<File
@@ -248,7 +244,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\Tetris\MultiplayerGame.h"
+				RelativePath=".\include\Tetris\MultiplayerSimpleGame.h"
 				>
 			</File>
 			<File
@@ -332,7 +328,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\GameImpl.cpp"
+				RelativePath=".\src\Game.cpp"
 				>
 			</File>
 			<File

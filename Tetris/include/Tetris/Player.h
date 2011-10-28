@@ -3,7 +3,7 @@
 
 
 #include "Tetris/PlayerType.h"
-#include "Tetris/Game.h"
+#include "Tetris/SimpleGame.h"
 #include "Futile/Array.h"
 #include "Futile/TypedWrapper.h"
 #include <boost/noncopyable.hpp>
@@ -43,9 +43,9 @@ public:
 
     const std::string & playerName() const;
 
-    const Game * game() const;
+    const SimpleGame * game() const;
 
-    Game * game();
+    SimpleGame * game();
 
 protected:
     Player(PlayerType inPlayerType,
