@@ -283,7 +283,7 @@ const Grid & Game::gameGrid() const
 }
 
 
-void Game::getFutureBlocks(std::size_t inCount, BlockTypes & outBlocks)
+void Game::getFutureBlocks(std::size_t inCount, BlockTypes & outBlocks) const
 {
     // Make sure we have all blocks we need.
     while (mBlocks.size() < mCurrentBlockIndex + inCount)
@@ -298,7 +298,7 @@ void Game::getFutureBlocks(std::size_t inCount, BlockTypes & outBlocks)
 }
 
 
-void Game::getFutureBlocksWithOffset(std::size_t inOffset, std::size_t inCount, BlockTypes & outBlocks)
+void Game::getFutureBlocksWithOffset(std::size_t inOffset, std::size_t inCount, BlockTypes & outBlocks) const
 {
     // Make sure we have all blocks we need.
     while (mBlocks.size() < inOffset + inCount)

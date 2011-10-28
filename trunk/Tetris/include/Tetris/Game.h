@@ -79,9 +79,9 @@ public:
 
     std::size_t currentBlockIndex() const;
 
-    void getFutureBlocks(std::size_t inCount, BlockTypes & outBlocks);
+    void getFutureBlocks(std::size_t inCount, BlockTypes & outBlocks) const;
 
-    void getFutureBlocksWithOffset(std::size_t inOffset, std::size_t inCount, BlockTypes & outBlocks);
+    void getFutureBlocksWithOffset(std::size_t inOffset, std::size_t inCount, BlockTypes & outBlocks) const;
 
     virtual const GameState & gameState() const = 0;
 
@@ -112,7 +112,7 @@ protected:
     boost::scoped_ptr<Block> mActiveBlock;
     boost::scoped_ptr<BlockFactory> mBlockFactory;
     boost::scoped_ptr<BlockFactory> mGarbageFactory;
-    BlockTypes mBlocks;
+    mutable BlockTypes mBlocks;
     std::size_t mCurrentBlockIndex;
     int mStartingLevel;
     bool mPaused;
