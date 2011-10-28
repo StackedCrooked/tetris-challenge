@@ -6,7 +6,9 @@
 #include "Futile/Logging.h"
 #include "Futile/Threading.h"
 #include "Futile/AutoPtrSupport.h"
+#include "Futile/MainThread.h"
 #include <boost/bind.hpp>
+#include <boost/weak_ptr.hpp>
 #include <set>
 #include <stdexcept>
 
@@ -17,7 +19,8 @@ namespace Tetris {
 using namespace Futile;
 
 
-struct SimpleGame::Impl : public Game::EventHandler
+struct SimpleGame::Impl : public Game::EventHandler,
+                          boost::enable_shared_from_this<SimpleGame::Impl>
 {
     static Futile::ThreadSafe<Game> CreateGame(PlayerType inPlayerType, std::size_t inRowCount, std::size_t inColumnCount)
     {
@@ -54,7 +57,25 @@ struct SimpleGame::Impl : public Game::EventHandler
         Game::RegisterEventHandler(mGame, this);
     }
 
-    virtual void onGameStateChanged(Game * )
+    virtual void onGameStateChanged(Game * inGame)
+    {
+        // This method is triggered in a worker thread. Dispatch to main thread.
+        boost::weak_ptr<Impl> weakSelf(shared_from_this());
+        InvokeLater(boost::bind(&Impl::OnGameStateChangedLater, weakSelf));
+
+    }
+
+    static void OnGameStateChangedLater(boost::weak_ptr<Impl> inWeakImpl)
+    {
+        if (boost::shared_ptr<Impl> impl = inWeakImpl.lock())
+        {
+            impl->handleGameStateChanged();
+        }
+    }
+
+    typedef std::set<SimpleGame::EventHandler*> EventHandlers;
+
+    void handleGameStateChanged()
     {
         EventHandlers::iterator it = mEventHandlers.begin(), end = mEventHandlers.end();
         for (; it != end; ++it)
@@ -65,6 +86,21 @@ struct SimpleGame::Impl : public Game::EventHandler
     }
 
     virtual void onLinesCleared(Game * , int inLineCount)
+    {
+        // This method is triggered in a worker thread. Dispatch to main thread.
+        boost::weak_ptr<Impl> weakSelf(shared_from_this());
+        InvokeLater(boost::bind(&Impl::OnLinesClearedLater, weakSelf, inLineCount));
+    }
+
+    static void OnLinesClearedLater(boost::weak_ptr<Impl> inWeakImpl, int inLineCount)
+    {
+        if (boost::shared_ptr<Impl> impl = inWeakImpl.lock())
+        {
+            impl->handleLinesCleared(inLineCount);
+        }
+    }
+
+    void handleLinesCleared(int inLineCount)
     {
         EventHandlers::iterator it = mEventHandlers.begin(), end = mEventHandlers.end();
         for (; it != end; ++it)
@@ -80,25 +116,19 @@ struct SimpleGame::Impl : public Game::EventHandler
     boost::scoped_ptr<Gravity> mGravity;
     std::size_t mCenterColumn;
     SimpleGame * mBackPtr;
-    typedef std::set<SimpleGame::EventHandler*> EventHandlers;
     EventHandlers mEventHandlers;
 };
-
-
-SimpleGame::Instances SimpleGame::sInstances;
 
 
 SimpleGame::SimpleGame(PlayerType inPlayerType, std::size_t inRowCount, std::size_t inColumnCount) :
     mImpl(new Impl(inPlayerType, inRowCount, inColumnCount))
 {
     mImpl->init(this);
-    sInstances.insert(this);
 }
 
 
 SimpleGame::~SimpleGame()
 {
-    sInstances.erase(this);
     mImpl.reset();
 }
 
@@ -109,33 +139,15 @@ PlayerType SimpleGame::playerType() const
 }
 
 
-void SimpleGame::RegisterEventHandler(SimpleGame * inGame, EventHandler * inEventHandler)
+void SimpleGame::registerEventHandler(EventHandler * inEventHandler)
 {
-    if (sInstances.find(inGame) == sInstances.end())
-    {
-        LogWarning("Game::RegisterEventHandler: The Game object does not exist!");
-        return;
-    }
-
-    inGame->mImpl->mEventHandlers.insert(inEventHandler);
+    mImpl->mEventHandlers.insert(inEventHandler);
 }
 
 
-void SimpleGame::UnregisterEventHandler(SimpleGame * inGame, EventHandler * inEventHandler)
+void SimpleGame::unregisterEventHandler(EventHandler * inEventHandler)
 {
-    if (sInstances.find(inGame) == sInstances.end())
-    {
-        LogWarning("Game::UnregisterEventHandler: The Game no longer exists!");
-        return;
-    }
-
-    inGame->mImpl->mEventHandlers.erase(inEventHandler);
-}
-
-
-bool SimpleGame::Exists(SimpleGame * inGame)
-{
-    return sInstances.find(inGame) != sInstances.end();
+    mImpl->mEventHandlers.erase(inEventHandler);
 }
 
 
@@ -159,7 +171,7 @@ bool SimpleGame::isPaused() const
 
 GameStateStats SimpleGame::stats() const
 {
-    const Locker locker(gameImpl());
+    const Locker<Game> locker(gameImpl());
     const GameState & gameState = locker->gameState();
     return GameStateStats(gameState.numLines(),
                           gameState.numSingles(),

@@ -1,1 +1,1 @@
-valgrind --tool=memcheck --dsymutil=yes --leak-check=yes --show-reachable=yes --num-callers=20 --track-fds=yes $1
+valgrind --tool=memcheck --dsymutil=yes --leak-check=yes --show-reachable=yes --num-callers=20 --track-fds=yes 2>valgrind.out $1

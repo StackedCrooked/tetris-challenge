@@ -8,7 +8,7 @@
 #include "Tetris/PlayerType.h"
 #include "Futile/Threading.h"
 #include <boost/function.hpp>
-#include <boost/scoped_ptr.hpp>
+#include <boost/shared_ptr.hpp>
 #include <boost/signals2/signal.hpp>
 #include <cstddef>
 #include <set>
@@ -56,11 +56,9 @@ public:
 
     ~SimpleGame();
 
-    static void RegisterEventHandler(SimpleGame * inGame, EventHandler * inEventHandler);
+    void registerEventHandler(EventHandler * inEventHandler);
 
-    static void UnregisterEventHandler(SimpleGame * inGame, EventHandler * inEventHandler);
-
-    static bool Exists(SimpleGame * inGame);
+    void unregisterEventHandler(EventHandler * inEventHandler);
 
     PlayerType playerType() const;
 
@@ -107,17 +105,8 @@ public:
     void applyLinePenalty(int inNumberOfLinesMadeByOpponent);
 
 private:
-    // non-copyable
-    SimpleGame(const SimpleGame & );
-    SimpleGame & operator=(const SimpleGame&);
-
-    typedef Futile::Locker<Game> Locker;
-
     struct Impl;
-    boost::scoped_ptr<Impl> mImpl;
-
-    typedef std::set<SimpleGame*> Instances;
-    static Instances sInstances;
+    boost::shared_ptr<Impl> mImpl;
 };
 
 
