@@ -2,6 +2,9 @@
 #define BOOST_H
 
 
+#include <functional>
+
+
 /**
  * This is my a mini-boost implementation that may be useful when want to avoid the big boost dependency.
  */
@@ -50,11 +53,6 @@ public:
             mImpl = rhs.mImpl;
         }
         return *this;
-    }
-
-    bool operator==(const shared_ptr & rhs)
-    {
-        return mImpl == rhs.mImpl;
     }
 
     operator bool() const
@@ -117,6 +115,21 @@ private:
 
     Impl * mImpl;
 };
+
+
+template<class T>
+inline bool operator==(const shared_ptr<T> & lhs, const shared_ptr<T> & rhs)
+{
+    return lhs.mImpl == rhs.mImpl;
+}
+
+
+template<class T>
+inline bool operator<(const shared_ptr<T> & lhs, const shared_ptr<T> & rhs)
+{
+    typedef typename shared_ptr<T>::Impl Impl;
+    return std::less<Impl*>()(lhs.mImpl, rhs.mImpl);
+}
 
 
 } } // namespace Futile::Boost
