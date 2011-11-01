@@ -23,7 +23,7 @@ public:
     // This is required to enable certain multiplayer features.
     void setGrid(const Grid & inGrid);
 
-    // Returns true if setGrid() has been called in the passed.
+    // Returns true if setGrid() has been called on this object.
     bool tainted() const;
 
     // The Block that was used in the commit(...) call.
