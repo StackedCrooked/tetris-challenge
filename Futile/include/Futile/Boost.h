@@ -2,6 +2,7 @@
 #define BOOST_H
 
 
+#include <algorithm>
 #include <functional>
 
 
@@ -28,8 +29,8 @@ template<class T>
 class shared_ptr
 {
 public:
-    shared_ptr(T * inValue = 0) :
-        mImpl(new Impl(inValue))
+    shared_ptr(T * inValue = NULL) :
+        mImpl(inValue != NULL ? new Impl(inValue) : NULL)
     {
     }
 
@@ -41,18 +42,21 @@ public:
 
     ~shared_ptr()
     {
-        unref();
+        if (--mImpl->mRefCount == 0)
+        {
+            delete mImpl;
+        }
     }
 
-    shared_ptr & operator=(const shared_ptr & rhs)
+    shared_ptr & operator=(shared_ptr rhs) // by value(!)
     {
-        if (this != &rhs)
-        {
-            rhs.mImpl->mRefCount++;
-            unref();
-            mImpl = rhs.mImpl;
-        }
+        swap(rhs);
         return *this;
+    }
+
+    void swap(shared_ptr & rhs)
+    {
+        std::swap(mImpl, rhs.mImpl);
     }
 
     operator bool() const
@@ -70,26 +74,18 @@ public:
         return mImpl->mValue;
     }
 
-    void reset()
-    {
-        unref();
-    }
-
     void reset(T * inValue)
     {
-        unref();
-        mImpl = new Impl(inValue);
+        shared_ptr<T>(inValue).swap(this);
     }
 
-    T & operator* () const
-    {
-        return *mImpl->mValue;
-    }
+    const T & operator* () const { return *mImpl->mValue; }
 
-    T * operator-> () const
-    {
-        return mImpl->mValue;
-    }
+    T & operator* () { return *mImpl->mValue; }
+
+    const T * operator-> () const { return mImpl->mValue; }
+
+    T * operator-> () { return mImpl->mValue; }
 
 private:
     struct Impl
@@ -99,19 +95,14 @@ private:
             mValue(inValue)
         {
         }
+
         int mRefCount;
         T * mValue;
-    };
 
-    inline void unref()
-    {
-        if (--mImpl->mRefCount == 0)
-        {
-            delete mImpl->mValue;
-            delete mImpl;
-            mImpl = 0;
-        }
-    }
+    private:
+        Impl(const Impl&);
+        Impl& operator=(const Impl&);
+    };
 
     Impl * mImpl;
 };
