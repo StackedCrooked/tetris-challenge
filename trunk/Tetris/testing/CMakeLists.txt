@@ -8,6 +8,8 @@ add_executable(TetrisTest
     src/main.cpp
     src/TetrisTest.cpp
     src/TetrisTest.h
+    src/WorkerTest.cpp
+    src/WorkerTest.h
     src/WorkerPoolTest.cpp
     src/WorkerPoolTest.h)
 
@@ -18,4 +20,4 @@ target_link_libraries(TetrisTest
     ${EXTRA_LIBS}
     "${BOOST_LIB}/libboost_thread.a"
     "${BOOST_LIB}/libboost_signals.a"
-    gtest)
+    /usr/local/lib/libgtest.a)
