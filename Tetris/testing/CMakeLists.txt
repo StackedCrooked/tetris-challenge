@@ -1,16 +1,7 @@
 cmake_minimum_required(VERSION 2.6)
 project(TetrisTest)
 
-
-#
-# Check TETRIS_BUILD_TYPE environment variable
-#
-set(CMAKE_BUILD_TYPE $ENV{TETRIS_BUILD_TYPE})
-if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "Release")
-message("CMAKE_BUILD_TYPE is ${CMAKE_BUILD_TYPE}")
-else()
-set(CMAKE_BUILD_TYPE Release)
-endif()
+set(CMAKE_BUILD_TYPE "Debug")
 
 
 #
@@ -60,14 +51,6 @@ set(WARNING_OPTIONS         " -Wall -Werror ")
 set(CXX_FLAGS_Debug   "${CXX_FLAGS} ${WARNING_OPTIONS} -ggdb3")
 set(CXX_FLAGS_Release "${CXX_FLAGS} ${WARNING_OPTIONS} -O3 -DNDEBUG")
 set(FINAL_COMPILE_FLAGS "${CXX_FLAGS_${CMAKE_BUILD_TYPE}}")
-
-
-#
-# Platform specific compiler flags
-#
-if(APPLE)
-    set(WARNING_OPTIONS "-arch ${ARCH} ")
-endif()
 
 
 #
@@ -123,7 +106,7 @@ set(TetrisTest_SOURCES
 #
 # TetrisTest header files
 #
-set(TetrisTest_HEADERS 
+set(TetrisTest_HEADERS
     src/NodeCalculatorTest.h
     src/TetrisTest.h
     src/WorkerPoolTest.h
@@ -176,6 +159,6 @@ target_link_libraries(${EXECUTABLE}
 #
 # Target properties
 #
-set_target_properties(${EXECUTABLE}  PROPERTIES
+set_target_properties(${EXECUTABLE} PROPERTIES
                       COMPILE_FLAGS  ${FINAL_COMPILE_FLAGS})
 
