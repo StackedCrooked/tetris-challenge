@@ -34,6 +34,7 @@ NodeCalculatorImpl::NodeCalculatorImpl(std::auto_ptr<GameStateNode> inNode,
     mNodeMutex(),
     mQuitFlag(false),
     mQuitFlagMutex(),
+    mNodeCount(0),
     mTreeRowInfos(inEvaluator, inBlockTypes.size()),
     mBlockTypes(inBlockTypes),
     mWidths(inWidths),
@@ -65,6 +66,12 @@ bool NodeCalculatorImpl::getQuitFlag() const
 {
     ScopedLock lock(mQuitFlagMutex);
     return mQuitFlag;
+}
+
+
+unsigned NodeCalculatorImpl::getNumberOfCalculatedNodes() const
+{
+    return mNodeCount.get();
 }
 
 
@@ -149,6 +156,7 @@ void NodeCalculatorImpl::populateNodesRecursively(
     {
         generatedChildNodes = ChildNodes(GameStateComparator());
         GenerateOffspring(ioNode, inBlockTypes[inIndex], mEvaluator, generatedChildNodes);
+        mNodeCount.increment(generatedChildNodes.size());
 
         int count = 0;
         ChildNodes::iterator it = generatedChildNodes.begin(), end = generatedChildNodes.end();

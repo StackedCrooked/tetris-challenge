@@ -19,7 +19,7 @@
 namespace { // anonymous
 
 
-int gTimeout = 100;
+int gTimeout = 1000;
 
 
 } // anonymous namespace
@@ -29,8 +29,8 @@ namespace testing {
 
 TEST_F(NodeCalculatorTest, Interrupt)
 {
-    int depth = 10;
-    int width = 4;
+    int depth = 8;
+    int width = 5;
 
     std::cout << std::endl;
     testInterrupt(Depth(depth), Width(width), WorkerCount(16), TimeMs(gTimeout));
@@ -48,16 +48,12 @@ TEST_F(NodeCalculatorTest, Interrupt)
     testInterrupt(Depth(depth), Width(width), WorkerCount(3), TimeMs(gTimeout));
     testInterrupt(Depth(depth), Width(width), WorkerCount(2), TimeMs(gTimeout));
     testInterrupt(Depth(depth), Width(width), WorkerCount(1), TimeMs(gTimeout));
-    testInterrupt(Depth(1), Width(1), WorkerCount(1), TimeMs(10000));
+    testInterrupt(Depth(1), Width(1), WorkerCount(1), TimeMs(10));
 }
 
 
 void NodeCalculatorTest::testInterrupt(Depth inDepth, Width inWidth, WorkerCount inWorkerCount, TimeMs inTimeMs)
 {
-    std::cout << "    Depth: "     << std::setw(2) << std::setfill(' ') << inDepth
-              << ", Width: "       << std::setw(2) << std::setfill(' ') << inWidth
-              << ", WorkerCount: " << std::setw(2) << std::setfill(' ') << inWorkerCount
-              << ", TimeMs: "      << std::setw(5) << std::setfill(' ') << inTimeMs;
     std::auto_ptr<GameStateNode> rootNode = GameStateNode::CreateRootNode(20, 10);
 
     BlockTypes blockTypes;
@@ -87,6 +83,7 @@ void NodeCalculatorTest::testInterrupt(Depth inDepth, Width inWidth, WorkerCount
     Poco::Stopwatch stopwatch;
     stopwatch.start();
     bool interrupted = false;
+    int duration = 0;
     while (nodeCalculator.status() != NodeCalculator::Status_Finished)
     {
         if (nodeCalculator.status() != NodeCalculator::Status_Stopped)
@@ -95,36 +92,42 @@ void NodeCalculatorTest::testInterrupt(Depth inDepth, Width inWidth, WorkerCount
             {
                 nodeCalculator.stop();
                 stopwatch.stop();
-                ASSERT_TRUE(nodeCalculator.status() == NodeCalculator::Status_Stopped ||
-                       nodeCalculator.status() == NodeCalculator::Status_Finished);
+                ASSERT_TRUE(
+                    nodeCalculator.status() == NodeCalculator::Status_Stopped ||
+                    nodeCalculator.status() == NodeCalculator::Status_Finished);
                 interrupted = true;
             }
         }
-        Poco::Thread::sleep(10);
+
+        duration = static_cast<int>(0.5 + stopwatch.elapsed() / 1000.0);
+        if (stopwatch.elapsed() / 1000 > inTimeMs)
+        {
+            int overtime = duration - inTimeMs;
+            ASSERT_TRUE(overtime < 500);
+        }
+
+
+        std::cout << "\r"
+                  << "Depth: "           << inDepth
+                  << ". Width: "         << inWidth
+                  << ". WorkerCount: "   << inWorkerCount
+                  << ". TimeMs: "        << inTimeMs
+                  << ". Result: "        << nodeCalculator.getCurrentSearchDepth() << "/" << nodeCalculator.getMaxSearchDepth()
+                  << ". Node count: "    << nodeCalculator.getNumberOfCalculatedNodes()
+                  << std::flush;
+
+        Futile::Sleep(10);
     }
 
-    int duration = static_cast<int>(0.5 + stopwatch.elapsed() / 1000.0);
-    if (stopwatch.elapsed() / 1000 > inTimeMs)
-    {
-        int overtime = duration - inTimeMs;
-        ASSERT_TRUE(overtime < 500);
-    }
-
-
-
-    std::cout
-        << std::setw(25) << std::setfill(' ')
-        << (interrupted ? (SS() << "Interrupted after " << duration << "ms.") :
-                          (SS() << "Succeeded after " << duration << "ms.")).str()
-        << " Result: " << nodeCalculator.getCurrentSearchDepth() << "/" << nodeCalculator.getMaxSearchDepth()
-        << " Number of calculated nodes: "
-            << std::setw(6) << std::setfill(' ') << std::pow(double(int(inWidth)), nodeCalculator.getCurrentSearchDepth())
-            << " - "
-            << std::setw(6) << std::setfill(' ') << std::pow(double(int(inWidth)), nodeCalculator.getCurrentSearchDepth() + 1)
-            << "."
-        << std::endl;
-
-
+    std::cout << "\r"
+              << "Depth: "           << inDepth
+              << ". Width: "         << inWidth
+              << ". WorkerCount: "   << inWorkerCount
+              << ". TimeMs: "        << inTimeMs
+              << ". Result: "        << nodeCalculator.getCurrentSearchDepth() << "/" << nodeCalculator.getMaxSearchDepth()
+              << ". Node count: "    << nodeCalculator.getNumberOfCalculatedNodes()
+              << ". Duration: "      << duration << "ms."
+              << std::endl;
 
     NodePtr resultPtr = nodeCalculator.result();
     GameStateNode & result(*resultPtr);

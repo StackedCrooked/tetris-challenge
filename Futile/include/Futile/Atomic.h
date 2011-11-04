@@ -31,6 +31,18 @@ public:
         mValue = inValue;
     }
 
+    void increment(const T & inValue)
+    {
+        ScopedLock lock(mMutex);
+        mValue += inValue;
+    }
+
+    void decrement(const T & inValue)
+    {
+        ScopedLock lock(mMutex);
+        mValue -= inValue;
+    }
+
 private:
     mutable Mutex mMutex;
     T mValue;
