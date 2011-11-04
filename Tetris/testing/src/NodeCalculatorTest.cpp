@@ -113,11 +113,11 @@ void NodeCalculatorTest::testInterrupt(Depth inDepth, Width inWidth, WorkerCount
 
 
     std::cout
-        << std::setw(30) << std::setfill(' ')
-        << (interrupted ? (SS() << " -> Interrupted after " << duration << "ms") :
-                          (SS() << " -> Succeeded in " << duration << "ms")).str()
-        << ". Result: " << nodeCalculator.getCurrentSearchDepth() << "/" << nodeCalculator.getMaxSearchDepth()
-        << ". Number of calculated nodes: "
+        << std::setw(25) << std::setfill(' ')
+        << (interrupted ? (SS() << "Interrupted after " << duration << "ms.") :
+                          (SS() << "Succeeded after " << duration << "ms.")).str()
+        << " Result: " << nodeCalculator.getCurrentSearchDepth() << "/" << nodeCalculator.getMaxSearchDepth()
+        << " Number of calculated nodes: "
             << std::setw(6) << std::setfill(' ') << std::pow(double(int(inWidth)), nodeCalculator.getCurrentSearchDepth())
             << " - "
             << std::setw(6) << std::setfill(' ') << std::pow(double(int(inWidth)), nodeCalculator.getCurrentSearchDepth() + 1)
