@@ -2,31 +2,17 @@
 #define WORKERPOOLTEST_H_INCLUDED
 
 
-#include "CppUnit/TestCase.h"
+#include "TetrisTest.h"
 #include "Poco/Stopwatch.h"
 #include "Poco/Types.h"
 
 
-class WorkerPoolTest: public CppUnit::TestCase
+class WorkerPoolTest : public TetrisTest
 {
 public:
-    WorkerPoolTest(const std::string & name);
-    ~WorkerPoolTest();
+    WorkerPoolTest();
 
-    static void BeBusy();
-
-    void testWorkerPool();
-
-    void setUp();
-
-    void tearDown();
-
-    static CppUnit::Test* suite();
-
-private:
-    void testWorkerPoolImpl();
-
-    Poco::Stopwatch mStopwatch;
+protected:
     size_t mIterationCount;
 };
 

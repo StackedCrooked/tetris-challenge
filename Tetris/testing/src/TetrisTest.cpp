@@ -1,15 +1,17 @@
 #include "TetrisTest.h"
-#include "WorkerTest.h"
-#include "WorkerPoolTest.h"
-#include "NodeCalculatorTest.h"
+#include "Futile/Threading.h"
 
 
-CppUnit::Test* TetrisCoreTestSuite::suite()
+void TetrisTest::BeBusy()
 {
-    CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("TetrisCoreTestSuite");
-
-    pSuite->addTest(WorkerTest::suite());
-    pSuite->addTest(WorkerPoolTest::suite());
-    pSuite->addTest(NodeCalculatorTest::suite());
-    return pSuite;
+    while (true)
+    {
+        bool interruptRequest = boost::this_thread::interruption_requested();
+        boost::this_thread::interruption_point();
+        if (interruptRequest)
+        {
+            throw std::runtime_error("Interrupt requested!");
+        }
+        Futile::Sleep(100);
+    }
 }
