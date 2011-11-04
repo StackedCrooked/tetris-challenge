@@ -94,7 +94,7 @@ void WorkerPoolTest::testWorkerPoolImpl()
     std::cout << std::endl;
 
     // Test resize
-    for (int i = 0; i < cPoolSizeCount; ++i)
+    for (std::size_t i = 0; i < cPoolSizeCount; ++i)
     {
         std::cout << "\r  Test resize            " << (i + 1) << "/" << cPoolSizeCount << std::flush;
         mStopwatch.restart();
@@ -107,7 +107,7 @@ void WorkerPoolTest::testWorkerPoolImpl()
         pool.resize(cPoolSize[i]);
         Assert(pool.size() == cPoolSize[i]);
 
-        int newSize = static_cast<int>(0.5 + (cPoolSize[i] / 2.0));
+        std::size_t newSize = static_cast<int>(0.5 + (cPoolSize[i] / 2.0));
         pool.resize(newSize);
         Assert(pool.size() == newSize);
 
@@ -122,7 +122,7 @@ void WorkerPoolTest::testWorkerPoolImpl()
     std::cout << std::endl;
 
     // Test joinAll
-    for (int i = 0; i < cPoolSizeCount; ++i)
+    for (std::size_t i = 0; i < cPoolSizeCount; ++i)
     {
         std::cout << "\r  Test joinAll           " << (i + 1) << "/" << cPoolSizeCount << std::flush;
         mStopwatch.restart();

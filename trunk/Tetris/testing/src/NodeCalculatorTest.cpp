@@ -54,7 +54,7 @@ void NodeCalculatorTest::testNodeCalculator()
             testDestroy(mainWorker, workerPool);
         }
     }
-	
+
     testInterrupt(Depth(depth), Width(width), WorkerCount(16), TimeMs(15000));
     testInterrupt(Depth(depth), Width(width), WorkerCount(15), TimeMs(15000));
     testInterrupt(Depth(depth), Width(width), WorkerCount(14), TimeMs(15000));
@@ -96,8 +96,8 @@ void NodeCalculatorTest::testInterrupt(Depth inDepth, Width inWidth, WorkerCount
 
     Assert(nodeCalculator.getCurrentSearchDepth() == 0);
     Assert(blockTypes.size() == widths.size());
-    Assert(nodeCalculator.getMaxSearchDepth() == blockTypes.size());
-    Assert(nodeCalculator.status() == NodeCalculator::Status_Nil);
+    Assert(std::size_t(nodeCalculator.getMaxSearchDepth()) == blockTypes.size());
+    Assert(std::size_t(nodeCalculator.status()) == NodeCalculator::Status_Nil);
 
     nodeCalculator.start();
 
@@ -169,7 +169,7 @@ void NodeCalculatorTest::testDestroy(Worker & inMainWorker, WorkerPool & inWorke
 
     Assert(nodeCalculator.getCurrentSearchDepth() == 0);
     Assert(blockTypes.size() == widths.size());
-    Assert(nodeCalculator.getMaxSearchDepth() == blockTypes.size());
+    Assert(std::size_t(nodeCalculator.getMaxSearchDepth()) == blockTypes.size());
     Assert(nodeCalculator.status() == NodeCalculator::Status_Nil);
 
     nodeCalculator.start();
