@@ -11,6 +11,7 @@
 #include "Futile/MakeString.h"
 #include "Futile/Threading.h"
 #include <boost/shared_ptr.hpp>
+#include <iostream>
 #include <memory>
 #include <stdexcept>
 
@@ -43,8 +44,7 @@ MultithreadedNodeCalculator::~MultithreadedNodeCalculator()
 void MultithreadedNodeCalculator::generateChildNodes(NodePtr ioNode,
                                                      const Evaluator * inEvaluator,
                                                      BlockType inBlockType,
-                                                     int inDepth,
-                                                     int inWidth)
+                                                     int inMaxChildCount)
 {
     ChildNodes childNodes;
     GenerateOffspring(ioNode, inBlockType, *inEvaluator, childNodes);
@@ -55,7 +55,7 @@ void MultithreadedNodeCalculator::generateChildNodes(NodePtr ioNode,
 
     int count = 0;
     ChildNodes::iterator it = childNodes.begin(), end = childNodes.end();
-    while (count < inWidth && it != end)
+    while (count < inMaxChildCount && it != end)
     {
         ioNode->addChild(*it);
         ++count;
@@ -99,7 +99,6 @@ void MultithreadedNodeCalculator::populateNodes(NodePtr ioNode,
                                         ioNode,
                                         &mEvaluator,
                                         inBlockTypes[inIndex],
-                                        inIndex + 1,
                                         inWidths[inIndex]);
         mWorkerPool.schedule(task);
 

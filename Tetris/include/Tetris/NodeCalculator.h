@@ -6,8 +6,9 @@
 #include "Tetris/NodePtr.h"
 #include "Futile/WorkerPool.h"
 #include <boost/scoped_ptr.hpp>
-#include <vector>
+#include <cstddef>
 #include <memory>
+#include <vector>
 
 
 namespace Tetris {
@@ -34,7 +35,9 @@ public:
 
     void stop();
 
-    unsigned getNumberOfCalculatedNodes() const;
+    std::size_t getCurrentNodeCount() const;
+
+    std::size_t getMaxNodeCount() const;
 
     int getCurrentSearchDepth() const;
 
