@@ -26,10 +26,13 @@ public:
         mBuffer << datum;
         return *this;
     }
-    operator std::string() const
-    {
-        return mBuffer.str();
-    }
+
+    inline operator std::string() const
+    { return mBuffer.str(); }
+
+    inline std::string str() const
+    { return mBuffer.str(); }
+
 private:
     std::ostringstream mBuffer;
 };

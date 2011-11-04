@@ -2,37 +2,29 @@
 #define NODECALCULATORTEST_H_INCLUDED
 
 
-#include "CppUnit/TestCase.h"
+#include "TetrisTest.h"
+#include "Futile/Worker.h"
 #include "Futile/TypedWrapper.h"
-#include "Futile/WorkerPool.h"
-#include "Poco/Stopwatch.h"
-#include "Poco/Types.h"
 
 
-class NodeCalculatorTest: public CppUnit::TestCase
+namespace testing {
+
+
+class NodeCalculatorTest : public TetrisTest
 {
-public:
-	NodeCalculatorTest(const std::string & name);
+protected:
+	Futile_TypedWrapper(Depth, int);
+	Futile_TypedWrapper(Width, int);
+	Futile_TypedWrapper(WorkerCount, int);
+	Futile_TypedWrapper(TimeMs, int);
 
-	~NodeCalculatorTest();
+	void testInterrupt(Depth inDepth, Width inWidth, WorkerCount inWorkerCount, TimeMs inTimeMs);
 
-    void testNodeCalculator();
-
-    Futile_TypedWrapper(Depth, int);
-    Futile_TypedWrapper(Width, int);
-    Futile_TypedWrapper(WorkerCount, int);
-    Futile_TypedWrapper(TimeMs, int);
-
-    void testInterrupt(Depth inDepth, Width inWidth, WorkerCount inWorkerCount, TimeMs inTimeMs);
-
-    void testDestroy(Futile::Worker & inMainWorker, Futile::WorkerPool & inWorkerPool);
-	
-	void setUp();
-
-	void tearDown();
-
-	static CppUnit::Test* suite();
+	void testDestroy(Worker & inMainWorker, WorkerPool & inWorkerPool);
 };
+
+
+} // namespace testing
 
 
 #endif // NODECALCULATORTEST_H_INCLUDED
