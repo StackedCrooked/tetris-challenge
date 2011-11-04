@@ -1,12 +1,24 @@
 cmake_minimum_required(VERSION 2.6)
 project(TetrisTestSuite)
 
+
+#
+# Check TETRIS_BUILD_TYPE environment variable
+#
+set(CMAKE_BUILD_TYPE $ENV{TETRIS_BUILD_TYPE})
+if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "Release")
+message("CMAKE_BUILD_TYPE is ${CMAKE_BUILD_TYPE}")
+else()
+set(CMAKE_BUILD_TYPE Release)
+endif()
+
+
 #
 # Detect PLATFORM and ARCH variables
 #
 if(WIN32)
-    set(ARCH x86)
     set(PLATFORM Windows)
+    set(ARCH x86)
 else()
     execute_process(COMMAND uname OUTPUT_VARIABLE PLATFORM)
     string(REPLACE "\n" "" PLATFORM ${PLATFORM})
@@ -15,17 +27,8 @@ else()
 endif()
 
 
-#
-# Check TETRIS_BUILD_TYPE environment variable
-#
-set(CMAKE_BUILD_TYPE $ENV{TETRIS_BUILD_TYPE})
-if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "Release")
-    message("CMAKE_BUILD_TYPE is ${CMAKE_BUILD_TYPE}")
-else()
-    set(CMAKE_BUILD_TYPE "Release")
-    message("TETRIS_BUILD_TYPE was not set or not correctly set. Defaulting to \"Release\"")
-else()
-endif()
+message("PLATFORM: ${PLATFORM}")
+message("ARCH:     ${ARCH}")
 
 
 #
@@ -33,13 +36,12 @@ endif()
 #
 set(EXECUTABLE TetrisTestSuite)
 set(CMAKE_OSX_ARCHITECTURES ${ARCH})
-set(SOLUTIONDIR ${TetrisTestSuite_SOURCE_DIR}/../../)
+set(SOLUTIONDIR "${TetrisTestSuite_SOURCE_DIR}/../../")
 set(BUILD_ROOT ${SOLUTIONDIR}Build/)
-set(POCO ${SOLUTIONDIR}3rdParty/Poco/)
 
 
 #
-# Set output directory
+# Set output directory variable
 #
 set(OUTDIR ${BUILD_ROOT}${CMAKE_BUILD_TYPE}/${PLATFORM}/${ARCH}/)
 
@@ -47,47 +49,68 @@ set(OUTDIR ${BUILD_ROOT}${CMAKE_BUILD_TYPE}/${PLATFORM}/${ARCH}/)
 #
 # Now we can set the CMAKE vars
 #
-set(LIBRARY_OUTPUT_PATH ${OUTDIR}lib/)
-set(EXECUTABLE_OUTPUT_PATH ${OUTDIR}bin/)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${OUTDIR}lib/)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OUTDIR}bin/)
 
 
 #
-# Compile Flags
+# Compile flags
 #
-set(WARNING_OPTIONS         "-arch ${ARCH} ")
-set(WARNING_OPTIONS_Debug   "${WARNING_OPTIONS} -Wall -Werror -Wno-sign-compare")
-set(CXX_FLAGS         "${CXX_FLAGS} -pthread ")
-set(CXX_FLAGS_Debug   "${CXX_FLAGS} ${WARNING_OPTIONS_Debug} -ggdb3 ")
-set(CXX_FLAGS_Release "${CXX_FLAGS} ${WARNING_OPTIONS_Release} -O3 ")
+set(WARNING_OPTIONS         " -Wall -Werror ")
+set(CXX_FLAGS_Debug   "${CXX_FLAGS} ${WARNING_OPTIONS} -ggdb3")
+set(CXX_FLAGS_Release "${CXX_FLAGS} ${WARNING_OPTIONS} -O3 -DNDEBUG")
 set(FINAL_COMPILE_FLAGS "${CXX_FLAGS_${CMAKE_BUILD_TYPE}}")
 
 
 #
-# Include directories for Tetris, Futile and Poco.
+# Platform specific compiler flags
 #
+if(APPLE)
+    set(WARNING_OPTIONS "-arch ${ARCH} ")
+endif()
+
+
+#
+# Extra platform specific libs
+#
+if(WIN32)
+    set(EXTRA_LIBS "-lIphlpapi ${EXTRA_LIBS}")
+else()
+    set(EXTRA_LIBS "pthread")
+endif()
+
+
+#
+# Poco dependency
+#
+set(POCO_ROOT "${SOLUTIONDIR}3rdParty/Poco/")
 include_directories(
-    ${POCO}Foundation/include
-    ${POCO}CppUnit/include
-    ${SOLUTIONDIR}Futile/include
-    ${SOLUTIONDIR}Tetris/include)
-
-
-#
-# Link with Poco
-#
-link_directories(${POCO}lib/${PLATFORM}/${ARCH})
+    ${POCO_ROOT}Foundation/include
+    ${POCO_ROOT}CppUnit/include)
+set(POCO_LIB "${SOLUTIONDIR}3rdParty/Poco/lib/${PLATFORM}/${ARCH}")
+link_directories(${POCO_LIB})
 
 
 #
 # Boost dependency
 #
-set(BOOST_ROOT ${SOLUTIONDIR}3rdParty/Boost)
+set(BOOST_ROOT "${SOLUTIONDIR}3rdParty/Boost")
 include_directories(${BOOST_ROOT})
 set(BOOST_LIB "${BOOST_ROOT}/lib/${PLATFORM}/${ARCH}")
 
 
 #
-# Testsuite source files
+# Tetris & Futile dependencies
+#
+add_subdirectory(${SOLUTIONDIR}Tetris ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Tetris)
+add_subdirectory(${SOLUTIONDIR}Futile ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Futile)
+include_directories(
+    ${SOLUTIONDIR}Futile/include
+    ${SOLUTIONDIR}Tetris/include)
+
+
+#
+# TetrisTestSuite source files
 #
 set(TetrisTestSuite_SOURCES
     src/Driver.cpp
@@ -98,35 +121,61 @@ set(TetrisTestSuite_SOURCES
 
 
 #
-# Testsuite header files
+# TetrisTestSuite header files
 #
-set(TetrisTestSuite_HEADERS
+set(TetrisTestSuite_HEADERS 
     src/NodeCalculatorTest.h
     src/TetrisTestSuite.h
     src/WorkerPoolTest.h
     src/WorkerTest.h)
 
 
+
 #
-# Set the executable
+# Platform specific options for the creation of the executable
 #
-add_executable(${EXECUTABLE} ${TetrisTestSuite_SOURCES} ${TetrisTestSuite_HEADERS_MOC})
+if(APPLE)
+    set(EXECUTABLE_OPTIONS MACOSX_BUNDLE)
+else()
+    set(EXECUTABLE_OPTIONS "")
+endif()
 
 
 #
-# Testsuite libs
+# Set the executable. On Mac we want a bundle.
+#
+add_executable(${EXECUTABLE} ${EXECUTABLE_OPTIONS} ${TetrisTestSuite_SOURCES} ${TetrisTestSuite_HEADERS_MOC} ${TetrisTestSuite_Resources})
+
+
+#
+# Post build step: make a symbolic link to the last build directory
+#
+if(WIN32)
+# TODO: Add unix shell support. Or use CMake builtin commands.
+else()
+add_custom_command(TARGET ${EXECUTABLE}
+                   POST_BUILD
+                   COMMAND /bin/rm ARGS -f ${BUILD_ROOT}LastBuild
+                   COMMAND /bin/ln ARGS -s ${OUTDIR} ${BUILD_ROOT}LastBuild
+                   WORKING_DIRECTORY    ${BUILD_ROOT})
+endif()
+
+
+#
+# TetrisTestSuite libs
 #
 target_link_libraries(${EXECUTABLE}
     Tetris
     Futile
     PocoFoundation
-    CppUnit
-    pthread
-    "${BOOST_LIB}/libboost_thread.a")
+    ${EXTRA_LIBS}
+    "${BOOST_LIB}/libboost_thread.a"
+    "${BOOST_LIB}/libboost_signals.a")
 
 
 #
 # Target properties
 #
-set_target_properties(${EXECUTABLE} PROPERTIES COMPILE_FLAGS ${FINAL_COMPILE_FLAGS})
+set_target_properties(${EXECUTABLE}  PROPERTIES
+                      COMPILE_FLAGS  ${FINAL_COMPILE_FLAGS})
 
