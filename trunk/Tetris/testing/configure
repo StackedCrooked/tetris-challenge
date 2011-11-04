@@ -11,4 +11,4 @@ cd Build
 cmake ..
 
 echo "Delete the \"Build\" directory to erase all configure and build files."
-echo "Type \"cd Build ; make\" to start building TetrisTestSuite"
+echo "Type \"cd Build ; make\" to start building TetrisTest"
