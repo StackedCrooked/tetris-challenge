@@ -33,7 +33,7 @@ TEST_F(WorkerTest, Worker)
 
     // Test without interrupt
     mStopwatch.restart();
-    worker.schedule(boost::bind(&Poco::Thread::sleep, cSleepTimeMs));
+    worker.schedule(boost::bind(&Futile::Sleep, cSleepTimeMs));
     worker.waitForStatus(WorkerStatus_Working);
     ASSERT_EQ(worker.size(), 0);
     worker.wait();

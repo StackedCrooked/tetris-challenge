@@ -8,6 +8,8 @@ add_executable(TetrisTest
     src/main.cpp
     src/TetrisTest.cpp
     src/TetrisTest.h
+    src/NodeCalculatorTest.cpp
+    src/NodeCalculatorTest.h
     src/WorkerTest.cpp
     src/WorkerTest.h
     src/WorkerPoolTest.cpp

@@ -1,7 +1,5 @@
 #include "Poco/Foundation.h"
 #include "NodeCalculatorTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
 #include "Tetris/NodeCalculator.h"
 #include "Tetris/Evaluator.h"
 #include "Tetris/GameStateComparator.h"
@@ -14,69 +12,52 @@
 #include "Futile/Logging.h"
 #include "Futile/MakeString.h"
 #include "Poco/Thread.h"
+#include <iomanip>
 #include <iostream>
 
 
-using namespace Futile;
-using namespace testing;
+namespace { // anonymous
 
 
-static const int cSleepTimeMs = 100;
+int gTimeout = 100;
 
 
-NodeCalculatorTest::NodeCalculatorTest(const std::string & inName):
-    CppUnit::TestCase(inName)
+} // anonymous namespace
+
+
+namespace testing {
+
+TEST_F(NodeCalculatorTest, Interrupt)
 {
-}
-
-
-NodeCalculatorTest::~NodeCalculatorTest()
-{
-}
-
-
-void NodeCalculatorTest::testNodeCalculator()
-{
-#ifdef _DEBUG
-    int depth = 4;
+    int depth = 10;
     int width = 4;
-#else
-    int depth = 8;
-    int width = 5;
-#endif
 
-    for (size_t i = 0; i != 2; ++i)
-    {
-        for (size_t workerCount = 1; workerCount < 12; ++workerCount)
-        {
-            Worker mainWorker("Main Worker");
-            WorkerPool workerPool("NodeCalculatorTest", workerCount);
-            testDestroy(mainWorker, workerPool);
-        }
-    }
-
-    testInterrupt(Depth(depth), Width(width), WorkerCount(16), TimeMs(15000));
-    testInterrupt(Depth(depth), Width(width), WorkerCount(15), TimeMs(15000));
-    testInterrupt(Depth(depth), Width(width), WorkerCount(14), TimeMs(15000));
-    testInterrupt(Depth(depth), Width(width), WorkerCount(12), TimeMs(15000));
-    testInterrupt(Depth(depth), Width(width), WorkerCount(11), TimeMs(15000));
-    testInterrupt(Depth(depth), Width(width), WorkerCount(10), TimeMs(15000));
-    testInterrupt(Depth(depth), Width(width), WorkerCount(9), TimeMs(15000));
-    testInterrupt(Depth(depth), Width(width), WorkerCount(8), TimeMs(15000));
-    testInterrupt(Depth(depth), Width(width), WorkerCount(7), TimeMs(15000));
-    testInterrupt(Depth(depth), Width(width), WorkerCount(6), TimeMs(15000));
-    testInterrupt(Depth(depth), Width(width), WorkerCount(5), TimeMs(15000));
-    testInterrupt(Depth(depth), Width(width), WorkerCount(4), TimeMs(15000));
-    testInterrupt(Depth(depth), Width(width), WorkerCount(3), TimeMs(15000));
-    testInterrupt(Depth(depth), Width(width), WorkerCount(2), TimeMs(15000));
-    testInterrupt(Depth(depth), Width(width), WorkerCount(1), TimeMs(15000));
+    std::cout << std::endl;
+    testInterrupt(Depth(depth), Width(width), WorkerCount(16), TimeMs(gTimeout));
+    testInterrupt(Depth(depth), Width(width), WorkerCount(15), TimeMs(gTimeout));
+    testInterrupt(Depth(depth), Width(width), WorkerCount(14), TimeMs(gTimeout));
+    testInterrupt(Depth(depth), Width(width), WorkerCount(12), TimeMs(gTimeout));
+    testInterrupt(Depth(depth), Width(width), WorkerCount(11), TimeMs(gTimeout));
+    testInterrupt(Depth(depth), Width(width), WorkerCount(10), TimeMs(gTimeout));
+    testInterrupt(Depth(depth), Width(width), WorkerCount(9), TimeMs(gTimeout));
+    testInterrupt(Depth(depth), Width(width), WorkerCount(8), TimeMs(gTimeout));
+    testInterrupt(Depth(depth), Width(width), WorkerCount(7), TimeMs(gTimeout));
+    testInterrupt(Depth(depth), Width(width), WorkerCount(6), TimeMs(gTimeout));
+    testInterrupt(Depth(depth), Width(width), WorkerCount(5), TimeMs(gTimeout));
+    testInterrupt(Depth(depth), Width(width), WorkerCount(4), TimeMs(gTimeout));
+    testInterrupt(Depth(depth), Width(width), WorkerCount(3), TimeMs(gTimeout));
+    testInterrupt(Depth(depth), Width(width), WorkerCount(2), TimeMs(gTimeout));
+    testInterrupt(Depth(depth), Width(width), WorkerCount(1), TimeMs(gTimeout));
     testInterrupt(Depth(1), Width(1), WorkerCount(1), TimeMs(10000));
 }
 
 
 void NodeCalculatorTest::testInterrupt(Depth inDepth, Width inWidth, WorkerCount inWorkerCount, TimeMs inTimeMs)
 {
-    std::cout << std::endl << "    Depth: " << inDepth << ", Width: " << inWidth << ", WorkerCount: " << inWorkerCount << ", TimeMs: " << inTimeMs;
+    std::cout << "    Depth: "     << std::setw(2) << std::setfill(' ') << inDepth
+              << ", Width: "       << std::setw(2) << std::setfill(' ') << inWidth
+              << ", WorkerCount: " << std::setw(2) << std::setfill(' ') << inWorkerCount
+              << ", TimeMs: "      << std::setw(5) << std::setfill(' ') << inTimeMs;
     std::auto_ptr<GameStateNode> rootNode = GameStateNode::CreateRootNode(20, 10);
 
     BlockTypes blockTypes;
@@ -94,14 +75,14 @@ void NodeCalculatorTest::testInterrupt(Depth inDepth, Width inWidth, WorkerCount
 
     NodeCalculator nodeCalculator(rootNode->clone(), blockTypes, widths, rootNode->evaluator(), mainWorker, workerPool);
 
-    Assert(nodeCalculator.getCurrentSearchDepth() == 0);
-    Assert(blockTypes.size() == widths.size());
-    Assert(std::size_t(nodeCalculator.getMaxSearchDepth()) == blockTypes.size());
-    Assert(std::size_t(nodeCalculator.status()) == NodeCalculator::Status_Nil);
+    ASSERT_TRUE(nodeCalculator.getCurrentSearchDepth() == 0);
+    ASSERT_TRUE(blockTypes.size() == widths.size());
+    ASSERT_TRUE(std::size_t(nodeCalculator.getMaxSearchDepth()) == blockTypes.size());
+    ASSERT_TRUE(std::size_t(nodeCalculator.status()) == NodeCalculator::Status_Nil);
 
     nodeCalculator.start();
 
-    Assert(nodeCalculator.status() == NodeCalculator::Status_Started);
+    ASSERT_TRUE(nodeCalculator.status() == NodeCalculator::Status_Started);
 
     Poco::Stopwatch stopwatch;
     stopwatch.start();
@@ -114,7 +95,7 @@ void NodeCalculatorTest::testInterrupt(Depth inDepth, Width inWidth, WorkerCount
             {
                 nodeCalculator.stop();
                 stopwatch.stop();
-                Assert(nodeCalculator.status() == NodeCalculator::Status_Stopped ||
+                ASSERT_TRUE(nodeCalculator.status() == NodeCalculator::Status_Stopped ||
                        nodeCalculator.status() == NodeCalculator::Status_Finished);
                 interrupted = true;
             }
@@ -126,26 +107,54 @@ void NodeCalculatorTest::testInterrupt(Depth inDepth, Width inWidth, WorkerCount
     if (stopwatch.elapsed() / 1000 > inTimeMs)
     {
         int overtime = duration - inTimeMs;
-        Assert(overtime < 500);
+        ASSERT_TRUE(overtime < 500);
     }
 
-    std::cout << (interrupted ? " -> Timeout" : std::string(SS() << " -> Succeeded in " << duration << "ms"));
+
+
+    std::cout
+        << std::setw(30) << std::setfill(' ')
+        << (interrupted ? (SS() << " -> Interrupted after " << duration << "ms") :
+                          (SS() << " -> Succeeded in " << duration << "ms")).str()
+        << ". Result: " << nodeCalculator.getCurrentSearchDepth() << "/" << nodeCalculator.getMaxSearchDepth()
+        << ". Number of calculated nodes: "
+            << std::setw(6) << std::setfill(' ') << std::pow(double(int(inWidth)), nodeCalculator.getCurrentSearchDepth())
+            << " - "
+            << std::setw(6) << std::setfill(' ') << std::pow(double(int(inWidth)), nodeCalculator.getCurrentSearchDepth() + 1)
+            << "."
+        << std::endl;
+
+
 
     NodePtr resultPtr = nodeCalculator.result();
     GameStateNode & result(*resultPtr);
-    Assert(result.depth() == rootNode->depth() + 1);
-    Assert(result.gameState().originalBlock().type() == blockTypes[0]);
+    ASSERT_TRUE(result.depth() == rootNode->depth() + 1);
+    ASSERT_TRUE(result.gameState().originalBlock().type() == blockTypes[0]);
 
     if (inDepth > 1)
     {
-        Assert(result.children().size() == 1);
+        ASSERT_TRUE(result.children().size() == 1);
     }
     else
     {
-        Assert(result.children().empty());
+        ASSERT_TRUE(result.children().empty());
     }
 
-    Assert(result.endNode()->children().empty());
+    ASSERT_TRUE(result.endNode()->children().empty());
+}
+
+
+TEST_F(NodeCalculatorTest, Destroy)
+{
+    for (size_t i = 0; i != 2; ++i)
+    {
+        for (size_t workerCount = 1; workerCount < 12; ++workerCount)
+        {
+            Worker mainWorker("Main Worker");
+            WorkerPool workerPool("NodeCalculatorTest", workerCount);
+            testDestroy(mainWorker, workerPool);
+        }
+    }
 }
 
 
@@ -167,32 +176,17 @@ void NodeCalculatorTest::testDestroy(Worker & inMainWorker, WorkerPool & inWorke
 
     NodeCalculator nodeCalculator(rootNode->clone(), blockTypes, widths, rootNode->evaluator(), inMainWorker, inWorkerPool);
 
-    Assert(nodeCalculator.getCurrentSearchDepth() == 0);
-    Assert(blockTypes.size() == widths.size());
-    Assert(std::size_t(nodeCalculator.getMaxSearchDepth()) == blockTypes.size());
-    Assert(nodeCalculator.status() == NodeCalculator::Status_Nil);
+    ASSERT_TRUE(nodeCalculator.getCurrentSearchDepth() == 0);
+    ASSERT_TRUE(blockTypes.size() == widths.size());
+    ASSERT_TRUE(std::size_t(nodeCalculator.getMaxSearchDepth()) == blockTypes.size());
+    ASSERT_TRUE(nodeCalculator.status() == NodeCalculator::Status_Nil);
 
     nodeCalculator.start();
 
-    Assert(nodeCalculator.status() >= NodeCalculator::Status_Started);
+    ASSERT_TRUE(nodeCalculator.status() >= NodeCalculator::Status_Started);
     Poco::Thread::sleep(10);
-    Assert(nodeCalculator.status() != NodeCalculator::Status_Error);
+    ASSERT_TRUE(nodeCalculator.status() != NodeCalculator::Status_Error);
 }
 
 
-void NodeCalculatorTest::setUp()
-{
-}
-
-
-void NodeCalculatorTest::tearDown()
-{
-}
-
-
-CppUnit::Test * NodeCalculatorTest::suite()
-{
-    CppUnit::TestSuite * suite(new CppUnit::TestSuite("NodeCalculatorTest"));
-    CppUnit_addTest(suite, NodeCalculatorTest, testNodeCalculator);
-    return suite;
-}
+} // namespace testing
