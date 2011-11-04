@@ -34,6 +34,8 @@ public:
 
     void stop();
 
+    unsigned getNumberOfCalculatedNodes() const;
+
     int getCurrentSearchDepth() const;
 
     int getMaxSearchDepth() const;

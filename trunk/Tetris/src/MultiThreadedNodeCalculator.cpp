@@ -61,6 +61,8 @@ void MultithreadedNodeCalculator::generateChildNodes(NodePtr ioNode,
         ++count;
         ++it;
     }
+
+    mNodeCount.increment(ioNode->children().size());
     mTreeRowInfos.registerNode(*ioNode->children().begin());
 }
 

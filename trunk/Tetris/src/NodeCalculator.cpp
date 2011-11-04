@@ -63,6 +63,11 @@ void NodeCalculator::stop()
 }
 
 
+unsigned NodeCalculator::getNumberOfCalculatedNodes() const
+{
+    return mImpl->getNumberOfCalculatedNodes();
+}
+
 int NodeCalculator::getCurrentSearchDepth() const
 {
     return mImpl->getCurrentSearchDepth();

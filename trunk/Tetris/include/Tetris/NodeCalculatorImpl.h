@@ -7,6 +7,7 @@
 #include "Tetris/Evaluator.h"
 #include "Futile/Worker.h"
 #include "Futile/WorkerPool.h"
+#include "Futile/Atomic.h"
 #include "Futile/Logging.h"
 #include "Futile/MakeString.h"
 #include "Futile/Assert.h"
@@ -35,6 +36,8 @@ public:
     void start();
 
     void stop();
+
+    unsigned getNumberOfCalculatedNodes() const;
 
     int getCurrentSearchDepth() const;
 
@@ -191,6 +194,8 @@ protected:
 
     bool mQuitFlag;
     mutable Futile::Mutex mQuitFlagMutex;
+
+    Futile::Atomic<unsigned long> mNodeCount;
 
     TreeRowInfos mTreeRowInfos;
 
