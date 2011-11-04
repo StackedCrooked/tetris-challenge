@@ -2,13 +2,22 @@
 #define TETRISCORETESTSUITE_H_INCLUDED
 
 
-#include "CppUnit/TestSuite.h"
+#include "Poco/Stopwatch.h"
+#include <gtest/gtest.h>
 
 
-class TetrisCoreTestSuite
+class TetrisTest : public testing::Test
 {
 public:
-	static CppUnit::Test* suite();
+    virtual ~TetrisTest() {}
+
+    static void BeBusy();
+
+protected:
+    virtual void SetUp() {}
+    virtual void TearDown() {}
+
+    Poco::Stopwatch mStopwatch;
 };
 
 

@@ -1,6 +1,4 @@
 #include "WorkerPoolTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
 #include "Futile/Threading.h"
 #include "Futile/WorkerPool.h"
 #include "Futile/Assert.h"
@@ -11,49 +9,18 @@
 using Futile::WorkerPool;
 
 
-static const int cSleepTime = 100; // ms
-static const int cMargin = 200; // ms
-
-
-WorkerPoolTest::WorkerPoolTest(const std::string & inName):
-    CppUnit::TestCase(inName),
+WorkerPoolTest::WorkerPoolTest() :
+    TetrisTest(),
     mIterationCount(10)
 {
 }
 
 
-WorkerPoolTest::~WorkerPoolTest()
+TEST_F(WorkerPoolTest, WorkerPool)
 {
-}
 
-
-void WorkerPoolTest::BeBusy()
-{
-    while (true)
-    {
-        bool interruptRequest = boost::this_thread::interruption_requested();
-        boost::this_thread::interruption_point();
-        if (interruptRequest)
-        {
-            throw std::runtime_error("Interrupt requested!");
-        }
-        Poco::Thread::sleep(cSleepTime);
-    }
-}
-
-
-void WorkerPoolTest::testWorkerPool()
-{
-    for (size_t idx = 0; idx < mIterationCount; ++idx)
-    {
-        std::cout << "\nTest workerpool iteration " << (idx + 1) << "/" << mIterationCount << std::flush << std::endl;
-        testWorkerPoolImpl();
-    }
-}
-
-
-void WorkerPoolTest::testWorkerPoolImpl()
-{
+    const int cSleepTime = 100; // ms
+    const int cMargin    = 200; // ms
     const std::size_t cPoolSize[] = {1, 2, 4, 8, 16, 32};
     const std::size_t cPoolSizeCount = sizeof(cPoolSize) / sizeof(cPoolSize[0]);
 
@@ -135,22 +102,4 @@ void WorkerPoolTest::testWorkerPoolImpl()
         mStopwatch.stop();
     }
     std::cout << std::endl << std::flush;
-}
-
-
-void WorkerPoolTest::setUp()
-{
-}
-
-
-void WorkerPoolTest::tearDown()
-{
-}
-
-
-CppUnit::Test * WorkerPoolTest::suite()
-{
-    CppUnit::TestSuite * suite(new CppUnit::TestSuite("WorkerPoolTest"));
-    CppUnit_addTest(suite, WorkerPoolTest, testWorkerPool);
-    return suite;
 }
