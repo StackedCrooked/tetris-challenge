@@ -2,6 +2,9 @@
 #include "Futile/Threading.h"
 
 
+namespace testing {
+
+
 void TetrisTest::BeBusy()
 {
     while (true)
@@ -15,3 +18,6 @@ void TetrisTest::BeBusy()
         Futile::Sleep(100);
     }
 }
+
+
+} // namespace testing

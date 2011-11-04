@@ -3,10 +3,22 @@
 
 
 #include "Poco/Stopwatch.h"
+#include "Poco/Types.h"
 #include <gtest/gtest.h>
 
 
-class TetrisTest : public testing::Test
+namespace Futile {}
+namespace Tetris {}
+
+
+namespace testing {
+
+
+using namespace Futile;
+using namespace Tetris;
+
+
+class TetrisTest : public Test
 {
 public:
     virtual ~TetrisTest() {}
@@ -19,6 +31,9 @@ protected:
 
     Poco::Stopwatch mStopwatch;
 };
+
+
+} // namespace testing
 
 
 #endif // TETRISCORETESTSUITE_H_INCLUDED

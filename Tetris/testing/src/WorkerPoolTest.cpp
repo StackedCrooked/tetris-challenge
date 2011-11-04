@@ -6,7 +6,7 @@
 #include <iostream>
 
 
-using Futile::WorkerPool;
+namespace testing {
 
 
 WorkerPoolTest::WorkerPoolTest() :
@@ -103,3 +103,6 @@ TEST_F(WorkerPoolTest, WorkerPool)
     }
     std::cout << std::endl << std::flush;
 }
+
+
+} // namespace testing

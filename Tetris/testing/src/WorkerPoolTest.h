@@ -3,8 +3,9 @@
 
 
 #include "TetrisTest.h"
-#include "Poco/Stopwatch.h"
-#include "Poco/Types.h"
+
+
+namespace testing {
 
 
 class WorkerPoolTest : public TetrisTest
@@ -15,6 +16,9 @@ public:
 protected:
     size_t mIterationCount;
 };
+
+
+} // namespace testing
 
 
 #endif // WORKERPOOLTEST_H_INCLUDED

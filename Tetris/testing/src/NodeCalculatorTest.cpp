@@ -18,7 +18,7 @@
 
 
 using namespace Futile;
-using namespace Tetris;
+using namespace testing;
 
 
 static const int cSleepTimeMs = 100;

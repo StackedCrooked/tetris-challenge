@@ -2,33 +2,23 @@
 #define WORKERTEST_H_INCLUDED
 
 
-#include "CppUnit/TestCase.h"
-#include "Poco/Stopwatch.h"
-#include "Poco/Types.h"
+#include "TetrisTest.h"
 
 
-class WorkerTest: public CppUnit::TestCase
+namespace testing {
+
+
+class WorkerTest : public TetrisTest
 {
 public:
-	WorkerTest(const std::string & name);
-
-	~WorkerTest();
-
-    void testWorker();    
-
-    void testWorkerImpl();
-	
-	void setUp();
-
-	void tearDown();
-
-	static CppUnit::Test* suite();
+	WorkerTest();
 
 private:
-    static void BeBusy();
-    Poco::Stopwatch mStopwatch;
-    size_t mRepeat;
+	size_t mRepeat;
 };
+
+
+} // namespace testing
 
 
 #endif // WORKERTEST_H_INCLUDED
