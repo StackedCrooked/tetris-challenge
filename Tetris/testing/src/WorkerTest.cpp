@@ -54,7 +54,7 @@ void WorkerTest::testWorkerImpl()
 {
     Worker worker("TestWorker");
     assertEqual(worker.name(), "TestWorker");
-    Assert(worker.status() >= WorkerStatus_Initial);
+    Assert(worker.status() >= WorkerStatus_Idle);
     worker.wait();
     worker.interrupt();
     worker.interruptAndClearQueue();
