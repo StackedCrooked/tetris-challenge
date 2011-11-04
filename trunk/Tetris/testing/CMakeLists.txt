@@ -4,7 +4,6 @@ include_directories(
     ${SOLUTIONDIR}3rdParty/Boost
     /usr/local/include)
 
-
 add_executable(TetrisTest
     src/main.cpp
     src/TetrisTest.cpp
