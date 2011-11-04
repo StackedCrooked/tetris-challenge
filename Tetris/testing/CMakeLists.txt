@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.6)
-project(TetrisTestSuite)
+project(TetrisTest)
 
 
 #
@@ -34,9 +34,9 @@ message("ARCH:     ${ARCH}")
 #
 # Path variables
 #
-set(EXECUTABLE TetrisTestSuite)
+set(EXECUTABLE TetrisTest)
 set(CMAKE_OSX_ARCHITECTURES ${ARCH})
-set(SOLUTIONDIR "${TetrisTestSuite_SOURCE_DIR}/../../")
+set(SOLUTIONDIR "${TetrisTest_SOURCE_DIR}/../../")
 set(BUILD_ROOT ${SOLUTIONDIR}Build/)
 
 
@@ -110,22 +110,22 @@ include_directories(
 
 
 #
-# TetrisTestSuite source files
+# TetrisTest source files
 #
-set(TetrisTestSuite_SOURCES
+set(TetrisTest_SOURCES
     src/Driver.cpp
     src/NodeCalculatorTest.cpp
-    src/TetrisTestSuite.cpp
+    src/TetrisTest.cpp
     src/WorkerPoolTest.cpp
     src/WorkerTest.cpp)
 
 
 #
-# TetrisTestSuite header files
+# TetrisTest header files
 #
-set(TetrisTestSuite_HEADERS 
+set(TetrisTest_HEADERS 
     src/NodeCalculatorTest.h
-    src/TetrisTestSuite.h
+    src/TetrisTest.h
     src/WorkerPoolTest.h
     src/WorkerTest.h)
 
@@ -144,7 +144,7 @@ endif()
 #
 # Set the executable. On Mac we want a bundle.
 #
-add_executable(${EXECUTABLE} ${EXECUTABLE_OPTIONS} ${TetrisTestSuite_SOURCES} ${TetrisTestSuite_HEADERS_MOC} ${TetrisTestSuite_Resources})
+add_executable(${EXECUTABLE} ${EXECUTABLE_OPTIONS} ${TetrisTest_SOURCES} ${TetrisTest_HEADERS_MOC} ${TetrisTest_Resources})
 
 
 #
@@ -162,7 +162,7 @@ endif()
 
 
 #
-# TetrisTestSuite libs
+# TetrisTest libs
 #
 target_link_libraries(${EXECUTABLE}
     Tetris

@@ -1,11 +1,11 @@
 #include "Futile/Logger.h"
 #include "CppUnit/TestRunner.h"
-#include "TetrisTestSuite.h"
+#include "TetrisTest.h"
 #include <boost/version.hpp>
 #include <iostream>
 
 
-int RunTetrisTestSuite()
+int RunTetrisTest()
 {
     //BOOST_VERSION % 100 is the patch level
     //BOOST_VERSION / 100 % 1000 is the minor version
@@ -30,6 +30,6 @@ int RunTetrisTestSuite()
 int main(int argc, char ** argv)
 {
     Futile::Logger::ScopedInitializer initLogger;
-    int res = RunTetrisTestSuite();
+    int res = RunTetrisTest();
     return res;
 }
