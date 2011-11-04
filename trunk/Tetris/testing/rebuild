@@ -1,0 +1,5 @@
+#!/bin/sh
+rm -rf Build
+./configure
+cd Build
+make -j8
