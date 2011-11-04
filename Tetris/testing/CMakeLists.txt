@@ -113,35 +113,10 @@ set(TetrisTest_HEADERS
     src/WorkerTest.h)
 
 
-
-#
-# Platform specific options for the creation of the executable
-#
-if(APPLE)
-    set(EXECUTABLE_OPTIONS MACOSX_BUNDLE)
-else()
-    set(EXECUTABLE_OPTIONS "")
-endif()
-
-
 #
 # Set the executable. On Mac we want a bundle.
 #
 add_executable(${EXECUTABLE} ${EXECUTABLE_OPTIONS} ${TetrisTest_SOURCES} ${TetrisTest_HEADERS_MOC} ${TetrisTest_Resources})
-
-
-#
-# Post build step: make a symbolic link to the last build directory
-#
-if(WIN32)
-# TODO: Add unix shell support. Or use CMake builtin commands.
-else()
-add_custom_command(TARGET ${EXECUTABLE}
-                   POST_BUILD
-                   COMMAND /bin/rm ARGS -f ${BUILD_ROOT}LastBuild
-                   COMMAND /bin/ln ARGS -s ${OUTDIR} ${BUILD_ROOT}LastBuild
-                   WORKING_DIRECTORY    ${BUILD_ROOT})
-endif()
 
 
 #
@@ -161,4 +136,3 @@ target_link_libraries(${EXECUTABLE}
 #
 set_target_properties(${EXECUTABLE} PROPERTIES
                       COMPILE_FLAGS  ${FINAL_COMPILE_FLAGS})
-
