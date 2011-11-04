@@ -28,10 +28,23 @@ namespace { // anonymous
 
 std::size_t calculateMaxNodeCount(const std::vector<int> & inWidths)
 {
-    std::size_t result = 1;
+    std::vector<std::size_t> results;
     for (std::size_t idx = 0; idx < inWidths.size(); ++idx)
     {
-        result *= inWidths[idx];
+        if (results.empty())
+        {
+            results.push_back(inWidths[idx]);
+        }
+        else
+        {
+            results.push_back(results.back() * inWidths[idx]);
+        }
+    }
+
+    std::size_t result = 0;
+    for (std::size_t idx = 0; idx < results.size(); ++idx)
+    {
+        result += results[idx];
     }
     return result;
 }

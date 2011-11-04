@@ -31,7 +31,7 @@ namespace testing {
 TEST_F(NodeCalculatorTest, Interrupt)
 {
     int depth = 8;
-    int width = 5;
+    int width = 4;
 
     std::cout << std::endl;
     testInterrupt(Depth(depth), Width(width), WorkerCount(16), TimeMs(gTimeout));
@@ -50,58 +50,6 @@ TEST_F(NodeCalculatorTest, Interrupt)
     testInterrupt(Depth(depth), Width(width), WorkerCount(2), TimeMs(gTimeout));
     testInterrupt(Depth(depth), Width(width), WorkerCount(1), TimeMs(gTimeout));
     testInterrupt(Depth(1), Width(1), WorkerCount(1), TimeMs(10));
-}
-
-
-namespace {
-
-
-enum {
-    cOneBillion  = 1000 * 1000 * 1000,
-    cOneMillion  = 1000 * 1000,
-    cOneThousand = 1000
-};
-
-
-template<typename T>
-std::string format(T n)
-{
-    std::stringstream ss;
-    ss << n;
-    return ss.str();/*
-    std::string counter;
-    if (n > cOneBillion)
-    {
-        ss << (double(n) / cOneBillion);
-        counter = "G";
-    }
-    else if (n > cOneMillion)
-    {
-        ss << (double(n) / cOneMillion);
-        counter = "M";
-    }
-    else
-    {
-        ss << (double(n) / cOneThousand);
-        counter = "K";
-    }
-
-    std::string result = ss.str();
-    std::string::size_type subLength = std::string::npos;
-    std::string::size_type pointOffset = result.find(".");
-    if (pointOffset != std::string::npos)
-    {
-        if (pointOffset + 1 < result.size())
-        {
-            subLength = pointOffset + 2;
-        }
-    }
-
-    result = result.substr(0, subLength) + counter;
-    return result;*/
-}
-
-
 }
 
 
@@ -168,9 +116,9 @@ void NodeCalculatorTest::testInterrupt(Depth inDepth, Width inWidth, WorkerCount
            << std::setw(2) << std::setfill(' ') << inWorkerCount
            << ". Result: "    << nodeCalculator.getCurrentSearchDepth() << "/" << nodeCalculator.getMaxSearchDepth()
            << ". Nodes: "
-           << std::setw(4) << std::setfill(' ') << format(nodeCalculator.getCurrentNodeCount())
+           << std::setw(6) << std::setfill(' ') << nodeCalculator.getCurrentNodeCount()
            << "/"
-           << format(nodeCalculator.getMaxNodeCount());
+           << nodeCalculator.getMaxNodeCount();
 
         message = ss.str();
         std::cout << message << std::flush;
