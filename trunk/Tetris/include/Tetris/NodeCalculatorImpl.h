@@ -11,8 +11,9 @@
 #include "Futile/Logging.h"
 #include "Futile/MakeString.h"
 #include "Futile/Assert.h"
-#include <vector>
+#include <cstddef>
 #include <memory>
+#include <vector>
 
 
 namespace Tetris {
@@ -37,7 +38,9 @@ public:
 
     void stop();
 
-    unsigned getNumberOfCalculatedNodes() const;
+    std::size_t getCurrentNodeCount() const;
+
+    std::size_t getMaxNodeCount() const;
 
     int getCurrentSearchDepth() const;
 
@@ -195,7 +198,8 @@ protected:
     bool mQuitFlag;
     mutable Futile::Mutex mQuitFlagMutex;
 
-    Futile::Atomic<unsigned long> mNodeCount;
+    Futile::Atomic<std::size_t> mNodeCount;
+    std::size_t mMaxNodeCount;
 
     TreeRowInfos mTreeRowInfos;
 

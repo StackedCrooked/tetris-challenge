@@ -27,7 +27,6 @@ private:
     void generateChildNodes(NodePtr ioNode,
                             const Evaluator * inEvaluator,
                             BlockType inBlockType,
-                            int inDepth,
                             int inWidth);
 
     void populateNodes(NodePtr ioNode,
