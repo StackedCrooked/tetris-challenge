@@ -37,7 +37,7 @@ const std::string cNodes = "Nodes";
 const std::size_t cNodesSize = std::string("100%").size() + 2;
 
 const std::string cTime = "Time";
-const std::size_t cTimeSize = std::string("10000/10000").size() + 2;
+const std::size_t cTimeSize = std::string("Time").size() + 2;
 
 const std::string cStatus = "Result";
 const std::size_t cStatusSize = std::string("Timed out").size() + 2;
@@ -62,6 +62,9 @@ std::string format(std::size_t workerCount,
                   const Pair & depth,
                   const Pair & nodes)
 {
+    if (time.second > time.first)
+        time.second = time.first;
+
     std::stringstream ss;
     ss << "\r"
        << std::setw(cWorkers.size()) << workerCount
