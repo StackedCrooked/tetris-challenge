@@ -39,6 +39,7 @@ std::string GetMessage(LogLevel inLogLevel, const std::string & inMessage)
 
 Logger::Logger() :
     mSharedMessageList(MessageList()),
+    mLogHandlerMutex(),
     mLogHandler()
 {
 }
@@ -46,6 +47,7 @@ Logger::Logger() :
 
 void Logger::setLogHandler(const LogHandler & inHandler)
 {
+    ScopedLock lock(mLogHandlerMutex);
     mLogHandler = inHandler;
 }
 
@@ -65,7 +67,10 @@ void Logger::flush()
 
     // Flush the logs.
     // Technically we may have a race condition on the mLogHandler here.
-    if (mLogHandler) {
+
+    ScopedLock lock(mLogHandlerMutex);
+    if (mLogHandler)
+    {
         std::for_each(localCopy.begin(), localCopy.end(), mLogHandler);
     }
 }

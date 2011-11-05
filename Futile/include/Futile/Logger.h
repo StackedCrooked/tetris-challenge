@@ -3,6 +3,7 @@
 
 
 #include "Futile/LeakDetector.h"
+#include "Futile/Threading.h"
 #include "stm.hpp"
 #include <boost/function.hpp>
 #include <string>
@@ -49,6 +50,8 @@ private:
     typedef std::vector<std::string> MessageList;
     typedef stm::shared<MessageList> SharedMessageList;
     SharedMessageList mSharedMessageList;
+
+    Mutex mLogHandlerMutex;
     LogHandler mLogHandler;
 };
 
