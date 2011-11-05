@@ -47,8 +47,8 @@ const std::size_t cNodesSize = std::max<std::size_t>(cNodes.size(), std::string(
 const std::string cNodesProcent = "Progress";
 const std::size_t cNodesProcentSize = std::max<std::size_t>(cNodesProcent.size(), std::string("100%").size()) + 2;
 
-const std::string cTime = "Time";
-const std::size_t cTimeSize = std::max<std::size_t>(cTime.size(),
+const std::string cRemainingTime = "Remaining Time";
+const std::size_t cRemainingTimeSize = std::max<std::size_t>(cRemainingTime.size(),
                                                     std::string("10000ms").size()) + 2;
 
 const std::string cStatus = "Result";
@@ -63,7 +63,7 @@ std::string header()
        << std::setw(cDepthProgressSize) << cDepthProgress
        << std::setw(cNodesSize) << cNodes
        << std::setw(cNodesProcentSize) << cNodesProcent
-       << std::setw(cTimeSize) << cTime
+       << std::setw(cRemainingTimeSize) << cRemainingTime
        << std::setw(cStatusSize) << cStatus;
     return ss.str();
 }
@@ -85,7 +85,7 @@ std::string format(std::size_t workerCount,
        << std::setw(cDepthProgressSize) << (SS() << depth.first << "/" << depth.second).str()
        << std::setw(cNodesSize) << (SS() << nodes.first << "/" << nodes.second).str()
        << std::setw(cNodesProcentSize) << (SS() << int(0.5 + 100 * double(nodes.first) / double(nodes.second)) << "%").str()
-       << std::setw(cTimeSize) << (SS() << (time.second - time.first) << "ms").str()
+       << std::setw(cRemainingTimeSize) << (SS() << (time.second - time.first) << "ms").str()
        << std::setw(cStatusSize) << std::right <<
           (time.first < time.second ? (depth.first < depth.second ? "Busy"
                                                                   : "OK"  )
