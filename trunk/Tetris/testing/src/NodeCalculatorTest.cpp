@@ -144,6 +144,11 @@ void NodeCalculatorTest::testInterrupt(Depth inDepth, Width inWidth, WorkerCount
     if (duration > inTimeMs)
     {
         ss << " (timeout)";
+        ASSERT_LT(nodeCalculator.getCurrentNodeCount(), nodeCalculator.getMaxNodeCount());
+    }
+    else
+    {
+        ASSERT_EQ(nodeCalculator.getCurrentNodeCount(), nodeCalculator.getMaxNodeCount());
     }
 
     std::cout << ss.str() << std::endl;
