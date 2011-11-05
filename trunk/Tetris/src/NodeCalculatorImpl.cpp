@@ -193,7 +193,6 @@ void NodeCalculatorImpl::populateNodesRecursively(
     {
         generatedChildNodes = ChildNodes(GameStateComparator());
         GenerateOffspring(ioNode, inBlockTypes[inIndex], mEvaluator, generatedChildNodes);
-        mNodeCount.increment(generatedChildNodes.size());
 
         int count = 0;
         ChildNodes::iterator it = generatedChildNodes.begin(), end = generatedChildNodes.end();
@@ -203,6 +202,8 @@ void NodeCalculatorImpl::populateNodesRecursively(
             ++count;
             ++it;
         }
+        mNodeCount.increment(count);
+
         Assert(count >= 1);
         mTreeRowInfos.registerNode(*ioNode->children().begin());
     }
