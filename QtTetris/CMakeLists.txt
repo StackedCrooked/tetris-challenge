@@ -64,7 +64,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OUTDIR}bin/)
 #
 # Compile flags
 #
-set(WARNING_OPTIONS         " -Wall -Werror ")
+set(WARNING_OPTIONS         " -Wall -Werror -Wno-strict-aliasing ")
 set(CXX_FLAGS         "${CXX_FLAGS} -DTETRIS_QT=1")
 set(CXX_FLAGS_Debug   "${CXX_FLAGS} ${WARNING_OPTIONS} -ggdb3")
 set(CXX_FLAGS_Release "${CXX_FLAGS} ${WARNING_OPTIONS} -O3 -DNDEBUG")
