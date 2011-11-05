@@ -10,11 +10,6 @@ namespace testing {
 
 class WorkerTest : public TetrisTest
 {
-public:
-	WorkerTest();
-
-private:
-	size_t mRepeat;
 };
 
 

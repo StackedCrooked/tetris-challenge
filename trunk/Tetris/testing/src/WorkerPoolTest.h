@@ -10,11 +10,6 @@ namespace testing {
 
 class WorkerPoolTest : public TetrisTest
 {
-public:
-    WorkerPoolTest();
-
-protected:
-    size_t mIterationCount;
 };
 
 

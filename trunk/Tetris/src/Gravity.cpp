@@ -38,8 +38,10 @@ struct Gravity::Impl : boost::noncopyable
     Impl(Gravity * inGravity, ThreadSafe<Game> inThreadSafeGame) :
         mGravity(inGravity),
         mThreadSafeGame(inThreadSafeGame),
-        mLevel(0)
+        mLevel(0),
+        mStopwatch()
     {
+        mStopwatch.start();
     }
 
     ~Impl()

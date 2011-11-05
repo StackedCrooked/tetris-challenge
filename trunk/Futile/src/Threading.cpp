@@ -15,8 +15,8 @@ void Sleep(UInt64 inMilliseconds)
 UInt64 GetCurrentTimeMs()
 {
     boost::posix_time::ptime time = boost::posix_time::microsec_clock::local_time();
-    boost::posix_time::time_duration duration( time.time_of_day() );
-    return static_cast<unsigned long long>(duration.total_milliseconds());
+    boost::posix_time::time_duration duration(time.time_of_day());
+    return static_cast<UInt64>(duration.total_milliseconds());
 }
 
 
