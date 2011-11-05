@@ -56,11 +56,11 @@ std::string format(std::size_t workerCount,
 {
     std::stringstream ss;
     ss << "\r"
-       << "Worker count: " << workerCount
-       << ". WD: " << widthAndDepth.first << "/" << widthAndDepth.second
-       << ". Duration: "  << std::setw(7) << (SS() << time.first << "/" << time.second).str() << "ms"
-       << ". Result: " << (SS() << depth.first << "/" << depth.second).str()
-       << ". Nodes: " << std::setw(15) << (SS() << nodeCount.first << "/" << nodeCount.second).str();
+       << "Workers: " << workerCount
+       << " Width: " << widthAndDepth.first
+       << " Depth: " << depth.first << "/" << depth.second
+       << " Nodes: " << std::setw(15) << (SS() << nodeCount.first << "/" << nodeCount.second).str()
+       << " Duration: " << std::setw(4) << time.first << "/" << std::setw(4) << time.second << "ms";
     return ss.str();
 }
 
