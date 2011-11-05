@@ -7,6 +7,16 @@
 
 
 namespace testing {
+namespace { // anonymous
+
+
+const int cSleepTime = 100; // ms
+const int cMargin    = 200; // ms
+const std::size_t cPoolSize[] = {1, 2, 4, 8, 16, 32};
+const std::size_t cPoolSizeCount = sizeof(cPoolSize) / sizeof(cPoolSize[0]);
+
+
+} // anonymous namespace
 
 
 WorkerPoolTest::WorkerPoolTest() :
@@ -16,18 +26,11 @@ WorkerPoolTest::WorkerPoolTest() :
 }
 
 
-TEST_F(WorkerPoolTest, WorkerPool)
+TEST_F(WorkerPoolTest, Basic)
 {
-
-    const int cSleepTime = 100; // ms
-    const int cMargin    = 200; // ms
-    const std::size_t cPoolSize[] = {1, 2, 4, 8, 16, 32};
-    const std::size_t cPoolSizeCount = sizeof(cPoolSize) / sizeof(cPoolSize[0]);
-
     // Test without interrupt
     for (std::size_t i = 0; i < cPoolSizeCount; ++i)
     {
-        std::cout << "\r  Test without interrupt " << (i + 1) << "/" << cPoolSizeCount << std::flush;
         mStopwatch.restart();
         WorkerPool pool("WorkerPool Test", cPoolSize[i]);
         for (size_t idx = 0; idx != cPoolSize[i]; ++idx)
@@ -40,13 +43,15 @@ TEST_F(WorkerPoolTest, WorkerPool)
         Assert(elapsedMs - cSleepTime > -cMargin);
         Assert(elapsedMs - cSleepTime < cMargin);
     }
-    std::cout << std::endl;
+}
 
 
+
+TEST_F(WorkerPoolTest, Interrupt)
+{
     // Test with interrupt
     for (size_t i = 0; i < cPoolSizeCount; ++i)
     {
-        std::cout << "\r  Test with interrupt    " << (i + 1) << "/" << cPoolSizeCount << std::flush;
         mStopwatch.restart();
         WorkerPool pool("WorkerPool Test", cPoolSize[i]);
         for (size_t idx = 0; idx != cPoolSize[i]; ++idx)
@@ -58,12 +63,14 @@ TEST_F(WorkerPoolTest, WorkerPool)
         Assert(elapsedMs - cSleepTime > -cMargin);
         Assert(elapsedMs - cSleepTime < cMargin);
     }
-    std::cout << std::endl;
+}
 
+
+TEST_F(WorkerPoolTest, Resize)
+{
     // Test resize
     for (std::size_t i = 0; i < cPoolSizeCount; ++i)
     {
-        std::cout << "\r  Test resize            " << (i + 1) << "/" << cPoolSizeCount << std::flush;
         mStopwatch.restart();
         WorkerPool pool("WorkerPool Test", cPoolSize[i]);
         for (size_t idx = 0; idx != cPoolSize[i]; ++idx)
@@ -86,12 +93,14 @@ TEST_F(WorkerPoolTest, WorkerPool)
         Assert(elapsedMs - cSleepTime > -cMargin);
         Assert(elapsedMs - cSleepTime < cMargin);
     }
-    std::cout << std::endl;
+}
 
+
+TEST_F(WorkerPoolTest, JoinAll)
+{
     // Test joinAll
     for (std::size_t i = 0; i < cPoolSizeCount; ++i)
     {
-        std::cout << "\r  Test joinAll           " << (i + 1) << "/" << cPoolSizeCount << std::flush;
         mStopwatch.restart();
         WorkerPool pool("WorkerPool Test", cPoolSize[i]);
         for (size_t i = 0; i < pool.size(); ++i)
@@ -101,7 +110,6 @@ TEST_F(WorkerPoolTest, WorkerPool)
         pool.wait();
         mStopwatch.stop();
     }
-    std::cout << std::endl << std::flush;
 }
 
 

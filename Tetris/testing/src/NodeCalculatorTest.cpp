@@ -21,6 +21,9 @@ namespace testing {
 namespace { // anonymous
 
 
+static const int cTimeout = 1000;
+
+
 typedef std::pair<std::size_t, std::size_t> Pair;
 
 
@@ -30,14 +33,18 @@ const std::size_t cWorkersSize = cWorkers.size() + 2;
 const std::string cSearchWidth = "Width x Depth";
 const std::size_t cSearchWidthSize = cSearchWidth.size() + 2;
 
-const std::string cSearchDepth= "Search Depth";
-const std::size_t cSearchDepthSize = cSearchDepth.size() + 2;
+const std::string cDepthProgress= "Depth Progress";
+const std::size_t cDepthProgressSize = cDepthProgress.size() + 2;
 
-const std::string cNodes = "Number of calculated nodes";
-const std::size_t cNodesSize = std::string("1000000/1000000 (100%)").size() + 2;
+const std::string cNodes = "Calculated nodes";
+const std::size_t cNodesSize = std::max<std::size_t>(cNodes.size(), std::string("1000000/1000000 (100%)").size()) + 2;
+
+const std::string cNodesProcent = "Progress";
+const std::size_t cNodesProcentSize = std::max<std::size_t>(cNodesProcent.size(), std::string("100%").size()) + 2;
 
 const std::string cTime = "Time";
-const std::size_t cTimeSize = std::string("Time").size() + 2;
+const std::size_t cTimeSize = std::max<std::size_t>(cTime.size(),
+                                                    std::string("10000ms").size()) + 2;
 
 const std::string cStatus = "Result";
 const std::size_t cStatusSize = std::string("Timed out").size() + 2;
@@ -48,8 +55,9 @@ std::string header()
     std::stringstream ss;
     ss << std::setw(cWorkers.size()) << cWorkers
        << std::setw(cSearchWidthSize) << cSearchWidth
-       << std::setw(cSearchDepthSize) << cSearchDepth
+       << std::setw(cDepthProgressSize) << cDepthProgress
        << std::setw(cNodesSize) << cNodes
+       << std::setw(cNodesProcentSize) << cNodesProcent
        << std::setw(cTimeSize) << cTime
        << std::setw(cStatusSize) << cStatus;
     return ss.str();
@@ -69,19 +77,16 @@ std::string format(std::size_t workerCount,
     ss << "\r"
        << std::setw(cWorkers.size()) << workerCount
        << std::setw(cSearchWidthSize) << (SS() << widthAndDepth.first << "x" << widthAndDepth.second).str()
-       << std::setw(cSearchDepthSize) << (SS() << depth.first << "/" << depth.second).str()
-       << std::setw(cNodesSize) << (SS() << nodes.first << "/" << nodes.second
-                                         << " (" << int(0.5 + 100 * double(nodes.first) / double(nodes.second)) << "%)").str()
-       << std::setw(cTimeSize) << (SS() << int(0.5 + (time.second - time.first) / 1000.0) << "s").str()
+       << std::setw(cDepthProgressSize) << (SS() << depth.first << "/" << depth.second).str()
+       << std::setw(cNodesSize) << (SS() << nodes.first << "/" << nodes.second).str()
+       << std::setw(cNodesProcentSize) << (SS() << int(0.5 + 100 * double(nodes.first) / double(nodes.second)) << "%").str()
+       << std::setw(cTimeSize) << (SS() << (time.second - time.first) << "ms").str()
        << std::setw(cStatusSize) << std::right <<
           (time.first < time.second ? (depth.first < depth.second ? "Busy"
                                                                   : "OK"  )
             : "Timed out");
     return ss.str();
 }
-
-
-int gTimeout = 10000;
 
 
 } // anonymous namespace
@@ -93,11 +98,11 @@ TEST_F(NodeCalculatorTest, Interrupt)
     std::cout << header() << std::endl;
     for (std::size_t w = 1; w <= 8; w *= 2)
     {
-        for (std::size_t width = 6; width <= 8; width += 2)
+        for (std::size_t width = 1; width <= 8; width *= 2)
         {
-            for (std::size_t depth = 6; depth <= 8; depth += 2)
+            for (std::size_t depth = 1; depth <= 8; depth *= 2)
             {
-                testInterrupt(Depth(depth), Width(width), WorkerCount(w), TimeMs(gTimeout));
+                testInterrupt(Depth(depth), Width(width), WorkerCount(w), TimeMs(cTimeout));
             }
         }
     }
