@@ -34,7 +34,7 @@ const std::string cSearchDepth= "Progress";
 const std::size_t cSearchDepthSize = cSearchDepth.size() + 2;
 
 const std::string cNodes = "Nodes";
-const std::size_t cNodesSize = std::string("10000000/10000000").size() + 2;
+const std::size_t cNodesSize = std::string("100%").size() + 2;
 
 const std::string cTime = "Time";
 const std::size_t cTimeSize = std::string("5000/5000").size() + 2;
@@ -67,7 +67,7 @@ std::string format(std::size_t workerCount,
        << std::setw(cWorkers.size()) << workerCount
        << std::setw(cSearchWidthSize) << widthAndDepth.first
        << std::setw(cSearchDepthSize) << (SS() << depth.first << "/" << depth.second).str()
-       << std::setw(cNodesSize) << (SS() << nodes.first << "/" << nodes.second).str()
+       << std::setw(cNodesSize) << (SS() << int(0.5 + 100 * double(nodes.first) / double(nodes.second)) << "%").str()
        << std::setw(cTimeSize) << (SS() << time.first << "/" << time.second).str()
        << std::setw(cStatusSize) << std::right <<
           (time.first < time.second ? (depth.first < depth.second ? "Busy"
