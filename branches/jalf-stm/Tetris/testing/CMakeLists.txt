@@ -1,7 +1,6 @@
 include_directories(
     ${SOLUTIONDIR}Futile/include
     ${SOLUTIONDIR}Tetris/include
-    ${SOLUTIONDIR}3rdParty/Boost
     ${SOLUTIONDIR}3rdParty/GTest/include
     ${SOLUTIONDIR}3rdParty/STM
     /usr/local/include
@@ -24,6 +23,6 @@ target_link_libraries(TetrisTest
     Futile
     PocoFoundation
     ${EXTRA_LIBS}
-    "${BOOST_LIB}/libboost_thread.a"
-    "${BOOST_LIB}/libboost_signals.a"
-    "${SOLUTIONDIR}3rdParty/GTest/lib/${PLATFORM}/${ARCH}/libgtest.a")
+    "${SOLUTIONDIR}3rdParty/GTest/lib/${PLATFORM}/${ARCH}/libgtest.a"
+    /usr/lib/libboost_thread-mt.a
+    /usr/lib/libboost_signals-mt.a)

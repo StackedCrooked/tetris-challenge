@@ -64,7 +64,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OUTDIR}bin/)
 #
 # Compile flags
 #
-set(WARNING_OPTIONS_STM "-Wno-strict-aliasing -std=c++0x")
+set(WARNING_OPTIONS_STM "-Wno-strict-aliasing -std=c++0x -Wno-deprecated-declarations")
 set(WARNING_OPTIONS     "-Wall -Werror ${WARNING_OPTIONS_STM}")
 set(CXX_FLAGS         "${CXX_FLAGS} -DTETRIS_QT=1")
 set(CXX_FLAGS_Debug   "${CXX_FLAGS} ${WARNING_OPTIONS} -ggdb3")
@@ -92,13 +92,6 @@ include_directories(
 set(POCO_LIB "${SOLUTIONDIR}3rdParty/Poco/lib/${PLATFORM}/${ARCH}")
 link_directories(${POCO_LIB})
 
-
-#
-# Boost dependency
-#
-set(BOOST_ROOT "${SOLUTIONDIR}3rdParty/Boost")
-include_directories(${BOOST_ROOT})
-set(BOOST_LIB "${BOOST_ROOT}/lib/${PLATFORM}/${ARCH}")
 
 
 #
@@ -215,8 +208,8 @@ target_link_libraries(${EXECUTABLE}
     Futile
     PocoFoundation
     ${EXTRA_LIBS}
-    "${BOOST_LIB}/libboost_thread.a"
-    "${BOOST_LIB}/libboost_signals.a")
+    /usr/lib/libboost_thread-mt.a
+    /usr/lib/libboost_signals-mt.a)
 
 
 #
