@@ -30,7 +30,7 @@ const std::size_t cWorkersSize = cWorkers.size() + 2;
 const std::string cSearchWidth = "Width x Depth";
 const std::size_t cSearchWidthSize = cSearchWidth.size() + 2;
 
-const std::string cSearchDepth= "Progress";
+const std::string cSearchDepth= "Search Depth";
 const std::size_t cSearchDepthSize = cSearchDepth.size() + 2;
 
 const std::string cNodes = "Nodes";
