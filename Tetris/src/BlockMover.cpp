@@ -32,6 +32,7 @@ struct BlockMover::Impl
             mActualSpeed(0),
             mMoveDownBehavior(MoveDownBehavior_Move)
         {
+            mStopwatch.start();
         }
 
         Futile::Stopwatch mStopwatch;

@@ -1,22 +1,21 @@
 #include "WorkerTest.h"
 #include "Futile/Worker.h"
+#include "Futile/WorkerPool.h"
 #include "Futile/Threading.h"
 #include "Futile/Assert.h"
-#include "Poco/Thread.h"
-#include "Poco/Stopwatch.h"
+#include "Futile/Stopwatch.h"
 #include <iostream>
 
 
 namespace testing {
 
 
-static const int cSleepTimeMs = 100;
+using namespace Futile;
 
 
-WorkerTest::WorkerTest():
-    TetrisTest(),
-    mRepeat(10)
-{
+namespace {
+static const UInt64 cSleepTimeMs = 100;
+static const UInt64 cWaitTime = 100;
 }
 
 
@@ -29,31 +28,38 @@ TEST_F(WorkerTest, Worker)
     worker.interrupt();
     worker.interruptAndClearQueue();
     ASSERT_EQ(worker.size(), 0);
+}
 
 
-    // Test without interrupt
-    mStopwatch.restart();
+TEST_F(WorkerTest, NoInterrupt)
+{
+    Worker worker("TestWorker");
+    Futile::Stopwatch stopwatch;
+    stopwatch.start();
     worker.schedule(boost::bind(&Futile::Sleep, cSleepTimeMs));
     worker.waitForStatus(WorkerStatus_Working);
     ASSERT_EQ(worker.size(), 0);
     worker.wait();
-    mStopwatch.stop();
-    ASSERT_TRUE(mStopwatch.elapsed() / 1000.0 >= cSleepTimeMs - 100);
-    ASSERT_TRUE(mStopwatch.elapsed() / 1000.0 < 100 + cSleepTimeMs);
+    stopwatch.stop();
+    ASSERT_LT(stopwatch.elapsedMs(), cSleepTimeMs + cWaitTime);
+}
 
 
-    // Test with interrupt
-    mStopwatch.restart();
+TEST_F(WorkerTest, WithInterrupt)
+{
+    Worker worker("TestWorker");
+    Futile::Stopwatch stopwatch;
+    stopwatch.start();
     worker.schedule(boost::bind(&WorkerTest::BeBusy));
     worker.waitForStatus(WorkerStatus_Working);
     worker.interrupt();
     ASSERT_EQ(worker.size(), 0);
-    mStopwatch.stop();
-    ASSERT_TRUE(mStopwatch.elapsed() / 1000.0 < 100 + cSleepTimeMs);
+    stopwatch.stop();
+    ASSERT_TRUE(stopwatch.elapsedMs() < cSleepTimeMs + cWaitTime);
 
 
     // Test with interrupt
-    mStopwatch.restart();
+    stopwatch.restart();
     worker.schedule(boost::bind(&WorkerTest::BeBusy));
     worker.schedule(boost::bind(&WorkerTest::BeBusy));
     worker.schedule(boost::bind(&WorkerTest::BeBusy));
@@ -62,15 +68,15 @@ TEST_F(WorkerTest, Worker)
     worker.waitForStatus(WorkerStatus_Working);
     ASSERT_EQ(worker.size(), 4);
     worker.interrupt();
-    ASSERT_TRUE(mStopwatch.elapsed() / 1000 < 2 * cSleepTimeMs);
+    ASSERT_TRUE(stopwatch.elapsedMs() < 2 * cSleepTimeMs);
     ASSERT_EQ(worker.size(), 3);
     worker.interrupt();
-    ASSERT_TRUE(mStopwatch.elapsed() / 1000 < 3 * cSleepTimeMs);
+    ASSERT_TRUE(stopwatch.elapsedMs() < 3 * cSleepTimeMs);
     ASSERT_EQ(worker.size(), 2);
     worker.interruptAndClearQueue();
     ASSERT_EQ(worker.size(), 0);
-    mStopwatch.stop();
-    ASSERT_TRUE(mStopwatch.elapsed() / 1000 < 4 * cSleepTimeMs);
+    stopwatch.stop();
+    ASSERT_TRUE(stopwatch.elapsedMs() < 4 * cSleepTimeMs);
 
     // Interrupt twice should not crash.
     worker.interrupt();

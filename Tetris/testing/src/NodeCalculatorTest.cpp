@@ -1,4 +1,3 @@
-#include "Poco/Foundation.h"
 #include "NodeCalculatorTest.h"
 #include "Tetris/NodeCalculator.h"
 #include "Tetris/Evaluator.h"
@@ -11,13 +10,19 @@
 #include "Futile/Assert.h"
 #include "Futile/Logging.h"
 #include "Futile/MakeString.h"
-#include "Poco/Thread.h"
+#include "Futile/Stopwatch.h"
 #include <iomanip>
 #include <iostream>
 #include <sstream>
 
 
 namespace testing {
+
+
+using namespace Futile;
+using namespace Tetris;
+
+
 namespace { // anonymous
 
 
@@ -137,13 +142,12 @@ void NodeCalculatorTest::testInterrupt(Depth inDepth, Width inWidth, WorkerCount
 
     ASSERT_TRUE(nodeCalculator.status() == NodeCalculator::Status_Started);
 
-    Poco::Stopwatch stopwatch;
+    Futile::Stopwatch stopwatch;
     stopwatch.start();
     int duration = 0;
     while (nodeCalculator.status() != NodeCalculator::Status_Finished)
     {
-
-        duration = static_cast<int>(0.5 + stopwatch.elapsed() / 1000.0);
+        duration = stopwatch.elapsedMs();
 
         Assert(nodeCalculator.getCurrentNodeCount() <= nodeCalculator.getMaxNodeCount());
 
@@ -250,7 +254,7 @@ void NodeCalculatorTest::testDestroy(Worker & inMainWorker, WorkerPool & inWorke
     nodeCalculator.start();
 
     ASSERT_TRUE(nodeCalculator.status() >= NodeCalculator::Status_Started);
-    Poco::Thread::sleep(10);
+    Futile::Sleep(10);
     ASSERT_TRUE(nodeCalculator.status() != NodeCalculator::Status_Error);
 }
 

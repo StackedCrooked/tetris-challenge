@@ -16,6 +16,10 @@ public:
     /// Creates and starts the stopwatch.
     Stopwatch();
 
+    void start();
+
+    void stop();
+
     /// Reset and start the stopwatch.
     void restart();
 
@@ -24,6 +28,7 @@ public:
 
 private:
     UInt64 mStart;
+    UInt64 mStop;
 };
 
 
