@@ -20,7 +20,7 @@
 namespace { // anonymous
 
 
-int gTimeout = 15000;
+int gTimeout = 500;
 
 
 } // anonymous namespace
@@ -28,28 +28,20 @@ int gTimeout = 15000;
 
 namespace testing {
 
+
 TEST_F(NodeCalculatorTest, Interrupt)
 {
-    int depth = 8;
-    int width = 4;
-
     std::cout << std::endl;
-    testInterrupt(Depth(depth), Width(width), WorkerCount(16), TimeMs(gTimeout));
-    testInterrupt(Depth(depth), Width(width), WorkerCount(15), TimeMs(gTimeout));
-    testInterrupt(Depth(depth), Width(width), WorkerCount(14), TimeMs(gTimeout));
-    testInterrupt(Depth(depth), Width(width), WorkerCount(12), TimeMs(gTimeout));
-    testInterrupt(Depth(depth), Width(width), WorkerCount(11), TimeMs(gTimeout));
-    testInterrupt(Depth(depth), Width(width), WorkerCount(10), TimeMs(gTimeout));
-    testInterrupt(Depth(depth), Width(width), WorkerCount(9), TimeMs(gTimeout));
-    testInterrupt(Depth(depth), Width(width), WorkerCount(8), TimeMs(gTimeout));
-    testInterrupt(Depth(depth), Width(width), WorkerCount(7), TimeMs(gTimeout));
-    testInterrupt(Depth(depth), Width(width), WorkerCount(6), TimeMs(gTimeout));
-    testInterrupt(Depth(depth), Width(width), WorkerCount(5), TimeMs(gTimeout));
-    testInterrupt(Depth(depth), Width(width), WorkerCount(4), TimeMs(gTimeout));
-    testInterrupt(Depth(depth), Width(width), WorkerCount(3), TimeMs(gTimeout));
-    testInterrupt(Depth(depth), Width(width), WorkerCount(2), TimeMs(gTimeout));
-    testInterrupt(Depth(depth), Width(width), WorkerCount(1), TimeMs(gTimeout));
-    testInterrupt(Depth(1), Width(1), WorkerCount(1), TimeMs(10));
+    for (std::size_t depth = 5; depth <= 8; ++depth)
+    {
+        for (std::size_t width = 4; width <= 5; ++width)
+        {
+            testInterrupt(Depth(depth), Width(width), WorkerCount(8), TimeMs(gTimeout));
+            testInterrupt(Depth(depth), Width(width), WorkerCount(4), TimeMs(gTimeout));
+            testInterrupt(Depth(depth), Width(width), WorkerCount(2), TimeMs(gTimeout));
+            testInterrupt(Depth(depth), Width(width), WorkerCount(1), TimeMs(gTimeout));
+        }
+    }
 }
 
 
@@ -108,17 +100,17 @@ void NodeCalculatorTest::testInterrupt(Depth inDepth, Width inWidth, WorkerCount
         ss << "\r"
            << "W/D: "         << inWidth << "/" << inDepth
            << ". Duration: "
-           << std::setw(2) << std::setfill(' ')
-           << int(0.5 + duration/1000.0)
-           << "/"
-           << int(0.5 + inTimeMs/1000.0) << "s"
+           << std::setw(7) << std::setfill(' ')
+           << (SS() << duration << "/" << inTimeMs).str()
+           << "ms"
            << ". Workers: "
            << std::setw(2) << std::setfill(' ') << inWorkerCount
-           << ". Result: "    << nodeCalculator.getCurrentSearchDepth() << "/" << nodeCalculator.getMaxSearchDepth()
+           << ". Result: "
+           << (SS() << nodeCalculator.getCurrentSearchDepth() << "/" << nodeCalculator.getMaxSearchDepth()).str()
+           << std::setw(4) << std::setfill(' ')
            << ". Nodes: "
-           << std::setw(6) << std::setfill(' ') << nodeCalculator.getCurrentNodeCount()
-           << "/"
-           << nodeCalculator.getMaxNodeCount();
+           << std::setw(15) << std::setfill(' ')
+           << (SS() << nodeCalculator.getCurrentNodeCount() << "/" << nodeCalculator.getMaxNodeCount()).str();
 
         message = ss.str();
         std::cout << message << std::flush;
@@ -132,7 +124,30 @@ void NodeCalculatorTest::testInterrupt(Depth inDepth, Width inWidth, WorkerCount
         Futile::Sleep(10);
     }
 
-    std::cout << message << std::endl;
+    std::stringstream ss;
+    ss << "\r"
+       << "W/D: "         << inWidth << "/" << inDepth
+       << ". Duration: "
+       << std::setw(7) << std::setfill(' ')
+       << (SS() << duration << "/" << inTimeMs).str()
+       << "ms"
+       << ". Workers: "
+       << std::setw(2) << std::setfill(' ') << inWorkerCount
+       << ". Result: "
+       << (SS() << nodeCalculator.getCurrentSearchDepth() << "/" << nodeCalculator.getMaxSearchDepth()).str()
+       << std::setw(4) << std::setfill(' ')
+       << ". Nodes: "
+       << std::setw(15) << std::setfill(' ')
+       << (SS() << nodeCalculator.getCurrentNodeCount() << "/" << nodeCalculator.getMaxNodeCount()).str();
+
+
+    if (duration > inTimeMs)
+    {
+        ss << " (timeout)";
+    }
+
+    std::cout << ss.str() << std::endl;
+
 
     NodePtr resultPtr = nodeCalculator.result();
     GameStateNode & result(*resultPtr);
