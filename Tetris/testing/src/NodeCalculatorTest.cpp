@@ -25,19 +25,19 @@ typedef std::pair<std::size_t, std::size_t> Pair;
 
 
 const std::string cWorkers = "Threads";
-const std::size_t cWorkersSize = cWorkers.size() + 1;
+const std::size_t cWorkersSize = cWorkers.size() + 2;
 
 const std::string cSearchWidth = "Width";
-const std::size_t cSearchWidthSize = cSearchWidth.size() + 1;
+const std::size_t cSearchWidthSize = cSearchWidth.size() + 2;
 
 const std::string cSearchDepth= "Depth";
-const std::size_t cSearchDepthSize = cSearchDepth.size() + 1;
+const std::size_t cSearchDepthSize = cSearchDepth.size() + 2;
 
 const std::string cNodes = "Nodes";
-const std::size_t cNodesSize = std::string("10000000/10000000").size() + 1;
+const std::size_t cNodesSize = std::string("10000000/10000000").size() + 2;
 
 const std::string cTime = "Time";
-const std::size_t cTimeSize = std::string("5000/5000").size() + 1;
+const std::size_t cTimeSize = std::string("5000/5000").size() + 2;
 
 
 std::string header()
