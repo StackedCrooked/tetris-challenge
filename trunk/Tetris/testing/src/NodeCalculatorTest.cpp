@@ -27,7 +27,7 @@ typedef std::pair<std::size_t, std::size_t> Pair;
 const std::string cWorkers = "Threads";
 const std::size_t cWorkersSize = cWorkers.size() + 2;
 
-const std::string cSearchWidth = "Width";
+const std::string cSearchWidth = "Dimension";
 const std::size_t cSearchWidthSize = cSearchWidth.size() + 2;
 
 const std::string cSearchDepth= "Progress";
@@ -65,7 +65,7 @@ std::string format(std::size_t workerCount,
     std::stringstream ss;
     ss << "\r"
        << std::setw(cWorkers.size()) << workerCount
-       << std::setw(cSearchWidthSize) << widthAndDepth.first
+       << std::setw(cSearchWidthSize) << (SS() << widthAndDepth.first << " x " << widthAndDepth.second).str()
        << std::setw(cSearchDepthSize) << (SS() << depth.first << "/" << depth.second).str()
        << std::setw(cNodesSize) << (SS() << int(0.5 + 100 * double(nodes.first) / double(nodes.second)) << "%").str()
        << std::setw(cTimeSize) << (SS() << time.first << "/" << time.second).str()
