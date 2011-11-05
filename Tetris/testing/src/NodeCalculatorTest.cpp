@@ -20,7 +20,7 @@
 namespace { // anonymous
 
 
-int gTimeout = 500;
+int gTimeout = 5000;
 
 
 } // anonymous namespace
@@ -39,10 +39,33 @@ TEST_F(NodeCalculatorTest, Interrupt)
             testInterrupt(Depth(depth), Width(width), WorkerCount(8), TimeMs(gTimeout));
             testInterrupt(Depth(depth), Width(width), WorkerCount(4), TimeMs(gTimeout));
             testInterrupt(Depth(depth), Width(width), WorkerCount(2), TimeMs(gTimeout));
-            testInterrupt(Depth(depth), Width(width), WorkerCount(1), TimeMs(gTimeout));
         }
     }
 }
+
+
+namespace { // anonymous
+
+
+typedef std::pair<std::size_t, std::size_t> Pair;
+std::string format(std::size_t workerCount,
+                  const Pair & widthAndDepth,
+                  const Pair & time,
+                  const Pair & depth,
+                  const Pair & nodeCount)
+{
+    std::stringstream ss;
+    ss << "\r"
+       << "Worker count: " << workerCount
+       << ". WD: " << widthAndDepth.first << "/" << widthAndDepth.second
+       << ". Duration: "  << std::setw(7) << (SS() << time.first << "/" << time.second).str() << "ms"
+       << ". Result: " << (SS() << depth.first << "/" << depth.second).str()
+       << ". Nodes: " << std::setw(15) << (SS() << nodeCount.first << "/" << nodeCount.second).str();
+    return ss.str();
+}
+
+
+} // anonymous namespace
 
 
 void NodeCalculatorTest::testInterrupt(Depth inDepth, Width inWidth, WorkerCount inWorkerCount, TimeMs inTimeMs)
@@ -75,84 +98,56 @@ void NodeCalculatorTest::testInterrupt(Depth inDepth, Width inWidth, WorkerCount
 
     Poco::Stopwatch stopwatch;
     stopwatch.start();
-    bool interrupted = false;
     int duration = 0;
-    std::string message;
     while (nodeCalculator.status() != NodeCalculator::Status_Finished)
     {
+
+        duration = static_cast<int>(0.5 + stopwatch.elapsed() / 1000.0);
+
+        std::cout << format(inWorkerCount,
+                            std::make_pair(inWidth, inDepth),
+                            std::make_pair(duration, inTimeMs),
+                            std::make_pair(nodeCalculator.getCurrentSearchDepth(), nodeCalculator.getMaxSearchDepth()),
+                            std::make_pair(nodeCalculator.getCurrentNodeCount(), nodeCalculator.getMaxNodeCount()));
+        std::cout << std::flush;
+
         if (nodeCalculator.status() != NodeCalculator::Status_Stopped)
         {
-            if (stopwatch.elapsed() > 1000 * inTimeMs)
+            if (duration > inTimeMs)
             {
                 nodeCalculator.stop();
                 stopwatch.stop();
                 ASSERT_TRUE(
                     nodeCalculator.status() == NodeCalculator::Status_Stopped ||
                     nodeCalculator.status() == NodeCalculator::Status_Finished);
-                interrupted = true;
+                break;
             }
         }
 
-        duration = static_cast<int>(0.5 + stopwatch.elapsed() / 1000.0);
-
-
-        std::stringstream ss;
-        ss << "\r"
-           << "W/D: "         << inWidth << "/" << inDepth
-           << ". Duration: "
-           << std::setw(7) << std::setfill(' ')
-           << (SS() << duration << "/" << inTimeMs).str()
-           << "ms"
-           << ". Workers: "
-           << std::setw(2) << std::setfill(' ') << inWorkerCount
-           << ". Result: "
-           << (SS() << nodeCalculator.getCurrentSearchDepth() << "/" << nodeCalculator.getMaxSearchDepth()).str()
-           << std::setw(4) << std::setfill(' ')
-           << ". Nodes: "
-           << std::setw(15) << std::setfill(' ')
-           << (SS() << nodeCalculator.getCurrentNodeCount() << "/" << nodeCalculator.getMaxNodeCount()).str();
-
-        message = ss.str();
-        std::cout << message << std::flush;
-
-        if (stopwatch.elapsed() / 1000 > inTimeMs)
-        {
-            int overtime = duration - inTimeMs;
-            ASSERT_TRUE(overtime < 500);
-        }
+        // Overtime should not exceed 500 ms.
+        ASSERT_LT(duration, inTimeMs + 500);
 
         Futile::Sleep(10);
     }
 
-    std::stringstream ss;
-    ss << "\r"
-       << "W/D: "         << inWidth << "/" << inDepth
-       << ". Duration: "
-       << std::setw(7) << std::setfill(' ')
-       << (SS() << duration << "/" << inTimeMs).str()
-       << "ms"
-       << ". Workers: "
-       << std::setw(2) << std::setfill(' ') << inWorkerCount
-       << ". Result: "
-       << (SS() << nodeCalculator.getCurrentSearchDepth() << "/" << nodeCalculator.getMaxSearchDepth()).str()
-       << std::setw(4) << std::setfill(' ')
-       << ". Nodes: "
-       << std::setw(15) << std::setfill(' ')
-       << (SS() << nodeCalculator.getCurrentNodeCount() << "/" << nodeCalculator.getMaxNodeCount()).str();
+    std::cout << format(inWorkerCount,
+                        std::make_pair(inWidth, inDepth),
+                        std::make_pair(duration, inTimeMs),
+                        std::make_pair(nodeCalculator.getCurrentSearchDepth(), nodeCalculator.getMaxSearchDepth()),
+                        std::make_pair(nodeCalculator.getCurrentNodeCount(), nodeCalculator.getMaxNodeCount()));
+    std::cout << std::endl;
 
+    ASSERT_LE(nodeCalculator.getCurrentSearchDepth(), nodeCalculator.getMaxSearchDepth());
 
-    if (duration > inTimeMs)
+    if(nodeCalculator.getCurrentSearchDepth() < nodeCalculator.getMaxSearchDepth())
     {
-        ss << " (timeout)";
         ASSERT_LT(nodeCalculator.getCurrentNodeCount(), nodeCalculator.getMaxNodeCount());
     }
-    else
+
+    if (nodeCalculator.getCurrentSearchDepth() == nodeCalculator.getMaxSearchDepth())
     {
         ASSERT_EQ(nodeCalculator.getCurrentNodeCount(), nodeCalculator.getMaxNodeCount());
     }
-
-    std::cout << ss.str() << std::endl;
-
 
     NodePtr resultPtr = nodeCalculator.result();
     GameStateNode & result(*resultPtr);
