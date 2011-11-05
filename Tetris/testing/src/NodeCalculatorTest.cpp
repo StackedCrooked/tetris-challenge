@@ -32,9 +32,9 @@ namespace testing {
 TEST_F(NodeCalculatorTest, Interrupt)
 {
     std::cout << std::endl;
-    for (std::size_t depth = 5; depth <= 8; ++depth)
+    for (std::size_t depth = 6; depth <= 8; ++depth)
     {
-        for (std::size_t width = 4; width <= 5; ++width)
+        for (std::size_t width = 4; width <= 6; ++width)
         {
             testInterrupt(Depth(depth), Width(width), WorkerCount(8), TimeMs(gTimeout));
             testInterrupt(Depth(depth), Width(width), WorkerCount(4), TimeMs(gTimeout));
