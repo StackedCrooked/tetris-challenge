@@ -62,8 +62,8 @@ std::string format(std::size_t workerCount,
                   Pair depth,
                   Pair nodes)
 {
-    if (time.second > time.first)
-        time.second = time.first;
+    if (time.first > time.second)
+        time.first = time.second;
 
     std::stringstream ss;
     ss << "\r"
