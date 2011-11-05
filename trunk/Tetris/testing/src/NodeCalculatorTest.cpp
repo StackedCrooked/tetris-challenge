@@ -57,10 +57,10 @@ std::string header()
 
 
 std::string format(std::size_t workerCount,
-                  const Pair & widthAndDepth,
-                  const Pair & time,
-                  const Pair & depth,
-                  const Pair & nodes)
+                  Pair widthAndDepth,
+                  Pair time,
+                  Pair depth,
+                  Pair nodes)
 {
     if (time.second > time.first)
         time.second = time.first;
