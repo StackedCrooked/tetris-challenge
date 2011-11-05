@@ -202,15 +202,15 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\include\Futile\Allocator.h"
-				>
-			</File>
-			<File
 				RelativePath=".\include\Futile\Array.h"
 				>
 			</File>
 			<File
 				RelativePath=".\include\Futile\Assert.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\Futile\Atomic.h"
 				>
 			</File>
 			<File
@@ -258,11 +258,23 @@
 				>
 			</File>
 			<File
+				RelativePath=".\include\Futile\Stopwatch.h"
+				>
+			</File>
+			<File
 				RelativePath=".\include\Futile\Threading.h"
 				>
 			</File>
 			<File
+				RelativePath=".\include\Futile\Timer.h"
+				>
+			</File>
+			<File
 				RelativePath=".\include\Futile\TypedWrapper.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\Futile\Types.h"
 				>
 			</File>
 			<File
