@@ -40,7 +40,6 @@ TEST_F(WorkerPoolTest, Basic)
 }
 
 
-
 TEST_F(WorkerPoolTest, Interrupt)
 {
     // Test with interrupt
