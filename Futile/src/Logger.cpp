@@ -37,37 +37,47 @@ std::string GetMessage(LogLevel inLogLevel, const std::string & inMessage)
 }
 
 
+Logger::Logger() :
+    mSharedMessageList(MessageList()),
+    mLogHandler()
+{
+}
+
+
 void Logger::setLogHandler(const LogHandler & inHandler)
 {
-    mHandler = inHandler;
+    mLogHandler = inHandler;
 }
 
 
 void Logger::flush()
 {
-    std::vector<std::string> items;
+    MessageList localCopy;
 
-    // We don't want to perform the logging during the lock.
-    // Therefore we make a local copy of the messages.
-    FUTILE_LOCK(MessageList & messageList, mMessageList)
-    {
-        items = messageList;
-        messageList.clear();
-    }
+    // Don't perform the logging (slow IO operations) inside the transaction.
+    // Use a local copy instead.
+    stm::atomic([&](stm::transaction & tx) {
+        MessageList & messages = mSharedMessageList.open_rw(tx);
+        localCopy = messages;
+        messages.clear();
+    });
 
-    // Do the actual logging.
-    if (mHandler)
-    {
-        std::for_each(items.begin(), items.end(), mHandler);
+
+    // Flush the logs.
+    // Technically we may have a race condition on the mLogHandler here.
+    if (mLogHandler) {
+        std::for_each(localCopy.begin(), localCopy.end(), mLogHandler);
     }
 }
 
 
 void Logger::log(LogLevel inLogLevel, const std::string & inMessage)
 {
-    mMessageList.lock()->push_back(GetMessage(inLogLevel, inMessage));
+    stm::atomic([&](stm::transaction & tx) {
+        MessageList & messages = mSharedMessageList.open_rw(tx);
+        messages.push_back(GetMessage(inLogLevel, inMessage));
+    });
 }
 
 
 } // namespace Futile
-
