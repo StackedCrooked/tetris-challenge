@@ -97,8 +97,6 @@ TEST_F(NodeCalculatorTest, Interrupt)
             for (std::size_t depth = 6; depth <= 8; depth += 2)
             {
                 testInterrupt(Depth(depth), Width(width), WorkerCount(w), TimeMs(gTimeout));
-                testInterrupt(Depth(depth), Width(width), WorkerCount(w), TimeMs(gTimeout));
-                testInterrupt(Depth(depth), Width(width), WorkerCount(w), TimeMs(gTimeout));
             }
         }
     }
