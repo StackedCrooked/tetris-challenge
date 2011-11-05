@@ -17,7 +17,57 @@
 #include <sstream>
 
 
+namespace testing {
 namespace { // anonymous
+
+
+typedef std::pair<std::size_t, std::size_t> Pair;
+
+
+const std::string cWorkers = "Threads";
+const std::size_t cWorkersSize = cWorkers.size() + 1;
+
+const std::string cSearchWidth = "Width";
+const std::size_t cSearchWidthSize = cSearchWidth.size() + 1;
+
+const std::string cSearchDepth= "Depth";
+const std::size_t cSearchDepthSize = cSearchDepth.size() + 1;
+
+const std::string cNodes = "Nodes";
+const std::size_t cNodesSize = std::string("10000000/10000000").size() + 1;
+
+const std::string cTime = "Time";
+const std::size_t cTimeSize = std::string("5000/5000").size() + 1;
+
+
+std::string header()
+{
+    std::stringstream ss;
+    ss << "\r"
+       << std::setw(cWorkers.size()) << cWorkers
+       << std::setw(cSearchWidthSize) << cSearchWidth
+       << std::setw(cSearchDepthSize) << cSearchDepth
+       << std::setw(cNodesSize) << cNodes
+       << std::setw(cTimeSize) << cTime;
+    return ss.str();
+}
+
+
+std::string format(std::size_t workerCount,
+                  const Pair & widthAndDepth,
+                  const Pair & time,
+                  const Pair & depth,
+                  const Pair & nodes)
+{
+    std::stringstream ss;
+    ss << "\r"
+       << std::setw(cWorkers.size()) << workerCount
+       << std::setw(cSearchWidthSize) << widthAndDepth.first
+       << std::setw(cSearchDepthSize) << (SS() << depth.first << "/" << depth.second).str()
+       << std::setw(cNodesSize) << (SS() << nodes.first << "/" << nodes.second).str()
+       << std::setw(cTimeSize) << (SS() << time.first << "/" << time.second).str();
+    return ss.str();
+}
 
 
 int gTimeout = 5000;
@@ -26,15 +76,13 @@ int gTimeout = 5000;
 } // anonymous namespace
 
 
-namespace testing {
-
-
 TEST_F(NodeCalculatorTest, Interrupt)
 {
-    std::cout << std::endl;
+
+    std::cout << header() << std::endl;
     for (std::size_t depth = 6; depth <= 8; ++depth)
     {
-        for (std::size_t width = 4; width <= 6; ++width)
+        for (std::size_t width = 5; width <= 6; ++width)
         {
             testInterrupt(Depth(depth), Width(width), WorkerCount(8), TimeMs(gTimeout));
             testInterrupt(Depth(depth), Width(width), WorkerCount(4), TimeMs(gTimeout));
@@ -42,30 +90,6 @@ TEST_F(NodeCalculatorTest, Interrupt)
         }
     }
 }
-
-
-namespace { // anonymous
-
-
-typedef std::pair<std::size_t, std::size_t> Pair;
-std::string format(std::size_t workerCount,
-                  const Pair & widthAndDepth,
-                  const Pair & time,
-                  const Pair & depth,
-                  const Pair & nodeCount)
-{
-    std::stringstream ss;
-    ss << "\r"
-       << "Workers: " << workerCount
-       << ", Width: " << widthAndDepth.first
-       << ", Depth: " << depth.first << "/" << depth.second
-       << ", Nodes: " << std::setw(15) << (SS() << nodeCount.first << "/" << nodeCount.second).str()
-       << ", Duration: " << std::setw(4) << time.first << "/" << std::setw(4) << time.second << "ms";
-    return ss.str();
-}
-
-
-} // anonymous namespace
 
 
 void NodeCalculatorTest::testInterrupt(Depth inDepth, Width inWidth, WorkerCount inWorkerCount, TimeMs inTimeMs)
