@@ -3,7 +3,7 @@
 
 
 #include "Futile/LeakDetector.h"
-#include "Futile/Threading.h"
+#include "stm.hpp"
 #include <boost/function.hpp>
 #include <string>
 #include <vector>
@@ -41,7 +41,7 @@ public:
     void flush();
 
 protected:
-    Logger() {}
+    Logger();
 
     ~Logger() {}
 
@@ -50,9 +50,10 @@ private:
 
     void logImpl(const std::string & inMessage);
 
-    LogHandler mHandler;
     typedef std::vector<std::string> MessageList;
-    ThreadSafe<MessageList> mMessageList;
+    typedef stm::shared<MessageList> SharedMessageList;
+    SharedMessageList mSharedMessageList;
+    LogHandler mLogHandler;
 };
 
 
