@@ -30,7 +30,7 @@ const std::size_t cWorkersSize = cWorkers.size() + 2;
 const std::string cSearchWidth = "Width";
 const std::size_t cSearchWidthSize = cSearchWidth.size() + 2;
 
-const std::string cSearchDepth= "Depth";
+const std::string cSearchDepth= "Progress";
 const std::size_t cSearchDepthSize = cSearchDepth.size() + 2;
 
 const std::string cNodes = "Nodes";
@@ -38,6 +38,9 @@ const std::size_t cNodesSize = std::string("10000000/10000000").size() + 2;
 
 const std::string cTime = "Time";
 const std::size_t cTimeSize = std::string("5000/5000").size() + 2;
+
+const std::string cStatus = "Result";
+const std::size_t cStatusSize = std::string("Timed out").size() + 2;
 
 
 std::string header()
@@ -47,7 +50,8 @@ std::string header()
        << std::setw(cSearchWidthSize) << cSearchWidth
        << std::setw(cSearchDepthSize) << cSearchDepth
        << std::setw(cNodesSize) << cNodes
-       << std::setw(cTimeSize) << cTime;
+       << std::setw(cTimeSize) << cTime
+       << std::setw(cStatusSize) << cStatus;
     return ss.str();
 }
 
@@ -64,12 +68,16 @@ std::string format(std::size_t workerCount,
        << std::setw(cSearchWidthSize) << widthAndDepth.first
        << std::setw(cSearchDepthSize) << (SS() << depth.first << "/" << depth.second).str()
        << std::setw(cNodesSize) << (SS() << nodes.first << "/" << nodes.second).str()
-       << std::setw(cTimeSize) << (SS() << time.first << "/" << time.second).str();
+       << std::setw(cTimeSize) << (SS() << time.first << "/" << time.second).str()
+       << std::setw(cStatusSize) << std::right <<
+          (time.first < time.second ? (depth.first < depth.second ? "Busy"
+                                                                  : "OK"  )
+            : "Timed out");
     return ss.str();
 }
 
 
-int gTimeout = 5000;
+int gTimeout = 2000;
 
 
 } // anonymous namespace
@@ -79,13 +87,16 @@ TEST_F(NodeCalculatorTest, Interrupt)
 {
 
     std::cout << header() << std::endl;
-    for (std::size_t depth = 6; depth <= 8; ++depth)
+    for (std::size_t w = 2; w <= 8; w *= 2)
     {
-        for (std::size_t width = 5; width <= 6; ++width)
+        for (std::size_t width = 6; width <= 8; width += 2)
         {
-            testInterrupt(Depth(depth), Width(width), WorkerCount(8), TimeMs(gTimeout));
-            testInterrupt(Depth(depth), Width(width), WorkerCount(4), TimeMs(gTimeout));
-            testInterrupt(Depth(depth), Width(width), WorkerCount(2), TimeMs(gTimeout));
+            for (std::size_t depth = 6; depth <= 8; depth += 2)
+            {
+                testInterrupt(Depth(depth), Width(width), WorkerCount(w), TimeMs(gTimeout));
+                testInterrupt(Depth(depth), Width(width), WorkerCount(w), TimeMs(gTimeout));
+                testInterrupt(Depth(depth), Width(width), WorkerCount(w), TimeMs(gTimeout));
+            }
         }
     }
 }
