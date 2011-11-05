@@ -181,6 +181,7 @@ Tetris/testing/src/NodeCalculatorTest.cpp
 Tetris/testing/src/NodeCalculatorTest.cpp
 Tetris/testing/src/NodeCalculatorTest.h
 Tetris/testing/src/NodeCalculatorTest.h
+Tetris/testing/src/STMTest.cpp
 Tetris/testing/src/TetrisTest.cpp
 Tetris/testing/src/TetrisTest.h
 Tetris/testing/src/WorkerPoolTest.cpp
