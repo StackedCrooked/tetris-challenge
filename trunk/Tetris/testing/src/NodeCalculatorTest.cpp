@@ -43,8 +43,7 @@ const std::size_t cTimeSize = std::string("5000/5000").size() + 2;
 std::string header()
 {
     std::stringstream ss;
-    ss << "\r"
-       << std::setw(cWorkers.size()) << cWorkers
+    ss << std::setw(cWorkers.size()) << cWorkers
        << std::setw(cSearchWidthSize) << cSearchWidth
        << std::setw(cSearchDepthSize) << cSearchDepth
        << std::setw(cNodesSize) << cNodes
