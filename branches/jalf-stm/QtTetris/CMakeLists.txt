@@ -3,6 +3,14 @@ project(QtTetris)
 FIND_PACKAGE(Qt4 REQUIRED)
 
 
+# Use gcc 4.6.1 for C++0x support on Mac
+if(APPLE)
+set(CMAKE_CXX_COMPILER "/opt/local/bin/g++-mp-4.6")
+set(CMAKE_INCLUDE_PATH "/opt/local/include")
+set(CMAKE_LIBRARY_PATH "/opt/local/lib/gcc46")
+endif()
+
+
 #
 # Check TETRIS_BUILD_TYPE environment variable
 #
@@ -36,7 +44,6 @@ message("ARCH:     ${ARCH}")
 # Path variables
 #
 set(EXECUTABLE QtTetris)
-set(CMAKE_OSX_ARCHITECTURES ${ARCH})
 set(SOLUTIONDIR "${QtTetris_SOURCE_DIR}/../")
 set(BUILD_ROOT ${SOLUTIONDIR}Build/)
 
@@ -62,14 +69,6 @@ set(CXX_FLAGS         "${CXX_FLAGS} -DTETRIS_QT=1")
 set(CXX_FLAGS_Debug   "${CXX_FLAGS} ${WARNING_OPTIONS} -ggdb3")
 set(CXX_FLAGS_Release "${CXX_FLAGS} ${WARNING_OPTIONS} -O3 -DNDEBUG")
 set(FINAL_COMPILE_FLAGS "${CXX_FLAGS_${CMAKE_BUILD_TYPE}}")
-
-
-#
-# Platform specific compiler flags
-#
-if(APPLE)
-    set(WARNING_OPTIONS "-arch ${ARCH} ")
-endif()
 
 
 #
