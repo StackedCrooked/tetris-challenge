@@ -33,8 +33,8 @@ const std::size_t cSearchWidthSize = cSearchWidth.size() + 2;
 const std::string cSearchDepth= "Search Depth";
 const std::size_t cSearchDepthSize = cSearchDepth.size() + 2;
 
-const std::string cNodes = "Nodes";
-const std::size_t cNodesSize = std::string("100%").size() + 2;
+const std::string cNodes = "Number of calculated nodes";
+const std::size_t cNodesSize = std::string("1000000/1000000 (100%)").size() + 2;
 
 const std::string cTime = "Time";
 const std::size_t cTimeSize = std::string("Time").size() + 2;
@@ -70,7 +70,8 @@ std::string format(std::size_t workerCount,
        << std::setw(cWorkers.size()) << workerCount
        << std::setw(cSearchWidthSize) << (SS() << widthAndDepth.first << "x" << widthAndDepth.second).str()
        << std::setw(cSearchDepthSize) << (SS() << depth.first << "/" << depth.second).str()
-       << std::setw(cNodesSize) << (SS() << int(0.5 + 100 * double(nodes.first) / double(nodes.second)) << "%").str()
+       << std::setw(cNodesSize) << (SS() << nodes.first << "/" << nodes.second
+                                         << " (" << int(0.5 + 100 * double(nodes.first) / double(nodes.second)) << "%)").str()
        << std::setw(cTimeSize) << (SS() << int(0.5 + (time.second - time.first) / 1000.0) << "s").str()
        << std::setw(cStatusSize) << std::right <<
           (time.first < time.second ? (depth.first < depth.second ? "Busy"
@@ -90,7 +91,7 @@ TEST_F(NodeCalculatorTest, Interrupt)
 {
 
     std::cout << header() << std::endl;
-    for (std::size_t w = 2; w <= 8; w *= 2)
+    for (std::size_t w = 1; w <= 8; w *= 2)
     {
         for (std::size_t width = 6; width <= 8; width += 2)
         {
@@ -138,6 +139,8 @@ void NodeCalculatorTest::testInterrupt(Depth inDepth, Width inWidth, WorkerCount
     {
 
         duration = static_cast<int>(0.5 + stopwatch.elapsed() / 1000.0);
+
+        Assert(nodeCalculator.getCurrentNodeCount() <= nodeCalculator.getMaxNodeCount());
 
         std::cout << format(inWorkerCount,
                             std::make_pair(inWidth, inDepth),
