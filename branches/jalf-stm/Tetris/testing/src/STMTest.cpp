@@ -1,5 +1,5 @@
 #include "TetrisTest.h"
-//#include "stm.hpp"
+#include "stm.hpp"
 
 
 namespace testing {

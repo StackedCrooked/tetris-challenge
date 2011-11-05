@@ -18,6 +18,9 @@ add_executable(TetrisTest
     src/WorkerPoolTest.cpp
     src/WorkerPoolTest.h)
 
+set_target_properties(TetrisTest PROPERTIES
+	COMPILE_FLAGS "${FINAL_COMPILE_FLAGS}")
+
 target_link_libraries(TetrisTest
     Tetris
     Futile
