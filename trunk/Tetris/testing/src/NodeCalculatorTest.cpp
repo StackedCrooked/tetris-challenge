@@ -77,7 +77,7 @@ std::string format(std::size_t workerCount,
 }
 
 
-int gTimeout = 2000;
+int gTimeout = 10000;
 
 
 } // anonymous namespace
