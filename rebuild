@@ -2,4 +2,4 @@
 rm -rf Build
 ./configure
 cd Build
-make
+make -j4

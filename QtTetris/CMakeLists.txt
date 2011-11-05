@@ -64,7 +64,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OUTDIR}bin/)
 #
 # Compile flags
 #
-set(WARNING_OPTIONS         " -Wall -Werror -Wno-strict-aliasing ")
+set(WARNING_OPTIONS_STM "-Wno-strict-aliasing -std=c++0x")
+set(WARNING_OPTIONS     "-Wall -Werror ${WARNING_OPTIONS_STM}")
 set(CXX_FLAGS         "${CXX_FLAGS} -DTETRIS_QT=1")
 set(CXX_FLAGS_Debug   "${CXX_FLAGS} ${WARNING_OPTIONS} -ggdb3")
 set(CXX_FLAGS_Release "${CXX_FLAGS} ${WARNING_OPTIONS} -O3 -DNDEBUG")
@@ -107,8 +108,9 @@ add_subdirectory(${SOLUTIONDIR}Tetris ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Tetris)
 add_subdirectory(${SOLUTIONDIR}Tetris/testing ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Tetris/testing)
 add_subdirectory(${SOLUTIONDIR}Futile ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Futile)
 include_directories(
+    ${SOLUTIONDIR}Tetris/include
     ${SOLUTIONDIR}Futile/include
-    ${SOLUTIONDIR}Tetris/include)
+    ${SOLUTIONDIR}3rdParty/STM)
 
 
 #
