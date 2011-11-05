@@ -68,7 +68,7 @@ std::string format(std::size_t workerCount,
        << std::setw(cSearchWidthSize) << (SS() << widthAndDepth.first << "x" << widthAndDepth.second).str()
        << std::setw(cSearchDepthSize) << (SS() << depth.first << "/" << depth.second).str()
        << std::setw(cNodesSize) << (SS() << int(0.5 + 100 * double(nodes.first) / double(nodes.second)) << "%").str()
-       << std::setw(cTimeSize) << (SS() << time.first << "/" << time.second).str()
+       << std::setw(cTimeSize) << (SS() << int(0.5 + (time.second - time.first) / 1000.0) << "s").str()
        << std::setw(cStatusSize) << std::right <<
           (time.first < time.second ? (depth.first < depth.second ? "Busy"
                                                                   : "OK"  )
