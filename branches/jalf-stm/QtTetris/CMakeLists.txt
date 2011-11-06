@@ -103,7 +103,8 @@ add_subdirectory(${SOLUTIONDIR}Futile ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Futile)
 include_directories(
     ${SOLUTIONDIR}Tetris/include
     ${SOLUTIONDIR}Futile/include
-    ${SOLUTIONDIR}3rdParty/STM)
+    ${SOLUTIONDIR}3rdParty/STM
+    /usr/include)
 
 
 #
@@ -208,8 +209,8 @@ target_link_libraries(${EXECUTABLE}
     Futile
     PocoFoundation
     ${EXTRA_LIBS}
-    /usr/lib/libboost_thread-mt.a
-    /usr/lib/libboost_signals-mt.a)
+    /usr/lib/libboost_thread.a
+    /usr/lib/libboost_signals.a)
 
 
 #
