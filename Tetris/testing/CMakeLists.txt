@@ -3,7 +3,6 @@ include_directories(
     ${SOLUTIONDIR}Tetris/include
     ${SOLUTIONDIR}3rdParty/GTest/include
     ${SOLUTIONDIR}3rdParty/STM
-    /usr/local/include
     /usr/include)
 
 add_executable(TetrisTest
@@ -19,7 +18,7 @@ add_executable(TetrisTest
     src/WorkerPoolTest.h)
 
 set_target_properties(TetrisTest PROPERTIES
-	COMPILE_FLAGS "${FINAL_COMPILE_FLAGS}")
+    COMPILE_FLAGS "${FINAL_COMPILE_FLAGS}")
 
 target_link_libraries(TetrisTest
     Tetris
