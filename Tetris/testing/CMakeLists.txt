@@ -24,8 +24,8 @@ set_target_properties(TetrisTest PROPERTIES
 target_link_libraries(TetrisTest
     Tetris
     Futile
-    PocoFoundation
     ${EXTRA_LIBS}
     ${SOLUTIONDIR}3rdParty/GTest/lib/${PLATFORM}/${ARCH}/libgtest.a
-    ${SOLUTIONDIR}/3rdParty/Boost/lib/${PLATFORM}/${ARCH}/libboost_signals.a
-    ${SOLUTIONDIR}/3rdParty/Boost/lib/${PLATFORM}/${ARCH}/libboost_thread.a)
+    ${SOLUTIONDIR}3rdParty/Boost/lib/${PLATFORM}/${ARCH}/libboost_signals.a
+    ${SOLUTIONDIR}3rdParty/Boost/lib/${PLATFORM}/${ARCH}/libboost_thread.a
+    ${SOLUTIONDIR}3rdParty/Poco/lib/${PLATFORM}/${ARCH}/libPocoFoundation.a)
