@@ -72,6 +72,11 @@ set(CXX_FLAGS_Release "${CXX_FLAGS} ${WARNING_OPTIONS} -O3 -DNDEBUG")
 set(FINAL_COMPILE_FLAGS "${CXX_FLAGS_${CMAKE_BUILD_TYPE}}")
 
 
+if(APPLE)
+set(FINAL_COMPILE_FLAGS "-arch ${ARCH} ${FINAL_COMPILE_FLAGS}")
+endif()
+
+
 #
 # Extra platform specific libs
 #
