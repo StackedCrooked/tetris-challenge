@@ -1,8 +1,10 @@
 include_directories(
     ${SOLUTIONDIR}Futile/include
     ${SOLUTIONDIR}Tetris/include
-    ${SOLUTIONDIR}3rdPary/Boost
-    ${SOLUTIONDIR}3rdPary/Poco/Foundation/include)
+    ${SOLUTIONDIR}3rdParty/Boost
+    ${SOLUTIONDIR}3rdParty/STM
+    ${SOLUTIONDIR}3rdParty/Poco/Foundation/include
+    /usr/include)
 
 
 add_library(Tetris
@@ -58,4 +60,3 @@ add_library(Tetris
     src/Unicode.cpp)
 
 set_target_properties(Tetris PROPERTIES COMPILE_FLAGS ${FINAL_COMPILE_FLAGS})
-

@@ -204,14 +204,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\Tetris\ForwardDeclarations.h"
-				>
-			</File>
-			<File
-				RelativePath=".\include\Tetris\SimpleGame.h"
-				>
-			</File>
-			<File
 				RelativePath=".\include\Tetris\Game.h"
 				>
 			</File>
@@ -244,7 +236,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\Tetris\MultiplayerSimpleGame.h"
+				RelativePath=".\include\Tetris\MultiplayerGame.h"
 				>
 			</File>
 			<File
@@ -272,11 +264,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\Tetris\SingleThreadedNodeCalculator.h"
+				RelativePath=".\include\Tetris\SimpleGame.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\Tetris\Tetris.h"
+				RelativePath=".\include\Tetris\SingleThreadedNodeCalculator.h"
 				>
 			</File>
 			<File
@@ -328,10 +320,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\Game.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\src\GameState.cpp"
 				>
 			</File>
@@ -365,6 +353,10 @@
 			</File>
 			<File
 				RelativePath=".\src\Player.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\SimpleGame.cpp"
 				>
 			</File>
 			<File
