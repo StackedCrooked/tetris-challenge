@@ -25,8 +25,6 @@ class Block
 public:
     Block(BlockType inType, Rotation inRotation, Row inRow, Column inColumn);
 
-    std::auto_ptr<Block> clone() const;
-
     unsigned identification() const;
 
     BlockType type() const;
