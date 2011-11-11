@@ -21,12 +21,6 @@ Block::Block(BlockType inType, Rotation inRotation, Row inRow, Column inColumn) 
 }
 
 
-std::auto_ptr<Block> Block::clone() const
-{
-    return Create<Block>(*this);
-}
-
-
 unsigned Block::identification() const
 {
     return GetBlockIdentifier(type(), rotation());
