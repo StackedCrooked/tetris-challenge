@@ -17,16 +17,16 @@ class GameState;
 
 
 // Type-safe int wrappers to prevent mix-ups in arg lists.
-Futile_TypedWrapper(GameHeightFactor, int);
-Futile_TypedWrapper(LastBlockHeightFactor, int);
-Futile_TypedWrapper(NumHolesFactor, int);
-Futile_TypedWrapper(NumLines, int);
-Futile_TypedWrapper(NumSinglesFactor, int);
-Futile_TypedWrapper(NumDoublesFactor, int);
-Futile_TypedWrapper(NumTriplesFactor, int);
-Futile_TypedWrapper(NumTetrisesFactor, int);
-Futile_TypedWrapper(SearchDepth, int);
-Futile_TypedWrapper(SearchWidth, int);
+FUTILE_BOX_TYPE(GameHeightFactor, int);
+FUTILE_BOX_TYPE(LastBlockHeightFactor, int);
+FUTILE_BOX_TYPE(NumHolesFactor, int);
+FUTILE_BOX_TYPE(NumLines, int);
+FUTILE_BOX_TYPE(NumSinglesFactor, int);
+FUTILE_BOX_TYPE(NumDoublesFactor, int);
+FUTILE_BOX_TYPE(NumTriplesFactor, int);
+FUTILE_BOX_TYPE(NumTetrisesFactor, int);
+FUTILE_BOX_TYPE(SearchDepth, int);
+FUTILE_BOX_TYPE(SearchWidth, int);
 
 
 class Evaluator
