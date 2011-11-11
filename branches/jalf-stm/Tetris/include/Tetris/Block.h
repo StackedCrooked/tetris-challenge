@@ -17,54 +17,8 @@ Futile_TypedWrapper(Column, std::size_t);
 
 
 // Forward declarations.
-class BlockImpl;
+class Block;
 typedef char BlockType;
-
-
-/**
- * Represents a Tetris block.
- */
-class Block
-{
-public:
-    Block(BlockType inType, Rotation inRotation, Row inRow, Column inColumn);
-
-    Block(const Block & inBlock);
-
-    Block & operator=(const Block & inBlock);
-
-    ~Block();
-
-    int identification() const;
-
-    BlockType type() const;
-
-    // Get the grid associated with this block
-    const Grid & grid() const;
-
-    std::size_t row() const;
-
-    std::size_t rowCount() const;
-
-    std::size_t column() const;
-
-    std::size_t columnCount() const;
-
-    std::size_t rotation() const;
-
-    std::size_t rotationCount() const;
-
-    void rotate();
-
-    void setRow(std::size_t inRow);
-
-    void setColumn(std::size_t inColumn);
-
-    void setRotation(std::size_t inRotation);
-
-private:
-    BlockImpl * mImpl;
-};
 
 
 std::size_t GetBlockRotationCount(BlockType inType);
@@ -77,6 +31,51 @@ int GetBlockIdentifier(BlockType inType, int inRotation);
 
 // Gets the Grid object that is associated with a block identifier
 const Grid & GetGrid(int inBlockIdentifier);
+
+
+/**
+ * Represents a Tetris block.
+ */
+class Block
+{
+public:
+    Block(BlockType inType, Rotation inRotation, Row inRow, Column inColumn);
+
+    std::auto_ptr<Block> clone() const;
+
+    inline unsigned identification() const { return GetBlockIdentifier(type(), rotation()); }
+
+    BlockType type() const;
+
+    std::size_t rotation() const;
+
+    std::size_t rotationCount() const;
+
+    const Grid & grid() const;
+
+    std::size_t row() const;
+
+    std::size_t column() const;
+
+    std::size_t rowCount() const;
+
+    std::size_t columnCount() const;
+
+    void rotate();
+
+    void setRow(std::size_t inRow);
+
+    void setColumn(std::size_t inColumn);
+
+    void setRotation(std::size_t inRotation);
+
+private:
+    BlockType mType;
+    std::size_t mRotation;
+    std::size_t mRow;
+    std::size_t mColumn;
+    const Grid * mGrid;
+};
 
 
 } // namespace Tetris

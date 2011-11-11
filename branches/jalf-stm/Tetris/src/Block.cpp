@@ -11,47 +11,7 @@ namespace Tetris {
 using namespace Futile;
 
 
-class BlockImpl
-{
-public:
-    BlockImpl(BlockType inType, Rotation inRotation, Row inRow, Column inColumn);
-
-    std::auto_ptr<BlockImpl> clone() const;
-
-    BlockType type() const;
-
-    std::size_t rotation() const;
-
-    std::size_t numRotations() const;
-
-    const Grid & grid() const;
-
-    std::size_t row() const;
-
-    std::size_t column() const;
-
-    std::size_t rowCount() const;
-
-    std::size_t columnCount() const;
-
-    void rotate();
-
-    void setRow(std::size_t inRow);
-
-    void setColumn(std::size_t inColumn);
-
-    void setRotation(std::size_t inRotation);
-
-private:
-    BlockType mType;
-    std::size_t mRotation;
-    std::size_t mRow;
-    std::size_t mColumn;
-    const Grid * mGrid;
-};
-
-
-BlockImpl::BlockImpl(BlockType inType, Rotation inRotation, Row inRow, Column inColumn) :
+Block::Block(BlockType inType, Rotation inRotation, Row inRow, Column inColumn) :
     mType(inType),
     mRotation(inRotation),
     mRow(inRow),
@@ -62,190 +22,82 @@ BlockImpl::BlockImpl(BlockType inType, Rotation inRotation, Row inRow, Column in
 }
 
 
-std::auto_ptr<BlockImpl> BlockImpl::clone() const
+std::auto_ptr<Block> Block::clone() const
 {
-    return Create<BlockImpl>(*this);
+    return Create<Block>(*this);
 }
 
 
-BlockType BlockImpl::type() const
+BlockType Block::type() const
 {
     return mType;
 }
 
 
-std::size_t BlockImpl::rotation() const
+std::size_t Block::rotation() const
 {
     return mRotation;
 }
 
 
-std::size_t BlockImpl::numRotations() const
+std::size_t Block::rotationCount() const
 {
     return GetBlockRotationCount(mType);
 }
 
 
-const Grid & BlockImpl::grid() const
+const Grid & Block::grid() const
 {
     return *mGrid;
 }
 
 
-std::size_t BlockImpl::row() const
+std::size_t Block::row() const
 {
     return mRow;
 }
 
 
-std::size_t BlockImpl::column() const
+std::size_t Block::column() const
 {
     return mColumn;
 }
 
 
-std::size_t BlockImpl::rowCount() const
+std::size_t Block::rowCount() const
 {
     return mGrid->rowCount();
 }
 
 
-std::size_t BlockImpl::columnCount() const
+std::size_t Block::columnCount() const
 {
     return mGrid->columnCount();
 }
 
 
-void BlockImpl::setRow(std::size_t inRow)
+void Block::setRow(std::size_t inRow)
 {
     mRow = inRow;
 }
 
 
-void BlockImpl::setColumn(std::size_t inColumn)
+void Block::setColumn(std::size_t inColumn)
 {
     mColumn = inColumn;
 }
 
 
-void BlockImpl::setRotation(std::size_t inRotation)
+void Block::setRotation(std::size_t inRotation)
 {
     mRotation = inRotation % GetBlockRotationCount(mType);
     mGrid = &GetGrid(GetBlockIdentifier(mType, mRotation));
 }
 
 
-void BlockImpl::rotate()
-{
-    setRotation((mRotation + 1) % GetBlockRotationCount(mType));
-}
-
-
-Block::Block(BlockType inType, Rotation inRotation, Row inRow, Column inColumn) :
-    mImpl(Create<BlockImpl>(inType, inRotation, inRow, inColumn).release())
-{
-}
-
-
-Block::Block(const Block & rhs) :
-    mImpl(rhs.mImpl->clone().release())
-{
-}
-
-
-Block & Block::operator=(const Block & rhs)
-{
-    if (&rhs != this)
-    {
-        delete mImpl;
-        mImpl = Create<BlockImpl>(*rhs.mImpl).release();
-    }
-    return *this;
-}
-
-
-Block::~Block()
-{
-    delete mImpl;
-    mImpl = 0;
-}
-
-
-int Block::identification() const
-{
-    return GetBlockIdentifier(type(), rotation());
-}
-
-
-BlockType Block::type() const
-{
-    return mImpl->type();
-}
-
-
-std::size_t Block::rotation() const
-{
-    return mImpl->rotation();
-}
-
-
-std::size_t Block::rotationCount() const
-{
-    return mImpl->numRotations();
-}
-
-
-const Grid & Block::grid() const
-{
-    return mImpl->grid();
-}
-
-
-std::size_t Block::row() const
-{
-    return mImpl->row();
-}
-
-
-std::size_t Block::column() const
-{
-    return mImpl->column();
-}
-
-
-std::size_t Block::rowCount() const
-{
-    return mImpl->rowCount();
-}
-
-
-std::size_t Block::columnCount() const
-{
-    return mImpl->columnCount();
-}
-
-
-void Block::setRow(std::size_t inRow)
-{
-    mImpl->setRow(inRow);
-}
-
-
-void Block::setColumn(std::size_t inColumn)
-{
-    mImpl->setColumn(inColumn);
-}
-
-
-void Block::setRotation(std::size_t inRotation)
-{
-    mImpl->setRotation(inRotation);
-}
-
-
 void Block::rotate()
 {
-    mImpl->rotate();
+    setRotation((mRotation + 1) % GetBlockRotationCount(mType));
 }
 
 
