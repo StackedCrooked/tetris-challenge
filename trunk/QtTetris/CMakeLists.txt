@@ -66,14 +66,6 @@ set(FINAL_COMPILE_FLAGS "${CXX_FLAGS_${CMAKE_BUILD_TYPE}}")
 
 
 #
-# Platform specific compiler flags
-#
-if(APPLE)
-    set(WARNING_OPTIONS "-arch ${ARCH} ")
-endif()
-
-
-#
 # Extra platform specific libs
 #
 if(WIN32)
