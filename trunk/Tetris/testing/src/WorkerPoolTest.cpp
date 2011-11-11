@@ -34,8 +34,7 @@ TEST_F(WorkerPoolTest, Basic)
         }
         pool.wait();
         stopwatch.stop();
-        Assert(stopwatch.elapsedMs() - cSleepTime > -cMargin);
-        Assert(stopwatch.elapsedMs() - cSleepTime < cMargin);
+        ASSERT_LT(stopwatch.elapsedMs(), cMargin);
     }
 }
 
@@ -53,8 +52,7 @@ TEST_F(WorkerPoolTest, Interrupt)
             pool.schedule(boost::bind(&WorkerPoolTest::BeBusy));
         }
         pool.interruptAndClearQueue();
-        Assert(stopwatch.elapsedMs() - cSleepTime > -cMargin);
-        Assert(stopwatch.elapsedMs() - cSleepTime < cMargin);
+        ASSERT_LT(stopwatch.elapsedMs(), cMargin);
     }
 }
 
@@ -83,8 +81,7 @@ TEST_F(WorkerPoolTest, Resize)
         Assert(pool.size() == 0);
 
         stopwatch.stop();
-        Assert(stopwatch.elapsedMs() - cSleepTime > -cMargin);
-        Assert(stopwatch.elapsedMs() - cSleepTime < cMargin);
+        ASSERT_LT(stopwatch.elapsedMs(), cMargin);
     }
 }
 

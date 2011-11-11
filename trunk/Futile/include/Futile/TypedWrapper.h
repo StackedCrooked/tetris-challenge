@@ -3,7 +3,7 @@
 
 
 /**
- * Macro Futile_TypedWrapper
+ * Macro FUTILE_BOX_TYPE
  *
  * This macro generates simple class wrapper for a given type.
  * Accidental mix-ups will result in compile errors instead of
@@ -11,8 +11,8 @@
  *
  * Example:
  *
- *     Futile_TypedWrapper(Width, int);
- *     Futile_TypedWrapper(Height, int);
+ *     FUTILE_BOX_TYPE(Width, int);
+ *     FUTILE_BOX_TYPE(Height, int);
  *
  *     Width width = 800;
  *     Height height = 600;
@@ -20,7 +20,7 @@
  *     // Signature is: 'SetSize(Width width, Height height);'
  *     SetSize(height, width); // => compiler error
  */
-#define Futile_TypedWrapper(ClassName, Type)     \
+#define FUTILE_BOX_TYPE(ClassName, Type) \
     struct ClassName {                           \
         explicit ClassName(Type inValue) :       \
             mValue(inValue) {}                   \
