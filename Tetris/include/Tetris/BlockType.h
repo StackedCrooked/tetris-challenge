@@ -15,7 +15,8 @@ namespace Tetris {
  * O = square block
  * etc...
  */
-enum BlockType
+typedef char BlockType;
+enum
 {
     BlockType_Nil,
     BlockType_I,
@@ -29,7 +30,7 @@ enum BlockType
     BlockType_End
 };
 
-static const unsigned cBlockTypeCount = static_cast<unsigned>(BlockType_End) - 1;
+static const unsigned int cBlockTypeCount = static_cast<unsigned int>(BlockType_End) - 1;
 
 
 } // namespace Tetris

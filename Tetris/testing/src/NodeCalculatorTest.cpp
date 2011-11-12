@@ -123,7 +123,7 @@ void NodeCalculatorTest::testInterrupt(Depth inDepth, Width inWidth, WorkerCount
     for (int idx = 0; idx != inDepth; ++idx)
     {
         blockTypes.push_back(type);
-        type = (unsigned(type) + 1) < BlockType_End ? static_cast<BlockType>(unsigned(type) + 1) : BlockType_Begin;
+        type = (type + 1) < BlockType_End ? (type + 1) : BlockType_Begin;
     }
 
     std::vector<int> widths(inDepth, inWidth);
@@ -239,7 +239,7 @@ void NodeCalculatorTest::testDestroy(Worker & inMainWorker, WorkerPool & inWorke
     for (int idx = 0; idx != cDepth; ++idx)
     {
         blockTypes.push_back(type);
-        type = (unsigned(type) + 1) < BlockType_End ? static_cast<BlockType>(unsigned(type) + 1) : BlockType_Begin;
+        type = (type + 1) < BlockType_End ? (type + 1) : BlockType_Begin;
     }
 
     std::vector<int> widths(cDepth, cWidth);
