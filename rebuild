@@ -1,5 +1,5 @@
 #!/bin/sh
 rm -rf Build
-./configure
+TETRIS_BUILD_TYPE=Debug ./configure
 cd Build
-make -j4
+make -j6

@@ -82,8 +82,8 @@ GameStateNode::~GameStateNode()
 std::auto_ptr<GameStateNode> GameStateNode::clone() const
 {
     NodePtr parent = mImpl->mParent.lock();
-    std::auto_ptr<GameStateNode> result(parent ? new GameStateNode(parent, GameState(mImpl->mEvaluatedGameState->gameState()), mImpl->mEvaluator)
-                                               : new GameStateNode(GameState(mImpl->mEvaluatedGameState->gameState()), mImpl->mEvaluator));
+    std::auto_ptr<GameStateNode> result(parent ? new GameStateNode(parent, gameState(), mImpl->mEvaluator)
+                                               : new GameStateNode(gameState(), mImpl->mEvaluator));
     result->mImpl->mDepth = mImpl->mDepth;
 
     ChildNodes::const_iterator it = mImpl->mChildren.begin(), end = mImpl->mChildren.end();

@@ -29,11 +29,10 @@ GameState::GameState(unsigned inRowCount, unsigned inColumnCount) :
 
 
 GameState::GameState(const GameState & rhs,
-                     const Block & inBlock,
-                     GameOver inGameOver) :
+                     const Block & inBlock) :
     mGrid(rhs.mGrid),
     mOriginalBlock(inBlock),
-    mIsGameOver(inGameOver),
+    mIsGameOver(rhs.mIsGameOver),
     mFirstOccupiedRow(rhs.mFirstOccupiedRow),
     mNumLines(rhs.mNumLines),
     mNumSingles(rhs.mNumSingles),
@@ -42,11 +41,14 @@ GameState::GameState(const GameState & rhs,
     mNumTetrises(rhs.mNumTetrises),
     mTainted(false)
 {
+    Assert(!rhs.mIsGameOver);
+    Assert(!checkPositionValid(inBlock, inBlock.row() + 1, inBlock.column()));
+    mIsGameOver = inBlock.row() == 0 && !checkPositionValid(inBlock, inBlock.row(), inBlock.column());
+    solidifyBlock(inBlock);
     if (!mIsGameOver)
     {
-        solidifyBlock(inBlock);
+        clearLines();
     }
-    clearLines();
 }
 
 

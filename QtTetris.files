@@ -130,7 +130,6 @@ Tetris/include/Tetris/ComputerPlayer.h
 Tetris/include/Tetris/Direction.h
 Tetris/include/Tetris/Evaluator.h
 Tetris/include/Tetris/Game.h
-Tetris/include/Tetris/GameOver.h
 Tetris/include/Tetris/GameState.h
 Tetris/include/Tetris/GameStateComparator.h
 Tetris/include/Tetris/GameStateNode.h

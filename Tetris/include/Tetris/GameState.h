@@ -3,7 +3,6 @@
 
 
 #include "Tetris/Block.h"
-#include "Tetris/GameOver.h"
 #include "Tetris/Grid.h"
 #include <memory>
 #include <stdexcept>
@@ -17,10 +16,8 @@ class GameState
 public:
     GameState(unsigned inRowCount, unsigned inColumnCount);
 
-    GameState(const GameState & inGameState, const Block & inBlock, GameOver inGameOver);
-
-    inline GameState commit(const Block & inBlock, GameOver inGameOver) const
-    { return GameState(*this, inBlock, inGameOver); }
+    inline GameState commit(const Block & inBlock) const
+    { return GameState(*this, inBlock); }
 
     const Grid & grid() const;
 
@@ -40,6 +37,8 @@ public:
     // without overlapping with previously placed blocks.
     bool checkPositionValid(const Block & inBlock, unsigned inRowIdx, unsigned inColIdx) const;
 
+    inline bool checkPositionValid(const Block & inBlock) const
+    { return checkPositionValid(inBlock, inBlock.row(), inBlock.column()); }
 
     // Statistics
     int numLines() const { return mNumLines; }
@@ -52,6 +51,8 @@ public:
     int currentHeight() const { return mGrid.rowCount() - mFirstOccupiedRow; }
 
 private:
+    GameState(const GameState & inGameState, const Block & inBlock);
+
     void solidifyBlock(const Block & inBlock);
     void clearLines();
     void updateCache();
