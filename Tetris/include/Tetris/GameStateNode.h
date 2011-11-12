@@ -24,9 +24,9 @@ class GameStateNode
 public:
     static std::auto_ptr<GameStateNode> CreateRootNode(std::size_t inNumRows, std::size_t inNumColumns);
 
-    GameStateNode(NodePtr inParent, GameState * inGameState, const Evaluator & inEvaluator);
+    GameStateNode(NodePtr inParent, const GameState & inGameState, const Evaluator & inEvaluator);
 
-    GameStateNode(GameState * inGameState, const Evaluator & inEvaluator);
+    GameStateNode(const GameState & inGameState, const Evaluator & inEvaluator);
 
     ~GameStateNode();
 
