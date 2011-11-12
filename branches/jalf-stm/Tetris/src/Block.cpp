@@ -1,4 +1,5 @@
 #include "Tetris/Block.h"
+#include "Tetris/BlockType.h"
 #include "Futile/AutoPtrSupport.h"
 #include "Futile/Assert.h"
 #include <stdexcept>
@@ -21,25 +22,19 @@ Block::Block(BlockType inType, Rotation inRotation, Row inRow, Column inColumn) 
 }
 
 
-unsigned Block::identification() const
-{
-    return GetBlockIdentifier(type(), rotation());
-}
-
-
 BlockType Block::type() const
 {
     return mType;
 }
 
 
-unsigned Block::rotation() const
+std::size_t Block::rotation() const
 {
     return mRotation;
 }
 
 
-unsigned Block::rotationCount() const
+std::size_t Block::rotationCount() const
 {
     return GetBlockRotationCount(mType);
 }
@@ -51,43 +46,43 @@ const Grid & Block::grid() const
 }
 
 
-unsigned Block::row() const
+std::size_t Block::row() const
 {
     return mRow;
 }
 
 
-unsigned Block::column() const
+std::size_t Block::column() const
 {
     return mColumn;
 }
 
 
-unsigned Block::rowCount() const
+std::size_t Block::rowCount() const
 {
     return mGrid->rowCount();
 }
 
 
-unsigned Block::columnCount() const
+std::size_t Block::columnCount() const
 {
     return mGrid->columnCount();
 }
 
 
-void Block::setRow(unsigned inRow)
+void Block::setRow(std::size_t inRow)
 {
     mRow = inRow;
 }
 
 
-void Block::setColumn(unsigned inColumn)
+void Block::setColumn(std::size_t inColumn)
 {
     mColumn = inColumn;
 }
 
 
-void Block::setRotation(unsigned inRotation)
+void Block::setRotation(std::size_t inRotation)
 {
     mRotation = inRotation % GetBlockRotationCount(mType);
     mGrid = &GetGrid(GetBlockIdentifier(mType, mRotation));
@@ -100,18 +95,18 @@ void Block::rotate()
 }
 
 
-unsigned GetBlockIdentifier(BlockType inType, unsigned inRotation)
+int GetBlockIdentifier(BlockType inType, int inRotation)
 {
     Assert(inType >= BlockType_Begin || inType < BlockType_End);
     // Max 4 rotations.
-    return 4 * static_cast<unsigned>(inType - 1) + inRotation;
+    return 4 * static_cast<int>(inType - 1) + inRotation;
 }
 
 
-unsigned GetBlockRotationCount(BlockType inType)
+std::size_t GetBlockRotationCount(BlockType inType)
 {
     Assert(inType >= BlockType_Begin || inType < BlockType_End);
-    static const unsigned fRotationCounts[] =
+    static const int fRotationCounts[] =
     {
         2, // BlockType_I
         4, // BlockType_J
@@ -121,15 +116,15 @@ unsigned GetBlockRotationCount(BlockType inType)
         4, // BlockType_T
         2  // BlockType_Z
     };
-    return fRotationCounts[static_cast<unsigned>(inType) - 1];
+    return fRotationCounts[static_cast<int>(inType) - 1];
 }
 
 
-unsigned GetBlockPositionCount(BlockType inType, unsigned inNumColumns)
+std::size_t GetBlockPositionCount(BlockType inType, std::size_t inNumColumns)
 {
-    unsigned result = 0;
-    unsigned numRotations = GetBlockRotationCount(inType);
-    for (unsigned idx = 0; idx != numRotations; ++idx)
+    std::size_t result = 0;
+    std::size_t numRotations = GetBlockRotationCount(inType);
+    for (std::size_t idx = 0; idx != numRotations; ++idx)
     {
         const Grid & grid = GetGrid(GetBlockIdentifier(inType, idx));
         result += inNumColumns - grid.columnCount() + 1;
@@ -138,16 +133,16 @@ unsigned GetBlockPositionCount(BlockType inType, unsigned inNumColumns)
 }
 
 
-Grid GetIGrid(unsigned rotation);
-Grid GetJGrid(unsigned rotation);
-Grid GetLGrid(unsigned rotation);
-Grid GetOGrid(unsigned rotation);
-Grid GetSGrid(unsigned rotation);
-Grid GetTGrid(unsigned rotation);
-Grid GetZGrid(unsigned rotation);
+Grid GetIGrid(int rotation);
+Grid GetJGrid(int rotation);
+Grid GetLGrid(int rotation);
+Grid GetOGrid(int rotation);
+Grid GetSGrid(int rotation);
+Grid GetTGrid(int rotation);
+Grid GetZGrid(int rotation);
 
 
-const Grid & GetGrid(unsigned inId)
+const Grid & GetGrid(int inId)
 {
     if (inId < 0 || inId >= 28)
     {
@@ -195,7 +190,7 @@ const Grid & GetGrid(unsigned inId)
 }
 
 
-Grid GetIGrid(unsigned rotation)
+Grid GetIGrid(int rotation)
 {
     if (rotation%2 == 0)
     {
@@ -218,7 +213,7 @@ Grid GetIGrid(unsigned rotation)
 }
 
 
-Grid GetJGrid(unsigned rotation)
+Grid GetJGrid(int rotation)
 {
     if (rotation%4 == 0)
     {
@@ -258,7 +253,7 @@ Grid GetJGrid(unsigned rotation)
     }
 }
 
-Grid GetLGrid(unsigned rotation)
+Grid GetLGrid(int rotation)
 {
     if (rotation%4 == 0)
     {
@@ -298,7 +293,7 @@ Grid GetLGrid(unsigned rotation)
     }
 }
 
-Grid GetOGrid(unsigned) // rotation is not relevant
+Grid GetOGrid(int) // rotation is not relevant
 {
     Grid grid(2, 2, BlockType_Nil);
     grid.set(0, 0, BlockType_O);
@@ -308,7 +303,7 @@ Grid GetOGrid(unsigned) // rotation is not relevant
     return grid;
 }
 
-Grid GetSGrid(unsigned rotation)
+Grid GetSGrid(int rotation)
 {
     if (rotation%2 == 0)
     {
@@ -330,7 +325,7 @@ Grid GetSGrid(unsigned rotation)
     }
 }
 
-Grid GetTGrid(unsigned rotation)
+Grid GetTGrid(int rotation)
 {
     if (rotation%4 == 0)
     {
@@ -370,7 +365,7 @@ Grid GetTGrid(unsigned rotation)
     }
 }
 
-Grid GetZGrid(unsigned rotation)
+Grid GetZGrid(int rotation)
 {
     if (rotation%2 == 0)
     {

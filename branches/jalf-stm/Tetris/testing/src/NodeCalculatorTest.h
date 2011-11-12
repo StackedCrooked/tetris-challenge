@@ -13,10 +13,10 @@ namespace testing {
 class NodeCalculatorTest : public TetrisTest
 {
 protected:
-	FUTILE_BOX_TYPE(Depth, int);
-	FUTILE_BOX_TYPE(Width, int);
-	FUTILE_BOX_TYPE(WorkerCount, int);
-	FUTILE_BOX_TYPE(TimeMs, int);
+	Futile_TypedWrapper(Depth, int);
+	Futile_TypedWrapper(Width, int);
+	Futile_TypedWrapper(WorkerCount, int);
+	Futile_TypedWrapper(TimeMs, int);
 
 	void testInterrupt(Depth inDepth, Width inWidth, WorkerCount inWorkerCount, TimeMs inTimeMs);
 

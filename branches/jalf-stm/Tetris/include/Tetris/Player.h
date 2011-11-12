@@ -17,8 +17,8 @@
 namespace Tetris {
 
 
-FUTILE_BOX_TYPE(TeamName, std::string);
-FUTILE_BOX_TYPE(PlayerName, std::string);
+Futile_TypedWrapper(TeamName, std::string);
+Futile_TypedWrapper(PlayerName, std::string);
 
 
 class Player;
