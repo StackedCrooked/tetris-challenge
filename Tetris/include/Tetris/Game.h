@@ -158,7 +158,7 @@ public:
 
     virtual bool move(MoveDirection inDirection);
 
-    const GameState & gameState() const;
+    virtual const GameState & gameState() const;
 
     virtual void setGrid(const Grid & inGrid);
 
@@ -170,10 +170,10 @@ protected:
 
     HumanGame(const Game & inGame);
 
-    GameState & gameState();
+    virtual GameState & gameState();
 
 private:
-    boost::scoped_ptr<GameState> mGameState;
+    GameState mGameState;
 };
 
 
@@ -199,7 +199,7 @@ public:
 
     void clearPrecalculatedNodes();
 
-    const GameState & gameState() const;
+    virtual const GameState & gameState() const;
 
     virtual void setGrid(const Grid & inGrid);
 
@@ -211,7 +211,7 @@ protected:
 
     ComputerGame(const Game & inGame);
 
-    GameState & gameState();
+    virtual GameState & gameState();
 
 private:
     void setCurrentNode(NodePtr inCurrentNode);
