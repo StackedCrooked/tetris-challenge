@@ -10,12 +10,31 @@ namespace Futile {
 
 
 template<typename T>
-class Atomic : boost::noncopyable
+class Atomic
 {
 public:
+    typedef Atomic<T> This;
+
     Atomic(T inValue = T()) :
         mValue(inValue)
     {
+    }
+
+    Atomic(const This & rhs) :
+        mMutex(),
+        mValue(rhs.get())
+    {
+    }
+
+    Atomic & operator=(const This & rhs)
+    {
+        set(rhs.get());
+        return *this;
+    }
+
+    ~Atomic()
+    {
+        // No implementation required.
     }
 
     // Get a copy of the value
