@@ -13,11 +13,11 @@
 namespace Tetris {
 
 
-GameState::GameState(std::size_t inNumRows, std::size_t inNumColumns) :
-    mGrid(inNumRows, inNumColumns, BlockType_Nil),
+GameState::GameState(unsigned inRowCount, unsigned inColumnCount) :
+    mGrid(inRowCount, inColumnCount, BlockType_Nil),
     mOriginalBlock(BlockType_L, Rotation(0), Row(0), Column(0)),
     mIsGameOver(false),
-    mFirstOccupiedRow(inNumRows),
+    mFirstOccupiedRow(inRowCount),
     mNumLines(0),
     mNumSingles(0),
     mNumDoubles(0),
@@ -28,7 +28,22 @@ GameState::GameState(std::size_t inNumRows, std::size_t inNumColumns) :
 }
 
 
-bool GameState::checkPositionValid(const Block & inBlock, std::size_t inRowIdx, std::size_t inColIdx) const
+GameState GameState::commit(const Block & inBlock) const
+{
+    GameState result(*this);
+    result.mTainted = false;
+    result.mOriginalBlock = inBlock;
+    result.mIsGameOver = inBlock.row() == 0 && !result.checkPositionValid(inBlock, inBlock.row(), inBlock.column());
+    result.solidifyBlock(inBlock);
+    if (!result.mIsGameOver)
+    {
+        result.clearLines();
+    }
+    return result;
+}
+
+
+bool GameState::checkPositionValid(const Block & inBlock, unsigned inRowIdx, unsigned inColIdx) const
 {
     const Grid & blockGrid(inBlock.grid());
 
@@ -42,17 +57,17 @@ bool GameState::checkPositionValid(const Block & inBlock, std::size_t inRowIdx, 
         return false;
     }
 
-    for (std::size_t r = 0; r != blockGrid.rowCount(); ++r)
+    for (unsigned r = 0; r != blockGrid.rowCount(); ++r)
     {
-        std::size_t rowIdx = inRowIdx + r;
+        unsigned rowIdx = inRowIdx + r;
         if (rowIdx >= mGrid.rowCount())
         {
             return false;
         }
 
-        for (std::size_t c = 0; c != blockGrid.columnCount(); ++c)
+        for (unsigned c = 0; c != blockGrid.columnCount(); ++c)
         {
-            std::size_t colIdx = inColIdx + c;
+            unsigned colIdx = inColIdx + c;
             if (colIdx >= mGrid.columnCount())
             {
                 return false;
@@ -71,14 +86,14 @@ bool GameState::checkPositionValid(const Block & inBlock, std::size_t inRowIdx, 
 void GameState::solidifyBlock(const Block & inBlock)
 {
     const Grid & grid = inBlock.grid();
-    for (std::size_t r = 0; r != grid.rowCount(); ++r)
+    for (unsigned r = 0; r != grid.rowCount(); ++r)
     {
-        for (std::size_t c = 0; c != grid.columnCount(); ++c)
+        for (unsigned c = 0; c != grid.columnCount(); ++c)
         {
             if (grid.get(r, c) != BlockType_Nil)
             {
-                std::size_t gridRow = inBlock.row() + r;
-                std::size_t gridCol = inBlock.column() + c;
+                unsigned gridRow = inBlock.row() + r;
+                unsigned gridCol = inBlock.column() + c;
                 mGrid.set(gridRow, gridCol, inBlock.type());
                 if (gridRow < mFirstOccupiedRow)
                 {
@@ -92,11 +107,11 @@ void GameState::solidifyBlock(const Block & inBlock)
 
 void GameState::clearLines()
 {
-    std::size_t numLines = 0;
-    int rowIndex = mOriginalBlock.row() + mOriginalBlock.rowCount() - 1;
+    unsigned numLines = 0;
+    int rowIndex = static_cast<int>(mOriginalBlock.row() + mOriginalBlock.rowCount()) - 1;
     for (; rowIndex >= static_cast<int>(mFirstOccupiedRow); --rowIndex)
     {
-        std::size_t colIndex = 0;
+        unsigned colIndex = 0;
         bool line = true;
         for (; colIndex < mGrid.columnCount(); ++colIndex)
         {
@@ -199,7 +214,7 @@ void GameState::updateCache()
     mFirstOccupiedRow = 0;
     while (mFirstOccupiedRow < mGrid.rowCount())
     {
-        for (std::size_t colIndex = 0; colIndex != mGrid.columnCount(); ++colIndex)
+        for (unsigned colIndex = 0; colIndex != mGrid.columnCount(); ++colIndex)
         {
             if (mGrid.get(mFirstOccupiedRow, colIndex) != BlockType_Nil)
             {
@@ -226,22 +241,7 @@ const Block & GameState::originalBlock() const
 }
 
 
-std::auto_ptr<GameState> GameState::commit(const Block & inBlock, GameOver inGameOver) const
-{
-    std::auto_ptr<GameState> result(new GameState(*this));
-    result->mIsGameOver = inGameOver;
-    result->mTainted = false; // a new generation, a new start
-    if (!inGameOver)
-    {
-        result->solidifyBlock(inBlock);
-    }
-    result->mOriginalBlock = inBlock;
-    result->clearLines();
-    return result;
-}
-
-
-EvaluatedGameState::EvaluatedGameState(GameState * inGameState, int inQuality) :
+EvaluatedGameState::EvaluatedGameState(const GameState & inGameState, signed inQuality) :
     mGameState(inGameState),
     mQuality(inQuality)
 {
@@ -250,23 +250,22 @@ EvaluatedGameState::EvaluatedGameState(GameState * inGameState, int inQuality) :
 
 EvaluatedGameState::~EvaluatedGameState()
 {
-    delete mGameState;
 }
 
 
 const GameState & EvaluatedGameState::gameState() const
 {
-    return *mGameState;
+    return mGameState;
 }
 
 
 GameState & EvaluatedGameState::gameState()
 {
-    return *mGameState;
+    return mGameState;
 }
 
 
-int EvaluatedGameState::quality() const
+signed EvaluatedGameState::quality() const
 {
     return mQuality;
 }
