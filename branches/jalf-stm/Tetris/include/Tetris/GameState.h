@@ -16,8 +16,7 @@ class GameState
 public:
     GameState(unsigned inRowCount, unsigned inColumnCount);
 
-    inline GameState commit(const Block & inBlock) const
-    { return GameState(*this, inBlock); }
+    GameState commit(const Block & inBlock) const;
 
     const Grid & grid() const;
 
@@ -51,8 +50,6 @@ public:
     int currentHeight() const { return mGrid.rowCount() - mFirstOccupiedRow; }
 
 private:
-    GameState(const GameState & inGameState, const Block & inBlock);
-
     void solidifyBlock(const Block & inBlock);
     void clearLines();
     void updateCache();
