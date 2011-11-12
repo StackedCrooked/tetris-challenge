@@ -20,7 +20,6 @@ add_library(Tetris
     include/Tetris/Evaluator.h
     include/Tetris/SimpleGame.h
     include/Tetris/Game.h
-    include/Tetris/GameOver.h
     include/Tetris/GameState.h
     include/Tetris/GameStateComparator.h
     include/Tetris/GameStateNode.h

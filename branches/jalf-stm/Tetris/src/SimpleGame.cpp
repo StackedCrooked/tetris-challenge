@@ -187,7 +187,7 @@ GameStateStats SimpleGame::stats() const
 
 void SimpleGame::applyLinePenalty(int inNumberOfLinesMadeByOpponent)
 {
-    LogInfo(SS() << mImpl->mName << " receives " << inNumberOfLinesMadeByOpponent << " lines from his crafty opponent");
+    LogInfo(SS() << (playerType() == PlayerType_Computer ? "The computer" : "The human being") << " received " << inNumberOfLinesMadeByOpponent << " lines from his crafty opponent");
     return gameImpl().lock()->applyLinePenalty(inNumberOfLinesMadeByOpponent);
 }
 

@@ -111,17 +111,28 @@ void Gravity::Impl::onTimerEvent()
         if (mStopwatch.elapsedMs() > intervalMs())
         {
             mStopwatch.restart();
-            Locker<Game> wGame(mThreadSafeGame);
-            if (wGame->isGameOver() || wGame->isPaused())
+            FUTILE_LOCK(Game & game, mThreadSafeGame)
             {
-                return;
-            }
 
-            wGame->move(MoveDirection_Down);
-            mLevel = wGame->level();
-            if (mLevel > cMaxLevel)
-            {
-                mLevel = cMaxLevel;
+				// If our block was "caught" by the sudden appearance of new blocks, then we solidify it in that state.
+				if (!static_cast<const Game&>(game).gameState().checkPositionValid(game.activeBlock()))
+				{
+					game.move(MoveDirection_Down);
+					return;
+				}
+
+                if (game.isGameOver() || game.isPaused())
+                {
+                    return;
+                }
+
+                game.move(MoveDirection_Down);
+                mLevel = game.level();
+                if (mLevel > cMaxLevel)
+                {
+                    mLevel = cMaxLevel;
+                }
+                Assert(static_cast<const Game&>(game).gameState().checkPositionValid(game.activeBlock()));
             }
         }
         if (mLevel != oldLevel)

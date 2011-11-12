@@ -99,9 +99,9 @@ void GenerateOffspring(NodePtr inNode,
     {
         std::size_t initialColumn = DivideByTwo(gameGrid.columnCount() - GetGrid(GetBlockIdentifier(inBlockType, 0)).columnCount());
         NodePtr childState(new GameStateNode(inNode,
-                                             gameState.commit(Block(inBlockType, Rotation(0), Row(0), Column(initialColumn)),
-                                                              GameOver(true)),
+                                             gameState.commit(Block(inBlockType, Rotation(0), Row(0), Column(initialColumn))),
                                              inEvaluator));
+        Assert(childState->gameState().isGameOver());
         Assert(childState->depth() == (inNode->depth() + 1));
         outChildNodes.insert(childState);
         return;
@@ -123,7 +123,7 @@ void GenerateOffspring(NodePtr inNode,
             {
                 block.setRow(row - 1);
                 NodePtr childState(new GameStateNode(inNode,
-                                                     gameState.commit(block, GameOver(false)),
+                                                     gameState.commit(block),
                                                      inEvaluator));
                 Assert(childState->depth() == inNode->depth() + 1);
                 outChildNodes.insert(childState);

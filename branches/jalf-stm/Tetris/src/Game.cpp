@@ -444,7 +444,7 @@ bool HumanGame::move(MoveDirection inDirection)
 
     // Commit the block. This returns a new GameState object
     // where any full lines have already been cleared.
-    mGameState = mGameState.commit(block, GameOver(block.row() == 0));
+    mGameState = mGameState.commit(block);
 
     // Count the number of lines that were made in  the commit call.
     int linesCleared = mGameState.numLines() - oldLineCount;
@@ -624,6 +624,7 @@ bool ComputerGame::move(MoveDirection inDirection)
                 else
                 {
                     LogError("NavigateNodeDown failed for unknown reason (untainted).");
+                    Assert(false);
                     mCurrentNode->clearChildren();
                 }
             }
@@ -651,7 +652,7 @@ bool ComputerGame::move(MoveDirection inDirection)
 
     // Actually commit the block
     NodePtr child(new GameStateNode(mCurrentNode,
-                                    mCurrentNode->gameState().commit(block, GameOver(block.row() == 0)),
+                                    mCurrentNode->gameState().commit(block),
                                     mCurrentNode->evaluator()));
     mCurrentNode->addChild(child);
     setCurrentNode(child);
