@@ -173,7 +173,7 @@ protected:
     GameState & gameState();
 
 private:
-    boost::scoped_ptr<GameState> mGameState;
+    GameState mGameState;
 };
 
 

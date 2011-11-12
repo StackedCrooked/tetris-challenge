@@ -15,7 +15,12 @@ namespace Tetris {
 class GameState
 {
 public:
-    GameState(std::size_t inNumRows, std::size_t inNumColumns);
+    GameState(unsigned inRowCount, unsigned inColumnCount);
+
+    GameState(const GameState & inGameState, const Block & inBlock, GameOver inGameOver);
+
+    inline GameState commit(const Block & inBlock, GameOver inGameOver) const
+    { return GameState(*this, inBlock, inGameOver); }
 
     const Grid & grid() const;
 
@@ -33,11 +38,7 @@ public:
 
     // Checks if a Block can be placed at a given location
     // without overlapping with previously placed blocks.
-    bool checkPositionValid(const Block & inBlock, std::size_t inRowIdx, std::size_t inColIdx) const;
-
-    // Creates a copy of the current gamestate with the given active block committed.
-    // Use inGameOver = true to mark the new gamestate as "game over".
-    std::auto_ptr<GameState> commit(const Block & inBlock, GameOver inGameOver) const;
+    bool checkPositionValid(const Block & inBlock, unsigned inRowIdx, unsigned inColIdx) const;
 
 
     // Statistics
@@ -59,7 +60,7 @@ private:
     Grid mGrid;
     Block mOriginalBlock;
     bool mIsGameOver;
-    std::size_t mFirstOccupiedRow;
+    unsigned mFirstOccupiedRow;
     int mNumLines;
     int mNumSingles;
     int mNumDoubles;
@@ -73,7 +74,7 @@ class EvaluatedGameState
 {
 public:
     // Takes ownership of the GameState object
-    EvaluatedGameState(GameState *  inGameState, int inQuality);
+    EvaluatedGameState(const GameState & inGameState, signed inQuality);
 
     ~EvaluatedGameState();
 
@@ -81,13 +82,13 @@ public:
 
     GameState & gameState();
 
-    int quality() const;
+    signed quality() const;
 
 private:
     EvaluatedGameState(const EvaluatedGameState &);
     EvaluatedGameState& operator=(const EvaluatedGameState&);
 
-    GameState * mGameState;
+    GameState mGameState;
     int mQuality;
 };
 

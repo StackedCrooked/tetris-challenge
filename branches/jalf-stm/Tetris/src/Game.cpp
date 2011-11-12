@@ -384,41 +384,33 @@ void Game::setStartingLevel(int inLevel)
 
 HumanGame::HumanGame(std::size_t inNumRows, std::size_t inNumCols) :
     Game(inNumRows, inNumCols),
-    mGameState(new GameState(inNumRows, inNumCols))
+    mGameState(inNumRows, inNumCols)
 {
 }
 
 
 HumanGame::HumanGame(const Game & inGame) :
     Game(inGame.rowCount(), inGame.columnCount()),
-    mGameState(new GameState(inGame.gameState()))
+    mGameState(inGame.gameState())
 {
 }
 
 
 GameState & HumanGame::gameState()
 {
-    if (!mGameState.get())
-    {
-        throw std::logic_error("Null pointer deref: mGameState");
-    }
-    return *mGameState;
+    return mGameState;
 }
 
 
 const GameState & HumanGame::gameState() const
 {
-    if (!mGameState.get())
-    {
-        throw std::logic_error("Null pointer deref: mGameState");
-    }
-    return *mGameState;
+    return mGameState;
 }
 
 
 void HumanGame::setGrid(const Grid & inGrid)
 {
-    mGameState->setGrid(inGrid);
+    mGameState.setGrid(inGrid);
     onChanged();
 }
 
@@ -448,14 +440,14 @@ bool HumanGame::move(MoveDirection inDirection)
     }
 
     // Remember the number of lines in the current game state.
-    int oldLineCount = mGameState->numLines();
+    int oldLineCount = mGameState.numLines();
 
     // Commit the block. This returns a new GameState object
     // where any full lines have already been cleared.
-    mGameState.reset(mGameState->commit(block, GameOver(block.row() == 0)).release());
+    mGameState = mGameState.commit(block, GameOver(block.row() == 0));
 
     // Count the number of lines that were made in  the commit call.
-    int linesCleared = mGameState->numLines() - oldLineCount;
+    int linesCleared = mGameState.numLines() - oldLineCount;
     Assert(linesCleared >= 0);
 
     // Notify the listeners.
@@ -482,7 +474,7 @@ ComputerGame::ComputerGame(std::size_t inNumRows, std::size_t inNumCols) :
 
 ComputerGame::ComputerGame(const Game & inGame) :
     Game(inGame.rowCount(), inGame.columnCount()),
-    mCurrentNode(new GameStateNode(new GameState(inGame.gameState()), Balanced::Instance()))
+    mCurrentNode(new GameStateNode(inGame.gameState(), Balanced::Instance()))
 {
 }
 
@@ -659,7 +651,7 @@ bool ComputerGame::move(MoveDirection inDirection)
 
     // Actually commit the block
     NodePtr child(new GameStateNode(mCurrentNode,
-                                    mCurrentNode->gameState().commit(block, GameOver(block.row() == 0)).release(),
+                                    mCurrentNode->gameState().commit(block, GameOver(block.row() == 0)),
                                     mCurrentNode->evaluator()));
     mCurrentNode->addChild(child);
     setCurrentNode(child);
