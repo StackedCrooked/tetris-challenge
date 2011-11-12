@@ -51,11 +51,10 @@ public:
     int firstOccupiedRow() const { return mFirstOccupiedRow; }
     int currentHeight() const { return mGrid.rowCount() - mFirstOccupiedRow; }
 
-    void updateCache();
-
 private:
     void solidifyBlock(const Block & inBlock);
     void clearLines();
+    void updateCache();
 
     Grid mGrid;
     Block mOriginalBlock;
