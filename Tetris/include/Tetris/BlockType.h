@@ -30,7 +30,7 @@ enum
     BlockType_End
 };
 
-static const unsigned int cBlockTypeCount = static_cast<unsigned int>(BlockType_End) - 1;
+static const unsigned cBlockTypeCount = static_cast<unsigned>(BlockType_End) - 1;
 
 
 } // namespace Tetris

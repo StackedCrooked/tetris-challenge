@@ -16,4 +16,3 @@ typedef Futile::GenericGrid<BlockType> Grid;
 
 
 #endif // TETRIS_GRID_H_INCLUDED
-
