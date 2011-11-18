@@ -9,6 +9,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Todo.txt" />
+  </ItemGroup>
+  <ItemGroup>
     <ClInclude Include="include\Tetris\AbstractWidget.h">
       <Filter>Include Files</Filter>
     </ClInclude>
@@ -161,8 +164,5 @@
     <ClCompile Include="src\Unicode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Todo.txt" />
   </ItemGroup>
 </Project>

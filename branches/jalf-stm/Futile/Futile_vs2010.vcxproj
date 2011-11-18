@@ -10,6 +10,40 @@
       <Platform>Win32</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Futile\Array.h" />
+    <ClInclude Include="include\Futile\Assert.h" />
+    <ClInclude Include="include\Futile\Atomic.h" />
+    <ClInclude Include="include\Futile\AutoPtrSupport.h" />
+    <ClInclude Include="include\Futile\Boost.h" />
+    <ClInclude Include="include\Futile\Config.h" />
+    <ClInclude Include="include\Futile\GenericGrid.h" />
+    <ClInclude Include="include\Futile\LeakDetector.h" />
+    <ClInclude Include="include\Futile\Logger.h" />
+    <ClInclude Include="include\Futile\Logging.h" />
+    <ClInclude Include="include\Futile\MainThread.h" />
+    <ClInclude Include="include\Futile\MainThreadImpl.h" />
+    <ClInclude Include="include\Futile\MakeString.h" />
+    <ClInclude Include="include\Futile\Singleton.h" />
+    <ClInclude Include="include\Futile\Stopwatch.h" />
+    <ClInclude Include="include\Futile\Threading.h" />
+    <ClInclude Include="include\Futile\Timer.h" />
+    <ClInclude Include="include\Futile\TypedWrapper.h" />
+    <ClInclude Include="include\Futile\Types.h" />
+    <ClInclude Include="include\Futile\Worker.h" />
+    <ClInclude Include="include\Futile\WorkerPool.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\LeakDetector.cpp" />
+    <ClCompile Include="src\Logger.cpp" />
+    <ClCompile Include="src\Logging.cpp" />
+    <ClCompile Include="src\MainThread.cpp" />
+    <ClCompile Include="src\Stopwatch.cpp" />
+    <ClCompile Include="src\Threading.cpp" />
+    <ClCompile Include="src\Timer.cpp" />
+    <ClCompile Include="src\Worker.cpp" />
+    <ClCompile Include="src\WorkerPool.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectName>Futile</ProjectName>
     <ProjectGuid>{38AF5C44-D977-4123-9AE3-CAE078744562}</ProjectGuid>
@@ -71,55 +105,17 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <AdditionalOptions>/MP /D "_CRT_SECURE_NO_WARNINGS" /D "_SCL_SECURE_NO_WARNINGS" /D "_SECURE_SCL=0" /D "_SECURE_SCL_THROWS=0" %(AdditionalOptions)</AdditionalOptions>
-      <Optimization>MaxSpeed</Optimization>
-      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
-      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <Optimization>Full</Optimization>
       <AdditionalIncludeDirectories>$(SolutionDir)Futile\include;$(SolutionDir)3rdParty\Boost;$(SolutionDir)3rdParty\STM;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NOMINMAX;BOOST_ALL_NO_LIB;NDEBUG;_WINDOWS;POCO_STATIC;POCO_NO_AUTOMATIC_LIBS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <StringPooling>false</StringPooling>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <WarningLevel>Level3</WarningLevel>
+      <ExceptionHandling>Sync</ExceptionHandling>
     </ClCompile>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="src\LeakDetector.cpp" />
-    <ClCompile Include="src\Logger.cpp" />
-    <ClCompile Include="src\Logging.cpp" />
-    <ClCompile Include="src\MainThread.cpp" />
-    <ClCompile Include="src\Stopwatch.cpp" />
-    <ClCompile Include="src\Threading.cpp" />
-    <ClCompile Include="src\Timer.cpp" />
-    <ClCompile Include="src\Worker.cpp" />
-    <ClCompile Include="src\WorkerPool.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="include\Futile\Array.h" />
-    <ClInclude Include="include\Futile\Assert.h" />
-    <ClInclude Include="include\Futile\Atomic.h" />
-    <ClInclude Include="include\Futile\AutoPtrSupport.h" />
-    <ClInclude Include="include\Futile\Boost.h" />
-    <ClInclude Include="include\Futile\Config.h" />
-    <ClInclude Include="include\Futile\GenericGrid.h" />
-    <ClInclude Include="include\Futile\LeakDetector.h" />
-    <ClInclude Include="include\Futile\Logger.h" />
-    <ClInclude Include="include\Futile\Logging.h" />
-    <ClInclude Include="include\Futile\MainThread.h" />
-    <ClInclude Include="include\Futile\MainThreadImpl.h" />
-    <ClInclude Include="include\Futile\MakeString.h" />
-    <ClInclude Include="include\Futile\Singleton.h" />
-    <ClInclude Include="include\Futile\Stopwatch.h" />
-    <ClInclude Include="include\Futile\Threading.h" />
-    <ClInclude Include="include\Futile\Timer.h" />
-    <ClInclude Include="include\Futile\TypedWrapper.h" />
-    <ClInclude Include="include\Futile\Types.h" />
-    <ClInclude Include="include\Futile\Worker.h" />
-    <ClInclude Include="include\Futile\WorkerPool.h" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
