@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="Futile"
-	ProjectGUID="{38AF5C44-D977-4123-9AE3-CAE078744562}"
-	RootNamespace="Futile"
+	Name="STM"
+	ProjectGUID="{63C60C9A-82E4-4EA7-9F06-478C54955495}"
+	RootNamespace="STM"
 	TargetFrameworkVersion="196613"
 	>
 	<Platforms>
@@ -42,7 +42,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP /D &quot;_HAS_ITERATOR_DEBUGGING=0&quot; /D &quot;_SECURE_SCL=0&quot; /D &quot;_SECURE_SCL_THROWS=0&quot;"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)Futile\include&quot;;&quot;$(SolutionDir)3rdParty\Boost&quot;;&quot;$(SolutionDir)3rdParty\STM&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)3rdParty\STM&quot;;&quot;$(SolutionDir)3rdParty\Boost&quot;"
 				PreprocessorDefinitions="NOMINMAX;BOOST_ALL_NO_LIB;_DEBUG;_WINDOWS;POCO_STATIC;POCO_NO_AUTOMATIC_LIBS"
 				StringPooling="false"
 				MinimalRebuild="false"
@@ -112,7 +112,7 @@
 				InlineFunctionExpansion="2"
 				FavorSizeOrSpeed="1"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)Futile\include&quot;;&quot;$(SolutionDir)3rdParty\Boost&quot;;&quot;$(SolutionDir)3rdParty\STM&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)3rdParty\STM&quot;;&quot;$(SolutionDir)3rdParty\Boost&quot;"
 				PreprocessorDefinitions="NOMINMAX;BOOST_ALL_NO_LIB;NDEBUG;_WINDOWS;POCO_STATIC;POCO_NO_AUTOMATIC_LIBS"
 				StringPooling="false"
 				BasicRuntimeChecks="0"
@@ -160,129 +160,189 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\src\LeakDetector.cpp"
+				RelativePath=".\stm\backend.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\src\Logger.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\Logging.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\MainThread.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\Stopwatch.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\Threading.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\Timer.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\Worker.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\WorkerPool.cpp"
+				RelativePath=".\stm\frontend.cpp"
 				>
 			</File>
 		</Filter>
 		<Filter
-			Name="Include Files"
+			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\include\Futile\Array.h"
+				RelativePath=".\stm\atomic.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\include\Futile\Assert.h"
+				RelativePath=".\stm\atomic_detail.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\include\Futile\Atomic.h"
+				RelativePath=".\stm\backend.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\include\Futile\AutoPtrSupport.h"
+				RelativePath=".\stm\backend_impl.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\include\Futile\Boost.h"
+				RelativePath=".\stm\buffer_entry.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\include\Futile\Config.h"
+				RelativePath=".\stm\buffer_entry_impl.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\include\Futile\GenericGrid.h"
+				RelativePath=".\stm\buffer_functions.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\include\Futile\LeakDetector.h"
+				RelativePath=".\stm\buffer_ops.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\include\Futile\Logger.h"
+				RelativePath=".\stm\buffer_ops_impl.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\include\Futile\Logging.h"
+				RelativePath=".\stm\config.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\include\Futile\MainThread.h"
+				RelativePath=".\stm\cpp03.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\include\Futile\MainThreadImpl.h"
+				RelativePath=".\stm\cpp0x.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\include\Futile\MakeString.h"
+				RelativePath=".\stm\debug.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\include\Futile\Singleton.h"
+				RelativePath=".\stm\exception.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\include\Futile\Stopwatch.h"
+				RelativePath=".\stm\fixed_array_buffer.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\include\Futile\Threading.h"
+				RelativePath=".\stm\fixed_array_buffer_impl.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\include\Futile\Timer.h"
+				RelativePath=".\stm\gcc.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\include\Futile\TypedWrapper.h"
+				RelativePath=".\stm\header.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\include\Futile\Types.h"
+				RelativePath=".\stm\iterator_rw.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\include\Futile\Worker.h"
+				RelativePath=".\stm\msvc.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\include\Futile\WorkerPool.h"
+				RelativePath=".\stm\on_destroy.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\stm\orelse.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\stm\platform_specific.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\stm\ptr_cast.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\stm\shared.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\stm\shared_base.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\stm\shared_base_impl.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\stm\shared_detached.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\stm\shared_internal.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\stm\shared_internal_common.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\stm\shared_internal_detached.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\stm\tls.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\stm\tls_impl.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\stm\transaction.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\stm\transaction_group.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\stm\transaction_internal.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\stm\transaction_internal_ops.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\stm\transaction_manager.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\stm\transaction_manager_ops.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\stm\utility.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\stm\version_ops.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\stm\x64.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\stm\x86.hpp"
 				>
 			</File>
 		</Filter>
