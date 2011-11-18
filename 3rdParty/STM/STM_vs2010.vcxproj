@@ -1,0 +1,136 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{63C60C9A-82E4-4EA7-9F06-478C54955495}</ProjectGuid>
+    <RootNamespace>STM</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)Build\Windows\x86\v90\$(Configuration)\$(ProjectName)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)Intermediate\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)Build\Windows\x86\v90\$(Configuration)\$(ProjectName)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)Intermediate\</IntDir>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <AdditionalOptions>/MP /D "_HAS_ITERATOR_DEBUGGING=0" /D "_SECURE_SCL=0" /D "_SECURE_SCL_THROWS=0" %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(SolutionDir)3rdParty\STM;$(SolutionDir)3rdParty\Boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NOMINMAX;BOOST_ALL_NO_LIB;_DEBUG;_WINDOWS;POCO_STATIC;POCO_NO_AUTOMATIC_LIBS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>false</StringPooling>
+      <MinimalRebuild>false</MinimalRebuild>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <DisableLanguageExtensions>false</DisableLanguageExtensions>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <ShowIncludes>false</ShowIncludes>
+    </ClCompile>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalOptions>/MP /D "_CRT_SECURE_NO_WARNINGS" /D "_SCL_SECURE_NO_WARNINGS" /D "_SECURE_SCL=0" /D "_SECURE_SCL_THROWS=0" %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Full</Optimization>
+      <AdditionalIncludeDirectories>$(SolutionDir)3rdParty\STM;$(SolutionDir)3rdParty\Boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NOMINMAX;BOOST_ALL_NO_LIB;NDEBUG;_WINDOWS;POCO_STATIC;POCO_NO_AUTOMATIC_LIBS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <WarningLevel>Level3</WarningLevel>
+      <ExceptionHandling>Sync</ExceptionHandling>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="stm\backend.cpp" />
+    <ClCompile Include="stm\frontend.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stm\atomic.hpp" />
+    <ClInclude Include="stm\atomic_detail.hpp" />
+    <ClInclude Include="stm\backend.hpp" />
+    <ClInclude Include="stm\backend_impl.hpp" />
+    <ClInclude Include="stm\buffer_entry.hpp" />
+    <ClInclude Include="stm\buffer_entry_impl.hpp" />
+    <ClInclude Include="stm\buffer_functions.hpp" />
+    <ClInclude Include="stm\buffer_ops.hpp" />
+    <ClInclude Include="stm\buffer_ops_impl.hpp" />
+    <ClInclude Include="stm\config.hpp" />
+    <ClInclude Include="stm\cpp03.hpp" />
+    <ClInclude Include="stm\cpp0x.hpp" />
+    <ClInclude Include="stm\debug.hpp" />
+    <ClInclude Include="stm\exception.hpp" />
+    <ClInclude Include="stm\fixed_array_buffer.hpp" />
+    <ClInclude Include="stm\fixed_array_buffer_impl.hpp" />
+    <ClInclude Include="stm\gcc.hpp" />
+    <ClInclude Include="stm\header.hpp" />
+    <ClInclude Include="stm\iterator_rw.hpp" />
+    <ClInclude Include="stm\msvc.hpp" />
+    <ClInclude Include="stm\on_destroy.hpp" />
+    <ClInclude Include="stm\orelse.hpp" />
+    <ClInclude Include="stm\platform_specific.hpp" />
+    <ClInclude Include="stm\ptr_cast.hpp" />
+    <ClInclude Include="stm\shared.hpp" />
+    <ClInclude Include="stm\shared_base.hpp" />
+    <ClInclude Include="stm\shared_base_impl.hpp" />
+    <ClInclude Include="stm\shared_detached.hpp" />
+    <ClInclude Include="stm\shared_internal.hpp" />
+    <ClInclude Include="stm\shared_internal_common.hpp" />
+    <ClInclude Include="stm\shared_internal_detached.hpp" />
+    <ClInclude Include="stm\tls.hpp" />
+    <ClInclude Include="stm\tls_impl.hpp" />
+    <ClInclude Include="stm\transaction.hpp" />
+    <ClInclude Include="stm\transaction_group.hpp" />
+    <ClInclude Include="stm\transaction_internal.hpp" />
+    <ClInclude Include="stm\transaction_internal_ops.hpp" />
+    <ClInclude Include="stm\transaction_manager.hpp" />
+    <ClInclude Include="stm\transaction_manager_ops.hpp" />
+    <ClInclude Include="stm\utility.hpp" />
+    <ClInclude Include="stm\version_ops.hpp" />
+    <ClInclude Include="stm\x64.hpp" />
+    <ClInclude Include="stm\x86.hpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

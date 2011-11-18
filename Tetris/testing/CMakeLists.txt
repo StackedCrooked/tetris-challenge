@@ -3,10 +3,12 @@ include_directories(
     ${SOLUTIONDIR}Tetris/include
     ${SOLUTIONDIR}3rdParty/GTest/include
     ${SOLUTIONDIR}3rdParty/Boost
-    /usr/local/include)
+    ${SOLUTIONDIR}3rdParty/STM
+    /usr/include)
 
 add_executable(TetrisTest
     src/main.cpp
+    src/STMTest.cpp
     src/TetrisTest.cpp
     src/TetrisTest.h
     src/NodeCalculatorTest.cpp

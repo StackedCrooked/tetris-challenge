@@ -1,0 +1,107 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Include Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Futile\Array.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Futile\Assert.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Futile\Atomic.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Futile\AutoPtrSupport.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Futile\Boost.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Futile\Config.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Futile\GenericGrid.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Futile\LeakDetector.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Futile\Logger.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Futile\Logging.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Futile\MainThread.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Futile\MainThreadImpl.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Futile\MakeString.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Futile\Singleton.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Futile\Stopwatch.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Futile\Threading.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Futile\Timer.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Futile\TypedWrapper.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Futile\Types.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Futile\Worker.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Futile\WorkerPool.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\LeakDetector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Logger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Logging.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MainThread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Stopwatch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Threading.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Timer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Worker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WorkerPool.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
