@@ -68,8 +68,10 @@ AbstractWidget::AbstractWidget(int inSquareWidth, int inSquareHeight) :
     mMargin(2),
     mPaintActiveBlockShadow(false),
     mFrameCount(0),
+	mFPSStopwatch(),
     mFPS(0)
 {
+	mFPSStopwatch.start();
 }
 
 
