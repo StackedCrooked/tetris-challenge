@@ -18,6 +18,7 @@
     <ProjectGuid>{57ACA075-A82D-4127-AA99-3D12C3486E0C}</ProjectGuid>
     <RootNamespace>QtTetris</RootNamespace>
     <Keyword>Qt4VSv1.0</Keyword>
+    <ProjectName>QtTetris</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

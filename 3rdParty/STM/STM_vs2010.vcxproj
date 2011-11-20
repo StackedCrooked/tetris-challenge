@@ -13,6 +13,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{63C60C9A-82E4-4EA7-9F06-478C54955495}</ProjectGuid>
     <RootNamespace>STM</RootNamespace>
+    <ProjectName>3rdParty_STM</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
