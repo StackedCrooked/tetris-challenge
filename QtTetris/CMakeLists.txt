@@ -65,9 +65,9 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OUTDIR}bin/)
 # Compile flags
 #
 if(WIN32)
-    set(CXX_FLAGS_Debug   "${CXX_FLAGS} /DTETRIS_QT=1")
-    set(CXX_FLAGS_Release "${CXX_FLAGS} /DTETRIS_QT=0")
-    set(FINAL_COMPILE_FLAGS "${CXX_FLAGS_${CMAKE_BUILD_TYPE}}")
+    set(CXX_FLAGS_Debug   "${CXX_FLAGS} /DTETRIS_QT=1 ")
+    set(CXX_FLAGS_Release "${CXX_FLAGS} /DTETRIS_QT=0 ")
+    set(FINAL_COMPILE_FLAGS "${CXX_FLAGS_${CMAKE_BUILD_TYPE}} /D _HAS_ITERATOR_DEBUGGING=0 /D _SECURE_SCL=0 /D _SECURE_SCL_THROWS=0")
 else()
     set(CXX_FLAGS         "${CXX_FLAGS} -DTETRIS_QT=1")
     set(WARNING_OPTIONS_STM "-Wno-strict-aliasing -std=c++0x -Wno-deprecated-declarations")
