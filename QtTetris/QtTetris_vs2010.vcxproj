@@ -77,9 +77,9 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>libboost_thread.lib;libboost_signals.lib;qtmain.lib;QtCore4.lib;QtGui4.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libboost_thread.lib;libboost_signals.lib;libPocoFoundation.lib;qtmain.lib;QtCore4.lib;QtGui4.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).exe</OutputFile>
-      <AdditionalLibraryDirectories>$(QTDIR)\lib;$(SolutionDir)3rdParty\Boost\lib\Windows\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(QTDIR)\lib;$(SolutionDir)3rdParty\Poco\lib\Windows\x86;$(SolutionDir)3rdParty\Boost\lib\Windows\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>Windows</SubSystem>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
@@ -103,9 +103,9 @@
       <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
     </ProjectReference>
     <Link>
-      <AdditionalDependencies>libboost_thread.lib;libboost_signals.lib;qtmaind.lib;QtCored4.lib;QtGuid4.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libboost_thread.lib;libboost_signals.lib;libPocoFoundation.lib;qtmaind.lib;QtCored4.lib;QtGuid4.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).exe</OutputFile>
-      <AdditionalLibraryDirectories>$(QTDIR)\lib;$(SolutionDir)3rdParty\Boost\lib\Windows\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(QTDIR)\lib;$(SolutionDir)3rdParty\Poco\lib\Windows\x86;$(SolutionDir)3rdParty\Boost\lib\Windows\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
     </Link>
@@ -119,14 +119,10 @@
       <AdditionalIncludeDirectories>.\;.\GeneratedFiles;.\GeneratedFiles\$(Configuration);$(SolutionDir)Tetris\include;$(SolutionDir)Futile\include;$(SolutionDir)3rdParty\STM;$(SolutionDir)3rdParty\Boost;$(SolutionDir)3rdParty\Poco\Foundation\include;$(QTDIR)\include;$(QTDIR)\include\qtmain;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(QTDIR)\lib;$(SolutionDir)3rdParty\Boost\lib\Windows\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(QTDIR)\lib;$(SolutionDir)3rdParty\Poco\lib\Windows\x86;$(SolutionDir)3rdParty\Boost\lib\Windows\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ProjectReference Include="..\3rdParty\Poco\Foundation\Foundation_vs100.vcxproj">
-      <Project>{8164d41d-b053-405b-826c-cf37ac0ef176}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
     <ProjectReference Include="..\3rdParty\STM\STM_vs2010.vcxproj">
       <Project>{63c60c9a-82e4-4ea7-9f06-478c54955495}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
