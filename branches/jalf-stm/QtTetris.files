@@ -194,3 +194,5 @@ Tetris/testing/src/WorkerTest.h
 Tetris/testing/src/main.cpp
 configure
 rebuild.bat
+configure.bat
+clean.bat
