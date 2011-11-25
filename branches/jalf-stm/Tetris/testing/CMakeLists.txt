@@ -21,11 +21,17 @@ add_executable(TetrisTest
 set_target_properties(TetrisTest PROPERTIES
     COMPILE_FLAGS "${FINAL_COMPILE_FLAGS}")
 
+
+set(LIBEXT "a")
+if(WIN32)
+set(LIBEXT "lib")
+endif()
+
 target_link_libraries(TetrisTest
     Tetris
     Futile
     ${EXTRA_LIBS}
-    ${SOLUTIONDIR}3rdParty/GTest/lib/${PLATFORM}/${ARCH}/libgtest.a
-    ${SOLUTIONDIR}3rdParty/Boost/lib/${PLATFORM}/${ARCH}/libboost_signals.a
-    ${SOLUTIONDIR}3rdParty/Boost/lib/${PLATFORM}/${ARCH}/libboost_thread.a
-    ${SOLUTIONDIR}3rdParty/Poco/lib/${PLATFORM}/${ARCH}/libPocoFoundation.a)
+    ${SOLUTIONDIR}3rdParty/GTest/lib/${PLATFORM}/${ARCH}/libgtest.${LIBEXT}
+    ${SOLUTIONDIR}3rdParty/Boost/lib/${PLATFORM}/${ARCH}/libboost_signals.${LIBEXT}
+    ${SOLUTIONDIR}3rdParty/Boost/lib/${PLATFORM}/${ARCH}/libboost_thread.${LIBEXT}
+    ${SOLUTIONDIR}3rdParty/Poco/lib/${PLATFORM}/${ARCH}/libPocoFoundation.${LIBEXT})

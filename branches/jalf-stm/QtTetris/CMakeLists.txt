@@ -64,18 +64,17 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OUTDIR}bin/)
 #
 # Compile flags
 #
-set(WARNING_OPTIONS_STM "-Wno-strict-aliasing -std=c++0x -Wno-deprecated-declarations")
-set(WARNING_OPTIONS     "-Wall -Werror ${WARNING_OPTIONS_STM}")
-set(CXX_FLAGS         "${CXX_FLAGS} -DTETRIS_QT=1")
-set(CXX_FLAGS_Debug   "${CXX_FLAGS} ${WARNING_OPTIONS} -ggdb3")
-set(CXX_FLAGS_Release "${CXX_FLAGS} ${WARNING_OPTIONS} -O3 -DNDEBUG")
-set(FINAL_COMPILE_FLAGS "${CXX_FLAGS_${CMAKE_BUILD_TYPE}}")
-
-
-if(APPLE)
-if("$ENV{TETRIS_CPP0X}" STREQUAL "No")
-set(FINAL_COMPILE_FLAGS "-arch ${ARCH} ${FINAL_COMPILE_FLAGS}")
-endif()
+if(WIN32)
+    set(CXX_FLAGS_Debug   "${CXX_FLAGS} /DTETRIS_QT=1")
+    set(CXX_FLAGS_Release "${CXX_FLAGS} /DTETRIS_QT=0")
+    set(FINAL_COMPILE_FLAGS "${CXX_FLAGS_${CMAKE_BUILD_TYPE}}")
+else()
+    set(CXX_FLAGS         "${CXX_FLAGS} -DTETRIS_QT=1")
+    set(WARNING_OPTIONS_STM "-Wno-strict-aliasing -std=c++0x -Wno-deprecated-declarations")
+    set(WARNING_OPTIONS     "-Wall -Werror ${WARNING_OPTIONS_STM}")
+    set(CXX_FLAGS_Debug   "${CXX_FLAGS} ${WARNING_OPTIONS} -ggdb3")
+    set(CXX_FLAGS_Release "${CXX_FLAGS} ${WARNING_OPTIONS} -O3 -DNDEBUG")
+    set(FINAL_COMPILE_FLAGS "${CXX_FLAGS_${CMAKE_BUILD_TYPE}}")
 endif()
 
 
@@ -83,7 +82,7 @@ endif()
 # Extra platform specific libs
 #
 if(WIN32)
-    set(EXTRA_LIBS "-lIphlpapi ${EXTRA_LIBS}")
+    set(EXTRA_LIBS "-lIphlpapi" "${EXTRA_LIBS}")
 else()
     set(EXTRA_LIBS "pthread")
 endif()
@@ -202,6 +201,12 @@ add_custom_command(TARGET ${EXECUTABLE}
 endif(APPLE)
 
 
+set(LIBEXT "a")
+if(WIN32)
+set(LIBEXT "lib")
+endif()
+
+
 #
 # Libs
 #
@@ -210,9 +215,9 @@ target_link_libraries(${EXECUTABLE}
     Tetris
     Futile
     ${EXTRA_LIBS}
-    ${SOLUTIONDIR}3rdParty/Boost/lib/${PLATFORM}/${ARCH}/libboost_signals.a
-    ${SOLUTIONDIR}3rdParty/Boost/lib/${PLATFORM}/${ARCH}/libboost_thread.a
-    ${SOLUTIONDIR}3rdParty/Poco/lib/${PLATFORM}/${ARCH}/libPocoFoundation.a)
+    ${SOLUTIONDIR}3rdParty/Boost/lib/${PLATFORM}/${ARCH}/libboost_signals.${LIBEXT}
+    ${SOLUTIONDIR}3rdParty/Boost/lib/${PLATFORM}/${ARCH}/libboost_thread.${LIBEXT}
+    ${SOLUTIONDIR}3rdParty/Poco/lib/${PLATFORM}/${ARCH}/libPocoFoundation.${LIBEXT})
 
 
 #
