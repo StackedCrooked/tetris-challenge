@@ -55,7 +55,7 @@ void Game::onChanged()
 {
     if (!mMuteEvents)
     {
-        GameStateChanged(this);
+        GameStateChanged();
     }
 }
 
@@ -63,7 +63,7 @@ void Game::onLinesCleared(std::size_t inLineCount)
 {
     if (!mMuteEvents)
     {
-        LinesCleared(this, inLineCount);
+        LinesCleared(inLineCount);
     }
 }
 

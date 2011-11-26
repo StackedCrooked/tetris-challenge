@@ -48,8 +48,8 @@ struct SimpleGame::Impl : boost::enable_shared_from_this<SimpleGame::Impl>
     {
         FUTILE_LOCK(Game & game, mGame)
         {
-            game.GameStateChanged.connect(boost::bind(&Impl::onGameStateChanged, this, _1));
-            game.LinesCleared.connect(boost::bind(&Impl::onLinesCleared, this, _1, _2));
+            game.GameStateChanged.connect(boost::bind(&Impl::onGameStateChanged, this));
+            game.LinesCleared.connect(boost::bind(&Impl::onLinesCleared, this, _1));
         }
     }
 
@@ -57,7 +57,7 @@ struct SimpleGame::Impl : boost::enable_shared_from_this<SimpleGame::Impl>
     {
     }
 
-    virtual void onGameStateChanged(Game * inGame)
+    virtual void onGameStateChanged()
     {
         // This method is triggered in a worker thread. Dispatch to main thread.
         boost::weak_ptr<Impl> weakSelf(shared_from_this());
@@ -85,9 +85,8 @@ struct SimpleGame::Impl : boost::enable_shared_from_this<SimpleGame::Impl>
         }
     }
 
-    virtual void onLinesCleared(Game * inGame, std::size_t inLineCount)
+    virtual void onLinesCleared(std::size_t inLineCount)
     {
-        (void)inGame;
         // This method is triggered in a worker thread. Dispatch to main thread.
         boost::weak_ptr<Impl> weakSelf(shared_from_this());
         InvokeLater(boost::bind(&Impl::OnLinesClearedLater, weakSelf, inLineCount));
