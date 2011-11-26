@@ -68,37 +68,6 @@ private:
 };
 
 
-template<typename T>
-class Synchronized : boost::noncopyable
-{
-public:
-    Synchronized(T inValue = T()) :
-        mValue(inValue)
-    {
-    }
-
-    typedef boost::function<void(const T &)> Reader;
-
-    void apply(Reader reader) const
-    {
-        ScopedLock lock(mMutex);
-        reader(mValue);
-    }
-
-    typedef boost::function<void(T &)> Writer;
-
-    void apply(Writer writer)
-    {
-        ScopedLock lock(mMutex);
-        writer(mValue);
-    }
-
-private:
-    mutable Mutex mMutex;
-    T mValue;
-};
-
-
 } // namespace Futile
 
 
