@@ -46,8 +46,13 @@ protected:
 public:
     virtual ~Game();
 
-    boost::signals2::signal<void(Game *)> GameStateChanged;
-    boost::signals2::signal<void(Game *, int)> LinesCleared;
+    /// GameStateChanged signals change events.
+    /// NOTE: callbacks can be received from different threads.
+    boost::signals2::signal<void()> GameStateChanged;
+
+    /// LinesCleared signals when clearing lines.
+    /// NOTE: callbacks can be received from different threads.
+    boost::signals2::signal<void(int)> LinesCleared;
 
     void setPaused(bool inPause);
 
