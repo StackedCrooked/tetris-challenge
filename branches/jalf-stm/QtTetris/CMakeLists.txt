@@ -3,12 +3,12 @@ project(QtTetris)
 FIND_PACKAGE(Qt4 REQUIRED)
 
 
-# Use gcc 4.6.1 for C++0x support on Mac
 if(APPLE)
-set(CMAKE_CXX_COMPILER "/opt/local/bin/g++-mp-4.6")
-set(CMAKE_INCLUDE_PATH "/opt/local/include")
-set(CMAKE_LIBRARY_PATH "/opt/local/lib/gcc46")
+    set(CMAKE_CXX_COMPILER "/opt/local/bin/g++-mp-4.6")
+    set(CMAKE_INCLUDE_PATH "/opt/local/include/gcc46/c++")
+    set(CMAKE_LIBRARY_PATH "/opt/local/lib/gcc46")
 endif()
+
 
 
 #
@@ -28,6 +28,9 @@ endif()
 if(WIN32)
     set(PLATFORM Windows)
     set(ARCH x86)
+elseif(APPLE)
+    set(PLATFORM Darwin)
+    set(ARCH x86_64_g++-4.6.2)
 else()
     execute_process(COMMAND uname OUTPUT_VARIABLE PLATFORM)
     string(REPLACE "\n" "" PLATFORM ${PLATFORM})
