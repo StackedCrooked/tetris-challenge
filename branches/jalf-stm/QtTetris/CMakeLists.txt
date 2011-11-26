@@ -214,7 +214,6 @@ target_link_libraries(${EXECUTABLE}
     Tetris
     Futile
     ${EXTRA_LIBS}
-    ${SOLUTIONDIR}3rdParty/Boost/lib/${PLATFORM}/${ARCH}/libboost_signals.${LIBEXT}
     ${SOLUTIONDIR}3rdParty/Boost/lib/${PLATFORM}/${ARCH}/libboost_thread.${LIBEXT}
     ${SOLUTIONDIR}3rdParty/Poco/lib/${PLATFORM}/${ARCH}/libPocoFoundation.${LIBEXT})
 
