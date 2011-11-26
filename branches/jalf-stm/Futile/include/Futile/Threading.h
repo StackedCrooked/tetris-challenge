@@ -30,8 +30,37 @@ void Sleep(UInt64 inMilliseconds);
 UInt64 GetCurrentTimeMs();
 
 
+class LifeTimeChecker : boost::noncopyable
+{
+public:
+	LifeTimeChecker();
+
+	~LifeTimeChecker();
+
+private:
+	UInt64 mBeginTime;
+	UInt64 mMaxDuration;
+};
+
+
 typedef boost::mutex Mutex;
+
+
 typedef boost::mutex::scoped_lock ScopedLock;
+
+
+//struct ScopedLock : public LifeTimeChecker,
+//	                public boost::mutex::scoped_lock,
+//                    boost::noncopyable
+//{
+//    ScopedLock(Mutex & mutex) : 
+//        LifeTimeChecker(),
+//        boost::mutex::scoped_lock(mutex)
+//    {
+//    }
+//};
+
+
 typedef boost::condition_variable Condition;
 
 
