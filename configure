@@ -2,9 +2,9 @@
 
 # Apple only. TODO: make cross-platform
 if [[ `uname` == 'Darwin' ]]; then
-    export CC="/opt/local/bin/x86_64-apple-darwin10-gcc-mp-4.6"
-    export CPP="/opt/local/bin/cpp-mp-4.6"
-    export CXX="/opt/local/bin/x86_64-apple-darwin10-g++-mp-4.6"
+    export CC="x86_64-apple-darwin10-gcc-mp-4.6"
+    export CPP="cpp-mp-4.6"
+    export CXX="x86_64-apple-darwin10-g++-mp-4.6"
 fi
 
 # Set configuration variables
