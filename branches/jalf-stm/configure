@@ -1,5 +1,10 @@
 #!/bin/sh
 
+# Apple only. TODO: make cross-platform
+export CC="/opt/local/bin/x86_64-apple-darwin10-gcc-mp-4.6"
+export CPP="/opt/local/bin/cpp-mp-4.6"
+export CXX="/opt/local/bin/x86_64-apple-darwin10-g++-mp-4.6"
+
 # Set configuration variables
 export TETRIS_BUILD_TYPE=${TETRIS_BUILD_TYPE:-Release}
 export TETRIS_DEPLOY_DMG=${TETRIS_DEPLOY_DMG:-No}
