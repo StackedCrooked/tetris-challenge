@@ -3,13 +3,6 @@ project(QtTetris)
 FIND_PACKAGE(Qt4 REQUIRED)
 
 
-if(APPLE)
-    set(CMAKE_CXX_COMPILER "/opt/local/bin/g++-mp-4.6")
-    set(CMAKE_INCLUDE_PATH "/opt/local/include/gcc46/c++")
-    set(CMAKE_LIBRARY_PATH "/opt/local/lib/gcc46")
-endif()
-
-
 
 #
 # Check TETRIS_BUILD_TYPE environment variable
@@ -198,7 +191,7 @@ add_custom_command(TARGET ${EXECUTABLE}
                    COMMAND /bin/cp                  ARGS  "${SOLUTIONDIR}Tetris/res/Tetris.icns"
                                                           "${BUNDLE}/Contents/Resources/Tetris.icns"
                    COMMAND /usr/libexec/PlistBuddy  ARGS  "-c" \"Set :CFBundleIconFile Tetris\" "${BUNDLE}/Contents/Info.plist"
-                   COMMAND /usr/bin/macdeployqt     ARGS  "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}QtTetris.app" "${MACDEPLOYQT_OPTIONS}"
+                   #COMMAND /usr/bin/macdeployqt     ARGS  "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}QtTetris.app" "${MACDEPLOYQT_OPTIONS}"
                    WORKING_DIRECTORY  ${BUILD_ROOT})
 endif(APPLE)
 
