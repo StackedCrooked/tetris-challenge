@@ -3,7 +3,6 @@ project(QtTetris)
 FIND_PACKAGE(Qt4 REQUIRED)
 
 
-
 #
 # Check TETRIS_BUILD_TYPE environment variable
 #
@@ -23,7 +22,7 @@ if(WIN32)
     set(ARCH x86)
 elseif(APPLE)
     set(PLATFORM Darwin)
-    set(ARCH x86_64_g++-4.6.2)
+    set(ARCH x86_64)
 else()
     execute_process(COMMAND uname OUTPUT_VARIABLE PLATFORM)
     string(REPLACE "\n" "" PLATFORM ${PLATFORM})
@@ -191,7 +190,6 @@ add_custom_command(TARGET ${EXECUTABLE}
                    COMMAND /bin/cp                  ARGS  "${SOLUTIONDIR}Tetris/res/Tetris.icns"
                                                           "${BUNDLE}/Contents/Resources/Tetris.icns"
                    COMMAND /usr/libexec/PlistBuddy  ARGS  "-c" \"Set :CFBundleIconFile Tetris\" "${BUNDLE}/Contents/Info.plist"
-                   #COMMAND /usr/bin/macdeployqt     ARGS  "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}QtTetris.app" "${MACDEPLOYQT_OPTIONS}"
                    WORKING_DIRECTORY  ${BUILD_ROOT})
 endif(APPLE)
 
