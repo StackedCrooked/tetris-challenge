@@ -3,12 +3,10 @@
 # Set configuration variables
 export TETRIS_BUILD_TYPE=${TETRIS_BUILD_TYPE:-Release}
 export TETRIS_DEPLOY_DMG=${TETRIS_DEPLOY_DMG:-No}
-export TETRIS_CPP0X=${TETRIS_CPP0X:-No}
 
 # Print configuration variables
 echo "TETRIS_BUILD_TYPE=Debug|Release -> ${TETRIS_BUILD_TYPE}"
 echo "TETRIS_DEPLOY_DMG=Yes|No -> ${TETRIS_DEPLOY_DMG}"
-echo "TETRIS_CPP0X=Yes|No -> ${TETRIS_CPP0X}"
 
 mkdir -p Build
 cd Build
