@@ -10,7 +10,7 @@ namespace Tetris {
 using namespace Futile;
 
 
-static std::auto_ptr<NodeCalculatorImpl> CreateImpl(std::auto_ptr<GameStateNode> inNode,
+static std::unique_ptr<NodeCalculatorImpl> CreateImpl(std::unique_ptr<GameStateNode> inNode,
                                                     const BlockTypes & inBlockTypes,
                                                     const std::vector<int> & inWidths,
                                                     const Evaluator & inEvaluator,
@@ -19,13 +19,13 @@ static std::auto_ptr<NodeCalculatorImpl> CreateImpl(std::auto_ptr<GameStateNode>
 {
     if (inWorkerPool.size() > 1)
     {
-        return std::auto_ptr<NodeCalculatorImpl>(
-            new MultithreadedNodeCalculator(inNode, inBlockTypes, inWidths, inEvaluator, inMainWorker, inWorkerPool));
+        return std::unique_ptr<NodeCalculatorImpl>(
+            new MultithreadedNodeCalculator(std::move(inNode), inBlockTypes, inWidths, inEvaluator, inMainWorker, inWorkerPool));
     }
     else if (inWorkerPool.size() == 1)
     {
-        return std::auto_ptr<NodeCalculatorImpl>(
-            new SingleThreadedNodeCalculator(inNode, inBlockTypes, inWidths, inEvaluator, inMainWorker, inWorkerPool));
+        return std::unique_ptr<NodeCalculatorImpl>(
+            new SingleThreadedNodeCalculator(std::move(inNode), inBlockTypes, inWidths, inEvaluator, inMainWorker, inWorkerPool));
     }
     else
     {
@@ -34,13 +34,13 @@ static std::auto_ptr<NodeCalculatorImpl> CreateImpl(std::auto_ptr<GameStateNode>
 }
 
 
-NodeCalculator::NodeCalculator(std::auto_ptr<GameStateNode> inNode,
+NodeCalculator::NodeCalculator(std::unique_ptr<GameStateNode> inNode,
                                const BlockTypes & inBlockTypes,
                                const std::vector<int> & inWidths,
                                const Evaluator & inEvaluator,
                                Worker & inMainWorker,
                                WorkerPool & inWorkerPool) :
-    mImpl(CreateImpl(inNode, inBlockTypes, inWidths, inEvaluator, inMainWorker, inWorkerPool).release())
+    mImpl(CreateImpl(std::move(inNode), inBlockTypes, inWidths, inEvaluator, inMainWorker, inWorkerPool).release())
 {
 }
 

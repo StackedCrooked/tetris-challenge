@@ -22,7 +22,7 @@ class NodeCalculatorImpl;
 class NodeCalculator
 {
 public:
-    NodeCalculator(std::auto_ptr<GameStateNode> inNode,
+    NodeCalculator(std::unique_ptr<GameStateNode> inNode,
                    const BlockTypes & inBlockTypes,
                    const std::vector<int> & inWidths,
                    const Evaluator & inEvaluator,

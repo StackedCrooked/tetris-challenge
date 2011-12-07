@@ -157,9 +157,9 @@ void Game::applyLinePenalty(std::size_t inLineCount)
 }
 
 
-std::auto_ptr<Block> Game::CreateDefaultBlock(BlockType inBlockType, std::size_t inNumColumns)
+std::unique_ptr<Block> Game::CreateDefaultBlock(BlockType inBlockType, std::size_t inNumColumns)
 {
-    return std::auto_ptr<Block>(
+    return std::unique_ptr<Block>(
         new Block(inBlockType,
                     Rotation(0),
                     Row(0),
