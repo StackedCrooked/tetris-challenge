@@ -12,7 +12,7 @@ namespace Tetris {
 class MultithreadedNodeCalculator : public NodeCalculatorImpl
 {
 public:
-    MultithreadedNodeCalculator(std::auto_ptr<GameStateNode> inNode,
+    MultithreadedNodeCalculator(std::unique_ptr<GameStateNode> inNode,
                                 const BlockTypes & inBlockTypes,
                                 const std::vector<int> & inWidths,
                                 const Evaluator & inEvaluator,

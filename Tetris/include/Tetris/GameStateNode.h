@@ -22,7 +22,7 @@ class Evaluator;
 class GameStateNode
 {
 public:
-    static std::auto_ptr<GameStateNode> CreateRootNode(std::size_t inNumRows, std::size_t inNumColumns);
+    static std::unique_ptr<GameStateNode> CreateRootNode(std::size_t inNumRows, std::size_t inNumColumns);
 
     GameStateNode(NodePtr inParent, const GameState & inGameState, const Evaluator & inEvaluator);
 
@@ -31,7 +31,7 @@ public:
     ~GameStateNode();
 
     // Creates a deep copy of this node and all child nodes.
-    std::auto_ptr<GameStateNode> clone() const;
+    std::unique_ptr<GameStateNode> clone() const;
 
     // Each node is produced by a unique combination of the current block's column and rotation.
     int identifier() const;

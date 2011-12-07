@@ -106,7 +106,7 @@ protected:
     void onChanged();
     void onLinesCleared(std::size_t inLineCount);
 
-    static std::auto_ptr<Block> CreateDefaultBlock(BlockType inBlockType, std::size_t inNumColumns);
+    static std::unique_ptr<Block> CreateDefaultBlock(BlockType inBlockType, std::size_t inNumColumns);
     void reserveBlocks(std::size_t inCount);
     void supplyBlocks();
 

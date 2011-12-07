@@ -367,7 +367,7 @@ void ComputerPlayer::Impl::startNodeCalculator()
 {
 
     BlockTypes futureBlocks;
-    std::auto_ptr<GameStateNode> endNode;
+    std::unique_ptr<GameStateNode> endNode;
 
     // Critical section
     {
@@ -421,7 +421,7 @@ void ComputerPlayer::Impl::startNodeCalculator()
         mWorkerCount = cDefaultWorkerCount;
     }
     mWorkerPool.resize(mWorkerCount);
-    mNodeCalculator.reset(new NodeCalculator(endNode,
+    mNodeCalculator.reset(new NodeCalculator(std::move(endNode),
                                              futureBlocks,
                                              widths,
                                              *mEvaluator,
