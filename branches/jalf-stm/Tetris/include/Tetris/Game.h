@@ -112,8 +112,6 @@ protected:
 
     std::vector<BlockType> getGarbageRow() const;
 
-    std::size_t mNumRows;
-    std::size_t mNumColumns;
     boost::scoped_ptr<Block> mActiveBlock;
     boost::scoped_ptr<BlockFactory> mBlockFactory;
     boost::scoped_ptr<BlockFactory> mGarbageFactory;
