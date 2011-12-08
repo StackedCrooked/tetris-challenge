@@ -27,8 +27,6 @@ extern const int cMaxLevel;
 
 
 Game::Game(std::size_t inNumRows, std::size_t inNumColumns) :
-    mNumRows(inNumRows),
-    mNumColumns(inNumColumns),
     mActiveBlock(),
     mBlockFactory(new BlockFactory),
     mGarbageFactory(new BlockFactory),
@@ -70,7 +68,7 @@ void Game::onLinesCleared(std::size_t inLineCount)
 
 std::vector<BlockType> Game::getGarbageRow() const
 {
-    BlockTypes result(mNumColumns, BlockType_Nil);
+    BlockTypes result(columnCount(), BlockType_Nil);
 
     static Poco::UInt32 fSeed = static_cast<Poco::UInt32>(time(0) % Poco::UInt32(-1));
     fSeed = (fSeed + 1) % Poco::UInt32(-1);
@@ -82,7 +80,7 @@ std::vector<BlockType> Game::getGarbageRow() const
     int count = 0;
     while (count < cMinCount)
     {
-        for (std::size_t idx = 0; idx < mNumColumns; ++idx)
+        for (unsigned idx = 0; idx < unsigned(columnCount()); ++idx)
         {
             if (result[idx] == BlockType_Nil && rand.nextBool())
             {
@@ -197,13 +195,13 @@ bool Game::isGameOver() const
 
 int Game::rowCount() const
 {
-    return mNumRows;
+    return gameGrid().rowCount();
 }
 
 
 int Game::columnCount() const
 {
-    return mNumColumns;
+    return gameGrid().columnCount();
 }
 
 
@@ -458,7 +456,7 @@ bool HumanGame::move(MoveDirection inDirection)
 
     mCurrentBlockIndex++;
     supplyBlocks();
-    mActiveBlock.reset(CreateDefaultBlock(mBlocks[mCurrentBlockIndex], mNumColumns).release());
+    mActiveBlock.reset(CreateDefaultBlock(mBlocks[mCurrentBlockIndex], gameGrid().columnCount()).release());
 
     onChanged();
     return false;
@@ -507,7 +505,7 @@ void ComputerGame::setCurrentNode(NodePtr inCurrentNode)
     mCurrentBlockIndex = mCurrentNode->depth();
     supplyBlocks();
 
-    mActiveBlock.reset(CreateDefaultBlock(mBlocks[mCurrentBlockIndex], mNumColumns).release());
+    mActiveBlock.reset(CreateDefaultBlock(mBlocks[mCurrentBlockIndex], gameGrid().columnCount()).release());
     onChanged();
 }
 
