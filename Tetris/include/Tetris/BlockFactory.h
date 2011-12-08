@@ -2,35 +2,17 @@
 #define TETRIS_BLOCKFACTORY_H_INCLUDED
 
 
-#include "Tetris/BlockTypes.h"
+#include "Tetris/BlockType.h"
 #include "Futile/Threading.h"
+#include <boost/noncopyable.hpp>
 #include <memory>
 
 
 namespace Tetris {
 
 
-class Block;
-
-
-class AbstractBlockFactory
-{
-public:
-    AbstractBlockFactory();
-
-    virtual ~AbstractBlockFactory() = 0;
-
-    // Returns a random block type.
-    virtual BlockType getNext() const = 0;
-
-private:
-    AbstractBlockFactory(const AbstractBlockFactory &);
-    AbstractBlockFactory& operator=(const AbstractBlockFactory&);
-};
-
-
 // The default block factory
-class BlockFactory : public AbstractBlockFactory
+class BlockFactory : boost::noncopyable
 {
 public:
     // The size of the bag of blocks that shuffled and taken from.
@@ -42,9 +24,6 @@ public:
     virtual BlockType getNext() const;
 
 private:
-    BlockFactory(const BlockFactory &);
-    BlockFactory& operator=(const BlockFactory&);
-
     struct Impl;
     boost::scoped_ptr<Impl> mImpl;
 };
