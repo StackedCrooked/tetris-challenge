@@ -13,16 +13,6 @@ namespace Tetris {
 using namespace Futile;
 
 
-AbstractBlockFactory::AbstractBlockFactory()
-{
-}
-
-
-AbstractBlockFactory::~AbstractBlockFactory()
-{
-}
-
-
 struct BlockFactory::Impl : boost::noncopyable
 {
     typedef unsigned seed_t;
@@ -46,7 +36,6 @@ struct BlockFactory::Impl : boost::noncopyable
 
 
 BlockFactory::BlockFactory(int inBagSize) :
-    AbstractBlockFactory(),
     mImpl(new Impl(inBagSize))
 {
     srand(mImpl->mSeed);

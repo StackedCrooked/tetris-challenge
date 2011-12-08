@@ -10,6 +10,10 @@ namespace Tetris {
  *
  * Represents a tetris shape or block type.
  *
+ * Use a char because that takes less space
+ * which is very significant when building
+ * the AI search tree.
+ *
  * I = long shape
  * J = J shaped block
  * O = square block
