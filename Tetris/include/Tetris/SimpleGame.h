@@ -18,10 +18,6 @@
 namespace Tetris {
 
 
-class Game;
-class GameState;
-
-
 /**
  * SimpleGame is a simplified wrapper for the Game class.
  */
@@ -58,8 +54,6 @@ public:
     PlayerType playerType() const;
 
     GameStateStats stats() const;
-
-    Futile::ThreadSafe<Game> gameImpl() const;
 
     void setPaused(bool inPaused);
 
