@@ -153,12 +153,6 @@ void SimpleGame::unregisterEventHandler(EventHandler * inEventHandler)
 }
 
 
-ThreadSafe<Game> SimpleGame::gameImpl() const
-{
-    return mImpl->mGame;
-}
-
-
 void SimpleGame::setPaused(bool inPaused)
 {
     gameImpl().lock()->setPaused(inPaused);

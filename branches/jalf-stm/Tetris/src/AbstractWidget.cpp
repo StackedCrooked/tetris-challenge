@@ -66,12 +66,11 @@ AbstractWidget::AbstractWidget(int inSquareWidth, int inSquareHeight) :
     mAvatarWidth(80),
     mSpacing(5),
     mMargin(2),
-    mPaintActiveBlockShadow(false),
     mFrameCount(0),
-	mFPSStopwatch(),
+    mFPSStopwatch(),
     mFPS(0)
 {
-	mFPSStopwatch.start();
+    mFPSStopwatch.start();
 }
 
 
@@ -301,12 +300,6 @@ void AbstractWidget::coordinateRepaint(SimpleGame & inGame)
               theGameRect.top() + activeBlock.row() * mSquareHeight,
               activeBlock.grid());
 
-    // Paint shadow
-    if (mPaintActiveBlockShadow)
-    {
-        paintActiveBlockShadow(inGame);
-    }
-
     paintAvatar(inGame);
 
     paintUserInfo();
@@ -391,49 +384,6 @@ void AbstractWidget::paintAvatar(const SimpleGame & inGame)
 {
     Rect theAvatarRect = avatarRect();
     paintImage(theAvatarRect, player()->playerName() + "_80.gif");
-}
-
-
-void AbstractWidget::paintActiveBlockShadow(const SimpleGame & inGame)
-{
-    std::size_t colIdx(0);
-    std::size_t rowIdx(0);
-    boost::scoped_ptr<Grid> gridPtr;
-
-    // Critical section. Minimize scope.
-    {
-        Locker<Game> rgame(inGame.gameImpl());
-        const Game & game = *rgame.get();
-        const Block & block = game.activeBlock();
-        const GameState & gameState = game.gameState();
-
-        colIdx = block.column();
-        gridPtr.reset(new Grid(block.grid()));
-        for (; rowIdx < std::size_t(game.rowCount()); ++rowIdx)
-        {
-            if (!gameState.checkPositionValid(block, rowIdx, colIdx))
-            {
-                if (rowIdx == 0)
-                {
-                    return; // This game is over.
-                }
-
-                rowIdx--;
-                break;
-            }
-        }
-    }
-
-
-    Grid & grid = *gridPtr;
-
-    Rect theGameRect(gameRect());
-
-    int x = theGameRect.left() + colIdx * mSquareWidth;
-    int y = theGameRect.top() + rowIdx * mSquareHeight;
-
-    int gray = 240;
-    paintGrid(x, y, grid, RGBColor(gray, gray, gray));
 }
 
 
