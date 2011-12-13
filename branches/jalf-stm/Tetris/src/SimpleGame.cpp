@@ -155,19 +155,19 @@ void SimpleGame::unregisterEventHandler(EventHandler * inEventHandler)
 
 void SimpleGame::setPaused(bool inPaused)
 {
-    gameImpl().lock()->setPaused(inPaused);
+    mImpl->mGame.lock()->setPaused(inPaused);
 }
 
 
 bool SimpleGame::isPaused() const
 {
-    return gameImpl().lock()->isPaused();
+    return mImpl->mGame.lock()->isPaused();
 }
 
 
 GameStateStats SimpleGame::stats() const
 {
-    const Locker<Game> locker(gameImpl());
+    const Locker<Game> locker(mImpl->mGame);
     const GameState & gameState = locker->gameState();
     return GameStateStats(gameState.numLines(),
                           gameState.numSingles(),
@@ -181,74 +181,74 @@ GameStateStats SimpleGame::stats() const
 void SimpleGame::applyLinePenalty(int inNumberOfLinesMadeByOpponent)
 {
     LogInfo(SS() << (playerType() == PlayerType_Computer ? "The computer" : "The human being") << " received " << inNumberOfLinesMadeByOpponent << " lines from his crafty opponent");
-    return gameImpl().lock()->applyLinePenalty(inNumberOfLinesMadeByOpponent);
+    return mImpl->mGame.lock()->applyLinePenalty(inNumberOfLinesMadeByOpponent);
 }
 
 
 bool SimpleGame::isGameOver() const
 {
-    return gameImpl().lock()->isGameOver();
+    return mImpl->mGame.lock()->isGameOver();
 }
 
 
 int SimpleGame::rowCount() const
 {
-    return gameImpl().lock()->rowCount();
+    return mImpl->mGame.lock()->rowCount();
 }
 
 
 int SimpleGame::columnCount() const
 {
-    return gameImpl().lock()->columnCount();
+    return mImpl->mGame.lock()->columnCount();
 }
 
 
 void SimpleGame::move(MoveDirection inDirection)
 {
-    gameImpl().lock()->move(inDirection);
+    mImpl->mGame.lock()->move(inDirection);
 }
 
 
 void SimpleGame::rotate()
 {
-    gameImpl().lock()->rotate();
+    mImpl->mGame.lock()->rotate();
 }
 
 
 void SimpleGame::drop()
 {
-    gameImpl().lock()->dropAndCommit();
+    mImpl->mGame.lock()->dropAndCommit();
 }
 
 
 void SimpleGame::setStartingLevel(int inLevel)
 {
-    gameImpl().lock()->setStartingLevel(inLevel);
+    mImpl->mGame.lock()->setStartingLevel(inLevel);
 }
 
 
 int SimpleGame::level() const
 {
-    return gameImpl().lock()->level();
+    return mImpl->mGame.lock()->level();
 }
 
 
 Block SimpleGame::activeBlock() const
 {
-    return gameImpl().lock()->activeBlock();
+    return mImpl->mGame.lock()->activeBlock();
 }
 
 
 Grid SimpleGame::gameGrid() const
 {
-    return gameImpl().lock()->gameGrid();
+    return mImpl->mGame.lock()->gameGrid();
 }
 
 
 Block SimpleGame::getNextBlock() const
 {
     std::vector<BlockType> blockTypes;
-    gameImpl().lock()->getFutureBlocks(2, blockTypes);
+    mImpl->mGame.lock()->getFutureBlocks(2, blockTypes);
 
     if (blockTypes.size() != 2)
     {
@@ -263,7 +263,7 @@ std::vector<Block> SimpleGame::getNextBlocks(std::size_t inCount) const
 {
     std::vector<BlockType> blockTypes;
 
-    gameImpl().lock()->getFutureBlocks(1 + inCount, blockTypes);
+    mImpl->mGame.lock()->getFutureBlocks(1 + inCount, blockTypes);
 
     if (blockTypes.size() != (1 + inCount))
     {
