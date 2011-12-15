@@ -136,7 +136,7 @@ void GameState::clearLines()
         }
     }
 
-    Assert(numLines >= 0 && numLines <= 4);
+    Assert(numLines <= 4);
     if (numLines > 0)
     {
         BlockType * gridBegin = const_cast<BlockType*>(&(mGrid.get(mFirstOccupiedRow, 0)));
