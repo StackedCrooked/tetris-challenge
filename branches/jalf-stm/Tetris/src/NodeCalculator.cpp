@@ -63,18 +63,6 @@ void NodeCalculator::stop()
 }
 
 
-std::size_t NodeCalculator::getCurrentNodeCount() const
-{
-    return mImpl->getCurrentNodeCount();
-}
-
-
-std::size_t NodeCalculator::getMaxNodeCount() const
-{
-    return mImpl->getMaxNodeCount();
-}
-
-
 int NodeCalculator::getCurrentSearchDepth() const
 {
     return mImpl->getCurrentSearchDepth();

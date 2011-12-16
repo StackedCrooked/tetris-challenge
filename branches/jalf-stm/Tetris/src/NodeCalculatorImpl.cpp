@@ -65,8 +65,6 @@ NodeCalculatorImpl::NodeCalculatorImpl(std::unique_ptr<GameStateNode> inNode,
     mNodeMutex(),
     mQuitFlag(false),
     mQuitFlagMutex(),
-    mNodeCount(0),
-    mMaxNodeCount(calculateMaxNodeCount(inWidths)),
     mTreeRowInfos(inEvaluator, inBlockTypes.size()),
     mBlockTypes(inBlockTypes),
     mWidths(inWidths),
@@ -98,18 +96,6 @@ bool NodeCalculatorImpl::getQuitFlag() const
 {
     ScopedLock lock(mQuitFlagMutex);
     return mQuitFlag;
-}
-
-
-std::size_t NodeCalculatorImpl::getCurrentNodeCount() const
-{
-    return mNodeCount.get();
-}
-
-
-std::size_t NodeCalculatorImpl::getMaxNodeCount() const
-{
-    return mMaxNodeCount;
 }
 
 
