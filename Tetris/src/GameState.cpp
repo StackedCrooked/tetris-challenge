@@ -19,7 +19,8 @@ GameState::GameState(unsigned inRowCount, unsigned inColumnCount) :
     mIsGameOver(false),
     mFirstOccupiedRow(inRowCount),
     mStats(),
-    mTainted(false)
+    mTainted(false),
+    mId(0)
 {
 }
 
@@ -30,6 +31,7 @@ GameState GameState::commit(const Block & inBlock) const
     result.mTainted = false;
     result.mOriginalBlock = inBlock;
     result.mIsGameOver = inBlock.row() == 0 && !result.checkPositionValid(inBlock, inBlock.row(), inBlock.column());
+    result.mId = id() + 1;
     result.solidifyBlock(inBlock);
     if (!result.mIsGameOver)
     {
