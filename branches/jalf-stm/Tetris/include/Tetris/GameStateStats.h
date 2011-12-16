@@ -5,6 +5,9 @@
 namespace Tetris {
 
 
+class GameState;
+
+
 /**
  * GameStateStats contains game statistics.
  * Objects are immutible.
@@ -12,19 +15,35 @@ namespace Tetris {
 class GameStateStats
 {
 public:
+    GameStateStats() :
+        mNumLines(0),
+        mNumSingles(0),
+        mNumDoubles(0),
+        mNumTriples(0),
+        mNumTetrises(0)
+    {
+    }
+
     GameStateStats(int inNumLines,
                    int inNumSingles,
                    int inNumDoubles,
                    int inNumTriples,
-                   int inNumTetrises,
-                   int inCurrentHeight) :
+                   int inNumTetrises) :
         mNumLines(inNumLines),
         mNumSingles(inNumSingles),
         mNumDoubles(inNumDoubles),
         mNumTriples(inNumTriples),
-        mNumTetrises(inNumTetrises),
-        mCurrentHeight(inCurrentHeight)
+        mNumTetrises(inNumTetrises)
     {
+    }
+
+    inline GameStateStats increment(unsigned inNumLines)
+    {
+        return GameStateStats(numLines()    + inNumLines,
+                              numSingles()  + (inNumLines == 1 ? 1 : 0),
+                              numDoubles()  + (inNumLines == 2 ? 1 : 0),
+                              numTriples()  + (inNumLines == 3 ? 1 : 0),
+                              numTetrises() + (inNumLines == 4 ? 1 : 0));
     }
 
     inline int numLines() const
@@ -42,9 +61,6 @@ public:
     inline int numTetrises() const
     { return mNumTetrises; }
 
-    inline int currentHeight() const
-    { return mCurrentHeight; }
-
     inline int score() const
     {
         return   40 * mNumSingles +
@@ -54,12 +70,12 @@ public:
     }
 
 private:
+    friend class GameState;
     int mNumLines;
     int mNumSingles;
     int mNumDoubles;
     int mNumTriples;
     int mNumTetrises;
-    int mCurrentHeight;
 };
 
 
