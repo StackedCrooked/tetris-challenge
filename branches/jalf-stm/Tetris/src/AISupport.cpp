@@ -55,6 +55,24 @@ bool IsGameOver(const GameState & inGameState, BlockType inBlockType, int inRota
 }
 
 
+void CalculateNodes(NodePtr ioNode,
+                    const Evaluator & inEvaluator,
+                    const BlockTypes & inBlockTypes,
+                    const std::vector<int> & inWidths,
+                    const Progress & inProgress,
+                    boost::function<void(const GameState &)> inCallback);
+
+
+void CalculateNodes(const GameState & inGameState,
+                    const Evaluator & inEvaluator,
+                    const BlockTypes & inBlockTypes,
+                    const std::vector<int> & inWidths,
+                    const Progress & inProgress,
+                    boost::function<void(const GameState &)> inCallback)
+{
+    NodePtr node(new GameStateNode(inGameState, inEvaluator));
+    CalculateNodes(node, inEvaluator, inBlockTypes, inWidths, inProgress, inCallback);
+}
 
 
 void CalculateNodes(NodePtr ioNode,

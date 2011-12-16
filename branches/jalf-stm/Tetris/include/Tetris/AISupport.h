@@ -47,7 +47,7 @@ public:
 
     inline unsigned limit() const { return mMaximum; }
 
-    inline bool complete() const { return current() == limit(); }
+    inline bool complete() const { return mCurrent == mMaximum; }
 
     inline Progress increment(unsigned amount = 1) const
     {
@@ -60,7 +60,7 @@ private:
 };
 
 
-void CalculateNodes(NodePtr ioNode,
+void CalculateNodes(const GameState & inGameState,
                     const Evaluator & inEvaluator,
                     const BlockTypes & inBlockTypes,
                     const std::vector<int> & inWidths,
