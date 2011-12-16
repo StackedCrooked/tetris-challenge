@@ -49,7 +49,6 @@ public:
         mSearchDepth(6),
         mSearchWidth(4),
         mWorkerCount(cDefaultWorkerCount),
-        mGameDepth(0),
         mStop(false),
         mReset(false),
         mQuitFlag(false)
@@ -89,13 +88,13 @@ public:
 
     Worker mMainWorker;
     WorkerPool mWorkerPool;
+    std::vector<GameState> mPrecalculated;
     boost::scoped_ptr<NodeCalculator> mNodeCalculator;
     const Evaluator * mEvaluator;
     boost::scoped_ptr<BlockMover> mBlockMover;
     int mSearchDepth;
     int mSearchWidth;
     int mWorkerCount;
-    int mGameDepth;
     bool mStop;
     bool mReset;
     bool mQuitFlag;
@@ -364,67 +363,58 @@ void ComputerPlayer::Impl::timerEvent()
 
 
 void ComputerPlayer::Impl::startNodeCalculator()
-{
-//    BlockTypes futureBlocks;
-//    std::unique_ptr<GameStateNode> endNode;
+{   
+    if (mPrecalculated.size() > 8)
+    {
+        // We're fine for now.
+        return;
+    }
 
-//    // Critical section
-//    {
-//        ComputerGame & computerGame(GetComputerGame());
-
-//        if (computerGame.numPrecalculatedMoves() > 8)
-//        {
-//            // We're fine for now.
-//            return;
-//        }
-
-//        // Clone the starting node
-//        // The end node becomes the new start node.
-//        endNode = computerGame.endNode()->clone();
-//        if (endNode->gameState().isGameOver())
-//        {
-//            return;
-//        }
-
-//        mGameDepth = endNode->depth();
-//        Assert(endNode->children().empty());
-//        Assert(endNode->depth() >= computerGame.currentNode()->depth());
+    if (mPrecalculated.back().isGameOver())
+    {
+        return;
+    }
 
 
-//        //
-//        // Create the list of future blocks
-//        //
-//        computerGame.getFutureBlocksWithOffset(endNode->depth(), mSearchDepth, futureBlocks);
-//    }
+    //
+    // Create the list of future blocks
+    //
+    const SimpleGame * simpleGame = mComputerPlayer->game();
+    std::vector<Block> nextBlocks = simpleGame->getNextBlocks(mPrecalculated.size() + mSearchDepth);
+    BlockTypes futureBlocks;
+    for (std::size_t idx = 0; idx != nextBlocks.size(); ++idx)
+    {
+        futureBlocks.push_back(nextBlocks[idx].type());
+    }        
 
 
-//    //
-//    // Fill list of search widths (using the same width for each level).
-//    //
-//    std::vector<int> widths;
-//    for (std::size_t idx = 0; idx != futureBlocks.size(); ++idx)
-//    {
-//        widths.push_back(mSearchWidth);
-//    }
+    //
+    // Fill list of search widths (using the same width for each level).
+    //
+    std::vector<int> widths;
+    for (std::size_t idx = 0; idx != futureBlocks.size(); ++idx)
+    {
+        widths.push_back(mSearchWidth);
+    }
 
 
-//    //
-//    // Create and start the NodeCalculator object.
-//    //
-//    Assert(mWorkerPool.getActiveWorkerCount() == 0);
-//    if (mWorkerCount == 0)
-//    {
-//        mWorkerCount = cDefaultWorkerCount;
-//    }
-//    mWorkerPool.resize(mWorkerCount);
-//    mNodeCalculator.reset(new NodeCalculator(endNode->gameState(),
-//                                             futureBlocks,
-//                                             widths,
-//                                             *mEvaluator,
-//                                             mMainWorker,
-//                                             mWorkerPool));
+    //
+    // Create and start the NodeCalculator object.
+    //
+    Assert(mWorkerPool.getActiveWorkerCount() == 0);
+    if (mWorkerCount == 0)
+    {
+        mWorkerCount = cDefaultWorkerCount;
+    }
+    mWorkerPool.resize(mWorkerCount);
+    mNodeCalculator.reset(new NodeCalculator(mPrecalculated.back(),
+                                             futureBlocks,
+                                             widths,
+                                             *mEvaluator,
+                                             mMainWorker,
+                                             mWorkerPool));
 
-//    mNodeCalculator->start();
+    mNodeCalculator->start();
 }
 
 
@@ -438,7 +428,7 @@ void ComputerPlayer::Impl::onWorking()
 {
 //    const ComputerGame & game(GetComputerGame());
 
-//    if (mGameDepth < game.endNode()->depth())
+//    if (mPrecalculated.back().id() < game.endNode()->depth())
 //    {
 //        // The calculated results have become invalid. Start over.
 //        mReset = true;
