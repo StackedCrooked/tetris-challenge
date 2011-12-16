@@ -30,41 +30,42 @@ bool IsGameOver(const GameState & inGameState, BlockType inBlockType, int inRota
 
 class Progress
 {
+public:
     Progress(unsigned inMaxValue) :
-        mCurValue(0),
-        mMaxValue(inMaxValue)
+        mCurrent(0),
+        mMaximum(inMaxValue)
     {
     }
 
     Progress(unsigned inCurValue, unsigned inMaxValue) :
-        mCurValue(inCurValue),
-        mMaxValue(inMaxValue)
+        mCurrent(inCurValue),
+        mMaximum(inMaxValue)
     {
     }
 
-    inline unsigned current() const { return mCurValue; }
+    inline unsigned current() const { return mCurrent; }
 
-    inline unsigned limit() const { return mMaxValue; }
+    inline unsigned limit() const { return mMaximum; }
 
-    inline bool complete() const { return mCurValue == mMaxValue; }
+    inline bool complete() const { return current() == limit(); }
 
-    inline Progress increment(unsigned amount = 1)
+    inline Progress increment(unsigned amount = 1) const
     {
         return Progress(std::max<unsigned>(current() + amount, limit()), limit());
     }
 
 private:
-    unsigned mCurValue;
-    unsigned mMaxValue;
+    unsigned mCurrent;
+    unsigned mMaximum;
 };
 
-void PopulateNodesRecursively(NodePtr ioNode,
-                              const Evaluator & inEvaluator,
-                              const BlockTypes & inBlockTypes,
-                              const std::vector<int> & inWidths,
-                              std::size_t inIndex,
-                              std::size_t inMaxIndex,
-                              boost::function<void(const GameState &)> inCallback);
+
+void CalculateNodes(NodePtr ioNode,
+                    const Evaluator & inEvaluator,
+                    const BlockTypes & inBlockTypes,
+                    const std::vector<int> & inWidths,
+                    const Progress & inProgress,
+                    boost::function<void(const GameState &)> inCallback);
 
 void GenerateOffspring(NodePtr ioGameStateNode,
                        BlockTypes inBlockTypes,

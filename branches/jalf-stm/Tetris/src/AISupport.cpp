@@ -55,26 +55,26 @@ bool IsGameOver(const GameState & inGameState, BlockType inBlockType, int inRota
 }
 
 
-void PopulateNodesRecursively(
-    NodePtr ioNode,
-    const Evaluator & inEvaluator,
-    const BlockTypes & inBlockTypes,
-    const std::vector<int> & inWidths,
-    std::size_t inIndex,
-    std::size_t inMaxIndex,
-    boost::function<void(const GameState &)> inCallback)
-{
 
+
+void CalculateNodes(NodePtr ioNode,
+                    const Evaluator & inEvaluator,
+                    const BlockTypes & inBlockTypes,
+                    const std::vector<int> & inWidths,
+                    const Progress & inProgress,
+                    boost::function<void(const GameState &)> inCallback)
+{
     // We want to at least perform a search of depth 4.
-    if (inIndex >= 4)
+    if (inProgress.current() >= 4)
     {
         boost::this_thread::interruption_point();
     }
 
+
     //
     // Check stop conditions
     //
-    if (inIndex > inMaxIndex || inIndex >= inBlockTypes.size())
+    if (inProgress.complete() || inProgress.current() >= inBlockTypes.size())
     {
         return;
     }
@@ -97,11 +97,11 @@ void PopulateNodesRecursively(
     if (generatedChildNodes.empty())
     {
         generatedChildNodes = ChildNodes(GameStateComparator());
-        GenerateOffspring(ioNode, inBlockTypes[inIndex], inEvaluator, generatedChildNodes);
+        GenerateOffspring(ioNode, inBlockTypes[inProgress.current()], inEvaluator, generatedChildNodes);
 
         int count = 0;
         ChildNodes::iterator it = generatedChildNodes.begin(), end = generatedChildNodes.end();
-        while (count < inWidths[inIndex] && it != end)
+        while (count < inWidths[inProgress.current()] && it != end)
         {
             ioNode->addChild(*it);
             ++count;
@@ -117,13 +117,10 @@ void PopulateNodesRecursively(
     //
     // Recursive call on each child node.
     //
-    if (inIndex < inMaxIndex)
+    for (ChildNodes::iterator it = generatedChildNodes.begin(); it != generatedChildNodes.end(); ++it)
     {
-        for (ChildNodes::iterator it = generatedChildNodes.begin(); it != generatedChildNodes.end(); ++it)
-        {
-            NodePtr child = *it;
-            PopulateNodesRecursively(child, inEvaluator, inBlockTypes, inWidths, inIndex + 1, inMaxIndex, inCallback);
-        }
+        NodePtr child = *it;
+        CalculateNodes(child, inEvaluator, inBlockTypes, inWidths, inProgress.increment(), inCallback);
     }
 }
 

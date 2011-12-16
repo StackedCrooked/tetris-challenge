@@ -165,7 +165,7 @@ void NodeCalculatorImpl::populateNodesRecursively(
     std::size_t inIndex,
     std::size_t inMaxIndex)
 {
-    PopulateNodesRecursively(ioNode, mEvaluator, inBlockTypes, inWidths, inIndex, inMaxIndex, boost::bind(&OnPopulated, _1));
+    CalculateNodes(ioNode, mEvaluator, inBlockTypes, inWidths, Progress(inIndex, inMaxIndex), boost::bind(&OnPopulated, _1));
 }
 
 
