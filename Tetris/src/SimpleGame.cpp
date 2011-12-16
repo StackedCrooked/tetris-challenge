@@ -209,15 +209,15 @@ int SimpleGame::columnCount() const
 }
 
 
-void SimpleGame::move(MoveDirection inDirection)
+bool SimpleGame::move(MoveDirection inDirection)
 {
-    mImpl->mGame.lock()->move(inDirection);
+    return mImpl->mGame.lock()->move(inDirection);
 }
 
 
-void SimpleGame::rotate()
+bool SimpleGame::rotate()
 {
-    mImpl->mGame.lock()->rotate();
+    return mImpl->mGame.lock()->rotate();
 }
 
 
