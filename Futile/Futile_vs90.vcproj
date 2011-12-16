@@ -42,7 +42,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP /D &quot;_HAS_ITERATOR_DEBUGGING=0&quot; /D &quot;_SECURE_SCL=0&quot; /D &quot;_SECURE_SCL_THROWS=0&quot;"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)Futile\include&quot;;&quot;$(SolutionDir)3rdParty\Boost&quot;;&quot;$(SolutionDir)3rdParty\STM&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)Futile\include&quot;;&quot;$(SolutionDir)3rdParty\Boost&quot;"
 				PreprocessorDefinitions="NOMINMAX;BOOST_ALL_NO_LIB;_DEBUG;_WINDOWS;POCO_STATIC;POCO_NO_AUTOMATIC_LIBS"
 				StringPooling="false"
 				MinimalRebuild="false"
@@ -112,7 +112,7 @@
 				InlineFunctionExpansion="2"
 				FavorSizeOrSpeed="1"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)Futile\include&quot;;&quot;$(SolutionDir)3rdParty\Boost&quot;;&quot;$(SolutionDir)3rdParty\STM&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)Futile\include&quot;;&quot;$(SolutionDir)3rdParty\Boost&quot;"
 				PreprocessorDefinitions="NOMINMAX;BOOST_ALL_NO_LIB;NDEBUG;_WINDOWS;POCO_STATIC;POCO_NO_AUTOMATIC_LIBS"
 				StringPooling="false"
 				BasicRuntimeChecks="0"
@@ -202,15 +202,15 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath=".\include\Futile\Allocator.h"
+				>
+			</File>
+			<File
 				RelativePath=".\include\Futile\Array.h"
 				>
 			</File>
 			<File
 				RelativePath=".\include\Futile\Assert.h"
-				>
-			</File>
-			<File
-				RelativePath=".\include\Futile\Atomic.h"
 				>
 			</File>
 			<File
@@ -258,23 +258,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\Futile\Stopwatch.h"
-				>
-			</File>
-			<File
 				RelativePath=".\include\Futile\Threading.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\Futile\Timer.h"
-				>
-			</File>
-			<File
 				RelativePath=".\include\Futile\TypedWrapper.h"
-				>
-			</File>
-			<File
-				RelativePath=".\include\Futile\Types.h"
 				>
 			</File>
 			<File

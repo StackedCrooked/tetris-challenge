@@ -2,7 +2,6 @@
 #define TETRIS_BLOCK_H_INCLUDED
 
 
-#include "Tetris/BlockType.h"
 #include "Tetris/Grid.h"
 #include "Futile/TypedWrapper.h"
 #include <memory>
@@ -11,10 +10,15 @@
 namespace Tetris {
 
 
+// Generate the typesafe wrapper classes
+Futile_TypedWrapper(Rotation, std::size_t);
+Futile_TypedWrapper(Row, std::size_t);
+Futile_TypedWrapper(Column, std::size_t);
 
-FUTILE_BOX_TYPE(Rotation, unsigned);
-FUTILE_BOX_TYPE(Row,      unsigned);
-FUTILE_BOX_TYPE(Column,   unsigned);
+
+// Forward declarations.
+class BlockImpl;
+typedef char BlockType;
 
 
 /**
@@ -25,51 +29,54 @@ class Block
 public:
     Block(BlockType inType, Rotation inRotation, Row inRow, Column inColumn);
 
-    unsigned identification() const;
+    Block(const Block & inBlock);
+
+    Block & operator=(const Block & inBlock);
+
+    ~Block();
+
+    int identification() const;
 
     BlockType type() const;
 
-    unsigned rotation() const;
-
-    unsigned rotationCount() const;
-
+    // Get the grid associated with this block
     const Grid & grid() const;
 
-    unsigned row() const;
+    std::size_t row() const;
 
-    unsigned column() const;
+    std::size_t rowCount() const;
 
-    unsigned rowCount() const;
+    std::size_t column() const;
 
-    unsigned columnCount() const;
+    std::size_t columnCount() const;
+
+    std::size_t rotation() const;
+
+    std::size_t rotationCount() const;
 
     void rotate();
 
-    void setRow(unsigned inRow);
+    void setRow(std::size_t inRow);
 
-    void setColumn(unsigned inColumn);
+    void setColumn(std::size_t inColumn);
 
-    void setRotation(unsigned inRotation);
+    void setRotation(std::size_t inRotation);
 
 private:
-    BlockType mType;
-    unsigned mRotation;
-    unsigned mRow;
-    unsigned mColumn;
-    const Grid * mGrid;
+    BlockImpl * mImpl;
 };
 
 
-unsigned GetBlockRotationCount(BlockType inType);
+std::size_t GetBlockRotationCount(BlockType inType);
 
 // Returns the number possible combinations of rotations and position to
 // place a certain block in a grid that has a given a number of columns.
-unsigned GetBlockPositionCount(BlockType inType, unsigned inNumColumns);
+std::size_t GetBlockPositionCount(BlockType inType, std::size_t inNumColumns);
 
-unsigned GetBlockIdentifier(BlockType inType, unsigned inRotation);
+int GetBlockIdentifier(BlockType inType, int inRotation);
 
 // Gets the Grid object that is associated with a block identifier
-const Grid & GetGrid(unsigned inBlockIdentifier);
+const Grid & GetGrid(int inBlockIdentifier);
 
 
 } // namespace Tetris

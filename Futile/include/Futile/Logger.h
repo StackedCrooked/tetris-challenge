@@ -4,7 +4,6 @@
 
 #include "Futile/LeakDetector.h"
 #include "Futile/Threading.h"
-#include "stm.hpp"
 #include <boost/function.hpp>
 #include <string>
 #include <vector>
@@ -33,12 +32,16 @@ public:
 
     void log(LogLevel inLogLevel, const std::string & inMessage);
 
-    // Messages posted from worker threads are stored in a queue.
-    // The actual logging is delayed until flush() is called.
+    // MessageList posted from worker threads are stored in a queue.
+    // The actual logging is delayed until:
+    //   - a log message is posted from the main thread
+    //   - flush() is called
+    //
+    // This method should probably only be called from the main thread.
     void flush();
 
 protected:
-    Logger();
+    Logger() {}
 
     ~Logger() {}
 
@@ -47,12 +50,9 @@ private:
 
     void logImpl(const std::string & inMessage);
 
+    LogHandler mHandler;
     typedef std::vector<std::string> MessageList;
-    typedef stm::shared<MessageList> SharedMessageList;
-    SharedMessageList mSharedMessageList;
-
-    Mutex mLogHandlerMutex;
-    LogHandler mLogHandler;
+    ThreadSafe<MessageList> mMessageList;
 };
 
 

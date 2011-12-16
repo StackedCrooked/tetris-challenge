@@ -198,13 +198,6 @@ void BlockMover::Impl::move(Data & data)
         return;
     }
 
-    // If our block was "caught" by the sudden appearance of new blocks, then we solidify it in that state.
-    if (!static_cast<const Game&>(game).gameState().checkPositionValid(game.activeBlock()))
-	{
-		game.move(MoveDirection_Down);
-        return;
-	}
-
     const ChildNodes & children = game.currentNode()->children();
     if (children.empty())
     {

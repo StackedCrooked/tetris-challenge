@@ -57,12 +57,19 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OUTDIR}bin/)
 #
 # Compile flags
 #
-set(WARNING_OPTIONS_STM "-Wno-strict-aliasing -Wno-deprecated-declarations")
-set(WARNING_OPTIONS     "-Wall -Werror ${WARNING_OPTIONS_STM}")
+set(WARNING_OPTIONS         " -Wall -Werror ")
 set(CXX_FLAGS         "${CXX_FLAGS} -DTETRIS_QT=1")
 set(CXX_FLAGS_Debug   "${CXX_FLAGS} ${WARNING_OPTIONS} -ggdb3")
 set(CXX_FLAGS_Release "${CXX_FLAGS} ${WARNING_OPTIONS} -O3 -DNDEBUG")
 set(FINAL_COMPILE_FLAGS "${CXX_FLAGS_${CMAKE_BUILD_TYPE}}")
+
+
+#
+# Platform specific compiler flags
+#
+if(APPLE)
+    set(WARNING_OPTIONS "-arch ${ARCH} ")
+endif()
 
 
 #
@@ -75,23 +82,34 @@ else()
 endif()
 
 
+#
+# Poco dependency
+#
+set(POCO_ROOT "${SOLUTIONDIR}3rdParty/Poco/")
+include_directories(
+    ${POCO_ROOT}Foundation/include
+    ${POCO_ROOT}CppUnit/include)
+set(POCO_LIB "${SOLUTIONDIR}3rdParty/Poco/lib/${PLATFORM}/${ARCH}")
+link_directories(${POCO_LIB})
+
 
 #
-# Dependencies
+# Boost dependency
+#
+set(BOOST_ROOT "${SOLUTIONDIR}3rdParty/Boost")
+include_directories(${BOOST_ROOT})
+set(BOOST_LIB "${BOOST_ROOT}/lib/${PLATFORM}/${ARCH}")
+
+
+#
+# Tetris & Futile dependencies
 #
 add_subdirectory(${SOLUTIONDIR}Tetris ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Tetris)
 add_subdirectory(${SOLUTIONDIR}Tetris/testing ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Tetris/testing)
 add_subdirectory(${SOLUTIONDIR}Futile ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Futile)
-
-
-#
-# Includes
-#
 include_directories(
-    ${SOLUTIONDIR}Tetris/include
     ${SOLUTIONDIR}Futile/include
-    ${SOLUTIONDIR}3rdParty/Boost
-    ${SOLUTIONDIR}3rdParty/Poco/Foundation/include)
+    ${SOLUTIONDIR}Tetris/include)
 
 
 #
@@ -188,16 +206,16 @@ endif(APPLE)
 
 
 #
-# Libs
+# QtTetris libs
 #
 target_link_libraries(${EXECUTABLE}
     ${QT_LIBRARIES}
     Tetris
     Futile
+    PocoFoundation
     ${EXTRA_LIBS}
-    ${SOLUTIONDIR}3rdParty/Boost/lib/${PLATFORM}/${ARCH}/libboost_signals.a
-    ${SOLUTIONDIR}3rdParty/Boost/lib/${PLATFORM}/${ARCH}/libboost_thread.a
-    ${SOLUTIONDIR}3rdParty/Poco/lib/${PLATFORM}/${ARCH}/libPocoFoundation.a)
+    "${BOOST_LIB}/libboost_thread.a"
+    "${BOOST_LIB}/libboost_signals.a")
 
 
 #

@@ -7,7 +7,6 @@
 #include "Futile/Threading.h"
 #include "Futile/AutoPtrSupport.h"
 #include "Futile/MainThread.h"
-#include "Futile/MakeString.h"
 #include <boost/bind.hpp>
 #include <boost/signals.hpp>
 #include <boost/weak_ptr.hpp>
@@ -187,7 +186,6 @@ GameStateStats SimpleGame::stats() const
 
 void SimpleGame::applyLinePenalty(int inNumberOfLinesMadeByOpponent)
 {
-    LogInfo(SS() << (playerType() == PlayerType_Computer ? "The computer" : "The human being") << " received " << inNumberOfLinesMadeByOpponent << " lines from his crafty opponent");
     return gameImpl().lock()->applyLinePenalty(inNumberOfLinesMadeByOpponent);
 }
 

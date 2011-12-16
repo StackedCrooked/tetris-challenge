@@ -8,7 +8,7 @@
 namespace Tetris {
 
 
-FUTILE_BOX_TYPE(GameOver, bool);
+Futile_TypedWrapper(GameOver, bool);
 
 
 } // namespace Tetris

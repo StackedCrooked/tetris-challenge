@@ -53,12 +53,6 @@ struct MultiplayerGame::Impl : public SimpleGame::EventHandler,
 
     virtual void onLinesCleared(SimpleGame * inGame, std::size_t inLineCount)
     {
-		// Penalty to oppononent start from 2 lines.
-        if (inLineCount < 2)
-        {
-            return;
-        }
-
         // If number of lines >= 2 then apply a line penalty to each non-allied player.
         Player & activePlayer(findPlayer(inGame));
 
@@ -68,7 +62,7 @@ struct MultiplayerGame::Impl : public SimpleGame::EventHandler,
             Player & player(**it);
             if (player.teamName() != activePlayer.teamName())
             {
-                player.game()->applyLinePenalty(inLineCount == 4 ? 4 : (inLineCount - 1));
+                player.game()->applyLinePenalty(inLineCount);
             }
         }
     }

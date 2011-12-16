@@ -274,7 +274,7 @@ void NodeCalculatorImpl::calculateResult()
     while (!results.empty())
     {
         currentNode = results.top();
-        NodePtr copy(new GameStateNode(currentParent, GameState(currentNode->gameState()), currentNode->evaluator()));
+        NodePtr copy(new GameStateNode(currentParent, new GameState(currentNode->gameState()), currentNode->evaluator()));
         if (!mResult)
         {
             mResult = copy;

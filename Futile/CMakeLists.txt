@@ -1,9 +1,7 @@
 include_directories(
     ${SOLUTIONDIR}Futile/include
     ${SOLUTIONDIR}Tetris/include
-    ${SOLUTIONDIR}3rdParty/Boost
-    ${SOLUTIONDIR}3rdParty/STM
-    /usr/include)
+    ${SOLUTIONDIR}3rdParty/Boost)
 
 add_library(Futile
     include/Futile/Array.h
@@ -33,6 +31,3 @@ add_library(Futile
     src/Timer.cpp
     src/Worker.cpp
     src/WorkerPool.cpp)
-
-set_target_properties(Futile PROPERTIES
-    COMPILE_FLAGS "${FINAL_COMPILE_FLAGS}")
