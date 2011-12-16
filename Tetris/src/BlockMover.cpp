@@ -192,15 +192,15 @@ void BlockMover::Impl::move(Data & data)
 }
 
 
-void Move(SimpleGame & mSimpleGame, const Block & targetBlock)
+void Move(SimpleGame & ioSimpleGame, const Block & targetBlock)
 {
-    Block block = mSimpleGame.activeBlock();
+    Block block = ioSimpleGame.activeBlock();
     Assert(block.type() == targetBlock.type());
 
     // Try rotation first, if it fails then skip rotation and try horizontal move
     if (block.rotation() != targetBlock.rotation())
     {
-        if (mSimpleGame.rotate())
+        if (ioSimpleGame.rotate())
         {
             return;
         }
@@ -209,22 +209,22 @@ void Move(SimpleGame & mSimpleGame, const Block & targetBlock)
 
     if (block.column() < targetBlock.column())
     {
-        if (!mSimpleGame.move(MoveDirection_Right))
+        if (!ioSimpleGame.move(MoveDirection_Right))
         {
             // Damn we can't move this block anymore.
             // Give up on this block.
-            mSimpleGame.drop();
+            ioSimpleGame.drop();
         }
         return;
     }
 
     if (block.column() > targetBlock.column())
     {
-        if (!mSimpleGame.move(MoveDirection_Left))
+        if (!ioSimpleGame.move(MoveDirection_Left))
         {
             // Damn we can't move this block anymore.
             // Give up on this block.
-            mSimpleGame.drop();
+            ioSimpleGame.drop();
         }
         return;
     }
@@ -233,14 +233,14 @@ void Move(SimpleGame & mSimpleGame, const Block & targetBlock)
     // Retry rotation again. If it fails here then drop the block.
     if (block.rotation() != targetBlock.rotation())
     {
-        if (!mSimpleGame.rotate())
+        if (!ioSimpleGame.rotate())
         {
-            mSimpleGame.drop();
+            ioSimpleGame.drop();
         }
         return;
     }
 
-    mSimpleGame.move(MoveDirection_Down);
+    ioSimpleGame.move(MoveDirection_Down);
 }
 
 
