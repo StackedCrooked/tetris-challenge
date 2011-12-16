@@ -10,6 +10,7 @@
 #include "Tetris/GameState.h"
 #include "Tetris/Block.h"
 #include "Futile/MainThread.h"
+#include "Futile/MakeString.h"
 #include "Futile/WorkerPool.h"
 #include "Futile/Worker.h"
 #include "Futile/Threading.h"
@@ -362,6 +363,16 @@ void ComputerPlayer::Impl::timerEvent()
 }
 
 
+namespace {
+
+ComputerGame & GetComputerGame()
+{
+    throw std::logic_error("GetComputerGame() is not implemented.");
+}
+
+} // anonymous namespace
+
+
 void ComputerPlayer::Impl::startNodeCalculator()
 {
 
@@ -370,19 +381,17 @@ void ComputerPlayer::Impl::startNodeCalculator()
 
     // Critical section
     {
-        Locker<Game> rgame(mComputerPlayer->game()->gameImpl());
-        const ComputerGame & constComputerGame(dynamic_cast<const ComputerGame&>(*rgame.get()));
+        ComputerGame & computerGame(GetComputerGame());
 
-
-        if (constComputerGame.numPrecalculatedMoves() > 8)
+        if (computerGame.numPrecalculatedMoves() > 8)
         {
             // We're fine for now.
             return;
         }
 
         // Clone the starting node
-        // The end node becomes the new start node. It's like... a vantage point!
-        endNode = constComputerGame.endNode()->clone();
+        // The end node becomes the new start node.
+        endNode = computerGame.endNode()->clone();
         if (endNode->gameState().isGameOver())
         {
             return;
@@ -390,13 +399,12 @@ void ComputerPlayer::Impl::startNodeCalculator()
 
         mGameDepth = endNode->depth();
         Assert(endNode->children().empty());
-        Assert(endNode->depth() >= constComputerGame.currentNode()->depth());
+        Assert(endNode->depth() >= computerGame.currentNode()->depth());
 
 
         //
         // Create the list of future blocks
         //
-        ComputerGame & computerGame(dynamic_cast<ComputerGame&>(*rgame.get()));
         computerGame.getFutureBlocksWithOffset(endNode->depth(), mSearchDepth, futureBlocks);
     }
 
@@ -420,7 +428,7 @@ void ComputerPlayer::Impl::startNodeCalculator()
         mWorkerCount = cDefaultWorkerCount;
     }
     mWorkerPool.resize(mWorkerCount);
-    mNodeCalculator.reset(new NodeCalculator(std::move(endNode),
+    mNodeCalculator.reset(new NodeCalculator(endNode->gameState(),
                                              futureBlocks,
                                              widths,
                                              *mEvaluator,
@@ -440,8 +448,7 @@ void ComputerPlayer::Impl::onStarted()
 
 void ComputerPlayer::Impl::onWorking()
 {
-    Locker<Game> wgame(mComputerPlayer->game()->gameImpl());
-    const ComputerGame & game(dynamic_cast<const ComputerGame&>(*wgame.get()));
+    const ComputerGame & game(GetComputerGame());
 
     if (mGameDepth < game.endNode()->depth())
     {
@@ -477,8 +484,7 @@ void ComputerPlayer::Impl::onFinished()
         return;
     }
 
-    Locker<Game> wgame(mComputerPlayer->game()->gameImpl());
-    ComputerGame & game(dynamic_cast<ComputerGame&>(*wgame.get()));
+    ComputerGame & game(GetComputerGame());
 
     // Check for sync problems.
     if (resultNode->depth() != game.endNode()->depth() + 1)

@@ -11,7 +11,7 @@ namespace Tetris {
 class SingleThreadedNodeCalculator : public NodeCalculatorImpl
 {
 public:
-    SingleThreadedNodeCalculator(std::unique_ptr<GameStateNode> inNode,
+    SingleThreadedNodeCalculator(const GameState & inGameState,
                                  const BlockTypes & inBlockTypes,
                                  const std::vector<int> & inWidths,
                                  const Evaluator & inEvaluator,

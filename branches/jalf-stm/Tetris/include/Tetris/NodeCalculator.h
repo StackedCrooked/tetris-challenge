@@ -5,6 +5,8 @@
 #include "Tetris/BlockTypes.h"
 #include "Tetris/NodePtr.h"
 #include "Futile/WorkerPool.h"
+#include <boost/function.hpp>
+#include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <cstddef>
 #include <memory>
@@ -19,10 +21,10 @@ class GameStateNode;
 class NodeCalculatorImpl;
 
 
-class NodeCalculator
+class NodeCalculator : boost::noncopyable
 {
 public:
-    NodeCalculator(std::unique_ptr<GameStateNode> inNode,
+    NodeCalculator(const GameState & inGameState,
                    const BlockTypes & inBlockTypes,
                    const std::vector<int> & inWidths,
                    const Evaluator & inEvaluator,
@@ -35,11 +37,11 @@ public:
 
     void stop();
 
+    NodePtr result() const;
+
     int getCurrentSearchDepth() const;
 
     int getMaxSearchDepth() const;
-
-    NodePtr result() const;
 
     enum Status
     {
@@ -59,10 +61,6 @@ public:
     std::string errorMessage() const;
 
 private:
-    // non-copyable
-    NodeCalculator(const NodeCalculator &);
-    NodeCalculator & operator=(const NodeCalculator &);
-
     boost::scoped_ptr<NodeCalculatorImpl> mImpl;
 };
 

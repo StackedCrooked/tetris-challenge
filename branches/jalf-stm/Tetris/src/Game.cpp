@@ -205,6 +205,12 @@ int Game::columnCount() const
 }
 
 
+bool Game::checkPositionValid(const Block & inBlock) const
+{
+    return gameState().checkPositionValid(inBlock);
+}
+
+
 int Game::GetRowDelta(MoveDirection inDirection)
 {
     switch (inDirection)

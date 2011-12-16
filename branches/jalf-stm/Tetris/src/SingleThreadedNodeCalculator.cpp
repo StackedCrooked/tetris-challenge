@@ -18,13 +18,13 @@ namespace Tetris {
 using namespace Futile;
 
 
-SingleThreadedNodeCalculator::SingleThreadedNodeCalculator(std::unique_ptr<GameStateNode> inNode,
+SingleThreadedNodeCalculator::SingleThreadedNodeCalculator(const GameState & inGameState,
                                                            const BlockTypes & inBlockTypes,
                                                            const std::vector<int> & inWidths,
                                                            const Evaluator & inEvaluator,
                                                            Worker & inMainWorker,
                                                            WorkerPool & inWorkerPool) :
-    NodeCalculatorImpl(std::move(inNode), inBlockTypes, inWidths, inEvaluator, inMainWorker, inWorkerPool)
+    NodeCalculatorImpl(inGameState, inBlockTypes, inWidths, inEvaluator, inMainWorker, inWorkerPool)
 {
 }
 
