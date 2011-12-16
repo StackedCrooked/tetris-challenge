@@ -54,13 +54,13 @@ std::size_t calculateMaxNodeCount(const std::vector<int> & inWidths)
 } // anonymous namespace
 
 
-NodeCalculatorImpl::NodeCalculatorImpl(std::unique_ptr<GameStateNode> inNode,
+NodeCalculatorImpl::NodeCalculatorImpl(const GameState & inGameState,
                                        const BlockTypes & inBlockTypes,
                                        const std::vector<int> & inWidths,
                                        const Evaluator & inEvaluator,
                                        Worker & inMainWorker,
                                        WorkerPool & inWorkerPool) :
-    mNode(inNode.release()),
+    mNode(new GameStateNode(inGameState, inEvaluator)),
     mResult(),
     mNodeMutex(),
     mQuitFlag(false),

@@ -137,7 +137,7 @@ SimpleGame::~SimpleGame()
 
 bool SimpleGame::checkPositionValid(const Block & inBlock) const
 {
-    return mImpl->mGame.lock()->gameState().checkPositionValid(inBlock);
+    return mImpl->mGame.lock()->checkPositionValid(inBlock);
 }
 
 

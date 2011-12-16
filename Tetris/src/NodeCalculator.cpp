@@ -10,7 +10,7 @@ namespace Tetris {
 using namespace Futile;
 
 
-static std::unique_ptr<NodeCalculatorImpl> CreateImpl(std::unique_ptr<GameStateNode> inNode,
+static std::unique_ptr<NodeCalculatorImpl> CreateImpl(const GameState & inGameState,
                                                     const BlockTypes & inBlockTypes,
                                                     const std::vector<int> & inWidths,
                                                     const Evaluator & inEvaluator,
@@ -20,12 +20,22 @@ static std::unique_ptr<NodeCalculatorImpl> CreateImpl(std::unique_ptr<GameStateN
     if (inWorkerPool.size() > 1)
     {
         return std::unique_ptr<NodeCalculatorImpl>(
-            new MultithreadedNodeCalculator(std::move(inNode), inBlockTypes, inWidths, inEvaluator, inMainWorker, inWorkerPool));
+            new MultithreadedNodeCalculator(inGameState,
+                                            inBlockTypes,
+                                            inWidths,
+                                            inEvaluator,
+                                            inMainWorker,
+                                            inWorkerPool));
     }
     else if (inWorkerPool.size() == 1)
     {
         return std::unique_ptr<NodeCalculatorImpl>(
-            new SingleThreadedNodeCalculator(std::move(inNode), inBlockTypes, inWidths, inEvaluator, inMainWorker, inWorkerPool));
+            new SingleThreadedNodeCalculator(inGameState,
+                                             inBlockTypes,
+                                             inWidths,
+                                             inEvaluator,
+                                             inMainWorker,
+                                             inWorkerPool));
     }
     else
     {
@@ -34,13 +44,13 @@ static std::unique_ptr<NodeCalculatorImpl> CreateImpl(std::unique_ptr<GameStateN
 }
 
 
-NodeCalculator::NodeCalculator(std::unique_ptr<GameStateNode> inNode,
+NodeCalculator::NodeCalculator(const GameState & inGameState,
                                const BlockTypes & inBlockTypes,
                                const std::vector<int> & inWidths,
                                const Evaluator & inEvaluator,
                                Worker & inMainWorker,
                                WorkerPool & inWorkerPool) :
-    mImpl(CreateImpl(std::move(inNode), inBlockTypes, inWidths, inEvaluator, inMainWorker, inWorkerPool).release())
+    mImpl(CreateImpl(inGameState, inBlockTypes, inWidths, inEvaluator, inMainWorker, inWorkerPool).release())
 {
 }
 

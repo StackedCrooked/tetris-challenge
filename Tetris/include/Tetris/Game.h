@@ -64,6 +64,8 @@ public:
 
     int columnCount() const;
 
+    bool checkPositionValid(const Block & inBlock) const;
+
     bool canMove(MoveDirection inDirection);
 
     virtual bool move(MoveDirection inDirection) = 0;

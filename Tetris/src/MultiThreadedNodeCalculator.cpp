@@ -22,13 +22,13 @@ namespace Tetris {
 using namespace Futile;
 
 
-MultithreadedNodeCalculator::MultithreadedNodeCalculator(std::unique_ptr<GameStateNode> inNode,
+MultithreadedNodeCalculator::MultithreadedNodeCalculator(const GameState & inGameState,
                                                          const BlockTypes & inBlockTypes,
                                                          const std::vector<int> & inWidths,
                                                          const Evaluator & inEvaluator,
                                                          Futile::Worker & inMainWorker,
                                                          WorkerPool & inWorkerPool) :
-    NodeCalculatorImpl(std::move(inNode), inBlockTypes, inWidths, inEvaluator, inMainWorker, inWorkerPool)
+    NodeCalculatorImpl(inGameState, inBlockTypes, inWidths, inEvaluator, inMainWorker, inWorkerPool)
 {
 }
 
