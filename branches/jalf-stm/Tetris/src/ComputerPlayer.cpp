@@ -122,7 +122,7 @@ ComputerPlayer::ComputerPlayer(const TeamName & inTeamName,
     FUTILE_LOCK(Impl & impl, mImpl)
     {
         impl.mComputerPlayer = this;
-        impl.mBlockMover.reset(new BlockMover(game()->gameImpl()));
+        impl.mBlockMover.reset(new BlockMover(*game()));
     }
 
 

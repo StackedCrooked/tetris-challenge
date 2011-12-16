@@ -67,9 +67,9 @@ public:
 
     int columnCount() const;
 
-    void move(MoveDirection inDirection);
+    bool move(MoveDirection inDirection);
 
-    void rotate();
+    bool rotate();
 
     void drop();
 

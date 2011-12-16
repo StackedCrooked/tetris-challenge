@@ -189,24 +189,12 @@ void BlockMover::Impl::onTimerEvent()
 
 void BlockMover::Impl::move(Data & data)
 {
-    // If our block was "caught" by the sudden appearance of new blocks, then we solidify it in that state.
-    if (!mSimpleGame.checkPositionValid(mSimpleGame.activeBlock()))
-    {
-        mSimpleGame.move(MoveDirection_Down);
-        return;
-    }
+}
 
-    const ChildNodes & children = mSimpleGame.currentNode()->children();
-    if (children.empty())
-    {
-        return;
-    }
 
-    GameStateNode & firstChild = **children.begin();
-
-    const Block & block = mSimpleGame.activeBlock();
-    const Block & targetBlock = firstChild.gameState().originalBlock();
-
+void Move(SimpleGame & mSimpleGame, const Block & targetBlock)
+{
+    Block block = mSimpleGame.activeBlock();
     Assert(block.type() == targetBlock.type());
 
     // Try rotation first, if it fails then skip rotation and try horizontal move
@@ -225,7 +213,7 @@ void BlockMover::Impl::move(Data & data)
         {
             // Damn we can't move this block anymore.
             // Give up on this block.
-            mSimpleGame.dropAndCommit();
+            mSimpleGame.drop();
         }
         return;
     }
@@ -236,7 +224,7 @@ void BlockMover::Impl::move(Data & data)
         {
             // Damn we can't move this block anymore.
             // Give up on this block.
-            mSimpleGame.dropAndCommit();
+            mSimpleGame.drop();
         }
         return;
     }
@@ -247,27 +235,12 @@ void BlockMover::Impl::move(Data & data)
     {
         if (!mSimpleGame.rotate())
         {
-            mSimpleGame.dropAndCommit();
+            mSimpleGame.drop();
         }
         return;
     }
 
-    //
-    // If we get arrive here then horizontal position and rotation are OK.
-    // Start lowering the block.
-    //
-    if (data.mMoveDownBehavior == BlockMover::MoveDownBehavior_Move)
-    {
-        mSimpleGame.move(MoveDirection_Down);
-}
-    else if (data.mMoveDownBehavior == BlockMover::MoveDownBehavior_Drop)
-    {
-        mSimpleGame.dropAndCommit();
-    }
-    else
-    {
-        throw std::logic_error(SS() << "MoveDownBehavior: invalid enum value: " << data.mMoveDownBehavior);
-    }
+    mSimpleGame.move(MoveDirection_Down);
 }
 
 
