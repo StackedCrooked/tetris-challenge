@@ -55,6 +55,79 @@ bool IsGameOver(const GameState & inGameState, BlockType inBlockType, int inRota
 }
 
 
+void PopulateNodesRecursively(
+    NodePtr ioNode,
+    const Evaluator & inEvaluator,
+    const BlockTypes & inBlockTypes,
+    const std::vector<int> & inWidths,
+    std::size_t inIndex,
+    std::size_t inMaxIndex,
+    boost::function<void(const GameState &)> inCallback)
+{
+
+    // We want to at least perform a search of depth 4.
+    if (inIndex >= 4)
+    {
+        boost::this_thread::interruption_point();
+    }
+
+    //
+    // Check stop conditions
+    //
+    if (inIndex > inMaxIndex || inIndex >= inBlockTypes.size())
+    {
+        return;
+    }
+
+
+    if (ioNode->gameState().isGameOver())
+    {
+        // GameOver state has no children.
+        return;
+    }
+
+
+    //
+    // Generate the child nodes.
+    //
+    // It is possible that the nodes were already generated at this depth.
+    // If that is the case then we immediately jump to the recursive call below.
+    //
+    ChildNodes generatedChildNodes = ioNode->children();
+    if (generatedChildNodes.empty())
+    {
+        generatedChildNodes = ChildNodes(GameStateComparator());
+        GenerateOffspring(ioNode, inBlockTypes[inIndex], inEvaluator, generatedChildNodes);
+
+        int count = 0;
+        ChildNodes::iterator it = generatedChildNodes.begin(), end = generatedChildNodes.end();
+        while (count < inWidths[inIndex] && it != end)
+        {
+            ioNode->addChild(*it);
+            ++count;
+            ++it;
+        }
+
+        Assert(count >= 1);
+        NodePtr gameStateNode = *ioNode->children().begin();
+        inCallback(gameStateNode->gameState());
+    }
+
+
+    //
+    // Recursive call on each child node.
+    //
+    if (inIndex < inMaxIndex)
+    {
+        for (ChildNodes::iterator it = generatedChildNodes.begin(); it != generatedChildNodes.end(); ++it)
+        {
+            NodePtr child = *it;
+            PopulateNodesRecursively(child, inEvaluator, inBlockTypes, inWidths, inIndex + 1, inMaxIndex, inCallback);
+        }
+    }
+}
+
+
 void GenerateOffspring(NodePtr ioGameStateNode,
                        BlockTypes inBlockTypes,
                        std::size_t inOffset,

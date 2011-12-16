@@ -11,6 +11,7 @@
 #include "Futile/Logging.h"
 #include "Futile/MakeString.h"
 #include "Futile/Threading.h"
+#include <boost/function.hpp>
 #include <boost/shared_ptr.hpp>
 #include <memory>
 #include <stack>
@@ -152,6 +153,11 @@ void NodeCalculatorImpl::setStatus(int inStatus)
 }
 
 
+void OnPopulated(const GameState &)
+{
+}
+
+
 void NodeCalculatorImpl::populateNodesRecursively(
     NodePtr ioNode,
     const BlockTypes & inBlockTypes,
@@ -159,67 +165,7 @@ void NodeCalculatorImpl::populateNodesRecursively(
     std::size_t inIndex,
     std::size_t inMaxIndex)
 {
-
-    // We want to at least perform a search of depth 4.
-    if (inIndex >= 4)
-    {
-        boost::this_thread::interruption_point();
-    }
-
-    //
-    // Check stop conditions
-    //
-    if (inIndex > inMaxIndex || inIndex >= inBlockTypes.size())
-    {
-        return;
-    }
-
-
-    if (ioNode->gameState().isGameOver())
-    {
-        // GameOver state has no children.
-        return;
-    }
-
-
-    //
-    // Generate the child nodes.
-    //
-    // It is possible that the nodes were already generated at this depth.
-    // If that is the case then we immediately jump to the recursive call below.
-    //
-    ChildNodes generatedChildNodes = ioNode->children();
-    if (generatedChildNodes.empty())
-    {
-        generatedChildNodes = ChildNodes(GameStateComparator());
-        GenerateOffspring(ioNode, inBlockTypes[inIndex], mEvaluator, generatedChildNodes);
-
-        int count = 0;
-        ChildNodes::iterator it = generatedChildNodes.begin(), end = generatedChildNodes.end();
-        while (count < inWidths[inIndex] && it != end)
-        {
-            ioNode->addChild(*it);
-            ++count;
-            ++it;
-        }
-        mNodeCount.increment(count);
-
-        Assert(count >= 1);
-        mTreeRowInfos.registerNode(*ioNode->children().begin());
-    }
-
-
-    //
-    // Recursive call on each child node.
-    //
-    if (inIndex < inMaxIndex)
-    {
-        for (ChildNodes::iterator it = generatedChildNodes.begin(); it != generatedChildNodes.end(); ++it)
-        {
-            NodePtr child = *it;
-            populateNodesRecursively(child, inBlockTypes, inWidths, inIndex + 1, inMaxIndex);
-        }
-    }
+    PopulateNodesRecursively(ioNode, mEvaluator, inBlockTypes, inWidths, inIndex, inMaxIndex, boost::bind(&OnPopulated, _1));
 }
 
 
