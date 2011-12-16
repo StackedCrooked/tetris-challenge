@@ -4,6 +4,7 @@
 
 #include "Tetris/Block.h"
 #include "Tetris/Grid.h"
+#include "Tetris/GameStateStats.h"
 #include <memory>
 #include <stdexcept>
 
@@ -39,15 +40,28 @@ public:
     inline bool checkPositionValid(const Block & inBlock) const
     { return checkPositionValid(inBlock, inBlock.row(), inBlock.column()); }
 
-    // Statistics
-    int numLines() const { return mNumLines; }
-    int numSingles() const { return mNumSingles; }
-    int numDoubles() const { return mNumDoubles; }
-    int numTriples() const { return mNumTriples; }
-    int numTetrises() const { return mNumTetrises; }
-    int score() const;
-    int firstOccupiedRow() const { return mFirstOccupiedRow; }
-    int currentHeight() const { return mGrid.rowCount() - mFirstOccupiedRow; }
+
+    inline int numLines() const
+    { return mStats.mNumLines; }
+
+    inline int numSingles() const
+    { return mStats.mNumSingles; }
+
+    inline int numDoubles() const
+    { return mStats.mNumDoubles; }
+
+    inline int numTriples() const
+    { return mStats.mNumTriples; }
+
+    inline int numTetrises() const
+    { return mStats.mNumTetrises; }
+
+    inline int score() const
+    { return mStats.score(); }
+
+    inline int firstOccupiedRow() const { return mFirstOccupiedRow; }
+
+    inline int currentHeight() const { return mGrid.rowCount() - mFirstOccupiedRow; }
 
 private:
     void solidifyBlock(const Block & inBlock);
@@ -58,11 +72,7 @@ private:
     Block mOriginalBlock;
     bool mIsGameOver;
     unsigned mFirstOccupiedRow;
-    int mNumLines;
-    int mNumSingles;
-    int mNumDoubles;
-    int mNumTriples;
-    int mNumTetrises;
+    GameStateStats mStats;
     bool mTainted;
 };
 

@@ -179,8 +179,7 @@ GameStateStats SimpleGame::stats() const
                           gameState.numSingles(),
                           gameState.numDoubles(),
                           gameState.numTriples(),
-                          gameState.numTetrises(),
-                          gameState.currentHeight());
+                          gameState.numTetrises());
 }
 
 

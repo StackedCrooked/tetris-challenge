@@ -18,11 +18,7 @@ GameState::GameState(unsigned inRowCount, unsigned inColumnCount) :
     mOriginalBlock(BlockType_L, Rotation(0), Row(0), Column(0)),
     mIsGameOver(false),
     mFirstOccupiedRow(inRowCount),
-    mNumLines(0),
-    mNumSingles(0),
-    mNumDoubles(0),
-    mNumTriples(0),
-    mNumTetrises(0),
+    mStats(),
     mTainted(false)
 {
 }
@@ -145,40 +141,7 @@ void GameState::clearLines()
 
     Assert(mFirstOccupiedRow + numLines <= mGrid.rowCount());
     mFirstOccupiedRow += numLines;
-    mNumLines += numLines;
-
-    switch (numLines)
-    {
-        case 0:
-        {
-            // Do nothing.
-            break;
-        }
-        case 1:
-        {
-            mNumSingles++;
-            break;
-        }
-        case 2:
-        {
-            mNumDoubles++;
-            break;
-        }
-        case 3:
-        {
-            mNumTriples++;
-            break;
-        }
-        case 4:
-        {
-            mNumTetrises++;
-            break;
-        }
-        default:
-        {
-            throw std::logic_error("Invalid number of lines scored! ...?");
-        }
-    }
+    mStats = mStats.increment(numLines);
 }
 
 
@@ -223,16 +186,6 @@ void GameState::updateCache()
         }
         mFirstOccupiedRow++;
     }
-}
-
-
-int GameState::score() const
-{
-    // Same values as Tetris on the Gameboy.
-    return   40 * mNumSingles +
-            100 * mNumDoubles +
-            300 * mNumTriples +
-           1200 * mNumTetrises;
 }
 
 const Block & GameState::originalBlock() const
