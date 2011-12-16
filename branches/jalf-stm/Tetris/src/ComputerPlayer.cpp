@@ -2,8 +2,8 @@
 #include "Tetris/ComputerPlayer.h"
 #include "Tetris/NodeCalculator.h"
 #include "Tetris/AISupport.h"
-#include "Tetris/Gravity.h"
 #include "Tetris/Game.h"
+#include "Tetris/Gravity.h"
 #include "Tetris/GameStateComparator.h"
 #include "Tetris/Evaluator.h"
 #include "Tetris/GameStateNode.h"
@@ -437,7 +437,6 @@ void ComputerPlayer::Impl::startNodeCalculator()
 
 //    mNodeCalculator->start();
 }
-
 
 
 void ComputerPlayer::Impl::onStarted()

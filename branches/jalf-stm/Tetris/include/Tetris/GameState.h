@@ -19,6 +19,8 @@ public:
 
     GameState commit(const Block & inBlock) const;
 
+    inline unsigned id() const { return mId; }
+
     const Grid & grid() const;
 
     // Modifies the grid bypassing Tetris rules.
@@ -74,6 +76,7 @@ private:
     unsigned mFirstOccupiedRow;
     GameStateStats mStats;
     bool mTainted;
+    unsigned mId;
 };
 
 

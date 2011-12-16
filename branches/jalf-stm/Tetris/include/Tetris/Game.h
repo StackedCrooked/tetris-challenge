@@ -10,8 +10,9 @@
 #include "Tetris/NodePtr.h"
 #include "Futile/Threading.h"
 #include <boost/noncopyable.hpp>
-#include <boost/scoped_ptr.hpp>
 #include <boost/signals2.hpp>
+#include <boost/scoped_ptr.hpp>
+#include <deque>
 #include <memory>
 #include <set>
 
@@ -45,6 +46,8 @@ protected:
 
 public:
     virtual ~Game();
+
+    unsigned blockCount() const;
 
     /// GameStateChanged signals change events.
     /// NOTE: callbacks can be received from different threads.
@@ -84,26 +87,23 @@ public:
 
     const Grid & gameGrid() const;
 
-    std::size_t currentBlockIndex() const;
-
     void getFutureBlocks(std::size_t inCount, BlockTypes & outBlocks) const;
 
     void getFutureBlocksWithOffset(std::size_t inOffset, std::size_t inCount, BlockTypes & outBlocks) const;
 
     const GameState & gameState() const;
 
-    // For multiplayer crazyness
     virtual void applyLinePenalty(std::size_t inLineCount);
-    //virtual void setActiveBlock(const Block & inBlock);
+
     virtual void setGrid(const Grid & inGrid) = 0;
-    //void swapGrid(Game & other);
-    //void swapActiveBlock(Game & other);
 
 protected:
     static int GetRowDelta(MoveDirection inDirection);
     static int GetColumnDelta(MoveDirection inDirection);
 
     GameState & gameState();
+
+    void commit(const Block & inBlock);
 
     void onChanged();
     void onLinesCleared(std::size_t inLineCount);
@@ -118,7 +118,6 @@ protected:
     boost::scoped_ptr<BlockFactory> mBlockFactory;
     boost::scoped_ptr<BlockFactory> mGarbageFactory;
     mutable BlockTypes mBlocks;
-    std::size_t mCurrentBlockIndex;
     int mStartingLevel;
     bool mPaused;
 
@@ -146,7 +145,6 @@ protected:
         bool & mValue;
     };
 
-private:
     GameState mGameState;
 };
 
@@ -183,8 +181,6 @@ public:
 
     virtual bool move(MoveDirection inDirection);
 
-    bool navigateNodeDown();
-
     std::size_t numPrecalculatedMoves() const;
 
     void clearPrecalculatedNodes();
@@ -200,9 +196,11 @@ protected:
     ComputerGame(const Game & inGame);
 
 private:
-    void setCurrentNode(NodePtr inCurrentNode);
+    bool navigateNodeDown();
 
-    std::vector<GameState> mPrediction;
+    void setCurrentGameState(const GameState & inGameState);
+
+    std::deque<GameState> mPrediction;
 };
 
 
