@@ -32,7 +32,7 @@ class Game;
  *   - the list of future blocks
  *   - the root gamestate node
  */
-class Game
+class Game : boost::noncopyable
 {
 protected:
     /**
@@ -90,7 +90,7 @@ public:
 
     void getFutureBlocksWithOffset(std::size_t inOffset, std::size_t inCount, BlockTypes & outBlocks) const;
 
-    virtual const GameState & gameState() const = 0;
+    const GameState & gameState() const;
 
     // For multiplayer crazyness
     virtual void applyLinePenalty(std::size_t inLineCount);
@@ -103,7 +103,7 @@ protected:
     static int GetRowDelta(MoveDirection inDirection);
     static int GetColumnDelta(MoveDirection inDirection);
 
-    virtual GameState & gameState() = 0;
+    GameState & gameState();
 
     void onChanged();
     void onLinesCleared(std::size_t inLineCount);
@@ -147,9 +147,7 @@ protected:
     };
 
 private:
-    // non-copyable
-    Game(const Game&);
-    Game& operator=(const Game&);
+    GameState mGameState;
 };
 
 
@@ -163,8 +161,6 @@ public:
 
     virtual bool move(MoveDirection inDirection);
 
-    virtual const GameState & gameState() const;
-
     virtual void setGrid(const Grid & inGrid);
 
 protected:
@@ -174,11 +170,6 @@ protected:
     HumanGame(std::size_t inNumRows, std::size_t inNumCols);
 
     HumanGame(const Game & inGame);
-
-    virtual GameState & gameState();
-
-private:
-    GameState mGameState;
 };
 
 
@@ -192,19 +183,11 @@ public:
 
     virtual bool move(MoveDirection inDirection);
 
-    void appendPrecalculatedNode(NodePtr inNode);
-
-    const GameStateNode * currentNode() const;
-
-    const GameStateNode * endNode() const;
-
     bool navigateNodeDown();
 
     std::size_t numPrecalculatedMoves() const;
 
     void clearPrecalculatedNodes();
-
-    virtual const GameState & gameState() const;
 
     virtual void setGrid(const Grid & inGrid);
 
@@ -216,12 +199,10 @@ protected:
 
     ComputerGame(const Game & inGame);
 
-    virtual GameState & gameState();
-
 private:
     void setCurrentNode(NodePtr inCurrentNode);
 
-    NodePtr mCurrentNode;
+    std::vector<GameState> mPrediction;
 };
 
 
