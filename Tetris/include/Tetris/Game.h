@@ -71,7 +71,7 @@ public:
 
     bool canMove(MoveDirection inDirection);
 
-    virtual bool move(MoveDirection inDirection) = 0;
+    virtual bool move(MoveDirection inDirection);
 
     bool rotate();
 
@@ -95,7 +95,7 @@ public:
 
     virtual void applyLinePenalty(std::size_t inLineCount);
 
-    virtual void setGrid(const Grid & inGrid) = 0;
+    virtual void setGrid(const Grid & inGrid);
 
 protected:
     static int GetRowDelta(MoveDirection inDirection);
@@ -156,10 +156,6 @@ public:
     {
         return Futile::ThreadSafe<Game>(new HumanGame(inNumRows, inNumColumns));
     }
-
-    virtual bool move(MoveDirection inDirection);
-
-    virtual void setGrid(const Grid & inGrid);
 
 protected:
     // Friendship required for constructor.
