@@ -518,33 +518,6 @@ void ComputerGame::clearPrecalculatedNodes()
 }
 
 
-bool ComputerGame::navigateNodeDown()
-{
-    if (mPrediction.empty())
-    {
-        return false;
-    }
-
-
-
-    const GameState & nextGameState = *mPrediction.begin();
-    Assert(nextGameState.id() == gameState().id() + 1);
-
-
-
-    int lineDifference = nextGameState.numLines() - gameState().numLines();
-    Assert(lineDifference >= 0 && lineDifference <= 4);
-    if (lineDifference > 0)
-    {
-        onLinesCleared(lineDifference);
-    }
-
-    setCurrentGameState(nextGameState);
-    onChanged();
-    return true;
-}
-
-
 bool ComputerGame::move(MoveDirection inDirection)
 {
     if (isGameOver())
@@ -587,19 +560,20 @@ bool ComputerGame::move(MoveDirection inDirection)
             // The game is untainted. Good, now check if the blocks line up correctly.
             if (block.column() == nextBlock.column() && nextBlock.identification() == block.identification())
             {
-                // Swap the current gamestate with the next precalculated one.
-                if (navigateNodeDown())
+                int lineDifference = nextGameState.numLines() - gameState().numLines();
+                Assert(lineDifference >= 0 && lineDifference <= 4);
+                if (lineDifference > 0)
                 {
-                    // Return false because the block has not
-                    // moved down (it was solidified).
-                    return false;
+                    onLinesCleared(lineDifference);
                 }
-                else
-                {
-                    LogError("NavigateNodeDown failed for unknown reason (untainted).");
-                    Assert(false);
-                    mPrediction.clear();
-                }
+
+                setCurrentGameState(nextGameState);
+                mPrediction.pop_front();
+                onChanged();
+
+                // Return false because the block has not
+                // moved down (it was solidified).
+                return false;
             }
             else
             {
