@@ -38,10 +38,6 @@ public:
 
     void stop();
 
-    std::size_t getCurrentNodeCount() const;
-
-    std::size_t getMaxNodeCount() const;
-
     int getCurrentSearchDepth() const;
 
     int getMaxSearchDepth() const;
@@ -197,9 +193,6 @@ protected:
 
     bool mQuitFlag;
     mutable Futile::Mutex mQuitFlagMutex;
-
-    Futile::Atomic<std::size_t> mNodeCount;
-    std::size_t mMaxNodeCount;
 
     TreeRowInfos mTreeRowInfos;
 

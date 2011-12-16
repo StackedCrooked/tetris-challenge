@@ -35,10 +35,6 @@ public:
 
     void stop();
 
-    std::size_t getCurrentNodeCount() const;
-
-    std::size_t getMaxNodeCount() const;
-
     int getCurrentSearchDepth() const;
 
     int getMaxSearchDepth() const;
