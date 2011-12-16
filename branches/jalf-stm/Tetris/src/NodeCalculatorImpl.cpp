@@ -159,13 +159,13 @@ void OnPopulated(const GameState &)
 
 
 void NodeCalculatorImpl::populateNodesRecursively(
-    NodePtr ioNode,
+    const GameState & inGameState,
     const BlockTypes & inBlockTypes,
     const std::vector<int> & inWidths,
     std::size_t inIndex,
     std::size_t inMaxIndex)
 {
-    CalculateNodes(ioNode->gameState(), mEvaluator, inBlockTypes, inWidths, Progress(inIndex, inMaxIndex), boost::bind(&OnPopulated, _1));
+    CalculateNodes(inGameState, mEvaluator, inBlockTypes, inWidths, Progress(inIndex, inMaxIndex), boost::bind(&OnPopulated, _1));
 }
 
 

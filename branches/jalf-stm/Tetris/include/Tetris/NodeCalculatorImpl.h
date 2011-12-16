@@ -62,7 +62,7 @@ protected:
 
     void setStatus(int inStatus);
 
-    void populateNodesRecursively(NodePtr ioNode,
+    void populateNodesRecursively(const GameState & inGameState,
                                   const BlockTypes & inBlockTypes,
                                   const std::vector<int> & inWidths,
                                   std::size_t inIndex,
