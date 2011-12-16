@@ -47,9 +47,8 @@ const std::size_t cNodesSize = std::max<std::size_t>(cNodes.size(), std::string(
 const std::string cNodesProcent = "Progress";
 const std::size_t cNodesProcentSize = std::max<std::size_t>(cNodesProcent.size(), std::string("100%").size()) + 2;
 
-const std::string cRemainingTime = "Remaining Time";
-const std::size_t cRemainingTimeSize = std::max<std::size_t>(cRemainingTime.size(),
-                                                    std::string("10000ms").size()) + 2;
+const std::string cElapsedTime = "Elapsed Time";
+const std::size_t cElapsedTimeSize = std::max<std::size_t>(cElapsedTime.size(), std::string("10000ms").size()) + 2;
 
 const std::string cStatus = "Result";
 const std::size_t cStatusSize = std::string("Timed out").size() + 2;
@@ -63,7 +62,7 @@ std::string header()
        << std::setw(cDepthProgressSize) << cDepthProgress
        << std::setw(cNodesSize) << cNodes
        << std::setw(cNodesProcentSize) << cNodesProcent
-       << std::setw(cRemainingTimeSize) << cRemainingTime
+       << std::setw(cElapsedTimeSize) << cElapsedTime
        << std::setw(cStatusSize) << cStatus;
     return ss.str();
 }
@@ -85,7 +84,7 @@ std::string format(std::size_t workerCount,
        << std::setw(cDepthProgressSize) << (SS() << depth.first << "/" << depth.second).str()
        << std::setw(cNodesSize) << (SS() << nodes.first << "/" << nodes.second).str()
        << std::setw(cNodesProcentSize) << (SS() << int(0.5 + 100 * double(nodes.first) / double(nodes.second)) << "%").str()
-       << std::setw(cRemainingTimeSize) << (SS() << (time.second - time.first) << "ms").str()
+       << std::setw(cElapsedTimeSize) << (SS() << time.first << "ms").str()
        << std::setw(cStatusSize) << std::right <<
           (time.first < time.second ? (depth.first < depth.second ? "Busy"
                                                                   : "OK"  )
@@ -99,8 +98,12 @@ std::string format(std::size_t workerCount,
 
 TEST_F(NodeCalculatorTest, Interrupt)
 {
+    testInterrupt(Depth(8), Width(5), WorkerCount(1), TimeMs(5000));
+    testInterrupt(Depth(8), Width(5), WorkerCount(2), TimeMs(5000));
+    testInterrupt(Depth(8), Width(5), WorkerCount(4), TimeMs(5000));
+    testInterrupt(Depth(8), Width(5), WorkerCount(8), TimeMs(5000));
 
-    std::cout << header() << std::endl;
+    /*std::cout << header() << std::endl;
     for (std::size_t w = 1; w <= 8; w *= 2)
     {
         for (std::size_t width = 1; width <= 8; width *= 2)
@@ -110,7 +113,7 @@ TEST_F(NodeCalculatorTest, Interrupt)
                 testInterrupt(Depth(depth), Width(width), WorkerCount(w), TimeMs(cTimeout));
             }
         }
-    }
+    }*/
 }
 
 
@@ -127,6 +130,7 @@ void NodeCalculatorTest::testInterrupt(Depth inDepth, Width inWidth, WorkerCount
     }
 
     std::vector<int> widths(inDepth, inWidth);
+    ASSERT_EQ(widths.size(), std::size_t(inDepth));
 
     WorkerPool workerPool("Worker Pool", inWorkerCount);
     Worker mainWorker("Main Worker");
