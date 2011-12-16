@@ -47,7 +47,7 @@ void SingleThreadedNodeCalculator::populate()
         while (targetDepth <= mBlockTypes.size())
         {
             ScopedLock lock(mNodeMutex);
-            populateNodesRecursively(mNode, mBlockTypes, mWidths, 0, targetDepth - 1);
+            populateNodesRecursively(mNode->gameState(), mBlockTypes, mWidths, 0, targetDepth - 1);
             mTreeRowInfos.setFinished();
             targetDepth++;
         }
