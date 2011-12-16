@@ -495,7 +495,7 @@ void ComputerGame::setGrid(const Grid & inGrid)
 
 void ComputerGame::setCurrentGameState(const GameState & inGameState)
 {
-    Assert(inGameState->id() == mGameState.id() + 1);
+    Assert(inGameState.id() == mGameState.id() + 1);
 
     mGameState = inGameState;
 
