@@ -1,0 +1,14 @@
+#!/bin/sh
+
+# These environment variables will be read by CMake
+export TETRIS_BUILD_TYPE=${TETRIS_BUILD_TYPE:-Release}
+export TETRIS_DEPLOY_DMG=${TETRIS_DEPLOY_DMG:-No}
+export TETRIS_MINGW=${TETRIS_MINGW:-No}
+export CMAKE_LEGACY_CYGWIN_WIN32=0
+
+mkdir -p Build
+cd Build
+cmake ../QtTetris
+
+echo "Delete the \"Build\" directory to erase all configure and build files."
+echo "Type \"cd Build ; make\" to start building QtTetris"

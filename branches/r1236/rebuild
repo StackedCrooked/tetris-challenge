@@ -1,0 +1,5 @@
+#!/bin/sh
+rm -rf Build
+./configure
+cd Build
+make VERBOSE=1 -j8

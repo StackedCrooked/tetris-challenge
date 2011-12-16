@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QtTetris", "QtTetris\QtTetris.vcproj", "{57ACA075-A82D-4127-AA99-3D12C3486E0C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8164D41D-B053-405B-826C-CF37AC0EF176} = {8164D41D-B053-405B-826C-CF37AC0EF176}
+		{38AF5C44-D977-4123-9AE3-CAE078744562} = {38AF5C44-D977-4123-9AE3-CAE078744562}
+		{D623C05B-BDD9-4D6E-8E51-E3275608DEBE} = {D623C05B-BDD9-4D6E-8E51-E3275608DEBE}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Futile", "Futile\Futile_vs90.vcproj", "{38AF5C44-D977-4123-9AE3-CAE078744562}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tetris", "Tetris\Tetris_vs90.vcproj", "{D623C05B-BDD9-4D6E-8E51-E3275608DEBE}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PocoFoundation", "3rdParty\Poco\Foundation\Foundation_vs90.vcproj", "{8164D41D-B053-405B-826C-CF37AC0EF176}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{57ACA075-A82D-4127-AA99-3D12C3486E0C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{57ACA075-A82D-4127-AA99-3D12C3486E0C}.Debug|Win32.Build.0 = Debug|Win32
+		{57ACA075-A82D-4127-AA99-3D12C3486E0C}.Release|Win32.ActiveCfg = Release|Win32
+		{57ACA075-A82D-4127-AA99-3D12C3486E0C}.Release|Win32.Build.0 = Release|Win32
+		{38AF5C44-D977-4123-9AE3-CAE078744562}.Debug|Win32.ActiveCfg = Debug|Win32
+		{38AF5C44-D977-4123-9AE3-CAE078744562}.Debug|Win32.Build.0 = Debug|Win32
+		{38AF5C44-D977-4123-9AE3-CAE078744562}.Release|Win32.ActiveCfg = Release|Win32
+		{38AF5C44-D977-4123-9AE3-CAE078744562}.Release|Win32.Build.0 = Release|Win32
+		{D623C05B-BDD9-4D6E-8E51-E3275608DEBE}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D623C05B-BDD9-4D6E-8E51-E3275608DEBE}.Debug|Win32.Build.0 = Debug|Win32
+		{D623C05B-BDD9-4D6E-8E51-E3275608DEBE}.Release|Win32.ActiveCfg = Release|Win32
+		{D623C05B-BDD9-4D6E-8E51-E3275608DEBE}.Release|Win32.Build.0 = Release|Win32
+		{8164D41D-B053-405B-826C-CF37AC0EF176}.Debug|Win32.ActiveCfg = Debug|Win32
+		{8164D41D-B053-405B-826C-CF37AC0EF176}.Debug|Win32.Build.0 = Debug|Win32
+		{8164D41D-B053-405B-826C-CF37AC0EF176}.Release|Win32.ActiveCfg = Release|Win32
+		{8164D41D-B053-405B-826C-CF37AC0EF176}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
