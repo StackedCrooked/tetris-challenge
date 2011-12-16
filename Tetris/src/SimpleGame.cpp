@@ -25,15 +25,8 @@ struct SimpleGame::Impl : boost::enable_shared_from_this<SimpleGame::Impl>
 {
     static Futile::ThreadSafe<Game> CreateGame(PlayerType inPlayerType, std::size_t inRowCount, std::size_t inColumnCount)
     {
-        if (inPlayerType == PlayerType_Human)
-        {
-            return HumanGame::Create(inRowCount, inColumnCount);
-        }
-        else if (inPlayerType == PlayerType_Computer)
-        {
-            return ComputerGame::Create(inRowCount, inColumnCount);
-        }
-        throw std::logic_error("Invalid enum value for PlayerType.");
+        Futile::ThreadSafe<Game> result(new Game(inRowCount, inColumnCount));
+        return result;
     }
 
     Impl(SimpleGame * inSimpleGame,

@@ -26,25 +26,16 @@ class Game;
 
 
 /**
- * Game is the base class for HumanGame and ComputerGame subclasses.
- *
- * It manages the following things:
+ * Game manages the following things:
  *   - the currently active block
  *   - the list of future blocks
  *   - the root gamestate node
  */
 class Game : boost::noncopyable
 {
-protected:
-    /**
-     * Constructor is private. Use the factory methods defined in subtype.
-     */
+public:
     Game(std::size_t inNumRows, std::size_t inNumColumns);
 
-    // Friendship required for destructor.
-    friend class Futile::ThreadSafe<Game>;
-
-public:
     virtual ~Game();
 
     unsigned blockCount() const;
@@ -97,7 +88,10 @@ public:
 
     virtual void setGrid(const Grid & inGrid);
 
-protected:
+private:
+    // Friendship required for destructor.
+    friend class Futile::ThreadSafe<Game>;
+
     static int GetRowDelta(MoveDirection inDirection);
     static int GetColumnDelta(MoveDirection inDirection);
 
@@ -146,57 +140,6 @@ protected:
     };
 
     GameState mGameState;
-};
-
-
-class HumanGame : public Game
-{
-public:
-    inline static Futile::ThreadSafe<Game> Create(std::size_t inNumRows, std::size_t inNumColumns)
-    {
-        return Futile::ThreadSafe<Game>(new HumanGame(inNumRows, inNumColumns));
-    }
-
-protected:
-    // Friendship required for constructor.
-    friend class Game;
-
-    HumanGame(std::size_t inNumRows, std::size_t inNumCols);
-
-    HumanGame(const Game & inGame);
-};
-
-
-class ComputerGame : public Game
-{
-public:
-    inline static Futile::ThreadSafe<Game> Create(std::size_t inNumRows, std::size_t inNumColumns)
-    {
-        return Futile::ThreadSafe<Game>(new ComputerGame(inNumRows, inNumColumns));
-    }
-
-    virtual bool move(MoveDirection inDirection);
-
-    std::size_t numPrecalculatedMoves() const;
-
-    void clearPrecalculatedNodes();
-
-    virtual void setGrid(const Grid & inGrid);
-
-protected:
-    // Friendship required for constructor.
-    friend class Game;
-
-    ComputerGame(std::size_t inNumRows, std::size_t inNumCols);
-
-    ComputerGame(const Game & inGame);
-
-private:
-    bool navigateNodeDown();
-
-    void setCurrentGameState(const GameState & inGameState);
-
-    std::deque<GameState> mPrediction;
 };
 
 

@@ -363,16 +363,6 @@ void ComputerPlayer::Impl::timerEvent()
 }
 
 
-namespace {
-
-ComputerGame & GetComputerGame()
-{
-    throw std::logic_error("GetComputerGame() is not implemented.");
-}
-
-} // anonymous namespace
-
-
 void ComputerPlayer::Impl::startNodeCalculator()
 {
 
