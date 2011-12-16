@@ -101,7 +101,6 @@ public:
 };
 
 
-
 PlayerPtr ComputerPlayer::Create(const TeamName & inTeamName,
                                  const PlayerName & inPlayerName,
                                  std::size_t inRowCount,

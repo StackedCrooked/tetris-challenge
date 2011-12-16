@@ -12,7 +12,7 @@ bool GameStateComparator::operator()(NodePtr lhs, NodePtr rhs) const
 {
     // Order by descending quality.
     return lhs->quality() > rhs->quality();
-};
+}
 
 
 } // namespace Tetris

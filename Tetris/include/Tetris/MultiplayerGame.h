@@ -13,7 +13,7 @@ namespace Tetris {
 class MultiplayerGame
 {
 public:
-    MultiplayerGame(std::size_t inRowCount, std::size_t inColumnCount);
+    MultiplayerGame(unsigned inRowCount, unsigned inColumnCount);
 
     ~MultiplayerGame();
 
@@ -28,11 +28,15 @@ public:
 
     void removePlayer(Player * inPlayer);
 
-    std::size_t playerCount() const;
+    unsigned playerCount() const;
 
-    const Player * getPlayer(std::size_t inIndex) const;
+    const Player * getPlayer(unsigned inIndex) const;
 
-    Player * getPlayer(std::size_t inIndex);
+    Player * getPlayer(unsigned inIndex);
+
+    unsigned rowCount() const;
+
+    unsigned columnCount() const;
 
 private:
     MultiplayerGame(const MultiplayerGame&);

@@ -19,7 +19,7 @@ using namespace Futile;
 struct MultiplayerGame::Impl : public SimpleGame::EventHandler,
                                boost::noncopyable
 {
-    Impl(std::size_t inRowCount, std::size_t inColumnCount) :
+    Impl(unsigned inRowCount, unsigned inColumnCount) :
         mRowCount(inRowCount),
         mColumnCount(inColumnCount)
     {
@@ -53,7 +53,7 @@ struct MultiplayerGame::Impl : public SimpleGame::EventHandler,
 
     virtual void onLinesCleared(SimpleGame * inGame, std::size_t inLineCount)
     {
-		// Penalty to oppononent start from 2 lines.
+        // Penalty to oppononent start from 2 lines.
         if (inLineCount < 2)
         {
             return;
@@ -76,12 +76,12 @@ struct MultiplayerGame::Impl : public SimpleGame::EventHandler,
     typedef boost::shared_ptr<Player> PlayerPtr;
     typedef std::vector<PlayerPtr> Players;
     Players mPlayers;
-    std::size_t mRowCount;
-    std::size_t mColumnCount;
+    unsigned mRowCount;
+    unsigned mColumnCount;
 };
 
 
-MultiplayerGame::MultiplayerGame(std::size_t inRowCount, std::size_t inColumnCount) :
+MultiplayerGame::MultiplayerGame(unsigned inRowCount, unsigned inColumnCount) :
     mImpl(new Impl(inRowCount, inColumnCount))
 {
 }
@@ -146,21 +146,33 @@ void MultiplayerGame::removePlayer(Player * inPlayer)
 }
 
 
-std::size_t MultiplayerGame::playerCount() const
+unsigned MultiplayerGame::playerCount() const
 {
     return mImpl->mPlayers.size();
 }
 
 
-const Player * MultiplayerGame::getPlayer(std::size_t inIndex) const
+const Player * MultiplayerGame::getPlayer(unsigned inIndex) const
 {
     return mImpl->mPlayers[inIndex].get();
 }
 
 
-Player * MultiplayerGame::getPlayer(std::size_t inIndex)
+Player * MultiplayerGame::getPlayer(unsigned inIndex)
 {
     return mImpl->mPlayers[inIndex].get();
+}
+
+
+unsigned MultiplayerGame::rowCount() const
+{
+    return mImpl->mRowCount;
+}
+
+
+unsigned MultiplayerGame::columnCount() const
+{
+    return mImpl->mRowCount;
 }
 
 
