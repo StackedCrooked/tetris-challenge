@@ -34,7 +34,8 @@ Game::Game(std::size_t inNumRows, std::size_t inNumColumns) :
     mCurrentBlockIndex(0),
     mStartingLevel(-1),
     mPaused(false),
-    mMuteEvents(false)
+    mMuteEvents(false),
+    mGameState(inNumRows, inNumColumns)
 {
     if (mBlocks.empty())
     {
@@ -63,6 +64,18 @@ void Game::onLinesCleared(std::size_t inLineCount)
     {
         LinesCleared(inLineCount);
     }
+}
+
+
+GameState & Game::gameState()
+{
+    return mGameState;
+}
+
+
+const GameState & Game::gameState() const
+{
+    return mGameState;
 }
 
 
@@ -387,28 +400,14 @@ void Game::setStartingLevel(int inLevel)
 
 
 HumanGame::HumanGame(std::size_t inNumRows, std::size_t inNumCols) :
-    Game(inNumRows, inNumCols),
-    mGameState(inNumRows, inNumCols)
+    Game(inNumRows, inNumCols)
 {
 }
 
 
 HumanGame::HumanGame(const Game & inGame) :
-    Game(inGame.rowCount(), inGame.columnCount()),
-    mGameState(inGame.gameState())
+    Game(inGame.rowCount(), inGame.columnCount())
 {
-}
-
-
-GameState & HumanGame::gameState()
-{
-    return mGameState;
-}
-
-
-const GameState & HumanGame::gameState() const
-{
-    return mGameState;
 }
 
 
@@ -471,21 +470,15 @@ bool HumanGame::move(MoveDirection inDirection)
 
 ComputerGame::ComputerGame(std::size_t inNumRows, std::size_t inNumCols) :
     Game(inNumRows, inNumCols),
-    mCurrentNode(GameStateNode::CreateRootNode(inNumRows, inNumCols).release())
+    mPrediction()
 {
 }
 
 
 ComputerGame::ComputerGame(const Game & inGame) :
     Game(inGame.rowCount(), inGame.columnCount()),
-    mCurrentNode(new GameStateNode(inGame.gameState(), Balanced::Instance()))
+    mPrediction()
 {
-}
-
-
-GameState & ComputerGame::gameState()
-{
-    return const_cast<GameState&>(mCurrentNode->gameState());
 }
 
 

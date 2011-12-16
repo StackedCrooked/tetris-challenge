@@ -376,66 +376,66 @@ ComputerGame & GetComputerGame()
 void ComputerPlayer::Impl::startNodeCalculator()
 {
 
-    BlockTypes futureBlocks;
-    std::unique_ptr<GameStateNode> endNode;
+//    BlockTypes futureBlocks;
+//    std::unique_ptr<GameStateNode> endNode;
 
-    // Critical section
-    {
-        ComputerGame & computerGame(GetComputerGame());
+//    // Critical section
+//    {
+//        ComputerGame & computerGame(GetComputerGame());
 
-        if (computerGame.numPrecalculatedMoves() > 8)
-        {
-            // We're fine for now.
-            return;
-        }
+//        if (computerGame.numPrecalculatedMoves() > 8)
+//        {
+//            // We're fine for now.
+//            return;
+//        }
 
-        // Clone the starting node
-        // The end node becomes the new start node.
-        endNode = computerGame.endNode()->clone();
-        if (endNode->gameState().isGameOver())
-        {
-            return;
-        }
+//        // Clone the starting node
+//        // The end node becomes the new start node.
+//        endNode = computerGame.endNode()->clone();
+//        if (endNode->gameState().isGameOver())
+//        {
+//            return;
+//        }
 
-        mGameDepth = endNode->depth();
-        Assert(endNode->children().empty());
-        Assert(endNode->depth() >= computerGame.currentNode()->depth());
-
-
-        //
-        // Create the list of future blocks
-        //
-        computerGame.getFutureBlocksWithOffset(endNode->depth(), mSearchDepth, futureBlocks);
-    }
+//        mGameDepth = endNode->depth();
+//        Assert(endNode->children().empty());
+//        Assert(endNode->depth() >= computerGame.currentNode()->depth());
 
 
-    //
-    // Fill list of search widths (using the same width for each level).
-    //
-    std::vector<int> widths;
-    for (std::size_t idx = 0; idx != futureBlocks.size(); ++idx)
-    {
-        widths.push_back(mSearchWidth);
-    }
+//        //
+//        // Create the list of future blocks
+//        //
+//        computerGame.getFutureBlocksWithOffset(endNode->depth(), mSearchDepth, futureBlocks);
+//    }
 
 
-    //
-    // Create and start the NodeCalculator object.
-    //
-    Assert(mWorkerPool.getActiveWorkerCount() == 0);
-    if (mWorkerCount == 0)
-    {
-        mWorkerCount = cDefaultWorkerCount;
-    }
-    mWorkerPool.resize(mWorkerCount);
-    mNodeCalculator.reset(new NodeCalculator(endNode->gameState(),
-                                             futureBlocks,
-                                             widths,
-                                             *mEvaluator,
-                                             mMainWorker,
-                                             mWorkerPool));
+//    //
+//    // Fill list of search widths (using the same width for each level).
+//    //
+//    std::vector<int> widths;
+//    for (std::size_t idx = 0; idx != futureBlocks.size(); ++idx)
+//    {
+//        widths.push_back(mSearchWidth);
+//    }
 
-    mNodeCalculator->start();
+
+//    //
+//    // Create and start the NodeCalculator object.
+//    //
+//    Assert(mWorkerPool.getActiveWorkerCount() == 0);
+//    if (mWorkerCount == 0)
+//    {
+//        mWorkerCount = cDefaultWorkerCount;
+//    }
+//    mWorkerPool.resize(mWorkerCount);
+//    mNodeCalculator.reset(new NodeCalculator(endNode->gameState(),
+//                                             futureBlocks,
+//                                             widths,
+//                                             *mEvaluator,
+//                                             mMainWorker,
+//                                             mWorkerPool));
+
+//    mNodeCalculator->start();
 }
 
 
@@ -448,23 +448,23 @@ void ComputerPlayer::Impl::onStarted()
 
 void ComputerPlayer::Impl::onWorking()
 {
-    const ComputerGame & game(GetComputerGame());
+//    const ComputerGame & game(GetComputerGame());
 
-    if (mGameDepth < game.endNode()->depth())
-    {
-        // The calculated results have become invalid. Start over.
-        mReset = true;
-        return;
-    }
+//    if (mGameDepth < game.endNode()->depth())
+//    {
+//        // The calculated results have become invalid. Start over.
+//        mReset = true;
+//        return;
+//    }
 
-    if (game.numPrecalculatedMoves() == 0)
-    {
-        // Stop and use current results.
-        mStop = true;
-        return;
-    }
+//    if (game.numPrecalculatedMoves() == 0)
+//    {
+//        // Stop and use current results.
+//        mStop = true;
+//        return;
+//    }
 
-    // Keep working
+//    // Keep working
 }
 
 
@@ -476,24 +476,24 @@ void ComputerPlayer::Impl::onStopped()
 
 void ComputerPlayer::Impl::onFinished()
 {
-    mReset = true;
+//    mReset = true;
 
-    NodePtr resultNode = mNodeCalculator->result();
-    if (!resultNode || resultNode->gameState().isGameOver())
-    {
-        return;
-    }
+//    NodePtr resultNode = mNodeCalculator->result();
+//    if (!resultNode || resultNode->gameState().isGameOver())
+//    {
+//        return;
+//    }
 
-    ComputerGame & game(GetComputerGame());
+//    ComputerGame & game(GetComputerGame());
 
-    // Check for sync problems.
-    if (resultNode->depth() != game.endNode()->depth() + 1)
-    {
-        return;
-    }
+//    // Check for sync problems.
+//    if (resultNode->depth() != game.endNode()->depth() + 1)
+//    {
+//        return;
+//    }
 
-    // Ok, store the results.
-    game.appendPrecalculatedNode(resultNode);
+//    // Ok, store the results.
+//    game.appendPrecalculatedNode(resultNode);
 }
 
 
