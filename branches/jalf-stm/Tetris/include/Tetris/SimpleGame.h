@@ -51,6 +51,8 @@ public:
 
     void unregisterEventHandler(EventHandler * inEventHandler);
 
+    bool checkPositionValid(const Block & inBlock) const;
+
     PlayerType playerType() const;
 
     GameStateStats stats() const;
