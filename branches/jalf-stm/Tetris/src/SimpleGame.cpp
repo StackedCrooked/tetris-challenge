@@ -128,6 +128,18 @@ SimpleGame::~SimpleGame()
 }
 
 
+const GameState & SimpleGame::gameState() const
+{
+    return mImpl->mGame.lock()->gameState();
+}
+
+
+/*GameState & SimpleGame::gameState()
+{
+    return mImpl->mGame.lock()->gameState();
+}*/
+
+
 bool SimpleGame::checkPositionValid(const Block & inBlock) const
 {
     return mImpl->mGame.lock()->checkPositionValid(inBlock);

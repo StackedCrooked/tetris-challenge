@@ -95,8 +95,6 @@ private:
     static int GetRowDelta(MoveDirection inDirection);
     static int GetColumnDelta(MoveDirection inDirection);
 
-    GameState & gameState();
-
     void commit(const Block & inBlock);
 
     void onChanged();

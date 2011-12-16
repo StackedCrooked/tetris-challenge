@@ -365,7 +365,6 @@ void ComputerPlayer::Impl::timerEvent()
 
 void ComputerPlayer::Impl::startNodeCalculator()
 {
-
 //    BlockTypes futureBlocks;
 //    std::unique_ptr<GameStateNode> endNode;
 

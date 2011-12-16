@@ -18,6 +18,9 @@
 namespace Tetris {
 
 
+class GameState;
+
+
 /**
  * SimpleGame is a simplified wrapper for the Game class.
  */
@@ -93,6 +96,12 @@ public:
     void applyLinePenalty(int inNumberOfLinesMadeByOpponent);
 
 private:
+    friend class ComputerPlayer;
+
+    const GameState & gameState() const;
+
+    //GameState & gameState();
+
     struct Impl;
     boost::shared_ptr<Impl> mImpl;
 };

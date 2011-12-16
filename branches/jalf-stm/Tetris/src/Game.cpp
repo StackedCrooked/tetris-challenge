@@ -78,12 +78,6 @@ const GameState & Game::gameState() const
 }
 
 
-GameState & Game::gameState()
-{
-    return mGameState;
-}
-
-
 void Game::commit(const Block & inBlock)
 {
     mGameState.commit(inBlock);
@@ -406,7 +400,7 @@ void Game::setStartingLevel(int inLevel)
 
 void Game::setGrid(const Grid & inGrid)
 {
-    gameState().setGrid(inGrid);
+    mGameState.setGrid(inGrid);
     onChanged();
 }
 
