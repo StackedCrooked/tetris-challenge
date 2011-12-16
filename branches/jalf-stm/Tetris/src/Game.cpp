@@ -416,14 +416,14 @@ HumanGame::HumanGame(const Game & inGame) :
 }
 
 
-void HumanGame::setGrid(const Grid & inGrid)
+void Game::setGrid(const Grid & inGrid)
 {
     gameState().setGrid(inGrid);
     onChanged();
 }
 
 
-bool HumanGame::move(MoveDirection inDirection)
+bool Game::move(MoveDirection inDirection)
 {
     if (isGameOver())
     {
@@ -489,8 +489,7 @@ ComputerGame::ComputerGame(const Game & inGame) :
 void ComputerGame::setGrid(const Grid & inGrid)
 {
     mPrediction.clear();
-    gameState().setGrid(inGrid);
-    onChanged();
+    Game::setGrid(inGrid);
 }
 
 
