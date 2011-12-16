@@ -1,8 +1,6 @@
 #include "Poco/Foundation.h"
 #include "Tetris/BlockMover.h"
-#include "Tetris/Game.h"
-#include "Tetris/GameStateNode.h"
-#include "Tetris/GameStateComparator.h"
+#include "Tetris/SimpleGame.h"
 #include "Tetris/GameState.h"
 #include "Tetris/Block.h"
 #include "Futile/Logging.h"
@@ -42,8 +40,8 @@ struct BlockMover::Impl
         MoveDownBehavior mMoveDownBehavior;
     };
 
-    Impl(ThreadSafe<Game> inGame) :
-        mGame(inGame),
+    Impl(SimpleGame inSimpleGame) :
+        mSimpleGame(inSimpleGame),
         mTimer(10), // frequency is 100/s
         mData(new Data)
     {
@@ -94,14 +92,14 @@ struct BlockMover::Impl
 
     void move(Data & data);
 
-    ThreadSafe<Game> mGame;
+    SimpleGame mSimpleGame;
     Futile::Timer mTimer;
     ThreadSafe<Data> mData;
 };
 
 
-BlockMover::BlockMover(ThreadSafe<Game> inGame) :
-    mImpl(new Impl(inGame))
+BlockMover::BlockMover(SimpleGame inSimpleGame) :
+    mImpl(new Impl(inSimpleGame))
 {
     mImpl->mTimer.start(boost::bind(&Impl::onTimerEvent, mImpl.get()));
 }
@@ -191,21 +189,14 @@ void BlockMover::Impl::onTimerEvent()
 
 void BlockMover::Impl::move(Data & data)
 {
-    Locker<Game> wGame(mGame);
-    ComputerGame & game = dynamic_cast<ComputerGame&>(*wGame.get());
-    if (game.isPaused())
+    // If our block was "caught" by the sudden appearance of new blocks, then we solidify it in that state.
+    if (!mSimpleGame.checkPositionValid(mSimpleGame.activeBlock()))
     {
+        mSimpleGame.move(MoveDirection_Down);
         return;
     }
 
-    // If our block was "caught" by the sudden appearance of new blocks, then we solidify it in that state.
-    if (!static_cast<const Game&>(game).gameState().checkPositionValid(game.activeBlock()))
-	{
-		game.move(MoveDirection_Down);
-        return;
-	}
-
-    const ChildNodes & children = game.currentNode()->children();
+    const ChildNodes & children = mSimpleGame.currentNode()->children();
     if (children.empty())
     {
         return;
@@ -213,7 +204,7 @@ void BlockMover::Impl::move(Data & data)
 
     GameStateNode & firstChild = **children.begin();
 
-    const Block & block = game.activeBlock();
+    const Block & block = mSimpleGame.activeBlock();
     const Block & targetBlock = firstChild.gameState().originalBlock();
 
     Assert(block.type() == targetBlock.type());
@@ -221,7 +212,7 @@ void BlockMover::Impl::move(Data & data)
     // Try rotation first, if it fails then skip rotation and try horizontal move
     if (block.rotation() != targetBlock.rotation())
     {
-        if (game.rotate())
+        if (mSimpleGame.rotate())
         {
             return;
         }
@@ -230,22 +221,22 @@ void BlockMover::Impl::move(Data & data)
 
     if (block.column() < targetBlock.column())
     {
-        if (!game.move(MoveDirection_Right))
+        if (!mSimpleGame.move(MoveDirection_Right))
         {
             // Damn we can't move this block anymore.
             // Give up on this block.
-            game.dropAndCommit();
+            mSimpleGame.dropAndCommit();
         }
         return;
     }
 
     if (block.column() > targetBlock.column())
     {
-        if (!game.move(MoveDirection_Left))
+        if (!mSimpleGame.move(MoveDirection_Left))
         {
             // Damn we can't move this block anymore.
             // Give up on this block.
-            game.dropAndCommit();
+            mSimpleGame.dropAndCommit();
         }
         return;
     }
@@ -254,9 +245,9 @@ void BlockMover::Impl::move(Data & data)
     // Retry rotation again. If it fails here then drop the block.
     if (block.rotation() != targetBlock.rotation())
     {
-        if (!game.rotate())
+        if (!mSimpleGame.rotate())
         {
-            game.dropAndCommit();
+            mSimpleGame.dropAndCommit();
         }
         return;
     }
@@ -267,11 +258,11 @@ void BlockMover::Impl::move(Data & data)
     //
     if (data.mMoveDownBehavior == BlockMover::MoveDownBehavior_Move)
     {
-        game.move(MoveDirection_Down);
-    }
+        mSimpleGame.move(MoveDirection_Down);
+}
     else if (data.mMoveDownBehavior == BlockMover::MoveDownBehavior_Drop)
     {
-        game.dropAndCommit();
+        mSimpleGame.dropAndCommit();
     }
     else
     {
