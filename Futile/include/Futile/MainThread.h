@@ -5,7 +5,6 @@
 #include "Futile/Singleton.h"
 #include <boost/function.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/scoped_ptr.hpp>
 #include <memory>
 
 
@@ -30,7 +29,7 @@ private:
 
     ~MainThread();
 
-    boost::scoped_ptr<MainThreadImpl> mImpl;
+    std::unique_ptr<MainThreadImpl> mImpl;
 };
 
 
