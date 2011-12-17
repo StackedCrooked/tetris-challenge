@@ -86,6 +86,12 @@ std::string format(std::size_t workerCount,
 } // anonymous namespace
 
 
+TEST_F(NodeCalculatorTest, SingleThreaded)
+{
+    testInterrupt(Depth(6), Width(6), WorkerCount(1), TimeMs(10));
+}
+
+
 TEST_F(NodeCalculatorTest, Interrupt)
 {
 
@@ -173,7 +179,7 @@ void NodeCalculatorTest::testInterrupt(Depth inDepth, Width inWidth, WorkerCount
     ASSERT_LE(nodeCalculator.getCurrentSearchDepth(), nodeCalculator.getMaxSearchDepth());
 
     NodePtr resultPtr = nodeCalculator.result();
-    ASSERT(resultPtr);
+    ASSERT_TRUE(resultPtr);
 
     GameStateNode & result(*resultPtr);
     ASSERT_TRUE(result.depth() == rootNode.depth() + 1);
