@@ -78,7 +78,7 @@ const GameState & Game::gameState() const
 
 void Game::commit(const Block & inBlock)
 {
-    mGameState.commit(inBlock);
+    mGameState = mGameState.commit(inBlock);
 }
 
 
