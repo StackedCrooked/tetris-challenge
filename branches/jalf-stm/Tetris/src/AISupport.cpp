@@ -128,7 +128,11 @@ void CalculateNodes(NodePtr ioNode,
 
         Assert(count >= 1);
         NodePtr gameStateNode = *ioNode->children().begin();
-        inCallback(gameStateNode->gameState());
+
+        if (inCallback)
+        {
+            inCallback(gameStateNode->gameState());
+        }
     }
 
 

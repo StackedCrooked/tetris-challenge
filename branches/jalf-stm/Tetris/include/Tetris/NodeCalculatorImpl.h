@@ -58,12 +58,6 @@ protected:
 
     void setStatus(int inStatus);
 
-    void populateNodesRecursively(const GameState & inGameState,
-                                  const BlockTypes & inBlockTypes,
-                                  const std::vector<int> & inWidths,
-                                  std::size_t inIndex,
-                                  std::size_t inMaxIndex);
-
     void destroyInferiorChildren();
 
     void calculateResult();
