@@ -83,6 +83,13 @@ public:
     void onFinished();
     void onError();
 
+    // Return a copy!
+    GameState initialGameState()
+    {
+        return mPrecalculated.empty() ? mComputerPlayer->game()->game().lock()->gameState()
+                                      : mPrecalculated.back();
+    }
+
     ComputerPlayer * mComputerPlayer;
     Tweaker * mTweaker;
 
@@ -365,7 +372,7 @@ void ComputerPlayer::Impl::startNodeCalculator()
         return;
     }
 
-    if (mPrecalculated.back().isGameOver())
+    if (initialGameState().isGameOver())
     {
         return;
     }
@@ -402,7 +409,7 @@ void ComputerPlayer::Impl::startNodeCalculator()
         mWorkerCount = cDefaultWorkerCount;
     }
     mWorkerPool.resize(mWorkerCount);
-    mNodeCalculator.reset(new NodeCalculator(mPrecalculated.back(),
+    mNodeCalculator.reset(new NodeCalculator(initialGameState(),
                                              futureBlocks,
                                              widths,
                                              *mEvaluator,
@@ -425,7 +432,7 @@ void ComputerPlayer::Impl::onWorking()
 
     FUTILE_LOCK(Game & game, simpleGame.game())
     {
-        if (mPrecalculated.back().id() < game.gameState().id())
+        if (initialGameState().id() < game.gameState().id())
         {
             // The calculated results have become invalid. Start over.
             mReset = true;
@@ -454,12 +461,13 @@ void ComputerPlayer::Impl::onFinished()
     mReset = true;
 
     NodePtr resultNode = mNodeCalculator->result();
+    Assert(resultNode);
     if (!resultNode || resultNode->gameState().isGameOver())
     {
         return;
     }
 
-    const GameState & lastPrecalculatedGameState = mPrecalculated.back();
+    GameState lastPrecalculatedGameState(initialGameState());
     const GameState & resultGameState = resultNode->gameState();
 
     // Check for sync problems.
