@@ -11,7 +11,6 @@
 #include <boost/bind.hpp>
 #include <boost/signals2.hpp>
 #include <boost/weak_ptr.hpp>
-#include <set>
 #include <stdexcept>
 
 
@@ -128,9 +127,9 @@ SimpleGame::~SimpleGame()
 }
 
 
-const GameState & SimpleGame::gameState() const
+ThreadSafe<Game> SimpleGame::game()
 {
-    return mImpl->mGame.lock()->gameState();
+    return mImpl->mGame;
 }
 
 

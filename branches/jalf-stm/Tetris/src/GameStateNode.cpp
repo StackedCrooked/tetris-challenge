@@ -5,7 +5,6 @@
 #include "Tetris/Block.h"
 #include "Tetris/Utilities.h"
 #include "Futile/Assert.h"
-#include <set>
 #include <boost/scoped_ptr.hpp>
 #include <boost/weak_ptr.hpp>
 
@@ -76,25 +75,6 @@ GameStateNode::GameStateNode(NodePtr inParent, const GameState & inGameState, co
 GameStateNode::~GameStateNode()
 {
     mImpl.reset();
-}
-
-
-std::unique_ptr<GameStateNode> GameStateNode::clone() const
-{
-    NodePtr parent = mImpl->mParent.lock();
-    std::unique_ptr<GameStateNode> result(parent ? new GameStateNode(parent, gameState(), mImpl->mEvaluator)
-                                               : new GameStateNode(gameState(), mImpl->mEvaluator));
-    result->mImpl->mDepth = mImpl->mDepth;
-
-    ChildNodes::const_iterator it = mImpl->mChildren.begin(), end = mImpl->mChildren.end();
-    for (; it != end; ++it)
-    {
-        GameStateNode & node(*(*it));
-        NodePtr newChild(node.clone().release());
-        Assert(newChild->depth() == mImpl->mDepth + 1);
-        result->mImpl->mChildren.insert(newChild);
-    }
-    return result;
 }
 
 

@@ -7,7 +7,6 @@
 #include <boost/scoped_ptr.hpp>
 #include <algorithm>
 #include <vector>
-#include <set>
 
 
 namespace Tetris {

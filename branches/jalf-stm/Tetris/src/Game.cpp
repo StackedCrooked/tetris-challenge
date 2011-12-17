@@ -13,7 +13,6 @@
 #include "Poco/Random.h"
 #include <algorithm>
 #include <ctime>
-#include <set>
 #include <stdexcept>
 
 namespace Tetris {

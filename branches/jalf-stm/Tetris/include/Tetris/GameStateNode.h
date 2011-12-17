@@ -5,6 +5,7 @@
 #include "Tetris/GameStateComparator.h"
 #include "Tetris/Grid.h"
 #include "Tetris/NodePtr.h"
+#include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <memory>
 
@@ -19,7 +20,7 @@ class Evaluator;
  * GameStateNode is a tree of gamestates. It is used as the search tree for the AI.
  * Each node object contains one GameState object and a collection of child nodes.
  */
-class GameStateNode
+class GameStateNode : boost::noncopyable
 {
 public:
     static std::unique_ptr<GameStateNode> CreateRootNode(std::size_t inNumRows, std::size_t inNumColumns);
@@ -29,9 +30,6 @@ public:
     GameStateNode(const GameState & inGameState, const Evaluator & inEvaluator);
 
     ~GameStateNode();
-
-    // Creates a deep copy of this node and all child nodes.
-    std::unique_ptr<GameStateNode> clone() const;
 
     // Each node is produced by a unique combination of the current block's column and rotation.
     int identifier() const;
