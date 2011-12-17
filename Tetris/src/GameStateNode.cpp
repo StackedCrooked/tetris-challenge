@@ -54,9 +54,8 @@ struct GameStateNode::Impl
 
 std::unique_ptr<GameStateNode> GameStateNode::CreateRootNode(std::size_t inNumRows, std::size_t inNumColumns)
 {
-    return std::unique_ptr<GameStateNode>(new GameStateNode(
-        GameState(inNumRows, inNumColumns),
-        Balanced::Instance()));
+    return std::unique_ptr<GameStateNode>(new GameStateNode(GameState(inNumRows, inNumColumns),
+                                                            Balanced::Instance()));
 }
 
 

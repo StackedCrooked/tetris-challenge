@@ -390,11 +390,9 @@ bool Game::move(Direction inDirection)
     // Remember the number of lines in the current game state.
     int oldLineCount = gameState().numLines();
 
-    // Commit the block. This returns a new GameState object
-    // where any full lines have already been cleared.
     commit(block);
 
-    // Count the number of lines that were made in  the commit call.
+    // Count the number of lines that were made in the commit call.
     int linesCleared = mGameState.numLines() - oldLineCount;
     Assert(linesCleared >= 0);
 

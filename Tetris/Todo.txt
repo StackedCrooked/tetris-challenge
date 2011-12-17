@@ -1,2 +1,4 @@
 STM Version
 -----------
+- Fix the working of the program
+- Improve encapsulation by obeying the Law of Demeter

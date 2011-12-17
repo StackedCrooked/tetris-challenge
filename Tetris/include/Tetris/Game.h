@@ -85,13 +85,13 @@ public:
 
     virtual void applyLinePenalty(std::size_t inLineCount);
 
-    virtual void setGrid(const Grid & inGrid);
-
 private:
     // Friendship required for destructor.
     friend class Futile::ThreadSafe<Game>;
 
     void commit(const Block & inBlock);
+
+    void setGrid(const Grid & inGrid);
 
     void onChanged();
     void onLinesCleared(std::size_t inLineCount);
