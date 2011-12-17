@@ -112,7 +112,7 @@ MainWindow::MainWindow(QWidget *parent, Model & inModel) :
     connect(timer, SIGNAL(timeout()), this, SLOT(onTimerEvent()));
     timer->start(500);
 
-    onNewSingleHumanPlayerGame();
+    onNewSingleComputerPlayerGame();
 }
 
 
