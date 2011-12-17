@@ -187,8 +187,9 @@ void BlockMover::Impl::onTimerEvent()
 }
 
 
-void BlockMover::Impl::move(Data & data)
+void BlockMover::Impl::move(Data & )
 {
+    // TODO: implement
 }
 
 
