@@ -1,5 +1,5 @@
-#ifndef TETRIS_NODECALCULATOR_H_INCLUDED
-#define TETRIS_NODECALCULATOR_H_INCLUDED
+#ifndef TETRIS_NODECALCULATOR_H
+#define TETRIS_NODECALCULATOR_H
 
 
 #include "Tetris/BlockTypes.h"
@@ -68,4 +68,4 @@ private:
 } // namespace Tetris
 
 
-#endif // TETRIS_NODECALCULATOR_H_INCLUDED
+#endif // TETRIS_NODECALCULATOR_H

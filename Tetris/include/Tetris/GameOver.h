@@ -1,5 +1,5 @@
-#ifndef TETRIS_GAMEOVER_H_INCLUDED
-#define TETRIS_GAMEOVER_H_INCLUDED
+#ifndef TETRIS_GAMEOVER_H
+#define TETRIS_GAMEOVER_H
 
 
 #include "Futile/TypedWrapper.h"
@@ -14,4 +14,4 @@ FUTILE_BOX_TYPE(GameOver, bool);
 } // namespace Tetris
 
 
-#endif // TETRIS_GAMEOVER_H_INCLUDED
+#endif // TETRIS_GAMEOVER_H

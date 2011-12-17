@@ -1,5 +1,5 @@
-#ifndef TETRIS_ABSTRACTWIDGET_H_INCLUDED
-#define TETRIS_ABSTRACTWIDGET_H_INCLUDED
+#ifndef TETRIS_ABSTRACTWIDGET_H
+#define TETRIS_ABSTRACTWIDGET_H
 
 
 #include "Tetris/BlockType.h"
@@ -166,4 +166,4 @@ private:
 } // namespace Tetris
 
 
-#endif // TETRIS_ABSTRACTWIDGET_H_INCLUDED
+#endif // TETRIS_ABSTRACTWIDGET_H

@@ -1,5 +1,5 @@
-#ifndef TETRIS_GRAVITY_H_INCLUDED
-#define TETRIS_GRAVITY_H_INCLUDED
+#ifndef TETRIS_GRAVITY_H
+#define TETRIS_GRAVITY_H
 
 
 #include "Futile/Threading.h"
@@ -47,4 +47,4 @@ private:
 } // namespace Tetris
 
 
-#endif // GRAVITY_H_INCLUDED
+#endif // TETRIS_GRAVITY_H

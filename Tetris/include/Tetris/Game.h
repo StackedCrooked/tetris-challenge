@@ -1,5 +1,5 @@
-#ifndef TETRIS_GAME_H_INCLUDED
-#define TETRIS_GAME_H_INCLUDED
+#ifndef TETRIS_GAME_H
+#define TETRIS_GAME_H
 
 
 #include "Tetris/BlockFactory.h"
@@ -141,4 +141,4 @@ private:
 } // namespace Tetris
 
 
-#endif // GAME_H_INCLUDED
+#endif // TETRIS_GAME_H

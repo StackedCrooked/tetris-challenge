@@ -1,5 +1,5 @@
-#ifndef TETRIS_BLOCKTYPES_H_INCLUDED
-#define TETRIS_BLOCKTYPES_H_INCLUDED
+#ifndef TETRIS_BLOCKTYPES_H
+#define TETRIS_BLOCKTYPES_H
 
 
 #include "Tetris/BlockType.h"
@@ -15,5 +15,5 @@ typedef std::vector<BlockType> BlockTypes;
 } // namespace Tetris
 
 
-#endif // TETRIS_BLOCKTYPES_H_INCLUDED
+#endif // TETRIS_BLOCKTYPES_H
 

@@ -1,5 +1,5 @@
-#ifndef TETRIS_COMPUTERPLAYER_H_INCLUDED
-#define TETRIS_COMPUTERPLAYER_H_INCLUDED
+#ifndef TETRIS_COMPUTERPLAYER_H
+#define TETRIS_COMPUTERPLAYER_H
 
 
 #include "Tetris/BlockMover.h"
@@ -82,4 +82,4 @@ private:
 } // namespace Tetris
 
 
-#endif // PLAYER_H_INCLUDED
+#endif // TETRIS_PLAYER_H

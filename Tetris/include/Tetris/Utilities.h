@@ -1,5 +1,5 @@
-#ifndef TETRIS_UTILITIES_H_INCLUDED
-#define TETRIS_UTILITIES_H_INCLUDED
+#ifndef TETRIS_UTILITIES_H
+#define TETRIS_UTILITIES_H
 
 
 namespace Tetris {
@@ -15,4 +15,4 @@ static T DivideByTwo(T inValue)
 } // namespace Tetris
 
 
-#endif // UTILITIES_H_INCLUDED
+#endif // TETRIS_UTILITIES_H

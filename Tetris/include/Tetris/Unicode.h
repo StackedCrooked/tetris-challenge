@@ -1,5 +1,5 @@
-#ifndef TETRIS_UNICODE_H_INCLUDED
-#define TETRIS_UNICODE_H_INCLUDED
+#ifndef TETRIS_UNICODE_H
+#define TETRIS_UNICODE_H
 
 
 #include <string>
@@ -16,4 +16,4 @@ std::wstring ToUTF16(const std::string & inText);
 } // namespace Tetris
 
 
-#endif // TETRIS_UNICODE_H_INCLUDED
+#endif // TETRIS_UNICODE_H

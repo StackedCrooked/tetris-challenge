@@ -1,5 +1,5 @@
-#ifndef TETRIS_GAMESTATE_H_INCLUDED
-#define TETRIS_GAMESTATE_H_INCLUDED
+#ifndef TETRIS_GAMESTATE_H
+#define TETRIS_GAMESTATE_H
 
 
 #include "Tetris/Block.h"
@@ -106,4 +106,4 @@ private:
 } // namespace Tetris
 
 
-#endif // GAMESTATE_H_INCLUDED
+#endif // TETRIS_GAMESTATE_H

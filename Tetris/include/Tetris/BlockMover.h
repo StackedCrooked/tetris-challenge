@@ -1,5 +1,5 @@
-#ifndef TETRIS_BLOCKMOVER_H_INCLUDED
-#define TETRIS_BLOCKMOVER_H_INCLUDED
+#ifndef TETRIS_BLOCKMOVER_H
+#define TETRIS_BLOCKMOVER_H
 
 
 #include "Tetris/Utilities.h"
@@ -56,4 +56,4 @@ private:
 } // namespace Tetris
 
 
-#endif // BLOCKMOVER_H_INCLUDED
+#endif // TETRIS_BLOCKMOVER_H

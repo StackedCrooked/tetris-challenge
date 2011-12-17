@@ -1,5 +1,5 @@
-#ifndef TETRIS_PLAYER_H_INCLUDED
-#define TETRIS_PLAYER_H_INCLUDED
+#ifndef TETRIS_PLAYER_H
+#define TETRIS_PLAYER_H
 
 
 #include "Tetris/PlayerType.h"
@@ -84,4 +84,4 @@ private:
 } // namespace Tetris
 
 
-#endif // TETRIS_PLAYER_H_INCLUDED
+#endif // TETRIS_PLAYER_H

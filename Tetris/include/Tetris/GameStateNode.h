@@ -1,5 +1,5 @@
-#ifndef TETRIS_GAMESTATENODE_H_INCLUDED
-#define TETRIS_GAMESTATENODE_H_INCLUDED
+#ifndef TETRIS_GAMESTATENODE_H
+#define TETRIS_GAMESTATENODE_H
 
 
 #include "Tetris/GameStateComparator.h"
@@ -73,4 +73,4 @@ private:
 } // namespace Tetris
 
 
-#endif // GAMESTATENODE_H_INCLUDED
+#endif // TETRIS_GAMESTATENODE_H

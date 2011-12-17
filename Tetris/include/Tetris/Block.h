@@ -1,5 +1,5 @@
-#ifndef TETRIS_BLOCK_H_INCLUDED
-#define TETRIS_BLOCK_H_INCLUDED
+#ifndef TETRIS_BLOCK_H
+#define TETRIS_BLOCK_H
 
 
 #include "Tetris/BlockType.h"
@@ -75,4 +75,4 @@ const Grid & GetGrid(unsigned inBlockIdentifier);
 } // namespace Tetris
 
 
-#endif // BLOCK_H_INCLUDED
+#endif // TETRIS_BLOCK_H
