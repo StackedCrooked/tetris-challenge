@@ -15,7 +15,7 @@ struct Timer::Impl : boost::noncopyable
         mTimer(inTimer),
         mMainWorker("Timer"),
         mAction(),
-		mIntervalMutex(),
+        mIntervalMutex(),
         mInterval(inInterval),
         mStopMutex(),
         mStop(false)
@@ -29,13 +29,13 @@ struct Timer::Impl : boost::noncopyable
 
     bool isStopped() const
     {
-        ScopedLock lock(mStopMutex);
+        boost::mutex::scoped_lock lock(mStopMutex);
         return mStop;
     }
 
     void setStopped()
     {
-        ScopedLock lock(mStopMutex);
+        boost::mutex::scoped_lock lock(mStopMutex);
         mStop = true;
     }
 
@@ -47,7 +47,7 @@ struct Timer::Impl : boost::noncopyable
         }
 
         {
-            ScopedLock lock(mMutex);
+            boost::mutex::scoped_lock lock(mMutex);
             mAction = inAction;
         }
         mMainWorker.schedule(boost::bind(&Impl::poll, this));
@@ -57,7 +57,7 @@ struct Timer::Impl : boost::noncopyable
     {
         setStopped();
         {
-            ScopedLock lock(mMutex);
+            boost::mutex::scoped_lock lock(mMutex);
             mCondition.notify_one();
         }
         mMainWorker.interruptAndClearQueue();
@@ -66,13 +66,13 @@ struct Timer::Impl : boost::noncopyable
 
     void setInterval(UInt64 inInterval)
     {
-        ScopedLock lock(mIntervalMutex);
+        boost::mutex::scoped_lock lock(mIntervalMutex);
         mInterval = inInterval;
     }
 
     UInt64 getInterval()
     {
-        ScopedLock lock(mIntervalMutex);
+        boost::mutex::scoped_lock lock(mIntervalMutex);
         return mInterval;
     }
 
@@ -99,7 +99,7 @@ struct Timer::Impl : boost::noncopyable
             boost::system_time duration = boost::get_system_time() + boost::posix_time::milliseconds(getInterval());
 
             {
-                ScopedLock lock(mMutex);
+                boost::mutex::scoped_lock lock(mMutex);
                 if (mCondition.timed_wait(lock, duration))
                 {
                     return;
@@ -113,7 +113,7 @@ struct Timer::Impl : boost::noncopyable
 
 
             {
-                ScopedLock lock(mMutex);
+                boost::mutex::scoped_lock lock(mMutex);
                 if (mAction)
                 {
                     mAction();
@@ -127,15 +127,15 @@ struct Timer::Impl : boost::noncopyable
 
     Worker mMainWorker;
 
-    Condition mCondition;
-    Mutex mMutex;
+    boost::condition_variable mCondition;
+    boost::mutex mMutex;
 
     Action mAction;
 
-    mutable Mutex mIntervalMutex;
+    mutable boost::mutex mIntervalMutex;
     UInt64 mInterval;
 
-    mutable Mutex mStopMutex;
+    mutable boost::mutex mStopMutex;
     bool mStop;
 };
 
