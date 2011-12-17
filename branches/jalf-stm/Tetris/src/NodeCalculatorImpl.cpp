@@ -187,6 +187,7 @@ void NodeCalculatorImpl::calculateResult()
 
     if (getCurrentSearchDepth() == 0 || !mTreeRowInfos.bestNode())
     {
+        LogWarning("No results yet.");
         return;
     }
 
