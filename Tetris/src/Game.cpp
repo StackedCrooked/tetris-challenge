@@ -16,7 +16,6 @@
 #include <set>
 #include <stdexcept>
 
-
 namespace Tetris {
 
 
@@ -229,47 +228,7 @@ bool Game::checkPositionValid(const Block & inBlock) const
 }
 
 
-int Game::GetRowDelta(MoveDirection inDirection)
-{
-    switch (inDirection)
-    {
-        case MoveDirection_Up:
-        {
-            return -1;
-        }
-        case MoveDirection_Down:
-        {
-            return 1;
-        }
-        default:
-        {
-            return 0;
-        }
-    }
-}
-
-
-int Game::GetColumnDelta(MoveDirection inDirection)
-{
-    switch (inDirection)
-    {
-        case MoveDirection_Left:
-        {
-            return -1;
-        }
-        case MoveDirection_Right:
-        {
-            return 1;
-        }
-        default:
-        {
-            return 0;
-        }
-    }
-}
-
-
-bool Game::canMove(MoveDirection inDirection)
+bool Game::canMove(Direction inDirection)
 {
     if (isGameOver())
     {
@@ -405,7 +364,7 @@ void Game::setGrid(const Grid & inGrid)
 }
 
 
-bool Game::move(MoveDirection inDirection)
+bool Game::move(Direction inDirection)
 {
     if (isGameOver())
     {

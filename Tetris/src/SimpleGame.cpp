@@ -213,7 +213,7 @@ int SimpleGame::columnCount() const
 }
 
 
-bool SimpleGame::move(MoveDirection inDirection)
+bool SimpleGame::move(Direction inDirection)
 {
     return mImpl->mGame.lock()->move(inDirection);
 }
