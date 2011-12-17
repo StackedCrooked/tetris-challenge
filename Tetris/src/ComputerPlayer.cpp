@@ -362,7 +362,7 @@ void ComputerPlayer::Impl::timerEvent()
 
 
 void ComputerPlayer::Impl::startNodeCalculator()
-{   
+{
     if (mPrecalculated.size() > 8)
     {
         // We're fine for now.
@@ -384,7 +384,7 @@ void ComputerPlayer::Impl::startNodeCalculator()
     for (std::size_t idx = 0; idx != nextBlocks.size(); ++idx)
     {
         futureBlocks.push_back(nextBlocks[idx].type());
-    }        
+    }
 
 
     //
@@ -425,23 +425,25 @@ void ComputerPlayer::Impl::onStarted()
 
 void ComputerPlayer::Impl::onWorking()
 {
-//    const ComputerGame & game(GetComputerGame());
+    SimpleGame & simpleGame = *mComputerPlayer->game();
 
-//    if (mPrecalculated.back().id() < game.endNode()->depth())
-//    {
-//        // The calculated results have become invalid. Start over.
-//        mReset = true;
-//        return;
-//    }
+    FUTILE_LOCK(Game & game, simpleGame.game())
+    {
+        if (mPrecalculated.back().id() < game.gameState().id())
+        {
+            // The calculated results have become invalid. Start over.
+            mReset = true;
+            return;
+        }
 
-//    if (game.numPrecalculatedMoves() == 0)
-//    {
-//        // Stop and use current results.
-//        mStop = true;
-//        return;
-//    }
+        if (mPrecalculated.empty())
+        {
+            mStop = true;
+            return;
+        }
+    }
 
-//    // Keep working
+    // Keep working
 }
 
 
@@ -453,24 +455,24 @@ void ComputerPlayer::Impl::onStopped()
 
 void ComputerPlayer::Impl::onFinished()
 {
-//    mReset = true;
+    mReset = true;
 
-//    NodePtr resultNode = mNodeCalculator->result();
-//    if (!resultNode || resultNode->gameState().isGameOver())
-//    {
-//        return;
-//    }
+    NodePtr resultNode = mNodeCalculator->result();
+    if (!resultNode || resultNode->gameState().isGameOver())
+    {
+        return;
+    }
 
-//    ComputerGame & game(GetComputerGame());
+    const GameState & lastPrecalculatedGameState = mPrecalculated.back();
+    const GameState & resultGameState = resultNode->gameState();
 
-//    // Check for sync problems.
-//    if (resultNode->depth() != game.endNode()->depth() + 1)
-//    {
-//        return;
-//    }
+    // Check for sync problems.
+    if (resultGameState.id() != lastPrecalculatedGameState.id() + 1)
+    {
+        return;
+    }
 
-//    // Ok, store the results.
-//    game.appendPrecalculatedNode(resultNode);
+    mPrecalculated.push_back(resultGameState);
 }
 
 
