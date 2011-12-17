@@ -1,10 +1,13 @@
 include_directories(
     ${SOLUTIONDIR}Futile/include
-    ${SOLUTIONDIR}Tetris/include
+    ${SOLUTIONDIR}Tetris/include)
+
+set(CMAKE_INCLUDE_SYSTEM_FLAG_CXX "-isystem ")
+
+include_directories(SYSTEM
     ${SOLUTIONDIR}3rdParty/Boost
     ${SOLUTIONDIR}3rdParty/STM
-    ${SOLUTIONDIR}3rdParty/Poco/Foundation/include
-    /usr/include)
+    ${SOLUTIONDIR}3rdParty/Poco/Foundation/include)
 
 
 add_library(Tetris

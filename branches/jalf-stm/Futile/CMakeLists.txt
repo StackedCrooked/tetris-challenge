@@ -1,9 +1,12 @@
 include_directories(
     ${SOLUTIONDIR}Futile/include
-    ${SOLUTIONDIR}Tetris/include
+    ${SOLUTIONDIR}3rdParty/Boost)
+
+set(CMAKE_INCLUDE_SYSTEM_FLAG_CXX "-isystem ")
+
+include_directories(SYSTEM
     ${SOLUTIONDIR}3rdParty/Boost
-    ${SOLUTIONDIR}3rdParty/STM
-    /usr/include)
+    ${SOLUTIONDIR}3rdParty/STM)
 
 add_library(Futile
     include/Futile/Array.h
