@@ -1,10 +1,22 @@
+project(TetrisTest)
+
+set(SOLUTIONDIR "${TetrisTest_SOURCE_DIR}/../../")
+
+if(WIN32)
+set(LIBEXT "lib")
+else()
+set(LIBEXT "a")
+set(CMAKE_INCLUDE_SYSTEM_FLAG_CXX "-isystem ")
+endif()
+
 include_directories(
     ${SOLUTIONDIR}Futile/include
-    ${SOLUTIONDIR}Tetris/include
+    ${SOLUTIONDIR}Tetris/include)
+
+include_directories(SYSTEM
     ${SOLUTIONDIR}3rdParty/GTest/include
     ${SOLUTIONDIR}3rdParty/Boost
-    ${SOLUTIONDIR}3rdParty/STM
-    /usr/include)
+    ${SOLUTIONDIR}3rdParty/STM)
 
 add_executable(TetrisTest
     src/main.cpp
@@ -19,13 +31,7 @@ add_executable(TetrisTest
     src/WorkerPoolTest.h)
 
 set_target_properties(TetrisTest PROPERTIES
-    COMPILE_FLAGS "${FINAL_COMPILE_FLAGS}")
-
-
-set(LIBEXT "a")
-if(WIN32)
-set(LIBEXT "lib")
-endif()
+    COMPILE_FLAGS "-std=c++0x -Wall -Wextra -Werror ")
 
 target_link_libraries(TetrisTest
     Tetris
