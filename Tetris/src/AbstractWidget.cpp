@@ -82,13 +82,13 @@ AbstractWidget::~AbstractWidget()
 }
 
 
-void AbstractWidget::onGameStateChanged(SimpleGame * inGame)
+void AbstractWidget::onGameStateChanged(SimpleGame *)
 {
     refresh();
 }
 
 
-void AbstractWidget::onLinesCleared(SimpleGame * inGame, std::size_t inLineCount)
+void AbstractWidget::onLinesCleared(SimpleGame *, std::size_t inLineCount)
 {
     (void)inLineCount;
     refresh();
@@ -287,7 +287,7 @@ void AbstractWidget::coordinateRepaint(SimpleGame & inGame)
     {
         blockTypes.push_back(futureBlocks[idx].type());
     }
-    paintFutureBlocks(futureBlocksRect(), mSpacing, blockTypes);
+    paintFutureBlocks(futureBlocksRect(), blockTypes);
 
     // Paint the stats
     paintStats(statsRect(), inGame.stats());
@@ -379,7 +379,7 @@ void AbstractWidget::paintGameOver()
 }
 
 
-void AbstractWidget::paintAvatar(const SimpleGame & inGame)
+void AbstractWidget::paintAvatar(const SimpleGame &)
 {
     Rect theAvatarRect = avatarRect();
     paintImage(theAvatarRect, player()->playerName() + "_80.gif");
@@ -407,7 +407,7 @@ void AbstractWidget::paintStats(const Rect & inRect, const GameStateStats & inSt
 }
 
 
-void AbstractWidget::paintFutureBlocks(const Rect & inRect, int inSpacing, const BlockTypes & inBlockTypes)
+void AbstractWidget::paintFutureBlocks(const Rect & inRect, const BlockTypes & inBlockTypes)
 {
     if (inBlockTypes.empty())
     {

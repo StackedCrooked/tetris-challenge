@@ -22,7 +22,7 @@ using namespace Futile;
 
 struct SimpleGame::Impl : boost::enable_shared_from_this<SimpleGame::Impl>
 {
-    static Futile::ThreadSafe<Game> CreateGame(PlayerType inPlayerType, std::size_t inRowCount, std::size_t inColumnCount)
+    static Futile::ThreadSafe<Game> CreateGame(PlayerType /*inPlayerType*/, std::size_t inRowCount, std::size_t inColumnCount)
     {
         Futile::ThreadSafe<Game> result(new Game(inRowCount, inColumnCount));
         return result;

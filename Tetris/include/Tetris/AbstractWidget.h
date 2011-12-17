@@ -145,7 +145,7 @@ private:
     void paintGameOver();
     void paintAvatar(const SimpleGame & inGame);
     void paintStats(const Rect & inRect, const GameStateStats & inStats);
-    void paintFutureBlocks(const Rect & inRect, int inSpacing, const std::vector<BlockType> & inBlockTypes);
+    void paintFutureBlocks(const Rect & inRect, const std::vector<BlockType> & inBlockTypes);
 
     void recalculateFPS();
 

@@ -149,7 +149,7 @@ Grid GetZGrid(unsigned rotation);
 
 const Grid & GetGrid(unsigned inId)
 {
-    if (inId < 0 || inId >= 28)
+    if (inId >= 28)
     {
         throw std::logic_error("Invalid block identifier.");
     }
