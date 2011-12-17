@@ -1,7 +1,3 @@
-project(TetrisTest)
-
-set(SOLUTIONDIR "${TetrisTest_SOURCE_DIR}/../../")
-
 if(WIN32)
 set(LIBEXT "lib")
 else()
