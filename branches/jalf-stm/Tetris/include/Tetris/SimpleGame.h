@@ -70,7 +70,7 @@ public:
 
     int columnCount() const;
 
-    bool move(MoveDirection inDirection);
+    bool move(Direction inDirection);
 
     bool rotate();
 
@@ -97,7 +97,9 @@ public:
 
 private:
     friend class ComputerPlayer;
+    
 
+    // NOTE: This is thread-unsafe!
     const GameState & gameState() const;
 
     //GameState & gameState();

@@ -60,9 +60,9 @@ public:
 
     bool checkPositionValid(const Block & inBlock) const;
 
-    bool canMove(MoveDirection inDirection);
+    bool canMove(Direction inDirection);
 
-    virtual bool move(MoveDirection inDirection);
+    virtual bool move(Direction inDirection);
 
     bool rotate();
 
@@ -91,9 +91,6 @@ public:
 private:
     // Friendship required for destructor.
     friend class Futile::ThreadSafe<Game>;
-
-    static int GetRowDelta(MoveDirection inDirection);
-    static int GetColumnDelta(MoveDirection inDirection);
 
     void commit(const Block & inBlock);
 
