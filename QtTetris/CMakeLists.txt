@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.8)
 project(QtTetris)
 FIND_PACKAGE(Qt4 REQUIRED)
 
@@ -88,6 +88,7 @@ endif()
 # Dependencies
 #
 add_subdirectory(${SOLUTIONDIR}Tetris ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Tetris)
+add_subdirectory(${SOLUTIONDIR}Tetris/testing ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Tetris/testing)
 add_subdirectory(${SOLUTIONDIR}Futile ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Futile)
 
 
