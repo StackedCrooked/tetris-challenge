@@ -2,11 +2,13 @@
 #define WORKERTHREAD_H
 
 
-#include "Futile/Threading.h"
 #include "Futile/Atomic.h"
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
+#include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
+#include <boost/thread/condition_variable.hpp>
+#include <boost/thread/mutex.hpp>
 #include <list>
 
 
@@ -36,7 +38,7 @@ enum WorkerStatus
 /**
  * Worker starts a background thread that runs in a loop processing tasks from a queue.
  */
-class Worker
+class Worker : boost::noncopyable
 {
 public:
     // Creates a new thread and starts waiting for tasks.
@@ -95,9 +97,6 @@ public:
     void interruptAndClearQueue(bool inJoin = true);
 
 private:
-    Worker(const Worker&);
-    Worker& operator=(const Worker&);
-
     friend class WorkerPool;
 
     void setStatus(WorkerStatus inStatus);
@@ -108,12 +107,12 @@ private:
 
     std::string mName;
     WorkerStatus mStatus;
-    mutable Mutex mStatusMutex;
-    Futile::Condition mStatusCondition;
+    mutable boost::mutex mStatusMutex;
+    boost::condition_variable mStatusCondition;
 
     std::list<Task> mQueue;
-    mutable Mutex mQueueMutex;
-    Condition mQueueCondition;
+    mutable boost::mutex mQueueMutex;
+    boost::condition_variable mQueueCondition;
 
     Atomic<bool> mQuitFlag;
 

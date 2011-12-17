@@ -1,7 +1,6 @@
 #include "Futile/WorkerPool.h"
 #include "Futile/Logging.h"
 #include "Futile/MakeString.h"
-#include "Futile/Threading.h"
 #include <boost/noncopyable.hpp>
 
 
@@ -30,7 +29,7 @@ WorkerPool::~WorkerPool()
 
 void WorkerPool::schedule(const Worker::Task & inTask)
 {
-    ScopedLock lock(mMutex);
+    boost::mutex::scoped_lock lock(mMutex);
     mRotation = (mRotation + 1) % mWorkers.size();
     mWorkers[mRotation]->schedule(inTask);
 }
@@ -38,14 +37,14 @@ void WorkerPool::schedule(const Worker::Task & inTask)
 
 std::size_t WorkerPool::size() const
 {
-    ScopedLock lock(mMutex);
+    boost::mutex::scoped_lock lock(mMutex);
     return mWorkers.size();
 }
 
 
 void WorkerPool::resize(std::size_t inSize)
 {
-    ScopedLock lock(mMutex);
+    boost::mutex::scoped_lock lock(mMutex);
     if (inSize > mWorkers.size())
     {
         while (mWorkers.size() < inSize)
@@ -64,7 +63,7 @@ void WorkerPool::resize(std::size_t inSize)
 
 void WorkerPool::wait()
 {
-    ScopedLock lock(mMutex);
+    boost::mutex::scoped_lock lock(mMutex);
     for (std::size_t idx = 0; idx != mWorkers.size(); ++idx)
     {
         Worker & worker = *mWorkers[idx];
@@ -75,7 +74,7 @@ void WorkerPool::wait()
 
 void WorkerPool::interruptRange(std::size_t inBegin, std::size_t inCount)
 {
-    LockMany<Mutex> locker;
+    LockMany<boost::mutex> locker;
 
     //
     // Lock all workers.
@@ -107,7 +106,7 @@ void WorkerPool::interruptRange(std::size_t inBegin, std::size_t inCount)
     for (std::size_t idx = inBegin; idx != inBegin + inCount; ++idx)
     {
         Worker & worker = *mWorkers[idx];
-        ScopedLock statusLock(worker.mStatusMutex);
+        boost::mutex::scoped_lock statusLock(worker.mStatusMutex);
         if (worker.mStatus == WorkerStatus_Working)
         {
             worker.mStatusCondition.wait(statusLock);
@@ -118,14 +117,14 @@ void WorkerPool::interruptRange(std::size_t inBegin, std::size_t inCount)
 
 void WorkerPool::interruptAndClearQueue()
 {
-    ScopedLock lock(mMutex);
+    boost::mutex::scoped_lock lock(mMutex);
     interruptRange(0, mWorkers.size());
 }
 
 
 int WorkerPool::getActiveWorkerCount() const
 {
-    ScopedLock lock(mMutex);
+    boost::mutex::scoped_lock lock(mMutex);
     int activeWorkerCount = 0;
     for (std::size_t idx = 0; idx != mWorkers.size(); ++idx)
     {

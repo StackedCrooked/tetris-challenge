@@ -5,7 +5,9 @@
 #include "Futile/Array.h"
 #include "Futile/Worker.h"
 #include <vector>
+#include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/thread/mutex.hpp>
 
 
 namespace Futile {
@@ -14,7 +16,7 @@ namespace Futile {
 /**
  * WorkerPool manages a pool of Worker objects.
  */
-class WorkerPool
+class WorkerPool : boost::noncopyable
 {
 public:
     WorkerPool(const std::string & inName, std::size_t inSize);
@@ -42,10 +44,6 @@ public:
     void interruptAndClearQueue();
 
 private:
-    // non-coyable
-    WorkerPool(const WorkerPool&);
-    WorkerPool& operator=(const WorkerPool&);
-
     void interruptRange(std::size_t inBegin, std::size_t inCount);
 
     std::string mName;
@@ -55,7 +53,7 @@ private:
     typedef std::vector<WorkerPtr> Workers;
     Workers mWorkers;
 
-    mutable Mutex mMutex;
+    mutable boost::mutex mMutex;
 };
 
 

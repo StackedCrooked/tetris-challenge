@@ -33,35 +33,18 @@ UInt64 GetCurrentTimeMs();
 class LifeTimeChecker : boost::noncopyable
 {
 public:
-	LifeTimeChecker();
+    LifeTimeChecker();
 
-	~LifeTimeChecker();
+    ~LifeTimeChecker();
 
 private:
-	UInt64 mBeginTime;
-	UInt64 mMaxDuration;
+    UInt64 mBeginTime;
+    UInt64 mMaxDuration;
 };
 
 
-typedef boost::mutex Mutex;
-
-
-typedef boost::mutex::scoped_lock ScopedLock;
-
-
-//struct ScopedLock : public LifeTimeChecker,
-//	                public boost::mutex::scoped_lock,
-//                    boost::noncopyable
-//{
-//    ScopedLock(Mutex & mutex) : 
-//        LifeTimeChecker(),
-//        boost::mutex::scoped_lock(mutex)
-//    {
-//    }
-//};
-
-
-typedef boost::condition_variable Condition;
+typedef boost::recursive_mutex Mutex;
+typedef boost::recursive_mutex::scoped_lock ScopedLock;
 
 
 /**
