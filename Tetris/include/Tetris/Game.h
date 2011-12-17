@@ -14,7 +14,6 @@
 #include <boost/scoped_ptr.hpp>
 #include <deque>
 #include <memory>
-#include <set>
 
 
 namespace Tetris {

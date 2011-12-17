@@ -6,19 +6,19 @@
 #include "Tetris/Block.h"
 #include "Tetris/GameStateStats.h"
 #include "Tetris/PlayerType.h"
-#include "Futile/Threading.h"
-#include <boost/function.hpp>
 #include <boost/shared_ptr.hpp>
 #include <cstddef>
-#include <set>
 #include <stdexcept>
 #include <vector>
+
+
+namespace Futile { template<class Variable> class ThreadSafe; }
 
 
 namespace Tetris {
 
 
-class GameState;
+class Game;
 
 
 /**
@@ -97,13 +97,9 @@ public:
 
 private:
     friend class ComputerPlayer;
-    
 
-    // NOTE: This is thread-unsafe!
-    const GameState & gameState() const;
-
-    //GameState & gameState();
-
+    Futile::ThreadSafe<Game> game();
+        
     struct Impl;
     boost::shared_ptr<Impl> mImpl;
 };
