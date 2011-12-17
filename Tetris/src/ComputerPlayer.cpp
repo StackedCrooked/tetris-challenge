@@ -38,13 +38,14 @@ struct ComputerPlayer::Impl : boost::noncopyable
 public:
     typedef ComputerPlayer::Tweaker Tweaker;
 
-    Impl() :
-        mComputerPlayer(0),
+    Impl(ComputerPlayer * inComputerPlayer,
+         BlockMover * inBlockMover) :
+        mComputerPlayer(inComputerPlayer),
         mTweaker(0),
         mMainWorker("ComputerPlayer: MainWorker"),
         mWorkerPool("ComputerPlayer: WorkerPool", cDefaultWorkerCount),
         mEvaluator(&MakeTetrises::Instance()),
-        mBlockMover(),
+        mBlockMover(inBlockMover),
         mSearchDepth(6),
         mSearchWidth(4),
         mWorkerCount(cDefaultWorkerCount),
@@ -115,14 +116,9 @@ ComputerPlayer::ComputerPlayer(const TeamName & inTeamName,
                                std::size_t inRowCount,
                                std::size_t inColumnCount) :
     Player(PlayerType_Computer, inTeamName, inPlayerName, inRowCount, inColumnCount),
-    mImpl(new Impl()),
+    mImpl(new Impl(this, new BlockMover(*game()))),
     mTimer(new Futile::Timer(10))
 {
-    FUTILE_LOCK(Impl & impl, mImpl)
-    {
-        impl.mComputerPlayer = this;
-        impl.mBlockMover.reset(new BlockMover(*game()));
-    }
 
 
     mTimer->start(boost::bind(&ComputerPlayer::onTimerEvent, this));
