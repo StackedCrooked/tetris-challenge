@@ -1,5 +1,5 @@
-#ifndef TETRIS_NODEPTR_H_INCLUDED
-#define TETRIS_NODEPTR_H_INCLUDED
+#ifndef TETRIS_NODEPTR_H
+#define TETRIS_NODEPTR_H
 
 
 #include <boost/shared_ptr.hpp>
@@ -21,5 +21,5 @@ typedef std::multiset<NodePtr, GameStateComparator> ChildNodes;
 } // namespace Tetris
 
 
-#endif // TETRIS_NODEPTR_H_INCLUDED
+#endif // TETRIS_NODEPTR_H
 

@@ -1,5 +1,5 @@
-#ifndef TETRIS_DIRECTION_H_INCLUDED
-#define TETRIS_DIRECTION_H_INCLUDED
+#ifndef TETRIS_DIRECTION_H
+#define TETRIS_DIRECTION_H
 
 
 namespace Tetris {
@@ -40,4 +40,4 @@ inline int GetColumnDelta(Direction inDirection)
 } // namespace Tetris
 
 
-#endif // DIRECTION_H_INCLUDED
+#endif // TETRIS_DIRECTION_H

@@ -1,5 +1,5 @@
-#ifndef TETRIS_BLOCKTYPE_H_INCLUDED
-#define TETRIS_BLOCKTYPE_H_INCLUDED
+#ifndef TETRIS_BLOCKTYPE_H
+#define TETRIS_BLOCKTYPE_H
 
 
 namespace Tetris {
@@ -40,4 +40,4 @@ static const unsigned cBlockTypeCount = static_cast<unsigned>(BlockType_End) - 1
 } // namespace Tetris
 
 
-#endif // BLOCKTYPE_H_INCLUDED
+#endif // TETRIS_BLOCKTYPE_H

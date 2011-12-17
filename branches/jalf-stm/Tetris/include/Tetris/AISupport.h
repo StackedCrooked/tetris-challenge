@@ -1,5 +1,5 @@
-#ifndef TETRIS_AISUPPORT_H_INCLUDED
-#define TETRIS_AISUPPORT_H_INCLUDED
+#ifndef TETRIS_AISUPPORT_H
+#define TETRIS_AISUPPORT_H
 
 
 #include "Tetris/BlockType.h"
@@ -81,5 +81,5 @@ void GenerateOffspring(NodePtr ioGameStateNode,
 } // namespace Tetris
 
 
-#endif // AISUPPORT_H_INCLUDED
+#endif // TETRIS_AISUPPORT_H
 

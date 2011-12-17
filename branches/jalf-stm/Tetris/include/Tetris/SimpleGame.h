@@ -1,5 +1,5 @@
-#ifndef TETRIS_SIMPLEGAME_H_INCLUDED
-#define TETRIS_SIMPLEGAME_H_INCLUDED
+#ifndef TETRIS_SIMPLEGAME_H
+#define TETRIS_SIMPLEGAME_H
 
 
 #include "Tetris/Direction.h"
@@ -112,4 +112,4 @@ private:
 } // namespace Tetris
 
 
-#endif // TETRIS_SIMPLEGAME_H_INCLUDED
+#endif // TETRIS_SIMPLEGAME_H

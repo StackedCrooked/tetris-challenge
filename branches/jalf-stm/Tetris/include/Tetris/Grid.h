@@ -1,5 +1,5 @@
-#ifndef TETRIS_GRID_H_INCLUDED
-#define TETRIS_GRID_H_INCLUDED
+#ifndef TETRIS_GRID_H
+#define TETRIS_GRID_H
 
 
 #include "Tetris/BlockType.h"
@@ -15,4 +15,4 @@ typedef Futile::GenericGrid<BlockType> Grid;
 } // namespace Futile
 
 
-#endif // TETRIS_GRID_H_INCLUDED
+#endif // TETRIS_GRID_H

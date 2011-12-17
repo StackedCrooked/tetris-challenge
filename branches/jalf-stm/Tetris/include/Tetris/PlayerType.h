@@ -1,5 +1,5 @@
-#ifndef TETRIS_PLAYERTYPE_H_INCLUDED
-#define TETRIS_PLAYERTYPE_H_INCLUDED
+#ifndef TETRIS_PLAYERTYPE_H
+#define TETRIS_PLAYERTYPE_H
 
 
 #include <vector>
@@ -21,4 +21,4 @@ typedef std::vector<PlayerType> PlayerTypes;
 } // namespace Tetris
 
 
-#endif // TETRIS_PLAYERTYPE_H_INCLUDED
+#endif // TETRIS_PLAYERTYPE_H
