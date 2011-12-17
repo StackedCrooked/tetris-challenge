@@ -173,11 +173,8 @@ void NodeCalculatorTest::testInterrupt(Depth inDepth, Width inWidth, WorkerCount
     ASSERT_LE(nodeCalculator.getCurrentSearchDepth(), nodeCalculator.getMaxSearchDepth());
 
     NodePtr resultPtr = nodeCalculator.result();
-    ASSERT_TRUE(bool(resultPtr));
-    if (!resultPtr)
-    {
-        return;
-    }
+    ASSERT(resultPtr);
+
     GameStateNode & result(*resultPtr);
     ASSERT_TRUE(result.depth() == rootNode.depth() + 1);
     ASSERT_TRUE(result.gameState().originalBlock().type() == blockTypes[0]);

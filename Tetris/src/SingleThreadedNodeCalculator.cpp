@@ -1,4 +1,5 @@
 #include "Tetris/SingleThreadedNodeCalculator.h"
+#include "Tetris/AISupport.h"
 #include "Tetris/Evaluator.h"
 #include "Tetris/GameStateNode.h"
 #include "Tetris/GameState.h"
@@ -47,7 +48,8 @@ void SingleThreadedNodeCalculator::populate()
         while (targetDepth <= mBlockTypes.size())
         {
             ScopedLock lock(mNodeMutex);
-            populateNodesRecursively(mNode->gameState(), mBlockTypes, mWidths, 0, targetDepth - 1);
+            typedef boost::function<void(const GameState &)> Callback;
+            CalculateNodes(mNode->gameState(), mEvaluator, mBlockTypes, mWidths, Progress(0, targetDepth), Callback());
             mTreeRowInfos.setFinished();
             targetDepth++;
         }

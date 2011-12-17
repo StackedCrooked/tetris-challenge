@@ -139,22 +139,6 @@ void NodeCalculatorImpl::setStatus(int inStatus)
 }
 
 
-void OnPopulated(const GameState &)
-{
-}
-
-
-void NodeCalculatorImpl::populateNodesRecursively(
-    const GameState & inGameState,
-    const BlockTypes & inBlockTypes,
-    const std::vector<int> & inWidths,
-    std::size_t inIndex,
-    std::size_t inMaxIndex)
-{
-    CalculateNodes(inGameState, mEvaluator, inBlockTypes, inWidths, Progress(inIndex, inMaxIndex), boost::bind(&OnPopulated, _1));
-}
-
-
 void NodeCalculatorImpl::destroyInferiorChildren()
 {
     std::size_t reachedDepth = getCurrentSearchDepth();
