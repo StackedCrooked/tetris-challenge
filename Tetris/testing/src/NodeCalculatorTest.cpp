@@ -41,9 +41,8 @@ const std::size_t cSearchWidthSize = cSearchWidth.size() + 2;
 const std::string cDepthProgress= "Depth Progress";
 const std::size_t cDepthProgressSize = cDepthProgress.size() + 2;
 
-const std::string cRemainingTime = "Remaining Time";
-const std::size_t cRemainingTimeSize = std::max<std::size_t>(cRemainingTime.size(),
-                                                    std::string("10000ms").size()) + 2;
+const std::string cElapsedTime = "Remaining Time";
+const std::size_t cElapsedTimeSize = std::max<std::size_t>(cElapsedTime.size(), std::string("10000ms").size()) + 2;
 
 const std::string cStatus = "Result";
 const std::size_t cStatusSize = std::string("Timed out").size() + 2;
@@ -55,7 +54,7 @@ std::string header()
     ss << std::setw(cWorkers.size()) << cWorkers
        << std::setw(cSearchWidthSize) << cSearchWidth
        << std::setw(cDepthProgressSize) << cDepthProgress
-       << std::setw(cRemainingTimeSize) << cRemainingTime
+       << std::setw(cElapsedTimeSize) << cElapsedTime
        << std::setw(cStatusSize) << cStatus;
     return ss.str();
 }
@@ -74,7 +73,7 @@ std::string format(std::size_t workerCount,
        << std::setw(cWorkers.size()) << workerCount
        << std::setw(cSearchWidthSize) << (SS() << widthAndDepth.first << "x" << widthAndDepth.second).str()
        << std::setw(cDepthProgressSize) << (SS() << depth.first << "/" << depth.second).str()
-       << std::setw(cRemainingTimeSize) << (SS() << (time.second - time.first) << "ms").str()
+       << std::setw(cElapsedTimeSize) << (SS() << time.first << "/" << time.second << "ms").str()
        << std::setw(cStatusSize) << std::right <<
           (time.first < time.second ? (depth.first < depth.second ? "Busy"
                                                                   : "OK"  )
@@ -88,7 +87,7 @@ std::string format(std::size_t workerCount,
 
 TEST_F(NodeCalculatorTest, SingleThreaded)
 {
-    testInterrupt(Depth(6), Width(6), WorkerCount(1), TimeMs(10));
+    testInterrupt(Depth(6), Width(6), WorkerCount(1), TimeMs(5000));
 }
 
 

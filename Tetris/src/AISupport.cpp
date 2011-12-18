@@ -1,12 +1,13 @@
 #include "Tetris/AISupport.h"
-#include "Tetris/GameStateComparator.h"
-#include "Tetris/Evaluator.h"
-#include "Tetris/GameStateNode.h"
-#include "Tetris/GameState.h"
+#include "Futile/Assert.h"
 #include "Tetris/Block.h"
+#include "Tetris/Evaluator.h"
+#include "Tetris/GameStateComparator.h"
+#include "Tetris/GameState.h"
+#include "Tetris/GameStateNode.h"
 #include "Tetris/Grid.h"
 #include "Tetris/Utilities.h"
-#include "Futile/Assert.h"
+#include "Futile/Logging.h"
 
 
 namespace Tetris {
@@ -60,27 +61,8 @@ void CalculateNodes(NodePtr ioNode,
                     const BlockTypes & inBlockTypes,
                     const std::vector<int> & inWidths,
                     const Progress & inProgress,
-                    boost::function<void(const GameState &)> inCallback);
-
-
-void CalculateNodes(const GameState & inGameState,
-                    const Evaluator & inEvaluator,
-                    const BlockTypes & inBlockTypes,
-                    const std::vector<int> & inWidths,
-                    const Progress & inProgress,
-                    boost::function<void(const GameState &)> inCallback)
-{
-    NodePtr node(new GameStateNode(inGameState, inEvaluator));
-    CalculateNodes(node, inEvaluator, inBlockTypes, inWidths, inProgress, inCallback);
-}
-
-
-void CalculateNodes(NodePtr ioNode,
-                    const Evaluator & inEvaluator,
-                    const BlockTypes & inBlockTypes,
-                    const std::vector<int> & inWidths,
-                    const Progress & inProgress,
-                    boost::function<void(const GameState &)> inCallback)
+                    const ChildNodeGeneratedCallback & inCallback,
+                    unsigned _checkChildCount)
 {
     // We want to at least perform a search of depth 4.
     if (inProgress.current() >= 4)
@@ -94,6 +76,7 @@ void CalculateNodes(NodePtr ioNode,
     //
     if (inProgress.complete() || inProgress.current() >= inBlockTypes.size())
     {
+        Assert(_checkChildCount  > 0);
         return;
     }
 
@@ -101,6 +84,7 @@ void CalculateNodes(NodePtr ioNode,
     if (ioNode->gameState().isGameOver())
     {
         // GameOver state has no children.
+        Assert(_checkChildCount  > 0);
         return;
     }
 
@@ -112,29 +96,30 @@ void CalculateNodes(NodePtr ioNode,
     // If that is the case then we immediately jump to the recursive call below.
     //
     ChildNodes generatedChildNodes = ioNode->children();
+
+    int numNewChildren = 0;
     if (generatedChildNodes.empty())
     {
         generatedChildNodes = ChildNodes(GameStateComparator());
         GenerateOffspring(ioNode, inBlockTypes[inProgress.current()], inEvaluator, generatedChildNodes);
 
-        int count = 0;
         ChildNodes::iterator it = generatedChildNodes.begin(), end = generatedChildNodes.end();
-        while (count < inWidths[inProgress.current()] && it != end)
+        while (numNewChildren < inWidths[inProgress.current()] && it != end)
         {
             ioNode->addChild(*it);
-            ++count;
+            ++numNewChildren;
+            _checkChildCount = numNewChildren;
             ++it;
         }
 
-        Assert(count >= 1);
+        Assert(numNewChildren >= 1);
         NodePtr gameStateNode = *ioNode->children().begin();
 
         if (inCallback)
         {
-            inCallback(gameStateNode->gameState());
+            inCallback(inProgress, gameStateNode);
         }
     }
-
 
     //
     // Recursive call on each child node.
@@ -142,7 +127,7 @@ void CalculateNodes(NodePtr ioNode,
     for (ChildNodes::iterator it = generatedChildNodes.begin(); it != generatedChildNodes.end(); ++it)
     {
         NodePtr child = *it;
-        CalculateNodes(child, inEvaluator, inBlockTypes, inWidths, inProgress.increment(), inCallback);
+        CalculateNodes(child, inEvaluator, inBlockTypes, inWidths, inProgress.increment(), inCallback, _checkChildCount + numNewChildren);
     }
 }
 

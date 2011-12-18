@@ -27,6 +27,15 @@ void CarveBestPath(NodePtr startNode, NodePtr endNode);
 
 bool IsGameOver(const GameState & inGameState, BlockType inBlockType, int inRotation);
 
+void GenerateOffspring(NodePtr ioGameStateNode,
+                       BlockTypes inBlockTypes,
+                       std::size_t inOffset,
+                       const Evaluator & inEvaluator);
+
+void GenerateOffspring(NodePtr ioGameStateNode,
+                       BlockType inBlockType,
+                       const Evaluator & inEvaluator,
+                       ChildNodes & outChildNodes);
 
 class Progress
 {
@@ -51,7 +60,7 @@ public:
 
     inline Progress increment(unsigned amount = 1) const
     {
-        return Progress(std::max<unsigned>(current() + amount, limit()), limit());
+        return Progress(std::min<unsigned>(current() + amount, limit()), limit());
     }
 
 private:
@@ -60,22 +69,16 @@ private:
 };
 
 
-void CalculateNodes(const GameState & inGameState,
+typedef boost::function<void(const Progress &, const NodePtr &)> ChildNodeGeneratedCallback;
+
+
+void CalculateNodes(NodePtr ioNode,
                     const Evaluator & inEvaluator,
                     const BlockTypes & inBlockTypes,
                     const std::vector<int> & inWidths,
                     const Progress & inProgress,
-                    boost::function<void(const GameState &)> inCallback);
-
-void GenerateOffspring(NodePtr ioGameStateNode,
-                       BlockTypes inBlockTypes,
-                       std::size_t inOffset,
-                       const Evaluator & inEvaluator);
-
-void GenerateOffspring(NodePtr ioGameStateNode,
-                       BlockType inBlockType,
-                       const Evaluator & inEvaluator,
-                       ChildNodes & outChildNodes);
+                    const ChildNodeGeneratedCallback & inCallback = ChildNodeGeneratedCallback(),
+                    unsigned _checkChildCount = 0); // internal checking mechanism
 
 
 } // namespace Tetris

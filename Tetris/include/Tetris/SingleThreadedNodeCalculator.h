@@ -8,6 +8,9 @@
 namespace Tetris {
 
 
+class Progress;
+
+
 class SingleThreadedNodeCalculator : public NodeCalculatorImpl
 {
 public:
@@ -21,6 +24,8 @@ public:
     virtual ~SingleThreadedNodeCalculator();
 
 private:
+    void onChildNodeGenerated(const Progress & inProgress, const NodePtr & inChildNode);
+
     virtual void populate();
 };
 
