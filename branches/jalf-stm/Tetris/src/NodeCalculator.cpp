@@ -2,6 +2,7 @@
 #include "Tetris/NodeCalculatorImpl.h"
 #include "Tetris/MultithreadedNodeCalculator.h"
 #include "Tetris/SingleThreadedNodeCalculator.h"
+#include "Tetris/GameState.h"
 
 
 namespace Tetris {
@@ -85,7 +86,7 @@ int NodeCalculator::getMaxSearchDepth() const
 }
 
 
-NodePtr NodeCalculator::result() const
+std::vector<GameState> NodeCalculator::result() const
 {
     Assert(status() != Status_Error);
     return mImpl->result();
