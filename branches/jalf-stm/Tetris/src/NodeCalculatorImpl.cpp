@@ -180,30 +180,40 @@ void NodeCalculatorImpl::calculateResult()
     // Backtrack the best end-node to its starting node.
     std::stack<NodePtr> results;
     NodePtr endNode = mTreeRowInfos.bestNode();
+    unsigned id = endNode->gameState().id();
     while (endNode->depth() > mNode->depth())
     {
         results.push(endNode);
         endNode = endNode->parent();
+        unsigned parentId = endNode->gameState().id();
+        Assert(id == parentId + 1);
+        id = parentId;
     }
 
-    NodePtr currentNode;
-    NodePtr currentParent = mNode;
-    while (!results.empty())
-    {
-        currentNode = results.top();
-        NodePtr copy(new GameStateNode(currentParent, GameState(currentNode->gameState()), currentNode->evaluator()));
-        if (!mResult)
-        {
-            mResult = copy;
-        }
-        else
-        {
-            Assert(mResult->endNode()->depth() + 1 == copy->depth());
-            mResult->endNode()->addChild(copy);
-        }
-        currentParent = copy;
-        results.pop();
-    }
+    mResult = *endNode->children().begin();
+
+    unsigned firstId = mNode->gameState().id();
+    unsigned resultId = mResult->gameState().id();
+    Assert(resultId == firstId + 1);
+
+//    NodePtr currentNode;
+//    NodePtr currentParent = mNode;
+//    while (!results.empty())
+//    {
+//        currentNode = results.top();
+//        NodePtr copy(new GameStateNode(currentParent, GameState(currentNode->gameState()), currentNode->evaluator()));
+//        if (!mResult)
+//        {
+//            mResult = copy;
+//        }
+//        else
+//        {
+//            Assert(mResult->endNode()->depth() + 1 == copy->depth());
+//            mResult->endNode()->addChild(copy);
+//        }
+//        currentParent = copy;
+//        results.pop();
+//    }
 }
 
 

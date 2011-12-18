@@ -257,7 +257,10 @@ Grid SimpleGame::gameGrid() const
 Block SimpleGame::getNextBlock() const
 {
     std::vector<BlockType> blockTypes;
-    mImpl->mGame.lock()->getFutureBlocks(2, blockTypes);
+    FUTILE_LOCK(Game & game, mImpl->mGame)
+    {
+        game.getFutureBlocks(2, blockTypes);
+    }
 
     if (blockTypes.size() != 2)
     {
@@ -271,16 +274,13 @@ Block SimpleGame::getNextBlock() const
 std::vector<Block> SimpleGame::getNextBlocks(std::size_t inCount) const
 {
     std::vector<BlockType> blockTypes;
-
-    mImpl->mGame.lock()->getFutureBlocks(1 + inCount, blockTypes);
-
-    if (blockTypes.size() != (1 + inCount))
+    FUTILE_LOCK(Game & game, mImpl->mGame)
     {
-        throw std::logic_error("Failed to get the next block from the factory.");
+        game.getFutureBlocks(inCount, blockTypes);
     }
 
     std::vector<Block> result;
-    for (std::vector<BlockType>::size_type idx = 1; idx < blockTypes.size(); ++idx)
+    for (std::vector<BlockType>::size_type idx = 0; idx != blockTypes.size(); ++idx)
     {
         result.push_back(Block(blockTypes[idx],
                                Rotation(0),

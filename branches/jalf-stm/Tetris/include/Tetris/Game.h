@@ -37,7 +37,7 @@ public:
 
     virtual ~Game();
 
-    unsigned blockCount() const;
+    unsigned gameStateId() const;
 
     /// GameStateChanged signals change events.
     /// NOTE: callbacks can be received from different threads.
@@ -79,7 +79,7 @@ public:
 
     void getFutureBlocks(std::size_t inCount, BlockTypes & outBlocks) const;
 
-    void getFutureBlocksWithOffset(std::size_t inOffset, std::size_t inCount, BlockTypes & outBlocks) const;
+    //void getFutureBlocksWithOffset(std::size_t inOffset, std::size_t inCount, BlockTypes & outBlocks) const;
 
     const GameState & gameState() const;
 
