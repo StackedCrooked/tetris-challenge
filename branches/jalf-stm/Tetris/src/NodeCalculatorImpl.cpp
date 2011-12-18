@@ -180,15 +180,16 @@ void NodeCalculatorImpl::calculateResult()
     // Backtrack the best end-node to its starting node.
     std::stack<NodePtr> results;
     NodePtr endNode = mTreeRowInfos.bestNode();
-    unsigned id = endNode->gameState().id();
-    while (endNode->depth() > mNode->depth())
+    unsigned startId = mNode->gameState().id();
+    unsigned currentId = endNode->gameState().id();
+    while (currentId > startId + 1)
     {
         results.push(endNode);
         endNode = endNode->parent();
         unsigned parentId = endNode->gameState().id();
         mResult.push_back(endNode->gameState());
-        Assert(id == parentId + 1);
-        id = parentId;
+        Assert(currentId == parentId + 1);
+        currentId = parentId;
     }
 
     std::reverse(mResult.begin(), mResult.end());

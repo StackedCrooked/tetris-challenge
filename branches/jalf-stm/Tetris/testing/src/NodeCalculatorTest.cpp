@@ -1,19 +1,23 @@
 #include "NodeCalculatorTest.h"
-#include "Tetris/NodeCalculator.h"
-#include "Tetris/Evaluator.h"
-#include "Tetris/GameStateComparator.h"
-#include "Tetris/GameStateNode.h"
-#include "Tetris/GameState.h"
 #include "Tetris/Block.h"
 #include "Tetris/BlockTypes.h"
-#include "Futile/WorkerPool.h"
+#include "Tetris/Evaluator.h"
+#include "Tetris/GameStateComparator.h"
+#include "Tetris/GameState.h"
+#include "Tetris/GameStateNode.h"
+#include "Tetris/NodeCalculator.h"
 #include "Futile/Assert.h"
 #include "Futile/Logging.h"
+#include "Futile/MainThreadImpl.h"
 #include "Futile/MakeString.h"
 #include "Futile/Stopwatch.h"
+#include "Futile/WorkerPool.h"
+#include "Futile/Threading.h"
 #include <iomanip>
 #include <iostream>
 #include <sstream>
+#include <stdexcept>
+
 
 
 namespace testing {
@@ -83,6 +87,18 @@ std::string format(std::size_t workerCount,
 
 
 } // anonymous namespace
+
+// TODO: This doesn't belong here. Move to a better location..
+TEST_F(NodeCalculatorTest, BlockTypeIncrementation)
+{
+    Assert(increment(BlockType_I) == BlockType_J);
+    Assert(increment(BlockType_J) == BlockType_L);
+    Assert(increment(BlockType_L) == BlockType_O);
+    Assert(increment(BlockType_O) == BlockType_S);
+    Assert(increment(BlockType_S) == BlockType_T);
+    Assert(increment(BlockType_T) == BlockType_Z);
+    Assert(increment(BlockType_Z) == BlockType_I);
+}
 
 
 TEST_F(NodeCalculatorTest, SingleThreaded)
@@ -177,23 +193,12 @@ void NodeCalculatorTest::testInterrupt(Depth inDepth, Width inWidth, WorkerCount
 
     ASSERT_LE(nodeCalculator.getCurrentSearchDepth(), nodeCalculator.getMaxSearchDepth());
 
-    NodePtr resultPtr = nodeCalculator.result();
-    ASSERT_TRUE(resultPtr);
+    std::vector<GameState> result = nodeCalculator.result();
 
-    GameStateNode & result(*resultPtr);
-    ASSERT_TRUE(result.depth() == rootNode.depth() + 1);
-    ASSERT_TRUE(result.gameState().originalBlock().type() == blockTypes[0]);
-
-    if (inDepth > 1)
+    for (std::size_t idx = 0; idx + 1 < result.size(); ++idx)
     {
-        ASSERT_TRUE(result.children().size() == 1);
+        Assert(result[idx].id() + 1 == result[idx + 1].id());
     }
-    else
-    {
-        ASSERT_TRUE(result.children().empty());
-    }
-
-    ASSERT_TRUE(result.endNode()->children().empty());
 }
 
 

@@ -2,6 +2,9 @@
 #define TETRIS_BLOCKTYPE_H
 
 
+#include <stdexcept>
+
+
 namespace Tetris {
 
 
@@ -19,7 +22,7 @@ namespace Tetris {
  * O = square block
  * etc...
  */
-typedef char BlockType;
+typedef unsigned char BlockType;
 enum
 {
     BlockType_Nil,
@@ -35,6 +38,22 @@ enum
 };
 
 static const unsigned cBlockTypeCount = static_cast<unsigned>(BlockType_End) - 1;
+
+
+inline BlockType increment(BlockType inBlockType)
+{
+    if (inBlockType == BlockType_Nil)
+    {
+        throw std::logic_error("Can't rotate the nil block");
+    }
+
+    BlockType result = inBlockType + 1;
+    if (result == BlockType_End)
+    {
+        result = BlockType_I;
+    }
+    return result;
+}
 
 
 } // namespace Tetris
