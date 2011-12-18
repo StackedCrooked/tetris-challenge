@@ -38,6 +38,12 @@ SingleThreadedNodeCalculator::~SingleThreadedNodeCalculator()
 }
 
 
+void SingleThreadedNodeCalculator::onChildNodeGenerated(const Progress & , const NodePtr & inChildNode)
+{
+    mTreeRowInfos.registerNode(inChildNode);
+}
+
+
 void SingleThreadedNodeCalculator::populate()
 {
     try
@@ -48,8 +54,12 @@ void SingleThreadedNodeCalculator::populate()
         while (targetDepth <= mBlockTypes.size())
         {
             ScopedLock lock(mNodeMutex);
-            typedef boost::function<void(const GameState &)> Callback;
-            CalculateNodes(mNode->gameState(), mEvaluator, mBlockTypes, mWidths, Progress(0, targetDepth), Callback());
+            CalculateNodes(mNode,
+                           mEvaluator,
+                           mBlockTypes,
+                           mWidths,
+                           Progress(0, targetDepth),
+                           boost::bind(&SingleThreadedNodeCalculator::onChildNodeGenerated, this, _1, _2));
             mTreeRowInfos.setFinished();
             targetDepth++;
         }

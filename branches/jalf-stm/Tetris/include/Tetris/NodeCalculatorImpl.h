@@ -93,11 +93,13 @@ protected:
                 mBestScore = score;
             }
             mNodeCount++;
+            Assert(mBestNode);
         }
 
         inline void setFinished()
         {
             Assert(!mFinished);
+            Assert(mBestNode);
             mFinished = true;
         }
 
@@ -144,20 +146,18 @@ protected:
         void registerNode(NodePtr inNode)
         {
             Futile::ScopedLock lock(mMutex);
+            if (mInfos.back().finished()) // lazy creation of new level
+            {
+                mInfos.push_back(TreeRowInfo(*mEvaluator));
+            }
             mInfos.back().registerNode(inNode);
+            Assert(bestNode());
         }
 
         inline NodePtr bestNode() const
         {
             Futile::ScopedLock lock(mMutex);
-            if (mInfos.back().finished())
-            {
-                return mInfos.back().bestNode();
-            }
-            else
-            {
-                return mInfos[mInfos.size() - 2].bestNode();
-            }
+            return mInfos.back().bestNode();
         }
 
         inline bool finished() const
@@ -170,7 +170,6 @@ protected:
         {
             Futile::ScopedLock lock(mMutex);
             mInfos.back().setFinished();
-            mInfos.push_back(TreeRowInfo(*mEvaluator));
         }
 
     private:
