@@ -179,7 +179,7 @@ void Model::newGame(const PlayerTypes & inPlayerTypes, std::size_t inRowCount, s
 
             if (ComputerPlayer * computerPlayer = dynamic_cast<ComputerPlayer*>(player))
             {
-                computerPlayer->setMoveSpeed(allComputer ? 60 : 20);
+                computerPlayer->setMoveSpeed(allComputer ? 40 : 20);
             }
         }
         else
