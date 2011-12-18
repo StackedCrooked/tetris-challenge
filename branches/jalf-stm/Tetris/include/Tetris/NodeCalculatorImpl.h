@@ -76,7 +76,13 @@ protected:
         }
 
         inline NodePtr bestNode() const
-        { return mBestNode; }
+        {
+            if (!mBestNode)
+            {
+                throw std::runtime_error("Best node is null.");
+            }
+            return mBestNode;
+        }
 
         inline std::size_t nodeCount() const
         { return mNodeCount; }
@@ -146,10 +152,6 @@ protected:
         void registerNode(NodePtr inNode)
         {
             Futile::ScopedLock lock(mMutex);
-            if (mInfos.back().finished()) // lazy creation of new level
-            {
-                mInfos.push_back(TreeRowInfo(*mEvaluator));
-            }
             mInfos.back().registerNode(inNode);
             Assert(bestNode());
         }
@@ -157,7 +159,21 @@ protected:
         inline NodePtr bestNode() const
         {
             Futile::ScopedLock lock(mMutex);
-            return mInfos.back().bestNode();
+            if (mInfos.empty())
+            {
+                throw std::runtime_error("There is no best node.");
+            }
+
+            if (mInfos.size() >= 2)
+            {
+                return mInfos[mInfos.size() - 2].bestNode();
+            }
+            else
+            {
+                return mInfos[mInfos.size() - 1].bestNode();
+            }
+
+            throw std::runtime_error("Invalid state.");
         }
 
         inline bool finished() const
@@ -170,6 +186,7 @@ protected:
         {
             Futile::ScopedLock lock(mMutex);
             mInfos.back().setFinished();
+            mInfos.push_back(TreeRowInfo(*mEvaluator));
         }
 
     private:
