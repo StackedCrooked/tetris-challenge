@@ -66,6 +66,8 @@ public:
 
     void timerEvent();
 
+    void move();
+
     static void UpdateComputerBlockMoveSpeed(boost::weak_ptr<Player> weakPlayer) {
         if (PlayerPtr playerPtr = weakPlayer.lock())
         {
@@ -84,10 +86,16 @@ public:
     void onError();
 
     // Return a copy!
-    GameState initialGameState()
+    GameState previousGameState()
     {
         return mPrecalculated.empty() ? mComputerPlayer->game()->game().lock()->gameState()
                                       : mPrecalculated.back();
+    }
+
+    Block previousActiveBlock()
+    {
+        return mPrecalculated.empty() ? mComputerPlayer->game()->activeBlock()
+                                      : mPrecalculated.back().originalBlock();
     }
 
     ComputerPlayer * mComputerPlayer;
@@ -298,6 +306,83 @@ void ComputerPlayer::Impl::updateComputerBlockMoveSpeed()
 }
 
 
+bool Move(Game & ioGame, const Block & targetBlock)
+{
+    Block block = ioGame.activeBlock();
+    Assert(block.type() == targetBlock.type());
+
+    // Try rotation first, if it fails then skip rotation and try horizontal move
+    if (block.rotation() != targetBlock.rotation())
+    {
+        if (ioGame.rotate())
+        {
+            return true;
+        }
+        // else: try left or right move below
+    }
+
+    if (block.column() < targetBlock.column())
+    {
+        if (!ioGame.move(MoveDirection_Right))
+        {
+            // Damn we can't move this block anymore.
+            // Give up on this block.
+            ioGame.dropAndCommit();
+            return false;
+        }
+        return true;
+    }
+
+    if (block.column() > targetBlock.column())
+    {
+        if (!ioGame.move(MoveDirection_Left))
+        {
+            // Damn we can't move this block anymore.
+            // Give up on this block.
+            ioGame.dropAndCommit();
+            return false;
+        }
+        return true;
+    }
+
+    // Horizontal position is OK.
+    // Retry rotation again. If it fails here then drop the block.
+    if (block.rotation() != targetBlock.rotation())
+    {
+        if (!ioGame.rotate())
+        {
+            ioGame.dropAndCommit();
+            return false;
+        }
+        return true;
+    }
+
+    return ioGame.move(MoveDirection_Down);
+}
+
+
+void ComputerPlayer::Impl::move()
+{
+    if (mPrecalculated.empty())
+    {
+        return;
+    }
+
+    FUTILE_LOCK(Game & game, mComputerPlayer->game()->game())
+    {
+        unsigned oldId = game.gameStateId();
+        Move(game, mPrecalculated.front().originalBlock());
+        unsigned newId = game.gameStateId();
+
+        Assert(oldId == newId || oldId == newId + 1);
+        if (newId > oldId)
+        {
+            mPrecalculated.erase(mPrecalculated.begin());
+        }
+    }
+}
+
+
 void ComputerPlayer::Impl::timerEvent()
 {
     if (mReset)
@@ -313,6 +398,10 @@ void ComputerPlayer::Impl::timerEvent()
         mNodeCalculator->stop();
         return;
     }
+
+
+    move();
+
 
     // Consult the tweaker.
     PlayerPtr playerPtr = mComputerPlayer->shared_from_this();
@@ -372,7 +461,7 @@ void ComputerPlayer::Impl::startNodeCalculator()
         return;
     }
 
-    if (initialGameState().isGameOver())
+    if (previousGameState().isGameOver())
     {
         return;
     }
@@ -384,7 +473,7 @@ void ComputerPlayer::Impl::startNodeCalculator()
     const SimpleGame * simpleGame = mComputerPlayer->game();
     std::vector<Block> nextBlocks = simpleGame->getNextBlocks(mPrecalculated.size() + mSearchDepth);
     BlockTypes futureBlocks;
-    for (std::size_t idx = 0; idx != nextBlocks.size(); ++idx)
+    for (std::size_t idx = mPrecalculated.size(); idx != nextBlocks.size(); ++idx)
     {
         futureBlocks.push_back(nextBlocks[idx].type());
     }
@@ -409,7 +498,7 @@ void ComputerPlayer::Impl::startNodeCalculator()
         mWorkerCount = cDefaultWorkerCount;
     }
     mWorkerPool.resize(mWorkerCount);
-    mNodeCalculator.reset(new NodeCalculator(initialGameState(),
+    mNodeCalculator.reset(new NodeCalculator(previousGameState(),
                                              futureBlocks,
                                              widths,
                                              *mEvaluator,
@@ -432,7 +521,7 @@ void ComputerPlayer::Impl::onWorking()
 
     FUTILE_LOCK(Game & game, simpleGame.game())
     {
-        if (initialGameState().id() < game.gameState().id())
+        if (previousGameState().id() < game.gameState().id())
         {
             // The calculated results have become invalid. Start over.
             mReset = true;
@@ -460,23 +549,31 @@ void ComputerPlayer::Impl::onFinished()
 {
     mReset = true;
 
-    NodePtr resultNode = mNodeCalculator->result();
-    Assert(resultNode);
-    if (!resultNode || resultNode->gameState().isGameOver())
+    NodePtr resultNodePtr = mNodeCalculator->result();
+    Assert(resultNodePtr);
+    const GameStateNode & resultNode = *resultNodePtr;
+
+    if (resultNode.gameState().isGameOver())
     {
         return;
     }
 
-    GameState lastPrecalculatedGameState(initialGameState());
-    const GameState & resultGameState = resultNode->gameState();
+    std::vector<GameState> resultVector;
 
-    // Check for sync problems.
-    if (resultGameState.id() != lastPrecalculatedGameState.id() + 1)
+    while (true)
     {
-        return;
+        const GameState & resultGameState = resultNode.gameState();
+        const GameState & prevGameState = previousGameState();
+        Assert(resultGameState.id() == prevGameState.id() + 1);
+        resultVector.push_back(resultGameState);
+        if (resultNode.children().empty())
+        {
+            break;
+        }
+        resultNodePtr = *resultNode.children().begin();
     }
 
-    mPrecalculated.push_back(resultGameState);
+    std::copy(resultVector.begin(), resultVector.end(), std::back_inserter(mPrecalculated));
 }
 
 

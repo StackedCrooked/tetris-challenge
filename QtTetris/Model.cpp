@@ -132,8 +132,8 @@ const Evaluator & Model::updateAIParameters(const Player & inPlayer,
         throw std::runtime_error("GameState is null!");
     }
 
-    outWorkerCount = CalculateOptimalWorkerCount(computerPlayerCount());
-    outSearchDepth = 8;
+    outWorkerCount = 2;
+    outSearchDepth = 5;
     outSearchWidth = 4;
     outMoveDownBehavior = BlockMover::MoveDownBehavior_Move;
     return MakeTetrises::Instance();

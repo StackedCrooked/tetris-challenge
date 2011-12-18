@@ -47,7 +47,7 @@ Game::~Game()
 }
 
 
-unsigned Game::blockCount() const
+unsigned Game::gameStateId() const
 {
     return gameState().id();
 }
@@ -183,7 +183,7 @@ std::unique_ptr<Block> Game::CreateDefaultBlock(BlockType inBlockType, std::size
 
 void Game::supplyBlocks()
 {
-    while (blockCount() >= mBlocks.size())
+    while (gameStateId() >= mBlocks.size())
     {
         mBlocks.push_back(mBlockFactory->getNext());
     }
@@ -266,31 +266,31 @@ const Grid & Game::gameGrid() const
 void Game::getFutureBlocks(std::size_t inCount, BlockTypes & outBlocks) const
 {
     // Make sure we have all blocks we need.
-    while (mBlocks.size() < blockCount() + inCount)
+    while (mBlocks.size() < gameStateId() + inCount)
     {
         mBlocks.push_back(mBlockFactory->getNext());
     }
 
     for (std::size_t idx = 0; idx < inCount; ++idx)
     {
-        outBlocks.push_back(mBlocks[blockCount() + idx]);
+        outBlocks.push_back(mBlocks[gameStateId() + idx]);
     }
 }
 
 
-void Game::getFutureBlocksWithOffset(std::size_t inOffset, std::size_t inCount, BlockTypes & outBlocks) const
-{
-    // Make sure we have all blocks we need.
-    while (mBlocks.size() < inOffset + inCount)
-    {
-        mBlocks.push_back(mBlockFactory->getNext());
-    }
+//void Game::getFutureBlocksWithOffset(std::size_t inOffset, std::size_t inCount, BlockTypes & outBlocks) const
+//{
+//    // Make sure we have all blocks we need.
+//    while (mBlocks.size() < gameStateId() + inOffset + inCount)
+//    {
+//        mBlocks.push_back(mBlockFactory->getNext());
+//    }
 
-    for (std::size_t idx = 0; idx < inCount; ++idx)
-    {
-        outBlocks.push_back(mBlocks[inOffset + idx]);
-    }
-}
+//    for (std::size_t idx = 0; idx < inCount; ++idx)
+//    {
+//        outBlocks.push_back(mBlocks[inOffset + idx]);
+//    }
+//}
 
 
 bool Game::rotate()
@@ -403,7 +403,7 @@ bool Game::move(Direction inDirection)
     }
 
     supplyBlocks();
-    mActiveBlock.reset(CreateDefaultBlock(mBlocks[blockCount()], gameGrid().columnCount()).release());
+    mActiveBlock.reset(CreateDefaultBlock(mBlocks[gameStateId()], gameGrid().columnCount()).release());
 
     onChanged();
     return false;
