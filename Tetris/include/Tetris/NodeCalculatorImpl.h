@@ -42,7 +42,7 @@ public:
 
     int getMaxSearchDepth() const;
 
-    NodePtr result() const;
+    std::vector<GameState> result() const;
 
     int status() const;
 
@@ -180,7 +180,7 @@ protected:
     };
 
     NodePtr mNode;
-    NodePtr mResult;
+    std::vector<GameState> mResult;
     mutable Futile::Mutex mNodeMutex;
 
 

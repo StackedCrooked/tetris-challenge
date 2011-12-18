@@ -111,7 +111,7 @@ int NodeCalculatorImpl::getMaxSearchDepth() const
 }
 
 
-NodePtr NodeCalculatorImpl::result() const
+std::vector<GameState> NodeCalculatorImpl::result() const
 {
     Assert(status() == NodeCalculator::Status_Finished);
     ScopedLock lock(mNodeMutex);
@@ -186,34 +186,12 @@ void NodeCalculatorImpl::calculateResult()
         results.push(endNode);
         endNode = endNode->parent();
         unsigned parentId = endNode->gameState().id();
+        mResult.push_back(endNode->gameState());
         Assert(id == parentId + 1);
         id = parentId;
     }
 
-    mResult = *endNode->children().begin();
-
-    unsigned firstId = mNode->gameState().id();
-    unsigned resultId = mResult->gameState().id();
-    Assert(resultId == firstId + 1);
-
-//    NodePtr currentNode;
-//    NodePtr currentParent = mNode;
-//    while (!results.empty())
-//    {
-//        currentNode = results.top();
-//        NodePtr copy(new GameStateNode(currentParent, GameState(currentNode->gameState()), currentNode->evaluator()));
-//        if (!mResult)
-//        {
-//            mResult = copy;
-//        }
-//        else
-//        {
-//            Assert(mResult->endNode()->depth() + 1 == copy->depth());
-//            mResult->endNode()->addChild(copy);
-//        }
-//        currentParent = copy;
-//        results.pop();
-//    }
+    std::reverse(mResult.begin(), mResult.end());
 }
 
 

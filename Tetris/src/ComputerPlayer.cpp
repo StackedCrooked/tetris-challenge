@@ -549,31 +549,19 @@ void ComputerPlayer::Impl::onFinished()
 {
     mReset = true;
 
-    NodePtr resultNodePtr = mNodeCalculator->result();
-    Assert(resultNodePtr);
-    const GameStateNode & resultNode = *resultNodePtr;
+    std::vector<GameState> results = mNodeCalculator->result();
+    std::copy(results.begin(), results.end(), std::back_inserter(mPrecalculated));
 
-    if (resultNode.gameState().isGameOver())
+
+    if (mPrecalculated.empty())
     {
         return;
     }
 
-    std::vector<GameState> resultVector;
-
-    while (true)
+    for (std::size_t idx = 0; idx + 1 < mPrecalculated.size(); ++idx)
     {
-        const GameState & resultGameState = resultNode.gameState();
-        const GameState & prevGameState = previousGameState();
-        Assert(resultGameState.id() == prevGameState.id() + 1);
-        resultVector.push_back(resultGameState);
-        if (resultNode.children().empty())
-        {
-            break;
-        }
-        resultNodePtr = *resultNode.children().begin();
+        Assert(mPrecalculated[idx].id() == mPrecalculated[idx + 1].id());
     }
-
-    std::copy(resultVector.begin(), resultVector.end(), std::back_inserter(mPrecalculated));
 }
 
 

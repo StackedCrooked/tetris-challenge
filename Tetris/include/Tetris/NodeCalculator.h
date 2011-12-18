@@ -37,7 +37,7 @@ public:
 
     void stop();
 
-    NodePtr result() const;
+    std::vector<GameState> result() const;
 
     int getCurrentSearchDepth() const;
 
