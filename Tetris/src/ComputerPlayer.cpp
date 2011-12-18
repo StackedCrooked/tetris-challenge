@@ -374,7 +374,7 @@ void ComputerPlayer::Impl::move()
         Move(game, mPrecalculated.front().originalBlock());
         unsigned newId = game.gameStateId();
 
-        Assert(oldId == newId || oldId == newId + 1);
+        Assert(oldId == newId || oldId + 1 == newId);
         if (newId > oldId)
         {
             mPrecalculated.erase(mPrecalculated.begin());
@@ -560,7 +560,7 @@ void ComputerPlayer::Impl::onFinished()
 
     for (std::size_t idx = 0; idx + 1 < mPrecalculated.size(); ++idx)
     {
-        Assert(mPrecalculated[idx].id() == mPrecalculated[idx + 1].id());
+        Assert(mPrecalculated[idx].id() + 1 == mPrecalculated[idx + 1].id());
     }
 }
 
