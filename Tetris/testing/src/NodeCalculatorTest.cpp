@@ -98,10 +98,10 @@ std::string format(std::size_t workerCount,
 
 TEST_F(NodeCalculatorTest, Interrupt)
 {
-    testInterrupt(Depth(8), Width(5), WorkerCount(1), TimeMs(5000));
-    testInterrupt(Depth(8), Width(5), WorkerCount(2), TimeMs(5000));
+    //testInterrupt(Depth(8), Width(5), WorkerCount(1), TimeMs(5000));
+    //testInterrupt(Depth(8), Width(5), WorkerCount(2), TimeMs(5000));
     testInterrupt(Depth(8), Width(5), WorkerCount(4), TimeMs(5000));
-    testInterrupt(Depth(8), Width(5), WorkerCount(8), TimeMs(5000));
+    //testInterrupt(Depth(8), Width(5), WorkerCount(8), TimeMs(5000));
 
     /*std::cout << header() << std::endl;
     for (std::size_t w = 1; w <= 8; w *= 2)

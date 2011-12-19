@@ -1,0 +1,8 @@
+{
+   BOOST_CALL_ONCE
+   Memcheck:Leak
+   fun:malloc
+   fun:_ZN5boost6detail25get_once_per_thread_epochEv
+   fun:_ZN5boost9call_onceIPFvvEEEvRNS_9once_flagET_.clone.110
+   ...
+}
