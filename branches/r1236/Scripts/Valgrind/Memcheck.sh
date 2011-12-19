@@ -1,1 +1,1 @@
-valgrind --tool=memcheck --dsymutil=yes --leak-check=yes --show-reachable=yes --num-callers=20 --track-fds=yes 2>valgrind.out $1
+valgrind --tool=memcheck --suppressions=Scripts/Valgrind/suppressions --dsymutil=yes --leak-check=yes --show-reachable=yes --num-callers=20 --track-fds=yes --gen-suppressions=all --log-file=valgrind.out $1
