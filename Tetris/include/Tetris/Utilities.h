@@ -11,7 +11,7 @@ namespace Tetris {
 
 inline unsigned InitialBlockPosition(unsigned gridWidth, unsigned blockWidth)
 {
-    if (blockWidth >= gridWidth)
+    if (gridWidth < blockWidth)
     {
         throw std::runtime_error(Futile::SS() << "Grid is to narrow to contain block. Grid width: " << gridWidth << ". Block width: " << blockWidth);
     }
