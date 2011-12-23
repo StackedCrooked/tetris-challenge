@@ -5,7 +5,7 @@ export TETRIS_BUILD_TYPE=${TETRIS_BUILD_TYPE:-Release}
 export TETRIS_DEPLOY_DMG=${TETRIS_DEPLOY_DMG:-No}
 
 # Print configuration variables
-echo "TETRIS_BUILD_TYPE=Debug|Release -> ${TETRIS_BUILD_TYPE}"
+echo "TETRIS_BUILD_TYPE=Debug|Release|RelWithDebInfo -> ${TETRIS_BUILD_TYPE}"
 echo "TETRIS_DEPLOY_DMG=Yes|No -> ${TETRIS_DEPLOY_DMG}"
 
 mkdir -p Build
