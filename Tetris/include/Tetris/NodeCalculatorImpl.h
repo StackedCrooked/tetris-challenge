@@ -185,6 +185,7 @@ protected:
         inline void setFinished()
         {
             Futile::ScopedLock lock(mMutex);
+            Assert(!mInfos.empty());
             mInfos.back().setFinished();
             mInfos.push_back(TreeRowInfo(*mEvaluator));
         }
