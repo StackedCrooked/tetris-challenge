@@ -371,9 +371,19 @@ void ComputerPlayer::Impl::move()
     FUTILE_LOCK(Game & game, mComputerPlayer->game()->game())
     {
         unsigned oldId = game.gameStateId();
+        unsigned predictedId = mPrecalculated.front().id();
+        if (oldId >= predictedId)
+        {
+            // Precalculated blocks have been invalidated.
+            LogInfo("Precalculated invalidated.");
+            mPrecalculated.clear();
+            return;
+        }
+
+        Assert(predictedId == oldId + 1); // check sync
+
         Move(game, mPrecalculated.front().originalBlock());
         unsigned newId = game.gameStateId();
-
         Assert(oldId == newId || oldId + 1 == newId);
         if (newId > oldId)
         {
