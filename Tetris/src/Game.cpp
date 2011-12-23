@@ -78,7 +78,9 @@ const GameState & Game::gameState() const
 
 void Game::commit(const Block & inBlock)
 {
+    unsigned oldId = mGameState.id();
     mGameState = mGameState.commit(inBlock);
+    Assert(oldId + 1 == mGameState.id());
 }
 
 
@@ -234,7 +236,7 @@ bool Game::canMove(Direction inDirection)
         return false;
     }
 
-    Block & block = *mActiveBlock;
+    const Block & block = *mActiveBlock;
     std::size_t newRow = block.row()    + GetRowDelta(inDirection);
     std::size_t newCol = block.column() + GetColumnDelta(inDirection);
     return gameState().checkPositionValid(block, newRow, newCol);
@@ -403,7 +405,11 @@ bool Game::move(Direction inDirection)
     }
 
     supplyBlocks();
+
+    BlockType oldType = mActiveBlock->type();
     mActiveBlock.reset(CreateDefaultBlock(mBlocks[gameStateId()], gameGrid().columnCount()).release());
+    Assert(increment(oldType) == mActiveBlock->type());
+
 
     onChanged();
     return false;

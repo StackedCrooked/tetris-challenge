@@ -47,7 +47,7 @@ BlockFactory::BlockFactory(int inBagSize) :
         BlockType blockType = static_cast<BlockType>(1 + (idx % cBlockTypeCount));
         mImpl->mBag.push_back(blockType);
     }
-    std::random_shuffle(mImpl->mBag.begin(), mImpl->mBag.end());
+    //std::random_shuffle(mImpl->mBag.begin(), mImpl->mBag.end());
 }
 
 
@@ -61,7 +61,7 @@ BlockType BlockFactory::getNext() const
     if (mImpl->mCurrentIndex >= mImpl->mBag.size())
     {
         // Reshuffle the bag.
-        std::random_shuffle(mImpl->mBag.begin(), mImpl->mBag.end());
+        //std::random_shuffle(mImpl->mBag.begin(), mImpl->mBag.end());
         mImpl->mCurrentIndex = 0;
     }
     return mImpl->mBag[mImpl->mCurrentIndex++];

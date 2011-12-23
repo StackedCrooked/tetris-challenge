@@ -235,11 +235,9 @@ public:
         mThreadSafe.getMutex().lock();
     }
 
-    // Allow copy to enable move semantics
-    Locker(const Locker & rhs) :
+    Locker(Locker && rhs) :
         mThreadSafe(rhs.mThreadSafe)
     {
-        rhs.invalidate();
     }
 
     ~Locker()
@@ -271,13 +269,9 @@ public:
     }
 
 private:
-    // disallow assignment
+    // non-copyable
+    Locker(const Locker&);
     Locker & operator=(const Locker &);
-
-    void invalidate() const
-    {
-        mThreadSafe.mImpl.reset();
-    }
 
     mutable ThreadSafe<Variable> mThreadSafe;
 };
