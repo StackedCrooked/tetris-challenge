@@ -179,7 +179,7 @@ std::unique_ptr<Block> Game::CreateDefaultBlock(BlockType inBlockType, std::size
         new Block(inBlockType,
                     Rotation(0),
                     Row(0),
-                    Column(DivideByTwo(inNumColumns - GetGrid(GetBlockIdentifier(inBlockType, 0)).columnCount()))));
+                    Column(InitialBlockPosition(inNumColumns, GetGrid(GetBlockIdentifier(inBlockType, 0)).columnCount()))));
 }
 
 

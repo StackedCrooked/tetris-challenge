@@ -41,7 +41,7 @@ bool IsGameOver(const GameState & inGameState, BlockType inBlockType, int inRota
 {
     const Grid & blockGrid = GetGrid(GetBlockIdentifier(inBlockType, inRotation));
     const Grid & gameGrid = inGameState.grid();
-    std::size_t initialColumn = DivideByTwo(inGameState.grid().columnCount() - blockGrid.columnCount());
+    std::size_t initialColumn = InitialBlockPosition(inGameState.grid().columnCount(), blockGrid.columnCount());
     for (std::size_t row = 0; row < blockGrid.rowCount(); ++row)
     {
         for (std::size_t col = 0; col < blockGrid.columnCount(); ++col)
@@ -174,7 +174,7 @@ void GenerateOffspring(NodePtr inNode,
     // If yes then append the final "broken" game state as only child.
     if (IsGameOver(gameState, inBlockType, 0))
     {
-        std::size_t initialColumn = DivideByTwo(gameGrid.columnCount() - GetGrid(GetBlockIdentifier(inBlockType, 0)).columnCount());
+        std::size_t initialColumn = InitialBlockPosition(gameGrid.columnCount(), GetGrid(GetBlockIdentifier(inBlockType, 0)).columnCount());
         NodePtr childState(new GameStateNode(inNode,
                                              gameState.commit(Block(inBlockType, Rotation(0), Row(0), Column(initialColumn))),
                                              inEvaluator));

@@ -113,13 +113,12 @@ void Gravity::Impl::onTimerEvent()
             mStopwatch.restart();
             FUTILE_LOCK(Game & game, mThreadSafeGame)
             {
-
-				// If our block was "caught" by the sudden appearance of new blocks, then we solidify it in that state.
-				if (!static_cast<const Game&>(game).gameState().checkPositionValid(game.activeBlock()))
-				{
-					game.move(MoveDirection_Down);
-					return;
-				}
+                // If our block was "caught" by the sudden appearance of new blocks, then we solidify it in that state.
+                if (!static_cast<const Game&>(game).gameState().checkPositionValid(game.activeBlock()))
+                {
+                    game.move(MoveDirection_Down);
+                    return;
+                }
 
                 if (game.isGameOver() || game.isPaused())
                 {
@@ -132,7 +131,6 @@ void Gravity::Impl::onTimerEvent()
                 {
                     mLevel = cMaxLevel;
                 }
-                Assert(static_cast<const Game&>(game).gameState().checkPositionValid(game.activeBlock()));
             }
         }
         if (mLevel != oldLevel)

@@ -220,6 +220,9 @@ int MakeTetrises::evaluate(const GameState & inGameState) const
 {
     const Grid & grid = inGameState.grid();
 
+    double result = std::pow(inGameState.firstOccupiedRow(), 0.5);
+
+
     std::size_t c = grid.columnCount() - 1;
     if (grid.rowCount() >= 4)
     {
@@ -230,11 +233,11 @@ int MakeTetrises::evaluate(const GameState & inGameState) const
             {
                 // Penalty for occupying the last column,
                 // which is reserved for making tetrises.
-                return Evaluator::evaluate(inGameState) - 4;
+                return int(0.5 + result + Evaluator::evaluate(inGameState) - 4);
             }
         }
     }
-    return Evaluator::evaluate(inGameState);
+    return int(0.5 + result + Evaluator::evaluate(inGameState));
 }
 
 

@@ -109,8 +109,8 @@ void AbstractWidget::setPlayer(Player * inPlayer)
     // Start listening to the events from the new player.
     if (mPlayer && mPlayer->game())
     {
-        setMinSize(Size(2 * margin() + futureBlocksRect().right() - gameRect().left(),
-                        2 * margin() + avatarRect().bottom() - gameRect().top()));
+        setMinSize(Size(2 * margin() + gameRect().width() + futureBlocksRect().width(),
+                        2 * margin() + std::max(gameRect().height() + userInfoRect().height(), avatarRect().bottom() - gameRect().top())));
 
         mPlayer->game()->registerEventHandler(this);
     }
@@ -217,7 +217,7 @@ Rect AbstractWidget::userInfoRect() const
     int x = margin();
     int y = theGameRect.bottom() + margin();
     int width = theGameRect.width();
-    int height = avatarRect().bottom() - y;
+    int height = 30;
     return Rect(x, y, width, height);
 }
 
