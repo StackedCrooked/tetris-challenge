@@ -33,7 +33,7 @@ public:
 
     unsigned rotationCount() const;
 
-    const Grid & grid() const;
+    inline const Grid & grid() const { return *mGrid; }
 
     unsigned row() const;
 
