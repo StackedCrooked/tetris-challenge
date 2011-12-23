@@ -63,10 +63,10 @@ protected:
     void calculateResult();
 
     // Store info per horizontal level of nodes.
-    class TreeRowInfo
+    class Etage
     {
     public:
-        TreeRowInfo(const Evaluator & inEvaluator) :
+        Etage(const Evaluator & inEvaluator) :
             mBestNode(),
             mBestScore(0),
             mEvaluator(&inEvaluator),
@@ -117,16 +117,16 @@ protected:
         bool mFinished;
     };
 
-    class TreeRowInfos
+    class Etages
     {
     public:
-        TreeRowInfos(const Evaluator & inEvaluator, std::size_t inMaxDepth) :
+        Etages(const Evaluator & inEvaluator, std::size_t inMaxDepth) :
             mInfos(),
             mMaxDepth(inMaxDepth),
             mEvaluator(&inEvaluator),
             mMutex()
         {
-            mInfos.push_back(TreeRowInfo(*mEvaluator));
+            mInfos.push_back(Etage(*mEvaluator));
         }
 
         inline std::size_t depth() const
@@ -187,11 +187,11 @@ protected:
             Futile::ScopedLock lock(mMutex);
             Assert(!mInfos.empty());
             mInfos.back().setFinished();
-            mInfos.push_back(TreeRowInfo(*mEvaluator));
+            mInfos.push_back(Etage(*mEvaluator));
         }
 
     private:
-        std::vector<TreeRowInfo> mInfos;
+        std::vector<Etage> mInfos;
         std::size_t mMaxDepth;
         const Evaluator * mEvaluator;
         mutable Futile::Mutex mMutex;
@@ -205,7 +205,7 @@ protected:
     bool mQuitFlag;
     mutable Futile::Mutex mQuitFlagMutex;
 
-    TreeRowInfos mTreeRowInfos;
+    Etages mTreeRowInfos;
 
     BlockTypes mBlockTypes;
     std::vector<int> mWidths;
