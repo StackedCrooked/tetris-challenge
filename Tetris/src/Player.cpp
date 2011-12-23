@@ -17,8 +17,6 @@ struct Player::Impl
          const PlayerName & inPlayerName,
          std::size_t inRowCount,
          std::size_t inColumnCount) :
-        mRowCount(inRowCount),
-        mColumnCount(inColumnCount),
         mPlayerType(inPlayerType),
         mSimpleGame(inPlayerType, inRowCount, inColumnCount),
         mTeamName(inTeamName),
@@ -31,8 +29,6 @@ struct Player::Impl
     {
     }
 
-    std::size_t mRowCount;
-    std::size_t mColumnCount;
     PlayerType mPlayerType;
     SimpleGame mSimpleGame;
     std::string mTeamName;
