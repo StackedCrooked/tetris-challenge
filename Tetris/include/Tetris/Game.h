@@ -28,7 +28,8 @@ class Game;
  * Game manages the following things:
  *   - the currently active block
  *   - the list of future blocks
- *   - the root gamestate node
+ *   - block factory
+ *   - paused state
  */
 class Game : boost::noncopyable
 {
@@ -39,12 +40,10 @@ public:
 
     unsigned gameStateId() const;
 
-    /// GameStateChanged signals change events.
-    /// NOTE: callbacks can be received from different threads.
+    // Threaded!
     boost::signals2::signal<void()> GameStateChanged;
 
-    /// LinesCleared signals when clearing lines.
-    /// NOTE: callbacks can be received from different threads.
+    // Threaded!
     boost::signals2::signal<void(int)> LinesCleared;
 
     void setPaused(bool inPause);
