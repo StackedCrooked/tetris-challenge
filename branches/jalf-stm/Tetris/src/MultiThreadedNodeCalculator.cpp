@@ -135,6 +135,10 @@ void MultithreadedNodeCalculator::populate()
             populateNodes(mNode, mBlockTypes, mWidths, 0, targetDepth);
             mWorkerPool.wait();
             Assert(mWorkerPool.getActiveWorkerCount() == 0);
+            if (mNode->endNode()->gameState().isGameOver())
+            {
+                break;
+            }
             mTreeRowInfos.setFinished();
             targetDepth++;
         }

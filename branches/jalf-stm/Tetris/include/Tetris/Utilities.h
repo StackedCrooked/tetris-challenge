@@ -2,13 +2,20 @@
 #define TETRIS_UTILITIES_H
 
 
+#include "Futile/MakeString.h"
+#include <stdexcept>
+
+
 namespace Tetris {
 
 
-template<class T>
-static T DivideByTwo(T inValue)
+inline unsigned InitialBlockPosition(unsigned gridWidth, unsigned blockWidth)
 {
-    return static_cast<int>(0.5 + 0.5 * inValue);
+    if (blockWidth >= gridWidth)
+    {
+        throw std::runtime_error(Futile::SS() << "Grid is to narrow to contain block. Grid width: " << gridWidth << ". Block width: " << blockWidth);
+    }
+    return unsigned(0.5 + (gridWidth - blockWidth) / 2.0);
 }
 
 

@@ -5,6 +5,7 @@
 #include "Model.h"
 #include "MainWindow.h"
 #include "Tetris/PlayerType.h"
+#include "Tetris/Unicode.h"
 #include "Futile/MainThread.h"
 #include "Futile/LeakDetector.h"
 #include "Futile/Logger.h"
@@ -43,12 +44,25 @@ int Tetris_GetSquareHeight()
 
 int RunGUI(int argc, char *argv[], Model & model)
 {
-    QApplication a(argc, argv);
-    a.setApplicationName("QtTetris");
-    a.setApplicationVersion("0.0 alpha");
-    a.setActiveWindow(new MainWindow(NULL, model));
-    a.activeWindow()->show();
-    return a.exec();
+    QApplication app(argc, argv);
+    app.setApplicationName("QtTetris");
+    app.setApplicationVersion("0.0 alpha");
+    try
+    {
+        app.setActiveWindow(new MainWindow(NULL, model));
+        app.activeWindow()->show();
+        return app.exec();
+    }
+    catch (const std::exception & exc)
+    {
+        std::string message(Futile::SS() << "Caught exception: " << exc.what());
+        QMessageBox::critical(NULL, "QtTetris", message.c_str(), QMessageBox::Ok, QMessageBox::NoButton);
+    }
+    catch (...)
+    {
+        QMessageBox::critical(NULL, "QtTetris", "Caught anonymous exception. Exiting.", QMessageBox::Ok, QMessageBox::NoButton);
+    }
+    return 1;
 }
 
 
@@ -73,11 +87,11 @@ int main(int argc, char *argv[])
     }
     catch (const std::exception & exc)
     {
-        std::cerr << "Exception caught in main: " << exc.what() << std::endl;
+        std::cerr << "QtTetris: Caught exception: " << exc.what() << std::endl;
     }
     catch (...)
     {
-        std::cerr << "Anonymous exception caught in main. Exiting program." << std::endl;
+        std::cerr << "QtTetris: Caught anonymous exception." << std::endl;
     }
     return 1;
 }

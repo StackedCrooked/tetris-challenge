@@ -171,7 +171,7 @@ void NodeCalculatorImpl::calculateResult()
 
     if (getCurrentSearchDepth() == 0 || !mTreeRowInfos.bestNode())
     {
-        LogWarning("No results yet.");
+        Assert(mNode->endNode()->gameState().isGameOver());
         return;
     }
 
