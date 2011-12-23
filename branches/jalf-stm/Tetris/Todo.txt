@@ -1,6 +1,7 @@
 STM Version
 -----------
-- Fix the working of the program
+v Fix the working of the program
 - Improve encapsulation by obeying the Law of Demeter
+- Player, multiplayer stuff?
 - Reduce GameState copying
 - mPrecalculated is a vector. Use a better data structure.

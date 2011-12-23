@@ -320,10 +320,7 @@ void Game::dropAndCommit()
     // Local scope for ScopedMute
     {
         ScopedMute scopedMute(mMuteEvents);
-        dropWithoutCommit();
-        bool result = move(MoveDirection_Down);
-        Assert(!result); // check commit
-        (void)result; // silence unused variable warning
+        while (move(MoveDirection_Down));
     }
     onChanged();
 }
