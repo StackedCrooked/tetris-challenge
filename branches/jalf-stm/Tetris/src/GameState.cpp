@@ -220,11 +220,5 @@ GameState & EvaluatedGameState::gameState()
 }
 
 
-signed EvaluatedGameState::quality() const
-{
-    return mQuality;
-}
-
-
 } // namespace Tetris
 

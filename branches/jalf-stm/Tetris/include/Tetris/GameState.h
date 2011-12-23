@@ -92,7 +92,7 @@ public:
 
     GameState & gameState();
 
-    signed quality() const;
+    inline signed quality() const { return mQuality; }
 
 private:
     EvaluatedGameState(const EvaluatedGameState &);
