@@ -11,11 +11,9 @@
 #include "Futile/Logging.h"
 #include "Futile/MakeString.h"
 #include "Futile/Assert.h"
-#include "stm.hpp"
 #include <cstddef>
 #include <memory>
 #include <vector>
-#include <stack>
 
 
 namespace Tetris {
@@ -65,10 +63,10 @@ protected:
     void calculateResult();
 
     // Store info per horizontal level of nodes.
-    class TreeLevel
+    class TreeRowInfo
     {
     public:
-        TreeLevel(const Evaluator & inEvaluator) :
+        TreeRowInfo(const Evaluator & inEvaluator) :
             mBestNode(),
             mBestScore(0),
             mEvaluator(&inEvaluator),
@@ -119,100 +117,95 @@ protected:
         bool mFinished;
     };
 
-    class TreeLevelStack
+    class TreeRowInfos
     {
-    private:
-        typedef std::stack<TreeLevel> Stack;
-        typedef stm::shared<Stack> SharedStack;
-
-        inline static Stack GetInitialStack(const Evaluator & inEvaluator)
-        {
-            Stack result;
-            result.push(TreeLevel(inEvaluator));
-            return result;
-        }
-
     public:
-        TreeLevelStack(const Evaluator & inEvaluator, std::size_t inMaxDepth) :
-            mSharedStack(GetInitialStack(inEvaluator)),
+        TreeRowInfos(const Evaluator & inEvaluator, std::size_t inMaxDepth) :
+            mInfos(),
             mMaxDepth(inMaxDepth),
-            mEvaluator(&inEvaluator)
+            mEvaluator(&inEvaluator),
+            mMutex()
         {
+            mInfos.push_back(TreeRowInfo(*mEvaluator));
         }
 
-        inline unsigned depth() const
+        inline std::size_t depth() const
         {
-            return stm::atomic<unsigned>([&](stm::transaction & tx) {
-                const Stack & stack = mSharedStack.open_r(tx);
-                if (stack.top().finished())
-                {
-                    return stack.size();
-                }
-                else
-                {
-                    return stack.size() - 1;
-                }
-            });
+            Futile::ScopedLock lock(mMutex);
+            if (mInfos.back().finished())
+            {
+                return mInfos.size();
+            }
+            else
+            {
+                Assert(mInfos.size() >= 1);
+                return mInfos.size() - 1;
+            }
         }
 
-        inline unsigned maxDepth() const
+        inline std::size_t maxDepth() const
         {
+            Futile::ScopedLock lock(mMutex);
             return mMaxDepth;
         }
 
         void registerNode(NodePtr inNode)
         {
-            stm::atomic([&](stm::transaction & tx) {
-               Stack & stack = mSharedStack.open_rw(tx);
-               stack.top().registerNode(inNode);
-            });
+            Futile::ScopedLock lock(mMutex);
+            mInfos.back().registerNode(inNode);
+            Assert(bestNode());
         }
 
         inline NodePtr bestNode() const
         {
-            return stm::atomic<NodePtr>([&](stm::transaction & tx) {
-                const Stack & stack = mSharedStack.open_r(tx);
-                return stack.top().bestNode();
-            });
+            Futile::ScopedLock lock(mMutex);
+            if (mInfos.empty())
+            {
+                throw std::runtime_error("There is no best node.");
+            }
+
+            if (mInfos.size() >= 2)
+            {
+                return mInfos[mInfos.size() - 2].bestNode();
+            }
+            else
+            {
+                return mInfos[mInfos.size() - 1].bestNode();
+            }
+
+            throw std::runtime_error("Invalid state.");
         }
 
         inline bool finished() const
         {
-            return stm::atomic<bool>([&](stm::transaction & tx) {
-                const Stack & stack = mSharedStack.open_r(tx);
-                return stack.size() == (mMaxDepth - 1) && stack.top().finished();
-            });
+            Futile::ScopedLock lock(mMutex);
+            return mInfos.size() == (mMaxDepth - 1) && mInfos.back().finished();
         }
 
         inline void setFinished()
         {
-            stm::atomic([&](stm::transaction & tx) {
-                Stack & stack = mSharedStack.open_rw(tx);
-                Assert(!stack.empty());
-                stack.top().setFinished();
-                if (stack.size() < mMaxDepth)
-                {
-                    stack.push(TreeLevel(*mEvaluator));
-                }
-            });
+            Futile::ScopedLock lock(mMutex);
+            Assert(!mInfos.empty());
+            mInfos.back().setFinished();
+            mInfos.push_back(TreeRowInfo(*mEvaluator));
         }
 
     private:
-        mutable SharedStack mSharedStack;
-        const std::size_t mMaxDepth;
+        std::vector<TreeRowInfo> mInfos;
+        std::size_t mMaxDepth;
         const Evaluator * mEvaluator;
+        mutable Futile::Mutex mMutex;
     };
-
-    TreeLevelStack mTreeRowInfos;
-
 
     NodePtr mNode;
     std::vector<GameState> mResult;
     mutable Futile::Mutex mNodeMutex;
 
+
     bool mQuitFlag;
     mutable Futile::Mutex mQuitFlagMutex;
 
+    TreeRowInfos mTreeRowInfos;
 
     BlockTypes mBlockTypes;
     std::vector<int> mWidths;
