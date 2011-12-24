@@ -45,12 +45,6 @@ unsigned Block::rotationCount() const
 }
 
 
-const Grid & Block::grid() const
-{
-    return *mGrid;
-}
-
-
 unsigned Block::row() const
 {
     return mRow;
