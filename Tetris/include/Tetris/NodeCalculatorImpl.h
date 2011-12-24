@@ -15,6 +15,7 @@
 #include <cstddef>
 #include <memory>
 #include <vector>
+#include <stack>
 
 
 namespace Tetris {
@@ -121,12 +122,19 @@ protected:
     class TreeLevelStack
     {
     private:
-        typedef std::vector<TreeLevel> Stack;
+        typedef std::stack<TreeLevel> Stack;
         typedef stm::shared<Stack> SharedStack;
+
+        inline static Stack GetInitialStack(const Evaluator & inEvaluator)
+        {
+            Stack result;
+            result.push(TreeLevel(inEvaluator));
+            return result;
+        }
 
     public:
         TreeLevelStack(const Evaluator & inEvaluator, std::size_t inMaxDepth) :
-            mSharedStack(Stack(1, TreeLevel(inEvaluator))),
+            mSharedStack(GetInitialStack(inEvaluator)),
             mMaxDepth(inMaxDepth),
             mEvaluator(&inEvaluator)
         {
@@ -135,14 +143,14 @@ protected:
         inline unsigned depth() const
         {
             return stm::atomic<unsigned>([&](stm::transaction & tx) {
-                const Stack & treeLevels = mSharedStack.open_r(tx);
-                if (treeLevels.back().finished())
+                const Stack & stack = mSharedStack.open_r(tx);
+                if (stack.top().finished())
                 {
-                    return treeLevels.size();
+                    return stack.size();
                 }
                 else
                 {
-                    return treeLevels.size() - 1;
+                    return stack.size() - 1;
                 }
             });
         }
@@ -155,48 +163,36 @@ protected:
         void registerNode(NodePtr inNode)
         {
             stm::atomic([&](stm::transaction & tx) {
-               Stack & treeLevels = mSharedStack.open_rw(tx);
-               treeLevels.back().registerNode(inNode);
+               Stack & stack = mSharedStack.open_rw(tx);
+               stack.top().registerNode(inNode);
             });
         }
 
         inline NodePtr bestNode() const
         {
             return stm::atomic<NodePtr>([&](stm::transaction & tx) {
-                const Stack & treeLevels = mSharedStack.open_r(tx);
-
-                if (treeLevels.back().finished())
-                {
-                    return treeLevels.back().bestNode();
-                }
-                else if (treeLevels.size() > 1)
-                {
-                    return treeLevels[treeLevels.size() - 2].bestNode();
-                }
-                else
-                {
-                    throw std::logic_error("Invalid tree state.");
-                }
+                const Stack & stack = mSharedStack.open_r(tx);
+                return stack.top().bestNode();
             });
         }
 
         inline bool finished() const
         {
             return stm::atomic<bool>([&](stm::transaction & tx) {
-                const Stack & treeLevels = mSharedStack.open_r(tx);
-                return treeLevels.size() == (mMaxDepth - 1) && treeLevels.back().finished();
+                const Stack & stack = mSharedStack.open_r(tx);
+                return stack.size() == (mMaxDepth - 1) && stack.top().finished();
             });
         }
 
         inline void setFinished()
         {
             stm::atomic([&](stm::transaction & tx) {
-                Stack & treeLevels = mSharedStack.open_rw(tx);
-                Assert(!treeLevels.empty());
-                treeLevels.back().setFinished();
-                if (treeLevels.size() < mMaxDepth)
+                Stack & stack = mSharedStack.open_rw(tx);
+                Assert(!stack.empty());
+                stack.top().setFinished();
+                if (stack.size() < mMaxDepth)
                 {
-                    treeLevels.push_back(TreeLevel(*mEvaluator));
+                    stack.push(TreeLevel(*mEvaluator));
                 }
             });
         }
