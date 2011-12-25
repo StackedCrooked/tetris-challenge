@@ -46,6 +46,7 @@ struct GameStateNode::Impl
     int mScore;
     int mDepth;
     const Evaluator & mEvaluator; // } => Order matters!
+    ChildNodes mChildren;
 
 
 private:
