@@ -405,8 +405,6 @@ bool Game::move(Direction inDirection)
 
     BlockType oldType = mActiveBlock->type();
     mActiveBlock.reset(CreateDefaultBlock(mBlocks[gameStateId()], gameGrid().columnCount()).release());
-    Assert(increment(oldType) == mActiveBlock->type());
-
 
     onChanged();
     return false;
