@@ -15,30 +15,39 @@
 #include <ctime>
 #include <stdexcept>
 
+
 namespace Tetris {
 
 
 using namespace Futile;
-
-
 extern const int cMaxLevel;
 
 
+namespace { // anonymous
+
+
+Block CreateDefaultBlock(BlockType inBlockType, std::size_t inNumColumns)
+{
+    return Block(inBlockType,
+                 Rotation(0),
+                 Row(0),
+                 Column(InitialBlockPosition(inNumColumns, GetGrid(GetBlockIdentifier(inBlockType, 0)).columnCount())));
+}
+
+
+} // anonymous namespace
+
+
 Game::Game(std::size_t inNumRows, std::size_t inNumColumns) :
-    mActiveBlock(),
     mBlockFactory(new BlockFactory),
     mGarbageFactory(new BlockFactory),
-    mBlocks(),
+    mBlocks(1, mBlockFactory->getNext()),
+    mActiveBlock(CreateDefaultBlock(mBlocks[0], inNumColumns)),
     mStartingLevel(-1),
     mPaused(false),
     mMuteEvents(false),
     mGameState(inNumRows, inNumColumns)
 {
-    if (mBlocks.empty())
-    {
-        mBlocks.push_back(mBlockFactory->getNext());
-    }
-    mActiveBlock.reset(CreateDefaultBlock(mBlocks.front(), inNumColumns).release());
 }
 
 
@@ -173,16 +182,6 @@ void Game::applyLinePenalty(std::size_t inLineCount)
 }
 
 
-std::unique_ptr<Block> Game::CreateDefaultBlock(BlockType inBlockType, std::size_t inNumColumns)
-{
-    return std::unique_ptr<Block>(
-        new Block(inBlockType,
-                    Rotation(0),
-                    Row(0),
-                    Column(InitialBlockPosition(inNumColumns, GetGrid(GetBlockIdentifier(inBlockType, 0)).columnCount()))));
-}
-
-
 void Game::supplyBlocks()
 {
     while (gameStateId() >= mBlocks.size())
@@ -236,10 +235,12 @@ bool Game::canMove(Direction inDirection)
         return false;
     }
 
-    const Block & block = *mActiveBlock;
-    std::size_t newRow = block.row()    + GetRowDelta(inDirection);
-    std::size_t newCol = block.column() + GetColumnDelta(inDirection);
-    return gameState().checkPositionValid(block, newRow, newCol);
+    stm::atomic<bool>([&](stm::transaction & tx){
+        const Block & block = mActiveBlock.open_r(tx);
+        std::size_t newRow = block.row()    + GetRowDelta(inDirection);
+        std::size_t newCol = block.column() + GetColumnDelta(inDirection);
+        return gameState().checkPositionValid(block, newRow, newCol);
+    });
 }
 
 
@@ -252,10 +253,11 @@ void Game::reserveBlocks(std::size_t inCount)
 }
 
 
-const Block & Game::activeBlock() const
+Block Game::activeBlock() const
 {
-    Assert(mActiveBlock);
-    return *mActiveBlock;
+    return stm::atomic<Block>([&](stm::transaction & tx) {
+        return mActiveBlock.open_r(tx);
+    });
 }
 
 
@@ -302,16 +304,22 @@ bool Game::rotate()
         return false;
     }
 
-    Block & block = *mActiveBlock;
-    std::size_t oldRotation = block.rotation();
-    block.rotate();
-    if (!gameState().checkPositionValid(block, block.row(), block.column()))
-    {
-        block.setRotation(oldRotation);
-        return false;
+    bool result = stm::atomic<bool>([&](stm::transaction & tx) {
+        Block & block = mActiveBlock.open_rw(tx);
+        std::size_t oldRotation = block.rotation();
+        block.rotate();
+        if (!gameState().checkPositionValid(block, block.row(), block.column()))
+        {
+            block.setRotation(oldRotation);
+            return false;
+        }
+        return true;
+    });
+
+    if (result) {
+        onChanged();
     }
-    onChanged();
-    return true;
+    return result;
 }
 
 
@@ -369,45 +377,48 @@ bool Game::move(Direction inDirection)
         return false;
     }
 
-    Block & block = *mActiveBlock;
-    std::size_t newRow = block.row() + GetRowDelta(inDirection);
-    std::size_t newCol = block.column() + GetColumnDelta(inDirection);
-    if (gameState().checkPositionValid(block, newRow, newCol))
+    bool result = stm::atomic<bool>([&](stm::transaction & tx)
     {
-        block.setRow(newRow);
-        block.setColumn(newCol);
-        onChanged();
-        return true;
-    }
+        const Block & block = mActiveBlock.open_r(tx);
+        std::size_t newRow = block.row() + GetRowDelta(inDirection);
+        std::size_t newCol = block.column() + GetColumnDelta(inDirection);
 
-    if (inDirection != MoveDirection_Down)
-    {
-        // Do nothing
+        if (gameState().checkPositionValid(block, newRow, newCol))
+        {
+            Block & block = mActiveBlock.open_rw(tx);
+            block.setRow(newRow);
+            block.setColumn(newCol);
+            onChanged();
+            return true;
+        }
+
+        if (inDirection != MoveDirection_Down)
+        {
+            // Do nothing
+            return false;
+        }
+
+        // Remember the number of lines in the current game state.
+        int oldLineCount = gameState().numLines();
+
+        commit(block);
+
+        // Count the number of lines that were made in the commit call.
+        int linesCleared = mGameState.numLines() - oldLineCount;
+        Assert(linesCleared >= 0);
+
+        // Notify the listeners.
+        if (linesCleared > 0)
+        {
+            onLinesCleared(linesCleared);
+        }
+
+        supplyBlocks();
+        mActiveBlock.open_rw(tx) = CreateDefaultBlock(mBlocks[gameStateId()], gameGrid().columnCount());
         return false;
-    }
-
-    // Remember the number of lines in the current game state.
-    int oldLineCount = gameState().numLines();
-
-    commit(block);
-
-    // Count the number of lines that were made in the commit call.
-    int linesCleared = mGameState.numLines() - oldLineCount;
-    Assert(linesCleared >= 0);
-
-    // Notify the listeners.
-    if (linesCleared > 0)
-    {
-        onLinesCleared(linesCleared);
-    }
-
-    supplyBlocks();
-
-    BlockType oldType = mActiveBlock->type();
-    mActiveBlock.reset(CreateDefaultBlock(mBlocks[gameStateId()], gameGrid().columnCount()).release());
-
+    });
     onChanged();
-    return false;
+    return result;
 }
 
 
