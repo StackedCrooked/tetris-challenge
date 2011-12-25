@@ -16,7 +16,8 @@ class BlockFactory : boost::noncopyable
 {
 public:
     // The size of the bag of blocks that shuffled and taken from.
-    BlockFactory(int inBagSize = 1);
+    // @param n Determines how many times all block types appear in the bag.
+    BlockFactory(unsigned n = 1);
 
     virtual ~BlockFactory();
 
