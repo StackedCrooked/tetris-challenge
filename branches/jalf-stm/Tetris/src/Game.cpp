@@ -92,9 +92,7 @@ const GameState & Game::gameState() const
 
 void Game::commit(const Block & inBlock)
 {
-    unsigned oldId = mGameState.id();
     mGameState = mGameState.commit(inBlock);
-    Assert(oldId + 1 == mGameState.id());
 }
 
 
