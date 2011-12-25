@@ -28,13 +28,14 @@ struct BlockFactory::Impl : boost::noncopyable
                 result.push_back(type);
             }
         }
+        Assert(result.size() == n * cBlockTypeCount);
         std::random_shuffle(result.begin(), result.end());
         return result;
     }
 
     Impl(unsigned n) :
-        mCurrentIndex(0), // trigger a reshuffle on first access
         mBag(GetInitialBag(n)),
+        mCurrentIndex(0),
         mBagSize(n * cBlockTypeCount),
         mSeed(static_cast<seed_t>(Poco::Timestamp().epochMicroseconds()))
     {
@@ -44,8 +45,8 @@ struct BlockFactory::Impl : boost::noncopyable
     {
     }
 
-    stm::shared<unsigned> mCurrentIndex;
     stm::shared<BlockTypes> mBag;
+    stm::shared<unsigned> mCurrentIndex;
     const unsigned mBagSize;
     const seed_t mSeed;
 };
@@ -77,8 +78,7 @@ BlockType BlockFactory::getNext()
             // Reshuffle the bag.
             BlockTypes & bag = mImpl->mBag.open_rw(tx);
             std::random_shuffle(bag.begin(), bag.end());
-            currentIndex = 0;
-            return bag[currentIndex];
+            return bag[currentIndex = 0];
         }
     });
 }
