@@ -98,7 +98,7 @@ unsigned GetBlockIdentifier(BlockType inType, unsigned inRotation)
 {
     Assert(inType >= BlockType_Begin && inType < BlockType_End);
     // Max 4 rotations.
-    unsigned result = 4 * static_cast<unsigned>(inType) - 1 + inRotation;
+    unsigned result = 4 * static_cast<unsigned>(inType - 1) + inRotation;
     Assert(result <= 28);
     return result;
 }
@@ -145,7 +145,7 @@ Grid GetZGrid(unsigned rotation);
 
 const Grid & GetGrid(unsigned inId)
 {
-    Assert(inId <= 28);
+    Assert(inId < 28);
 
     static Grid fBlocks[] =
     {
