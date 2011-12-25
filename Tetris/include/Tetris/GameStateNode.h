@@ -20,7 +20,7 @@ class Evaluator;
  * GameStateNode is a tree of gamestates. It is used as the search tree for the AI.
  * Each node object contains one GameState object and a collection of child nodes.
  */
-class GameStateNode : boost::noncopyable
+class GameStateNode
 {
 public:
     static std::unique_ptr<GameStateNode> CreateRootNode(std::size_t inNumRows, std::size_t inNumColumns);
@@ -29,10 +29,9 @@ public:
 
     GameStateNode(const GameState & inGameState, const Evaluator & inEvaluator);
 
-    ~GameStateNode();
+    GameStateNode(const GameStateNode & rhs);
 
-    // Each node is produced by a unique combination of the current block's column and rotation.
-    int identifier() const;
+    ~GameStateNode();
 
     const Evaluator & evaluator() const;
 
@@ -63,8 +62,11 @@ public:
     int quality() const;
 
 private:
+    // disallow assignment
+    GameStateNode& operator=(const GameStateNode &);
+
     struct Impl;
-    boost::scoped_ptr<Impl> mImpl;
+    boost::shared_ptr<Impl> mImpl;
 };
 
 
