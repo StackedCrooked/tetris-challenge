@@ -482,8 +482,9 @@ void ComputerPlayer::Impl::startNodeCalculator()
     //
     const SimpleGame * simpleGame = mComputerPlayer->game();
     std::vector<Block> nextBlocks = simpleGame->getNextBlocks(mPrecalculated.size() + mSearchDepth);
+    Assert(nextBlocks.size() == mPrecalculated.size() + mSearchDepth);
     BlockTypes futureBlocks;
-    for (std::size_t idx = mPrecalculated.size(); idx != nextBlocks.size(); ++idx)
+    for (std::size_t idx = mPrecalculated.size(); idx < nextBlocks.size(); ++idx)
     {
         futureBlocks.push_back(nextBlocks[idx].type());
     }

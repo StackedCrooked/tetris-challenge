@@ -259,7 +259,7 @@ Block SimpleGame::getNextBlock() const
     std::vector<BlockType> blockTypes;
     FUTILE_LOCK(Game & game, mImpl->mGame)
     {
-        game.getFutureBlocks(2, blockTypes);
+        blockTypes = game.getFutureBlocks(2);
     }
 
     if (blockTypes.size() != 2)
@@ -276,7 +276,8 @@ std::vector<Block> SimpleGame::getNextBlocks(std::size_t inCount) const
     std::vector<BlockType> blockTypes;
     FUTILE_LOCK(Game & game, mImpl->mGame)
     {
-        game.getFutureBlocks(inCount, blockTypes);
+        blockTypes = game.getFutureBlocks(inCount);
+        Assert(blockTypes.size() == inCount);
     }
 
     std::vector<Block> result;
@@ -287,6 +288,7 @@ std::vector<Block> SimpleGame::getNextBlocks(std::size_t inCount) const
                                Row(0),
                                Column((columnCount() - mImpl->mCenterColumn)/2)));
     }
+    Assert(result.size() == inCount);
     return result;
 }
 
