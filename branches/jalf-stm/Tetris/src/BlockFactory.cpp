@@ -2,6 +2,7 @@
 #include "Tetris/BlockType.h"
 #include "Tetris/BlockTypes.h"
 #include "Poco/Timestamp.h"
+#include "stm.hpp"
 #include <boost/noncopyable.hpp>
 #include <algorithm>
 #include <ctime>
@@ -17,9 +18,24 @@ struct BlockFactory::Impl : boost::noncopyable
 {
     typedef unsigned seed_t;
 
-    Impl(int inBagSize) :
-        mBagSize(inBagSize),
-        mCurrentIndex(0),
+    static BlockTypes GetInitialBag(unsigned n)
+    {
+        BlockTypes result;
+        for (int i = 0; i < n; ++i)
+        {
+            for (BlockType type = BlockType_Begin; type != BlockType_End; ++type)
+            {
+                result.push_back(type);
+            }
+        }
+        std::random_shuffle(result.begin(), result.end());
+        return result;
+    }
+
+    Impl(unsigned n) :
+        mCurrentIndex(0), // trigger a reshuffle on first access
+        mBag(GetInitialBag(n)),
+        mBagSize(n * cBlockTypeCount),
         mSeed(static_cast<seed_t>(Poco::Timestamp().epochMicroseconds()))
     {
     }
@@ -28,26 +44,17 @@ struct BlockFactory::Impl : boost::noncopyable
     {
     }
 
-    BlockTypes::size_type mBagSize;
-    std::size_t mCurrentIndex;
-    BlockTypes mBag;
-    seed_t mSeed;
+    stm::shared<unsigned> mCurrentIndex;
+    stm::shared<BlockTypes> mBag;
+    const unsigned mBagSize;
+    const seed_t mSeed;
 };
 
 
-BlockFactory::BlockFactory(int inBagSize) :
+BlockFactory::BlockFactory(unsigned inBagSize) :
     mImpl(new Impl(inBagSize))
 {
     srand(mImpl->mSeed);
-
-    std::size_t totalSize = mImpl->mBagSize * cBlockTypeCount;
-    mImpl->mBag.reserve(totalSize);
-    for (std::size_t idx = 0; idx != totalSize; ++idx)
-    {
-        BlockType blockType = static_cast<BlockType>(1 + (idx % cBlockTypeCount));
-        mImpl->mBag.push_back(blockType);
-    }
-    //std::random_shuffle(mImpl->mBag.begin(), mImpl->mBag.end());
 }
 
 
@@ -58,13 +65,22 @@ BlockFactory::~BlockFactory()
 
 BlockType BlockFactory::getNext()
 {
-    if (mImpl->mCurrentIndex >= mImpl->mBag.size())
-    {
-        // Reshuffle the bag.
-        //std::random_shuffle(mImpl->mBag.begin(), mImpl->mBag.end());
-        mImpl->mCurrentIndex = 0;
-    }
-    return mImpl->mBag[mImpl->mCurrentIndex++];
+    return stm::atomic<BlockType>([&](stm::transaction & tx) {
+        unsigned & currentIndex = mImpl->mCurrentIndex.open_rw(tx);
+        if (currentIndex < mImpl->mBagSize)
+        {
+            const BlockTypes & bag = mImpl->mBag.open_r(tx);
+            return bag[currentIndex++];
+        }
+        else
+        {
+            // Reshuffle the bag.
+            BlockTypes & bag = mImpl->mBag.open_rw(tx);
+            std::random_shuffle(bag.begin(), bag.end());
+            currentIndex = 0;
+            return bag[currentIndex];
+        }
+    });
 }
 
 
