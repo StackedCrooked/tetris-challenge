@@ -103,8 +103,8 @@ private:
 
     boost::scoped_ptr<BlockFactory> mBlockFactory;
     boost::scoped_ptr<BlockFactory> mGarbageFactory;
-    mutable BlockTypes mBlocks;
     mutable stm::shared<Block> mActiveBlock;
+    mutable stm::shared<BlockTypes> mBlockTypes;
     int mStartingLevel;
     bool mPaused;
 

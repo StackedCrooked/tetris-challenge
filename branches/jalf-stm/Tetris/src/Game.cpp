@@ -41,13 +41,16 @@ Block CreateDefaultBlock(BlockType inBlockType, std::size_t inNumColumns)
 Game::Game(std::size_t inNumRows, std::size_t inNumColumns) :
     mBlockFactory(new BlockFactory),
     mGarbageFactory(new BlockFactory),
-    mBlocks(1, mBlockFactory->getNext()),
-    mActiveBlock(CreateDefaultBlock(mBlocks[0], inNumColumns)),
+    mActiveBlock(CreateDefaultBlock(mBlockFactory->getNext(), inNumColumns)),
+    mBlockTypes(BlockTypes()),
     mStartingLevel(-1),
     mPaused(false),
     mMuteEvents(false),
     mGameState(inNumRows, inNumColumns)
 {
+    stm::atomic([&](stm::transaction & tx) {
+        mBlockTypes.open_rw(tx).push_back(mActiveBlock.open_r(tx).type());
+    });
 }
 
 
@@ -184,10 +187,19 @@ void Game::applyLinePenalty(std::size_t inLineCount)
 
 void Game::supplyBlocks()
 {
-    while (gameStateId() >= mBlocks.size())
-    {
-        mBlocks.push_back(mBlockFactory->getNext());
-    }
+    stm::atomic([&](stm::transaction & tx) {
+        const BlockTypes & cBlocks = mBlockTypes.open_r(tx);
+        if (cBlocks.size() > gameStateId())
+        {
+            return;
+        }
+
+        BlockTypes & blocks = mBlockTypes.open_rw(tx);
+        while (blocks.size() <= gameStateId())
+        {
+            blocks.push_back(mBlockFactory->getNext());
+        }
+    });
 }
 
 
@@ -246,10 +258,19 @@ bool Game::canMove(Direction inDirection)
 
 void Game::reserveBlocks(std::size_t inCount)
 {
-    while (mBlocks.size() < inCount)
-    {
-        mBlocks.push_back(mBlockFactory->getNext());
-    }
+    stm::atomic([&](stm::transaction & tx) {
+        const BlockTypes & cBlocks = mBlockTypes.open_r(tx);
+        if (cBlocks.size() >= inCount)
+        {
+            return;
+        }
+
+        BlockTypes & blocks = mBlockTypes.open_rw(tx);
+        while (blocks.size() <= inCount)
+        {
+            blocks.push_back(mBlockFactory->getNext());
+        }
+    });
 }
 
 
@@ -270,15 +291,19 @@ const Grid & Game::gameGrid() const
 void Game::getFutureBlocks(std::size_t inCount, BlockTypes & outBlocks) const
 {
     // Make sure we have all blocks we need.
-    while (mBlocks.size() < gameStateId() + inCount)
-    {
-        mBlocks.push_back(mBlockFactory->getNext());
-    }
+    stm::atomic([&](stm::transaction & tx) {
+        const BlockTypes & cBlockTypes = mBlockTypes.open_r(tx);
+        while (cBlockTypes.size() < gameStateId() + inCount)
+        {
+            BlockTypes & blockTypes = mBlockTypes.open_rw(tx);
+            blockTypes.push_back(mBlockFactory->getNext());
+        }
 
-    for (std::size_t idx = 0; idx < inCount; ++idx)
-    {
-        outBlocks.push_back(mBlocks[gameStateId() + idx]);
-    }
+        for (std::size_t idx = 0; idx < inCount; ++idx)
+        {
+            outBlocks.push_back(cBlockTypes[gameStateId() + idx]);
+        }
+    });
 }
 
 
@@ -414,7 +439,7 @@ bool Game::move(Direction inDirection)
         }
 
         supplyBlocks();
-        mActiveBlock.open_rw(tx) = CreateDefaultBlock(mBlocks[gameStateId()], gameGrid().columnCount());
+        mActiveBlock.open_rw(tx) = CreateDefaultBlock(mBlockTypes.open_r(tx)[gameStateId()], gameGrid().columnCount());
         return false;
     });
     onChanged();
