@@ -12,13 +12,6 @@
 namespace Tetris {
 
 
-static int GetIdentifier(const GameState & inGameState)
-{
-    const Block & block = inGameState.originalBlock();
-    return block.rotationCount() * block.column() + block.rotation();
-}
-
-
 struct GameStateNode::Impl
 {
     Impl(NodePtr inParent, const GameState & inGameState, const Evaluator & inEvaluator) :
@@ -43,8 +36,8 @@ struct GameStateNode::Impl
 
     boost::weak_ptr<GameStateNode> mParent;
     GameState mGameState;
-    int mScore;
     int mDepth;
+    int mScore;
     const Evaluator & mEvaluator; // } => Order matters!
     ChildNodes mChildren;
 

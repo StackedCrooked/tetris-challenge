@@ -21,7 +21,7 @@ struct BlockFactory::Impl : boost::noncopyable
     static BlockTypes GetInitialBag(unsigned n)
     {
         BlockTypes result;
-        for (int i = 0; i < n; ++i)
+        for (unsigned i = 0; i < n; ++i)
         {
             for (BlockType type = BlockType_Begin; type != BlockType_End; ++type)
             {
@@ -61,12 +61,13 @@ BlockFactory::BlockFactory(unsigned inBagSize) :
 
 BlockFactory::~BlockFactory()
 {
+    mImpl.reset();
 }
 
 
 BlockType BlockFactory::getNext()
 {
-    return stm::atomic<BlockType>([&](stm::transaction & tx) {
+    BlockType result = stm::atomic<BlockType>([&](stm::transaction & tx) {
         unsigned & currentIndex = mImpl->mCurrentIndex.open_rw(tx);
         if (currentIndex < mImpl->mBagSize)
         {
@@ -81,6 +82,8 @@ BlockType BlockFactory::getNext()
             return bag[currentIndex = 0];
         }
     });
+    Assert(result >= BlockType_Begin && result < BlockType_End);
+    return result;
 }
 
 

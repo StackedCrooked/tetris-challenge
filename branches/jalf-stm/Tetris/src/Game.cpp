@@ -56,6 +56,8 @@ Game::Game(std::size_t inNumRows, std::size_t inNumColumns) :
 
 Game::~Game()
 {
+    mBlockFactory.reset();
+    mGarbageFactory.reset();
 }
 
 
@@ -247,7 +249,7 @@ bool Game::canMove(Direction inDirection)
         return false;
     }
 
-    stm::atomic<bool>([&](stm::transaction & tx){
+    return stm::atomic<bool>([&](stm::transaction & tx){
         const Block & block = mActiveBlock.open_r(tx);
         std::size_t newRow = block.row()    + GetRowDelta(inDirection);
         std::size_t newCol = block.column() + GetColumnDelta(inDirection);
@@ -288,21 +290,38 @@ const Grid & Game::gameGrid() const
 }
 
 
-void Game::getFutureBlocks(std::size_t inCount, BlockTypes & outBlocks) const
+BlockTypes Game::getFutureBlocks(std::size_t inCount) const
 {
     // Make sure we have all blocks we need.
-    stm::atomic([&](stm::transaction & tx) {
+    return stm::atomic<BlockTypes>([&](stm::transaction & tx) {
         const BlockTypes & cBlockTypes = mBlockTypes.open_r(tx);
-        while (cBlockTypes.size() < gameStateId() + inCount)
+        if (cBlockTypes.size() >= gameStateId() + inCount)
         {
-            BlockTypes & blockTypes = mBlockTypes.open_rw(tx);
-            blockTypes.push_back(mBlockFactory->getNext());
+            BlockTypes result;
+            for (std::size_t idx = 0; idx < inCount; ++idx)
+            {
+                result.push_back(cBlockTypes[gameStateId() + idx]);
+                Assert(result.back() <= 28);
+            }
+            return result;
         }
 
+        BlockTypes & blockTypes = mBlockTypes.open_rw(tx);
+        while (blockTypes.size() < gameStateId() + inCount)
+        {
+            blockTypes.push_back(mBlockFactory->getNext());
+            Assert(blockTypes.back() <= 28);
+        }
+        Assert(blockTypes.size() == gameStateId() + inCount);
+
+        BlockTypes result;
         for (std::size_t idx = 0; idx < inCount; ++idx)
         {
-            outBlocks.push_back(cBlockTypes[gameStateId() + idx]);
+            result.push_back(blockTypes[gameStateId() + idx]);
+            Assert(result.back() <= 28);
         }
+        Assert(result.size() == inCount);
+        return result;
     });
 }
 

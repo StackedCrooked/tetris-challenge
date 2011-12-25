@@ -77,7 +77,7 @@ public:
 
     const Grid & gameGrid() const;
 
-    void getFutureBlocks(std::size_t inCount, BlockTypes & outBlocks) const;
+    BlockTypes getFutureBlocks(std::size_t inCount) const;
 
     //void getFutureBlocksWithOffset(std::size_t inOffset, std::size_t inCount, BlockTypes & outBlocks) const;
 
