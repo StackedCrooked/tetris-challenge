@@ -56,7 +56,7 @@ BlockFactory::~BlockFactory()
 }
 
 
-BlockType BlockFactory::getNext() const
+BlockType BlockFactory::getNext()
 {
     if (mImpl->mCurrentIndex >= mImpl->mBag.size())
     {

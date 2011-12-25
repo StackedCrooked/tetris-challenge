@@ -21,7 +21,7 @@ public:
     virtual ~BlockFactory();
 
     // Returns a random block type.
-    virtual BlockType getNext() const;
+    virtual BlockType getNext();
 
 private:
     struct Impl;
