@@ -23,32 +23,33 @@ struct GameStateNode::Impl
 {
     Impl(NodePtr inParent, const GameState & inGameState, const Evaluator & inEvaluator) :
         mParent(inParent),
-        mIdentifier(GetIdentifier(inGameState)),
+        mGameState(inGameState),
         mDepth(inParent->depth() + 1),
-        mEvaluatedGameState(),
+        mScore(inEvaluator.evaluate(inGameState)),
         mEvaluator(inEvaluator),
         mChildren()
     {
-        mEvaluatedGameState.reset(new EvaluatedGameState(inGameState, inEvaluator.evaluate(inGameState)));
     }
 
     Impl(const GameState & inGameState, const Evaluator & inEvaluator) :
         mParent(),
-        mIdentifier(GetIdentifier(inGameState)),
+        mGameState(inGameState),
         mDepth(0),
-        mEvaluatedGameState(),
+        mScore(inEvaluator.evaluate(inGameState)),
         mEvaluator(inEvaluator),
         mChildren()
     {
-        mEvaluatedGameState.reset(new EvaluatedGameState(inGameState, inEvaluator.evaluate(inGameState)));
     }
 
     boost::weak_ptr<GameStateNode> mParent;
-    int mIdentifier;
+    GameState mGameState;
+    int mScore;
     int mDepth;
-    boost::scoped_ptr<EvaluatedGameState> mEvaluatedGameState;
     const Evaluator & mEvaluator; // } => Order matters!
-    ChildNodes mChildren;         // }    (Evaluator must outlive mChildren)
+
+
+private:
+    Impl& operator=(const Impl&);
 };
 
 
@@ -71,15 +72,15 @@ GameStateNode::GameStateNode(NodePtr inParent, const GameState & inGameState, co
 }
 
 
-GameStateNode::~GameStateNode()
+GameStateNode::GameStateNode(const GameStateNode & rhs) :
+    mImpl(new Impl(*rhs.mImpl))
 {
-    mImpl.reset();
 }
 
 
-int GameStateNode::identifier() const
+GameStateNode::~GameStateNode()
 {
-    return mImpl->mIdentifier;
+    mImpl.reset();
 }
 
 
@@ -91,13 +92,13 @@ const Evaluator & GameStateNode::evaluator() const
 
 const GameState & GameStateNode::gameState() const
 {
-    return mImpl->mEvaluatedGameState->gameState();
+    return mImpl->mGameState;
 }
 
 
 int GameStateNode::quality() const
 {
-    return mImpl->mEvaluatedGameState->quality();
+    return mImpl->mScore;
 }
 
 
