@@ -9,6 +9,7 @@
 #include "Tetris/Grid.h"
 #include "Tetris/NodePtr.h"
 #include "Futile/Threading.h"
+#include "stm.hpp"
 #include <boost/noncopyable.hpp>
 #include <boost/signals2.hpp>
 #include <boost/scoped_ptr.hpp>
@@ -72,7 +73,7 @@ public:
 
     void setStartingLevel(int inLevel);
 
-    const Block & activeBlock() const;
+    Block activeBlock() const;
 
     const Grid & gameGrid() const;
 
@@ -95,16 +96,15 @@ private:
     void onChanged();
     void onLinesCleared(std::size_t inLineCount);
 
-    static std::unique_ptr<Block> CreateDefaultBlock(BlockType inBlockType, std::size_t inNumColumns);
     void reserveBlocks(std::size_t inCount);
     void supplyBlocks();
 
     std::vector<BlockType> getGarbageRow() const;
 
-    boost::scoped_ptr<Block> mActiveBlock;
     boost::scoped_ptr<BlockFactory> mBlockFactory;
     boost::scoped_ptr<BlockFactory> mGarbageFactory;
     mutable BlockTypes mBlocks;
+    mutable stm::shared<Block> mActiveBlock;
     int mStartingLevel;
     bool mPaused;
 
