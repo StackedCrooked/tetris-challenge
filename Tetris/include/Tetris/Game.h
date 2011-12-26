@@ -48,17 +48,13 @@ public:
     // Threaded!
     boost::signals2::signal<void(int)> LinesCleared;
 
-    inline void setPaused(stm::transaction & tx, bool inPause)
-    { mPaused.open_rw(tx) = inPause; }
+    void setPaused(stm::transaction & tx, bool inPause);
 
-    inline bool isPaused(stm::transaction & tx) const
-    { return mPaused.open_r(tx); }
+    bool isPaused(stm::transaction & tx) const;
 
-    inline bool isGameOver(stm::transaction & tx) const
-    { return mGameState.open_r(tx).isGameOver(); }
+    bool isGameOver(stm::transaction & tx) const;
 
-    inline const Block & activeBlock(stm::transaction & tx) const
-    { return mActiveBlock.open_r(tx); }
+    const Block & activeBlock(stm::transaction & tx) const;
 
     int rowCount(stm::transaction & tx) const;
 
@@ -78,12 +74,11 @@ public:
 
     int level(stm::transaction & tx) const;
 
-    inline void setStartingLevel(stm::transaction & tx, int inLevel)
-    { mStartingLevel.open_rw(tx) = inLevel; }
+    void setStartingLevel(stm::transaction & tx, int inLevel);
 
     const Grid & gameGrid(stm::transaction & tx) const;
 
-    BlockTypes getFutureBlocks(stm::transaction & tx, std::size_t inCount) const;
+    BlockTypes getFutureBlocks(stm::transaction & tx, std::size_t inCount);
 
     const GameState & gameState(stm::transaction & tx) const;
 
@@ -100,11 +95,10 @@ private:
     void reserveBlocks(stm::transaction & tx, std::size_t inCount);
     void supplyBlocks(stm::transaction & tx);
 
-    std::vector<BlockType> getGarbageRow(stm::transaction & tx) const;
+    std::vector<BlockType> getGarbageRow(stm::transaction & tx);
 
-    boost::scoped_ptr<BlockFactory> mBlockFactory;
-    boost::scoped_ptr<BlockFactory> mGarbageFactory;
-
+    BlockFactory mBlockFactory;
+    BlockFactory mGarbageFactory;
     mutable stm::shared<Block> mActiveBlock;
     mutable stm::shared<BlockTypes> mBlockTypes;
     mutable stm::shared<int> mStartingLevel;
