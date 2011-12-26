@@ -29,7 +29,7 @@ struct BlockFactory::Impl : boost::noncopyable
             }
         }
         Assert(result.size() == n * cBlockTypeCount);
-        std::random_shuffle(result.begin(), result.end());
+        //std::random_shuffle(result.begin(), result.end());
         return result;
     }
 
@@ -78,7 +78,7 @@ BlockType BlockFactory::getNext()
         {
             // Reshuffle the bag.
             BlockTypes & bag = mImpl->mBag.open_rw(tx);
-            std::random_shuffle(bag.begin(), bag.end());
+            //std::random_shuffle(bag.begin(), bag.end());
             return bag[currentIndex = 0];
         }
     });
