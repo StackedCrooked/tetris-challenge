@@ -147,30 +147,12 @@ void GameState::clearLines()
 }
 
 
-bool GameState::isGameOver() const
-{
-    return mIsGameOver;
-}
-
-
-const Grid & GameState::grid() const
-{
-    return mGrid;
-}
-
-
 void GameState::setGrid(const Grid & inGrid)
 {
     Assert(mGrid.rowCount() == inGrid.rowCount() && mGrid.columnCount() == inGrid.columnCount());
     mGrid = inGrid;
     mTainted = true;
     updateCache();
-}
-
-
-bool GameState::tainted() const
-{
-    return mTainted;
 }
 
 
@@ -188,11 +170,6 @@ void GameState::updateCache()
         }
         mFirstOccupiedRow++;
     }
-}
-
-const Block & GameState::originalBlock() const
-{
-    return mOriginalBlock;
 }
 
 
