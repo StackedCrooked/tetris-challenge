@@ -71,8 +71,10 @@ Gravity::Gravity(const ThreadSafe<Game> & inThreadSafeGame) :
     mImpl(new Impl(this, inThreadSafeGame)),
     mTimer()
 {
-    mTimer.reset(new Timer(sIntervals[inThreadSafeGame.lock()->level()]));
-    mTimer->start(boost::bind(&Gravity::onTimerEvent, this));
+    stm::atomic([&](stm::transaction & tx){
+        mTimer.reset(new Timer(sIntervals[inThreadSafeGame.lock()->level(tx)]));
+        mTimer->start(boost::bind(&Gravity::onTimerEvent, this));
+    });
 }
 
 
@@ -115,20 +117,20 @@ void Gravity::Impl::onTimerEvent()
             {
                 // If our block was "caught" by the sudden appearance of new blocks, then we solidify it in that state.
                 stm::atomic([&](stm::transaction & tx) {
-                    const Block & block = game.mActiveBlock.open_r(tx);
-                    if (!static_cast<const Game&>(game).gameState().checkPositionValid(block))
+                    const Block & block = game.activeBlock(tx);
+                    if (!game.gameState(tx).checkPositionValid(block))
                     {
-                         game.move(MoveDirection_Down);
+                         game.move(tx, MoveDirection_Down);
                          return;
                     }
 
-                    if (game.isGameOver() || game.isPaused(tx))
+                    if (game.isGameOver(tx) || game.isPaused(tx))
                     {
                         return;
                     }
 
-                    game.move(MoveDirection_Down);
-                    mLevel = game.level();
+                    game.move(tx, MoveDirection_Down);
+                    mLevel = game.level(tx);
                     if (mLevel > cMaxLevel)
                     {
                         mLevel = cMaxLevel;

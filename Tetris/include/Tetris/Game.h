@@ -40,7 +40,7 @@ public:
 
     virtual ~Game();
 
-    unsigned gameStateId() const;
+    unsigned gameStateId(stm::transaction & tx) const;
 
     // Threaded!
     boost::signals2::signal<void()> GameStateChanged;
@@ -48,105 +48,68 @@ public:
     // Threaded!
     boost::signals2::signal<void(int)> LinesCleared;
 
-    inline void setPaused(bool inPause)
-    {
-        stm::atomic([&](stm::transaction & tx){
-            setPaused(tx, inPause);
-        });
-    }
-
     inline void setPaused(stm::transaction & tx, bool inPause)
-    {
-        mPaused.open_rw(tx) = inPause;
-    }
+    { mPaused.open_rw(tx) = inPause; }
 
     inline bool isPaused(stm::transaction & tx) const
-    {
-        return mPaused.open_r(tx);
-    }
+    { return mPaused.open_r(tx); }
 
-    bool isGameOver() const;
+    inline bool isGameOver(stm::transaction & tx) const
+    { return mGameState.open_r(tx).isGameOver(); }
 
-    int rowCount() const;
+    inline const Block & activeBlock(stm::transaction & tx) const
+    { return mActiveBlock.open_r(tx); }
 
-    int columnCount() const;
+    int rowCount(stm::transaction & tx) const;
 
-    bool checkPositionValid(const Block & inBlock) const;
+    int columnCount(stm::transaction & tx) const;
 
-    bool canMove(Direction inDirection);
+    bool checkPositionValid(stm::transaction & tx, const Block & inBlock) const;
 
-    virtual bool move(Direction inDirection);
+    bool canMove(stm::transaction & tx, Direction inDirection);
 
-    bool rotate();
+    virtual bool move(stm::transaction & tx, Direction inDirection);
 
-    void dropWithoutCommit();
+    bool rotate(stm::transaction & tx);
 
-    void dropAndCommit();
+    void dropWithoutCommit(stm::transaction & tx);
 
-    int level() const;
+    void dropAndCommit(stm::transaction & tx);
 
-    void setStartingLevel(int inLevel);
+    int level(stm::transaction & tx) const;
 
-    const Grid & gameGrid() const;
+    inline void setStartingLevel(stm::transaction & tx, int inLevel)
+    { mStartingLevel.open_rw(tx) = inLevel; }
 
-    BlockTypes getFutureBlocks(std::size_t inCount) const;
+    const Grid & gameGrid(stm::transaction & tx) const;
 
-    const GameState & gameState() const;
+    BlockTypes getFutureBlocks(stm::transaction & tx, std::size_t inCount) const;
 
-    virtual void applyLinePenalty(std::size_t inLineCount);
+    const GameState & gameState(stm::transaction & tx) const;
+
+    virtual void applyLinePenalty(stm::transaction & tx, std::size_t inLineCount);
 
 private:
     // Friendship required for destructor.
     friend class Futile::ThreadSafe<Game>;
 
-    void commit(const Block & inBlock);
+    void commit(stm::transaction & tx, const Block & inBlock);
 
-    void setGrid(const Grid & inGrid);
+    void setGrid(stm::transaction & tx, const Grid & inGrid);
 
-    void onChanged();
-    void onLinesCleared(std::size_t inLineCount);
+    void reserveBlocks(stm::transaction & tx, std::size_t inCount);
+    void supplyBlocks(stm::transaction & tx);
 
-    void reserveBlocks(std::size_t inCount);
-    void supplyBlocks();
-
-    std::vector<BlockType> getGarbageRow() const;
+    std::vector<BlockType> getGarbageRow(stm::transaction & tx) const;
 
     boost::scoped_ptr<BlockFactory> mBlockFactory;
     boost::scoped_ptr<BlockFactory> mGarbageFactory;
 
-public:
     mutable stm::shared<Block> mActiveBlock;
     mutable stm::shared<BlockTypes> mBlockTypes;
-
-private:
-    int mStartingLevel;
+    mutable stm::shared<int> mStartingLevel;
     mutable stm::shared<bool> mPaused;
-
-    // In order to avoid flooding the queue in certain situations.
-    bool mMuteEvents;
-
-    /**
-     * Create an instance to make the mMuteEvents false over a certain scope.
-     * This is handy when we are running a loop and don't want to trigger for
-     * for each event.
-     */
-    struct ScopedMute : boost::noncopyable
-    {
-        ScopedMute(bool & value) :
-            mValue(value)
-        {
-            mValue = true;
-        }
-
-        ~ScopedMute()
-        {
-            mValue = false;
-        }
-
-        bool & mValue;
-    };
-
-    GameState mGameState;
+    mutable stm::shared<GameState> mGameState;
 };
 
 

@@ -141,7 +141,9 @@ ThreadSafe<Game> SimpleGame::game()
 
 bool SimpleGame::checkPositionValid(const Block & inBlock) const
 {
-    return mImpl->mGame.lock()->checkPositionValid(inBlock);
+    return stm::atomic<bool>([&](stm::transaction & tx) {
+        return mImpl->mGame.lock()->checkPositionValid(tx, inBlock);
+    });
 }
 
 
@@ -165,7 +167,9 @@ void SimpleGame::unregisterEventHandler(EventHandler * inEventHandler)
 
 void SimpleGame::setPaused(bool inPaused)
 {
-    mImpl->mGame.lock()->setPaused(inPaused);
+    stm::atomic([&](stm::transaction & tx) {
+        mImpl->mGame.lock()->setPaused(tx, inPaused);
+    });
 }
 
 
@@ -179,124 +183,148 @@ bool SimpleGame::isPaused() const
 
 GameStateStats SimpleGame::stats() const
 {
-    const Locker<Game> locker(mImpl->mGame);
-    const GameState & gameState = locker->gameState();
-    return GameStateStats(gameState.numLines(),
-                          gameState.numSingles(),
-                          gameState.numDoubles(),
-                          gameState.numTriples(),
-                          gameState.numTetrises());
+    return stm::atomic<GameStateStats>([&](stm::transaction & tx) {
+        const Locker<Game> locker(mImpl->mGame);
+        const GameState & gameState = locker->gameState(tx);
+        return GameStateStats(gameState.numLines(),
+                              gameState.numSingles(),
+                              gameState.numDoubles(),
+                              gameState.numTriples(),
+                              gameState.numTetrises());
+    });
 }
 
 
 void SimpleGame::applyLinePenalty(int inNumberOfLinesMadeByOpponent)
 {
     LogInfo(SS() << (playerType() == PlayerType_Computer ? "The computer" : "The human being") << " received " << inNumberOfLinesMadeByOpponent << " lines from his crafty opponent");
-    return mImpl->mGame.lock()->applyLinePenalty(inNumberOfLinesMadeByOpponent);
+
+    stm::atomic([&](stm::transaction & tx) {
+        mImpl->mGame.lock()->applyLinePenalty(tx, inNumberOfLinesMadeByOpponent);
+    });
 }
 
 
 bool SimpleGame::isGameOver() const
 {
-    return mImpl->mGame.lock()->isGameOver();
+    return stm::atomic<bool>([&](stm::transaction & tx) {
+        return mImpl->mGame.lock()->isGameOver(tx);
+    });
 }
 
 
 int SimpleGame::rowCount() const
 {
-    return mImpl->mGame.lock()->rowCount();
+    return stm::atomic<int>([&](stm::transaction & tx) {
+        return mImpl->mGame.lock()->rowCount(tx);
+    });
 }
 
 
 int SimpleGame::columnCount() const
 {
-    return mImpl->mGame.lock()->columnCount();
+    return stm::atomic<int>([&](stm::transaction & tx) {
+        return mImpl->mGame.lock()->columnCount(tx);
+    });
 }
 
 
 bool SimpleGame::move(Direction inDirection)
 {
-    return mImpl->mGame.lock()->move(inDirection);
+    return stm::atomic<bool>([&](stm::transaction & tx) {
+        return mImpl->mGame.lock()->move(tx, inDirection);
+    });
 }
 
 
 bool SimpleGame::rotate()
 {
-    return mImpl->mGame.lock()->rotate();
+    return stm::atomic<bool>([&](stm::transaction & tx) {
+        return mImpl->mGame.lock()->rotate(tx);
+    });
 }
 
 
 void SimpleGame::drop()
 {
-    mImpl->mGame.lock()->dropAndCommit();
+    stm::atomic([&](stm::transaction & tx) {
+        mImpl->mGame.lock()->dropAndCommit(tx);
+    });
 }
 
 
 void SimpleGame::setStartingLevel(int inLevel)
 {
-    mImpl->mGame.lock()->setStartingLevel(inLevel);
+    stm::atomic([&](stm::transaction & tx) {
+        mImpl->mGame.lock()->setStartingLevel(tx, inLevel);
+    });
 }
 
 
 int SimpleGame::level() const
 {
-    return mImpl->mGame.lock()->level();
+    return stm::atomic<int>([&](stm::transaction & tx) {
+        return mImpl->mGame.lock()->level(tx);
+    });
 }
 
 
 Block SimpleGame::activeBlock() const
 {
     return stm::atomic<Block>([&](stm::transaction & tx) {
-        Locker<Game> locker(mImpl->mGame);
-        const Game & game = *locker.get();
-        return game.mActiveBlock.open_r(tx);
+        return mImpl->mGame.lock()->activeBlock(tx);
     });
-
 }
 
 
 Grid SimpleGame::gameGrid() const
 {
-    return mImpl->mGame.lock()->gameGrid();
+    return stm::atomic<Grid>([&](stm::transaction & tx) {
+        return mImpl->mGame.lock()->gameState(tx).grid();
+    });
 }
 
 
 Block SimpleGame::getNextBlock() const
 {
-    std::vector<BlockType> blockTypes;
-    FUTILE_LOCK(Game & game, mImpl->mGame)
-    {
-        blockTypes = game.getFutureBlocks(2);
-    }
+    return stm::atomic<Block>([&](stm::transaction & tx) {
+        std::vector<BlockType> blockTypes;
+        FUTILE_LOCK(Game & game, mImpl->mGame)
+        {
+            blockTypes = game.getFutureBlocks(tx, 2);
+        }
 
-    if (blockTypes.size() != 2)
-    {
-        throw std::logic_error("Failed to get the next block from the factory.");
-    }
+        if (blockTypes.size() != 2)
+        {
+            throw std::logic_error("Failed to get the next block from the factory.");
+        }
 
-    return Block(blockTypes.back(), Rotation(0), Row(0), Column((columnCount() - mImpl->mCenterColumn)/2));
+        return Block(blockTypes.back(), Rotation(0), Row(0), Column((columnCount() - mImpl->mCenterColumn)/2));
+    });
 }
 
 
 std::vector<Block> SimpleGame::getNextBlocks(std::size_t inCount) const
 {
-    std::vector<BlockType> blockTypes;
-    FUTILE_LOCK(Game & game, mImpl->mGame)
-    {
-        blockTypes = game.getFutureBlocks(inCount);
-        Assert(blockTypes.size() == inCount);
-    }
+    return stm::atomic< std::vector<Block> >([&](stm::transaction & tx) {
+        std::vector<BlockType> blockTypes;
+        FUTILE_LOCK(Game & game, mImpl->mGame)
+        {
+            blockTypes = game.getFutureBlocks(tx, inCount);
+            Assert(blockTypes.size() == inCount);
+        }
 
-    std::vector<Block> result;
-    for (std::vector<BlockType>::size_type idx = 0; idx != blockTypes.size(); ++idx)
-    {
-        result.push_back(Block(blockTypes[idx],
-                               Rotation(0),
-                               Row(0),
-                               Column((columnCount() - mImpl->mCenterColumn)/2)));
-    }
-    Assert(result.size() == inCount);
-    return result;
+        std::vector<Block> result;
+        for (std::vector<BlockType>::size_type idx = 0; idx != blockTypes.size(); ++idx)
+        {
+            result.push_back(Block(blockTypes[idx],
+                                   Rotation(0),
+                                   Row(0),
+                                   Column((columnCount() - mImpl->mCenterColumn)/2)));
+        }
+        Assert(result.size() == inCount);
+        return result;
+    });
 }
 
 
