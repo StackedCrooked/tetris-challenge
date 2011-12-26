@@ -368,7 +368,9 @@ bool Game::move(stm::transaction & tx, Direction inDirection)
     Assert(linesCleared >= 0);
 
     supplyBlocks(tx);
-    mActiveBlock.open_rw(tx) = CreateDefaultBlock(mBlockTypes.open_r(tx)[cGameState.id()], cGameState.grid().columnCount());
+    Block & assignActiveBlock = mActiveBlock.open_rw(tx);
+    const GameState & newGameState = this->gameState(tx);
+    assignActiveBlock = CreateDefaultBlock(mBlockTypes.open_r(tx)[newGameState.id()], newGameState.grid().columnCount());
     return false;
 }
 

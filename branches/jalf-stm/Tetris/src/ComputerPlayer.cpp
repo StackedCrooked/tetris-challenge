@@ -384,6 +384,9 @@ void ComputerPlayer::Impl::move()
             }
 
             Assert(predictedId == oldId + 1); // check sync
+            const Block & activeBlock = game.activeBlock(tx);
+            const Block & originalBlock = mPrecalculated.front().originalBlock();
+            Assert(activeBlock.type() == originalBlock.type());
 
             Move(tx, game, mPrecalculated.front().originalBlock());
             unsigned newId = game.gameStateId(tx);
