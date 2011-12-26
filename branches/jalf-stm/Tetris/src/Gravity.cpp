@@ -114,23 +114,26 @@ void Gravity::Impl::onTimerEvent()
             FUTILE_LOCK(Game & game, mThreadSafeGame)
             {
                 // If our block was "caught" by the sudden appearance of new blocks, then we solidify it in that state.
-                if (!static_cast<const Game&>(game).gameState().checkPositionValid(game.activeBlock()))
-                {
+                stm::atomic([&](stm::transaction & tx) {
+                    const Block & block = game.activeBlock().open_r(tx);
+                    if (!static_cast<const Game&>(game).gameState().checkPositionValid(block))
+                    {
+                         game.move(MoveDirection_Down);
+                         return;
+                    }
+
+                    if (game.isGameOver() || game.isPaused())
+                    {
+                        return;
+                    }
+
                     game.move(MoveDirection_Down);
-                    return;
-                }
-
-                if (game.isGameOver() || game.isPaused())
-                {
-                    return;
-                }
-
-                game.move(MoveDirection_Down);
-                mLevel = game.level();
-                if (mLevel > cMaxLevel)
-                {
-                    mLevel = cMaxLevel;
-                }
+                    mLevel = game.level();
+                    if (mLevel > cMaxLevel)
+                    {
+                        mLevel = cMaxLevel;
+                    }
+                });
             }
         }
         if (mLevel != oldLevel)

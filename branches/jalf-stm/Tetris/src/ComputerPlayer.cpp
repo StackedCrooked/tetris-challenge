@@ -308,56 +308,58 @@ void ComputerPlayer::Impl::updateComputerBlockMoveSpeed()
 
 bool Move(Game & ioGame, const Block & targetBlock)
 {
-    Block block = ioGame.activeBlock();
-    Assert(block.type() == targetBlock.type());
+    return stm::atomic<bool>([&](stm::transaction & tx) {
+        const Block & block = ioGame.activeBlock().open_r(tx);
+        Assert(block.type() == targetBlock.type());
 
-    // Try rotation first, if it fails then skip rotation and try horizontal move
-    if (block.rotation() != targetBlock.rotation())
-    {
-        if (ioGame.rotate())
+        // Try rotation first, if it fails then skip rotation and try horizontal move
+        if (block.rotation() != targetBlock.rotation())
         {
+            if (ioGame.rotate())
+            {
+                return true;
+            }
+            // else: try left or right move below
+        }
+
+        if (block.column() < targetBlock.column())
+        {
+            if (!ioGame.move(MoveDirection_Right))
+            {
+                // Damn we can't move this block anymore.
+                // Give up on this block.
+                ioGame.dropAndCommit();
+                return false;
+            }
             return true;
         }
-        // else: try left or right move below
-    }
 
-    if (block.column() < targetBlock.column())
-    {
-        if (!ioGame.move(MoveDirection_Right))
+        if (block.column() > targetBlock.column())
         {
-            // Damn we can't move this block anymore.
-            // Give up on this block.
-            ioGame.dropAndCommit();
-            return false;
+            if (!ioGame.move(MoveDirection_Left))
+            {
+                // Damn we can't move this block anymore.
+                // Give up on this block.
+                ioGame.dropAndCommit();
+                return false;
+            }
+            return true;
         }
-        return true;
-    }
 
-    if (block.column() > targetBlock.column())
-    {
-        if (!ioGame.move(MoveDirection_Left))
+        // Horizontal position is OK.
+        // Retry rotation again. If it fails here then drop the block.
+        if (block.rotation() != targetBlock.rotation())
         {
-            // Damn we can't move this block anymore.
-            // Give up on this block.
-            ioGame.dropAndCommit();
-            return false;
+            if (!ioGame.rotate())
+            {
+                ioGame.dropAndCommit();
+                return false;
+            }
+            return true;
         }
-        return true;
-    }
 
-    // Horizontal position is OK.
-    // Retry rotation again. If it fails here then drop the block.
-    if (block.rotation() != targetBlock.rotation())
-    {
-        if (!ioGame.rotate())
-        {
-            ioGame.dropAndCommit();
-            return false;
-        }
-        return true;
-    }
-
-    return ioGame.move(MoveDirection_Down);
+        return ioGame.move(MoveDirection_Down);
+    });
 }
 
 

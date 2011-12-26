@@ -128,59 +128,61 @@ std::vector<BlockType> Game::getGarbageRow() const
 
 void Game::applyLinePenalty(std::size_t inLineCount)
 {
-    if (inLineCount < 2 || isGameOver())
-    {
-        return;
-    }
+    stm::atomic([&](stm::transaction & tx) {
 
-    int lineIncrement = inLineCount < 4 ? (inLineCount - 1) : inLineCount;
-
-    int newFirstOccupiedRow = gameState().firstOccupiedRow() - lineIncrement;
-    if (newFirstOccupiedRow < 0)
-    {
-        newFirstOccupiedRow = 0;
-    }
-
-    // Work with a copy of the current grid.
-    Grid grid = gameGrid();
-
-    std::size_t garbageStart = grid.rowCount() - lineIncrement;
-
-    std::vector<BlockType> garbageRow;
-
-    for (std::size_t r = newFirstOccupiedRow; r < grid.rowCount(); ++r)
-    {
-        if (r >= garbageStart)
+        if (inLineCount < 2 || isGameOver())
         {
-            garbageRow = getGarbageRow();
+            return;
         }
-        for (std::size_t c = 0; c < grid.columnCount(); ++c)
+
+        int lineIncrement = inLineCount < 4 ? (inLineCount - 1) : inLineCount;
+
+        int newFirstOccupiedRow = gameState().firstOccupiedRow() - lineIncrement;
+        if (newFirstOccupiedRow < 0)
         {
-            if (r < garbageStart)
+            newFirstOccupiedRow = 0;
+        }
+
+        // Work with a copy of the current grid.
+        Grid grid = mGameState.grid();
+
+        std::size_t garbageStart = grid.rowCount() - lineIncrement;
+
+        std::vector<BlockType> garbageRow;
+
+        for (std::size_t r = newFirstOccupiedRow; r < grid.rowCount(); ++r)
+        {
+            if (r >= garbageStart)
             {
-                grid.set(r, c, grid.get(r + lineIncrement, c));
+                garbageRow = getGarbageRow();
             }
-            else
+            for (std::size_t c = 0; c < grid.columnCount(); ++c)
             {
-                grid.set(r, c, garbageRow[c]);
+                if (r < garbageStart)
+                {
+                    grid.set(r, c, grid.get(r + lineIncrement, c));
+                }
+                else
+                {
+                    grid.set(r, c, garbageRow[c]);
+                }
             }
         }
-    }
 
-    // Overwrite the grid with our copy.
-    setGrid(grid);
+        // Overwrite the grid with our copy.
+        setGrid(grid);
 
-    // Check if the active block has been caught in the penalty lines that were added.
-    // If yes then we need to commit the current gamestate.
-    const Block & block(activeBlock());
-    if (!gameState().checkPositionValid(block, block.row(), block.column()))
-    {
-        // Commit the game state.
-        bool result = move(MoveDirection_Down);
-        Assert(!result); // verify commit
-        (void)result; // silence compiler warning about unused variable
-    }
-
+        // Check if the active block has been caught in the penalty lines that were added.
+        // If yes then we need to commit the current gamestate.
+        const Block & block = mActiveBlock.open_r(tx);
+        if (!gameState().checkPositionValid(block, block.row(), block.column()))
+        {
+            // Commit the game state.
+            bool result = move(MoveDirection_Down);
+            Assert(!result); // verify commit
+            (void)result; // silence compiler warning about unused variable
+        }
+    });
     onChanged();
 }
 
@@ -270,14 +272,6 @@ void Game::reserveBlocks(std::size_t inCount)
         {
             blocks.push_back(mBlockFactory->getNext());
         }
-    });
-}
-
-
-Block Game::activeBlock() const
-{
-    return stm::atomic<Block>([&](stm::transaction & tx) {
-        return mActiveBlock.open_r(tx);
     });
 }
 

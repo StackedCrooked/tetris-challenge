@@ -14,6 +14,7 @@
 #include <boost/signals2.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <deque>
+#include <functional>
 #include <memory>
 
 
@@ -73,7 +74,7 @@ public:
 
     void setStartingLevel(int inLevel);
 
-    Block activeBlock() const;
+    inline stm::shared<Block> & activeBlock() const { return mActiveBlock; }
 
     const Grid & gameGrid() const;
 

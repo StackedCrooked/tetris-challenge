@@ -244,7 +244,11 @@ int SimpleGame::level() const
 
 Block SimpleGame::activeBlock() const
 {
-    return mImpl->mGame.lock()->activeBlock();
+    return stm::atomic<Block>([&](stm::transaction & tx) {
+        Locker<Game> locker(mImpl->mGame);
+        const Game & game = *locker.get();
+        return game.activeBlock().open_r(tx);
+    });
 }
 
 
