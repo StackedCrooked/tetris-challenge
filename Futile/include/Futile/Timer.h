@@ -6,9 +6,9 @@
 #include "Futile/WorkerPool.h"
 #include "Futile/Threading.h"
 #include "Futile/Types.h"
-#include <boost/function.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
+#include <functional>
 
 
 namespace Futile {
@@ -20,7 +20,7 @@ namespace Futile {
 class Timer : boost::noncopyable
 {
 public:
-    typedef boost::function<void()> Action;
+    typedef std::function<void()> Action;
 
     Timer(UInt64 inInterval);
 

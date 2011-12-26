@@ -30,14 +30,17 @@ struct SimpleGame::Impl : boost::enable_shared_from_this<SimpleGame::Impl>
         mGame(inRowCount, inColumnCount),
         mPlayerType(inPlayerType),
         mGravity(new Gravity(mGame)),
-        mCenterColumn(static_cast<std::size_t>(0.5 + inColumnCount / 2.0))
+        mCenterColumn(static_cast<std::size_t>(0.5 + inColumnCount / 2.0)),
+        mTimer(10)
     {
+        mTimer.start([&](){ this->mGame.GameStateChanged(); });
         mGame.GameStateChanged.connect(boost::bind(&Impl::onGameStateChanged, this));
         mGame.LinesCleared.connect(boost::bind(&Impl::onLinesCleared, this, _1));
     }
 
     ~Impl()
     {
+        mTimer.stop();
     }
 
     virtual void onGameStateChanged()
@@ -103,6 +106,7 @@ struct SimpleGame::Impl : boost::enable_shared_from_this<SimpleGame::Impl>
     ScopedConnection mGameStateChanged;
     ScopedConnection mLinesCleared;
     EventHandlers mEventHandlers;
+    Futile::Timer mTimer;
 };
 
 
