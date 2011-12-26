@@ -379,6 +379,7 @@ bool Game::move(stm::transaction & tx, Direction inDirection)
     // Count the number of lines that were made in the commit call.
     int linesCleared = cGameState.numLines() - oldLineCount;
     Assert(linesCleared >= 0);
+    (void)linesCleared;
 
     supplyBlocks(tx);
     Block & assignActiveBlock = mActiveBlock.open_rw(tx);
