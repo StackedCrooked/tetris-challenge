@@ -22,27 +22,18 @@ using namespace Futile;
 
 struct SimpleGame::Impl : boost::enable_shared_from_this<SimpleGame::Impl>
 {
-    static Futile::ThreadSafe<Game> CreateGame(PlayerType /*inPlayerType*/, std::size_t inRowCount, std::size_t inColumnCount)
-    {
-        Futile::ThreadSafe<Game> result(new Game(inRowCount, inColumnCount));
-        return result;
-    }
-
     Impl(SimpleGame * inSimpleGame,
          PlayerType inPlayerType,
          std::size_t inRowCount,
          std::size_t inColumnCount) :
         mSimpleGame(inSimpleGame),
-        mGame(CreateGame(inPlayerType, inRowCount, inColumnCount)),
+        mGame(inRowCount, inColumnCount),
         mPlayerType(inPlayerType),
         mGravity(new Gravity(mGame)),
         mCenterColumn(static_cast<std::size_t>(0.5 + inColumnCount / 2.0))
     {
-        FUTILE_LOCK(Game & game, mGame)
-        {
-            game.GameStateChanged.connect(boost::bind(&Impl::onGameStateChanged, this));
-            game.LinesCleared.connect(boost::bind(&Impl::onLinesCleared, this, _1));
-        }
+        mGame.GameStateChanged.connect(boost::bind(&Impl::onGameStateChanged, this));
+        mGame.LinesCleared.connect(boost::bind(&Impl::onLinesCleared, this, _1));
     }
 
     ~Impl()
@@ -104,7 +95,7 @@ struct SimpleGame::Impl : boost::enable_shared_from_this<SimpleGame::Impl>
 
     SimpleGame * mSimpleGame;
     std::string mName;
-    ThreadSafe<Game> mGame;
+    Game mGame;
     PlayerType mPlayerType;
     boost::scoped_ptr<Gravity> mGravity;
     std::size_t mCenterColumn;
@@ -127,22 +118,16 @@ SimpleGame::~SimpleGame()
 }
 
 
-ThreadSafe<Game> SimpleGame::game()
+Game & SimpleGame::game()
 {
     return mImpl->mGame;
 }
 
 
-/*GameState & SimpleGame::gameState()
-{
-    return mImpl->mGame.lock()->gameState();
-}*/
-
-
 bool SimpleGame::checkPositionValid(const Block & inBlock) const
 {
     return stm::atomic<bool>([&](stm::transaction & tx) {
-        return mImpl->mGame.lock()->checkPositionValid(tx, inBlock);
+        return mImpl->mGame.checkPositionValid(tx, inBlock);
     });
 }
 
@@ -168,7 +153,7 @@ void SimpleGame::unregisterEventHandler(EventHandler * inEventHandler)
 void SimpleGame::setPaused(bool inPaused)
 {
     stm::atomic([&](stm::transaction & tx) {
-        mImpl->mGame.lock()->setPaused(tx, inPaused);
+        mImpl->mGame.setPaused(tx, inPaused);
     });
 }
 
@@ -176,7 +161,7 @@ void SimpleGame::setPaused(bool inPaused)
 bool SimpleGame::isPaused() const
 {
     return stm::atomic<bool>([&](stm::transaction & tx) {
-        return mImpl->mGame.lock()->isPaused(tx);
+        return mImpl->mGame.isPaused(tx);
     });
 }
 
@@ -184,8 +169,7 @@ bool SimpleGame::isPaused() const
 GameStateStats SimpleGame::stats() const
 {
     return stm::atomic<GameStateStats>([&](stm::transaction & tx) {
-        const Locker<Game> locker(mImpl->mGame);
-        const GameState & gameState = locker->gameState(tx);
+        const GameState & gameState =  mImpl->mGame.gameState(tx);
         return GameStateStats(gameState.numLines(),
                               gameState.numSingles(),
                               gameState.numDoubles(),
@@ -200,7 +184,7 @@ void SimpleGame::applyLinePenalty(int inNumberOfLinesMadeByOpponent)
     LogInfo(SS() << (playerType() == PlayerType_Computer ? "The computer" : "The human being") << " received " << inNumberOfLinesMadeByOpponent << " lines from his crafty opponent");
 
     stm::atomic([&](stm::transaction & tx) {
-        mImpl->mGame.lock()->applyLinePenalty(tx, inNumberOfLinesMadeByOpponent);
+        mImpl->mGame.applyLinePenalty(tx, inNumberOfLinesMadeByOpponent);
     });
 }
 
@@ -208,7 +192,7 @@ void SimpleGame::applyLinePenalty(int inNumberOfLinesMadeByOpponent)
 bool SimpleGame::isGameOver() const
 {
     return stm::atomic<bool>([&](stm::transaction & tx) {
-        return mImpl->mGame.lock()->isGameOver(tx);
+        return mImpl->mGame.isGameOver(tx);
     });
 }
 
@@ -216,7 +200,7 @@ bool SimpleGame::isGameOver() const
 int SimpleGame::rowCount() const
 {
     return stm::atomic<int>([&](stm::transaction & tx) {
-        return mImpl->mGame.lock()->rowCount(tx);
+        return mImpl->mGame.rowCount(tx);
     });
 }
 
@@ -224,23 +208,29 @@ int SimpleGame::rowCount() const
 int SimpleGame::columnCount() const
 {
     return stm::atomic<int>([&](stm::transaction & tx) {
-        return mImpl->mGame.lock()->columnCount(tx);
+        return mImpl->mGame.columnCount(tx);
     });
 }
 
 
 bool SimpleGame::move(Direction inDirection)
 {
-    return stm::atomic<bool>([&](stm::transaction & tx) {
-        return mImpl->mGame.lock()->move(tx, inDirection);
+    bool result = stm::atomic<bool>([&](stm::transaction & tx) {
+        return mImpl->mGame.move(tx, inDirection);
     });
+
+    if (result) {
+        mImpl->mGame.GameStateChanged();
+    }
+
+    return result;
 }
 
 
 bool SimpleGame::rotate()
 {
     return stm::atomic<bool>([&](stm::transaction & tx) {
-        return mImpl->mGame.lock()->rotate(tx);
+        return mImpl->mGame.rotate(tx);
     });
 }
 
@@ -248,7 +238,7 @@ bool SimpleGame::rotate()
 void SimpleGame::drop()
 {
     stm::atomic([&](stm::transaction & tx) {
-        mImpl->mGame.lock()->dropAndCommit(tx);
+        mImpl->mGame.dropAndCommit(tx);
     });
 }
 
@@ -256,7 +246,7 @@ void SimpleGame::drop()
 void SimpleGame::setStartingLevel(int inLevel)
 {
     stm::atomic([&](stm::transaction & tx) {
-        mImpl->mGame.lock()->setStartingLevel(tx, inLevel);
+        mImpl->mGame.setStartingLevel(tx, inLevel);
     });
 }
 
@@ -264,7 +254,7 @@ void SimpleGame::setStartingLevel(int inLevel)
 int SimpleGame::level() const
 {
     return stm::atomic<int>([&](stm::transaction & tx) {
-        return mImpl->mGame.lock()->level(tx);
+        return mImpl->mGame.level(tx);
     });
 }
 
@@ -272,7 +262,7 @@ int SimpleGame::level() const
 Block SimpleGame::activeBlock() const
 {
     return stm::atomic<Block>([&](stm::transaction & tx) {
-        return mImpl->mGame.lock()->activeBlock(tx);
+        return mImpl->mGame.activeBlock(tx);
     });
 }
 
@@ -280,7 +270,7 @@ Block SimpleGame::activeBlock() const
 Grid SimpleGame::gameGrid() const
 {
     return stm::atomic<Grid>([&](stm::transaction & tx) {
-        return mImpl->mGame.lock()->gameState(tx).grid();
+        return mImpl->mGame.gameState(tx).grid();
     });
 }
 
@@ -288,12 +278,7 @@ Grid SimpleGame::gameGrid() const
 Block SimpleGame::getNextBlock() const
 {
     return stm::atomic<Block>([&](stm::transaction & tx) {
-        std::vector<BlockType> blockTypes;
-        FUTILE_LOCK(Game & game, mImpl->mGame)
-        {
-            blockTypes = game.getFutureBlocks(tx, 2);
-        }
-
+        std::vector<BlockType> blockTypes = mImpl->mGame.getFutureBlocks(tx, 2);
         if (blockTypes.size() != 2)
         {
             throw std::logic_error("Failed to get the next block from the factory.");
@@ -308,11 +293,8 @@ std::vector<Block> SimpleGame::getNextBlocks(std::size_t inCount) const
 {
     return stm::atomic< std::vector<Block> >([&](stm::transaction & tx) {
         std::vector<BlockType> blockTypes;
-        FUTILE_LOCK(Game & game, mImpl->mGame)
-        {
-            blockTypes = game.getFutureBlocks(tx, inCount);
-            Assert(blockTypes.size() == inCount);
-        }
+        blockTypes = mImpl->mGame.getFutureBlocks(tx, inCount);
+        Assert(blockTypes.size() == inCount);
 
         std::vector<Block> result;
         for (std::vector<BlockType>::size_type idx = 0; idx != blockTypes.size(); ++idx)

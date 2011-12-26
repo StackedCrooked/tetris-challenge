@@ -41,6 +41,7 @@ public:
     Impl(ComputerPlayer * inComputerPlayer,
          BlockMover * inBlockMover) :
         mComputerPlayer(inComputerPlayer),
+        mGame(mComputerPlayer->game()->game()),
         mTweaker(0),
         mMainWorker("ComputerPlayer: MainWorker"),
         mWorkerPool("ComputerPlayer: WorkerPool", cDefaultWorkerCount),
@@ -89,7 +90,7 @@ public:
     GameState previousGameState()
     {
         return stm::atomic<GameState>([&](stm::transaction & tx){
-            return mPrecalculated.empty() ? mComputerPlayer->game()->game().lock()->gameState(tx)
+            return mPrecalculated.empty() ? mComputerPlayer->game()->game().gameState(tx)
                                           : mPrecalculated.back();
         });
     }
@@ -101,6 +102,7 @@ public:
     }
 
     ComputerPlayer * mComputerPlayer;
+    Game & mGame;
     Tweaker * mTweaker;
 
     Worker mMainWorker;
@@ -370,35 +372,32 @@ void ComputerPlayer::Impl::move()
         return;
     }
 
-    FUTILE_LOCK(Game & game, mComputerPlayer->game()->game())
-    {
-        stm::atomic([&](stm::transaction & tx) {
-            unsigned oldId = game.gameStateId(tx);
-            unsigned predictedId = mPrecalculated.front().id();
-            if (oldId >= predictedId)
-            {
-                // Precalculated blocks have been invalidated.
-                LogInfo("Precalculated invalidated.");
-                mPrecalculated.clear();
-                return;
-            }
+    stm::atomic([&](stm::transaction & tx) {
+        unsigned oldId = mComputerPlayer->game()->game().gameStateId(tx);
+        unsigned predictedId = mPrecalculated.front().id();
+        if (oldId >= predictedId)
+        {
+            // Precalculated blocks have been invalidated.
+            LogInfo("Precalculated invalidated.");
+            mPrecalculated.clear();
+            return;
+        }
 
-            Assert(predictedId == oldId + 1); // check sync
-            const Block & activeBlock = game.activeBlock(tx);
-            const Block & originalBlock = mPrecalculated.front().originalBlock();
-            Assert(activeBlock.type() == originalBlock.type());
-            (void)activeBlock;
-            (void)originalBlock;
+        Assert(predictedId == oldId + 1); // check sync
+        const Block & activeBlock = mGame.activeBlock(tx);
+        const Block & originalBlock = mPrecalculated.front().originalBlock();
+        Assert(activeBlock.type() == originalBlock.type());
+        (void)activeBlock;
+        (void)originalBlock;
 
-            Move(tx, game, mPrecalculated.front().originalBlock());
-            unsigned newId = game.gameStateId(tx);
-            Assert(oldId == newId || oldId + 1 == newId);
-            if (newId > oldId)
-            {
-                mPrecalculated.erase(mPrecalculated.begin());
-            }
-        });
-    }
+        Move(tx, mGame, mPrecalculated.front().originalBlock());
+        unsigned newId = mGame.gameStateId(tx);
+        Assert(oldId == newId || oldId + 1 == newId);
+        if (newId > oldId)
+        {
+            mPrecalculated.erase(mPrecalculated.begin());
+        }
+    });
 }
 
 
@@ -537,25 +536,20 @@ void ComputerPlayer::Impl::onStarted()
 
 void ComputerPlayer::Impl::onWorking()
 {
-    SimpleGame & simpleGame = *mComputerPlayer->game();
+    stm::atomic([&](stm::transaction & tx) {
+        if (previousGameState().id() < mGame.gameState(tx).id())
+        {
+            // The calculated results have become invalid. Start over.
+            mReset = true;
+            return;
+        }
 
-    FUTILE_LOCK(Game & game, simpleGame.game())
-    {
-        stm::atomic([&](stm::transaction & tx) {
-            if (previousGameState().id() < game.gameState(tx).id())
-            {
-                // The calculated results have become invalid. Start over.
-                mReset = true;
-                return;
-            }
-
-            if (mPrecalculated.empty())
-            {
-                mStop = true;
-                return;
-            }
-        });
-    }
+        if (mPrecalculated.empty())
+        {
+            mStop = true;
+            return;
+        }
+    });
 
     // Keep working
 }

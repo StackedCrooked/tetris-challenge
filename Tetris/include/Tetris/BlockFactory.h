@@ -5,7 +5,7 @@
 #include "Tetris/BlockType.h"
 #include "Futile/Threading.h"
 #include <boost/noncopyable.hpp>
-#include <memory>
+#include <boost/shared_ptr.hpp>
 
 
 namespace Tetris {
@@ -19,14 +19,12 @@ public:
     // @param n Determines how many times all block types appear in the bag.
     BlockFactory(unsigned n = 1);
 
-    ~BlockFactory();
-
     // Returns a random block type.
     virtual BlockType getNext();
 
 private:
     struct Impl;
-    boost::scoped_ptr<Impl> mImpl;
+    boost::shared_ptr<Impl> mImpl;
 };
 
 

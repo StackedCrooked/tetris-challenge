@@ -33,7 +33,7 @@ class Game;
  *   - block factory
  *   - paused state
  */
-class Game : boost::noncopyable
+class Game
 {
 public:
     Game(std::size_t inNumRows, std::size_t inNumColumns);
@@ -85,9 +85,6 @@ public:
     virtual void applyLinePenalty(stm::transaction & tx, std::size_t inLineCount);
 
 private:
-    // Friendship required for destructor.
-    friend class Futile::ThreadSafe<Game>;
-
     void commit(stm::transaction & tx, const Block & inBlock);
     void setGrid(stm::transaction & tx, const Grid & inGrid);
     void reserveBlocks(stm::transaction & tx, std::size_t inCount);
