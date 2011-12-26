@@ -247,8 +247,9 @@ Block SimpleGame::activeBlock() const
     return stm::atomic<Block>([&](stm::transaction & tx) {
         Locker<Game> locker(mImpl->mGame);
         const Game & game = *locker.get();
-        return game.activeBlock().open_r(tx);
+        return game.mActiveBlock.open_r(tx);
     });
+
 }
 
 
