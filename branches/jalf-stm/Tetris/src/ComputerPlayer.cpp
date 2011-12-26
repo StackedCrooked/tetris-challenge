@@ -387,6 +387,8 @@ void ComputerPlayer::Impl::move()
             const Block & activeBlock = game.activeBlock(tx);
             const Block & originalBlock = mPrecalculated.front().originalBlock();
             Assert(activeBlock.type() == originalBlock.type());
+            (void)activeBlock;
+            (void)originalBlock;
 
             Move(tx, game, mPrecalculated.front().originalBlock());
             unsigned newId = game.gameStateId(tx);
