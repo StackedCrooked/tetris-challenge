@@ -19,21 +19,26 @@ public:
 
     GameState commit(const Block & inBlock) const;
 
-    inline unsigned id() const { return mId; }
+    inline unsigned id() const
+    { return mId; }
 
-    const Grid & grid() const;
+    inline const Grid & grid() const
+    { return mGrid; }
 
     // Modifies the grid bypassing Tetris rules.
     // This is required to enable certain multiplayer features.
     void setGrid(const Grid & inGrid);
 
     // Returns true if setGrid() has been called on this object.
-    bool tainted() const;
+    inline bool tainted() const
+    { return mTainted; }
 
     // The Block that was used in the commit(...) call.
-    const Block & originalBlock() const;
+    inline const Block & originalBlock() const
+    { return mOriginalBlock; }
 
-    bool isGameOver() const;
+    inline bool isGameOver() const
+    { return mIsGameOver; }
 
     // Checks if a Block can be placed at a given location
     // without overlapping with previously placed blocks.
@@ -41,7 +46,6 @@ public:
 
     inline bool checkPositionValid(const Block & inBlock) const
     { return checkPositionValid(inBlock, inBlock.row(), inBlock.column()); }
-
 
     inline int numLines() const
     { return mStats.mNumLines; }
@@ -61,9 +65,11 @@ public:
     inline int score() const
     { return mStats.score(); }
 
-    inline int firstOccupiedRow() const { return mFirstOccupiedRow; }
+    inline int firstOccupiedRow() const
+    { return mFirstOccupiedRow; }
 
-    inline int currentHeight() const { return mGrid.rowCount() - mFirstOccupiedRow; }
+    inline int currentHeight() const
+    { return mGrid.rowCount() - mFirstOccupiedRow; }
 
 private:
     void solidifyBlock(const Block & inBlock);
