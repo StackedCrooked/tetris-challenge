@@ -74,13 +74,9 @@ public:
 
     void setStartingLevel(int inLevel);
 
-    inline stm::shared<Block> & activeBlock() const { return mActiveBlock; }
-
     const Grid & gameGrid() const;
 
     BlockTypes getFutureBlocks(std::size_t inCount) const;
-
-    //void getFutureBlocksWithOffset(std::size_t inOffset, std::size_t inCount, BlockTypes & outBlocks) const;
 
     const GameState & gameState() const;
 
@@ -104,8 +100,12 @@ private:
 
     boost::scoped_ptr<BlockFactory> mBlockFactory;
     boost::scoped_ptr<BlockFactory> mGarbageFactory;
+
+public:
     mutable stm::shared<Block> mActiveBlock;
     mutable stm::shared<BlockTypes> mBlockTypes;
+
+private:
     int mStartingLevel;
     bool mPaused;
 

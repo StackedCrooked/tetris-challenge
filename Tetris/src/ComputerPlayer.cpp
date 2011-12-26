@@ -309,7 +309,7 @@ void ComputerPlayer::Impl::updateComputerBlockMoveSpeed()
 bool Move(Game & ioGame, const Block & targetBlock)
 {
     return stm::atomic<bool>([&](stm::transaction & tx) {
-        const Block & block = ioGame.activeBlock().open_r(tx);
+        const Block & block = ioGame.mActiveBlock.open_r(tx);
         Assert(block.type() == targetBlock.type());
 
         // Try rotation first, if it fails then skip rotation and try horizontal move
