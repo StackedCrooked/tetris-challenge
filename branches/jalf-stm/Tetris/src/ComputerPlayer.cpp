@@ -88,8 +88,10 @@ public:
     // Return a copy!
     GameState previousGameState()
     {
-        return mPrecalculated.empty() ? mComputerPlayer->game()->game().lock()->gameState()
-                                      : mPrecalculated.back();
+        return stm::atomic<GameState>([&](stm::transaction & tx){
+            return mPrecalculated.empty() ? mComputerPlayer->game()->game().lock()->gameState(tx)
+                                          : mPrecalculated.back();
+        });
     }
 
     Block previousActiveBlock()
@@ -306,60 +308,58 @@ void ComputerPlayer::Impl::updateComputerBlockMoveSpeed()
 }
 
 
-bool Move(Game & ioGame, const Block & targetBlock)
+bool Move(stm::transaction & tx, Game & ioGame, const Block & targetBlock)
 {
-    return stm::atomic<bool>([&](stm::transaction & tx) {
-        const Block & block = ioGame.mActiveBlock.open_r(tx);
-        Assert(block.type() == targetBlock.type());
+    const Block & block = ioGame.activeBlock(tx);
+    Assert(block.type() == targetBlock.type());
 
-        // Try rotation first, if it fails then skip rotation and try horizontal move
-        if (block.rotation() != targetBlock.rotation())
+    // Try rotation first, if it fails then skip rotation and try horizontal move
+    if (block.rotation() != targetBlock.rotation())
+    {
+        if (ioGame.rotate(tx))
         {
-            if (ioGame.rotate())
-            {
-                return true;
-            }
-            // else: try left or right move below
-        }
-
-        if (block.column() < targetBlock.column())
-        {
-            if (!ioGame.move(MoveDirection_Right))
-            {
-                // Damn we can't move this block anymore.
-                // Give up on this block.
-                ioGame.dropAndCommit();
-                return false;
-            }
             return true;
         }
+        // else: try left or right move below
+    }
 
-        if (block.column() > targetBlock.column())
+    if (block.column() < targetBlock.column())
+    {
+        if (!ioGame.move(tx, MoveDirection_Right))
         {
-            if (!ioGame.move(MoveDirection_Left))
-            {
-                // Damn we can't move this block anymore.
-                // Give up on this block.
-                ioGame.dropAndCommit();
-                return false;
-            }
-            return true;
+            // Damn we can't move this block anymore.
+            // Give up on this block.
+            ioGame.dropAndCommit(tx);
+            return false;
         }
+        return true;
+    }
 
-        // Horizontal position is OK.
-        // Retry rotation again. If it fails here then drop the block.
-        if (block.rotation() != targetBlock.rotation())
+    if (block.column() > targetBlock.column())
+    {
+        if (!ioGame.move(tx, MoveDirection_Left))
         {
-            if (!ioGame.rotate())
-            {
-                ioGame.dropAndCommit();
-                return false;
-            }
-            return true;
+            // Damn we can't move this block anymore.
+            // Give up on this block.
+            ioGame.dropAndCommit(tx);
+            return false;
         }
+        return true;
+    }
 
-        return ioGame.move(MoveDirection_Down);
-    });
+    // Horizontal position is OK.
+    // Retry rotation again. If it fails here then drop the block.
+    if (block.rotation() != targetBlock.rotation())
+    {
+        if (!ioGame.rotate(tx))
+        {
+            ioGame.dropAndCommit(tx);
+            return false;
+        }
+        return true;
+    }
+
+    return ioGame.move(tx, MoveDirection_Down);
 }
 
 
@@ -372,25 +372,27 @@ void ComputerPlayer::Impl::move()
 
     FUTILE_LOCK(Game & game, mComputerPlayer->game()->game())
     {
-        unsigned oldId = game.gameStateId();
-        unsigned predictedId = mPrecalculated.front().id();
-        if (oldId >= predictedId)
-        {
-            // Precalculated blocks have been invalidated.
-            LogInfo("Precalculated invalidated.");
-            mPrecalculated.clear();
-            return;
-        }
+        stm::atomic([&](stm::transaction & tx) {
+            unsigned oldId = game.gameStateId(tx);
+            unsigned predictedId = mPrecalculated.front().id();
+            if (oldId >= predictedId)
+            {
+                // Precalculated blocks have been invalidated.
+                LogInfo("Precalculated invalidated.");
+                mPrecalculated.clear();
+                return;
+            }
 
-        Assert(predictedId == oldId + 1); // check sync
+            Assert(predictedId == oldId + 1); // check sync
 
-        Move(game, mPrecalculated.front().originalBlock());
-        unsigned newId = game.gameStateId();
-        Assert(oldId == newId || oldId + 1 == newId);
-        if (newId > oldId)
-        {
-            mPrecalculated.erase(mPrecalculated.begin());
-        }
+            Move(tx, game, mPrecalculated.front().originalBlock());
+            unsigned newId = game.gameStateId(tx);
+            Assert(oldId == newId || oldId + 1 == newId);
+            if (newId > oldId)
+            {
+                mPrecalculated.erase(mPrecalculated.begin());
+            }
+        });
     }
 }
 
@@ -534,18 +536,20 @@ void ComputerPlayer::Impl::onWorking()
 
     FUTILE_LOCK(Game & game, simpleGame.game())
     {
-        if (previousGameState().id() < game.gameState().id())
-        {
-            // The calculated results have become invalid. Start over.
-            mReset = true;
-            return;
-        }
+        stm::atomic([&](stm::transaction & tx) {
+            if (previousGameState().id() < game.gameState(tx).id())
+            {
+                // The calculated results have become invalid. Start over.
+                mReset = true;
+                return;
+            }
 
-        if (mPrecalculated.empty())
-        {
-            mStop = true;
-            return;
-        }
+            if (mPrecalculated.empty())
+            {
+                mStop = true;
+                return;
+            }
+        });
     }
 
     // Keep working
