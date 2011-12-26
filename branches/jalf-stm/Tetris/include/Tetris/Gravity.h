@@ -23,7 +23,7 @@ class Gravity;
 class Gravity
 {
 public:
-    Gravity(const Futile::ThreadSafe<Game> & inGame);
+    Gravity(Game & inGame);
 
     ~Gravity();
 

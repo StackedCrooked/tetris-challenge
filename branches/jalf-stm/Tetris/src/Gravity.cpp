@@ -35,9 +35,9 @@ extern const std::size_t cMaxLevel = sizeof(sIntervals)/sizeof(int) - 1;
 
 struct Gravity::Impl : boost::noncopyable
 {
-    Impl(Gravity * inGravity, ThreadSafe<Game> inThreadSafeGame) :
+    Impl(Gravity * inGravity, Game & inGame) :
         mGravity(inGravity),
-        mThreadSafeGame(inThreadSafeGame),
+        mGame(inGame),
         mLevel(0),
         mStopwatch()
     {
@@ -61,18 +61,18 @@ struct Gravity::Impl : boost::noncopyable
     }
 
     Gravity * mGravity;
-    ThreadSafe<Game> mThreadSafeGame;
+    Game & mGame;
     std::size_t mLevel;
     Futile::Stopwatch mStopwatch;
 };
 
 
-Gravity::Gravity(const ThreadSafe<Game> & inThreadSafeGame) :
-    mImpl(new Impl(this, inThreadSafeGame)),
+Gravity::Gravity(Game & inGame) :
+    mImpl(new Impl(this, inGame)),
     mTimer()
 {
     stm::atomic([&](stm::transaction & tx){
-        mTimer.reset(new Timer(sIntervals[inThreadSafeGame.lock()->level(tx)]));
+        mTimer.reset(new Timer(sIntervals[inGame.level(tx)]));
         mTimer->start(boost::bind(&Gravity::onTimerEvent, this));
     });
 }
@@ -113,30 +113,27 @@ void Gravity::Impl::onTimerEvent()
         if (mStopwatch.elapsedMs() > intervalMs())
         {
             mStopwatch.restart();
-            FUTILE_LOCK(Game & game, mThreadSafeGame)
-            {
                 // If our block was "caught" by the sudden appearance of new blocks, then we solidify it in that state.
-                stm::atomic([&](stm::transaction & tx) {
-                    const Block & block = game.activeBlock(tx);
-                    if (!game.gameState(tx).checkPositionValid(block))
-                    {
-                         game.move(tx, MoveDirection_Down);
-                         return;
-                    }
+            stm::atomic([&](stm::transaction & tx) {
+                const Block & block = mGame.activeBlock(tx);
+                if (!mGame.gameState(tx).checkPositionValid(block))
+                {
+                     mGame.move(tx, MoveDirection_Down);
+                     return;
+                }
 
-                    if (game.isGameOver(tx) || game.isPaused(tx))
-                    {
-                        return;
-                    }
+                if (mGame.isGameOver(tx) || mGame.isPaused(tx))
+                {
+                    return;
+                }
 
-                    game.move(tx, MoveDirection_Down);
-                    mLevel = game.level(tx);
-                    if (mLevel > cMaxLevel)
-                    {
-                        mLevel = cMaxLevel;
-                    }
-                });
-            }
+                mGame.move(tx, MoveDirection_Down);
+                mLevel = mGame.level(tx);
+                if (mLevel > cMaxLevel)
+                {
+                    mLevel = cMaxLevel;
+                }
+            });
         }
         if (mLevel != oldLevel)
         {

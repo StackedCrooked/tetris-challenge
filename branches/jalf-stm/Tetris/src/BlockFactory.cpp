@@ -59,12 +59,6 @@ BlockFactory::BlockFactory(unsigned inBagSize) :
 }
 
 
-BlockFactory::~BlockFactory()
-{
-    mImpl.reset();
-}
-
-
 BlockType BlockFactory::getNext()
 {
     BlockType result = stm::atomic<BlockType>([&](stm::transaction & tx) {

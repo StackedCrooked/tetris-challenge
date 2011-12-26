@@ -98,8 +98,8 @@ public:
 private:
     friend class ComputerPlayer;
 
-    Futile::ThreadSafe<Game> game();
-        
+    Game & game();
+
     struct Impl;
     boost::shared_ptr<Impl> mImpl;
 };
