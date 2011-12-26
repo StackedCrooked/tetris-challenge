@@ -19,7 +19,7 @@ public:
     // @param n Determines how many times all block types appear in the bag.
     BlockFactory(unsigned n = 1);
 
-    virtual ~BlockFactory();
+    ~BlockFactory();
 
     // Returns a random block type.
     virtual BlockType getNext();

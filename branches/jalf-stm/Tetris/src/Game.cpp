@@ -39,9 +39,9 @@ Block CreateDefaultBlock(BlockType inBlockType, std::size_t inNumColumns)
 
 
 Game::Game(std::size_t inNumRows, std::size_t inNumColumns) :
-    mBlockFactory(new BlockFactory),
-    mGarbageFactory(new BlockFactory),
-    mActiveBlock(CreateDefaultBlock(mBlockFactory->getNext(), inNumColumns)),
+    mBlockFactory(),
+    mGarbageFactory(),
+    mActiveBlock(CreateDefaultBlock(mBlockFactory.getNext(), inNumColumns)),
     mBlockTypes(BlockTypes()),
     mStartingLevel(-1),
     mPaused(false),
@@ -55,8 +55,6 @@ Game::Game(std::size_t inNumRows, std::size_t inNumColumns) :
 
 Game::~Game()
 {
-    mBlockFactory.reset();
-    mGarbageFactory.reset();
 }
 
 
@@ -79,7 +77,7 @@ void Game::commit(stm::transaction & tx, const Block & inBlock)
 }
 
 
-std::vector<BlockType> Game::getGarbageRow(stm::transaction & tx) const
+std::vector<BlockType> Game::getGarbageRow(stm::transaction & tx)
 {
     BlockTypes result(columnCount(tx), BlockType_Nil);
 
@@ -97,7 +95,7 @@ std::vector<BlockType> Game::getGarbageRow(stm::transaction & tx) const
         {
             if (result[idx] == BlockType_Nil && rand.nextBool())
             {
-                result[idx] = mGarbageFactory->getNext();
+                result[idx] = mGarbageFactory.getNext();
                 if (++count >= cMaxCount)
                 {
                     break;
@@ -177,8 +175,32 @@ void Game::supplyBlocks(stm::transaction & tx)
     BlockTypes & blocks = mBlockTypes.open_rw(tx);
     while (blocks.size() <= gameStateId(tx))
     {
-        blocks.push_back(mBlockFactory->getNext());
+        blocks.push_back(mBlockFactory.getNext());
     }
+}
+
+
+void Game::setPaused(stm::transaction & tx, bool inPause)
+{
+    mPaused.open_rw(tx) = inPause;
+}
+
+
+bool Game::isPaused(stm::transaction & tx) const
+{
+    return mPaused.open_r(tx);
+}
+
+
+bool Game::isGameOver(stm::transaction & tx) const
+{
+    return mGameState.open_r(tx).isGameOver();
+}
+
+
+const Block & Game::activeBlock(stm::transaction & tx) const
+{
+    return mActiveBlock.open_r(tx);
 }
 
 
@@ -225,7 +247,7 @@ void Game::reserveBlocks(stm::transaction & tx, std::size_t inCount)
     BlockTypes & blocks = mBlockTypes.open_rw(tx);
     while (blocks.size() <= inCount)
     {
-        blocks.push_back(mBlockFactory->getNext());
+        blocks.push_back(mBlockFactory.getNext());
     }
 }
 
@@ -236,7 +258,7 @@ const Grid & Game::gameGrid(stm::transaction & tx) const
 }
 
 
-BlockTypes Game::getFutureBlocks(stm::transaction & tx, std::size_t inCount) const
+BlockTypes Game::getFutureBlocks(stm::transaction & tx, std::size_t inCount)
 {
     const BlockTypes & cBlockTypes = mBlockTypes.open_r(tx);
     if (cBlockTypes.size() >= gameStateId(tx) + inCount)
@@ -253,7 +275,7 @@ BlockTypes Game::getFutureBlocks(stm::transaction & tx, std::size_t inCount) con
     BlockTypes & blockTypes = mBlockTypes.open_rw(tx);
     while (blockTypes.size() < gameStateId(tx) + inCount)
     {
-        blockTypes.push_back(mBlockFactory->getNext());
+        blockTypes.push_back(mBlockFactory.getNext());
         Assert(blockTypes.back() <= 28);
     }
     Assert(blockTypes.size() == gameStateId(tx) + inCount);
@@ -267,21 +289,6 @@ BlockTypes Game::getFutureBlocks(stm::transaction & tx, std::size_t inCount) con
     Assert(result.size() == inCount);
     return result;
 }
-
-
-//void Game::getFutureBlocksWithOffset(std::size_t inOffset, std::size_t inCount, BlockTypes & outBlocks) const
-//{
-//    // Make sure we have all blocks we need.
-//    while (mBlocks.size() < gameStateId(tx) + inOffset + inCount)
-//    {
-//        mBlocks.push_back(mBlockFactory->getNext());
-//    }
-
-//    for (std::size_t idx = 0; idx < inCount; ++idx)
-//    {
-//        outBlocks.push_back(mBlocks[inOffset + idx]);
-//    }
-//}
 
 
 bool Game::rotate(stm::transaction & tx)
@@ -323,6 +330,12 @@ void Game::dropWithoutCommit(stm::transaction & tx)
 int Game::level(stm::transaction & tx) const
 {
     return std::max<int>(gameState(tx).numLines() / 10, mStartingLevel.open_r(tx));
+}
+
+
+void Game::setStartingLevel(stm::transaction & tx, int inLevel)
+{
+    mStartingLevel.open_rw(tx) = inLevel;
 }
 
 
