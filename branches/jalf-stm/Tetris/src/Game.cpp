@@ -205,19 +205,6 @@ void Game::supplyBlocks()
 }
 
 
-void Game::setPaused(bool inPaused)
-{
-    LogInfo(SS() << "Game::setPaused: " << inPaused);
-    mPaused = inPaused;
-}
-
-
-bool Game::isPaused() const
-{
-    return mPaused;
-}
-
-
 bool Game::isGameOver() const
 {
     return gameState().isGameOver();

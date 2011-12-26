@@ -171,7 +171,9 @@ void SimpleGame::setPaused(bool inPaused)
 
 bool SimpleGame::isPaused() const
 {
-    return mImpl->mGame.lock()->isPaused();
+    return stm::atomic<bool>([&](stm::transaction & tx) {
+        return mImpl->mGame.lock()->isPaused(tx);
+    });
 }
 
 

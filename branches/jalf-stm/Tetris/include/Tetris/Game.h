@@ -48,9 +48,22 @@ public:
     // Threaded!
     boost::signals2::signal<void(int)> LinesCleared;
 
-    void setPaused(bool inPause);
+    inline void setPaused(bool inPause)
+    {
+        stm::atomic([&](stm::transaction & tx){
+            setPaused(tx, inPause);
+        });
+    }
 
-    bool isPaused() const;
+    inline void setPaused(stm::transaction & tx, bool inPause)
+    {
+        mPaused.open_rw(tx) = inPause;
+    }
+
+    inline bool isPaused(stm::transaction & tx) const
+    {
+        return mPaused.open_r(tx);
+    }
 
     bool isGameOver() const;
 
@@ -107,7 +120,7 @@ public:
 
 private:
     int mStartingLevel;
-    bool mPaused;
+    mutable stm::shared<bool> mPaused;
 
     // In order to avoid flooding the queue in certain situations.
     bool mMuteEvents;
