@@ -1,6 +1,7 @@
 STM Version
 -----------
 - Use STM in TreeRowInfos
+- Use Valgrind memcheck, helgrind
 - There is something wrong with the block types: BlockType_I appears twice.
 - Find more places to use STM.
 - Redesign Model, MultiplayerGame, Player classes.

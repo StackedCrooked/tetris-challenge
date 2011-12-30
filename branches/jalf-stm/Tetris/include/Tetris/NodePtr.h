@@ -22,4 +22,3 @@ typedef std::multiset<NodePtr, GameStateComparator> ChildNodes;
 
 
 #endif // TETRIS_NODEPTR_H
-

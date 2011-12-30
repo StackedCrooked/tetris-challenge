@@ -8,6 +8,11 @@
 #include <ctime>
 
 
+#ifndef TETRIS_BLOCKFACTORY_RANDOMIZE
+#define TETRIS_BLOCKFACTORY_RANDOMIZE 0 // Temporary disable randomization
+#endif
+
+
 namespace Tetris {
 
 
@@ -29,7 +34,9 @@ struct BlockFactory::Impl : boost::noncopyable
             }
         }
         Assert(result.size() == n * cBlockTypeCount);
-        //std::random_shuffle(result.begin(), result.end());
+        #if TETRIS_BLOCKFACTORY_RANDOMIZE
+        std::random_shuffle(result.begin(), result.end());
+        #endif
         return result;
     }
 
@@ -72,7 +79,9 @@ BlockType BlockFactory::getNext()
         {
             // Reshuffle the bag.
             BlockTypes & bag = mImpl->mBag.open_rw(tx);
-            //std::random_shuffle(bag.begin(), bag.end());
+            #if TETRIS_BLOCKFACTORY_RANDOMIZE
+            std::random_shuffle(bag.begin(), bag.end());
+            #endif
             return bag[currentIndex = 0];
         }
     });
