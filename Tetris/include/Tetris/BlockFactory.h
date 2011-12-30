@@ -4,6 +4,7 @@
 
 #include "Tetris/BlockType.h"
 #include "Futile/Threading.h"
+#include "stm/transaction.hpp"
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
 
@@ -12,7 +13,7 @@ namespace Tetris {
 
 
 // The default block factory
-class BlockFactory : boost::noncopyable
+class BlockFactory
 {
 public:
     // The size of the bag of blocks that shuffled and taken from.
@@ -20,7 +21,10 @@ public:
     BlockFactory(unsigned n = 1);
 
     // Returns a random block type.
-    virtual BlockType getNext();
+    BlockType getNext(stm::transaction & tx);
+
+    // Returns a random block type.
+    BlockType getNextWithoutTransaction();
 
 private:
     struct Impl;

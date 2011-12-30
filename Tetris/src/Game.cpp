@@ -41,7 +41,7 @@ Block CreateDefaultBlock(BlockType inBlockType, std::size_t inNumColumns)
 Game::Game(std::size_t inNumRows, std::size_t inNumColumns) :
     mBlockFactory(),
     mGarbageFactory(),
-    mActiveBlock(CreateDefaultBlock(mBlockFactory.getNext(), inNumColumns)),
+    mActiveBlock(CreateDefaultBlock(mBlockFactory.getNextWithoutTransaction(), inNumColumns)),
     mBlockTypes(BlockTypes()),
     mStartingLevel(-1),
     mPaused(false),
@@ -95,7 +95,7 @@ std::vector<BlockType> Game::getGarbageRow(stm::transaction & tx)
         {
             if (result[idx] == BlockType_Nil && rand.nextBool())
             {
-                result[idx] = mGarbageFactory.getNext();
+                result[idx] = mGarbageFactory.getNext(tx);
                 if (++count >= cMaxCount)
                 {
                     break;
@@ -243,7 +243,7 @@ BlockTypes Game::getFutureBlocks(stm::transaction & tx, std::size_t inCount)
     BlockTypes & blockTypes = mBlockTypes.open_rw(tx);
     while (blockTypes.size() < gameStateId(tx) + inCount)
     {
-        blockTypes.push_back(mBlockFactory.getNext());
+        blockTypes.push_back(mBlockFactory.getNext(tx));
         Assert(blockTypes.back() <= 28);
 
         #if TETRIS_BLOCKFACTORY_RANDOMIZE != 1

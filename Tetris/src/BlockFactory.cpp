@@ -66,28 +66,32 @@ BlockFactory::BlockFactory(unsigned inBagSize) :
 }
 
 
-BlockType BlockFactory::getNext()
+BlockType BlockFactory::getNextWithoutTransaction()
 {
-    BlockType result = stm::atomic<BlockType>([&](stm::transaction & tx) {
-        unsigned & currentIndex = mImpl->mCurrentIndex.open_rw(tx);
-        if (currentIndex < mImpl->mBagSize)
-        {
-            const BlockTypes & rBag = mImpl->mBag.open_r(tx);
-            return rBag[currentIndex++];
-        }
-        else
-        {
-            // Reshuffle the bag.
-            BlockTypes & rwBag = mImpl->mBag.open_rw(tx);
-            #if TETRIS_BLOCKFACTORY_RANDOMIZE
-            std::random_shuffle(bag.begin(), bag.end());
-            #endif
-            currentIndex = 0;
-            return rwBag[currentIndex++];
-        }
+    return stm::atomic<BlockType>([&](stm::transaction & tx) {
+        return getNext(tx);
     });
-    Assert(result >= BlockType_Begin && result < BlockType_End);
-    return result;
+}
+
+
+BlockType BlockFactory::getNext(stm::transaction & tx)
+{
+    unsigned & currentIndex = mImpl->mCurrentIndex.open_rw(tx);
+    if (currentIndex < mImpl->mBagSize)
+    {
+        const BlockTypes & rBag = mImpl->mBag.open_r(tx);
+        return rBag[currentIndex++];
+    }
+    else
+    {
+        // Reshuffle the bag.
+        BlockTypes & rwBag = mImpl->mBag.open_rw(tx);
+        #if TETRIS_BLOCKFACTORY_RANDOMIZE
+        std::random_shuffle(bag.begin(), bag.end());
+        #endif
+        currentIndex = 0;
+        return rwBag[currentIndex++];
+    }
 }
 
 
