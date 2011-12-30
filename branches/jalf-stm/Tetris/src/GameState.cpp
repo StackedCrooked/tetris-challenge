@@ -15,7 +15,7 @@ namespace Tetris {
 
 GameState::GameState(unsigned inRowCount, unsigned inColumnCount) :
     mGrid(inRowCount, inColumnCount, BlockType_Nil),
-    mOriginalBlock(BlockType_Nil, Rotation(0), Row(0), Column(0)),
+    mOriginalBlock(BlockType_Z, Rotation(0), Row(0), Column(0)),
     mIsGameOver(false),
     mFirstOccupiedRow(inRowCount),
     mStats(),

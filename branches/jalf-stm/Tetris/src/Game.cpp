@@ -164,22 +164,6 @@ void Game::applyLinePenalty(stm::transaction & tx, std::size_t inLineCount)
 }
 
 
-void Game::supplyBlocks(stm::transaction & tx)
-{
-    const BlockTypes & cBlocks = mBlockTypes.open_r(tx);
-    if (cBlocks.size() > gameStateId(tx))
-    {
-        return;
-    }
-
-    BlockTypes & blocks = mBlockTypes.open_rw(tx);
-    while (blocks.size() <= gameStateId(tx))
-    {
-        blocks.push_back(mBlockFactory.getNext());
-    }
-}
-
-
 void Game::setPaused(stm::transaction & tx, bool inPause)
 {
     mPaused.open_rw(tx) = inPause;
@@ -236,22 +220,6 @@ bool Game::canMove(stm::transaction & tx, Direction inDirection)
 }
 
 
-void Game::reserveBlocks(stm::transaction & tx, std::size_t inCount)
-{
-    const BlockTypes & cBlocks = mBlockTypes.open_r(tx);
-    if (cBlocks.size() >= inCount)
-    {
-        return;
-    }
-
-    BlockTypes & blocks = mBlockTypes.open_rw(tx);
-    while (blocks.size() <= inCount)
-    {
-        blocks.push_back(mBlockFactory.getNext());
-    }
-}
-
-
 const Grid & Game::gameGrid(stm::transaction & tx) const
 {
     return gameState(tx).grid();
@@ -277,6 +245,13 @@ BlockTypes Game::getFutureBlocks(stm::transaction & tx, std::size_t inCount)
     {
         blockTypes.push_back(mBlockFactory.getNext());
         Assert(blockTypes.back() <= 28);
+
+        #if TETRIS_BLOCKFACTORY_RANDOMIZE != 1
+        if (blockTypes.size() >= 2)
+        {
+            Assert(blockTypes[blockTypes.size() - 2] != blockTypes[blockTypes.size() - 1]);
+        }
+        #endif
     }
     Assert(blockTypes.size() == gameStateId(tx) + inCount);
 
@@ -381,7 +356,6 @@ bool Game::move(stm::transaction & tx, Direction inDirection)
     Assert(linesCleared >= 0);
     (void)linesCleared;
 
-    supplyBlocks(tx);
     Block & assignActiveBlock = mActiveBlock.open_rw(tx);
     const GameState & newGameState = this->gameState(tx);
     assignActiveBlock = CreateDefaultBlock(mBlockTypes.open_r(tx)[newGameState.id()], newGameState.grid().columnCount());

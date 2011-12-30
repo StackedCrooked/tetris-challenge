@@ -72,17 +72,18 @@ BlockType BlockFactory::getNext()
         unsigned & currentIndex = mImpl->mCurrentIndex.open_rw(tx);
         if (currentIndex < mImpl->mBagSize)
         {
-            const BlockTypes & bag = mImpl->mBag.open_r(tx);
-            return bag[currentIndex++];
+            const BlockTypes & rBag = mImpl->mBag.open_r(tx);
+            return rBag[currentIndex++];
         }
         else
         {
             // Reshuffle the bag.
-            BlockTypes & bag = mImpl->mBag.open_rw(tx);
+            BlockTypes & rwBag = mImpl->mBag.open_rw(tx);
             #if TETRIS_BLOCKFACTORY_RANDOMIZE
             std::random_shuffle(bag.begin(), bag.end());
             #endif
-            return bag[currentIndex = 0];
+            currentIndex = 0;
+            return rwBag[currentIndex++];
         }
     });
     Assert(result >= BlockType_Begin && result < BlockType_End);
