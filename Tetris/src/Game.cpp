@@ -35,21 +35,36 @@ Block CreateDefaultBlock(BlockType inBlockType, std::size_t inNumColumns)
 }
 
 
+BlockTypes GenerateBlockTypes(unsigned n)
+{
+    BlockTypes result;
+    BlockFactory blockFactory;
+    for (std::size_t idx = 0; idx < cBlockTypeCount * n; ++idx)
+    {
+        result.push_back(blockFactory.getNext());
+    }
+    return result;
+}
+
+
 } // anonymous namespace
 
 
+Game::CircularBlockTypes::CircularBlockTypes(unsigned n) :
+    mBlockTypes(GenerateBlockTypes(n))
+{
+}
+
+
 Game::Game(std::size_t inNumRows, std::size_t inNumColumns) :
-    mBlockFactory(),
-    mGarbageFactory(),
-    mActiveBlock(CreateDefaultBlock(mBlockFactory.getNextWithoutTransaction(), inNumColumns)),
-    mBlockTypes(BlockTypes()),
+    mBlockTypes(1),
+    mGarbage(1),
+    mGarbageIndex(0),
+    mActiveBlock(CreateDefaultBlock(mBlockTypes.get(0), inNumColumns)),
     mStartingLevel(-1),
     mPaused(false),
     mGameState(GameState(inNumRows, inNumColumns))
 {
-    stm::atomic([&](stm::transaction & tx) {
-        mBlockTypes.open_rw(tx).push_back(mActiveBlock.open_r(tx).type());
-    });
 }
 
 
@@ -80,6 +95,7 @@ void Game::commit(stm::transaction & tx, const Block & inBlock)
 std::vector<BlockType> Game::getGarbageRow(stm::transaction & tx)
 {
     BlockTypes result(columnCount(tx), BlockType_Nil);
+    BlockTypes::size_type & garbageIndex = mGarbageIndex.open_rw(tx);
 
     static Poco::UInt32 fSeed = static_cast<Poco::UInt32>(time(0) % Poco::UInt32(-1));
     fSeed = (fSeed + 1) % Poco::UInt32(-1);
@@ -95,7 +111,8 @@ std::vector<BlockType> Game::getGarbageRow(stm::transaction & tx)
         {
             if (result[idx] == BlockType_Nil && rand.nextBool())
             {
-                result[idx] = mGarbageFactory.getNext(tx);
+                result[idx] = mGarbage.get(garbageIndex++);
+
                 if (++count >= cMaxCount)
                 {
                     break;
@@ -228,37 +245,11 @@ const Grid & Game::gameGrid(stm::transaction & tx) const
 
 BlockTypes Game::getFutureBlocks(stm::transaction & tx, std::size_t inCount)
 {
-    const BlockTypes & cBlockTypes = mBlockTypes.open_r(tx);
-    if (cBlockTypes.size() >= gameStateId(tx) + inCount)
-    {
-        BlockTypes result;
-        for (std::size_t idx = 0; idx < inCount; ++idx)
-        {
-            result.push_back(cBlockTypes[gameStateId(tx) + idx]);
-            Assert(result.back() <= 28);
-        }
-        return result;
-    }
-
-    BlockTypes & blockTypes = mBlockTypes.open_rw(tx);
-    while (blockTypes.size() < gameStateId(tx) + inCount)
-    {
-        blockTypes.push_back(mBlockFactory.getNext(tx));
-        Assert(blockTypes.back() <= 28);
-
-        #if TETRIS_BLOCKFACTORY_RANDOMIZE != 1
-        if (blockTypes.size() >= 2)
-        {
-            Assert(blockTypes[blockTypes.size() - 2] != blockTypes[blockTypes.size() - 1]);
-        }
-        #endif
-    }
-    Assert(blockTypes.size() == gameStateId(tx) + inCount);
-
     BlockTypes result;
+
     for (std::size_t idx = 0; idx < inCount; ++idx)
     {
-        result.push_back(blockTypes[gameStateId(tx) + idx]);
+        result.push_back(mBlockTypes.get(gameStateId(tx) + idx));
         Assert(result.back() <= 28);
     }
     Assert(result.size() == inCount);
@@ -358,7 +349,8 @@ bool Game::move(stm::transaction & tx, Direction inDirection)
 
     Block & assignActiveBlock = mActiveBlock.open_rw(tx);
     const GameState & newGameState = this->gameState(tx);
-    assignActiveBlock = CreateDefaultBlock(mBlockTypes.open_r(tx)[newGameState.id()], newGameState.grid().columnCount());
+
+    assignActiveBlock = CreateDefaultBlock(mBlockTypes.get(newGameState.id()), newGameState.grid().columnCount());
     return false;
 }
 

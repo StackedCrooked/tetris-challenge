@@ -4,7 +4,6 @@
 
 #include "Tetris/BlockType.h"
 #include "Futile/Threading.h"
-#include "stm/transaction.hpp"
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
 
@@ -21,10 +20,7 @@ public:
     BlockFactory(unsigned n = 1);
 
     // Returns a random block type.
-    BlockType getNext(stm::transaction & tx);
-
-    // Returns a random block type.
-    BlockType getNextWithoutTransaction();
+    BlockType getNext();
 
 private:
     struct Impl;
