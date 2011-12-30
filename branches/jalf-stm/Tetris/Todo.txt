@@ -7,3 +7,8 @@ STM Version
 - Redesign Model, MultiplayerGame, Player classes.
 v Fix the working of the program
 v Improve encapsulation by obeying the Law of Demeter
+
+
+STM Notes
+---------
+stm::shared<std::string> s(std::string()); // a little weird
