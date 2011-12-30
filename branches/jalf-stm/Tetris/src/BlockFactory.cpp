@@ -52,8 +52,8 @@ struct BlockFactory::Impl : boost::noncopyable
     {
     }
 
-    stm::shared<BlockTypes> mBag;
-    stm::shared<unsigned> mCurrentIndex;
+    BlockTypes mBag;
+    unsigned mCurrentIndex;
     const unsigned mBagSize;
     const seed_t mSeed;
 };
@@ -66,31 +66,20 @@ BlockFactory::BlockFactory(unsigned inBagSize) :
 }
 
 
-BlockType BlockFactory::getNextWithoutTransaction()
+BlockType BlockFactory::getNext()
 {
-    return stm::atomic<BlockType>([&](stm::transaction & tx) {
-        return getNext(tx);
-    });
-}
-
-
-BlockType BlockFactory::getNext(stm::transaction & tx)
-{
-    unsigned & currentIndex = mImpl->mCurrentIndex.open_rw(tx);
-    if (currentIndex < mImpl->mBagSize)
+    if (mImpl->mCurrentIndex < mImpl->mBagSize)
     {
-        const BlockTypes & rBag = mImpl->mBag.open_r(tx);
-        return rBag[currentIndex++];
+        return mImpl->mBag[mImpl->mCurrentIndex++];
     }
     else
     {
         // Reshuffle the bag.
-        BlockTypes & rwBag = mImpl->mBag.open_rw(tx);
         #if TETRIS_BLOCKFACTORY_RANDOMIZE
         std::random_shuffle(bag.begin(), bag.end());
         #endif
-        currentIndex = 0;
-        return rwBag[currentIndex++];
+        mImpl->mCurrentIndex = 0;
+        return mImpl->mBag[mImpl->mCurrentIndex++];
     }
 }
 

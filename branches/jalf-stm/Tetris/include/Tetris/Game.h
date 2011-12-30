@@ -89,10 +89,29 @@ private:
     void setGrid(stm::transaction & tx, const Grid & inGrid);
     std::vector<BlockType> getGarbageRow(stm::transaction & tx);
 
-    BlockFactory mBlockFactory;
-    BlockFactory mGarbageFactory;
+    class CircularBlockTypes
+    {
+    public:
+        CircularBlockTypes(unsigned n);
+
+        inline BlockType get(std::size_t inIndex) const
+        {
+            return mBlockTypes[inIndex % mBlockTypes.size()];
+        }
+
+        inline BlockTypes::size_type size() const
+        {
+            return mBlockTypes.size();
+        }
+
+    private:
+        BlockTypes mBlockTypes;
+    };
+
+    const CircularBlockTypes mBlockTypes;
+    const CircularBlockTypes mGarbage;
+    mutable stm::shared<BlockTypes::size_type> mGarbageIndex;
     mutable stm::shared<Block> mActiveBlock;
-    mutable stm::shared<BlockTypes> mBlockTypes;
     mutable stm::shared<int> mStartingLevel;
     mutable stm::shared<bool> mPaused;
     mutable stm::shared<GameState> mGameState;
