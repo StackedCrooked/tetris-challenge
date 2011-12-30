@@ -87,8 +87,6 @@ public:
 private:
     void commit(stm::transaction & tx, const Block & inBlock);
     void setGrid(stm::transaction & tx, const Grid & inGrid);
-    void reserveBlocks(stm::transaction & tx, std::size_t inCount);
-    void supplyBlocks(stm::transaction & tx);
     std::vector<BlockType> getGarbageRow(stm::transaction & tx);
 
     BlockFactory mBlockFactory;
