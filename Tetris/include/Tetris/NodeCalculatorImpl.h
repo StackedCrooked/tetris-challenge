@@ -11,6 +11,7 @@
 #include "Futile/Logging.h"
 #include "Futile/MakeString.h"
 #include "Futile/Assert.h"
+#include "stm.hpp"
 #include <cstddef>
 #include <memory>
 #include <vector>
@@ -34,33 +35,33 @@ public:
 
     virtual ~NodeCalculatorImpl() = 0;
 
-    void start();
+    void start(stm::transaction & tx);
 
-    void stop();
+    void stop(stm::transaction & tx);
 
-    int getCurrentSearchDepth() const;
+    int getCurrentSearchDepth(stm::transaction & tx) const;
 
     int getMaxSearchDepth() const;
 
-    std::vector<GameState> result() const;
+    std::vector<GameState> result(stm::transaction & tx) const;
 
-    int status() const;
+    int status(stm::transaction & tx) const;
 
-    std::string errorMessage() const;
+    std::string errorMessage(stm::transaction & tx) const;
 
 protected:
     virtual void populate() = 0;
 
-    void startImpl();
+    void startImpl(stm::transaction & tx);
 
-    void setQuitFlag();
-    bool getQuitFlag() const;
+    void setQuitFlag(stm::transaction & tx);
+    bool getQuitFlag(stm::transaction & tx) const;
 
-    void setStatus(int inStatus);
+    void setStatus(stm::transaction & tx, int inStatus);
 
-    void destroyInferiorChildren();
+    void destroyInferiorChildren(stm::transaction & tx);
 
-    void calculateResult();
+    void calculateResult(stm::transaction & tx);
 
     // Store info per horizontal level of nodes.
     class TreeRowInfo
@@ -69,10 +70,34 @@ protected:
         TreeRowInfo(const Evaluator & inEvaluator) :
             mBestNode(),
             mBestScore(0),
-            mEvaluator(&inEvaluator),
             mNodeCount(0),
-            mFinished(false)
+            mFinished(false),
+            mEvaluator(const_cast<Evaluator*>(&inEvaluator))
         {
+        }
+
+        TreeRowInfo(const TreeRowInfo & rhs) :
+            mBestNode(rhs.mBestNode),
+            mBestScore(rhs.mBestScore),
+            mNodeCount(rhs.mNodeCount),
+            mFinished(rhs.mFinished),
+            mEvaluator(rhs.mEvaluator)
+        {
+        }
+
+        TreeRowInfo & operator=(TreeRowInfo rhs) // by value (!)
+        {
+            swap(rhs);
+            return *this;
+        }
+
+        void swap(TreeRowInfo & rhs)
+        {
+            std::swap(mBestNode, rhs.mBestNode);
+            std::swap(mBestScore, rhs.mBestScore);
+            std::swap(mNodeCount, rhs.mNodeCount);
+            std::swap(mFinished, rhs.mFinished);
+            std::swap(mEvaluator, rhs.mEvaluator);
         }
 
         inline NodePtr bestNode() const
@@ -112,108 +137,131 @@ protected:
     private:
         NodePtr mBestNode;
         int mBestScore;
-        const Evaluator * mEvaluator;
         std::size_t mNodeCount;
         bool mFinished;
+        Evaluator * mEvaluator;
     };
 
     class TreeRowInfos
     {
+    private:
+        typedef std::vector<TreeRowInfo> Infos;
+        mutable stm::shared<Infos> mInfos;
+        std::size_t mMaxDepth;
+        Evaluator * mEvaluator;
+
     public:
         TreeRowInfos(const Evaluator & inEvaluator, std::size_t inMaxDepth) :
-            mInfos(),
+            mInfos(Infos(1, TreeRowInfo(inEvaluator))),
             mMaxDepth(inMaxDepth),
-            mEvaluator(&inEvaluator),
-            mMutex()
+            mEvaluator(const_cast<Evaluator*>(&inEvaluator))
         {
-            mInfos.push_back(TreeRowInfo(*mEvaluator));
         }
 
-        inline std::size_t depth() const
+        TreeRowInfos(const TreeRowInfos & rhs) :
+            mInfos(rhs.mInfos),
+            mMaxDepth(rhs.mMaxDepth),
+            mEvaluator(rhs.mEvaluator)
         {
-            Futile::ScopedLock lock(mMutex);
-            if (mInfos.back().finished())
+        }
+
+        TreeRowInfos& operator=(TreeRowInfos rhs) // by value (!)
+        {
+            swap(rhs);
+            return *this;
+        }
+
+        void swap(TreeRowInfos & rhs)
+        {
+            stm::atomic([&](stm::transaction & tx) {
+                Infos & leftInfos = mInfos.open_rw(tx);
+                Infos & rightInfos = rhs.mInfos.open_rw(tx);
+                leftInfos.swap(rightInfos);
+                std::swap(mMaxDepth, rhs.mMaxDepth);
+                std::swap(mEvaluator, rhs.mEvaluator);
+            });
+        }
+
+        inline std::size_t depth(stm::transaction & tx) const
+        {
+            const Infos & infos = mInfos.open_r(tx);
+            if (infos.back().finished())
             {
-                return mInfos.size();
+                return infos.size();
             }
             else
             {
-                Assert(mInfos.size() >= 1);
-                return mInfos.size() - 1;
+                Assert(infos.size() >= 1);
+                return infos.size() - 1;
             }
         }
 
         inline std::size_t maxDepth() const
         {
-            Futile::ScopedLock lock(mMutex);
             return mMaxDepth;
         }
 
-        void registerNode(NodePtr inNode)
+        void registerNode(stm::transaction & tx, NodePtr inNode)
         {
-            Futile::ScopedLock lock(mMutex);
-            mInfos.back().registerNode(inNode);
-            Assert(bestNode());
+            Infos & infos = mInfos.open_rw(tx);
+            infos.back().registerNode(inNode);
         }
 
-        inline NodePtr bestNode() const
+        inline NodePtr bestNode(stm::transaction & tx) const
         {
-            Futile::ScopedLock lock(mMutex);
-            if (mInfos.empty())
+            const Infos & infos = mInfos.open_r(tx);
+            if (infos.empty())
             {
                 throw std::runtime_error("There is no best node.");
             }
 
-            if (mInfos.size() >= 2)
+            if (infos.size() >= 2)
             {
-                return mInfos[mInfos.size() - 2].bestNode();
+                return infos[infos.size() - 2].bestNode();
             }
             else
             {
-                return mInfos[mInfos.size() - 1].bestNode();
+                return infos[infos.size() - 1].bestNode();
             }
 
             throw std::runtime_error("Invalid state.");
         }
 
-        inline bool finished() const
+        inline bool finished(stm::transaction & tx) const
         {
-            Futile::ScopedLock lock(mMutex);
-            return mInfos.size() == (mMaxDepth - 1) && mInfos.back().finished();
+            const Infos & infos = mInfos.open_r(tx);
+            return infos.size() == (mMaxDepth - 1) && infos.back().finished();
         }
 
-        inline void setFinished()
+        inline void setFinished(stm::transaction & tx)
         {
-            Futile::ScopedLock lock(mMutex);
-            Assert(!mInfos.empty());
-            mInfos.back().setFinished();
-            mInfos.push_back(TreeRowInfo(*mEvaluator));
+            Infos & infos = mInfos.open_rw(tx);
+            Assert(!infos.empty());
+            infos.back().setFinished();
+            infos.push_back(TreeRowInfo(*mEvaluator));
         }
-
-    private:
-        std::vector<TreeRowInfo> mInfos;
-        std::size_t mMaxDepth;
-        const Evaluator * mEvaluator;
-        mutable Futile::Mutex mMutex;
     };
 
-    NodePtr mNode;
-    std::vector<GameState> mResult;
-    mutable Futile::Mutex mNodeMutex;
+    static void testcopy()
+    {
+        TreeRowInfos test(ConcreteEvaluator<MakeTetrises>::Instance(), 1);
+        TreeRowInfos test2 = test;
+        test = test2;
+    }
 
+    typedef std::vector<GameState> Result;
 
-    bool mQuitFlag;
-    mutable Futile::Mutex mQuitFlagMutex;
+    NodePtr mNode; // TODO: make thread-safe!
+    mutable stm::shared<Result> mResult;
+    mutable stm::shared<bool> mQuitFlag;
+    mutable stm::shared<TreeRowInfos> mTreeRowInfos;
 
-    TreeRowInfos mTreeRowInfos;
-
-    BlockTypes mBlockTypes;
-    std::vector<int> mWidths;
+    const BlockTypes mBlockTypes;
+    const std::vector<int> mWidths;
     const Evaluator & mEvaluator;
 
-    int mStatus;
-    mutable Futile::Mutex mStatusMutex;
-    std::string mErrorMessage;
+    mutable stm::shared<int> mStatus;
+    mutable stm::shared<std::string> mErrorMessage;
 
     Futile::Worker & mMainWorker;
     Futile::WorkerPool & mWorkerPool;

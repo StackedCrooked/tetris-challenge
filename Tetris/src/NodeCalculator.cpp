@@ -21,7 +21,7 @@ static std::unique_ptr<NodeCalculatorImpl> CreateImpl(const GameState & inGameSt
     if (inWorkerPool.size() > 1)
     {
         return std::unique_ptr<NodeCalculatorImpl>(
-            new MultithreadedNodeCalculator(inGameState,
+            new MultiThreadedNodeCalculator(inGameState,
                                             inBlockTypes,
                                             inWidths,
                                             inEvaluator,
@@ -64,19 +64,25 @@ NodeCalculator::~NodeCalculator()
 
 void NodeCalculator::start()
 {
-    return mImpl->start();
+    stm::atomic([&](stm::transaction & tx) {
+        mImpl->start(tx);
+    });
 }
 
 
 void NodeCalculator::stop()
 {
-    mImpl->stop();
+    stm::atomic([&](stm::transaction & tx) {
+        mImpl->stop(tx);
+    });
 }
 
 
 int NodeCalculator::getCurrentSearchDepth() const
 {
-    return mImpl->getCurrentSearchDepth();
+    return stm::atomic<int>([&](stm::transaction & tx) {
+        return mImpl->getCurrentSearchDepth(tx);
+    });
 }
 
 
@@ -88,20 +94,26 @@ int NodeCalculator::getMaxSearchDepth() const
 
 std::vector<GameState> NodeCalculator::result() const
 {
-    Assert(status() != Status_Error);
-    return mImpl->result();
+    return stm::atomic< std::vector<GameState> >([&](stm::transaction & tx) {
+        Assert(mImpl->status(tx) != Status_Error);
+        return mImpl->result(tx);
+    });
 }
 
 
 NodeCalculator::Status NodeCalculator::status() const
 {
-    return static_cast<Status>(mImpl->status());
+    return stm::atomic<NodeCalculator::Status>([&](stm::transaction & tx) {
+        return static_cast<Status>(mImpl->status(tx));
+    });
 }
 
 
 std::string NodeCalculator::errorMessage() const
 {
-    return mImpl->errorMessage();
+    return stm::atomic<std::string>([&](stm::transaction & tx) {
+        return mImpl->errorMessage(tx);
+    });
 }
 
 

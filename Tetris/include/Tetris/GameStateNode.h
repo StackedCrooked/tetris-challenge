@@ -38,6 +38,8 @@ public:
     // Distance from the root node.
     int depth() const;
 
+    unsigned id() const;
+
     const NodePtr parent() const;
 
     NodePtr parent();
