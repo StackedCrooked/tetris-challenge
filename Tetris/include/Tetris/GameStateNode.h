@@ -74,13 +74,33 @@ private:
 class COWGameStateNode
 {
     COWGameStateNode(const GameState & inGameState, const Evaluator & inEvaluator) :
-        mGameStateNode(new GameStateNode(inGameState, inEvaluator))
+        mGameStateNode(new GameStateNode(inGameState, inEvaluator)),
+        mIsUnique(true)
     {
     }
 
     COWGameStateNode(const GameStateNode & rhs) :
-        mGameStateNode(new GameStateNode(rhs))
+        mGameStateNode(new GameStateNode(rhs)),
+        mIsUnique(true)
     {
+    }
+
+    COWGameStateNode(const COWGameStateNode & rhs) :
+        mGameStateNode(rhs.mGameStateNode),
+        mIsUnique(rhs.mIsUnique = false)
+    {
+    }
+
+    COWGameStateNode & operator=(COWGameStateNode rhs)
+    {
+        swap(rhs);
+        return *this;
+    }
+
+    void swap(COWGameStateNode & rhs)
+    {
+        std::swap(mGameStateNode, rhs.mGameStateNode);
+        std::swap(mIsUnique, rhs.mIsUnique);
     }
 
     inline const Evaluator & evaluator() const
@@ -127,10 +147,15 @@ class COWGameStateNode
 private:
     inline void makeUnique()
     {
-        mGameStateNode.reset(new GameStateNode(mGameStateNode));
+        if (!mIsUnique)
+        {
+            mGameStateNode.reset(new GameStateNode(*mGameStateNode));
+            mIsUnique = true;
+        }
     }
 
     boost::shared_ptr<GameStateNode> mGameStateNode;
+    mutable bool mIsUnique;
 };
 
 
