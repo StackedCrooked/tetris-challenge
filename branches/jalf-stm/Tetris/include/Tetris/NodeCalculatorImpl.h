@@ -52,7 +52,7 @@ public:
 protected:
     virtual void populate() = 0;
 
-    void startImpl(stm::transaction & tx);
+    void startImpl();
 
     void setQuitFlag(stm::transaction & tx);
     bool getQuitFlag(stm::transaction & tx) const;
