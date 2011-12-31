@@ -1,6 +1,6 @@
 #include "Tetris/NodeCalculator.h"
 #include "Tetris/NodeCalculatorImpl.h"
-#include "Tetris/MultithreadedNodeCalculator.h"
+#include "Tetris/MultiThreadedNodeCalculator.h"
 #include "Tetris/SingleThreadedNodeCalculator.h"
 #include "Tetris/GameState.h"
 
