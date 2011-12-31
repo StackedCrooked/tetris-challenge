@@ -232,7 +232,7 @@ void NodeCalculatorImpl::startImpl()
 void NodeCalculatorImpl::start(stm::transaction & tx)
 {
     Assert(mStatus.open_r(tx) == NodeCalculator::Status_Nil);
-    mMainWorker.schedule(boost::bind(&NodeCalculatorImpl::startImpl, this, boost::ref(tx)));
+    mMainWorker.schedule(boost::bind(&NodeCalculatorImpl::startImpl, this));
     mStatus.open_rw(tx) = NodeCalculator::Status_Started;
 }
 
