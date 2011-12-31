@@ -100,7 +100,7 @@ protected:
             std::swap(mEvaluator, rhs.mEvaluator);
         }
 
-        inline NodePtr bestNode() const
+        inline GameStateNode & bestNode() const
         {
             if (!mBestNode)
             {
@@ -115,7 +115,7 @@ protected:
         inline bool finished() const
         { return mFinished; }
 
-        void registerNode(NodePtr inNode)
+        void registerNode(const GameStateNode & inNode)
         {
             int score = mEvaluator->evaluate(inNode->gameState());
             if (!mBestNode || score > mBestScore)
@@ -135,7 +135,7 @@ protected:
         }
 
     private:
-        NodePtr mBestNode;
+        boost::optional<GameStateNode> mBestNode;
         int mBestScore;
         std::size_t mNodeCount;
         bool mFinished;
