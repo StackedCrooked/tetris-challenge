@@ -196,3 +196,7 @@ rebuild.bat
 configure.bat
 clean.bat
 Tetris/src/MultiThreadedNodeCalculator.cpp
+Tetris/src/STMWorkerPool.h
+Tetris/src/STMWorker.h
+Tetris/src/STMWorkerPool.cpp
+Tetris/src/STMWorker.cpp

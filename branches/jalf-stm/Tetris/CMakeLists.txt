@@ -59,6 +59,11 @@ add_library(Tetris
     src/NodeCalculatorImpl.cpp
     src/Player.cpp
     src/SingleThreadedNodeCalculator.cpp
-    src/Unicode.cpp)
+    src/Unicode.cpp
+    src/STMWorker.cpp
+    src/STMWorker.h
+    src/STMWorkerPool.cpp
+    src/STMWorkerPool.h)
+
 
 set_target_properties(Tetris PROPERTIES COMPILE_FLAGS ${FINAL_COMPILE_FLAGS})
