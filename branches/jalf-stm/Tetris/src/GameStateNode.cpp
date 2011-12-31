@@ -78,6 +78,12 @@ GameStateNode::~GameStateNode()
 }
 
 
+unsigned GameStateNode::id() const
+{
+    return mImpl->mGameState.id();
+}
+
+
 const Evaluator & GameStateNode::evaluator() const
 {
     return mImpl->mEvaluator;
