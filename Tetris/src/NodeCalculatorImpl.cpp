@@ -208,21 +208,24 @@ void NodeCalculatorImpl::stop(stm::transaction & tx)
 }
 
 
-void NodeCalculatorImpl::startImpl(stm::transaction & tx)
+void NodeCalculatorImpl::startImpl()
 {
-    // Thread entry point has try/catch block
-    try
+    stm::atomic([&](stm::transaction & tx)
     {
-        setStatus(tx, NodeCalculator::Status_Working);
-        populate();
-        calculateResult(tx);
-        setStatus(tx, NodeCalculator::Status_Finished);
-    }
-    catch (const std::exception & inException)
-    {
-        mErrorMessage.open_rw(tx) = inException.what();
-        setStatus(tx, NodeCalculator::Status_Error);
-    }
+        // Thread entry point has try/catch block
+        try
+        {
+            setStatus(tx, NodeCalculator::Status_Working);
+            populate();
+            calculateResult(tx);
+            setStatus(tx, NodeCalculator::Status_Finished);
+        }
+        catch (const std::exception & inException)
+        {
+            mErrorMessage.open_rw(tx) = inException.what();
+            setStatus(tx, NodeCalculator::Status_Error);
+        }
+    });
 }
 
 
