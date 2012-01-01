@@ -1,4 +1,4 @@
-#include "Tetris/MultiThreadedNodeCalculator.h"
+#include "Tetris/MultithreadedNodeCalculator.h"
 #include "Tetris/AISupport.h"
 #include "Tetris/GameStateComparator.h"
 #include "Tetris/Evaluator.h"
@@ -22,7 +22,7 @@ namespace Tetris {
 using namespace Futile;
 
 
-MultiThreadedNodeCalculator::MultiThreadedNodeCalculator(const GameState & inGameState,
+MultithreadedNodeCalculator::MultithreadedNodeCalculator(const GameState & inGameState,
                                                          const BlockTypes & inBlockTypes,
                                                          const std::vector<int> & inWidths,
                                                          const Evaluator & inEvaluator,
@@ -33,17 +33,15 @@ MultiThreadedNodeCalculator::MultiThreadedNodeCalculator(const GameState & inGam
 }
 
 
-MultiThreadedNodeCalculator::~MultiThreadedNodeCalculator()
+MultithreadedNodeCalculator::~MultithreadedNodeCalculator()
 {
-    stm::atomic([&](stm::transaction & tx) {
-        setQuitFlag(tx);
-    });
+    setQuitFlag();
     mMainWorker.interruptAndClearQueue();
     mWorkerPool.interruptAndClearQueue();
 }
 
 
-void MultiThreadedNodeCalculator::generateChildNodes(NodePtr ioNode,
+void MultithreadedNodeCalculator::generateChildNodes(NodePtr ioNode,
                                                      const Evaluator * inEvaluator,
                                                      BlockType inBlockType,
                                                      int inMaxChildCount)
@@ -64,15 +62,11 @@ void MultiThreadedNodeCalculator::generateChildNodes(NodePtr ioNode,
         ++it;
     }
 
-    stm::atomic([&](stm::transaction & tx) {
-        TreeRowInfos & treeRowInfos = mTreeRowInfos.open_rw(tx);
-        NodePtr childPtr = *(ioNode->children().begin());
-        treeRowInfos.registerNode(tx, childPtr);
-    });
+    mTreeRowInfos.registerNode(*ioNode->children().begin());
 }
 
 
-void MultiThreadedNodeCalculator::populateNodes(NodePtr ioNode,
+void MultithreadedNodeCalculator::populateNodes(NodePtr ioNode,
                                                 const BlockTypes & inBlockTypes,
                                                 const std::vector<int> & inWidths,
                                                 std::size_t inIndex,
@@ -99,7 +93,7 @@ void MultiThreadedNodeCalculator::populateNodes(NodePtr ioNode,
     if (inIndex + 1 == inEndIndex)
     {
         Assert(ioNode->children().empty());
-        Worker::Task task = boost::bind(&MultiThreadedNodeCalculator::generateChildNodes,
+        Worker::Task task = boost::bind(&MultithreadedNodeCalculator::generateChildNodes,
                                         this,
                                         ioNode,
                                         &mEvaluator,
@@ -128,7 +122,7 @@ void MultiThreadedNodeCalculator::populateNodes(NodePtr ioNode,
 }
 
 
-void MultiThreadedNodeCalculator::populate()
+void MultithreadedNodeCalculator::populate()
 {
     try
     {
@@ -137,23 +131,16 @@ void MultiThreadedNodeCalculator::populate()
         std::size_t targetDepth = 1;
         while (targetDepth <= mBlockTypes.size())
         {
-            bool doBreak = stm::atomic<bool>([&](stm::transaction & tx) {
-                populateNodes(mNode, mBlockTypes, mWidths, 0, targetDepth);
-                mWorkerPool.wait();
-                Assert(mWorkerPool.getActiveWorkerCount() == 0);
-                if (mNode->endNode()->gameState().isGameOver())
-                {
-                    return false;
-                }
-                mTreeRowInfos.open_rw(tx).setFinished(tx);
-                targetDepth++;
-                return false;
-            });
-
-            if (doBreak)
+            ScopedLock lock(mNodeMutex);
+            populateNodes(mNode, mBlockTypes, mWidths, 0, targetDepth);
+            mWorkerPool.wait();
+            Assert(mWorkerPool.getActiveWorkerCount() == 0);
+            if (mNode->endNode()->gameState().isGameOver())
             {
                 break;
             }
+            mTreeRowInfos.setFinished();
+            targetDepth++;
         }
     }
     catch (const boost::thread_interrupted &)

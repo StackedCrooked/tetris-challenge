@@ -38,8 +38,6 @@ public:
     // Distance from the root node.
     int depth() const;
 
-    unsigned id() const;
-
     const NodePtr parent() const;
 
     NodePtr parent();
@@ -69,93 +67,6 @@ private:
 
     struct Impl;
     boost::shared_ptr<Impl> mImpl;
-};
-
-class COWGameStateNode
-{
-    COWGameStateNode(const GameState & inGameState, const Evaluator & inEvaluator) :
-        mGameStateNode(new GameStateNode(inGameState, inEvaluator)),
-        mIsUnique(true)
-    {
-    }
-
-    COWGameStateNode(const GameStateNode & rhs) :
-        mGameStateNode(new GameStateNode(rhs)),
-        mIsUnique(true)
-    {
-    }
-
-    COWGameStateNode(const COWGameStateNode & rhs) :
-        mGameStateNode(rhs.mGameStateNode),
-        mIsUnique(rhs.mIsUnique = false)
-    {
-    }
-
-    COWGameStateNode & operator=(COWGameStateNode rhs)
-    {
-        swap(rhs);
-        return *this;
-    }
-
-    void swap(COWGameStateNode & rhs)
-    {
-        std::swap(mGameStateNode, rhs.mGameStateNode);
-        std::swap(mIsUnique, rhs.mIsUnique);
-    }
-
-    inline const Evaluator & evaluator() const
-    {
-        return mGameStateNode->evaluator();
-    }
-
-    // Distance from the root node.
-    inline int depth() const
-    {
-        return mGameStateNode->depth();
-    }
-
-    inline unsigned id() const { return mGameStateNode->id(); }
-
-    inline const NodePtr parent() const { return mGameStateNode->parent(); }
-
-    inline const ChildNodes & children() const { return mGameStateNode->children(); }
-
-    const GameStateNode * endNode() const { return mGameStateNode->endNode(); }
-
-    const GameState & gameState() const { return mGameStateNode->gameState(); }
-
-    int quality() const { return mGameStateNode->quality(); }
-
-    inline void makeRoot()
-    {
-        makeUnique();
-        mGameStateNode->makeRoot();
-    }
-
-    void clearChildren()
-    {
-        makeUnique();
-        mGameStateNode->clearChildren();
-    }
-
-    void addChild(NodePtr inChildNode)
-    {
-        makeUnique();
-        mGameStateNode->addChild(inChildNode);
-    }
-
-private:
-    inline void makeUnique()
-    {
-        if (!mIsUnique)
-        {
-            mGameStateNode.reset(new GameStateNode(*mGameStateNode));
-            mIsUnique = true;
-        }
-    }
-
-    boost::shared_ptr<GameStateNode> mGameStateNode;
-    mutable bool mIsUnique;
 };
 
 

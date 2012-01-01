@@ -9,7 +9,6 @@
 #include "Futile/MakeString.h"
 #include "Futile/Threading.h"
 #include <boost/shared_ptr.hpp>
-#include <functional>
 #include <memory>
 #include <stdexcept>
 
@@ -33,19 +32,15 @@ SingleThreadedNodeCalculator::SingleThreadedNodeCalculator(const GameState & inG
 
 SingleThreadedNodeCalculator::~SingleThreadedNodeCalculator()
 {
-    stm::atomic([&](stm::transaction & tx) {
-        setQuitFlag(tx);
-    });
-
+    setQuitFlag();
     mMainWorker.interruptAndClearQueue();
     mWorkerPool.interruptAndClearQueue();
 }
 
 
-void SingleThreadedNodeCalculator::onChildNodeGenerated(stm::transaction & tx, const Progress & , const NodePtr & inChildNode)
+void SingleThreadedNodeCalculator::onChildNodeGenerated(const Progress & , const NodePtr & inChildNode)
 {
-    TreeRowInfos & treeRowInfos = mTreeRowInfos.open_rw(tx);
-    treeRowInfos.registerNode(tx, inChildNode);
+    mTreeRowInfos.registerNode(inChildNode);
 }
 
 
@@ -58,16 +53,15 @@ void SingleThreadedNodeCalculator::populate()
         std::size_t targetDepth = 1;
         while (targetDepth <= mBlockTypes.size())
         {
-            stm::atomic([&](stm::transaction & tx) {
-                CalculateNodes(mNode,
-                               mEvaluator,
-                               mBlockTypes,
-                               mWidths,
-                               Progress(0, targetDepth),
-                               boost::bind(&SingleThreadedNodeCalculator::onChildNodeGenerated, this, boost::ref(tx), _1, _2));
-                mTreeRowInfos.open_rw(tx).setFinished(tx);
-                targetDepth++;
-            });
+            ScopedLock lock(mNodeMutex);
+            CalculateNodes(mNode,
+                           mEvaluator,
+                           mBlockTypes,
+                           mWidths,
+                           Progress(0, targetDepth),
+                           boost::bind(&SingleThreadedNodeCalculator::onChildNodeGenerated, this, _1, _2));
+            mTreeRowInfos.setFinished();
+            targetDepth++;
         }
     }
     catch (const boost::thread_interrupted &)
@@ -75,12 +69,7 @@ void SingleThreadedNodeCalculator::populate()
         // Task was interrupted. Ok.
     }
     mWorkerPool.wait();
-
-#ifndef NDEBUG
-    stm::atomic([&](stm::transaction & tx) {
-        Assert(getCurrentSearchDepth(tx) >= 1 || getQuitFlag(tx));
-    });
-#endif // NDEBUG
+    Assert(getCurrentSearchDepth() >= 1 || getQuitFlag());
 }
 
 } // namespace Tetris

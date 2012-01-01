@@ -60,15 +60,17 @@ NodeCalculatorImpl::NodeCalculatorImpl(const GameState & inGameState,
                                        const Evaluator & inEvaluator,
                                        Worker & inMainWorker,
                                        WorkerPool & inWorkerPool) :
-    mNode(NodePtr(new GameStateNode(inGameState, inEvaluator))),
-    mResult(Result()),
+    mNode(new GameStateNode(inGameState, inEvaluator)),
+    mResult(),
+    mNodeMutex(),
     mQuitFlag(false),
-    mTreeRowInfos(TreeRowInfos(inEvaluator, inBlockTypes.size())),
+    mQuitFlagMutex(),
+    mTreeRowInfos(inEvaluator, inBlockTypes.size()),
     mBlockTypes(inBlockTypes),
     mWidths(inWidths),
     mEvaluator(inEvaluator),
     mStatus(0),
-    mErrorMessage(std::string()),
+    mStatusMutex(),
     mMainWorker(inMainWorker),
     mWorkerPool(inWorkerPool)
 {
@@ -83,21 +85,23 @@ NodeCalculatorImpl::~NodeCalculatorImpl()
 }
 
 
-void NodeCalculatorImpl::setQuitFlag(stm::transaction & tx)
+void NodeCalculatorImpl::setQuitFlag()
 {
-    mQuitFlag.open_rw(tx) = true;
+    ScopedLock lock(mQuitFlagMutex);
+    mQuitFlag = true;
 }
 
 
-bool NodeCalculatorImpl::getQuitFlag(stm::transaction & tx) const
+bool NodeCalculatorImpl::getQuitFlag() const
 {
-    return mQuitFlag.open_r(tx);
+    ScopedLock lock(mQuitFlagMutex);
+    return mQuitFlag;
 }
 
 
-int NodeCalculatorImpl::getCurrentSearchDepth(stm::transaction & tx) const
+int NodeCalculatorImpl::getCurrentSearchDepth() const
 {
-    return mTreeRowInfos.open_r(tx).depth(tx);
+    return mTreeRowInfos.depth();
 }
 
 
@@ -107,44 +111,48 @@ int NodeCalculatorImpl::getMaxSearchDepth() const
 }
 
 
-std::vector<GameState> NodeCalculatorImpl::result(stm::transaction & tx) const
+std::vector<GameState> NodeCalculatorImpl::result() const
 {
-    Assert(status(tx) == NodeCalculator::Status_Finished);
-    return mResult.open_r(tx);
+    Assert(status() == NodeCalculator::Status_Finished);
+    ScopedLock lock(mNodeMutex);
+    return mResult;
 }
 
 
-int NodeCalculatorImpl::status(stm::transaction & tx) const
+int NodeCalculatorImpl::status() const
 {
-    return mStatus.open_r(tx);
+    ScopedLock lock(mStatusMutex);
+    return mStatus;
 }
 
 
-std::string NodeCalculatorImpl::errorMessage(stm::transaction & tx) const
+std::string NodeCalculatorImpl::errorMessage() const
 {
-    return mErrorMessage.open_r(tx);
+    return mErrorMessage;
 }
 
 
-void NodeCalculatorImpl::setStatus(stm::transaction & tx, int inStatus)
+void NodeCalculatorImpl::setStatus(int inStatus)
 {
-    mStatus.open_rw(tx) = inStatus;
+    ScopedLock lock(mStatusMutex);
+    mStatus = inStatus;
 }
 
 
-void NodeCalculatorImpl::destroyInferiorChildren(stm::transaction & tx)
+void NodeCalculatorImpl::destroyInferiorChildren()
 {
-    std::size_t reachedDepth = getCurrentSearchDepth(tx);
+    std::size_t reachedDepth = getCurrentSearchDepth();
     if (reachedDepth == 0)
     {
-        Assert(getQuitFlag(tx));
+        Assert(getQuitFlag());
         return;
     }
 
     // We use the 'best child' from this search depth.
     // The path between the start node and this best
     // child will be the list of precalculated nodes.
-    NodePtr endNode = mTreeRowInfos.open_r(tx).bestNode(tx);
+    ScopedLock nodeLock(mNodeMutex);
+    NodePtr endNode = mTreeRowInfos.bestNode();
     Assert(endNode);
     if (endNode)
     {
@@ -154,48 +162,48 @@ void NodeCalculatorImpl::destroyInferiorChildren(stm::transaction & tx)
 }
 
 
-void NodeCalculatorImpl::calculateResult(stm::transaction & tx)
+void NodeCalculatorImpl::calculateResult()
 {
-    if (getQuitFlag(tx))
+    if (getQuitFlag())
     {
         return;
     }
 
-    const TreeRowInfos & treeRowInfos = mTreeRowInfos.open_r(tx);
-    if (getCurrentSearchDepth(tx) == 0 || !treeRowInfos.bestNode(tx))
+    if (getCurrentSearchDepth() == 0 || !mTreeRowInfos.bestNode())
     {
         Assert(mNode->endNode()->gameState().isGameOver());
         return;
     }
 
-    // Backtrack the best end-node to its starting node.
-    Result localResult;
-    NodePtr endNode = treeRowInfos.bestNode(tx);
+    ScopedLock lock(mNodeMutex);
 
-    unsigned startId = mNode->id();
+    // Backtrack the best end-node to its starting node.
+    std::stack<NodePtr> results;
+    NodePtr endNode = mTreeRowInfos.bestNode();
+    unsigned startId = mNode->gameState().id();
     unsigned currentId = endNode->gameState().id();
     while (currentId > startId + 1)
     {
+        results.push(endNode);
         endNode = endNode->parent();
         unsigned parentId = endNode->gameState().id();
-        localResult.push_back(endNode->gameState());
+        mResult.push_back(endNode->gameState());
         Assert(currentId == parentId + 1);
         currentId = parentId;
     }
 
-    std::reverse(localResult.begin(), localResult.end());
-    mResult.open_rw(tx) = localResult;
+    std::reverse(mResult.begin(), mResult.end());
 }
 
 
-void NodeCalculatorImpl::stop(stm::transaction & tx)
+void NodeCalculatorImpl::stop()
 {
-    switch (status(tx))
+    switch (status())
     {
         case NodeCalculator::Status_Started:
         case NodeCalculator::Status_Working:
         {
-            setStatus(tx, NodeCalculator::Status_Stopped);
+            setStatus(NodeCalculator::Status_Stopped);
             Assert(mMainWorker.size() <= 1);
             mMainWorker.interruptAndClearQueue();
             mWorkerPool.interruptAndClearQueue();
@@ -210,30 +218,28 @@ void NodeCalculatorImpl::stop(stm::transaction & tx)
 
 void NodeCalculatorImpl::startImpl()
 {
-    stm::atomic([&](stm::transaction & tx)
+    // Thread entry point has try/catch block
+    try
     {
-        // Thread entry point has try/catch block
-        try
-        {
-            setStatus(tx, NodeCalculator::Status_Working);
-            populate();
-            calculateResult(tx);
-            setStatus(tx, NodeCalculator::Status_Finished);
-        }
-        catch (const std::exception & inException)
-        {
-            mErrorMessage.open_rw(tx) = inException.what();
-            setStatus(tx, NodeCalculator::Status_Error);
-        }
-    });
+        setStatus(NodeCalculator::Status_Working);
+        populate();
+        calculateResult();
+        setStatus(NodeCalculator::Status_Finished);
+    }
+    catch (const std::exception & inException)
+    {
+        mErrorMessage = inException.what();
+        setStatus(NodeCalculator::Status_Error);
+    }
 }
 
 
-void NodeCalculatorImpl::start(stm::transaction & tx)
+void NodeCalculatorImpl::start()
 {
-    Assert(mStatus.open_r(tx) == NodeCalculator::Status_Nil);
+    ScopedLock lock(mStatusMutex);
+    Assert(mStatus == NodeCalculator::Status_Nil);
     mMainWorker.schedule(boost::bind(&NodeCalculatorImpl::startImpl, this));
-    mStatus.open_rw(tx) = NodeCalculator::Status_Started;
+    mStatus = NodeCalculator::Status_Started;
 }
 
 
