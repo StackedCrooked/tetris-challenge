@@ -1,5 +1,6 @@
 STM Version
 -----------
+- Remove ComputerGame's dependency to MainThread.
 - Use Valgrind memcheck, helgrind
 - Use STM in TreeRowInfos
 - There is something wrong with the block types: BlockType_I appears twice.
