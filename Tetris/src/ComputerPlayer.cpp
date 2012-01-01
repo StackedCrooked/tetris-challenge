@@ -73,11 +73,6 @@ public:
 
     void move();
 
-    void onMoveTimer()
-    {
-        move();
-    }
-
     static void UpdateComputerBlockMoveSpeed(boost::weak_ptr<Player> weakPlayer) {
         if (PlayerPtr playerPtr = weakPlayer.lock())
         {
@@ -150,7 +145,7 @@ ComputerPlayer::ComputerPlayer(const TeamName & inTeamName,
     mTimer->start(boost::bind(&ComputerPlayer::onTimerEvent, this));
     FUTILE_LOCK(Impl & impl, mImpl)
     {
-        impl.mMoveTimer.start(boost::bind(&ComputerPlayer::Impl::onMoveTimer, &impl));
+        impl.mMoveTimer.start(boost::bind(&ComputerPlayer::Impl::move, &impl));
     }
 
 }
