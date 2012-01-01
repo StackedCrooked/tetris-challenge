@@ -22,7 +22,7 @@ class Timer : boost::noncopyable
 public:
     typedef std::function<void()> Action;
 
-    Timer(UInt64 inInterval);
+    Timer(UInt64 inInterval = 100);
 
     ~Timer();
 
@@ -33,10 +33,11 @@ public:
     /// Stops the timer and waits for the current action to finish.
     void stop();
 
+    /// Returns the timer interval.
+    UInt64 interval() const;
+
     /// Sets the timer interval.
     void setInterval(UInt64 inInterval);
-
-    UInt64 getInterval() const;
 
 private:
     struct Impl;

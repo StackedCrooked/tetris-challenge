@@ -51,7 +51,7 @@ public:
         mStop(false),
         mReset(false),
         mQuitFlag(false),
-        mMoveTimer(GetTimerIntervalMs(1))
+        mMoveTimer()
     {
     }
 
@@ -152,6 +152,7 @@ ComputerPlayer::ComputerPlayer(const TeamName & inTeamName,
     {
         impl.mMoveTimer.start(boost::bind(&ComputerPlayer::Impl::onMoveTimer, &impl));
     }
+
 }
 
 
@@ -238,7 +239,7 @@ int ComputerPlayer::depth() const
 
 int ComputerPlayer::moveSpeed() const
 {
-    return mImpl.lock()->mMoveTimer.getInterval();
+    return mImpl.lock()->mMoveTimer.interval();
 }
 
 
