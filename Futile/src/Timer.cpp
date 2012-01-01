@@ -178,7 +178,7 @@ void Timer::setInterval(UInt64 inInterval)
 }
 
 
-UInt64 Timer::getInterval() const
+UInt64 Timer::interval() const
 {
     return mImpl->mInterval;
 }
