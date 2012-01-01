@@ -23,8 +23,7 @@ public:
 
     // Creates the player object and retains ownership
     Player * addComputerPlayer(const TeamName & inTeamName,
-                               const PlayerName & inPlayerName,
-                               ComputerPlayer::Tweaker * inTweaker);
+                               const PlayerName & inPlayerName);
 
     void removePlayer(Player * inPlayer);
 

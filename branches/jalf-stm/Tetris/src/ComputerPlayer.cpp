@@ -30,20 +30,27 @@ namespace Tetris {
 using namespace Futile;
 
 
+ComputerPlayer::ComputerPlayer(const TeamName & inTeamName,
+                               const PlayerName & inPlayerName,
+                               std::size_t inRowCount,
+                               std::size_t inColumnCount) :
+    Player(PlayerType_Computer, inTeamName, inPlayerName, inRowCount, inColumnCount),
+    Computer(Player::game().game())
+{
+}
+
+
 static const unsigned cDefaultWorkerCount = 8;
 
 
-struct ComputerPlayer::Impl : boost::noncopyable
+struct Computer::Impl : boost::noncopyable
 {
 public:
-    typedef ComputerPlayer::Tweaker Tweaker;
-
-    Impl(ComputerPlayer * inComputerPlayer) :
-        mComputerPlayer(inComputerPlayer),
-        mGame(mComputerPlayer->game().game()),
-        mTweaker(0),
-        mMainWorker("ComputerPlayer: MainWorker"),
-        mWorkerPool("ComputerPlayer: WorkerPool", cDefaultWorkerCount),
+    Impl(Computer * inComputer, Game & inGame) :
+        mComputer(inComputer),
+        mGame(inGame),
+        mMainWorker("Computer: MainWorker"),
+        mWorkerPool("Computer: WorkerPool", cDefaultWorkerCount),
         mPrecalculated(Precalculated()),
         mNodeCalculator(),
         mEvaluator(&Balanced::Instance()),
@@ -79,7 +86,7 @@ public:
     static void UpdateComputerBlockMoveSpeed(boost::weak_ptr<Player> weakPlayer) {
         if (PlayerPtr playerPtr = weakPlayer.lock())
         {
-            ComputerPlayer & cp = dynamic_cast<ComputerPlayer&>(*playerPtr);
+            Computer & cp = dynamic_cast<Computer&>(*playerPtr);
             cp.mImpl.lock()->updateComputerBlockMoveSpeed();
         }
     }
@@ -97,20 +104,18 @@ public:
     inline GameState previousGameState(stm::transaction & tx)
     {
         const Precalculated & cPrecalculated = mPrecalculated.open_r(tx);
-        return cPrecalculated.empty() ? mComputerPlayer->game().game().gameState(tx)
-                                      : cPrecalculated.back();
+        return cPrecalculated.empty() ? mGame.gameState(tx) : cPrecalculated.back();
     }
 
     inline Block previousActiveBlock(stm::transaction & tx)
     {
         const Precalculated & cPrecalculated = mPrecalculated.open_r(tx);
-        return cPrecalculated.empty() ? mComputerPlayer->game().activeBlock()
+        return cPrecalculated.empty() ? mGame.activeBlock(tx)
                                       : cPrecalculated.back().originalBlock();
     }
 
-    ComputerPlayer * mComputerPlayer;
+    Computer * mComputer;
     Game & mGame;
-    Tweaker * mTweaker;
 
     Worker mMainWorker;
     WorkerPool mWorkerPool;
@@ -128,33 +133,19 @@ public:
 };
 
 
-PlayerPtr ComputerPlayer::Create(const TeamName & inTeamName,
-                                 const PlayerName & inPlayerName,
-                                 std::size_t inRowCount,
-                                 std::size_t inColumnCount)
+Computer::Computer(Game & inGame) :
+  mImpl(new Impl(this, inGame)),
+  mTimer(new Futile::Timer(10))
 {
-    PlayerPtr result(new ComputerPlayer(inTeamName, inPlayerName, inRowCount, inColumnCount));
-    return result;
+  mTimer->start(boost::bind(&Computer::onTimerEvent, this));
+  FUTILE_LOCK(Impl & impl, mImpl)
+  {
+      impl.mMoveTimer.start(boost::bind(&Computer::Impl::move, &impl));
+  }
 }
 
 
-ComputerPlayer::ComputerPlayer(const TeamName & inTeamName,
-                               const PlayerName & inPlayerName,
-                               std::size_t inRowCount,
-                               std::size_t inColumnCount) :
-    Player(PlayerType_Computer, inTeamName, inPlayerName, inRowCount, inColumnCount),
-    mImpl(new Impl(this)),
-    mTimer(new Futile::Timer(10))
-{
-    mTimer->start(boost::bind(&ComputerPlayer::onTimerEvent, this));
-    FUTILE_LOCK(Impl & impl, mImpl)
-    {
-        impl.mMoveTimer.start(boost::bind(&ComputerPlayer::Impl::move, &impl));
-    }
-}
-
-
-ComputerPlayer::~ComputerPlayer()
+Computer::~Computer()
 {
     mTimer->stop();
     FUTILE_LOCK(Impl & impl, mImpl)
@@ -164,7 +155,7 @@ ComputerPlayer::~ComputerPlayer()
 }
 
 
-void ComputerPlayer::onTimerEvent()
+void Computer::onTimerEvent()
 {
     try
     {
@@ -178,27 +169,18 @@ void ComputerPlayer::onTimerEvent()
     }
     catch (const std::exception & exc)
     {
-        LogError(SS() << "Exception caught during ComputerPlayer timerEvent. Details: " << exc.what());
+        LogError(SS() << "Exception caught during Computer timerEvent. Details: " << exc.what());
     }
 }
 
 
-void ComputerPlayer::setTweaker(Tweaker *inTweaker)
-{
-    FUTILE_LOCK(Impl & impl, mImpl)
-    {
-        impl.mTweaker = inTweaker;
-    }
-}
-
-
-int ComputerPlayer::searchDepth() const
+int Computer::searchDepth() const
 {
     return mImpl.lock()->mSearchDepth;
 }
 
 
-void ComputerPlayer::setSearchDepth(int inSearchDepth)
+void Computer::setSearchDepth(int inSearchDepth)
 {
     FUTILE_LOCK(Impl & impl, mImpl)
     {
@@ -207,13 +189,13 @@ void ComputerPlayer::setSearchDepth(int inSearchDepth)
 }
 
 
-int ComputerPlayer::searchWidth() const
+int Computer::searchWidth() const
 {
     return mImpl.lock()->mSearchWidth;
 }
 
 
-void ComputerPlayer::setSearchWidth(int inSearchWidth)
+void Computer::setSearchWidth(int inSearchWidth)
 {
     FUTILE_LOCK(Impl & impl, mImpl)
     {
@@ -222,7 +204,7 @@ void ComputerPlayer::setSearchWidth(int inSearchWidth)
 }
 
 
-int ComputerPlayer::depth() const
+int Computer::depth() const
 {
     FUTILE_LOCK(Impl & impl, mImpl)
     {
@@ -235,13 +217,13 @@ int ComputerPlayer::depth() const
 }
 
 
-int ComputerPlayer::moveSpeed() const
+int Computer::moveSpeed() const
 {
     return mImpl.lock()->mMoveTimer.interval();
 }
 
 
-void ComputerPlayer::setMoveSpeed(int inNumMovesPerSecond)
+void Computer::setMoveSpeed(int inNumMovesPerSecond)
 {
     FUTILE_LOCK(Impl & impl, mImpl)
     {
@@ -260,13 +242,13 @@ void ComputerPlayer::setMoveSpeed(int inNumMovesPerSecond)
 }
 
 
-int ComputerPlayer::workerCount() const
+int Computer::workerCount() const
 {
     return mImpl.lock()->mWorkerCount;
 }
 
 
-void ComputerPlayer::setWorkerCount(int inWorkerCount)
+void Computer::setWorkerCount(int inWorkerCount)
 {
     FUTILE_LOCK(Impl & impl, mImpl)
     {
@@ -277,42 +259,6 @@ void ComputerPlayer::setWorkerCount(int inWorkerCount)
         else
         {
             impl.mWorkerCount = inWorkerCount;
-        }
-    }
-}
-
-
-void ComputerPlayer::Impl::updateComputerBlockMoveSpeed()
-{
-    // Consult the Tweaker for improved settings
-    if (mTweaker)
-    {
-        int moveSpeed = 0;
-
-        mEvaluator = &mTweaker->updateAIParameters(*mComputerPlayer,
-                                                   mSearchDepth,
-                                                   mSearchWidth,
-                                                   mWorkerCount,
-                                                   moveSpeed);
-
-        if (mSearchDepth < 1 || mSearchDepth > 100)
-        {
-            throw std::runtime_error(SS() << "Invalid search depth: " << mSearchDepth);
-        }
-
-        if (mSearchWidth < 1 || mSearchWidth > 100)
-        {
-            throw std::runtime_error(SS() << "Invalid search width: " << mSearchWidth);
-        }
-
-        if (mWorkerCount < 1 || mWorkerCount > 128)
-        {
-            throw std::runtime_error(SS() << "Invalid worker count: " << mWorkerCount);
-        }
-
-        if (moveSpeed != 0)
-        {
-            mMoveTimer.setInterval(GetTimerIntervalMs(moveSpeed));
         }
     }
 }
@@ -374,7 +320,7 @@ bool Move(stm::transaction & tx, Game & ioGame, const Block & targetBlock)
 }
 
 
-void ComputerPlayer::Impl::move()
+void Computer::Impl::move()
 {
 
     stm::atomic([&](stm::transaction & tx) {
@@ -385,7 +331,7 @@ void ComputerPlayer::Impl::move()
             return;
         }
 
-        unsigned oldId = mComputerPlayer->game().game().gameStateId(tx);
+        unsigned oldId = mGame.gameStateId(tx);
         unsigned predictedId = cPrecalculated.front().id();
         if (oldId >= predictedId)
         {
@@ -414,7 +360,7 @@ void ComputerPlayer::Impl::move()
 }
 
 
-void ComputerPlayer::Impl::timerEvent()
+void Computer::Impl::timerEvent()
 {
     stm::atomic([&](stm::transaction & tx) {
         timerEventImpl(tx);
@@ -422,7 +368,7 @@ void ComputerPlayer::Impl::timerEvent()
 }
 
 
-void ComputerPlayer::Impl::timerEventImpl(stm::transaction & tx)
+void Computer::Impl::timerEventImpl(stm::transaction & tx)
 {
     if (mReset)
     {
@@ -438,17 +384,7 @@ void ComputerPlayer::Impl::timerEventImpl(stm::transaction & tx)
         return;
     }
 
-
     move();
-
-
-#if 0
-    // Consult the tweaker.
-    PlayerPtr playerPtr = mComputerPlayer->shared_from_this();
-    boost::weak_ptr<Player> weakPtr(playerPtr);
-    InvokeLater(boost::bind(&ComputerPlayer::Impl::UpdateComputerBlockMoveSpeed, weakPtr));
-#endif
-
 
     if (!mNodeCalculator)
     {
@@ -495,7 +431,7 @@ void ComputerPlayer::Impl::timerEventImpl(stm::transaction & tx)
 }
 
 
-void ComputerPlayer::Impl::startNodeCalculator(stm::transaction & tx)
+void Computer::Impl::startNodeCalculator(stm::transaction & tx)
 {
     const Precalculated & cPrecalculated = mPrecalculated.open_r(tx);
     if (cPrecalculated.size() > 8)
@@ -513,13 +449,12 @@ void ComputerPlayer::Impl::startNodeCalculator(stm::transaction & tx)
     //
     // Create the list of future blocks
     //
-    const SimpleGame & simpleGame = mComputerPlayer->game();
-    std::vector<Block> nextBlocks = simpleGame.getNextBlocks(cPrecalculated.size() + mSearchDepth);
+    std::vector<BlockType> nextBlocks = mGame.getFutureBlocks(tx, cPrecalculated.size() + mSearchDepth);
     Assert(nextBlocks.size() == cPrecalculated.size() + mSearchDepth);
     BlockTypes futureBlocks;
     for (std::size_t idx = cPrecalculated.size(); idx < nextBlocks.size(); ++idx)
     {
-        futureBlocks.push_back(nextBlocks[idx].type());
+        futureBlocks.push_back(nextBlocks[idx]);
     }
 
 
@@ -552,13 +487,13 @@ void ComputerPlayer::Impl::startNodeCalculator(stm::transaction & tx)
 }
 
 
-void ComputerPlayer::Impl::onStarted(stm::transaction &)
+void Computer::Impl::onStarted(stm::transaction &)
 {
     // Good.
 }
 
 
-void ComputerPlayer::Impl::onWorking(stm::transaction & tx)
+void Computer::Impl::onWorking(stm::transaction & tx)
 {
     if (previousGameState(tx).id() < mGame.gameState(tx).id())
     {
@@ -578,13 +513,13 @@ void ComputerPlayer::Impl::onWorking(stm::transaction & tx)
 }
 
 
-void ComputerPlayer::Impl::onStopped(stm::transaction &)
+void Computer::Impl::onStopped(stm::transaction &)
 {
     // Good. Now wait until onFinished.
 }
 
 
-void ComputerPlayer::Impl::onFinished(stm::transaction & tx)
+void Computer::Impl::onFinished(stm::transaction & tx)
 {
     mReset = true;
 
@@ -605,10 +540,10 @@ void ComputerPlayer::Impl::onFinished(stm::transaction & tx)
 }
 
 
-void ComputerPlayer::Impl::onError(stm::transaction & )
+void Computer::Impl::onError(stm::transaction & )
 {
     mReset = true;
-    LogError("ComputerPlayer: " + mNodeCalculator->errorMessage());
+    LogError("Computer: " + mNodeCalculator->errorMessage());
 }
 
 
