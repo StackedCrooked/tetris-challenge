@@ -19,10 +19,13 @@ class ComputerPlayerTest : public TetrisTest
 
 TEST_F(ComputerPlayerTest, All)
 {
-    Game game(20, 10);
-    Computer computer(game);
-    std::cout << "Let computer work for 10s" << std::endl;
-    Futile::Sleep(10000);
+	static const unsigned cWaitMs = 1000;
+    boost::scoped_ptr<Game> game(new Game(20, 10));
+    boost::scoped_ptr<Computer> computer(new Computer(*game));
+    std::cout << "Let computer work for " << cWaitMs << "ms" << std::endl;
+    Futile::Sleep(cWaitMs);
+    computer.reset();
+    game.reset();
 }
 
 
