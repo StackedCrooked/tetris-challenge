@@ -25,8 +25,7 @@ class Player;
 typedef boost::shared_ptr<Player> PlayerPtr;
 
 
-class Player : public boost::enable_shared_from_this<Player>,
-               boost::noncopyable
+class Player : boost::noncopyable
 {
 public:
     static PlayerPtr Create(PlayerType inPlayerType,

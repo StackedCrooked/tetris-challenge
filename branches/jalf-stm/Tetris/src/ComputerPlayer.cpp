@@ -155,7 +155,6 @@ ComputerPlayer::ComputerPlayer(const TeamName & inTeamName,
     {
         impl.mMoveTimer.start(boost::bind(&ComputerPlayer::Impl::move, &impl));
     }
-
 }
 
 
@@ -447,10 +446,13 @@ void ComputerPlayer::Impl::timerEventImpl(stm::transaction & tx)
     move();
 
 
+#if 0
     // Consult the tweaker.
     PlayerPtr playerPtr = mComputerPlayer->shared_from_this();
     boost::weak_ptr<Player> weakPtr(playerPtr);
     InvokeLater(boost::bind(&ComputerPlayer::Impl::UpdateComputerBlockMoveSpeed, weakPtr));
+#endif
+
 
     if (!mNodeCalculator)
     {
