@@ -58,8 +58,6 @@ protected:
 
     void setStatus(int inStatus);
 
-    void destroyInferiorChildren();
-
     void calculateResult();
 
     // Store info per horizontal level of nodes.

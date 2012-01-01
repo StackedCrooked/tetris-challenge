@@ -139,29 +139,6 @@ void NodeCalculatorImpl::setStatus(int inStatus)
 }
 
 
-void NodeCalculatorImpl::destroyInferiorChildren()
-{
-    std::size_t reachedDepth = getCurrentSearchDepth();
-    if (reachedDepth == 0)
-    {
-        Assert(getQuitFlag());
-        return;
-    }
-
-    // We use the 'best child' from this search depth.
-    // The path between the start node and this best
-    // child will be the list of precalculated nodes.
-    ScopedLock nodeLock(mNodeMutex);
-    NodePtr endNode = mTreeRowInfos.bestNode();
-    Assert(endNode);
-    if (endNode)
-    {
-        CarveBestPath(mNode, endNode);
-        Assert(mNode->children().size() == 1);
-    }
-}
-
-
 void NodeCalculatorImpl::calculateResult()
 {
     if (getQuitFlag())
