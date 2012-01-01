@@ -240,7 +240,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\Tetris\MultithreadedNodeCalculator.h"
+				RelativePath=".\include\Tetris\MultiThreadedNodeCalculator.h"
 				>
 			</File>
 			<File

@@ -1,4 +1,4 @@
-#include "Tetris/MultithreadedNodeCalculator.h"
+#include "Tetris/MultiThreadedNodeCalculator.h"
 #include "Tetris/AISupport.h"
 #include "Tetris/GameStateComparator.h"
 #include "Tetris/Evaluator.h"
@@ -22,7 +22,7 @@ namespace Tetris {
 using namespace Futile;
 
 
-MultithreadedNodeCalculator::MultithreadedNodeCalculator(const GameState & inGameState,
+MultiThreadedNodeCalculator::MultiThreadedNodeCalculator(const GameState & inGameState,
                                                          const BlockTypes & inBlockTypes,
                                                          const std::vector<int> & inWidths,
                                                          const Evaluator & inEvaluator,
@@ -33,7 +33,7 @@ MultithreadedNodeCalculator::MultithreadedNodeCalculator(const GameState & inGam
 }
 
 
-MultithreadedNodeCalculator::~MultithreadedNodeCalculator()
+MultiThreadedNodeCalculator::~MultiThreadedNodeCalculator()
 {
     setQuitFlag();
     mMainWorker.interruptAndClearQueue();
@@ -41,7 +41,7 @@ MultithreadedNodeCalculator::~MultithreadedNodeCalculator()
 }
 
 
-void MultithreadedNodeCalculator::generateChildNodes(NodePtr ioNode,
+void MultiThreadedNodeCalculator::generateChildNodes(NodePtr ioNode,
                                                      const Evaluator * inEvaluator,
                                                      BlockType inBlockType,
                                                      int inMaxChildCount)
@@ -66,7 +66,7 @@ void MultithreadedNodeCalculator::generateChildNodes(NodePtr ioNode,
 }
 
 
-void MultithreadedNodeCalculator::populateNodes(NodePtr ioNode,
+void MultiThreadedNodeCalculator::populateNodes(NodePtr ioNode,
                                                 const BlockTypes & inBlockTypes,
                                                 const std::vector<int> & inWidths,
                                                 std::size_t inIndex,
@@ -93,7 +93,7 @@ void MultithreadedNodeCalculator::populateNodes(NodePtr ioNode,
     if (inIndex + 1 == inEndIndex)
     {
         Assert(ioNode->children().empty());
-        Worker::Task task = boost::bind(&MultithreadedNodeCalculator::generateChildNodes,
+        Worker::Task task = boost::bind(&MultiThreadedNodeCalculator::generateChildNodes,
                                         this,
                                         ioNode,
                                         &mEvaluator,
@@ -122,7 +122,7 @@ void MultithreadedNodeCalculator::populateNodes(NodePtr ioNode,
 }
 
 
-void MultithreadedNodeCalculator::populate()
+void MultiThreadedNodeCalculator::populate()
 {
     try
     {

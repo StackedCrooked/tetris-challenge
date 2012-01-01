@@ -124,7 +124,7 @@
     <ClInclude Include="include\Tetris\Gravity.h" />
     <ClInclude Include="include\Tetris\Grid.h" />
     <ClInclude Include="include\Tetris\MultiplayerGame.h" />
-    <ClInclude Include="include\Tetris\MultithreadedNodeCalculator.h" />
+    <ClInclude Include="include\Tetris\MultiThreadedNodeCalculator.h" />
     <ClInclude Include="include\Tetris\NodeCalculator.h" />
     <ClInclude Include="include\Tetris\NodeCalculatorImpl.h" />
     <ClInclude Include="include\Tetris\NodePtr.h" />
