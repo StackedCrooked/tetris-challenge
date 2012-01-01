@@ -62,7 +62,6 @@ NodeCalculatorImpl::NodeCalculatorImpl(const GameState & inGameState,
                                        WorkerPool & inWorkerPool) :
     mNode(new GameStateNode(inGameState, inEvaluator)),
     mResult(),
-    mNodeMutex(),
     mQuitFlag(false),
     mQuitFlagMutex(),
     mTreeRowInfos(inEvaluator, inBlockTypes.size()),
@@ -114,7 +113,6 @@ int NodeCalculatorImpl::getMaxSearchDepth() const
 std::vector<GameState> NodeCalculatorImpl::result() const
 {
     Assert(status() == NodeCalculator::Status_Finished);
-    ScopedLock lock(mNodeMutex);
     return mResult;
 }
 
@@ -151,8 +149,6 @@ void NodeCalculatorImpl::calculateResult()
         Assert(mNode->endNode()->gameState().isGameOver());
         return;
     }
-
-    ScopedLock lock(mNodeMutex);
 
     // Backtrack the best end-node to its starting node.
     std::stack<NodePtr> results;

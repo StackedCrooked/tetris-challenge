@@ -197,7 +197,6 @@ protected:
 
     NodePtr mNode;
     std::vector<GameState> mResult;
-    mutable Futile::Mutex mNodeMutex;
 
 
     bool mQuitFlag;
