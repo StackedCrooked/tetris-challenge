@@ -22,12 +22,10 @@ endif()
 # Check TETRIS_BUILD_TYPE environment variable
 #
 set(CMAKE_BUILD_TYPE $ENV{TETRIS_BUILD_TYPE})
-if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "Release")
-    message("CMAKE_BUILD_TYPE is ${CMAKE_BUILD_TYPE}")
+if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+message("CMAKE_BUILD_TYPE is ${CMAKE_BUILD_TYPE}")
 else()
-    set(CMAKE_BUILD_TYPE "Release")
-    message("TETRIS_BUILD_TYPE was not set or not correctly set. Defaulting to \"Release\"")
-else()
+set(CMAKE_BUILD_TYPE Release)
 endif()
 
 
@@ -62,13 +60,13 @@ if(WIN32)
     set(FINAL_COMPILE_FLAGS "${CXX_FLAGS_${CMAKE_BUILD_TYPE}} /D POCO_STATIC /D POCO_NO_AUTOMATIC_LIBS /D BOOST_ALL_NO_LIB /D _HAS_ITERATOR_DEBUGGING=0 /D _SECURE_SCL=0 /D _SECURE_SCL_THROWS=0")
 else()
     set(CMAKE_INCLUDE_SYSTEM_FLAG_CXX "-isystem ")
-    set(CXX_FLAGS         "${CXX_FLAGS} ")
+    set(CXX_FLAGS         "${CXX_FLAGS} -DTETRIS_QT=1")
     set(WARNING_OPTIONS_STM "-std=c++0x -Wall -Wextra -Werror ")
-    set(WARNING_OPTIONS     "${WARNING_OPTIONS_STM} ")
+    set(WARNING_OPTIONS     " ${WARNING_OPTIONS_STM}")
     set(CXX_FLAGS_Debug   "${CXX_FLAGS} ${WARNING_OPTIONS} -ggdb3 ")
     set(CXX_FLAGS_Release "${CXX_FLAGS} ${WARNING_OPTIONS} -O3 -DNDEBUG ")
     set(CXX_FLAGS_RelWithDebInfo "${CXX_FLAGS} ${WARNING_OPTIONS} -O2 -g3 -DNDEBUG ")
-    set(FINAL_COMPILE_FLAGS "${CXX_FLAGS_${CMAKE_BUILD_TYPE}} ")
+    set(FINAL_COMPILE_FLAGS "${CXX_FLAGS_${CMAKE_BUILD_TYPE}}")
 endif()
 
 
