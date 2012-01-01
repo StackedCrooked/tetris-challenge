@@ -40,7 +40,7 @@ public:
 
     Impl(ComputerPlayer * inComputerPlayer) :
         mComputerPlayer(inComputerPlayer),
-        mGame(mComputerPlayer->game()->game()),
+        mGame(mComputerPlayer->game().game()),
         mTweaker(0),
         mMainWorker("ComputerPlayer: MainWorker"),
         mWorkerPool("ComputerPlayer: WorkerPool", cDefaultWorkerCount),
@@ -97,14 +97,14 @@ public:
     inline GameState previousGameState(stm::transaction & tx)
     {
         const Precalculated & cPrecalculated = mPrecalculated.open_r(tx);
-        return cPrecalculated.empty() ? mComputerPlayer->game()->game().gameState(tx)
+        return cPrecalculated.empty() ? mComputerPlayer->game().game().gameState(tx)
                                       : cPrecalculated.back();
     }
 
     inline Block previousActiveBlock(stm::transaction & tx)
     {
         const Precalculated & cPrecalculated = mPrecalculated.open_r(tx);
-        return cPrecalculated.empty() ? mComputerPlayer->game()->activeBlock()
+        return cPrecalculated.empty() ? mComputerPlayer->game().activeBlock()
                                       : cPrecalculated.back().originalBlock();
     }
 
@@ -385,7 +385,7 @@ void ComputerPlayer::Impl::move()
             return;
         }
 
-        unsigned oldId = mComputerPlayer->game()->game().gameStateId(tx);
+        unsigned oldId = mComputerPlayer->game().game().gameStateId(tx);
         unsigned predictedId = cPrecalculated.front().id();
         if (oldId >= predictedId)
         {
@@ -513,8 +513,8 @@ void ComputerPlayer::Impl::startNodeCalculator(stm::transaction & tx)
     //
     // Create the list of future blocks
     //
-    const SimpleGame * simpleGame = mComputerPlayer->game();
-    std::vector<Block> nextBlocks = simpleGame->getNextBlocks(cPrecalculated.size() + mSearchDepth);
+    const SimpleGame & simpleGame = mComputerPlayer->game();
+    std::vector<Block> nextBlocks = simpleGame.getNextBlocks(cPrecalculated.size() + mSearchDepth);
     Assert(nextBlocks.size() == cPrecalculated.size() + mSearchDepth);
     BlockTypes futureBlocks;
     for (std::size_t idx = cPrecalculated.size(); idx < nextBlocks.size(); ++idx)

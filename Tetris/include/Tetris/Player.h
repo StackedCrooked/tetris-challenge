@@ -36,29 +36,37 @@ public:
 
     virtual ~Player() = 0;
 
-    PlayerType type() const;
+    inline PlayerType type() const { return mPlayerType; }
 
-    const std::string & teamName() const;
+    inline const std::string & teamName() const { return mTeamName; }
 
-    const std::string & playerName() const;
+    inline const std::string & playerName() const { return mPlayerName; }
 
-    const SimpleGame * game() const;
+    inline const SimpleGame & game() const { return mSimpleGame; }
 
-    SimpleGame * game();
+    inline SimpleGame & game() { return mSimpleGame; }
 
 protected:
     Player(PlayerType inPlayerType,
            const TeamName & inTeamName,
            const PlayerName & inPlayerName,
            std::size_t inRowCount,
-           std::size_t inColumnCount);
+           std::size_t inColumnCount) :
+        mPlayerType(inPlayerType),
+        mTeamName(inTeamName),
+        mPlayerName(inPlayerName),
+        mSimpleGame(inPlayerType, inRowCount, inColumnCount)
+    {
+    }
 
 private:
     friend bool operator==(const Player & lhs, const Player & rhs);
     friend bool operator<(const Player & lhs, const Player & rhs);
 
-    struct Impl;
-    boost::scoped_ptr<Impl> mImpl;
+    PlayerType mPlayerType;
+    std::string mTeamName;
+    std::string mPlayerName;
+    SimpleGame mSimpleGame;
 };
 
 
