@@ -94,22 +94,18 @@ public:
     void onError(stm::transaction & tx);
 
     // Return a copy!
-    GameState previousGameState()
+    inline GameState previousGameState(stm::transaction & tx)
     {
-        return stm::atomic<GameState>([&](stm::transaction & tx) {
-            const Precalculated & cPrecalculated = mPrecalculated.open_r(tx);
-            return cPrecalculated.empty() ? mComputerPlayer->game()->game().gameState(tx)
-                                          : cPrecalculated.back();
-        });
+        const Precalculated & cPrecalculated = mPrecalculated.open_r(tx);
+        return cPrecalculated.empty() ? mComputerPlayer->game()->game().gameState(tx)
+                                      : cPrecalculated.back();
     }
 
-    Block previousActiveBlock()
+    inline Block previousActiveBlock(stm::transaction & tx)
     {
-        return stm::atomic<Block>([&](stm::transaction & tx) {
-            const Precalculated & cPrecalculated = mPrecalculated.open_r(tx);
-            return cPrecalculated.empty() ? mComputerPlayer->game()->activeBlock()
-                                          : cPrecalculated.back().originalBlock();
-        });
+        const Precalculated & cPrecalculated = mPrecalculated.open_r(tx);
+        return cPrecalculated.empty() ? mComputerPlayer->game()->activeBlock()
+                                      : cPrecalculated.back().originalBlock();
     }
 
     ComputerPlayer * mComputerPlayer;
@@ -508,7 +504,7 @@ void ComputerPlayer::Impl::startNodeCalculator(stm::transaction & tx)
         return;
     }
 
-    if (previousGameState().isGameOver())
+    if (previousGameState(tx).isGameOver())
     {
         return;
     }
@@ -546,7 +542,7 @@ void ComputerPlayer::Impl::startNodeCalculator(stm::transaction & tx)
         mWorkerCount = cDefaultWorkerCount;
     }
     mWorkerPool.resize(mWorkerCount);
-    mNodeCalculator.reset(new NodeCalculator(previousGameState(),
+    mNodeCalculator.reset(new NodeCalculator(previousGameState(tx),
                                              futureBlocks,
                                              widths,
                                              *mEvaluator,
@@ -564,7 +560,7 @@ void ComputerPlayer::Impl::onStarted(stm::transaction &)
 
 void ComputerPlayer::Impl::onWorking(stm::transaction & tx)
 {
-    if (previousGameState().id() < mGame.gameState(tx).id())
+    if (previousGameState(tx).id() < mGame.gameState(tx).id())
     {
         // The calculated results have become invalid. Start over.
         mReset = true;
