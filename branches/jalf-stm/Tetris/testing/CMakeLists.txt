@@ -135,6 +135,20 @@ add_executable(${EXECUTABLE} ${TetrisTestSuite_SOURCES})
 
 
 #
+# Post build step: make a symbolic link to the last build directory
+#
+if(WIN32)
+# TODO: Add unix shell support. Or use CMake builtin commands.
+else()
+add_custom_command(TARGET ${EXECUTABLE}
+                   POST_BUILD
+                   COMMAND /bin/rm ARGS -f ${BUILD_ROOT}LastBuild
+                   COMMAND /bin/ln ARGS -s ${OUTDIR} ${BUILD_ROOT}LastBuild
+                   WORKING_DIRECTORY    ${BUILD_ROOT})
+endif()
+
+
+#
 # Lib filename extension
 #
 set(LIBEXT "a")
