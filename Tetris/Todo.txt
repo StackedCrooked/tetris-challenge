@@ -14,3 +14,5 @@ v Improve encapsulation by obeying the Law of Demeter
 STM Notes
 ---------
 stm::shared<std::string> s(std::string()); // a little weird
+
+@StackedCrooked btw, if you need something like a condition variable in the STM lib, simply open the variables you want to wait for changes in, check their value, and call transaction::retry(). In an ideal world, it'd then suspend the thread until one of your opened variables is modified. In the current implementation, it's basically a busy loop, so much less efficient, but the effect is the same :)
