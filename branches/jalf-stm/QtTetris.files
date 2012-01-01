@@ -137,7 +137,7 @@ Tetris/include/Tetris/GameStateStats.h
 Tetris/include/Tetris/Gravity.h
 Tetris/include/Tetris/Grid.h
 Tetris/include/Tetris/MultiplayerGame.h
-Tetris/include/Tetris/MultiThreadedNodeCalculator.h
+Tetris/include/Tetris/MultithreadedNodeCalculator.h
 Tetris/include/Tetris/NodeCalculator.h
 Tetris/include/Tetris/NodeCalculatorImpl.h
 Tetris/include/Tetris/NodePtr.h
@@ -196,7 +196,3 @@ rebuild.bat
 configure.bat
 clean.bat
 Tetris/src/MultiThreadedNodeCalculator.cpp
-Tetris/src/STMWorkerPool.h
-Tetris/src/STMWorker.h
-Tetris/src/STMWorkerPool.cpp
-Tetris/src/STMWorker.cpp

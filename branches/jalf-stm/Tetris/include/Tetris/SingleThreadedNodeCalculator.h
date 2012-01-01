@@ -24,9 +24,7 @@ public:
     virtual ~SingleThreadedNodeCalculator();
 
 private:
-    void onChildNodeGenerated(stm::transaction & tx,
-                              const Progress & inProgress,
-                              const NodePtr & inChildNode);
+    void onChildNodeGenerated(const Progress & inProgress, const NodePtr & inChildNode);
 
     virtual void populate();
 };

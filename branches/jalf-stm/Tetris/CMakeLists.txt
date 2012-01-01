@@ -30,7 +30,7 @@ add_library(Tetris
     include/Tetris/Gravity.h
     include/Tetris/Grid.h
     include/Tetris/MultiplayerGame.h
-    include/Tetris/MultiThreadedNodeCalculator.h
+    include/Tetris/MultithreadedNodeCalculator.h
     include/Tetris/NodeCalculator.h
     include/Tetris/NodeCalculatorImpl.h
     include/Tetris/NodePtr.h
@@ -59,11 +59,6 @@ add_library(Tetris
     src/NodeCalculatorImpl.cpp
     src/Player.cpp
     src/SingleThreadedNodeCalculator.cpp
-    src/Unicode.cpp
-    src/STMWorker.cpp
-    src/STMWorker.h
-    src/STMWorkerPool.cpp
-    src/STMWorkerPool.h)
-
+    src/Unicode.cpp)
 
 set_target_properties(Tetris PROPERTIES COMPILE_FLAGS ${FINAL_COMPILE_FLAGS})

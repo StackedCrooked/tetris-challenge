@@ -1,6 +1,6 @@
 #include "Tetris/NodeCalculator.h"
 #include "Tetris/NodeCalculatorImpl.h"
-#include "Tetris/MultiThreadedNodeCalculator.h"
+#include "Tetris/MultithreadedNodeCalculator.h"
 #include "Tetris/SingleThreadedNodeCalculator.h"
 #include "Tetris/GameState.h"
 
@@ -21,7 +21,7 @@ static std::unique_ptr<NodeCalculatorImpl> CreateImpl(const GameState & inGameSt
     if (inWorkerPool.size() > 1)
     {
         return std::unique_ptr<NodeCalculatorImpl>(
-            new MultiThreadedNodeCalculator(inGameState,
+            new MultithreadedNodeCalculator(inGameState,
                                             inBlockTypes,
                                             inWidths,
                                             inEvaluator,
@@ -64,25 +64,19 @@ NodeCalculator::~NodeCalculator()
 
 void NodeCalculator::start()
 {
-    stm::atomic([&](stm::transaction & tx) {
-        mImpl->start(tx);
-    });
+    return mImpl->start();
 }
 
 
 void NodeCalculator::stop()
 {
-    stm::atomic([&](stm::transaction & tx) {
-        mImpl->stop(tx);
-    });
+    mImpl->stop();
 }
 
 
 int NodeCalculator::getCurrentSearchDepth() const
 {
-    return stm::atomic<int>([&](stm::transaction & tx) {
-        return mImpl->getCurrentSearchDepth(tx);
-    });
+    return mImpl->getCurrentSearchDepth();
 }
 
 
@@ -94,26 +88,20 @@ int NodeCalculator::getMaxSearchDepth() const
 
 std::vector<GameState> NodeCalculator::result() const
 {
-    return stm::atomic< std::vector<GameState> >([&](stm::transaction & tx) {
-        Assert(mImpl->status(tx) != Status_Error);
-        return mImpl->result(tx);
-    });
+    Assert(status() != Status_Error);
+    return mImpl->result();
 }
 
 
 NodeCalculator::Status NodeCalculator::status() const
 {
-    return stm::atomic<NodeCalculator::Status>([&](stm::transaction & tx) {
-        return static_cast<Status>(mImpl->status(tx));
-    });
+    return static_cast<Status>(mImpl->status());
 }
 
 
 std::string NodeCalculator::errorMessage() const
 {
-    return stm::atomic<std::string>([&](stm::transaction & tx) {
-        return mImpl->errorMessage(tx);
-    });
+    return mImpl->errorMessage();
 }
 
 

@@ -9,17 +9,17 @@
 namespace Tetris {
 
 
-class MultiThreadedNodeCalculator : public NodeCalculatorImpl
+class MultithreadedNodeCalculator : public NodeCalculatorImpl
 {
 public:
-    MultiThreadedNodeCalculator(const GameState & inGameState,
+    MultithreadedNodeCalculator(const GameState & inGameState,
                                 const BlockTypes & inBlockTypes,
                                 const std::vector<int> & inWidths,
                                 const Evaluator & inEvaluator,
                                 Futile::Worker & inMainWorker,
                                 Futile::WorkerPool & inWorkerPool);
 
-    virtual ~MultiThreadedNodeCalculator();
+    virtual ~MultithreadedNodeCalculator();
 
 private:
     virtual void populate();
