@@ -131,7 +131,6 @@ void MultithreadedNodeCalculator::populate()
         std::size_t targetDepth = 1;
         while (targetDepth <= mBlockTypes.size())
         {
-            ScopedLock lock(mNodeMutex);
             populateNodes(mNode, mBlockTypes, mWidths, 0, targetDepth);
             mWorkerPool.wait();
             Assert(mWorkerPool.getActiveWorkerCount() == 0);

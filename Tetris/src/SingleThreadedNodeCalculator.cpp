@@ -53,7 +53,6 @@ void SingleThreadedNodeCalculator::populate()
         std::size_t targetDepth = 1;
         while (targetDepth <= mBlockTypes.size())
         {
-            ScopedLock lock(mNodeMutex);
             CalculateNodes(mNode,
                            mEvaluator,
                            mBlockTypes,
