@@ -65,7 +65,7 @@ else()
     set(WARNING_OPTIONS     " ${WARNING_OPTIONS_STM}")
     set(CXX_FLAGS_Debug   "${CXX_FLAGS} ${WARNING_OPTIONS} -ggdb3 ")
     set(CXX_FLAGS_Release "${CXX_FLAGS} ${WARNING_OPTIONS} -O3 -DNDEBUG ")
-    set(CXX_FLAGS_RelWithDebInfo "${CXX_FLAGS} ${WARNING_OPTIONS} -fno-inline -O3 -g -DNDEBUG ")
+    set(CXX_FLAGS_RelWithDebInfo "${CXX_FLAGS} ${WARNING_OPTIONS} -fno-inline -O1 -g -DNDEBUG ")
     set(FINAL_COMPILE_FLAGS "${CXX_FLAGS_${CMAKE_BUILD_TYPE}}")
 endif()
 
