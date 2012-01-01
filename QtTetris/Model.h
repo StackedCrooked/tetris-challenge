@@ -21,8 +21,7 @@ class Model;
 typedef boost::shared_ptr<Model> ModelPtr;
 
 
-class Model : public ComputerPlayer::Tweaker,
-              boost::noncopyable
+class Model : boost::noncopyable
 {
 public:
     Model();
@@ -40,12 +39,6 @@ public:
     const MultiplayerGame & multiplayerGame() const;
 
     MultiplayerGame & multiplayerGame();
-
-    virtual const Evaluator & updateAIParameters(const Player & inPlayer,
-                                                 int & outSearchDepth,
-                                                 int & outSearchWidth,
-                                                 int & outWorkerCount,
-                                                 int & /*outMoveSpeed*/);
 
     void newGame(const PlayerTypes & inPlayerTypes, std::size_t inRowCount, std::size_t inColumnCount);
 

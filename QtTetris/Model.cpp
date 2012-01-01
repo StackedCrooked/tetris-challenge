@@ -51,7 +51,7 @@ bool Model::IsGameOver()
     for (std::size_t idx = 0; idx < mMultiplayerGame->playerCount(); ++idx)
     {
         Player * player = mMultiplayerGame->getPlayer(idx);
-        if (player->game()->isGameOver())
+        if (player->game().isGameOver())
         {
             mGameOver = true;
         }
@@ -120,24 +120,6 @@ unsigned CalculateOptimalWorkerCount(std::size_t numComputerPlayers)
 } // anonymous namespace
 
 
-const Evaluator & Model::updateAIParameters(const Player & inPlayer,
-                                            int & outSearchDepth,
-                                            int & outSearchWidth,
-                                            int & outWorkerCount,
-                                            int & /*outMoveSpeed*/)
-{
-    if (!inPlayer.game())
-    {
-        throw std::runtime_error("GameState is null!");
-    }
-
-    outWorkerCount = 2;
-    outSearchDepth = 5;
-    outSearchWidth = 4;
-    return MakeTetrises::Instance();
-}
-
-
 void Model::newGame(const PlayerTypes & inPlayerTypes, std::size_t inRowCount, std::size_t inColumnCount)
 {
     mMultiplayerGame.reset();
@@ -170,10 +152,8 @@ void Model::newGame(const PlayerTypes & inPlayerTypes, std::size_t inRowCount, s
         }
         else if (playerType == PlayerType_Computer)
         {
-            Player * player = mMultiplayerGame->addComputerPlayer(
-                TeamName(teamName),
-                PlayerName(GetPlayerName(inPlayerTypes[idx])),
-                this);
+            Player * player = mMultiplayerGame->addComputerPlayer(TeamName(teamName),
+                                                                  PlayerName(GetPlayerName(inPlayerTypes[idx])));
 
             if (ComputerPlayer * computerPlayer = dynamic_cast<ComputerPlayer*>(player))
             {
