@@ -29,7 +29,7 @@ add_library(Tetris
     include/Tetris/Gravity.h
     include/Tetris/Grid.h
     include/Tetris/MultiplayerGame.h
-    include/Tetris/MultithreadedNodeCalculator.h
+    include/Tetris/MultiThreadedNodeCalculator.h
     include/Tetris/NodeCalculator.h
     include/Tetris/NodeCalculatorImpl.h
     include/Tetris/NodePtr.h

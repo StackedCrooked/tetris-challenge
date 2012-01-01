@@ -1,6 +1,6 @@
 #include "Tetris/NodeCalculator.h"
 #include "Tetris/NodeCalculatorImpl.h"
-#include "Tetris/MultithreadedNodeCalculator.h"
+#include "Tetris/MultiThreadedNodeCalculator.h"
 #include "Tetris/SingleThreadedNodeCalculator.h"
 #include "Tetris/GameState.h"
 
@@ -21,7 +21,7 @@ static std::unique_ptr<NodeCalculatorImpl> CreateImpl(const GameState & inGameSt
     if (inWorkerPool.size() > 1)
     {
         return std::unique_ptr<NodeCalculatorImpl>(
-            new MultithreadedNodeCalculator(inGameState,
+            new MultiThreadedNodeCalculator(inGameState,
                                             inBlockTypes,
                                             inWidths,
                                             inEvaluator,

@@ -69,7 +69,7 @@
     <ClInclude Include="include\Tetris\MultiplayerGame.h">
       <Filter>Include Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Tetris\MultithreadedNodeCalculator.h">
+    <ClInclude Include="include\Tetris\MultiThreadedNodeCalculator.h">
       <Filter>Include Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Tetris\NodeCalculator.h">
