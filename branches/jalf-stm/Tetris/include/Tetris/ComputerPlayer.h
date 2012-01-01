@@ -2,7 +2,6 @@
 #define TETRIS_COMPUTERPLAYER_H
 
 
-#include "Tetris/BlockMover.h"
 #include "Tetris/Evaluator.h"
 #include "Tetris/Player.h"
 #include "Futile/Threading.h"
@@ -30,8 +29,7 @@ public:
                                                      int & outSearchDepth,
                                                      int & outSearchWidth,
                                                      int & outWorkerCount,
-                                                     int & outMoveSpeed,
-                                                     BlockMover::MoveDownBehavior & outMoveDownBehavior) = 0;
+                                                     int & outMoveSpeed) = 0;
     };
 
     static PlayerPtr Create(const TeamName & inTeamName,

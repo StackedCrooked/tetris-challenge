@@ -36,6 +36,8 @@ public:
     /// Sets the timer interval.
     void setInterval(UInt64 inInterval);
 
+    UInt64 getInterval() const;
+
 private:
     struct Impl;
     boost::scoped_ptr<Impl> mImpl;

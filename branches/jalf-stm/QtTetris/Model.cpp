@@ -124,8 +124,7 @@ const Evaluator & Model::updateAIParameters(const Player & inPlayer,
                                             int & outSearchDepth,
                                             int & outSearchWidth,
                                             int & outWorkerCount,
-                                            int & /*outMoveSpeed*/,
-                                            BlockMover::MoveDownBehavior & outMoveDownBehavior)
+                                            int & /*outMoveSpeed*/)
 {
     if (!inPlayer.game())
     {
@@ -135,7 +134,6 @@ const Evaluator & Model::updateAIParameters(const Player & inPlayer,
     outWorkerCount = 2;
     outSearchDepth = 5;
     outSearchWidth = 4;
-    outMoveDownBehavior = BlockMover::MoveDownBehavior_Move;
     return MakeTetrises::Instance();
 }
 

@@ -1,6 +1,5 @@
 #include "MainWindow.h"
 #include "NewGameDialog.h"
-#include "Tetris/BlockMover.h"
 #include "Tetris/ComputerPlayer.h"
 #include "Poco/Path.h"
 #include "Tetris/Utilities.h"

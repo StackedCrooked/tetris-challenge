@@ -2,13 +2,14 @@
 
 
 #include <QtGui/QApplication>
-#include "Model.h"
 #include "MainWindow.h"
+#include "Model.h"
 #include "Tetris/PlayerType.h"
 #include "Tetris/Unicode.h"
-#include "Futile/MainThread.h"
 #include "Futile/LeakDetector.h"
 #include "Futile/Logger.h"
+#include "Futile/MainThread.h"
+#include "Futile/MakeString.h"
 #include <iostream>
 #include <stdexcept>
 
