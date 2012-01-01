@@ -14,32 +14,12 @@ namespace Tetris {
 class Game;
 class GameState;
 
-
-class ComputerPlayer : public Player
+class Computer
 {
 public:
-    class Tweaker
-    {
-    public:
-        /**
-         * Gets updated parameters from the tweaker object.
-         * This message will be called in the main thread.
-         */
-        virtual const Evaluator & updateAIParameters(const Player & inPlayer,
-                                                     int & outSearchDepth,
-                                                     int & outSearchWidth,
-                                                     int & outWorkerCount,
-                                                     int & outMoveSpeed) = 0;
-    };
+    Computer(Game & inGame);
 
-    static PlayerPtr Create(const TeamName & inTeamName,
-                            const PlayerName & inPlayerName,
-                            std::size_t inRowCount,
-                            std::size_t inColumnCount);
-
-    virtual ~ComputerPlayer();
-
-    void setTweaker(Tweaker * inTweaker);
+    virtual ~Computer();
 
     int searchDepth() const;
 
@@ -62,18 +42,35 @@ public:
     void setWorkerCount(int inWorkerCount);
 
 private:
-    ComputerPlayer(const TeamName & inTeamName,
-                   const PlayerName & inPlayerName,
-                   std::size_t inRowCount,
-                   std::size_t inColumnCount);
-
     void onTimerEvent();
-
 
     struct Impl;
     friend struct Impl;
     Futile::ThreadSafe<Impl> mImpl;
     boost::scoped_ptr<Futile::Timer> mTimer;
+};
+
+
+class ComputerPlayer : public Player,
+                       public Computer
+
+{
+public:
+    static inline PlayerPtr Create(const TeamName & inTeamName,
+                                   const PlayerName & inPlayerName,
+                                   std::size_t inRowCount,
+                                   std::size_t inColumnCount)
+    {
+        PlayerPtr result(new ComputerPlayer(inTeamName, inPlayerName, inRowCount, inColumnCount));
+        return result;
+    }
+
+    ComputerPlayer(const TeamName & inTeamName,
+                   const PlayerName & inPlayerName,
+                   std::size_t inRowCount,
+                   std::size_t inColumnCount);
+
+    virtual ~ComputerPlayer() {}
 };
 
 
