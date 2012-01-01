@@ -10,32 +10,6 @@ namespace Tetris {
 using namespace Futile;
 
 
-struct Player::Impl
-{
-    Impl(PlayerType inPlayerType,
-         const TeamName & inTeamName,
-         const PlayerName & inPlayerName,
-         std::size_t inRowCount,
-         std::size_t inColumnCount) :
-        mPlayerType(inPlayerType),
-        mSimpleGame(inPlayerType, inRowCount, inColumnCount),
-        mTeamName(inTeamName),
-        mPlayerName(inPlayerName)
-    {
-    }
-
-
-    ~Impl()
-    {
-    }
-
-    PlayerType mPlayerType;
-    SimpleGame mSimpleGame;
-    std::string mTeamName;
-    std::string mPlayerName;
-};
-
-
 PlayerPtr Player::Create(PlayerType inPlayerType,
                          const TeamName & inTeamName,
                          const PlayerName & inPlayerName,
@@ -54,53 +28,8 @@ PlayerPtr Player::Create(PlayerType inPlayerType,
 }
 
 
-Player::Player(PlayerType inPlayerType,
-               const TeamName & inTeamName,
-               const PlayerName & inPlayerName,
-               std::size_t inRowCount,
-               std::size_t inColumnCount) :
-    mImpl(new Impl(inPlayerType,
-                   inTeamName,
-                   inPlayerName,
-                   inRowCount,
-                   inColumnCount))
-{
-}
-
-
 Player::~Player()
 {
-    mImpl.reset();
-}
-
-
-PlayerType Player::type() const
-{
-    return mImpl->mPlayerType;
-}
-
-
-const std::string & Player::teamName() const
-{
-    return mImpl->mTeamName;
-}
-
-
-const std::string & Player::playerName() const
-{
-    return mImpl->mPlayerName;
-}
-
-
-const SimpleGame * Player::game() const
-{
-    return &mImpl->mSimpleGame;
-}
-
-
-SimpleGame * Player::game()
-{
-    return &mImpl->mSimpleGame;
 }
 
 

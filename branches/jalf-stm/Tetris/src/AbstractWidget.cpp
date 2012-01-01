@@ -77,7 +77,7 @@ AbstractWidget::~AbstractWidget()
 {
     if (mPlayer)
     {
-        mPlayer->game()->unregisterEventHandler(this);
+        mPlayer->game().unregisterEventHandler(this);
     }
 }
 
@@ -98,21 +98,21 @@ void AbstractWidget::onLinesCleared(SimpleGame *, std::size_t inLineCount)
 void AbstractWidget::setPlayer(Player * inPlayer)
 {
     // Stop listing to the events from the old player.
-    if (mPlayer && mPlayer->game())
+    if (mPlayer)
     {
-        mPlayer->game()->unregisterEventHandler(this);
+        mPlayer->game().unregisterEventHandler(this);
     }
 
     // Set the new player.
     mPlayer = inPlayer;
 
     // Start listening to the events from the new player.
-    if (mPlayer && mPlayer->game())
+    if (mPlayer)
     {
         setMinSize(Size(2 * margin() + gameRect().width() + futureBlocksRect().width(),
                         2 * margin() + std::max(gameRect().height() + userInfoRect().height(), avatarRect().bottom() - gameRect().top())));
 
-        mPlayer->game()->registerEventHandler(this);
+        mPlayer->game().registerEventHandler(this);
     }
 }
 
@@ -123,7 +123,7 @@ const SimpleGame * AbstractWidget::game() const
     {
         return NULL;
     }
-    return mPlayer->game();
+    return &mPlayer->game();
 }
 
 
@@ -133,7 +133,7 @@ SimpleGame * AbstractWidget::game()
     {
         return NULL;
     }
-    return mPlayer->game();
+    return &mPlayer->game();
 }
 
 
