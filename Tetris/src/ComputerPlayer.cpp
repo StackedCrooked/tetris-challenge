@@ -529,7 +529,6 @@ void ComputerPlayer::Impl::startNodeCalculator()
                                              *mEvaluator,
                                              mMainWorker,
                                              mWorkerPool));
-
     mNodeCalculator->start();
 }
 
