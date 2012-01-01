@@ -59,8 +59,7 @@ public:
         mWorkerCount(cDefaultWorkerCount),
         mStop(false),
         mReset(false),
-        mQuitFlag(false),
-        mMoveTimer()
+        mQuitFlag(false)
     {
     }
 
@@ -81,7 +80,7 @@ public:
     void timerEvent();
     void timerEventImpl(stm::transaction & tx);
 
-    void move();
+    void move(stm::transaction & tx);
 
     static void UpdateComputerBlockMoveSpeed(boost::weak_ptr<Player> weakPlayer) {
         if (PlayerPtr playerPtr = weakPlayer.lock())
@@ -129,19 +128,14 @@ public:
     bool mStop;
     bool mReset;
     bool mQuitFlag;
-    Futile::Timer mMoveTimer;
 };
 
 
 Computer::Computer(Game & inGame) :
-  mImpl(new Impl(this, inGame)),
-  mTimer(new Futile::Timer(10))
+    mImpl(new Impl(this, inGame)),
+    mTimer(new Futile::Timer(100))
 {
   mTimer->start(boost::bind(&Computer::onTimerEvent, this));
-  FUTILE_LOCK(Impl & impl, mImpl)
-  {
-      impl.mMoveTimer.start(boost::bind(&Computer::Impl::move, &impl));
-  }
 }
 
 
@@ -219,26 +213,23 @@ int Computer::depth() const
 
 int Computer::moveSpeed() const
 {
-    return mImpl.lock()->mMoveTimer.interval();
+    return mTimer->interval();
 }
 
 
 void Computer::setMoveSpeed(int inNumMovesPerSecond)
 {
-    FUTILE_LOCK(Impl & impl, mImpl)
+    if (inNumMovesPerSecond > 1000)
     {
-        if (inNumMovesPerSecond > 1000)
-        {
-            inNumMovesPerSecond = 1000;
-        }
-
-        if (inNumMovesPerSecond < 1)
-        {
-            inNumMovesPerSecond = 1;
-        }
-
-        impl.mMoveTimer.setInterval(Impl::GetTimerIntervalMs(inNumMovesPerSecond));
+        inNumMovesPerSecond = 1000;
     }
+
+    if (inNumMovesPerSecond < 1)
+    {
+        inNumMovesPerSecond = 1;
+    }
+
+    mTimer->setInterval(Impl::GetTimerIntervalMs(inNumMovesPerSecond));
 }
 
 
@@ -320,43 +311,39 @@ bool Move(stm::transaction & tx, Game & ioGame, const Block & targetBlock)
 }
 
 
-void Computer::Impl::move()
+void Computer::Impl::move(stm::transaction & tx)
 {
+    const Precalculated & cPrecalculated = mPrecalculated.open_r(tx);
+    if (cPrecalculated.empty())
+    {
+        return;
+    }
 
-    stm::atomic([&](stm::transaction & tx) {
+    unsigned oldId = mGame.gameStateId(tx);
+    unsigned predictedId = cPrecalculated.front().id();
+    if (oldId >= predictedId)
+    {
+        // Precalculated blocks have been invalidated.
+        LogInfo("Precalculated invalidated.");
+        mPrecalculated.open_rw(tx).clear();
+        return;
+    }
 
-        const Precalculated & cPrecalculated = mPrecalculated.open_r(tx);
-        if (cPrecalculated.empty())
-        {
-            return;
-        }
+    Assert(predictedId == oldId + 1); // check sync
+    const Block & activeBlock = mGame.activeBlock(tx);
+    const Block & originalBlock = cPrecalculated.front().originalBlock();
+    Assert(activeBlock.type() == originalBlock.type());
+    (void)activeBlock;
+    (void)originalBlock;
 
-        unsigned oldId = mGame.gameStateId(tx);
-        unsigned predictedId = cPrecalculated.front().id();
-        if (oldId >= predictedId)
-        {
-            // Precalculated blocks have been invalidated.
-            LogInfo("Precalculated invalidated.");
-            mPrecalculated.open_rw(tx).clear();
-            return;
-        }
-
-        Assert(predictedId == oldId + 1); // check sync
-        const Block & activeBlock = mGame.activeBlock(tx);
-        const Block & originalBlock = cPrecalculated.front().originalBlock();
-        Assert(activeBlock.type() == originalBlock.type());
-        (void)activeBlock;
-        (void)originalBlock;
-
-        Move(tx, mGame, cPrecalculated.front().originalBlock());
-        unsigned newId = mGame.gameStateId(tx);
-        Assert(oldId == newId || oldId + 1 == newId);
-        if (newId > oldId)
-        {
-            Precalculated & precalculated = mPrecalculated.open_rw(tx);
-            precalculated.erase(precalculated.begin());
-        }
-    });
+    Move(tx, mGame, cPrecalculated.front().originalBlock());
+    unsigned newId = mGame.gameStateId(tx);
+    Assert(oldId == newId || oldId + 1 == newId);
+    if (newId > oldId)
+    {
+        Precalculated & precalculated = mPrecalculated.open_rw(tx);
+        precalculated.erase(precalculated.begin());
+    }
 }
 
 
@@ -384,7 +371,7 @@ void Computer::Impl::timerEventImpl(stm::transaction & tx)
         return;
     }
 
-    move();
+    move(tx);
 
     if (!mNodeCalculator)
     {
