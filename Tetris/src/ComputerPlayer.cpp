@@ -38,21 +38,20 @@ struct ComputerPlayer::Impl : boost::noncopyable
 public:
     typedef ComputerPlayer::Tweaker Tweaker;
 
-    Impl(ComputerPlayer * inComputerPlayer,
-         BlockMover * inBlockMover) :
+    Impl(ComputerPlayer * inComputerPlayer) :
         mComputerPlayer(inComputerPlayer),
         mGame(mComputerPlayer->game()->game()),
         mTweaker(0),
         mMainWorker("ComputerPlayer: MainWorker"),
         mWorkerPool("ComputerPlayer: WorkerPool", cDefaultWorkerCount),
         mEvaluator(&Balanced::Instance()),
-        mBlockMover(inBlockMover),
         mSearchDepth(8),
         mSearchWidth(5),
         mWorkerCount(cDefaultWorkerCount),
         mStop(false),
         mReset(false),
-        mQuitFlag(false)
+        mQuitFlag(false),
+        mMoveTimer(GetTimerIntervalMs(1))
     {
     }
 
@@ -65,9 +64,19 @@ public:
         mWorkerPool.interruptAndClearQueue();
     }
 
+    static unsigned GetTimerIntervalMs(unsigned inNumMovesPerSecond)
+    {
+        return static_cast<unsigned>(0.5 + 1000.0 / static_cast<double>(inNumMovesPerSecond));
+    }
+
     void timerEvent();
 
     void move();
+
+    void onMoveTimer()
+    {
+        move();
+    }
 
     static void UpdateComputerBlockMoveSpeed(boost::weak_ptr<Player> weakPlayer) {
         if (PlayerPtr playerPtr = weakPlayer.lock())
@@ -110,13 +119,13 @@ public:
     std::vector<GameState> mPrecalculated;
     boost::scoped_ptr<NodeCalculator> mNodeCalculator;
     const Evaluator * mEvaluator;
-    boost::scoped_ptr<BlockMover> mBlockMover;
     int mSearchDepth;
     int mSearchWidth;
     int mWorkerCount;
     bool mStop;
     bool mReset;
     bool mQuitFlag;
+    Futile::Timer mMoveTimer;
 };
 
 
@@ -135,12 +144,14 @@ ComputerPlayer::ComputerPlayer(const TeamName & inTeamName,
                                std::size_t inRowCount,
                                std::size_t inColumnCount) :
     Player(PlayerType_Computer, inTeamName, inPlayerName, inRowCount, inColumnCount),
-    mImpl(new Impl(this, new BlockMover(*game()))),
+    mImpl(new Impl(this)),
     mTimer(new Futile::Timer(10))
 {
-
-
     mTimer->start(boost::bind(&ComputerPlayer::onTimerEvent, this));
+    FUTILE_LOCK(Impl & impl, mImpl)
+    {
+        impl.mMoveTimer.start(boost::bind(&ComputerPlayer::Impl::onMoveTimer, &impl));
+    }
 }
 
 
@@ -150,7 +161,6 @@ ComputerPlayer::~ComputerPlayer()
     FUTILE_LOCK(Impl & impl, mImpl)
     {
         impl.mQuitFlag = true;
-        impl.mBlockMover.reset();
     }
 }
 
@@ -228,15 +238,25 @@ int ComputerPlayer::depth() const
 
 int ComputerPlayer::moveSpeed() const
 {
-    return mImpl.lock()->mBlockMover->speed();
+    return mImpl.lock()->mMoveTimer.getInterval();
 }
 
 
-void ComputerPlayer::setMoveSpeed(int inMoveSpeed)
+void ComputerPlayer::setMoveSpeed(int inNumMovesPerSecond)
 {
     FUTILE_LOCK(Impl & impl, mImpl)
     {
-        impl.mBlockMover->setSpeed(inMoveSpeed);
+        if (inNumMovesPerSecond > 1000)
+        {
+            inNumMovesPerSecond = 1000;
+        }
+
+        if (inNumMovesPerSecond < 1)
+        {
+            inNumMovesPerSecond = 1;
+        }
+
+        impl.mMoveTimer.setInterval(Impl::GetTimerIntervalMs(inNumMovesPerSecond));
     }
 }
 
@@ -268,15 +288,13 @@ void ComputerPlayer::Impl::updateComputerBlockMoveSpeed()
     // Consult the Tweaker for improved settings
     if (mTweaker)
     {
-        BlockMover::MoveDownBehavior moveDownBehavior = BlockMover::MoveDownBehavior_Null;
         int moveSpeed = 0;
 
         mEvaluator = &mTweaker->updateAIParameters(*mComputerPlayer,
                                                    mSearchDepth,
                                                    mSearchWidth,
                                                    mWorkerCount,
-                                                   moveSpeed,
-                                                   moveDownBehavior);
+                                                   moveSpeed);
 
         if (mSearchDepth < 1 || mSearchDepth > 100)
         {
@@ -295,16 +313,7 @@ void ComputerPlayer::Impl::updateComputerBlockMoveSpeed()
 
         if (moveSpeed != 0)
         {
-            if (moveSpeed < 0)
-            {
-                throw std::runtime_error(SS() << "Invalid move speed: " << moveSpeed);
-            }
-            mBlockMover->setSpeed(moveSpeed);
-        }
-
-        if (moveDownBehavior != BlockMover::MoveDownBehavior_Null)
-        {
-            mBlockMover->setMoveDownBehavior(moveDownBehavior);
+            mMoveTimer.setInterval(GetTimerIntervalMs(moveSpeed));
         }
     }
 }
@@ -361,7 +370,8 @@ bool Move(stm::transaction & tx, Game & ioGame, const Block & targetBlock)
         return true;
     }
 
-    return ioGame.move(tx, MoveDirection_Down);
+    ioGame.dropAndCommit(tx);
+    return false;
 }
 
 

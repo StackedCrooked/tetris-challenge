@@ -123,7 +123,6 @@ Tetris/include/Tetris/AISupport.h
 Tetris/include/Tetris/AbstractWidget.h
 Tetris/include/Tetris/Block.h
 Tetris/include/Tetris/BlockFactory.h
-Tetris/include/Tetris/BlockMover.h
 Tetris/include/Tetris/BlockType.h
 Tetris/include/Tetris/BlockTypes.h
 Tetris/include/Tetris/ComputerPlayer.h
@@ -154,7 +153,6 @@ Tetris/src/AISupport.cpp
 Tetris/src/AbstractWidget.cpp
 Tetris/src/Block.cpp
 Tetris/src/BlockFactory.cpp
-Tetris/src/BlockMover.cpp
 Tetris/src/BlockType.cpp
 Tetris/src/ComputerPlayer.cpp
 Tetris/src/Evaluator.cpp

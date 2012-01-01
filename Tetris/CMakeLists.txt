@@ -15,7 +15,6 @@ add_library(Tetris
     include/Tetris/AISupport.h
     include/Tetris/Block.h
     include/Tetris/BlockFactory.h
-    include/Tetris/BlockMover.h
     include/Tetris/BlockType.h
     include/Tetris/BlockTypes.h
     include/Tetris/ComputerPlayer.h
@@ -43,7 +42,6 @@ add_library(Tetris
     src/AISupport.cpp
     src/Block.cpp
     src/BlockFactory.cpp
-    src/BlockMover.cpp
     src/BlockType.cpp
     src/ComputerPlayer.cpp
     src/Evaluator.cpp

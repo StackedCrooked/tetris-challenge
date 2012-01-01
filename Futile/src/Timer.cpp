@@ -70,7 +70,7 @@ struct Timer::Impl : boost::noncopyable
         mInterval = inInterval;
     }
 
-    UInt64 getInterval()
+    UInt64 getInterval() const
     {
         boost::mutex::scoped_lock lock(mIntervalMutex);
         return mInterval;
@@ -175,6 +175,12 @@ void Timer::stop()
 void Timer::setInterval(UInt64 inInterval)
 {
     mImpl->setInterval(inInterval);
+}
+
+
+UInt64 Timer::getInterval() const
+{
+    return mImpl->mInterval;
 }
 
 

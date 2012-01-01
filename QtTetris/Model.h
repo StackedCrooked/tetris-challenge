@@ -2,7 +2,6 @@
 #define QTTETRIS_MODEL_H
 
 
-#include "Tetris/BlockMover.h"
 #include "Tetris/ComputerPlayer.h"
 #include "Tetris/Evaluator.h"
 #include "Tetris/MultiplayerGame.h"
@@ -46,8 +45,7 @@ public:
                                                  int & outSearchDepth,
                                                  int & outSearchWidth,
                                                  int & outWorkerCount,
-                                                 int & /*outMoveSpeed*/,
-                                                 BlockMover::MoveDownBehavior & outMoveDownBehavior);
+                                                 int & /*outMoveSpeed*/);
 
     void newGame(const PlayerTypes & inPlayerTypes, std::size_t inRowCount, std::size_t inColumnCount);
 
