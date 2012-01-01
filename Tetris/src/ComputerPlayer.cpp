@@ -44,6 +44,8 @@ public:
         mTweaker(0),
         mMainWorker("ComputerPlayer: MainWorker"),
         mWorkerPool("ComputerPlayer: WorkerPool", cDefaultWorkerCount),
+        mPrecalculated(Precalculated()),
+        mNodeCalculator(),
         mEvaluator(&Balanced::Instance()),
         mSearchDepth(8),
         mSearchWidth(5),
@@ -70,6 +72,7 @@ public:
     }
 
     void timerEvent();
+    void timerEventImpl(stm::transaction & tx);
 
     void move();
 
@@ -83,26 +86,30 @@ public:
 
     void updateComputerBlockMoveSpeed();
 
-    void startNodeCalculator();
-    void onStarted();
-    void onWorking();
-    void onStopped();
-    void onFinished();
-    void onError();
+    void startNodeCalculator(stm::transaction & tx);
+    void onStarted(stm::transaction & tx);
+    void onWorking(stm::transaction & tx);
+    void onStopped(stm::transaction & tx);
+    void onFinished(stm::transaction & tx);
+    void onError(stm::transaction & tx);
 
     // Return a copy!
     GameState previousGameState()
     {
-        return stm::atomic<GameState>([&](stm::transaction & tx){
-            return mPrecalculated.empty() ? mComputerPlayer->game()->game().gameState(tx)
-                                          : mPrecalculated.back();
+        return stm::atomic<GameState>([&](stm::transaction & tx) {
+            const Precalculated & cPrecalculated = mPrecalculated.open_r(tx);
+            return cPrecalculated.empty() ? mComputerPlayer->game()->game().gameState(tx)
+                                          : cPrecalculated.back();
         });
     }
 
     Block previousActiveBlock()
     {
-        return mPrecalculated.empty() ? mComputerPlayer->game()->activeBlock()
-                                      : mPrecalculated.back().originalBlock();
+        return stm::atomic<Block>([&](stm::transaction & tx) {
+            const Precalculated & cPrecalculated = mPrecalculated.open_r(tx);
+            return cPrecalculated.empty() ? mComputerPlayer->game()->activeBlock()
+                                          : cPrecalculated.back().originalBlock();
+        });
     }
 
     ComputerPlayer * mComputerPlayer;
@@ -111,7 +118,8 @@ public:
 
     Worker mMainWorker;
     WorkerPool mWorkerPool;
-    std::vector<GameState> mPrecalculated;
+    typedef std::vector<GameState> Precalculated;
+    mutable stm::shared<Precalculated> mPrecalculated;
     boost::scoped_ptr<NodeCalculator> mNodeCalculator;
     const Evaluator * mEvaluator;
     int mSearchDepth;
@@ -373,41 +381,53 @@ bool Move(stm::transaction & tx, Game & ioGame, const Block & targetBlock)
 
 void ComputerPlayer::Impl::move()
 {
-    if (mPrecalculated.empty())
-    {
-        return;
-    }
 
     stm::atomic([&](stm::transaction & tx) {
+
+        const Precalculated & cPrecalculated = mPrecalculated.open_r(tx);
+        if (cPrecalculated.empty())
+        {
+            return;
+        }
+
         unsigned oldId = mComputerPlayer->game()->game().gameStateId(tx);
-        unsigned predictedId = mPrecalculated.front().id();
+        unsigned predictedId = cPrecalculated.front().id();
         if (oldId >= predictedId)
         {
             // Precalculated blocks have been invalidated.
             LogInfo("Precalculated invalidated.");
-            mPrecalculated.clear();
+            mPrecalculated.open_rw(tx).clear();
             return;
         }
 
         Assert(predictedId == oldId + 1); // check sync
         const Block & activeBlock = mGame.activeBlock(tx);
-        const Block & originalBlock = mPrecalculated.front().originalBlock();
+        const Block & originalBlock = cPrecalculated.front().originalBlock();
         Assert(activeBlock.type() == originalBlock.type());
         (void)activeBlock;
         (void)originalBlock;
 
-        Move(tx, mGame, mPrecalculated.front().originalBlock());
+        Move(tx, mGame, cPrecalculated.front().originalBlock());
         unsigned newId = mGame.gameStateId(tx);
         Assert(oldId == newId || oldId + 1 == newId);
         if (newId > oldId)
         {
-            mPrecalculated.erase(mPrecalculated.begin());
+            Precalculated & precalculated = mPrecalculated.open_rw(tx);
+            precalculated.erase(precalculated.begin());
         }
     });
 }
 
 
 void ComputerPlayer::Impl::timerEvent()
+{
+    stm::atomic([&](stm::transaction & tx) {
+        timerEventImpl(tx);
+    });
+}
+
+
+void ComputerPlayer::Impl::timerEventImpl(stm::transaction & tx)
 {
     if (mReset)
     {
@@ -434,7 +454,7 @@ void ComputerPlayer::Impl::timerEvent()
 
     if (!mNodeCalculator)
     {
-        startNodeCalculator();
+        startNodeCalculator(tx);
         return;
     }
 
@@ -446,27 +466,27 @@ void ComputerPlayer::Impl::timerEvent()
         }
         case NodeCalculator::Status_Started:
         {
-            onStarted();
+            onStarted(tx);
             return;
         }
         case NodeCalculator::Status_Working:
         {
-            onWorking();
+            onWorking(tx);
             return;
         }
         case NodeCalculator::Status_Stopped:
         {
-            onStopped();
+            onStopped(tx);
             return;
         }
         case NodeCalculator::Status_Finished:
         {
-            onFinished();
+            onFinished(tx);
             return;
         }
         case NodeCalculator::Status_Error:
         {
-            onError();
+            onError(tx);
             return;
         }
         default:
@@ -477,9 +497,10 @@ void ComputerPlayer::Impl::timerEvent()
 }
 
 
-void ComputerPlayer::Impl::startNodeCalculator()
+void ComputerPlayer::Impl::startNodeCalculator(stm::transaction & tx)
 {
-    if (mPrecalculated.size() > 8)
+    const Precalculated & cPrecalculated = mPrecalculated.open_r(tx);
+    if (cPrecalculated.size() > 8)
     {
         // We're fine for now.
         return;
@@ -495,10 +516,10 @@ void ComputerPlayer::Impl::startNodeCalculator()
     // Create the list of future blocks
     //
     const SimpleGame * simpleGame = mComputerPlayer->game();
-    std::vector<Block> nextBlocks = simpleGame->getNextBlocks(mPrecalculated.size() + mSearchDepth);
-    Assert(nextBlocks.size() == mPrecalculated.size() + mSearchDepth);
+    std::vector<Block> nextBlocks = simpleGame->getNextBlocks(cPrecalculated.size() + mSearchDepth);
+    Assert(nextBlocks.size() == cPrecalculated.size() + mSearchDepth);
     BlockTypes futureBlocks;
-    for (std::size_t idx = mPrecalculated.size(); idx < nextBlocks.size(); ++idx)
+    for (std::size_t idx = cPrecalculated.size(); idx < nextBlocks.size(); ++idx)
     {
         futureBlocks.push_back(nextBlocks[idx].type());
     }
@@ -533,60 +554,60 @@ void ComputerPlayer::Impl::startNodeCalculator()
 }
 
 
-void ComputerPlayer::Impl::onStarted()
+void ComputerPlayer::Impl::onStarted(stm::transaction &)
 {
     // Good.
 }
 
 
-void ComputerPlayer::Impl::onWorking()
+void ComputerPlayer::Impl::onWorking(stm::transaction & tx)
 {
-    stm::atomic([&](stm::transaction & tx) {
-        if (previousGameState().id() < mGame.gameState(tx).id())
-        {
-            // The calculated results have become invalid. Start over.
-            mReset = true;
-            return;
-        }
+    if (previousGameState().id() < mGame.gameState(tx).id())
+    {
+        // The calculated results have become invalid. Start over.
+        mReset = true;
+        return;
+    }
 
-        if (mPrecalculated.empty())
-        {
-            mStop = true;
-            return;
-        }
-    });
+    const Precalculated & cPrecalculated = mPrecalculated.open_r(tx);
+    if (cPrecalculated.empty())
+    {
+        mStop = true;
+        return;
+    }
 
     // Keep working
 }
 
 
-void ComputerPlayer::Impl::onStopped()
+void ComputerPlayer::Impl::onStopped(stm::transaction &)
 {
     // Good. Now wait until onFinished.
 }
 
 
-void ComputerPlayer::Impl::onFinished()
+void ComputerPlayer::Impl::onFinished(stm::transaction & tx)
 {
     mReset = true;
 
+    Precalculated & precalculated = mPrecalculated.open_rw(tx);
     std::vector<GameState> results = mNodeCalculator->result();
-    std::copy(results.begin(), results.end(), std::back_inserter(mPrecalculated));
+    std::copy(results.begin(), results.end(), std::back_inserter(precalculated));
 
 
-    if (mPrecalculated.empty())
+    if (precalculated.empty())
     {
         return;
     }
 
-    for (std::size_t idx = 0; idx + 1 < mPrecalculated.size(); ++idx)
+    for (std::size_t idx = 0; idx + 1 < precalculated.size(); ++idx)
     {
-        Assert(mPrecalculated[idx].id() + 1 == mPrecalculated[idx + 1].id());
+        Assert(precalculated[idx].id() + 1 == precalculated[idx + 1].id());
     }
 }
 
 
-void ComputerPlayer::Impl::onError()
+void ComputerPlayer::Impl::onError(stm::transaction & )
 {
     mReset = true;
     LogError("ComputerPlayer: " + mNodeCalculator->errorMessage());
