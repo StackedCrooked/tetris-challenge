@@ -194,3 +194,4 @@ rebuild.bat
 configure.bat
 clean.bat
 Tetris/src/MultiThreadedNodeCalculator.cpp
+Tetris/testing/src/ComputerPlayerTest.cpp
