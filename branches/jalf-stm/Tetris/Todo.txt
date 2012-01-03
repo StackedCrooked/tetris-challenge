@@ -1,5 +1,6 @@
 STM Version
 -----------
+- Check out Google Perftools (http://code.google.com/p/google-perftools/wiki/GooglePerformanceTools)
 - Setup Valgrind script for memcheck, drd, helgrind, etc...
 - Use STM in TreeRowInfos
 - Future blocks shows current block as next block.
