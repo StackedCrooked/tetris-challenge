@@ -195,3 +195,16 @@ configure.bat
 clean.bat
 Tetris/src/MultiThreadedNodeCalculator.cpp
 Tetris/testing/src/ComputerPlayerTest.cpp
+Scripts/Valgrind/Memcheck.sh
+Scripts/Valgrind/darwin11.supp
+Scripts/Valgrind/Linux.supp
+Scripts/Valgrind/DRD.sh
+Scripts/MacOSX/CreateDMG.sh
+Scripts/CodeFormatter/AStyle.exe
+Scripts/CodeFormatter/FormatCode.bat
+Scripts/CodeFormatter/FormatCode.sh
+Scripts/Configure/configure-testsuite-valgrind.sh
+Scripts/Configure/configure-qttetris-release.sh
+Scripts/Configure/configure-qttetris-debug.sh
+Scripts/Linux/run.sh
+Tetris/testing/src/Benchmark.cpp
