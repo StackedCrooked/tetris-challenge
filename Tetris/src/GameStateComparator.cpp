@@ -8,7 +8,7 @@
 namespace Tetris {
 
 
-bool GameStateComparator::operator()(NodePtr lhs, NodePtr rhs) const
+bool GameStateComparator::operator()(const NodePtr & lhs, const NodePtr & rhs) const
 {
     // Order by descending quality.
     return lhs->quality() > rhs->quality();

@@ -41,7 +41,7 @@ MultiThreadedNodeCalculator::~MultiThreadedNodeCalculator()
 }
 
 
-void MultiThreadedNodeCalculator::generateChildNodes(NodePtr ioNode,
+void MultiThreadedNodeCalculator::generateChildNodes(NodePtr & ioNode,
                                                      const Evaluator * inEvaluator,
                                                      BlockType inBlockType,
                                                      int inMaxChildCount)
@@ -66,7 +66,7 @@ void MultiThreadedNodeCalculator::generateChildNodes(NodePtr ioNode,
 }
 
 
-void MultiThreadedNodeCalculator::populateNodes(NodePtr ioNode,
+void MultiThreadedNodeCalculator::populateNodes(NodePtr & ioNode,
                                                 const BlockTypes & inBlockTypes,
                                                 const std::vector<int> & inWidths,
                                                 std::size_t inIndex,
@@ -113,10 +113,8 @@ void MultiThreadedNodeCalculator::populateNodes(NodePtr ioNode,
 
         for (ChildNodes::iterator it = childNodes.begin(); it != childNodes.end(); ++it)
         {
-            NodePtr child = *it;
-
-            // Start recursion.
-            populateNodes(child, inBlockTypes, inWidths, inIndex + 1, inEndIndex);
+            NodePtr childNode = *it;
+            populateNodes(childNode, inBlockTypes, inWidths, inIndex + 1, inEndIndex);
         }
     }
 }
