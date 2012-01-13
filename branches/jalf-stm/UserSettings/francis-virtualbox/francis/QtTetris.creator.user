@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by Qt Creator 2.4.0, 2012-01-13T22:48:13. -->
+<!-- Written by Qt Creator 2.4.0, 2012-01-13T23:58:23. -->
 <qtcreator>
  <data>
   <variable>GenericProjectManager.GenericProject.Toolchain</variable>
@@ -320,9 +320,11 @@
     <value type="bool" key="RunConfiguration.UseQmlDebuggerAuto">false</value>
    </valuemap>
    <valuemap type="QVariantMap" key="ProjectExplorer.Target.RunConfiguration.1">
-    <value type="bool" key="Analyzer.Project.UseGlobal">true</value>
     <value type="bool" key="Analyzer.Project.UseGlobal">false</value>
-    <valuelist type="QVariantList" key="Analyzer.Valgrind.AddedSuppressionFiles"/>
+    <value type="bool" key="Analyzer.Project.UseGlobal">false</value>
+    <valuelist type="QVariantList" key="Analyzer.Valgrind.AddedSuppressionFiles">
+     <value type="QString">/home/francis/svn/jalf-stm/Scripts/Valgrind/Linux.supp</value>
+    </valuelist>
     <valuelist type="QVariantList" key="Analyzer.Valgrind.AddedSuppressionFiles">
      <value type="QString">/home/francis/svn/jalf-stm/Scripts/Valgrind/Linux.supp</value>
     </valuelist>
@@ -348,7 +350,7 @@
     <valuelist type="QVariantList" key="Analyzer.Valgrind.RemovedSuppressionFiles"/>
     <value type="bool" key="Analyzer.Valgrind.TrackOrigins">true</value>
     <value type="bool" key="Analyzer.Valgrind.TrackOrigins">true</value>
-    <value type="QString" key="Analyzer.Valgrind.ValgrindExecutable">valgrind</value>
+    <value type="QString" key="Analyzer.Valgrind.ValgrindExecutable">/usr/local/bin/valgrind</value>
     <value type="QString" key="Analyzer.Valgrind.ValgrindExecutable">/usr/local/bin/valgrind</value>
     <valuelist type="QVariantList" key="Analyzer.Valgrind.VisibleErrorKinds">
      <value type="int">0</value>

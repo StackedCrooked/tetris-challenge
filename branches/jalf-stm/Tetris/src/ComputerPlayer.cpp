@@ -54,7 +54,7 @@ public:
         mPrecalculated(Precalculated()),
         mNodeCalculator(),
         mEvaluator(&Balanced::Instance()),
-        mSearchDepth(4),
+        mSearchDepth(8),
         mSearchWidth(4),
         mWorkerCount(cDefaultWorkerCount),
         mStop(false),

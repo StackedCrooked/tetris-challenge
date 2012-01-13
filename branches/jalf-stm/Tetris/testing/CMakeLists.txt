@@ -110,6 +110,7 @@ add_subdirectory(${SOLUTIONDIR}Futile ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Futile)
 #
 set(TetrisTestSuite_SOURCES
     src/main.cpp
+    src/Benchmark.cpp
     src/ComputerPlayerTest.cpp
     src/NodeCalculatorTest.cpp
     src/STMTest.cpp
