@@ -111,11 +111,11 @@ TEST_F(NodeCalculatorTest, Interrupt)
 {
 
     std::cout << header() << std::endl;
-    for (std::size_t w = 1; w <= 8; w *= 2)
+    for (std::size_t w = 1; w <= 4; w *= 2)
     {
-        for (std::size_t width = 1; width <= 8; width *= 2)
+        for (std::size_t width = 1; width <= 4; width *= 2)
         {
-            for (std::size_t depth = 1; depth <= 8; depth *= 2)
+            for (std::size_t depth = 1; depth <= 4; depth *= 2)
             {
                 testInterrupt(Depth(depth), Width(width), WorkerCount(w), TimeMs(cTimeout));
             }
