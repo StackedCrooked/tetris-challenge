@@ -306,7 +306,7 @@ bool Move(stm::transaction & tx, Game & ioGame, const Block & targetBlock)
         return true;
     }
 
-    ioGame.dropAndCommit(tx);
+    ioGame.move(tx, MoveDirection_Down);
     return false;
 }
 
