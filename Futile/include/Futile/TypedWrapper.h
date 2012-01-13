@@ -26,7 +26,7 @@
             mValue(inValue) {}                   \
         operator Type() const { return mValue; } \
         Type mValue;                             \
-    } // semi-colon must be typed when calling the macro
+    } /*semi-colon must be typed when calling the macro*/
 
 
 #endif // TYPEDWRAPPER_H
