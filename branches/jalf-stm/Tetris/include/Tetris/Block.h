@@ -17,6 +17,12 @@ FUTILE_BOX_TYPE(Row,      unsigned);
 FUTILE_BOX_TYPE(Column,   unsigned);
 
 
+unsigned GetBlockIdentifier(BlockType inType, unsigned inRotation);
+unsigned GetBlockRotationCount(BlockType inType);
+unsigned GetBlockPositionCount(BlockType inType, unsigned inNumColumns);
+const Grid & GetGrid(unsigned inId);
+
+
 /**
  * Represents a Tetris block.
  */
@@ -25,31 +31,35 @@ class Block
 public:
     Block(BlockType inType, Rotation inRotation, Row inRow, Column inColumn);
 
-    unsigned identification() const;
+    inline unsigned identification() const { return GetBlockIdentifier(type(), rotation()); }
 
-    BlockType type() const;
+    inline BlockType type() const { return mType; }
 
-    unsigned rotation() const;
+    inline unsigned rotation() const { return mRotation; }
 
-    unsigned rotationCount() const;
+    inline unsigned rotationCount() const { return GetBlockRotationCount(mType); }
 
     inline const Grid & grid() const { return *mGrid; }
 
-    unsigned row() const;
+    inline unsigned row() const { return mRow; }
 
-    unsigned column() const;
+    inline unsigned column() const { return mColumn; }
 
-    unsigned rowCount() const;
+    inline unsigned rowCount() const { return mGrid->rowCount(); }
 
-    unsigned columnCount() const;
+    inline unsigned columnCount() const { return mGrid->columnCount(); }
 
-    void rotate();
+    inline void rotate() { setRotation((mRotation + 1) % GetBlockRotationCount(mType)); }
 
-    void setRow(unsigned inRow);
+    inline void setRow(unsigned inRow) { mRow = inRow; }
 
-    void setColumn(unsigned inColumn);
+    inline void setColumn(unsigned inColumn) { mColumn = inColumn; }
 
-    void setRotation(unsigned inRotation);
+    inline void setRotation(unsigned inRotation)
+    {
+        mRotation = inRotation % GetBlockRotationCount(mType);
+        mGrid = &GetGrid(GetBlockIdentifier(mType, mRotation));
+    }
 
 private:
     BlockType mType;

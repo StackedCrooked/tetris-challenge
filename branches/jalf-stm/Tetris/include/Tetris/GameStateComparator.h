@@ -11,7 +11,7 @@ namespace Tetris {
 class GameStateComparator
 {
 public:
-    bool operator()(NodePtr lhs, NodePtr rhs) const;
+    bool operator()(const NodePtr & lhs, const NodePtr & rhs) const;
 };
 
 

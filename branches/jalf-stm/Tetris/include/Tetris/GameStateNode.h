@@ -25,7 +25,7 @@ class GameStateNode
 public:
     static std::unique_ptr<GameStateNode> CreateRootNode(std::size_t inNumRows, std::size_t inNumColumns);
 
-    GameStateNode(NodePtr inParent, const GameState & inGameState, const Evaluator & inEvaluator);
+    GameStateNode(const NodePtr & inParent, const GameState & inGameState, const Evaluator & inEvaluator);
 
     GameStateNode(const GameState & inGameState, const Evaluator & inEvaluator);
 
@@ -38,9 +38,7 @@ public:
     // Distance from the root node.
     int depth() const;
 
-    const NodePtr parent() const;
-
-    NodePtr parent();
+    NodePtr parent() const;
 
     void makeRoot();
 
@@ -51,7 +49,7 @@ public:
 
     void clearChildren();
 
-    void addChild(NodePtr inChildNode);
+    void addChild(const NodePtr & inChildNode);
 
     const GameStateNode * endNode() const;
 

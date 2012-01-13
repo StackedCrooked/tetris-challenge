@@ -14,7 +14,7 @@ namespace Tetris {
 
 struct GameStateNode::Impl
 {
-    Impl(NodePtr inParent, const GameState & inGameState, const Evaluator & inEvaluator) :
+    Impl(const NodePtr & inParent, const GameState & inGameState, const Evaluator & inEvaluator) :
         mParent(inParent),
         mGameState(inGameState),
         mDepth(inParent->depth() + 1),
@@ -60,7 +60,7 @@ GameStateNode::GameStateNode(const GameState & inGameState, const Evaluator & in
 }
 
 
-GameStateNode::GameStateNode(NodePtr inParent, const GameState & inGameState, const Evaluator & inEvaluator) :
+GameStateNode::GameStateNode(const NodePtr & inParent, const GameState & inGameState, const Evaluator & inEvaluator) :
     mImpl(new Impl(inParent, inGameState, inEvaluator))
 {
 }
@@ -114,20 +114,15 @@ void GameStateNode::clearChildren()
 }
 
 
-void GameStateNode::addChild(NodePtr inChildNode)
+void GameStateNode::addChild(const NodePtr & inChildNode)
 {
     Assert(inChildNode->depth() == mImpl->mDepth + 1);
-    mImpl->mChildren.insert(inChildNode);
+    NodePtr copy = inChildNode;
+    mImpl->mChildren.insert(copy);
 }
 
 
-NodePtr GameStateNode::parent()
-{
-    return mImpl->mParent.lock();
-}
-
-
-const NodePtr GameStateNode::parent() const
+NodePtr GameStateNode::parent() const
 {
     return mImpl->mParent.lock();
 }

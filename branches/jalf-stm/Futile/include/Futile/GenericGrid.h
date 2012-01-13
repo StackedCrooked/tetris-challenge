@@ -21,13 +21,13 @@ public:
 
     GenericGrid(std::size_t inRowCount, std::size_t inColumnCount, const T & inInitialValue);
 
-    std::size_t rowCount() const;
+    inline std::size_t rowCount() const;
 
-    std::size_t columnCount() const;
+    inline std::size_t columnCount() const;
 
-    const T & get(std::size_t inRow, std::size_t inColumn) const;
+    inline const T & get(std::size_t inRow, std::size_t inColumn) const;
 
-    void set(std::size_t inRow, std::size_t inColumn, const T & inValue);
+    inline void set(std::size_t inRow, std::size_t inColumn, const T & inValue);
 
 private:
     typedef std::vector<T> Data;

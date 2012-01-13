@@ -13,7 +13,7 @@
 namespace Tetris {
 
 
-void CarveBestPath(NodePtr startNode, NodePtr dst)
+void CarveBestPath(NodePtr & startNode, NodePtr & dst)
 {
     Assert(dst->depth() > startNode->depth());
     while (dst->depth() != startNode->depth())
@@ -21,7 +21,7 @@ void CarveBestPath(NodePtr startNode, NodePtr dst)
         ChildNodes::const_iterator it = dst->parent()->children().begin(), end = dst->parent()->children().end();
         for (; it != end; ++it)
         {
-            NodePtr endNode = *it;
+            const NodePtr & endNode = *it;
             if (endNode == dst) // is endNode part of the path between startNode and endNode?
             {
                 // Erase all children. The endNode object is kept alive by endNode object.
@@ -56,7 +56,7 @@ bool IsGameOver(const GameState & inGameState, BlockType inBlockType, int inRota
 }
 
 
-void CalculateNodes(NodePtr ioNode,
+void CalculateNodes(const NodePtr & ioNode,
                     const Evaluator & inEvaluator,
                     const BlockTypes & inBlockTypes,
                     const std::vector<int> & inWidths,
@@ -113,7 +113,7 @@ void CalculateNodes(NodePtr ioNode,
         }
 
         Assert(numNewChildren >= 1);
-        NodePtr gameStateNode = *ioNode->children().begin();
+        const NodePtr & gameStateNode = *ioNode->children().begin();
 
         if (inCallback)
         {
@@ -126,13 +126,13 @@ void CalculateNodes(NodePtr ioNode,
     //
     for (ChildNodes::iterator it = generatedChildNodes.begin(); it != generatedChildNodes.end(); ++it)
     {
-        NodePtr child = *it;
+        const NodePtr & child = *it;
         CalculateNodes(child, inEvaluator, inBlockTypes, inWidths, inProgress.increment(), inCallback, _checkChildCount + numNewChildren);
     }
 }
 
 
-void GenerateOffspring(NodePtr ioGameStateNode,
+void GenerateOffspring(const NodePtr & ioGameStateNode,
                        BlockTypes inBlockTypes,
                        std::size_t inOffset,
                        const Evaluator & inEvaluator)
@@ -147,11 +147,11 @@ void GenerateOffspring(NodePtr ioGameStateNode,
 
     if (inOffset + 1 < inBlockTypes.size())
     {
-        for (ChildNodes::iterator it = ioGameStateNode->children().begin();
+        for (ChildNodes::const_iterator it = ioGameStateNode->children().begin();
                 it != ioGameStateNode->children().end();
                 ++it)
         {
-            NodePtr childNode = *it;
+            const NodePtr & childNode = *it;
             GenerateOffspring(childNode,
                               inBlockTypes,
                               inOffset + 1,
@@ -161,7 +161,7 @@ void GenerateOffspring(NodePtr ioGameStateNode,
 }
 
 
-void GenerateOffspring(NodePtr inNode,
+void GenerateOffspring(const NodePtr & inNode,
                        BlockType inBlockType,
                        const Evaluator & inEvaluator,
                        ChildNodes & outChildNodes)

@@ -73,7 +73,7 @@ protected:
         {
         }
 
-        inline NodePtr bestNode() const
+        inline const NodePtr & bestNode() const
         {
             if (!mBestNode)
             {
@@ -88,7 +88,7 @@ protected:
         inline bool finished() const
         { return mFinished; }
 
-        void registerNode(NodePtr inNode)
+        void registerNode(const NodePtr & inNode)
         {
             int score = mEvaluator->evaluate(inNode->gameState());
             if (!mBestNode || score > mBestScore)
@@ -147,14 +147,14 @@ protected:
             return mMaxDepth;
         }
 
-        void registerNode(NodePtr inNode)
+        void registerNode(const NodePtr & inNode)
         {
             Futile::ScopedLock lock(mMutex);
             mInfos.back().registerNode(inNode);
             Assert(bestNode());
         }
 
-        inline NodePtr bestNode() const
+        inline const NodePtr & bestNode() const
         {
             Futile::ScopedLock lock(mMutex);
             if (mInfos.empty())

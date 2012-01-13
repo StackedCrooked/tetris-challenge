@@ -23,16 +23,16 @@ class GameState;
  * The best path is defined as the path that is formed by backtracking the
  * ancestry (parent nodes) of endNode's first child up until the start node.
  */
-void CarveBestPath(NodePtr startNode, NodePtr endNode);
+void CarveBestPath(NodePtr & startNode, NodePtr & endNode);
 
 bool IsGameOver(const GameState & inGameState, BlockType inBlockType, int inRotation);
 
-void GenerateOffspring(NodePtr ioGameStateNode,
+void GenerateOffspring(const NodePtr & ioGameStateNode,
                        BlockTypes inBlockTypes,
                        std::size_t inOffset,
                        const Evaluator & inEvaluator);
 
-void GenerateOffspring(NodePtr ioGameStateNode,
+void GenerateOffspring(const NodePtr & ioGameStateNode,
                        BlockType inBlockType,
                        const Evaluator & inEvaluator,
                        ChildNodes & outChildNodes);
@@ -72,7 +72,7 @@ private:
 typedef boost::function<void(const Progress &, const NodePtr &)> ChildNodeGeneratedCallback;
 
 
-void CalculateNodes(NodePtr ioNode,
+void CalculateNodes(const NodePtr & ioNode,
                     const Evaluator & inEvaluator,
                     const BlockTypes & inBlockTypes,
                     const std::vector<int> & inWidths,
