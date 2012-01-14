@@ -14,7 +14,7 @@ using namespace Futile;
 
 namespace {
 const UInt64 cSleepTime = 100; // ms
-const UInt64 cMargin    = 200; // ms
+const UInt64 cMargin    = 400; // ms
 const std::size_t cPoolSize[] = {1, 2, 4, 8, 16, 32};
 const std::size_t cPoolSizeCount = sizeof(cPoolSize) / sizeof(cPoolSize[0]);
 }
