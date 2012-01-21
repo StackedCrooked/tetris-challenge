@@ -11,6 +11,7 @@
 #include "Futile/Logging.h"
 #include "Futile/MakeString.h"
 #include "Futile/Assert.h"
+#include <boost/static_assert.hpp>
 #include <atomic>
 #include <cstddef>
 #include <memory>
@@ -198,22 +199,19 @@ protected:
 
     NodePtr mNode;
     std::vector<GameState> mResult;
-
     std::atomic_bool mQuitFlag;
     std::atomic_int mStatus;
-
     TreeRowInfos mTreeRowInfos;
-
     BlockTypes mBlockTypes;
     std::vector<int> mWidths;
     const Evaluator & mEvaluator;
-
-
     std::string mErrorMessage;
-
     Futile::Worker & mMainWorker;
     Futile::WorkerPool & mWorkerPool;
 };
+
+
+BOOST_STATIC_ASSERT(ATOMIC_INT_LOCK_FREE == 2);
 
 
 } // namespace Tetris
