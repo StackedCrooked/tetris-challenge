@@ -100,13 +100,13 @@ public:
     void onError(stm::transaction & tx);
 
     // Return a copy!
-    inline GameState previousGameState(stm::transaction & tx)
+    GameState previousGameState(stm::transaction & tx)
     {
         const Precalculated & cPrecalculated = mPrecalculated.open_r(tx);
         return cPrecalculated.empty() ? mGame.gameState(tx) : cPrecalculated.back();
     }
 
-    inline Block previousActiveBlock(stm::transaction & tx)
+    Block previousActiveBlock(stm::transaction & tx)
     {
         const Precalculated & cPrecalculated = mPrecalculated.open_r(tx);
         return cPrecalculated.empty() ? mGame.activeBlock(tx)
@@ -313,35 +313,34 @@ bool Move(stm::transaction & tx, Game & ioGame, const Block & targetBlock)
 
 void Computer::Impl::move(stm::transaction & tx)
 {
-    const Precalculated & cPrecalculated = mPrecalculated.open_r(tx);
-    if (cPrecalculated.empty())
+    Precalculated & precalculated = mPrecalculated.open_rw(tx);
+    if (precalculated.empty())
     {
         return;
     }
 
     unsigned oldId = mGame.gameStateId(tx);
-    unsigned predictedId = cPrecalculated.front().id();
+    unsigned predictedId = precalculated.front().id();
     if (oldId >= predictedId)
     {
         // Precalculated blocks have been invalidated.
         LogInfo("Precalculated invalidated.");
-        mPrecalculated.open_rw(tx).clear();
+        precalculated.clear();
         return;
     }
 
     Assert(predictedId == oldId + 1); // check sync
     const Block & activeBlock = mGame.activeBlock(tx);
-    const Block & originalBlock = cPrecalculated.front().originalBlock();
+    const Block & originalBlock = precalculated.front().originalBlock();
     Assert(activeBlock.type() == originalBlock.type());
     (void)activeBlock;
     (void)originalBlock;
 
-    Move(tx, mGame, cPrecalculated.front().originalBlock());
+    Move(tx, mGame, precalculated.front().originalBlock());
     unsigned newId = mGame.gameStateId(tx);
     Assert(oldId == newId || oldId + 1 == newId);
     if (newId > oldId)
     {
-        Precalculated & precalculated = mPrecalculated.open_rw(tx);
         precalculated.erase(precalculated.begin());
     }
 }
@@ -486,6 +485,7 @@ void Computer::Impl::onWorking(stm::transaction & tx)
     {
         // The calculated results have become invalid. Start over.
         mReset = true;
+        //mPrecalculated.open_rw(tx).clear();
         return;
     }
 
@@ -511,18 +511,13 @@ void Computer::Impl::onFinished(stm::transaction & tx)
     mReset = true;
 
     Precalculated & precalculated = mPrecalculated.open_rw(tx);
+
     std::vector<GameState> results = mNodeCalculator->result();
-    std::copy(results.begin(), results.end(), std::back_inserter(precalculated));
-
-
-    if (precalculated.empty())
+    for (std::size_t idx = 0; idx < results.size(); ++idx)
     {
-        return;
-    }
-
-    for (std::size_t idx = 0; idx + 1 < precalculated.size(); ++idx)
-    {
-        Assert(precalculated[idx].id() + 1 == precalculated[idx + 1].id());
+        GameState & gameState = results[idx];
+        Assert(precalculated.empty() || gameState.id() == precalculated.back().id() + 1);
+        precalculated.push_back(gameState);
     }
 }
 
