@@ -1,10 +1,10 @@
 STM Version
 -----------
-- Check out Google Perftools (http://code.google.com/p/google-perftools/wiki/GooglePerformanceTools)
 - Setup Valgrind script for memcheck, drd, helgrind, etc...
 - Use STM in TreeRowInfos
-- Future blocks shows current block as next block.
 - Redesign Model, MultiplayerGame, Player classes.
+v Future blocks shows current block as next block.
+v Check out Google Perftools (http://code.google.com/p/google-perftools/wiki/GooglePerformanceTools)
 v Remove Computer's dependency to MainThread.
 v There is something wrong with the block types: BlockType_I appears twice.
 v Restore unit-test build.

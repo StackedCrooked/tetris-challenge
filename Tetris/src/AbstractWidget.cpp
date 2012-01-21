@@ -281,9 +281,9 @@ void AbstractWidget::coordinateRepaint(SimpleGame & inGame)
     }
 
     // Paint future blocks
-    std::vector<Block> futureBlocks(inGame.getNextBlocks(mFutureBlockCount));
+    std::vector<Block> futureBlocks(inGame.getNextBlocks(mFutureBlockCount + 1));
     std::vector<BlockType> blockTypes;
-    for (std::vector<Block>::size_type idx = 0; idx < futureBlocks.size(); ++idx)
+    for (std::vector<Block>::size_type idx = 1; idx < futureBlocks.size(); ++idx)
     {
         blockTypes.push_back(futureBlocks[idx].type());
     }
