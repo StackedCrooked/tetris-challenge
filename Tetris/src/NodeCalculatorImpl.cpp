@@ -63,13 +63,11 @@ NodeCalculatorImpl::NodeCalculatorImpl(const GameState & inGameState,
     mNode(new GameStateNode(inGameState, inEvaluator)),
     mResult(),
     mQuitFlag(false),
-    mQuitFlagMutex(),
+    mStatus(0),
     mTreeRowInfos(inEvaluator, inBlockTypes.size()),
     mBlockTypes(inBlockTypes),
     mWidths(inWidths),
     mEvaluator(inEvaluator),
-    mStatus(0),
-    mStatusMutex(),
     mMainWorker(inMainWorker),
     mWorkerPool(inWorkerPool)
 {
@@ -86,14 +84,12 @@ NodeCalculatorImpl::~NodeCalculatorImpl()
 
 void NodeCalculatorImpl::setQuitFlag()
 {
-    ScopedLock lock(mQuitFlagMutex);
     mQuitFlag = true;
 }
 
 
 bool NodeCalculatorImpl::getQuitFlag() const
 {
-    ScopedLock lock(mQuitFlagMutex);
     return mQuitFlag;
 }
 
@@ -119,7 +115,6 @@ std::vector<GameState> NodeCalculatorImpl::result() const
 
 int NodeCalculatorImpl::status() const
 {
-    ScopedLock lock(mStatusMutex);
     return mStatus;
 }
 
@@ -132,7 +127,6 @@ std::string NodeCalculatorImpl::errorMessage() const
 
 void NodeCalculatorImpl::setStatus(int inStatus)
 {
-    ScopedLock lock(mStatusMutex);
     mStatus = inStatus;
 }
 
@@ -209,8 +203,6 @@ void NodeCalculatorImpl::startImpl()
 
 void NodeCalculatorImpl::start()
 {
-    ScopedLock lock(mStatusMutex);
-    Assert(mStatus == NodeCalculator::Status_Nil);
     mMainWorker.schedule(boost::bind(&NodeCalculatorImpl::startImpl, this));
     mStatus = NodeCalculator::Status_Started;
 }
