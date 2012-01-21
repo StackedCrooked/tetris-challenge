@@ -257,11 +257,11 @@ BlockTypes Game::getFutureBlocks(stm::transaction & tx, std::size_t inCount)
 }
 
 
-bool Game::rotate(stm::transaction & tx)
+Game::MoveResult Game::rotate(stm::transaction & tx)
 {
     if (isGameOver(tx))
     {
-        return false;
+        return MoveResult_NotMoved;
     }
 
     Block & block = mActiveBlock.open_rw(tx);
@@ -270,9 +270,9 @@ bool Game::rotate(stm::transaction & tx)
     if (!gameState(tx).checkPositionValid(block, block.row(), block.column()))
     {
         block.setRotation(oldRotation);
-        return false;
+        return MoveResult_NotMoved;
     }
-    return true;
+    return MoveResult_Moved;
 }
 
 
@@ -311,11 +311,11 @@ void Game::setGrid(stm::transaction & tx, const Grid & inGrid)
 }
 
 
-bool Game::move(stm::transaction & tx, Direction inDirection)
+Game::MoveResult Game::move(stm::transaction & tx, Direction inDirection)
 {
     if (isGameOver(tx))
     {
-        return false;
+        return MoveResult_NotMoved;
     }
 
     const Block & block = activeBlock(tx);
@@ -328,13 +328,13 @@ bool Game::move(stm::transaction & tx, Direction inDirection)
         Block & block = mActiveBlock.open_rw(tx);
         block.setRow(newRow);
         block.setColumn(newCol);
-        return true;
+        return MoveResult_Moved;
     }
 
     if (inDirection != MoveDirection_Down)
     {
         // Do nothing
-        return false;
+        return MoveResult_NotMoved;
     }
 
     // Remember the number of lines in the current game state.
@@ -351,7 +351,7 @@ bool Game::move(stm::transaction & tx, Direction inDirection)
     const GameState & newGameState = this->gameState(tx);
 
     assignActiveBlock = CreateDefaultBlock(mBlockTypes.get(newGameState.id()), newGameState.grid().columnCount());
-    return false;
+    return MoveResult_Commited;
 }
 
 
