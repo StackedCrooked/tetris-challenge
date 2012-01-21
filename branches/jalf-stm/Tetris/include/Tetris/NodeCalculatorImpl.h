@@ -11,6 +11,7 @@
 #include "Futile/Logging.h"
 #include "Futile/MakeString.h"
 #include "Futile/Assert.h"
+#include <atomic>
 #include <cstddef>
 #include <memory>
 #include <vector>
@@ -198,9 +199,8 @@ protected:
     NodePtr mNode;
     std::vector<GameState> mResult;
 
-
-    bool mQuitFlag;
-    mutable Futile::Mutex mQuitFlagMutex;
+    std::atomic_bool mQuitFlag;
+    std::atomic_int mStatus;
 
     TreeRowInfos mTreeRowInfos;
 
@@ -208,8 +208,7 @@ protected:
     std::vector<int> mWidths;
     const Evaluator & mEvaluator;
 
-    int mStatus;
-    mutable Futile::Mutex mStatusMutex;
+
     std::string mErrorMessage;
 
     Futile::Worker & mMainWorker;
