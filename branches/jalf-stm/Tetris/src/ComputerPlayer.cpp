@@ -255,7 +255,10 @@ void Computer::setWorkerCount(int inWorkerCount)
 }
 
 
-bool Move(stm::transaction & tx, Game & ioGame, const Block & targetBlock)
+namespace {
+
+
+Game::MoveResult Move(stm::transaction & tx, Game & ioGame, const Block & targetBlock)
 {
     const Block & block = ioGame.activeBlock(tx);
     Assert(block.type() == targetBlock.type());
@@ -263,52 +266,64 @@ bool Move(stm::transaction & tx, Game & ioGame, const Block & targetBlock)
     // Try rotation first, if it fails then skip rotation and try horizontal move
     if (block.rotation() != targetBlock.rotation())
     {
-        if (ioGame.rotate(tx))
+        if (ioGame.rotate(tx) == Game::MoveResult_Moved)
         {
-            return true;
+            return Game::MoveResult_Moved;
         }
         // else: try left or right move below
     }
 
     if (block.column() < targetBlock.column())
     {
-        if (!ioGame.move(tx, MoveDirection_Right))
+        if (ioGame.move(tx, MoveDirection_Right) == Game::MoveResult_Moved)
         {
-            // Damn we can't move this block anymore.
-            // Give up on this block.
-            ioGame.dropAndCommit(tx);
-            return false;
+            return Game::MoveResult_Moved;
         }
-        return true;
+        else
+        {
+            // Can't move the block to the left.
+            // Our path is blocked.
+            // Give up on this block and just drop it.
+            ioGame.dropAndCommit(tx);
+            return Game::MoveResult_Commited;
+        }
     }
 
     if (block.column() > targetBlock.column())
     {
-        if (!ioGame.move(tx, MoveDirection_Left))
+        if (ioGame.move(tx, MoveDirection_Left) == Game::MoveResult_Moved)
+        {
+            return Game::MoveResult_Moved;
+        }
+        else
         {
             // Damn we can't move this block anymore.
             // Give up on this block.
             ioGame.dropAndCommit(tx);
-            return false;
+            return Game::MoveResult_Commited;
         }
-        return true;
     }
 
     // Horizontal position is OK.
     // Retry rotation again. If it fails here then drop the block.
     if (block.rotation() != targetBlock.rotation())
     {
-        if (!ioGame.rotate(tx))
+        if (ioGame.rotate(tx) == Game::MoveResult_Moved)
+        {
+            return Game::MoveResult_Moved;
+        }
+        else
         {
             ioGame.dropAndCommit(tx);
-            return false;
+            return Game::MoveResult_Commited;
         }
-        return true;
     }
 
-    ioGame.move(tx, MoveDirection_Down);
-    return false;
+    return ioGame.move(tx, MoveDirection_Down);
 }
+
+
+} // anonymous namespace
 
 
 void Computer::Impl::move(stm::transaction & tx)
@@ -336,10 +351,13 @@ void Computer::Impl::move(stm::transaction & tx)
     (void)activeBlock;
     (void)originalBlock;
 
-    Move(tx, mGame, precalculated.front().originalBlock());
-    unsigned newId = mGame.gameStateId(tx);
-    Assert(oldId == newId || oldId + 1 == newId);
-    if (newId > oldId)
+    Game::MoveResult res = Move(tx, mGame, precalculated.front().originalBlock());
+
+    Assert((
+        (res == Game::MoveResult_Moved || res == Game::MoveResult_NotMoved) && mGame.gameStateId(tx) == oldId)
+        || (res == Game::MoveResult_Commited && mGame.gameStateId(tx) == oldId + 1));
+
+    if (res == Game::MoveResult_Commited)
     {
         precalculated.erase(precalculated.begin());
     }

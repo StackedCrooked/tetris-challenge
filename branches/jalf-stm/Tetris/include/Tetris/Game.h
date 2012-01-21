@@ -64,9 +64,16 @@ public:
 
     bool canMove(stm::transaction & tx, Direction inDirection);
 
-    virtual bool move(stm::transaction & tx, Direction inDirection);
+    enum MoveResult
+    {
+        MoveResult_Moved,
+        MoveResult_NotMoved,
+        MoveResult_Commited
+    };
 
-    bool rotate(stm::transaction & tx);
+    virtual MoveResult move(stm::transaction & tx, Direction inDirection);
+
+    MoveResult rotate(stm::transaction & tx);
 
     void dropWithoutCommit(stm::transaction & tx);
 
