@@ -12,7 +12,7 @@ namespace testing {
 using namespace Futile;
 
 
-typedef stm::shared<int> SharedInt;
+typedef stm::shared<int> shared_int;
 
 
 class STMTest : public TetrisTest
@@ -30,12 +30,12 @@ public:
     }
 
     std::atomic_bool stop;
-    SharedInt a;
-    SharedInt b;
-    SharedInt c;
-    SharedInt sum_ab;
-    SharedInt sum_bc;
-    SharedInt sum_ac;
+    shared_int a;
+    shared_int b;
+    shared_int c;
+    shared_int sum_ab;
+    shared_int sum_bc;
+    shared_int sum_ac;
 
     void increment_a(stm::transaction & tx)
     {
