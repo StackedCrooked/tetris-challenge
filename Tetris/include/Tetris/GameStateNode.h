@@ -44,7 +44,6 @@ public:
 
     const ChildNodes & children() const;
 
-    // yeah
     ChildNodes & children();
 
     void clearChildren();
