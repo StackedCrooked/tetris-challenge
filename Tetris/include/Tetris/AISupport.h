@@ -23,12 +23,12 @@ class GameState;
  * The best path is defined as the path that is formed by backtracking the
  * ancestry (parent nodes) of endNode's first child up until the start node.
  */
-void CarveBestPath(NodePtr & startNode, NodePtr & endNode);
+void CarveBestPath(const NodePtr & startNode, NodePtr & endNode);
 
 bool IsGameOver(const GameState & inGameState, BlockType inBlockType, int inRotation);
 
 void GenerateOffspring(const NodePtr & ioGameStateNode,
-                       BlockTypes inBlockTypes,
+                       const BlockTypes & inBlockTypes,
                        std::size_t inOffset,
                        const Evaluator & inEvaluator);
 

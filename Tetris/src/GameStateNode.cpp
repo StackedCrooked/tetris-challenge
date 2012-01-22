@@ -96,12 +96,6 @@ int GameStateNode::quality() const
 }
 
 
-ChildNodes & GameStateNode::children()
-{
-    return mImpl->mChildren;
-}
-
-
 const ChildNodes & GameStateNode::children() const
 {
     return mImpl->mChildren;
