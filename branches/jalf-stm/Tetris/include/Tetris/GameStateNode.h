@@ -44,8 +44,6 @@ public:
 
     const ChildNodes & children() const;
 
-    ChildNodes & children();
-
     void clearChildren();
 
     void addChild(const NodePtr & inChildNode);

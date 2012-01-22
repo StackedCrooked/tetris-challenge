@@ -8,12 +8,13 @@
 #include "Tetris/Grid.h"
 #include "Tetris/Utilities.h"
 #include "Futile/Logging.h"
+#include <algorithm>
 
 
 namespace Tetris {
 
 
-void CarveBestPath(NodePtr & startNode, NodePtr & dst)
+void CarveBestPath(const NodePtr & startNode, NodePtr & dst)
 {
     Assert(dst->depth() > startNode->depth());
     while (dst->depth() != startNode->depth())
@@ -133,17 +134,19 @@ void CalculateNodes(const NodePtr & ioNode,
 
 
 void GenerateOffspring(const NodePtr & ioGameStateNode,
-                       BlockTypes inBlockTypes,
+                       const BlockTypes & inBlockTypes,
                        std::size_t inOffset,
                        const Evaluator & inEvaluator)
 {
     Assert(inOffset < inBlockTypes.size());
     Assert(ioGameStateNode->children().empty());
 
+    ChildNodes children;
     GenerateOffspring(ioGameStateNode,
                       inBlockTypes[inOffset],
                       inEvaluator,
-                      ioGameStateNode->children());
+                      children);
+    std::for_each(children.begin(), children.end(), [&](const NodePtr & child) { ioGameStateNode->addChild(child); });
 
     if (inOffset + 1 < inBlockTypes.size())
     {
