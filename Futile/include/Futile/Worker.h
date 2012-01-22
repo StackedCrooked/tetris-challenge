@@ -49,7 +49,7 @@ public:
     // Any remaining tasks are erased and the thread is destroyed.
     ~Worker();
 
-    inline const std::string & name() const { return mName; }
+    const std::string & name() const { return mName; }
 
     typedef boost::function<void()> Task;
 

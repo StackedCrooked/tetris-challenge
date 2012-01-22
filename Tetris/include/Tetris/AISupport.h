@@ -52,13 +52,13 @@ public:
     {
     }
 
-    inline unsigned current() const { return mCurrent; }
+    unsigned current() const { return mCurrent; }
 
-    inline unsigned limit() const { return mMaximum; }
+    unsigned limit() const { return mMaximum; }
 
-    inline bool complete() const { return mCurrent == mMaximum; }
+    bool complete() const { return mCurrent == mMaximum; }
 
-    inline Progress increment(unsigned amount = 1) const
+    Progress increment(unsigned amount = 1) const
     {
         return Progress(std::min<unsigned>(current() + amount, limit()), limit());
     }

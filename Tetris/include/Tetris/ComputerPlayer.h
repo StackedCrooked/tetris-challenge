@@ -56,7 +56,7 @@ class ComputerPlayer : public Player,
 
 {
 public:
-    static inline PlayerPtr Create(const TeamName & inTeamName,
+    static PlayerPtr Create(const TeamName & inTeamName,
                                    const PlayerName & inPlayerName,
                                    std::size_t inRowCount,
                                    std::size_t inColumnCount)

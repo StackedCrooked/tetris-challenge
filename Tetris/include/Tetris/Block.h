@@ -31,31 +31,31 @@ class Block
 public:
     Block(BlockType inType, Rotation inRotation, Row inRow, Column inColumn);
 
-    inline unsigned identification() const { return GetBlockIdentifier(type(), rotation()); }
+    unsigned identification() const { return GetBlockIdentifier(type(), rotation()); }
 
-    inline BlockType type() const { return mType; }
+    BlockType type() const { return mType; }
 
-    inline unsigned rotation() const { return mRotation; }
+    unsigned rotation() const { return mRotation; }
 
-    inline unsigned rotationCount() const { return GetBlockRotationCount(mType); }
+    unsigned rotationCount() const { return GetBlockRotationCount(mType); }
 
-    inline const Grid & grid() const { return *mGrid; }
+    const Grid & grid() const { return *mGrid; }
 
-    inline unsigned row() const { return mRow; }
+    unsigned row() const { return mRow; }
 
-    inline unsigned column() const { return mColumn; }
+    unsigned column() const { return mColumn; }
 
-    inline unsigned rowCount() const { return mGrid->rowCount(); }
+    unsigned rowCount() const { return mGrid->rowCount(); }
 
-    inline unsigned columnCount() const { return mGrid->columnCount(); }
+    unsigned columnCount() const { return mGrid->columnCount(); }
 
-    inline void rotate() { setRotation((mRotation + 1) % GetBlockRotationCount(mType)); }
+    void rotate() { setRotation((mRotation + 1) % GetBlockRotationCount(mType)); }
 
-    inline void setRow(unsigned inRow) { mRow = inRow; }
+    void setRow(unsigned inRow) { mRow = inRow; }
 
-    inline void setColumn(unsigned inColumn) { mColumn = inColumn; }
+    void setColumn(unsigned inColumn) { mColumn = inColumn; }
 
-    inline void setRotation(unsigned inRotation)
+    void setRotation(unsigned inRotation)
     {
         mRotation = inRotation % GetBlockRotationCount(mType);
         mGrid = &GetGrid(GetBlockIdentifier(mType, mRotation));
