@@ -27,10 +27,10 @@ public:
         return *this;
     }
 
-    inline operator std::string() const
+    operator std::string() const
     { return mBuffer.str(); }
 
-    inline std::string str() const
+    std::string str() const
     { return mBuffer.str(); }
 
 private:

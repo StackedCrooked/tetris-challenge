@@ -75,7 +75,7 @@ protected:
         {
         }
 
-        inline const NodePtr & bestNode() const
+        const NodePtr & bestNode() const
         {
             if (!mBestNode)
             {
@@ -84,10 +84,10 @@ protected:
             return mBestNode;
         }
 
-        inline std::size_t nodeCount() const
+        std::size_t nodeCount() const
         { return mNodeCount; }
 
-        inline bool finished() const
+        bool finished() const
         { return mFinished; }
 
         void registerNode(const NodePtr & inNode)
@@ -102,7 +102,7 @@ protected:
             Assert(mBestNode);
         }
 
-        inline void setFinished()
+        void setFinished()
         {
             Assert(!mFinished);
             Assert(mBestNode);
@@ -129,7 +129,7 @@ protected:
             mInfos.push_back(TreeRowInfo(*mEvaluator));
         }
 
-        inline std::size_t depth() const
+        std::size_t depth() const
         {
             Futile::ScopedLock lock(mMutex);
             if (mInfos.back().finished())
@@ -143,7 +143,7 @@ protected:
             }
         }
 
-        inline std::size_t maxDepth() const
+        std::size_t maxDepth() const
         {
             Futile::ScopedLock lock(mMutex);
             return mMaxDepth;
@@ -156,7 +156,7 @@ protected:
             Assert(bestNode());
         }
 
-        inline const NodePtr & bestNode() const
+        const NodePtr & bestNode() const
         {
             Futile::ScopedLock lock(mMutex);
             if (mInfos.empty())
@@ -176,13 +176,13 @@ protected:
             throw std::runtime_error("Invalid state.");
         }
 
-        inline bool finished() const
+        bool finished() const
         {
             Futile::ScopedLock lock(mMutex);
             return mInfos.size() == (mMaxDepth - 1) && mInfos.back().finished();
         }
 
-        inline void setFinished()
+        void setFinished()
         {
             Futile::ScopedLock lock(mMutex);
             Assert(!mInfos.empty());

@@ -36,15 +36,15 @@ public:
 
     virtual ~Player() = 0;
 
-    inline PlayerType type() const { return mPlayerType; }
+    PlayerType type() const { return mPlayerType; }
 
-    inline const std::string & teamName() const { return mTeamName; }
+    const std::string & teamName() const { return mTeamName; }
 
-    inline const std::string & playerName() const { return mPlayerName; }
+    const std::string & playerName() const { return mPlayerName; }
 
-    inline const SimpleGame & game() const { return mSimpleGame; }
+    const SimpleGame & game() const { return mSimpleGame; }
 
-    inline SimpleGame & game() { return mSimpleGame; }
+    SimpleGame & game() { return mSimpleGame; }
 
 protected:
     Player(PlayerType inPlayerType,

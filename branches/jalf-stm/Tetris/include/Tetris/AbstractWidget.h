@@ -37,21 +37,21 @@ class Rect
 public:
     Rect(int x, int y, int width, int height);
 
-    inline int x() const { return mX; }
+    int x() const { return mX; }
 
-    inline int y() const { return mY; }
+    int y() const { return mY; }
 
-    inline int width() const { return mWidth; }
+    int width() const { return mWidth; }
 
-    inline int height() const { return mHeight; }
+    int height() const { return mHeight; }
 
-    inline int left() const { return mX; }
+    int left() const { return mX; }
 
-    inline int right() const { return mX + mWidth; }
+    int right() const { return mX + mWidth; }
 
-    inline int top() const { return mY; }
+    int top() const { return mY; }
 
-    inline int bottom() const { return mY + mHeight; }
+    int bottom() const { return mY + mHeight; }
 
 private:
     int mX, mY, mWidth, mHeight;
@@ -63,9 +63,9 @@ class Size
 public:
     Size(int width, int height);
 
-    inline int width() const { return mWidth; }
+    int width() const { return mWidth; }
 
-    inline int height() const { return mHeight; }
+    int height() const { return mHeight; }
 
 private:
     int mWidth, mHeight;

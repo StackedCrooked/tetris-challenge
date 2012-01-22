@@ -19,10 +19,10 @@ public:
 
     GameState commit(const Block & inBlock) const;
 
-    inline unsigned id() const
+    unsigned id() const
     { return mId; }
 
-    inline const Grid & grid() const
+    const Grid & grid() const
     { return mGrid; }
 
     // Modifies the grid bypassing Tetris rules.
@@ -30,45 +30,45 @@ public:
     void setGrid(const Grid & inGrid);
 
     // Returns true if setGrid() has been called on this object.
-    inline bool tainted() const
+    bool tainted() const
     { return mTainted; }
 
     // The Block that was used in the commit(...) call.
-    inline const Block & originalBlock() const
+    const Block & originalBlock() const
     { return mOriginalBlock; }
 
-    inline bool isGameOver() const
+    bool isGameOver() const
     { return mIsGameOver; }
 
     // Checks if a Block can be placed at a given location
     // without overlapping with previously placed blocks.
     bool checkPositionValid(const Block & inBlock, unsigned inRowIdx, unsigned inColIdx) const;
 
-    inline bool checkPositionValid(const Block & inBlock) const
+    bool checkPositionValid(const Block & inBlock) const
     { return checkPositionValid(inBlock, inBlock.row(), inBlock.column()); }
 
-    inline int numLines() const
+    int numLines() const
     { return mStats.mNumLines; }
 
-    inline int numSingles() const
+    int numSingles() const
     { return mStats.mNumSingles; }
 
-    inline int numDoubles() const
+    int numDoubles() const
     { return mStats.mNumDoubles; }
 
-    inline int numTriples() const
+    int numTriples() const
     { return mStats.mNumTriples; }
 
-    inline int numTetrises() const
+    int numTetrises() const
     { return mStats.mNumTetrises; }
 
-    inline int score() const
+    int score() const
     { return mStats.score(); }
 
-    inline int firstOccupiedRow() const
+    int firstOccupiedRow() const
     { return mFirstOccupiedRow; }
 
-    inline int currentHeight() const
+    int currentHeight() const
     { return mGrid.rowCount() - mFirstOccupiedRow; }
 
 private:
@@ -98,7 +98,7 @@ public:
 
     GameState & gameState();
 
-    inline signed quality() const { return mQuality; }
+    signed quality() const { return mQuality; }
 
 private:
     EvaluatedGameState(const EvaluatedGameState &);

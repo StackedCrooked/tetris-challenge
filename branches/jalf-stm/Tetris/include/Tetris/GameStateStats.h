@@ -37,7 +37,7 @@ public:
     {
     }
 
-    inline GameStateStats increment(unsigned inNumLines)
+    GameStateStats increment(unsigned inNumLines)
     {
         return GameStateStats(numLines()    + inNumLines,
                               numSingles()  + (inNumLines == 1 ? 1 : 0),
@@ -46,22 +46,22 @@ public:
                               numTetrises() + (inNumLines == 4 ? 1 : 0));
     }
 
-    inline int numLines() const
+    int numLines() const
     { return mNumLines; }
 
-    inline int numSingles() const
+    int numSingles() const
     { return mNumSingles; }
 
-    inline int numDoubles() const
+    int numDoubles() const
     { return mNumDoubles; }
 
-    inline int numTriples() const
+    int numTriples() const
     { return mNumTriples; }
 
-    inline int numTetrises() const
+    int numTetrises() const
     { return mNumTetrises; }
 
-    inline int score() const
+    int score() const
     {
         return   40 * mNumSingles +
                 100 * mNumDoubles +

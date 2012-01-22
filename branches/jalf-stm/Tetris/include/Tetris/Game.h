@@ -101,12 +101,12 @@ private:
     public:
         CircularBlockTypes(unsigned n);
 
-        inline BlockType get(std::size_t inIndex) const
+        BlockType get(std::size_t inIndex) const
         {
             return mBlockTypes[inIndex % mBlockTypes.size()];
         }
 
-        inline BlockTypes::size_type size() const
+        BlockTypes::size_type size() const
         {
             return mBlockTypes.size();
         }
