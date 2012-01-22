@@ -1,6 +1,5 @@
 STM Version
 -----------
-- Setup Valgrind script for memcheck, drd, helgrind, etc...
 - Use STM in TreeRowInfos
 - Redesign Model, MultiplayerGame, Player classes.
 v Future blocks shows current block as next block.
