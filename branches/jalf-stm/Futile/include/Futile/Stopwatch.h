@@ -23,6 +23,9 @@ public:
     /// Reset and start the stopwatch.
     void restart();
 
+    /// Resets the stopwatch
+    void reset();
+
     /// Returns the elapsed time in milliseconds.
     UInt64 elapsedMs() const;
 

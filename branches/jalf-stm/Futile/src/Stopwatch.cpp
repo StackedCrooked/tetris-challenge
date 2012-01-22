@@ -39,6 +39,13 @@ void Stopwatch::restart()
 }
 
 
+void Stopwatch::reset()
+{
+    mStart = 0;
+    mStop = 0;
+}
+
+
 UInt64 Stopwatch::elapsedMs() const
 {
     if (mStart != 0)
