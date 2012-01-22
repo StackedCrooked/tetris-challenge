@@ -53,8 +53,8 @@ public:
         mWorkerPool("Computer: WorkerPool", cDefaultWorkerCount),
         mPrecalculated(Precalculated()),
         mNodeCalculator(),
-        mEvaluator(&Balanced::Instance()),
-        mSearchDepth(8),
+        mEvaluator(&MakeTetrises::Instance()),
+        mSearchDepth(7),
         mSearchWidth(4),
         mWorkerCount(cDefaultWorkerCount),
         mStop(false),
@@ -72,12 +72,27 @@ public:
         mWorkerPool.interruptAndClearQueue();
     }
 
+    void check(stm::transaction & tx)
+    {
+        Precalculated & precalculated = mPrecalculated.open_rw(tx);
+        if (!precalculated.empty())
+        {
+            unsigned currId = mGame.gameState(tx).id();
+            while (!precalculated.empty() && precalculated.front().id() != currId + 1)
+            {
+                precalculated.erase(precalculated.begin());
+                LogWarning("Sync error");
+            }
+        }
+    }
+
     static unsigned GetTimerIntervalMs(unsigned inNumMovesPerSecond)
     {
         return static_cast<unsigned>(0.5 + 1000.0 / static_cast<double>(inNumMovesPerSecond));
     }
 
     void timerEvent();
+    void timerEvent(stm::transaction & tx);
     void timerEventImpl(stm::transaction & tx);
 
     void move(stm::transaction & tx);
@@ -367,8 +382,16 @@ void Computer::Impl::move(stm::transaction & tx)
 void Computer::Impl::timerEvent()
 {
     stm::atomic([&](stm::transaction & tx) {
-        timerEventImpl(tx);
+        timerEvent(tx);
     });
+}
+
+
+void Computer::Impl::timerEvent(stm::transaction & tx)
+{
+    check(tx);
+    timerEventImpl(tx);
+    check(tx);
 }
 
 
@@ -453,8 +476,7 @@ void Computer::Impl::startNodeCalculator(stm::transaction & tx)
     //
     // Create the list of future blocks
     //
-    std::vector<BlockType> nextBlocks = mGame.getFutureBlocks(tx, cPrecalculated.size() + mSearchDepth);
-    Assert(nextBlocks.size() == cPrecalculated.size() + mSearchDepth);
+    std::vector<BlockType> nextBlocks = mGame.getFutureBlocks(tx, cPrecalculated.size() + mSearchDepth + 1);
     BlockTypes futureBlocks;
     for (std::size_t idx = cPrecalculated.size(); idx < nextBlocks.size(); ++idx)
     {
@@ -499,14 +521,6 @@ void Computer::Impl::onStarted(stm::transaction &)
 
 void Computer::Impl::onWorking(stm::transaction & tx)
 {
-    if (previousGameState(tx).id() < mGame.gameState(tx).id())
-    {
-        // The calculated results have become invalid. Start over.
-        mReset = true;
-        //mPrecalculated.open_rw(tx).clear();
-        return;
-    }
-
     const Precalculated & cPrecalculated = mPrecalculated.open_r(tx);
     if (cPrecalculated.empty())
     {
@@ -529,14 +543,23 @@ void Computer::Impl::onFinished(stm::transaction & tx)
     mReset = true;
 
     Precalculated & precalculated = mPrecalculated.open_rw(tx);
+    Assert(precalculated.empty() || precalculated.front().id() == mGame.gameStateId(tx) + 1);
 
     std::vector<GameState> results = mNodeCalculator->result();
+    std::cout << "Precalculated " << results.size() << " items: ";
     for (std::size_t idx = 0; idx < results.size(); ++idx)
     {
         GameState & gameState = results[idx];
         Assert(precalculated.empty() || gameState.id() == precalculated.back().id() + 1);
         precalculated.push_back(gameState);
+
+        if (idx != 0)
+        {
+            std::cout << ", ";
+        }
+        std::cout << gameState.id();
     }
+    std::cout << std::endl;
 }
 
 
