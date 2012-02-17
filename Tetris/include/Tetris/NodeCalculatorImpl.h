@@ -7,10 +7,12 @@
 #include "Tetris/Evaluator.h"
 #include "Futile/Worker.h"
 #include "Futile/WorkerPool.h"
+#include "Futile/Assert.h"
 #include "Futile/Atomic.h"
 #include "Futile/Logging.h"
 #include "Futile/MakeString.h"
 #include "Futile/Assert.h"
+#include "stm.hpp"
 #include <boost/static_assert.hpp>
 #include <atomic>
 #include <cstddef>
@@ -19,6 +21,123 @@
 
 
 namespace Tetris {
+
+
+/// Etage stores the best scoring game state for a given etage.
+/// A tree has an etage for each depth level:
+///      *    Etage 0 (root)
+///     ***   Etage 1
+///    *****  Etage 2
+///           ...
+/// The higher the etage the more nodes.
+class Etage
+{
+public:
+    Etage() :
+        mBestNode(NodePtr()),
+        mBestScore(0),
+        mNodeCount(0),
+        mFinished(bool(false))
+    {
+    }
+
+    const NodePtr & bestNode(stm::transaction & tx) const
+    {
+        return mBestNode.open_r(tx);
+    }
+
+    std::size_t nodeCount(stm::transaction & tx) const
+    { return mNodeCount.open_r(tx); }
+
+    bool finished(stm::transaction & tx) const
+    { return mFinished.open_r(tx); }
+
+    void registerNode(stm::transaction & tx, const NodePtr & inNode, int score)
+    {
+        const NodePtr & cBestNode = mBestNode.open_r(tx);
+        const int & cBestScore = mBestScore.open_r(tx);
+        if (!cBestNode || score > cBestScore)
+        {
+            mBestNode.open_rw(tx) = inNode;
+            mBestScore.open_rw(tx) = score;
+        }
+        mNodeCount.open_rw(tx) += 1;
+    }
+
+    void setFinished(stm::transaction & tx)
+    {
+        Assert(!mFinished.open_r(tx));
+        Assert(mBestNode.open_r(tx));
+        mFinished.open_rw(tx) = true;
+    }
+
+    mutable stm::shared<NodePtr> mBestNode;
+    mutable stm::shared<int> mBestScore;
+    mutable stm::shared<std::size_t> mNodeCount;
+    mutable stm::shared<bool> mFinished;
+};
+
+
+
+typedef std::vector<Etage> Etages;
+
+
+class AllResults
+{
+public:
+    AllResults(const Evaluator & inEvaluator, std::size_t inMaxDepth) :
+        mEtages(inMaxDepth),
+        mMaxDepth(mEtages.size()),
+        mCurrentIndex(0),
+        mEvaluator(&inEvaluator)
+    {
+    }
+
+    std::size_t depth(stm::transaction & tx) const
+    {
+        const std::size_t & cIndex = mCurrentIndex.open_r(tx);
+        return cIndex;
+    }
+
+    std::size_t maxDepth() const
+    {
+        return mMaxDepth;
+    }
+
+    void registerNode(stm::transaction & tx, const NodePtr & inNode)
+    {
+        int score = mEvaluator->evaluate(inNode->gameState());
+        const std::size_t & cIndex = mCurrentIndex.open_r(tx);
+        mEtages.at(cIndex).registerNode(tx, inNode, score);
+        Assert(bestNode(tx));
+    }
+
+    const NodePtr & bestNode(stm::transaction & tx) const
+    {
+        const std::size_t & cIndex = mCurrentIndex.open_r(tx);
+        return mEtages.at(cIndex).bestNode(tx);
+    }
+
+    bool finished(stm::transaction & tx) const
+    {
+        const std::size_t & cIndex = mCurrentIndex.open_r(tx);
+        return cIndex == mMaxDepth;
+    }
+
+    void setFinished(stm::transaction & tx)
+    {
+        std::size_t & currentIndex = mCurrentIndex.open_rw(tx);
+        mEtages.at(currentIndex).setFinished(tx);
+        currentIndex++;
+        Assert(currentIndex <= mMaxDepth);
+    }
+
+private:
+    Etages mEtages;
+    const std::size_t mMaxDepth;
+    mutable stm::shared<std::size_t> mCurrentIndex;
+    const Evaluator * mEvaluator;
+};
 
 
 /**
@@ -60,149 +179,13 @@ protected:
 
     void setStatus(int inStatus);
 
-    void calculateResult();
-
-    // Store info per horizontal level of nodes.
-    class TreeRowInfo
-    {
-    public:
-        TreeRowInfo(const Evaluator & inEvaluator) :
-            mBestNode(),
-            mBestScore(0),
-            mEvaluator(&inEvaluator),
-            mNodeCount(0),
-            mFinished(false)
-        {
-        }
-
-        inline const NodePtr & bestNode() const
-        {
-            if (!mBestNode)
-            {
-                throw std::runtime_error("Best node is null.");
-            }
-            return mBestNode;
-        }
-
-        inline std::size_t nodeCount() const
-        { return mNodeCount; }
-
-        inline bool finished() const
-        { return mFinished; }
-
-        void registerNode(const NodePtr & inNode, int score)
-        {
-            if (!mBestNode || score > mBestScore)
-            {
-                mBestNode = inNode;
-                mBestScore = score;
-            }
-            mNodeCount++;
-            Assert(mBestNode);
-        }
-
-        inline void setFinished()
-        {
-            Assert(!mFinished);
-            Assert(mBestNode);
-            mFinished = true;
-        }
-
-    private:
-        NodePtr mBestNode;
-        int mBestScore;
-        const Evaluator * mEvaluator;
-        std::size_t mNodeCount;
-        bool mFinished;
-    };
-
-    class TreeRowInfos
-    {
-    public:
-        TreeRowInfos(const Evaluator & inEvaluator, std::size_t inMaxDepth) :
-            mInfos(),
-            mMaxDepth(inMaxDepth),
-            mEvaluator(&inEvaluator),
-            mMutex()
-        {
-            mInfos.push_back(TreeRowInfo(*mEvaluator));
-        }
-
-        inline std::size_t depth() const
-        {
-            Futile::ScopedLock lock(mMutex);
-            if (mInfos.back().finished())
-            {
-                return mInfos.size();
-            }
-            else
-            {
-                Assert(mInfos.size() >= 1);
-                return mInfos.size() - 1;
-            }
-        }
-
-        inline std::size_t maxDepth() const
-        {
-            Futile::ScopedLock lock(mMutex);
-            return mMaxDepth;
-        }
-
-        void registerNode(const NodePtr & inNode)
-        {
-            int score = mEvaluator->evaluate(inNode->gameState());
-
-            Futile::ScopedLock lock(mMutex);
-            mInfos.back().registerNode(inNode, score);
-            Assert(bestNode());
-        }
-
-        inline const NodePtr & bestNode() const
-        {
-            Futile::ScopedLock lock(mMutex);
-            if (mInfos.empty())
-            {
-                throw std::runtime_error("There is no best node.");
-            }
-
-            if (mInfos.size() >= 2)
-            {
-                return mInfos[mInfos.size() - 2].bestNode();
-            }
-            else
-            {
-                return mInfos[mInfos.size() - 1].bestNode();
-            }
-
-            throw std::runtime_error("Invalid state.");
-        }
-
-        inline bool finished() const
-        {
-            Futile::ScopedLock lock(mMutex);
-            return mInfos.size() == (mMaxDepth - 1) && mInfos.back().finished();
-        }
-
-        inline void setFinished()
-        {
-            Futile::ScopedLock lock(mMutex);
-            Assert(!mInfos.empty());
-            mInfos.back().setFinished();
-            mInfos.push_back(TreeRowInfo(*mEvaluator));
-        }
-
-    private:
-        std::vector<TreeRowInfo> mInfos;
-        std::size_t mMaxDepth;
-        const Evaluator * mEvaluator;
-        mutable Futile::Mutex mMutex;
-    };
+    void calculateResult(stm::transaction & tx);
 
     NodePtr mNode;
     std::vector<GameState> mResult;
     std::atomic_bool mQuitFlag;
     std::atomic_int mStatus;
-    TreeRowInfos mTreeRowInfos;
+    AllResults mAllResults;
     BlockTypes mBlockTypes;
     std::vector<int> mWidths;
     const Evaluator & mEvaluator;

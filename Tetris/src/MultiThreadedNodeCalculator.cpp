@@ -62,7 +62,10 @@ void MultiThreadedNodeCalculator::generateChildNodes(NodePtr & ioNode,
         ++it;
     }
 
-    mTreeRowInfos.registerNode(*ioNode->children().begin());
+    stm::atomic([&](stm::transaction & tx)
+    {
+        mAllResults.registerNode(tx, *ioNode->children().begin());
+    });
 }
 
 
@@ -136,7 +139,12 @@ void MultiThreadedNodeCalculator::populate()
             {
                 break;
             }
-            mTreeRowInfos.setFinished();
+
+            stm::atomic([&](stm::transaction & tx)
+            {
+                mAllResults.setFinished(tx);
+            });
+
             targetDepth++;
         }
     }

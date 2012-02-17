@@ -22,6 +22,7 @@
 #include <boost/bind.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/weak_ptr.hpp>
+#include <iostream> // TODO: cleanup
 
 
 namespace Tetris {
