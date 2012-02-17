@@ -71,6 +71,7 @@ public:
         mFinished.open_rw(tx) = true;
     }
 
+private:
     mutable stm::shared<NodePtr> mBestNode;
     mutable stm::shared<int> mBestScore;
     mutable stm::shared<std::size_t> mNodeCount;
