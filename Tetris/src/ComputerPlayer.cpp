@@ -108,8 +108,7 @@ public:
 
     void updateComputerBlockMoveSpeed();
 
-    void startNodeCalculator(stm::transaction & tx);
-    void onStarted(stm::transaction & tx);
+    void startNodeCalculator(stm::transaction & tx);    
     void onWorking(stm::transaction & tx);
     void onStopped(stm::transaction & tx);
     void onFinished(stm::transaction & tx);
@@ -345,11 +344,6 @@ Game::MoveResult Move(stm::transaction & tx, Game & ioGame, const Block & target
 void Computer::Impl::move(stm::transaction & tx)
 {
     Precalculated & precalculated = mPrecalculated.open_rw(tx);
-    if (precalculated.empty())
-    {
-        return;
-    }
-
     unsigned oldId = mGame.gameStateId(tx);
     unsigned predictedId = precalculated.front().id();
     if (oldId >= predictedId)
@@ -412,7 +406,12 @@ void Computer::Impl::timerEventImpl(stm::transaction & tx)
         return;
     }
 
-    move(tx);
+    const Precalculated & precalculated = mPrecalculated.open_r(tx);
+    if (!precalculated.empty())
+    {
+        move(tx);
+        return;
+    }
 
     if (!mNodeCalculator)
     {
@@ -427,10 +426,6 @@ void Computer::Impl::timerEventImpl(stm::transaction & tx)
             throw std::logic_error("Status should be Status_Started or higher.");
         }
         case NodeCalculator::Status_Started:
-        {
-            onStarted(tx);
-            return;
-        }
         case NodeCalculator::Status_Working:
         {
             onWorking(tx);
@@ -511,12 +506,6 @@ void Computer::Impl::startNodeCalculator(stm::transaction & tx)
                                              mMainWorker,
                                              mWorkerPool));
     mNodeCalculator->start();
-}
-
-
-void Computer::Impl::onStarted(stm::transaction &)
-{
-    // Good.
 }
 
 
