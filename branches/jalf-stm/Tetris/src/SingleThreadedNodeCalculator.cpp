@@ -40,7 +40,9 @@ SingleThreadedNodeCalculator::~SingleThreadedNodeCalculator()
 
 void SingleThreadedNodeCalculator::onChildNodeGenerated(const Progress & , const NodePtr & inChildNode)
 {
-    mTreeRowInfos.registerNode(inChildNode);
+    stm::atomic([&](stm::transaction & tx) {
+        mAllResults.registerNode(tx, inChildNode);
+    });
 }
 
 
@@ -59,7 +61,9 @@ void SingleThreadedNodeCalculator::populate()
                            mWidths,
                            Progress(0, targetDepth),
                            boost::bind(&SingleThreadedNodeCalculator::onChildNodeGenerated, this, _1, _2));
-            mTreeRowInfos.setFinished();
+            stm::atomic([&](stm::transaction & tx) {
+                mAllResults.setFinished(tx);
+            });
             targetDepth++;
         }
     }

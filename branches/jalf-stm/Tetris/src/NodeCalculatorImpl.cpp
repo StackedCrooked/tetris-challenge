@@ -64,7 +64,7 @@ NodeCalculatorImpl::NodeCalculatorImpl(const GameState & inGameState,
     mResult(),
     mQuitFlag(false),
     mStatus(0),
-    mTreeRowInfos(inEvaluator, inBlockTypes.size()),
+    mAllResults(AllResults(inEvaluator, inBlockTypes.size())),
     mBlockTypes(inBlockTypes),
     mWidths(inWidths),
     mEvaluator(inEvaluator),
@@ -96,7 +96,10 @@ bool NodeCalculatorImpl::getQuitFlag() const
 
 int NodeCalculatorImpl::getCurrentSearchDepth() const
 {
-    return mTreeRowInfos.depth();
+    return stm::atomic<int>([&](stm::transaction & tx)
+    {
+        return mAllResults.depth(tx);
+    });
 }
 
 
@@ -131,14 +134,14 @@ void NodeCalculatorImpl::setStatus(int inStatus)
 }
 
 
-void NodeCalculatorImpl::calculateResult()
+void NodeCalculatorImpl::calculateResult(stm::transaction & tx)
 {
     if (getQuitFlag())
     {
         return;
     }
 
-    if (getCurrentSearchDepth() == 0 || !mTreeRowInfos.bestNode())
+    if (getCurrentSearchDepth() == 0 || !mAllResults.bestNode(tx))
     {
         Assert(mNode->endNode()->gameState().isGameOver());
         return;
@@ -146,7 +149,7 @@ void NodeCalculatorImpl::calculateResult()
 
     // Backtrack the best end-node to its starting node.
     std::stack<NodePtr> results;
-    NodePtr endNode = mTreeRowInfos.bestNode();
+    NodePtr endNode = mAllResults.bestNode(tx);
     unsigned startId = mNode->gameState().id();
     unsigned currentId = endNode->gameState().id();
     while (currentId > startId + 1)
@@ -190,7 +193,7 @@ void NodeCalculatorImpl::startImpl()
     {
         setStatus(NodeCalculator::Status_Working);
         populate();
-        calculateResult();
+        stm::atomic([&](stm::transaction & tx) { calculateResult(tx); });
         setStatus(NodeCalculator::Status_Finished);
     }
     catch (const std::exception & inException)
