@@ -151,7 +151,7 @@ TEST_F(STMTest, CoordinatedChanges)
         workers.schedule(boost::bind(&STMTest::test, this));
     }
 
-    static const unsigned cDuration = 5000;
+    static const unsigned cDuration = 1000;
 
     std::cout << "Wait for " << cDuration << "ms..." << std::endl;
     Sleep(cDuration);
