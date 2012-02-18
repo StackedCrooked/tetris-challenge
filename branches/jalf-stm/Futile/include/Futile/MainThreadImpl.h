@@ -20,7 +20,11 @@ class MainThreadImpl : boost::noncopyable
 public:
     virtual ~MainThreadImpl() {}
 
+#ifdef FUTILE_EVENTLOOP
     virtual void postAction(Action inAction) = 0;
+#else
+    virtual void postAction(Action) {}
+#endif
 };
 
 
