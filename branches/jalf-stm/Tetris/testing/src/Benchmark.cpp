@@ -15,6 +15,9 @@ using namespace Futile;
 using namespace Tetris;
 
 
+struct Benchmark : public TetrisTest { };
+
+
 namespace { // anonymous
 
 
@@ -37,56 +40,53 @@ std::vector<int> GetWidths(unsigned inDepth, int inWidth)
 }
 
 
-} // anonymous namespace
-
-
-class Benchmark : public TetrisTest
-{
-};
-
-
-TEST_F(Benchmark, Quick)
+void PerformBenchmark(unsigned inWidth, unsigned inDepth)
 {
     UInt64 startTime = GetCurrentTimeMs();
     Worker worker("Main Worker");
     WorkerPool workerPool("Worker Pool", 8);
-
-    enum {
-        Depth = 8,
-        Width = 5
-    };
-
-    std::cout << "Starting test with Depth=" << Depth << " and Width=" << Width << std::endl;
+    std::cout << "Starting test with Depth=" << inDepth << " and Width=" << inWidth << std::endl;
     NodeCalculator nodeCalculator(GameState(20, 10),
-                                  GetBlockTypes(Width),
-                                  GetWidths(Width, Depth),
+                                  GetBlockTypes(inWidth),
+                                  GetWidths(inWidth, inDepth),
                                   MakeTetrises::Instance(),
                                   worker,
                                   workerPool);
 
     nodeCalculator.start();
-
-    NodeCalculator::Status status = NodeCalculator::Status_Begin;
-    while (status != NodeCalculator::Status_Finished)
+    unsigned c = 0;
+    std::cout << std::endl;
+    while (nodeCalculator.status() != NodeCalculator::Status_Finished)
     {
-        if (status == NodeCalculator::Status_Error)
-        {
-            throw std::runtime_error(nodeCalculator.errorMessage());
-        }
-        Sleep(UInt64(1));
-
-        NodeCalculator::Status newStatus = nodeCalculator.status();
-        if (newStatus != status)
-        {
-            std::cout << "Status is now " << newStatus << std::endl;
-        }
-
-        status = newStatus;
+        Sleep(UInt64(50));
+        std::cout << "\rNode count: " << nodeCalculator.getCurrentNodeCount() << "/" << nodeCalculator.getMaxNodeCount() << " (" << c++ << ")" << std::flush;
     }
 
+    std::cout << "\rNode count: " << nodeCalculator.getCurrentNodeCount() << "/" << nodeCalculator.getMaxNodeCount() << std::endl;
     std::cout << "Finished in " << (GetCurrentTimeMs() - startTime) << "ms." << std::endl;
 }
 
 
-} // namespace testing
+void Print(const std::exception & exc)
+{
+    std::cout << "Anticipated exception: " << exc.what() << std::endl;
+}
 
+
+} // anonymous namespace
+
+
+TEST_F(Benchmark, Quick)
+{
+    try { PerformBenchmark(0, 0); } catch (const std::exception & exc) { Print(exc); }
+    try { PerformBenchmark(0, 1); } catch (const std::exception & exc) { Print(exc); }
+    try { PerformBenchmark(1, 0); } catch (const std::exception & exc) { Print(exc); }
+
+    PerformBenchmark(1, 1);
+    PerformBenchmark(2, 2);
+    PerformBenchmark(4, 4);
+    PerformBenchmark(6, 6);
+}
+
+
+} // namespace testing

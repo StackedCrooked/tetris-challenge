@@ -56,6 +56,7 @@ void SingleThreadedNodeCalculator::populate()
         while (targetDepth <= mBlockTypes.size())
         {
             CalculateNodes(mNode,
+                           mCurrentNodeCount,
                            mEvaluator,
                            mBlockTypes,
                            mWidths,

@@ -47,7 +47,7 @@ void MultiThreadedNodeCalculator::generateChildNodes(NodePtr & ioNode,
                                                      int inMaxChildCount)
 {
     ChildNodes childNodes;
-    GenerateOffspring(ioNode, inBlockType, *inEvaluator, childNodes);
+    GenerateOffspring(ioNode, inBlockType, *inEvaluator, childNodes, mCurrentNodeCount);
     if (childNodes.empty())
     {
         throw std::logic_error("GenerateOffspring produced zero children. This should not happen!");
@@ -62,8 +62,8 @@ void MultiThreadedNodeCalculator::generateChildNodes(NodePtr & ioNode,
         ++it;
     }
 
-    stm::atomic([&](stm::transaction & tx)
-    {
+
+    stm::atomic([&](stm::transaction & tx) {
         mAllResults.registerNode(tx, *ioNode->children().begin());
     });
 }
@@ -96,12 +96,18 @@ void MultiThreadedNodeCalculator::populateNodes(NodePtr & ioNode,
     if (inIndex + 1 == inEndIndex)
     {
         Assert(ioNode->children().empty());
+        const int cWidth = inWidths[inIndex];
+        if (cWidth == 0)
+        {
+            throw std::logic_error("Width is zero.");
+        }
+
         Worker::Task task = boost::bind(&MultiThreadedNodeCalculator::generateChildNodes,
                                         this,
                                         ioNode,
                                         &mEvaluator,
                                         inBlockTypes[inIndex],
-                                        inWidths[inIndex]);
+                                        cWidth);
         mWorkerPool.schedule(task);
 
         // End of recursion.

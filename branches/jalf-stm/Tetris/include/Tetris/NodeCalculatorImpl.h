@@ -164,6 +164,10 @@ public:
 
     int getMaxSearchDepth() const;
 
+    unsigned getCurrentNodeCount() const;
+
+    unsigned getMaxNodeCount() const;
+
     std::vector<GameState> result() const;
 
     int status() const;
@@ -189,6 +193,8 @@ protected:
     AllResults mAllResults;
     BlockTypes mBlockTypes;
     std::vector<int> mWidths;
+    const unsigned mMaxNodeCount;
+    unsigned mCurrentNodeCount;
     const Evaluator & mEvaluator;
     std::string mErrorMessage;
     Futile::Worker & mMainWorker;

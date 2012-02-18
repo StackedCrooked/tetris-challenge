@@ -43,6 +43,10 @@ public:
 
     int getMaxSearchDepth() const;
 
+    unsigned getCurrentNodeCount() const;
+
+    unsigned getMaxNodeCount() const;
+
     enum Status
     {
         Status_Nil,

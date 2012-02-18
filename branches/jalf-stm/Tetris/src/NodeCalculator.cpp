@@ -86,6 +86,18 @@ int NodeCalculator::getMaxSearchDepth() const
 }
 
 
+unsigned NodeCalculator::getCurrentNodeCount() const
+{
+    return mImpl->getCurrentNodeCount();
+}
+
+
+unsigned NodeCalculator::getMaxNodeCount() const
+{
+    return mImpl->getMaxNodeCount();
+}
+
+
 std::vector<GameState> NodeCalculator::result() const
 {
     Assert(status() != Status_Error);

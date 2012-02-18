@@ -67,10 +67,29 @@ NodeCalculatorImpl::NodeCalculatorImpl(const GameState & inGameState,
     mAllResults(AllResults(inEvaluator, inBlockTypes.size())),
     mBlockTypes(inBlockTypes),
     mWidths(inWidths),
+    mMaxNodeCount(calculateMaxNodeCount(inWidths)),
     mEvaluator(inEvaluator),
     mMainWorker(inMainWorker),
     mWorkerPool(inWorkerPool)
 {
+    if (mBlockTypes.empty())
+    {
+        throw std::logic_error("Blocktypes must not be empty!");
+    }
+
+    if (mBlockTypes.size() != mWidths.size())
+    {
+        throw std::logic_error("Number of provided blocks does not equal number of provided widths.");
+    }
+
+    for (std::size_t idx = 0; idx < mWidths.size(); ++idx)
+    {
+        if (mWidths[idx] == 0)
+        {
+            throw std::logic_error("Width must be > 0.");
+        }
+    }
+
     Assert(!mNode->gameState().isGameOver());
     Assert(mNode->children().empty());
 }
@@ -106,6 +125,18 @@ int NodeCalculatorImpl::getCurrentSearchDepth() const
 int NodeCalculatorImpl::getMaxSearchDepth() const
 {
     return mWidths.size();
+}
+
+
+unsigned NodeCalculatorImpl::getCurrentNodeCount() const
+{
+    return mCurrentNodeCount;
+}
+
+
+unsigned NodeCalculatorImpl::getMaxNodeCount() const
+{
+    return mMaxNodeCount;
 }
 
 

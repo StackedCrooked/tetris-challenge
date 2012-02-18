@@ -58,6 +58,7 @@ bool IsGameOver(const GameState & inGameState, BlockType inBlockType, int inRota
 
 
 void CalculateNodes(const NodePtr & ioNode,
+                    unsigned & outTotalNodeCount,
                     const Evaluator & inEvaluator,
                     const BlockTypes & inBlockTypes,
                     const std::vector<int> & inWidths,
@@ -102,7 +103,7 @@ void CalculateNodes(const NodePtr & ioNode,
     if (generatedChildNodes.empty())
     {
         generatedChildNodes = ChildNodes(GameStateComparator());
-        GenerateOffspring(ioNode, inBlockTypes[inProgress.current()], inEvaluator, generatedChildNodes);
+        GenerateOffspring(ioNode, inBlockTypes[inProgress.current()], inEvaluator, generatedChildNodes, outTotalNodeCount);
 
         ChildNodes::iterator it = generatedChildNodes.begin(), end = generatedChildNodes.end();
         while (numNewChildren < inWidths[inProgress.current()] && it != end)
@@ -128,7 +129,7 @@ void CalculateNodes(const NodePtr & ioNode,
     for (ChildNodes::iterator it = generatedChildNodes.begin(); it != generatedChildNodes.end(); ++it)
     {
         const NodePtr & child = *it;
-        CalculateNodes(child, inEvaluator, inBlockTypes, inWidths, inProgress.increment(), inCallback, _checkChildCount + numNewChildren);
+        CalculateNodes(child, outTotalNodeCount, inEvaluator, inBlockTypes, inWidths, inProgress.increment(), inCallback, _checkChildCount + numNewChildren);
     }
 }
 
@@ -136,7 +137,8 @@ void CalculateNodes(const NodePtr & ioNode,
 void GenerateOffspring(const NodePtr & ioGameStateNode,
                        const BlockTypes & inBlockTypes,
                        std::size_t inOffset,
-                       const Evaluator & inEvaluator)
+                       const Evaluator & inEvaluator,
+                       unsigned & outTotalCounter)
 {
     Assert(inOffset < inBlockTypes.size());
     Assert(ioGameStateNode->children().empty());
@@ -145,7 +147,9 @@ void GenerateOffspring(const NodePtr & ioGameStateNode,
     GenerateOffspring(ioGameStateNode,
                       inBlockTypes[inOffset],
                       inEvaluator,
-                      children);
+                      children,
+                      outTotalCounter);
+
     std::for_each(children.begin(), children.end(), [&](const NodePtr & child) { ioGameStateNode->addChild(child); });
 
     if (inOffset + 1 < inBlockTypes.size())
@@ -158,7 +162,8 @@ void GenerateOffspring(const NodePtr & ioGameStateNode,
             GenerateOffspring(childNode,
                               inBlockTypes,
                               inOffset + 1,
-                              inEvaluator);
+                              inEvaluator,
+                              outTotalCounter);
         }
     }
 }
@@ -167,7 +172,8 @@ void GenerateOffspring(const NodePtr & ioGameStateNode,
 void GenerateOffspring(const NodePtr & inNode,
                        BlockType inBlockType,
                        const Evaluator & inEvaluator,
-                       ChildNodes & outChildNodes)
+                       ChildNodes & outChildNodes,
+                       unsigned & outTotalCounter)
 {
     Assert(outChildNodes.empty());
     const GameState & gameState = inNode->gameState();
@@ -177,13 +183,18 @@ void GenerateOffspring(const NodePtr & inNode,
     // If yes then append the final "broken" game state as only child.
     if (IsGameOver(gameState, inBlockType, 0))
     {
-        std::size_t initialColumn = InitialBlockPosition(gameGrid.columnCount(), GetGrid(GetBlockIdentifier(inBlockType, 0)).columnCount());
+        std::size_t initialColumn = InitialBlockPosition(gameGrid.columnCount(),
+                                                         GetGrid(GetBlockIdentifier(inBlockType, 0)).columnCount());
         NodePtr childState(new GameStateNode(inNode,
-                                             gameState.commit(Block(inBlockType, Rotation(0), Row(0), Column(initialColumn))),
+                                             gameState.commit(Block(inBlockType,
+                                                                    Rotation(0),
+                                                                    Row(0),
+                                                                    Column(initialColumn))),
                                              inEvaluator));
         Assert(childState->gameState().isGameOver());
         Assert(childState->depth() == (inNode->depth() + 1));
         outChildNodes.insert(childState);
+        outTotalCounter++;
         return;
     }
 
@@ -207,6 +218,7 @@ void GenerateOffspring(const NodePtr & inNode,
                                                      inEvaluator));
                 Assert(childState->depth() == inNode->depth() + 1);
                 outChildNodes.insert(childState);
+                outTotalCounter++;
             }
         }
     }
