@@ -13,4 +13,4 @@ cd Build
 cmake ../QtTetris
 
 echo "Delete the \"Build\" directory to erase all configure and build files."
-echo "Type \"cd Build ; make\" to start building.
+echo "Type \"cd Build ; make\" to start building."
