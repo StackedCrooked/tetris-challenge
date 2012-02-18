@@ -136,7 +136,6 @@
     <valuelist type="QVariantList" key="ProjectExplorer.BuildConfiguration.UserEnvironmentChanges">
      <value type="QString">PATH=/home/francis/bin:/home/francis/qtsdk-2010.05/qt/bin:/usr/local/bin:/usr/bin:/bin</value>
      <value type="QString">TETRIS_BUILD_TYPE=RelWithDebInfo</value>
-     <value type="QString">TETRIS_TARGET=Tetris/testing</value>
     </valuelist>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Make</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Configure Tetris/testing RelWithDebInfo</value>
@@ -179,7 +178,6 @@
     <valuelist type="QVariantList" key="ProjectExplorer.BuildConfiguration.UserEnvironmentChanges">
      <value type="QString">PATH=/home/francis/bin:/home/francis/qtsdk-2010.05/qt/bin:/usr/local/bin:/usr/bin:/bin</value>
      <value type="QString">TETRIS_BUILD_TYPE=Debug</value>
-     <value type="QString">TETRIS_TARGET=QtTetris</value>
     </valuelist>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Make</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Configure QtTetris Debug</value>
@@ -222,7 +220,6 @@
     <valuelist type="QVariantList" key="ProjectExplorer.BuildConfiguration.UserEnvironmentChanges">
      <value type="QString">PATH=/home/francis/bin:/home/francis/qtsdk-2010.05/qt/bin:/usr/local/bin:/usr/bin:/bin</value>
      <value type="QString">TETRIS_BUILD_TYPE=Release</value>
-     <value type="QString">TETRIS_TARGET=QtTetris</value>
     </valuelist>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Make</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Configure QtTetris Release</value>
