@@ -86,29 +86,6 @@ private:
 };
 
 
-class EvaluatedGameState
-{
-public:
-    // Takes ownership of the GameState object
-    EvaluatedGameState(const GameState & inGameState, signed inQuality);
-
-    ~EvaluatedGameState();
-
-    const GameState & gameState() const;
-
-    GameState & gameState();
-
-    signed quality() const { return mQuality; }
-
-private:
-    EvaluatedGameState(const EvaluatedGameState &);
-    EvaluatedGameState& operator=(const EvaluatedGameState&);
-
-    GameState mGameState;
-    int mQuality;
-};
-
-
 } // namespace Tetris
 
 
