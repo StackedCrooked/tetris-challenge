@@ -18,7 +18,7 @@ struct GameStateNode::Impl
         mParent(inParent),
         mGameState(inGameState),
         mDepth(inParent->depth() + 1),
-        mScore(inEvaluator.evaluate(inGameState)),
+        mQuality(inEvaluator.evaluate(inGameState)),
         mEvaluator(inEvaluator),
         mChildren()
     {
@@ -28,7 +28,7 @@ struct GameStateNode::Impl
         mParent(),
         mGameState(inGameState),
         mDepth(0),
-        mScore(inEvaluator.evaluate(inGameState)),
+        mQuality(inEvaluator.evaluate(inGameState)),
         mEvaluator(inEvaluator),
         mChildren()
     {
@@ -37,7 +37,7 @@ struct GameStateNode::Impl
     boost::weak_ptr<GameStateNode> mParent;
     GameState mGameState;
     int mDepth;
-    int mScore;
+    int mQuality;
     const Evaluator & mEvaluator; // } => Order matters!
     ChildNodes mChildren;
 
@@ -92,7 +92,7 @@ const GameState & GameStateNode::gameState() const
 
 int GameStateNode::quality() const
 {
-    return mImpl->mScore;
+    return mImpl->mQuality;
 }
 
 

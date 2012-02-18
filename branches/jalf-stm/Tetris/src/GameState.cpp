@@ -173,29 +173,5 @@ void GameState::updateCache()
 }
 
 
-EvaluatedGameState::EvaluatedGameState(const GameState & inGameState, signed inQuality) :
-    mGameState(inGameState),
-    mQuality(inQuality)
-{
-}
-
-
-EvaluatedGameState::~EvaluatedGameState()
-{
-}
-
-
-const GameState & EvaluatedGameState::gameState() const
-{
-    return mGameState;
-}
-
-
-GameState & EvaluatedGameState::gameState()
-{
-    return mGameState;
-}
-
-
 } // namespace Tetris
 

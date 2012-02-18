@@ -35,7 +35,7 @@ class Etage
 public:
     Etage() :
         mBestNode(NodePtr()),
-        mBestScore(0),
+        mBestQuality(0),
         mNodeCount(0),
         mFinished(bool(false))
     {
@@ -52,14 +52,14 @@ public:
     bool finished(stm::transaction & tx) const
     { return mFinished.open_r(tx); }
 
-    void registerNode(stm::transaction & tx, const NodePtr & inNode, int score)
+    void registerNode(stm::transaction & tx, const NodePtr & inNode, int quality)
     {
         const NodePtr & cBestNode = mBestNode.open_r(tx);
-        const int & cBestScore = mBestScore.open_r(tx);
-        if (!cBestNode || score > cBestScore)
+        const int & cBestQuality = mBestQuality.open_r(tx);
+        if (!cBestNode || quality > cBestQuality)
         {
             mBestNode.open_rw(tx) = inNode;
-            mBestScore.open_rw(tx) = score;
+            mBestQuality.open_rw(tx) = quality;
         }
         mNodeCount.open_rw(tx) += 1;
     }
@@ -73,7 +73,7 @@ public:
 
 private:
     mutable stm::shared<NodePtr> mBestNode;
-    mutable stm::shared<int> mBestScore;
+    mutable stm::shared<int> mBestQuality;
     mutable stm::shared<std::size_t> mNodeCount;
     mutable stm::shared<bool> mFinished;
 };
@@ -107,16 +107,16 @@ public:
 
     void registerNode(stm::transaction & tx, const NodePtr & inNode)
     {
-        int score = mEvaluator->evaluate(inNode->gameState());
+        int quality = inNode->quality();
         const std::size_t & cIndex = mCurrentIndex.open_r(tx);
-        mEtages.at(cIndex).registerNode(tx, inNode, score);
-        Assert(bestNode(tx));
+        mEtages[cIndex].registerNode(tx, inNode, quality);
+        Assert(cIndex == 0 || bestNode(tx));
     }
 
     const NodePtr & bestNode(stm::transaction & tx) const
     {
         const std::size_t & cIndex = mCurrentIndex.open_r(tx);
-        return mEtages.at(cIndex).bestNode(tx);
+        return mEtages[cIndex - 1].bestNode(tx);
     }
 
     bool finished(stm::transaction & tx) const
@@ -128,7 +128,7 @@ public:
     void setFinished(stm::transaction & tx)
     {
         std::size_t & currentIndex = mCurrentIndex.open_rw(tx);
-        mEtages.at(currentIndex).setFinished(tx);
+        mEtages[currentIndex].setFinished(tx);
         currentIndex++;
         Assert(currentIndex <= mMaxDepth);
     }
