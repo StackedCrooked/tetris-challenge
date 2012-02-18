@@ -30,12 +30,14 @@ bool IsGameOver(const GameState & inGameState, BlockType inBlockType, int inRota
 void GenerateOffspring(const NodePtr & ioGameStateNode,
                        const BlockTypes & inBlockTypes,
                        std::size_t inOffset,
-                       const Evaluator & inEvaluator);
+                       const Evaluator & inEvaluator,
+                       unsigned & outTotalCounter);
 
 void GenerateOffspring(const NodePtr & ioGameStateNode,
                        BlockType inBlockType,
                        const Evaluator & inEvaluator,
-                       ChildNodes & outChildNodes);
+                       ChildNodes & outChildNodes,
+                       unsigned & outTotalCounter);
 
 class Progress
 {
@@ -72,7 +74,8 @@ private:
 typedef boost::function<void(const Progress &, const NodePtr &)> ChildNodeGeneratedCallback;
 
 
-void CalculateNodes(const NodePtr & ioNode,
+void CalculateNodes(const NodePtr & ioNode,                    
+                    unsigned & outTotalNodeCount,
                     const Evaluator & inEvaluator,
                     const BlockTypes & inBlockTypes,
                     const std::vector<int> & inWidths,
