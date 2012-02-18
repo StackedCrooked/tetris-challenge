@@ -64,7 +64,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OUTDIR}bin/)
 if(WIN32)
     set(CXX_FLAGS_Debug   "${CXX_FLAGS} /DTETRIS_QT=1 ")
     set(CXX_FLAGS_Release "${CXX_FLAGS} /DTETRIS_QT=0 ")
-    set(FINAL_COMPILE_FLAGS "${CXX_FLAGS_${CMAKE_BUILD_TYPE}} /D POCO_STATIC /D POCO_NO_AUTOMATIC_LIBS /D BOOST_ALL_NO_LIB /D _HAS_ITERATOR_DEBUGGING=0 /D _SECURE_SCL=0 /D _SECURE_SCL_THROWS=0")
+    set(FINAL_COMPILE_FLAGS "${CXX_FLAGS_${CMAKE_BUILD_TYPE}} /D FUTILE_EVENTLOOP /D POCO_STATIC /D POCO_NO_AUTOMATIC_LIBS /D BOOST_ALL_NO_LIB /D _HAS_ITERATOR_DEBUGGING=0 /D _SECURE_SCL=0 /D _SECURE_SCL_THROWS=0")
 else()
     set(CMAKE_INCLUDE_SYSTEM_FLAG_CXX "-isystem ")
     set(CXX_FLAGS         "${CXX_FLAGS} -DTETRIS_QT=1")
@@ -73,7 +73,7 @@ else()
     set(CXX_FLAGS_Debug   "${CXX_FLAGS} ${WARNING_OPTIONS} -ggdb3 ")
     set(CXX_FLAGS_Release "${CXX_FLAGS} ${WARNING_OPTIONS} -O3 -DNDEBUG ")
     set(CXX_FLAGS_RelWithDebInfo "${CXX_FLAGS} ${WARNING_OPTIONS} -O1 -g3 -DNDEBUG ")
-    set(FINAL_COMPILE_FLAGS "${CXX_FLAGS_${CMAKE_BUILD_TYPE}}")
+    set(FINAL_COMPILE_FLAGS "${CXX_FLAGS_${CMAKE_BUILD_TYPE}} -DFUTILE_EVENTLOOP")
 endif()
 
 
@@ -91,7 +91,7 @@ endif()
 # Dependencies
 #
 add_subdirectory(${SOLUTIONDIR}Tetris ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Tetris)
-#add_subdirectory(${SOLUTIONDIR}Tetris/testing ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Tetris/testing)
+add_subdirectory(${SOLUTIONDIR}Tetris/testing ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Tetris/testing)
 add_subdirectory(${SOLUTIONDIR}Futile ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Futile)
 
 
@@ -154,7 +154,32 @@ endif()
 #
 # Set the executable. On Mac we want a bundle.
 #
-add_executable(${EXECUTABLE} ${EXECUTABLE_OPTIONS} ${QtTetris_SOURCES} ${QtTetris_HEADERS_MOC} ${QtTetris_Resources})
+add_executable(QtTetris   ${EXECUTABLE_OPTIONS} ${QtTetris_SOURCES} ${QtTetris_HEADERS_MOC} ${QtTetris_Resources})
+
+
+
+
+#
+# Compiler flags
+#
+set_target_properties(QtTetris  PROPERTIES COMPILE_FLAGS  ${FINAL_COMPILE_FLAGS})
+
+
+
+#
+# Libraries
+#
+set(LIBEXT "a")
+if(WIN32)
+set(LIBEXT "lib")
+endif()
+target_link_libraries(QtTetris ${QT_LIBRARIES}
+                               Tetris
+                               Futile
+                               ${EXTRA_LIBS}
+                               ${SOLUTIONDIR}3rdParty/Boost/lib/${PLATFORM}/${ARCH}/libboost_thread.${LIBEXT}
+                               ${SOLUTIONDIR}3rdParty/Poco/lib/${PLATFORM}/${ARCH}/libPocoFoundation.${LIBEXT})
+
 
 
 #
@@ -163,13 +188,12 @@ add_executable(${EXECUTABLE} ${EXECUTABLE_OPTIONS} ${QtTetris_SOURCES} ${QtTetri
 if(WIN32)
 # TODO: Add unix shell support. Or use CMake builtin commands.
 else()
-add_custom_command(TARGET ${EXECUTABLE}
+add_custom_command(TARGET QtTetris
                    POST_BUILD
                    COMMAND /bin/rm ARGS -f ${BUILD_ROOT}LastBuild
                    COMMAND /bin/ln ARGS -s ${OUTDIR} ${BUILD_ROOT}LastBuild
                    WORKING_DIRECTORY    ${BUILD_ROOT})
 endif()
-
 
 #
 # APPLE-specific post-build steps:
@@ -184,7 +208,7 @@ set(MACDEPLOYQT_OPTIONS "-dmg")
 else()
 set(MACDEPLOYQT_OPTIONS "")
 endif()
-add_custom_command(TARGET ${EXECUTABLE}
+add_custom_command(TARGET QtTetris
                    POST_BUILD
                    COMMAND /bin/rm                  ARGS  "-rf" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}QtTetris.app/Contents/Plugins"
                    COMMAND /bin/rm                  ARGS  "-f" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}QtTetris.app/Contents/Resources/qt.conf"
@@ -196,29 +220,4 @@ add_custom_command(TARGET ${EXECUTABLE}
                    COMMAND /usr/libexec/PlistBuddy  ARGS  "-c" \"Set :CFBundleIconFile Tetris\" "${BUNDLE}/Contents/Info.plist"
                    WORKING_DIRECTORY  ${BUILD_ROOT})
 endif(APPLE)
-
-
-set(LIBEXT "a")
-if(WIN32)
-set(LIBEXT "lib")
-endif()
-
-
-#
-# Libs
-#
-target_link_libraries(${EXECUTABLE}
-    ${QT_LIBRARIES}
-    Tetris
-    Futile
-    ${EXTRA_LIBS}
-    ${SOLUTIONDIR}3rdParty/Boost/lib/${PLATFORM}/${ARCH}/libboost_thread.${LIBEXT}
-    ${SOLUTIONDIR}3rdParty/Poco/lib/${PLATFORM}/${ARCH}/libPocoFoundation.${LIBEXT})
-
-
-#
-# Target properties
-#
-set_target_properties(${EXECUTABLE}  PROPERTIES
-                      COMPILE_FLAGS  ${FINAL_COMPILE_FLAGS})
 
