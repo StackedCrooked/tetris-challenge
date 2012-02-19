@@ -67,13 +67,13 @@ if(WIN32)
     set(FINAL_COMPILE_FLAGS "${CXX_FLAGS_${CMAKE_BUILD_TYPE}} /D FUTILE_EVENTLOOP /D POCO_STATIC /D POCO_NO_AUTOMATIC_LIBS /D BOOST_ALL_NO_LIB /D _HAS_ITERATOR_DEBUGGING=0 /D _SECURE_SCL=0 /D _SECURE_SCL_THROWS=0")
 else()
     set(CMAKE_INCLUDE_SYSTEM_FLAG_CXX "-isystem ")
-    set(CXX_FLAGS         "${CXX_FLAGS} -DTETRIS_QT=1")
-    set(WARNING_OPTIONS_STM "-std=c++0x -Wall -Wextra -Werror ")
-    set(WARNING_OPTIONS     " ${WARNING_OPTIONS_STM}")
+    set(CXX_FLAGS         "${CXX_FLAGS} -std=c++0x -stdlib=libc++ -DTETRIS_QT=1")
+    set(WARNING_OPTIONS_STM " -Wall -Wextra -Werror ")
+    set(WARNING_OPTIONS     " ${WARNING_OPTIONS_STM} ")
     set(CXX_FLAGS_Debug   "${CXX_FLAGS} ${WARNING_OPTIONS} -ggdb3 ")
     set(CXX_FLAGS_Release "${CXX_FLAGS} ${WARNING_OPTIONS} -O3 -DNDEBUG ")
     set(CXX_FLAGS_RelWithDebInfo "${CXX_FLAGS} ${WARNING_OPTIONS} -O1 -g3 -DNDEBUG ")
-    set(FINAL_COMPILE_FLAGS "${CXX_FLAGS_${CMAKE_BUILD_TYPE}} -DFUTILE_EVENTLOOP")
+    set(FINAL_COMPILE_FLAGS "${CXX_FLAGS_${CMAKE_BUILD_TYPE}} -DFUTILE_EVENTLOOP ")
 endif()
 
 
@@ -129,6 +129,7 @@ set(QtTetris_HEADERS ${QtTetris_QT_HEADERS} ${QtTetris_REGULAR_HEADERS})
 #
 # Qt resources
 #
+set(QT_QMAKE_EXECUTABLE /Users/francis/QtSDK/Desktop/Qt/4.8.0/gcc/bin)
 QT4_ADD_RESOURCES(QtTetris_Resources "QtTetris.qrc")
 
 
