@@ -122,7 +122,7 @@ void Gravity::Impl::onTimerEvent()
                      return;
                 }
 
-                if (mGame.isGameOver(tx) || mGame.isPaused())
+                if (mGame.isGameOver() || mGame.isPaused())
                 {
                     return;
                 }

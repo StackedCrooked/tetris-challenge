@@ -127,7 +127,7 @@ std::vector<BlockType> Game::getGarbageRow(stm::transaction & tx)
 void Game::applyLinePenalty(stm::transaction & tx, std::size_t inLineCount)
 {
 
-    if (inLineCount < 2 || isGameOver(tx))
+    if (inLineCount < 2 || isGameOver())
     {
         return;
     }
@@ -193,9 +193,9 @@ bool Game::isPaused() const
 }
 
 
-bool Game::isGameOver(stm::transaction & tx) const
+bool Game::isGameOver() const
 {
-    return mGameState.open_r(tx).isGameOver();
+    return stm::atomic<bool>([&](stm::transaction & tx) { return gameState(tx).isGameOver(); });
 }
 
 
@@ -227,7 +227,7 @@ bool Game::checkPositionValid(const Block & inBlock) const
 
 bool Game::canMove(stm::transaction & tx, Direction inDirection)
 {
-    if (isGameOver(tx))
+    if (isGameOver())
     {
         return false;
     }
@@ -261,7 +261,7 @@ BlockTypes Game::getFutureBlocks(stm::transaction & tx, std::size_t inCount)
 
 Game::MoveResult Game::rotate(stm::transaction & tx)
 {
-    if (isGameOver(tx))
+    if (isGameOver())
     {
         return MoveResult_NotMoved;
     }
@@ -315,7 +315,7 @@ void Game::setGrid(stm::transaction & tx, const Grid & inGrid)
 
 Game::MoveResult Game::move(stm::transaction & tx, Direction inDirection)
 {
-    if (isGameOver(tx))
+    if (isGameOver())
     {
         return MoveResult_NotMoved;
     }

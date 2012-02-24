@@ -189,9 +189,7 @@ void SimpleGame::applyLinePenalty(int inNumberOfLinesMadeByOpponent)
 
 bool SimpleGame::isGameOver() const
 {
-    return stm::atomic<bool>([&](stm::transaction & tx) {
-        return mImpl->mGame.isGameOver(tx);
-    });
+    return mImpl->mGame.isGameOver();
 }
 
 
