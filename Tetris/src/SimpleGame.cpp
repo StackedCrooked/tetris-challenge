@@ -130,9 +130,7 @@ Game & SimpleGame::game()
 
 bool SimpleGame::checkPositionValid(const Block & inBlock) const
 {
-    return stm::atomic<bool>([&](stm::transaction & tx) {
-        return mImpl->mGame.checkPositionValid(tx, inBlock);
-    });
+    return mImpl->mGame.checkPositionValid(inBlock);
 }
 
 

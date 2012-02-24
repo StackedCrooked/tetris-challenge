@@ -60,7 +60,7 @@ public:
 
     int columnCount(stm::transaction & tx) const;
 
-    bool checkPositionValid(stm::transaction & tx, const Block & inBlock) const;
+    bool checkPositionValid(const Block & inBlock) const;
 
     bool canMove(stm::transaction & tx, Direction inDirection);
 
