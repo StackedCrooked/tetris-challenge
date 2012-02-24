@@ -48,9 +48,9 @@ public:
     // Threaded!
     boost::signals2::signal<void(int)> LinesCleared;
 
-    void setPaused(stm::transaction & tx, bool inPause);
+    void setPaused(bool inPause);
 
-    bool isPaused(stm::transaction & tx) const;
+    bool isPaused() const;
 
     bool isGameOver(stm::transaction & tx) const;
 

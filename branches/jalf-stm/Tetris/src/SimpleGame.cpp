@@ -154,17 +154,13 @@ void SimpleGame::unregisterEventHandler(EventHandler * inEventHandler)
 
 void SimpleGame::setPaused(bool inPaused)
 {
-    stm::atomic([&](stm::transaction & tx) {
-        mImpl->mGame.setPaused(tx, inPaused);
-    });
+    mImpl->mGame.setPaused(inPaused);
 }
 
 
 bool SimpleGame::isPaused() const
 {
-    return stm::atomic<bool>([&](stm::transaction & tx) {
-        return mImpl->mGame.isPaused(tx);
-    });
+    return mImpl->mGame.isPaused();
 }
 
 
