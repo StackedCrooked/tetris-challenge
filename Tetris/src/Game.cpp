@@ -181,15 +181,15 @@ void Game::applyLinePenalty(stm::transaction & tx, std::size_t inLineCount)
 }
 
 
-void Game::setPaused(stm::transaction & tx, bool inPause)
+void Game::setPaused(bool inPause)
 {
-    mPaused.open_rw(tx) = inPause;
+    stm::atomic([&](stm::transaction & tx) { mPaused.open_rw(tx) = inPause; });
 }
 
 
-bool Game::isPaused(stm::transaction & tx) const
+bool Game::isPaused() const
 {
-    return mPaused.open_r(tx);
+    return stm::atomic<bool>([&](stm::transaction & tx) { return mPaused.open_r(tx); });
 }
 
 
