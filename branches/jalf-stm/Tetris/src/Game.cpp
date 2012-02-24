@@ -217,9 +217,11 @@ int Game::columnCount(stm::transaction & tx) const
 }
 
 
-bool Game::checkPositionValid(stm::transaction & tx, const Block & inBlock) const
+bool Game::checkPositionValid(const Block & inBlock) const
 {
-    return gameState(tx).checkPositionValid(inBlock);
+    return stm::atomic<bool>([&](stm::transaction & tx) {
+        return gameState(tx).checkPositionValid(inBlock);
+    });
 }
 
 
