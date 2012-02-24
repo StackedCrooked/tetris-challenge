@@ -130,7 +130,9 @@ Game & SimpleGame::game()
 
 bool SimpleGame::checkPositionValid(const Block & inBlock) const
 {
-    return mImpl->mGame.checkPositionValid(inBlock);
+    return stm::atomic<bool>([&](stm::transaction & tx) {
+        return mImpl->mGame.checkPositionValid(tx, inBlock);
+    });
 }
 
 
@@ -154,13 +156,17 @@ void SimpleGame::unregisterEventHandler(EventHandler * inEventHandler)
 
 void SimpleGame::setPaused(bool inPaused)
 {
-    mImpl->mGame.setPaused(inPaused);
+    stm::atomic([&](stm::transaction & tx) {
+        mImpl->mGame.setPaused(tx, inPaused);
+    });
 }
 
 
 bool SimpleGame::isPaused() const
 {
-    return mImpl->mGame.isPaused();
+    return stm::atomic<bool>([&](stm::transaction & tx) {
+        return mImpl->mGame.isPaused(tx);
+    });
 }
 
 
@@ -189,7 +195,9 @@ void SimpleGame::applyLinePenalty(int inNumberOfLinesMadeByOpponent)
 
 bool SimpleGame::isGameOver() const
 {
-    return mImpl->mGame.isGameOver();
+    return stm::atomic<bool>([&](stm::transaction & tx) {
+        return mImpl->mGame.isGameOver(tx);
+    });
 }
 
 

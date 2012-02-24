@@ -127,7 +127,7 @@ std::vector<BlockType> Game::getGarbageRow(stm::transaction & tx)
 void Game::applyLinePenalty(stm::transaction & tx, std::size_t inLineCount)
 {
 
-    if (inLineCount < 2 || isGameOver())
+    if (inLineCount < 2 || isGameOver(tx))
     {
         return;
     }
@@ -181,21 +181,21 @@ void Game::applyLinePenalty(stm::transaction & tx, std::size_t inLineCount)
 }
 
 
-void Game::setPaused(bool inPause)
+void Game::setPaused(stm::transaction & tx, bool inPause)
 {
-    stm::atomic([&](stm::transaction & tx) { mPaused.open_rw(tx) = inPause; });
+    mPaused.open_rw(tx) = inPause;
 }
 
 
-bool Game::isPaused() const
+bool Game::isPaused(stm::transaction & tx) const
 {
-    return stm::atomic<bool>([&](stm::transaction & tx) { return mPaused.open_r(tx); });
+    return mPaused.open_r(tx);
 }
 
 
-bool Game::isGameOver() const
+bool Game::isGameOver(stm::transaction & tx) const
 {
-    return stm::atomic<bool>([&](stm::transaction & tx) { return gameState(tx).isGameOver(); });
+    return mGameState.open_r(tx).isGameOver();
 }
 
 
@@ -217,17 +217,15 @@ int Game::columnCount(stm::transaction & tx) const
 }
 
 
-bool Game::checkPositionValid(const Block & inBlock) const
+bool Game::checkPositionValid(stm::transaction & tx, const Block & inBlock) const
 {
-    return stm::atomic<bool>([&](stm::transaction & tx) {
-        return gameState(tx).checkPositionValid(inBlock);
-    });
+    return gameState(tx).checkPositionValid(inBlock);
 }
 
 
 bool Game::canMove(stm::transaction & tx, Direction inDirection)
 {
-    if (isGameOver())
+    if (isGameOver(tx))
     {
         return false;
     }
@@ -261,7 +259,7 @@ BlockTypes Game::getFutureBlocks(stm::transaction & tx, std::size_t inCount)
 
 Game::MoveResult Game::rotate(stm::transaction & tx)
 {
-    if (isGameOver())
+    if (isGameOver(tx))
     {
         return MoveResult_NotMoved;
     }
@@ -315,7 +313,7 @@ void Game::setGrid(stm::transaction & tx, const Grid & inGrid)
 
 Game::MoveResult Game::move(stm::transaction & tx, Direction inDirection)
 {
-    if (isGameOver())
+    if (isGameOver(tx))
     {
         return MoveResult_NotMoved;
     }
