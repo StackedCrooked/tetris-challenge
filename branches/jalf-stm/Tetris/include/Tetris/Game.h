@@ -48,11 +48,11 @@ public:
     // Threaded!
     boost::signals2::signal<void(int)> LinesCleared;
 
-    void setPaused(bool inPause);
+    void setPaused(stm::transaction & tx, bool inPause);
 
-    bool isPaused() const;
+    bool isPaused(stm::transaction & tx) const;
 
-    bool isGameOver() const;
+    bool isGameOver(stm::transaction & tx) const;
 
     const Block & activeBlock(stm::transaction & tx) const;
 
@@ -60,7 +60,7 @@ public:
 
     int columnCount(stm::transaction & tx) const;
 
-    bool checkPositionValid(const Block & inBlock) const;
+    bool checkPositionValid(stm::transaction & tx, const Block & inBlock) const;
 
     bool canMove(stm::transaction & tx, Direction inDirection);
 
