@@ -11,6 +11,7 @@
 #include "Futile/MakeString.h"
 #include "Futile/Threading.h"
 #include <boost/shared_ptr.hpp>
+#include <functional>
 #include <iostream>
 #include <memory>
 #include <stdexcept>
@@ -102,12 +103,22 @@ void MultiThreadedNodeCalculator::populateNodes(NodePtr & ioNode,
             throw std::logic_error("Width is zero.");
         }
 
-        Worker::Task task = boost::bind(&MultiThreadedNodeCalculator::generateChildNodes,
-                                        this,
-                                        ioNode,
-                                        &mEvaluator,
-                                        inBlockTypes[inIndex],
-                                        cWidth);
+        // Signature:
+        // void MultiThreadedNodeCalculator::generateChildNodes(NodePtr & ioNode, const Evaluator * inEvaluator, BlockType inBlockType, int inMaxChildCount)
+
+        // Old boost bind notation:
+//        Worker::Task task = boost::bind(&MultiThreadedNodeCalculator::generateChildNodes,
+//                                        this,
+//                                        ioNode,
+//                                        &mEvaluator,
+//                                        inBlockTypes[inIndex],
+//                                        cWidth);
+
+        BlockType blockType = inBlockTypes[inIndex];
+        Worker::Task task = [this, ioNode, &mEvaluator, blockType, cWidth](){
+            NodePtr tmp(ioNode);
+            this->generateChildNodes(tmp, &mEvaluator, blockType, cWidth);
+        };
         mWorkerPool.schedule(task);
 
         // End of recursion.
