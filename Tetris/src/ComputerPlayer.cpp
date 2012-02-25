@@ -21,6 +21,7 @@
 #include "Futile/Timer.h"
 #include <boost/bind.hpp>
 #include <boost/noncopyable.hpp>
+#include <boost/optional.hpp>
 #include <boost/weak_ptr.hpp>
 #include <iostream> // TODO: cleanup
 
@@ -44,6 +45,35 @@ ComputerPlayer::ComputerPlayer(const TeamName & inTeamName,
 static const unsigned cDefaultWorkerCount = 8;
 
 
+namespace {
+
+
+typedef std::vector<GameState> Precalculated;
+
+
+struct NodeCalculatorParams
+{
+    NodeCalculatorParams(const GameState & inGameState,
+                         const BlockTypes & inBlockTypes,
+                         const Widths & inWidths,
+                         unsigned inWorkerCount) :
+        mGameState(inGameState),
+        mBlockTypes(inBlockTypes),
+        mWidths(inWidths),
+        mWorkerCount(inWorkerCount)
+    {
+    }
+
+    GameState mGameState;
+    BlockTypes mBlockTypes;
+    Widths mWidths;
+    unsigned mWorkerCount;
+};
+
+
+} // anonymous namespace
+
+
 struct Computer::Impl : boost::noncopyable
 {
 public:
@@ -58,8 +88,6 @@ public:
         mSearchDepth(8),
         mSearchWidth(5),
         mWorkerCount(cDefaultWorkerCount),
-        mStop(false),
-        mReset(false),
         mQuitFlag(false)
     {
     }
@@ -73,18 +101,27 @@ public:
         mWorkerPool.interruptAndClearQueue();
     }
 
-    void checkForSyncErrors(stm::transaction & tx)
+    void checkNodeCalculator();
+
+    Precalculated getPrecalculatedCopy() const
     {
-        Precalculated & precalculated = mPrecalculated.open_rw(tx);
-        if (!precalculated.empty())
-        {
-            unsigned currId = mGame.gameState(tx).id();
-            while (!precalculated.empty() && precalculated.front().id() != currId + 1)
+        return stm::atomic<Precalculated>([&](stm::transaction & tx) { return mPrecalculated.open_r(tx); });
+    }
+
+    void checkForSyncErrors()
+    {
+        stm::atomic([&](stm::transaction & tx) {
+            Precalculated & precalculated = mPrecalculated.open_rw(tx);
+            if (!precalculated.empty())
             {
-                precalculated.erase(precalculated.begin());
-                LogWarning("Sync error");
+                unsigned currId = mGame.gameState(tx).id();
+                while (!precalculated.empty() && precalculated.front().id() != currId + 1)
+                {
+                    precalculated.erase(precalculated.begin());
+                    LogWarning("Sync error");
+                }
             }
-        }
+        });
     }
 
     static unsigned GetTimerIntervalMs(unsigned inNumMovesPerSecond)
@@ -92,11 +129,11 @@ public:
         return static_cast<unsigned>(0.5 + 1000.0 / static_cast<double>(inNumMovesPerSecond));
     }
 
-    void timerEvent(stm::transaction & tx);
-    void timerEventImpl(stm::transaction & tx);
+    void timerEvent();
+    void timerEventImpl();
 
-    void moveTimerEvent(stm::transaction & tx);
-    void moveTimerEventImpl(stm::transaction & tx);
+    void moveTimerEvent();
+    void moveTimerEventImpl();
 
     void move(stm::transaction & tx);
 
@@ -110,13 +147,26 @@ public:
 
     void updateComputerBlockMoveSpeed();
 
-    void startNodeCalculator(stm::transaction & tx);    
-    void onWorking(stm::transaction & tx);
-    void onFinished(stm::transaction & tx);
-    void onError(stm::transaction & tx);
+    boost::optional<NodeCalculatorParams> getNodeCalculatorParams();
+
+    boost::optional<NodeCalculatorParams> getNodeCalculatorParams(stm::transaction & tx);
+
+    void startNodeCalculator(const GameState & inGameState,
+                             const std::vector<BlockType> & inBlockTypes,
+                             const std::vector<int> & inWidths,
+                             unsigned inWorkerCount);
+
+    void processResults(const std::vector<GameState> & results);
+
+    void processResults(stm::transaction & tx, const std::vector<GameState> & results);
 
     // Return a copy!
-    GameState previousGameState(stm::transaction & tx)
+    GameState previousGameState()
+    {
+        return stm::atomic<GameState>([&](stm::transaction & tx) { return previousGameState(tx); });
+    }
+
+    const GameState & previousGameState(stm::transaction & tx)
     {
         const Precalculated & cPrecalculated = mPrecalculated.open_r(tx);
         return cPrecalculated.empty() ? mGame.gameState(tx) : cPrecalculated.back();
@@ -134,15 +184,12 @@ public:
 
     Worker mMainWorker;
     WorkerPool mWorkerPool;
-    typedef std::vector<GameState> Precalculated;
     mutable stm::shared<Precalculated> mPrecalculated;
     boost::scoped_ptr<NodeCalculator> mNodeCalculator;
     const Evaluator * mEvaluator;
     int mSearchDepth;
     int mSearchWidth;
     int mWorkerCount;
-    bool mStop;
-    bool mReset;
     bool mQuitFlag;
 };
 
@@ -176,7 +223,7 @@ void Computer::onTimerEvent()
         {
             if (!impl.mQuitFlag)
             {
-                stm::atomic([&](stm::transaction & tx) { impl.timerEvent(tx); });
+                impl.timerEvent();
             }
         }
     }
@@ -195,7 +242,7 @@ void Computer::onMoveTimerEvent()
         {
             if (!impl.mQuitFlag)
             {
-                stm::atomic([&](stm::transaction & tx) { impl.moveTimerEvent(tx); });
+                impl.moveTimerEvent();
             }
         }
     }
@@ -397,51 +444,52 @@ void Computer::Impl::move(stm::transaction & tx)
 }
 
 
-void Computer::Impl::timerEvent(stm::transaction & tx)
+void Computer::Impl::timerEvent()
 {
-    checkForSyncErrors(tx);
-    timerEventImpl(tx);
-    checkForSyncErrors(tx);
+    checkForSyncErrors();
+    timerEventImpl();
+    checkForSyncErrors();
 }
 
 
-void Computer::Impl::moveTimerEvent(stm::transaction & tx)
+void Computer::Impl::moveTimerEvent()
 {
-    checkForSyncErrors(tx);
-    moveTimerEventImpl(tx);
-    checkForSyncErrors(tx);
+    checkForSyncErrors();
+    moveTimerEventImpl();
+    checkForSyncErrors();
 }
 
 
-void Computer::Impl::moveTimerEventImpl(stm::transaction & tx)
+void Computer::Impl::moveTimerEventImpl()
 {
-    const Precalculated & precalculated = mPrecalculated.open_r(tx);
-    if (!precalculated.empty())
-    {
-        move(tx);
-    }
+    stm::atomic([&](stm::transaction & tx) {
+        const Precalculated & precalculated = mPrecalculated.open_r(tx);
+        if (!precalculated.empty())
+        {
+            move(tx);
+        }
+    });
 }
 
 
-void Computer::Impl::timerEventImpl(stm::transaction & tx)
+void Computer::Impl::timerEventImpl()
 {
-    if (mReset)
-    {
-        mReset = false;
-        mNodeCalculator.reset();
-        return;
-    }
+    checkNodeCalculator();
+}
 
-    if (mStop)
-    {
-        mStop = false;
-        mNodeCalculator->stop();
-        return;
-    }
 
+void Computer::Impl::checkNodeCalculator()
+{
     if (!mNodeCalculator)
     {
-        startNodeCalculator(tx);
+        boost::optional<NodeCalculatorParams> params = getNodeCalculatorParams();
+        if (params.is_initialized())
+        {
+            startNodeCalculator(params->mGameState,
+                                params->mBlockTypes,
+                                params->mWidths,
+                                params->mWorkerCount);
+        }
         return;
     }
 
@@ -452,23 +500,58 @@ void Computer::Impl::timerEventImpl(stm::transaction & tx)
             throw std::logic_error("Status should be Status_Started or higher.");
         }
         case NodeCalculator::Status_Started:
+        {
+            return;
+        }
         case NodeCalculator::Status_Working:
         {
-            onWorking(tx);
+            const Precalculated cPrecalculated = getPrecalculatedCopy();
+            static const unsigned cMinimumPrecalculated = 4;
+            if (cPrecalculated.size() <= cMinimumPrecalculated)
+            {
+                mNodeCalculator->stop();
+                NodeCalculator::Status status = mNodeCalculator->status();
+                Assert(status == NodeCalculator::Status_Stopped ||
+                       status == NodeCalculator::Status_Finished);
+                (void)status;
+                processResults(mNodeCalculator->result());
+                mNodeCalculator.reset();
+                boost::optional<NodeCalculatorParams> params = getNodeCalculatorParams();
+                if (params.is_initialized())
+                {
+                    startNodeCalculator(params->mGameState,
+                                        params->mBlockTypes,
+                                        params->mWidths,
+                                        mWorkerPool.size());
+                }
+            }
             return;
         }
         case NodeCalculator::Status_Stopped:
         {
-            return; // Wait until finished.
+            // Stop should be handled above.
+            throw std::logic_error("Unexpected status.");
         }
         case NodeCalculator::Status_Finished:
         {
-            onFinished(tx);
+            processResults(mNodeCalculator->result());
+            mNodeCalculator.reset();
+            boost::optional<NodeCalculatorParams> params = getNodeCalculatorParams();
+            if (params.is_initialized())
+            {
+                mNodeCalculator.reset(new NodeCalculator(params->mGameState,
+                                                         params->mBlockTypes,
+                                                         params->mWidths,
+                                                         *mEvaluator,
+                                                         mMainWorker,
+                                                         mWorkerPool));
+            }
             return;
         }
         case NodeCalculator::Status_Error:
         {
-            onError(tx);
+            LogError("Computer: " + mNodeCalculator->errorMessage());
+            mNodeCalculator.reset();
             return;
         }
         default:
@@ -479,24 +562,44 @@ void Computer::Impl::timerEventImpl(stm::transaction & tx)
 }
 
 
-void Computer::Impl::startNodeCalculator(stm::transaction & tx)
+void Computer::Impl::startNodeCalculator(const GameState & inGameState,
+                                         const std::vector<BlockType> & inBlockTypes,
+                                         const std::vector<int> & inWidths,
+                                         unsigned inWorkerCount)
 {
-    const Precalculated & cPrecalculated = mPrecalculated.open_r(tx);
-    if (cPrecalculated.size() > 16)
-    {
-        // We're fine for now.
-        return;
-    }
+    mWorkerPool.resize(inWorkerCount);
+    mNodeCalculator.reset(new NodeCalculator(inGameState,
+                                             inBlockTypes,
+                                             inWidths,
+                                             *mEvaluator,
+                                             mMainWorker,
+                                             mWorkerPool));
+    mNodeCalculator->start();
+}
+
+
+boost::optional<NodeCalculatorParams> Computer::Impl::getNodeCalculatorParams()
+{
+    return stm::atomic<boost::optional<NodeCalculatorParams> >([&](stm::transaction & tx) {
+        return getNodeCalculatorParams(tx);
+    });
+}
+
+
+boost::optional<NodeCalculatorParams> Computer::Impl::getNodeCalculatorParams(stm::transaction & tx)
+{
+    typedef boost::optional<NodeCalculatorParams> Ret;
 
     if (previousGameState(tx).isGameOver())
     {
-        return;
+        return Ret();
     }
 
 
     //
     // Create the list of future blocks
     //
+    const Precalculated & cPrecalculated = mPrecalculated.open_r(tx);
     std::vector<BlockType> nextBlocks = mGame.getFutureBlocks(tx, cPrecalculated.size() + mSearchDepth + 1);
     BlockTypes futureBlocks;
     for (std::size_t idx = cPrecalculated.size(); idx < nextBlocks.size(); ++idx)
@@ -514,51 +617,25 @@ void Computer::Impl::startNodeCalculator(stm::transaction & tx)
         widths.push_back(mSearchWidth);
     }
 
-
-    //
-    // Create and start the NodeCalculator object.
-    //
-    Assert(mWorkerPool.getActiveWorkerCount() == 0);
-    if (mWorkerCount == 0)
-    {
-        mWorkerCount = cDefaultWorkerCount;
-    }
-    mWorkerPool.resize(mWorkerCount);
-    mNodeCalculator.reset(new NodeCalculator(previousGameState(tx),
-                                             futureBlocks,
-                                             widths,
-                                             *mEvaluator,
-                                             mMainWorker,
-                                             mWorkerPool));
-    mNodeCalculator->start();
+    return Ret(NodeCalculatorParams(previousGameState(tx), futureBlocks, widths, cDefaultWorkerCount));
 }
 
 
-void Computer::Impl::onWorking(stm::transaction & tx)
+void Computer::Impl::processResults(const std::vector<GameState> & results)
 {
-    const Precalculated & cPrecalculated = mPrecalculated.open_r(tx);
-    if (cPrecalculated.size() <= 3)
-    {
-        mStop = true;
-        return;
-    }
-
-    // Keep working
+    stm::atomic([&](stm::transaction & tx) { return processResults(tx, results); });
 }
 
 
-void Computer::Impl::onFinished(stm::transaction & tx)
+void Computer::Impl::processResults(stm::transaction & tx, const std::vector<GameState> & results)
 {
-    mReset = true;
-
     Precalculated & precalculated = mPrecalculated.open_rw(tx);
     Assert(precalculated.empty() || precalculated.front().id() == mGame.gameStateId(tx) + 1);
-    std::vector<GameState> results = mNodeCalculator->result();
     std::stringstream ss;
     ss << "Precalculated " << precalculated.size() << " + " << results.size() << " items: ";
     for (std::size_t idx = 0; idx < results.size(); ++idx)
     {
-        GameState & gameState = results[idx];
+        const GameState & gameState = results[idx];
         Assert(precalculated.empty() || gameState.id() == precalculated.back().id() + 1);
         precalculated.push_back(gameState);
 
@@ -569,13 +646,6 @@ void Computer::Impl::onFinished(stm::transaction & tx)
         ss << gameState.id();
     }
     LogInfo(ss.str());
-}
-
-
-void Computer::Impl::onError(stm::transaction & )
-{
-    mReset = true;
-    LogError("Computer: " + mNodeCalculator->errorMessage());
 }
 
 

@@ -19,6 +19,7 @@ namespace Tetris {
 class Evaluator;
 class GameStateNode;
 class NodeCalculatorImpl;
+typedef std::vector<int> Widths;
 
 
 class NodeCalculator : boost::noncopyable
@@ -26,7 +27,7 @@ class NodeCalculator : boost::noncopyable
 public:
     NodeCalculator(const GameState & inGameState,
                    const BlockTypes & inBlockTypes,
-                   const std::vector<int> & inWidths,
+                   const Widths & inWidths,
                    const Evaluator & inEvaluator,
                    Futile::Worker & inMainWorker,
                    Futile::WorkerPool & inWorkerPool);
