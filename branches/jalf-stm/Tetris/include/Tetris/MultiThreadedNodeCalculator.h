@@ -24,12 +24,12 @@ public:
 private:
     virtual void populate();
 
-    void generateChildNodes(NodePtr & ioNode,
+    void generateChildNodes(const NodePtr & ioNode,
                             const Evaluator * inEvaluator,
                             BlockType inBlockType,
                             int inWidth);
 
-    void populateNodes(NodePtr & ioNode,
+    void populateNodes(const NodePtr & ioNode,
                        const BlockTypes & inBlockTypes,
                        const std::vector<int> & inWidths,
                        std::size_t inIndex,

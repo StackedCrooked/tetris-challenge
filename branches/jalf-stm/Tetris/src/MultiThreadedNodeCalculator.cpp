@@ -42,7 +42,7 @@ MultiThreadedNodeCalculator::~MultiThreadedNodeCalculator()
 }
 
 
-void MultiThreadedNodeCalculator::generateChildNodes(NodePtr & ioNode,
+void MultiThreadedNodeCalculator::generateChildNodes(const NodePtr & ioNode,
                                                      const Evaluator * inEvaluator,
                                                      BlockType inBlockType,
                                                      int inMaxChildCount)
@@ -70,7 +70,7 @@ void MultiThreadedNodeCalculator::generateChildNodes(NodePtr & ioNode,
 }
 
 
-void MultiThreadedNodeCalculator::populateNodes(NodePtr & ioNode,
+void MultiThreadedNodeCalculator::populateNodes(const NodePtr & ioNode,
                                                 const BlockTypes & inBlockTypes,
                                                 const std::vector<int> & inWidths,
                                                 std::size_t inIndex,
@@ -103,10 +103,9 @@ void MultiThreadedNodeCalculator::populateNodes(NodePtr & ioNode,
             throw std::logic_error("Width is zero.");
         }
 
-        BlockType blockType = inBlockTypes[inIndex];
+        const BlockType cBlockType = inBlockTypes[inIndex];
         mWorkerPool.schedule([=]() {
-            NodePtr tmp(ioNode); // We neeed a copy because generateChildNodes takes a non-const reference.
-            this->generateChildNodes(tmp, &mEvaluator, blockType, cWidth);
+            generateChildNodes(ioNode, &mEvaluator, cBlockType, cWidth);
         });
 
         // End of recursion.
