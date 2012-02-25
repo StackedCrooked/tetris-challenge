@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by Qt Creator 2.4.0, 2012-01-13T23:58:23. -->
+<!-- Written by Qt Creator 2.4.0, 2012-02-25T09:25:57. -->
 <qtcreator>
  <data>
   <variable>GenericProjectManager.GenericProject.Toolchain</variable>
@@ -136,6 +136,7 @@
     <valuelist type="QVariantList" key="ProjectExplorer.BuildConfiguration.UserEnvironmentChanges">
      <value type="QString">PATH=/home/francis/bin:/home/francis/qtsdk-2010.05/qt/bin:/usr/local/bin:/usr/bin:/bin</value>
      <value type="QString">TETRIS_BUILD_TYPE=RelWithDebInfo</value>
+     <value type="QString">TETRIS_TARGET=Tetris/testing</value>
     </valuelist>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Make</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Configure Tetris/testing RelWithDebInfo</value>
@@ -178,6 +179,7 @@
     <valuelist type="QVariantList" key="ProjectExplorer.BuildConfiguration.UserEnvironmentChanges">
      <value type="QString">PATH=/home/francis/bin:/home/francis/qtsdk-2010.05/qt/bin:/usr/local/bin:/usr/bin:/bin</value>
      <value type="QString">TETRIS_BUILD_TYPE=Debug</value>
+     <value type="QString">TETRIS_TARGET=QtTetris</value>
     </valuelist>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Make</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Configure QtTetris Debug</value>
@@ -220,6 +222,7 @@
     <valuelist type="QVariantList" key="ProjectExplorer.BuildConfiguration.UserEnvironmentChanges">
      <value type="QString">PATH=/home/francis/bin:/home/francis/qtsdk-2010.05/qt/bin:/usr/local/bin:/usr/bin:/bin</value>
      <value type="QString">TETRIS_BUILD_TYPE=Release</value>
+     <value type="QString">TETRIS_TARGET=QtTetris</value>
     </valuelist>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Make</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Configure QtTetris Release</value>
@@ -241,7 +244,7 @@
    <value type="int" key="ProjectExplorer.Target.DeployConfigurationCount">1</value>
    <valuemap type="QVariantMap" key="ProjectExplorer.Target.RunConfiguration.0">
     <value type="bool" key="Analyzer.Project.UseGlobal">true</value>
-    <value type="bool" key="Analyzer.Project.UseGlobal">true</value>
+    <value type="bool" key="Analyzer.Project.UseGlobal">false</value>
     <valuelist type="QVariantList" key="Analyzer.Valgrind.AddedSuppressionFiles"/>
     <valuelist type="QVariantList" key="Analyzer.Valgrind.AddedSuppressionFiles"/>
     <value type="bool" key="Analyzer.Valgrind.Callgrind.CollectBusEvents">false</value>
@@ -267,7 +270,7 @@
     <value type="bool" key="Analyzer.Valgrind.TrackOrigins">true</value>
     <value type="bool" key="Analyzer.Valgrind.TrackOrigins">true</value>
     <value type="QString" key="Analyzer.Valgrind.ValgrindExecutable">valgrind</value>
-    <value type="QString" key="Analyzer.Valgrind.ValgrindExecutable">valgrind</value>
+    <value type="QString" key="Analyzer.Valgrind.ValgrindExecutable">/usr/local/bin/valgrind</value>
     <valuelist type="QVariantList" key="Analyzer.Valgrind.VisibleErrorKinds">
      <value type="int">0</value>
      <value type="int">1</value>
@@ -304,11 +307,11 @@
     </valuelist>
     <value type="QString" key="ProjectExplorer.CustomExecutableRunConfiguration.Arguments"></value>
     <value type="int" key="ProjectExplorer.CustomExecutableRunConfiguration.BaseEnvironmentBase">2</value>
-    <value type="QString" key="ProjectExplorer.CustomExecutableRunConfiguration.Executable">QtTetris</value>
+    <value type="QString" key="ProjectExplorer.CustomExecutableRunConfiguration.Executable">/home/francis/svn/jalf-stm/Build/RelWithDebInfo/Linux/x86_64/bin/QtTetris</value>
     <value type="bool" key="ProjectExplorer.CustomExecutableRunConfiguration.UseTerminal">false</value>
     <valuelist type="QVariantList" key="ProjectExplorer.CustomExecutableRunConfiguration.UserEnvironmentChanges"/>
-    <value type="QString" key="ProjectExplorer.CustomExecutableRunConfiguration.WorkingDirectory">%{buildDir}/LastBuild/bin</value>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Run QtTetris</value>
+    <value type="QString" key="ProjectExplorer.CustomExecutableRunConfiguration.WorkingDirectory">%{buildDir}</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Run /home/francis/svn/jalf-stm/Build/RelWithDebInfo/Linux/x86_64/bin/QtTetris</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">QtTetris</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">ProjectExplorer.CustomExecutableRunConfiguration</value>
     <value type="uint" key="RunConfiguration.QmlDebugServerPort">3768</value>
@@ -383,7 +386,7 @@
      <value type="int">13</value>
      <value type="int">14</value>
     </valuelist>
-    <value type="QString" key="ProjectExplorer.CustomExecutableRunConfiguration.Arguments">--gtest_filter=ComputerPlayerTest.All</value>
+    <value type="QString" key="ProjectExplorer.CustomExecutableRunConfiguration.Arguments"></value>
     <value type="int" key="ProjectExplorer.CustomExecutableRunConfiguration.BaseEnvironmentBase">2</value>
     <value type="QString" key="ProjectExplorer.CustomExecutableRunConfiguration.Executable">TetrisTestSuite</value>
     <value type="bool" key="ProjectExplorer.CustomExecutableRunConfiguration.UseTerminal">false</value>
