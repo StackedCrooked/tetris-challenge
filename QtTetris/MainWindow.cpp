@@ -63,7 +63,7 @@ MainWindow::MainWindow(QWidget *parent, Model & inModel) :
     mTetrisWidgets(),
     mSpacing(12),
     mLogField(0),
-    mShowLog(true),
+    mShowLog(false),
     mGameOver(false)
 {
     setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum));

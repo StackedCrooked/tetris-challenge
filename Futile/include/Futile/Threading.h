@@ -226,7 +226,8 @@ class LockerBase
  * Locker is used get access to the object wrapped by the ThreadSafe class.
  */
 template<class Variable>
-class Locker : public LockerBase
+class Locker : public  LockerBase,
+               private LifeTimeChecker
 {
 public:
     Locker(ThreadSafe<Variable> inTSV) :

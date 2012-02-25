@@ -52,7 +52,11 @@ LifeTimeChecker::LifeTimeChecker() :
 
 LifeTimeChecker::~LifeTimeChecker()
 {
-	Assert(GetCurrentTimeMs() - mBeginTime <= mMaxDuration);
+    UInt64 duration = (GetCurrentTimeMs() - mBeginTime);
+    if (duration > mMaxDuration)
+    {
+        LogWarning(SS() << "Lock was held for " << duration << " ms");
+    }
 }
 
 

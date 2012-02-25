@@ -73,7 +73,7 @@ public:
         mWorkerPool.interruptAndClearQueue();
     }
 
-    void check(stm::transaction & tx)
+    void checkForSyncErrors(stm::transaction & tx)
     {
         Precalculated & precalculated = mPrecalculated.open_rw(tx);
         if (!precalculated.empty())
@@ -92,9 +92,11 @@ public:
         return static_cast<unsigned>(0.5 + 1000.0 / static_cast<double>(inNumMovesPerSecond));
     }
 
-    void timerEvent();
     void timerEvent(stm::transaction & tx);
     void timerEventImpl(stm::transaction & tx);
+
+    void moveTimerEvent(stm::transaction & tx);
+    void moveTimerEventImpl(stm::transaction & tx);
 
     void move(stm::transaction & tx);
 
@@ -110,7 +112,6 @@ public:
 
     void startNodeCalculator(stm::transaction & tx);    
     void onWorking(stm::transaction & tx);
-    void onStopped(stm::transaction & tx);
     void onFinished(stm::transaction & tx);
     void onError(stm::transaction & tx);
 
@@ -148,15 +149,18 @@ public:
 
 Computer::Computer(Game & inGame) :
     mImpl(new Impl(this, inGame)),
-    mTimer(new Futile::Timer(100))
+    mTimer(new Futile::Timer(100)),
+    mMoveTimer(new Futile::Timer(60))
 {
-  mTimer->start(boost::bind(&Computer::onTimerEvent, this));
+    mTimer->start(boost::bind(&Computer::onTimerEvent, this));
+    mMoveTimer->start(boost::bind(&Computer::onMoveTimerEvent, this));
 }
 
 
 Computer::~Computer()
 {
     mTimer->stop();
+    mMoveTimer->stop();
     FUTILE_LOCK(Impl & impl, mImpl)
     {
         impl.mQuitFlag = true;
@@ -172,7 +176,26 @@ void Computer::onTimerEvent()
         {
             if (!impl.mQuitFlag)
             {
-                impl.timerEvent();
+                stm::atomic([&](stm::transaction & tx) { impl.timerEvent(tx); });
+            }
+        }
+    }
+    catch (const std::exception & exc)
+    {
+        LogError(SS() << "Exception caught during Computer timerEvent. Details: " << exc.what());
+    }
+}
+
+
+void Computer::onMoveTimerEvent()
+{
+    try
+    {
+        FUTILE_LOCK(Impl & impl, mImpl)
+        {
+            if (!impl.mQuitFlag)
+            {
+                stm::atomic([&](stm::transaction & tx) { impl.moveTimerEvent(tx); });
             }
         }
     }
@@ -228,7 +251,7 @@ int Computer::depth() const
 
 int Computer::moveSpeed() const
 {
-    return mTimer->interval();
+    return mMoveTimer->interval();
 }
 
 
@@ -244,7 +267,7 @@ void Computer::setMoveSpeed(int inNumMovesPerSecond)
         inNumMovesPerSecond = 1;
     }
 
-    mTimer->setInterval(Impl::GetTimerIntervalMs(inNumMovesPerSecond));
+    mMoveTimer->setInterval(Impl::GetTimerIntervalMs(inNumMovesPerSecond));
 }
 
 
@@ -374,19 +397,29 @@ void Computer::Impl::move(stm::transaction & tx)
 }
 
 
-void Computer::Impl::timerEvent()
+void Computer::Impl::timerEvent(stm::transaction & tx)
 {
-    stm::atomic([&](stm::transaction & tx) {
-        timerEvent(tx);
-    });
+    checkForSyncErrors(tx);
+    timerEventImpl(tx);
+    checkForSyncErrors(tx);
 }
 
 
-void Computer::Impl::timerEvent(stm::transaction & tx)
+void Computer::Impl::moveTimerEvent(stm::transaction & tx)
 {
-    check(tx);
-    timerEventImpl(tx);
-    check(tx);
+    checkForSyncErrors(tx);
+    moveTimerEventImpl(tx);
+    checkForSyncErrors(tx);
+}
+
+
+void Computer::Impl::moveTimerEventImpl(stm::transaction & tx)
+{
+    const Precalculated & precalculated = mPrecalculated.open_r(tx);
+    if (!precalculated.empty())
+    {
+        move(tx);
+    }
 }
 
 
@@ -403,13 +436,6 @@ void Computer::Impl::timerEventImpl(stm::transaction & tx)
     {
         mStop = false;
         mNodeCalculator->stop();
-        return;
-    }
-
-    const Precalculated & precalculated = mPrecalculated.open_r(tx);
-    if (!precalculated.empty())
-    {
-        move(tx);
         return;
     }
 
@@ -433,8 +459,7 @@ void Computer::Impl::timerEventImpl(stm::transaction & tx)
         }
         case NodeCalculator::Status_Stopped:
         {
-            onStopped(tx);
-            return;
+            return; // Wait until finished.
         }
         case NodeCalculator::Status_Finished:
         {
@@ -457,7 +482,7 @@ void Computer::Impl::timerEventImpl(stm::transaction & tx)
 void Computer::Impl::startNodeCalculator(stm::transaction & tx)
 {
     const Precalculated & cPrecalculated = mPrecalculated.open_r(tx);
-    if (cPrecalculated.size() > 8)
+    if (cPrecalculated.size() > 16)
     {
         // We're fine for now.
         return;
@@ -512,7 +537,7 @@ void Computer::Impl::startNodeCalculator(stm::transaction & tx)
 void Computer::Impl::onWorking(stm::transaction & tx)
 {
     const Precalculated & cPrecalculated = mPrecalculated.open_r(tx);
-    if (cPrecalculated.empty())
+    if (cPrecalculated.size() <= 3)
     {
         mStop = true;
         return;
@@ -522,22 +547,15 @@ void Computer::Impl::onWorking(stm::transaction & tx)
 }
 
 
-void Computer::Impl::onStopped(stm::transaction &)
-{
-    // Good. Now wait until onFinished.
-}
-
-
 void Computer::Impl::onFinished(stm::transaction & tx)
 {
     mReset = true;
 
     Precalculated & precalculated = mPrecalculated.open_rw(tx);
     Assert(precalculated.empty() || precalculated.front().id() == mGame.gameStateId(tx) + 1);
-
     std::vector<GameState> results = mNodeCalculator->result();
     std::stringstream ss;
-    ss << "Precalculated " << results.size() << " items: ";
+    ss << "Precalculated " << precalculated.size() << " + " << results.size() << " items: ";
     for (std::size_t idx = 0; idx < results.size(); ++idx)
     {
         GameState & gameState = results[idx];

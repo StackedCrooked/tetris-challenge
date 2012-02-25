@@ -43,8 +43,22 @@ int Tetris_GetSquareHeight()
 }
 
 
+namespace {
+
+
+void Print(const std::string & msg)
+{
+    std::cout << msg << std::endl;
+}
+
+
+} // anonymous namespace
+
+
 int RunGUI(int argc, char *argv[], Model & model)
 {
+    Futile::Logger::Instance().setLogHandler(boost::bind(&Print, _1));
+
     QApplication app(argc, argv);
     app.setApplicationName("QtTetris");
     app.setApplicationVersion("0.0 alpha");
