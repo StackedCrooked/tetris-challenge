@@ -25,27 +25,27 @@ UInt64 GetCurrentTimeMs()
 
 namespace {
 
-Atomic<unsigned> gMaxDuration(500);
-
 
 unsigned GetMaxDuration()
 {
-    unsigned result = gMaxDuration.get();
-    if (result % 10 == 0)
+    static unsigned fMaxDuration = 1000;
+    Assert(fMaxDuration % 10 == 0);
+    if (fMaxDuration == 10)
     {
-        LogInfo(SS() << "Max duration is now: " << result << " ms.");
+        fMaxDuration = 1000;
     }
-    gMaxDuration.decrement(1);
-    return result;
+    fMaxDuration -= 10;
+    Assert(fMaxDuration >= 10);
+    return fMaxDuration;
 }
 
 
-}
+} // anonymous namespace
 
 
 LifeTimeChecker::LifeTimeChecker() :
 	mBeginTime(GetCurrentTimeMs()),
-	mMaxDuration(100)
+    mMaxDuration(GetMaxDuration())
 {
 }
 
