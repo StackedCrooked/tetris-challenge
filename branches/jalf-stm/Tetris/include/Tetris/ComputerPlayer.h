@@ -47,7 +47,7 @@ private:
 
     struct Impl;
     friend struct Impl;
-    Futile::ThreadSafe<Impl> mImpl;
+    boost::scoped_ptr<Impl> mImpl;
     boost::scoped_ptr<Futile::Timer> mTimer;
     boost::scoped_ptr<Futile::Timer> mMoveTimer;
 };
