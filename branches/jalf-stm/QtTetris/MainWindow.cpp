@@ -15,6 +15,7 @@
 #include <QtCore/QTimer>
 #include <boost/noncopyable.hpp>
 #include <algorithm>
+#include <iomanip>
 #include <iostream>
 #include <sstream>
 
@@ -122,10 +123,9 @@ MainWindow::~MainWindow()
 
 void MainWindow::logMessage(const std::string & inMessage)
 {
-    if (mLogField)
-    {
-        mLogField->append(inMessage.c_str());
-    }
+    static UInt64 fBegin = GetCurrentTimeMs();
+    UInt64 time = GetCurrentTimeMs() - fBegin;
+    std::cout << std::setw(8) << std::setfill('0') << unsigned(time) << " " << inMessage << std::endl;
 }
 
 

@@ -536,7 +536,8 @@ void Computer::Impl::onFinished(stm::transaction & tx)
     Assert(precalculated.empty() || precalculated.front().id() == mGame.gameStateId(tx) + 1);
 
     std::vector<GameState> results = mNodeCalculator->result();
-    std::cout << "Precalculated " << results.size() << " items: ";
+    std::stringstream ss;
+    ss << "Precalculated " << results.size() << " items: ";
     for (std::size_t idx = 0; idx < results.size(); ++idx)
     {
         GameState & gameState = results[idx];
@@ -545,11 +546,11 @@ void Computer::Impl::onFinished(stm::transaction & tx)
 
         if (idx != 0)
         {
-            std::cout << ", ";
+            ss << ", ";
         }
-        std::cout << gameState.id();
+        ss << gameState.id();
     }
-    std::cout << std::endl;
+    LogInfo(ss.str());
 }
 
 
