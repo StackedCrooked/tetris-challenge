@@ -50,7 +50,7 @@ Worker::Worker(const std::string & inName) :
     mStatus(WorkerStatus_Idle),
     mQuitFlag(false)
 {
-    mThread.reset(new boost::thread(boost::bind(&Worker::run, this)));
+    mThread.reset(new boost::thread(std::bind(&Worker::run, this)));
 }
 
 

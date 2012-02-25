@@ -3,12 +3,11 @@
 
 
 #include "Futile/Atomic.h"
-#include <boost/bind.hpp>
-#include <boost/function.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread/condition_variable.hpp>
 #include <boost/thread/mutex.hpp>
+#include <functional>
 #include <list>
 
 
@@ -51,7 +50,7 @@ public:
 
     const std::string & name() const { return mName; }
 
-    typedef boost::function<void()> Task;
+    typedef std::function<void()> Task;
 
     // Adds a task to the queue.
     // The task should be interruptable. This can be achieved by letting it
