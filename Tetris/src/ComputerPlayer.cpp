@@ -233,7 +233,6 @@ void Computer::Impl::timerEvent()
 {
     checkForSyncErrors();
     timerEventImpl();
-    checkForSyncErrors();
 }
 
 
@@ -254,7 +253,6 @@ void Computer::Impl::moveTimerEvent()
 {
     checkForSyncErrors();
     moveTimerEventImpl();
-    checkForSyncErrors();
 }
 
 
