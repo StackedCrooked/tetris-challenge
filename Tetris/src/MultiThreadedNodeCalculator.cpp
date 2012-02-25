@@ -103,23 +103,11 @@ void MultiThreadedNodeCalculator::populateNodes(NodePtr & ioNode,
             throw std::logic_error("Width is zero.");
         }
 
-        // Signature:
-        // void MultiThreadedNodeCalculator::generateChildNodes(NodePtr & ioNode, const Evaluator * inEvaluator, BlockType inBlockType, int inMaxChildCount)
-
-        // Old boost bind notation:
-//        Worker::Task task = boost::bind(&MultiThreadedNodeCalculator::generateChildNodes,
-//                                        this,
-//                                        ioNode,
-//                                        &mEvaluator,
-//                                        inBlockTypes[inIndex],
-//                                        cWidth);
-
         BlockType blockType = inBlockTypes[inIndex];
-        Worker::Task task = [this, ioNode, &mEvaluator, blockType, cWidth](){
-            NodePtr tmp(ioNode);
+        mWorkerPool.schedule([=]() {
+            NodePtr tmp(ioNode); // We neeed a copy because generateChildNodes takes a non-const reference.
             this->generateChildNodes(tmp, &mEvaluator, blockType, cWidth);
-        };
-        mWorkerPool.schedule(task);
+        });
 
         // End of recursion.
     }
