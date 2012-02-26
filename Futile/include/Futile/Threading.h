@@ -122,43 +122,47 @@ template<class> class Locker;
  * The protected object is stored as a private member variable along with a mutex.
  * A Locker object can be used to obtain access to the protected object.
  */
-template<class Variable>
+template<class T>
 class ThreadSafe
 {
 public:
     // Constructor that takes an autoptr object.
-    explicit ThreadSafe(std::auto_ptr<Variable> inVariable) :
-        mImpl(new Impl(inVariable))
+    explicit ThreadSafe(std::auto_ptr<T> inT) :
+        mImpl(new Impl(inT))
     {
     }
 
     // Constructor that takes the new object.
-    explicit ThreadSafe(Variable * inVariable) :
-        mImpl(new Impl(inVariable))
+    explicit ThreadSafe(T * inT) :
+        mImpl(new Impl(inT))
     {
     }
 
-    // Default constructor can only be used if Variable has a default constructor.
+    // Default constructor can only be used if T has a default constructor.
     explicit ThreadSafe() :
-        mImpl(new Impl(new Variable))
+        mImpl(new Impl(new T))
     {
     }
 
-    const Locker<Variable> lock() const;
+    T get() const;
 
-    Locker<Variable> lock();
+    void set(const T & values);
 
-    bool operator== (const ThreadSafe<Variable> & rhs) const
+    const Locker<T> lock() const;
+
+    Locker<T> lock();
+
+    bool operator== (const ThreadSafe<T> & rhs) const
     {
         return mImpl.get() == rhs.mImpl.get();
     }
 
-    bool operator!= (const ThreadSafe<Variable> & rhs) const
+    bool operator!= (const ThreadSafe<T> & rhs) const
     {
         return !(*this == rhs);
     }
 
-    bool compare(const ThreadSafe<Variable> & inOther) const
+    bool compare(const ThreadSafe<T> & inOther) const
     {
         return mImpl < inOther.mImpl;
     }
@@ -169,7 +173,7 @@ public:
     }
 
 private:
-    friend class Locker<Variable>;
+    friend class Locker<T>;
     friend class LockerBase;
 
     Mutex & getMutex() const
@@ -177,31 +181,31 @@ private:
         return mImpl->mMutex;
     }
 
-    Variable * getVariable() const
+    T * getT() const
     {
-        return mImpl->mVariable;
+        return mImpl->mT;
     }
 
     struct Impl : boost::noncopyable
     {
-        Impl(std::auto_ptr<Variable> inVariable) :
-            mVariable(inVariable.release())
+        Impl(std::auto_ptr<T> inT) :
+            mT(inT.release())
         {
-            Assert(mVariable);
+            Assert(mT);
         }
 
-        Impl(Variable * inVariable) :
-            mVariable(inVariable)
+        Impl(T * inT) :
+            mT(inT)
         {
-            Assert(mVariable);
+            Assert(mT);
         }
 
         ~Impl()
         {
-            delete mVariable;
+            delete mT;
         }
 
-        mutable Variable * mVariable;
+        mutable T * mT;
         Mutex mMutex;
     };
 
@@ -209,8 +213,8 @@ private:
 };
 
 
-template<class Variable>
-bool operator< (const ThreadSafe<Variable> & lhs, const ThreadSafe<Variable> & rhs)
+template<class T>
+bool operator< (const ThreadSafe<T> & lhs, const ThreadSafe<T> & rhs)
 {
     return lhs.compare(rhs);
 }
@@ -225,12 +229,12 @@ class LockerBase
 /**
  * Locker is used get access to the object wrapped by the ThreadSafe class.
  */
-template<class Variable>
+template<class T>
 class Locker : public  LockerBase,
                private LifeTimeChecker
 {
 public:
-    Locker(ThreadSafe<Variable> inTSV) :
+    Locker(ThreadSafe<T> inTSV) :
         mThreadSafe(inTSV)
     {
         mThreadSafe.getMutex().lock();
@@ -249,22 +253,27 @@ public:
         }
     }
 
-    const Variable * get() const
+    T operator*() const
     {
-        return mThreadSafe.getVariable();
+        return *get();
     }
 
-    Variable * get()
+    const T * get() const
     {
-        return mThreadSafe.getVariable();
+        return mThreadSafe.getT();
     }
 
-    const Variable * operator->() const
+    T * get()
+    {
+        return mThreadSafe.getT();
+    }
+
+    const T * operator->() const
     {
         return get();
     }
 
-    Variable * operator->()
+    T * operator->()
     {
         return get();
     }
@@ -274,21 +283,36 @@ private:
     Locker(const Locker&);
     Locker & operator=(const Locker &);
 
-    mutable ThreadSafe<Variable> mThreadSafe;
+    mutable ThreadSafe<T> mThreadSafe;
 };
 
 
-template<class Variable>
-const Locker<Variable> ThreadSafe<Variable>::lock() const
+template<class T>
+const Locker<T> ThreadSafe<T>::lock() const
 {
-    return Locker<Variable>(*this);
+    return Locker<T>(*this);
 }
 
 
-template<class Variable>
-Locker<Variable> ThreadSafe<Variable>::lock()
+template<class T>
+Locker<T> ThreadSafe<T>::lock()
 {
-    return Locker<Variable>(*this);
+    return Locker<T>(*this);
+}
+
+
+template<class T>
+T ThreadSafe<T>::get() const
+{
+    return *lock().get();
+}
+
+
+template<class T>
+void ThreadSafe<T>::set(const T & v)
+{
+    T & value = *lock().get();
+    value = v;
 }
 
 
