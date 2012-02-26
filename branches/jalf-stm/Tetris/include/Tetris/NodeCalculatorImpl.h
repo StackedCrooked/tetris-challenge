@@ -5,6 +5,7 @@
 #include "Tetris/BlockTypes.h"
 #include "Tetris/GameStateNode.h"
 #include "Tetris/Evaluator.h"
+#include "Tetris/NodeCalculator.h"
 #include "Futile/Worker.h"
 #include "Futile/WorkerPool.h"
 #include "Futile/Assert.h"
@@ -156,7 +157,7 @@ public:
 
     virtual ~NodeCalculatorImpl() = 0;
 
-    void start();
+    void start(const NodeCalculator::Callback & inCallback);
 
     void stop();
 
@@ -177,7 +178,7 @@ public:
 protected:
     virtual void populate() = 0;
 
-    void startImpl();
+    void startImpl(const NodeCalculator::Callback & inCallback);
 
     void setQuitFlag();
     bool getQuitFlag() const;

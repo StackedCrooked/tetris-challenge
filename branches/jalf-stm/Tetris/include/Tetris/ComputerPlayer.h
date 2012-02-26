@@ -42,13 +42,11 @@ public:
     void setWorkerCount(int inWorkerCount);
 
 private:
-    void onTimerEvent();
     void onMoveTimerEvent();
 
     struct Impl;
     friend struct Impl;
     boost::scoped_ptr<Impl> mImpl;
-    boost::scoped_ptr<Futile::Timer> mTimer;
     boost::scoped_ptr<Futile::Timer> mMoveTimer;
 };
 

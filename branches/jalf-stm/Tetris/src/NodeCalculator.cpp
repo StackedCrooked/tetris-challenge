@@ -62,9 +62,9 @@ NodeCalculator::~NodeCalculator()
 }
 
 
-void NodeCalculator::start()
+void NodeCalculator::start(const Callback & inCallback)
 {
-    return mImpl->start();
+    return mImpl->start(inCallback);
 }
 
 

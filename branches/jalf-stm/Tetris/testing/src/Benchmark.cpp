@@ -53,7 +53,7 @@ void PerformBenchmark(unsigned inWidth, unsigned inDepth)
                                   worker,
                                   workerPool);
 
-    nodeCalculator.start();
+    nodeCalculator.start(NodeCalculator::Callback());
     unsigned c = 0;
     std::cout << std::endl;
     while (nodeCalculator.status() != NodeCalculator::Status_Finished)
