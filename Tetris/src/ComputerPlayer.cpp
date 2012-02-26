@@ -86,12 +86,25 @@ struct NodeCalculatorParams
 };
 
 
+struct SyncError : public std::runtime_error
+{
+    SyncError() :
+        std::runtime_error("SyncError")
+    {
+    }
+
+    virtual ~SyncError() throw() {}
+};
+
+
 } // anonymous namespace
 
 
 struct Computer::Impl : boost::noncopyable
 {
 public:
+    typedef std::vector<GameState> Result;
+
     Impl(Game & inGame) :
         mExclusiveResources(new ExclusiveResources),
         mEvaluator(&MakeTetrises::Instance()),
@@ -99,7 +112,8 @@ public:
         mPrecalculated(Precalculated()),
         mSearchDepth(8),
         mSearchWidth(5),
-        mWorkerCount(cDefaultWorkerCount)
+        mWorkerCount(cDefaultWorkerCount),
+        mResultHolder(ResultHolder())
     {
     }
 
@@ -114,10 +128,6 @@ public:
             res.mWorkerPool.interruptAndClearQueue();
         }
     }
-
-    void checkNodeCalculator();
-
-    void checkNodeCalculator(ExclusiveResources & res);
 
     Precalculated getPrecalculatedCopy() const
     {
@@ -145,17 +155,18 @@ public:
         return static_cast<unsigned>(0.5 + 1000.0 / static_cast<double>(inNumMovesPerSecond));
     }
 
-    void timerEvent();
-    void timerEventImpl();
+    boost::optional<GameState> getNextGameState(stm::transaction & tx) const;
 
     void moveTimerEvent();
-    void moveTimerEventImpl();
+    void moveTimerEventImpl(stm::transaction & tx);
 
-    void move(stm::transaction & tx);
+    Game::MoveResult move(stm::transaction & tx, const GameState & inNextGameState);
 
     boost::optional<NodeCalculatorParams> getNodeCalculatorParams();
 
     boost::optional<NodeCalculatorParams> getNodeCalculatorParams(stm::transaction & tx);
+
+    void restartNodeCalculator();
 
     void startNodeCalculator(ExclusiveResources & res,
                              const GameState & inGameState,
@@ -196,43 +207,63 @@ public:
     mutable stm::shared<int> mSearchDepth;
     mutable stm::shared<int> mSearchWidth;
     mutable stm::shared<int> mWorkerCount;
+
+    class ResultHolder
+    {
+    public:
+        enum Status {
+            Status_Initial,
+            Status_Assigned,
+            Status_Used
+        };
+
+        ResultHolder() :
+            mStatus(Status_Initial),
+            mGameStates()
+        {
+        }
+
+        Status status() const { return mStatus; }
+        bool initial() const { return mStatus == Status_Initial; }
+        bool assigned() const { return mStatus == Status_Assigned; }
+        bool used() const { return mStatus == Status_Used; }
+
+        void set(const std::vector<GameState> & inGameStates)
+        {
+            Assert(mStatus != Status_Used);
+            Assert(inGameStates.size() == mGameStates.size() + 1);
+            mGameStates = inGameStates;
+            mStatus = Status_Assigned;
+        }
+
+        std::vector<GameState> && gut()
+        {
+            Assert(mStatus == Status_Assigned);
+            mStatus = Status_Used;
+            return std::move(mGameStates);
+        }
+
+    private:
+        Status mStatus;
+        std::vector<GameState> mGameStates;
+    };
+
+    mutable stm::shared<ResultHolder> mResultHolder;
 };
 
 
 Computer::Computer(Game & inGame) :
     mImpl(new Impl(inGame)),
-    mTimer(new Futile::Timer(100)),
     mMoveTimer(new Futile::Timer(60))
 {
-    mTimer->start(boost::bind(&Computer::onTimerEvent, this));
+    mImpl->restartNodeCalculator();
     mMoveTimer->start(boost::bind(&Computer::onMoveTimerEvent, this));
 }
 
 
 Computer::~Computer()
 {
-    mTimer->stop();
     mMoveTimer->stop();
-}
-
-
-void Computer::onTimerEvent()
-{
-    try
-    {
-        mImpl->timerEvent();
-    }
-    catch (const std::exception & exc)
-    {
-        LogError(SS() << "Exception caught during Computer timerEvent. Details: " << exc.what());
-    }
-}
-
-
-void Computer::Impl::timerEvent()
-{
-    checkForSyncErrors();
-    timerEventImpl();
 }
 
 
@@ -252,7 +283,45 @@ void Computer::onMoveTimerEvent()
 void Computer::Impl::moveTimerEvent()
 {
     checkForSyncErrors();
-    moveTimerEventImpl();
+
+    LogInfo(SS()  << "Enter moveTimerEvent.");
+
+    ResultHolder::Status status = ResultHolder::Status(-1);
+
+    stm::atomic([&](stm::transaction & tx) {
+        if (boost::optional<GameState> gs = getNextGameState(tx))
+        {
+            move(tx, gs.get());
+        }
+        status = mResultHolder.open_r(tx).status();
+    });
+
+    Assert(status != ResultHolder::Status(-1));
+    if (status == ResultHolder::Status_Used)
+    {
+        restartNodeCalculator();
+    }
+}
+
+
+void Computer::Impl::restartNodeCalculator()
+{
+    FUTILE_LOCK(ExclusiveResources & res, mExclusiveResources)
+    {
+        if (boost::optional<NodeCalculatorParams> params = getNodeCalculatorParams())
+        {
+            LogInfo(SS()  << "We got the NodeCalculatorParams. Now start.");
+            startNodeCalculator(res,
+                                params->mGameState,
+                                params->mBlockTypes,
+                                params->mWidths,
+                                params->mWorkerCount);
+        }
+        else
+        {
+            LogInfo(SS()  << "We didn't get the params.");
+        }
+    }
 }
 
 
@@ -403,167 +472,49 @@ Game::MoveResult Move(stm::transaction & tx, Game & ioGame, const Block & target
 } // anonymous namespace
 
 
-void Computer::Impl::move(stm::transaction & tx)
+Game::MoveResult Computer::Impl::move(stm::transaction & tx, const GameState & inNextGameState)
 {
-    Precalculated & precalculated = mPrecalculated.open_rw(tx);
-    unsigned oldId = mGame.gameStateId(tx);
-    unsigned predictedId = precalculated.front().id();
-    if (oldId >= predictedId)
+    if (mGame.gameStateId(tx) + 1 != inNextGameState.id())
     {
-        // Precalculated blocks have been invalidated.
-        LogInfo("Precalculated invalidated.");
-        precalculated.clear();
-        return;
+        throw SyncError();
     }
 
-    Assert(predictedId == oldId + 1); // check sync
-    const Block & activeBlock = mGame.activeBlock(tx);
-    const Block & originalBlock = precalculated.front().originalBlock();
-    Assert(activeBlock.type() == originalBlock.type());
-    (void)activeBlock;
-    (void)originalBlock;
-
-    Game::MoveResult res = Move(tx, mGame, precalculated.front().originalBlock());
+    Game::MoveResult res = Move(tx, mGame, inNextGameState.originalBlock());
 
     Assert((
         (res == Game::MoveResult_Moved || res == Game::MoveResult_NotMoved) && mGame.gameStateId(tx) == oldId)
         || (res == Game::MoveResult_Commited && mGame.gameStateId(tx) == oldId + 1));
 
-    if (res == Game::MoveResult_Commited)
+    return res;
+}
+
+
+boost::optional<GameState> Computer::Impl::getNextGameState(stm::transaction & tx) const
+{
+    const Precalculated & cPrecalculated = mPrecalculated.open_r(tx);
+    if (!cPrecalculated.empty())
     {
-        precalculated.erase(precalculated.begin());
+        LogInfo(SS()  << "Using precalculated gameState");
+        return boost::make_optional(*cPrecalculated.begin());
     }
-}
-
-
-void Computer::Impl::moveTimerEventImpl()
-{
-    stm::atomic([&](stm::transaction & tx)
+    else
     {
-        const Precalculated & precalculated = mPrecalculated.open_r(tx);
-        if (!precalculated.empty())
+        LogInfo(SS()  << "Try to use results.");
+        const ResultHolder & cResultHolder = mResultHolder.open_r(tx);
+        Assert(!cResultHolder.used());
+        if (cResultHolder.assigned())
         {
-            move(tx);
+            LogInfo(SS() << " YES");
+            ResultHolder & resultHolder = mResultHolder.open_rw(tx);
+            Precalculated & prec = mPrecalculated.open_rw(tx);
+            std::vector<GameState> && result = std::move(resultHolder.gut());
+            std::move(result.begin(), result.end(), std::back_inserter(prec));
+            return boost::make_optional(prec[0]);
         }
-    });
-}
-
-
-void Computer::Impl::timerEventImpl()
-{
-    checkNodeCalculator();
-}
-
-
-void Computer::Impl::checkNodeCalculator()
-{
-    FUTILE_LOCK(ExclusiveResources & res, mExclusiveResources)
-    {
-        checkNodeCalculator(res);
-    }
-}
-
-
-void Computer::Impl::checkNodeCalculator(ExclusiveResources & res)
-{
-    if (!res.mNodeCalculator)
-    {
-        boost::optional<NodeCalculatorParams> params = getNodeCalculatorParams();
-        if (params.is_initialized())
-        {
-            startNodeCalculator(res,
-                                params->mGameState,
-                                params->mBlockTypes,
-                                params->mWidths,
-                                params->mWorkerCount);
-        }
-        return;
     }
 
-    switch (res.mNodeCalculator->status())
-    {
-        case NodeCalculator::Status_Nil:
-        {
-            throw std::logic_error("Status should be Status_Started or higher.");
-        }
-        case NodeCalculator::Status_Started:
-        {
-            return;
-        }
-        case NodeCalculator::Status_Working:
-        {
-            const Precalculated cPrecalculated = getPrecalculatedCopy();
-            static const unsigned cMinimumPrecalculated = 4;
-            if (cPrecalculated.size() <= cMinimumPrecalculated)
-            {
-                res.mNodeCalculator->stop();
-                NodeCalculator::Status status = res.mNodeCalculator->status();
-                Assert(status == NodeCalculator::Status_Stopped ||
-                       status == NodeCalculator::Status_Finished);
-                (void)status;
-                processResults(res.mNodeCalculator->result());
-                res.mNodeCalculator.reset();
-                boost::optional<NodeCalculatorParams> params = getNodeCalculatorParams();
-                if (params.is_initialized())
-                {
-                    startNodeCalculator(res,
-                                        params->mGameState,
-                                        params->mBlockTypes,
-                                        params->mWidths,
-                                        res.mWorkerPool.size());
-                }
-            }
-            return;
-        }
-        case NodeCalculator::Status_Stopped:
-        {
-            // Stop should be handled above.
-            throw std::logic_error("Unexpected status.");
-        }
-        case NodeCalculator::Status_Finished:
-        {
-            processResults(res.mNodeCalculator->result());
-            res.mNodeCalculator.reset();
-            boost::optional<NodeCalculatorParams> params = getNodeCalculatorParams();
-            if (params.is_initialized())
-            {
-                res.mNodeCalculator.reset(new NodeCalculator(params->mGameState,
-                                                             params->mBlockTypes,
-                                                             params->mWidths,
-                                                             *mEvaluator,
-                                                             res.mMainWorker,
-                                                             res.mWorkerPool));
-            }
-            return;
-        }
-        case NodeCalculator::Status_Error:
-        {
-            LogError("Computer: " + res.mNodeCalculator->errorMessage());
-            res.mNodeCalculator.reset();
-            return;
-        }
-        default:
-        {
-            throw std::invalid_argument("Invalid enum value for NodeCalculator::Status.");
-        }
-    }
-}
-
-
-void Computer::Impl::startNodeCalculator(ExclusiveResources & res,
-                                         const GameState & inGameState,
-                                         const std::vector<BlockType> & inBlockTypes,
-                                         const std::vector<int> & inWidths,
-                                         unsigned inWorkerCount)
-{
-    res.mWorkerPool.resize(inWorkerCount);
-    res.mNodeCalculator.reset(new NodeCalculator(inGameState,
-                                                 inBlockTypes,
-                                                 inWidths,
-                                                 *mEvaluator,
-                                                 res.mMainWorker,
-                                                 res.mWorkerPool));
-    res.mNodeCalculator->start();
+    static boost::optional<GameState> none;
+    return none;
 }
 
 
@@ -583,7 +534,6 @@ boost::optional<NodeCalculatorParams> Computer::Impl::getNodeCalculatorParams(st
     {
         return Ret();
     }
-
 
     //
     // Create the list of future blocks
@@ -607,6 +557,31 @@ boost::optional<NodeCalculatorParams> Computer::Impl::getNodeCalculatorParams(st
     }
 
     return Ret(NodeCalculatorParams(previousGameState(tx), futureBlocks, widths, cDefaultWorkerCount));
+}
+
+
+void Computer::Impl::startNodeCalculator(ExclusiveResources & res,
+                                         const GameState & inGameState,
+                                         const std::vector<BlockType> & inBlockTypes,
+                                         const std::vector<int> & inWidths,
+                                         unsigned inWorkerCount)
+{
+    LogInfo(SS()  << "Actually starting the node calculator.");
+    res.mWorkerPool.resize(inWorkerCount);
+    res.mNodeCalculator.reset(new NodeCalculator(inGameState,
+                                                 inBlockTypes,
+                                                 inWidths,
+                                                 *mEvaluator,
+                                                 res.mMainWorker,
+                                                 res.mWorkerPool));
+    res.mNodeCalculator->start([this](const std::vector<GameState> & result) {
+        stm::atomic([&](stm::transaction & tx) {
+            ResultHolder & r = mResultHolder.open_rw(tx);
+            Assert(r.initial() || r.assigned());
+            r.set(result);
+            Assert(r.assigned());
+        });
+    });
 }
 
 

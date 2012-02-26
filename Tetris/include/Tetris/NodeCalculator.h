@@ -9,6 +9,7 @@
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <cstddef>
+#include <functional>
 #include <memory>
 #include <vector>
 
@@ -34,7 +35,9 @@ public:
 
     ~NodeCalculator();
 
-    void start();
+    typedef std::function<void(const std::vector<GameState> &)> Callback;
+
+    void start(const Callback & inCallback);
 
     void stop();
 

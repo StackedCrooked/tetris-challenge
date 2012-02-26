@@ -217,7 +217,7 @@ void NodeCalculatorImpl::stop()
 }
 
 
-void NodeCalculatorImpl::startImpl()
+void NodeCalculatorImpl::startImpl(const NodeCalculator::Callback & inCallback)
 {
     // Thread entry point has try/catch block
     try
@@ -225,6 +225,10 @@ void NodeCalculatorImpl::startImpl()
         setStatus(NodeCalculator::Status_Working);
         populate();
         stm::atomic([&](stm::transaction & tx) { calculateResult(tx); });
+        if (inCallback)
+        {
+            inCallback(mResult);
+        }
         setStatus(NodeCalculator::Status_Finished);
     }
     catch (const std::exception & inException)
@@ -235,10 +239,9 @@ void NodeCalculatorImpl::startImpl()
 }
 
 
-void NodeCalculatorImpl::start()
+void NodeCalculatorImpl::start(const NodeCalculator::Callback & inCallback)
 {
-    mMainWorker.schedule(boost::bind(&NodeCalculatorImpl::startImpl, this));
-    //mMainWorker.schedule([&](){ startImpl(); });
+    mMainWorker.schedule(boost::bind(&NodeCalculatorImpl::startImpl, this, inCallback));
     mStatus = NodeCalculator::Status_Started;
 }
 
