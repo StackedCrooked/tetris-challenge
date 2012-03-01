@@ -181,7 +181,7 @@ private:
         return mImpl->mMutex;
     }
 
-    T * getT() const
+    T * getValue() const
     {
         return mImpl->mT;
     }
@@ -260,12 +260,12 @@ public:
 
     const T * get() const
     {
-        return mThreadSafe.getT();
+        return mThreadSafe.getValue();
     }
 
     T * get()
     {
-        return mThreadSafe.getT();
+        return mThreadSafe.getValue();
     }
 
     const T * operator->() const

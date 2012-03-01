@@ -12,20 +12,36 @@ namespace testing {
 using namespace Tetris;
 
 
-class ComputerPlayerTest : public TetrisTest
-{
-};
+struct ComputerPlayerTest : public TetrisTest { };
 
 
 TEST_F(ComputerPlayerTest, All)
 {
-	static const unsigned cWaitMs = 1000;
-    boost::scoped_ptr<Game> game(new Game(20, 10));
-    boost::scoped_ptr<Computer> computer(new Computer(*game));
-    std::cout << "Let computer work for " << cWaitMs << "ms" << std::endl;
-    Futile::Sleep(cWaitMs);
-    computer.reset();
-    game.reset();
+    enum {
+        cMoveSpeed = 100,
+        cSearchDepth = 4,
+        cSearchWidth = 5,
+        cWorkerCount = 6,
+        cDuration = 500
+    };
+
+    Game game(20, 10);
+    Computer computer(game);
+
+    computer.setMoveSpeed(cMoveSpeed);
+    ASSERT_EQ(computer.moveSpeed(), cMoveSpeed);
+
+    computer.setSearchWidth(cSearchWidth);
+    ASSERT_EQ(computer.searchWidth(), cSearchWidth);
+
+    computer.setSearchDepth(cSearchDepth);
+    ASSERT_EQ(computer.searchDepth(), cSearchDepth);
+
+    computer.setWorkerCount(cWorkerCount);
+    ASSERT_EQ(computer.workerCount(), cWorkerCount);
+
+    std::cout << "Let computer work for " << cDuration << "ms" << std::endl;
+    Futile::Sleep(cDuration);
 }
 
 
