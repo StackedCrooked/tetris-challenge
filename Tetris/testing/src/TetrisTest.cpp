@@ -1,8 +1,15 @@
 #include "TetrisTest.h"
 #include "Futile/Threading.h"
+#include <cstdlib>
 
 
 namespace testing {
+
+
+std::string GetEnv(const std::string & name, const std::string & def) {
+    const char * res = getenv(name.c_str());
+    return res ? res : def;
+}
 
 
 void TetrisTest::BeBusy()

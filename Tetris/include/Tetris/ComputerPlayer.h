@@ -21,25 +21,21 @@ public:
 
     virtual ~Computer();
 
-    int searchDepth() const;
-
     void setSearchDepth(int inSearchDepth);
 
-    // Get progress
-    int depth() const;
-
-    int searchWidth() const;
+    int searchDepth() const;
 
     void setSearchWidth(int inSearchWidth);
 
-    int moveSpeed() const;
+    int searchWidth() const;
 
     void setMoveSpeed(int inMoveSpeed);
 
-    int workerCount() const;
+    int moveSpeed() const;
 
-    // Set to 0 to auto-select
     void setWorkerCount(int inWorkerCount);
+
+    int workerCount() const;
 
 private:
     void onMoveTimerEvent();
@@ -53,7 +49,6 @@ private:
 
 class ComputerPlayer : public Player,
                        public Computer
-
 {
 public:
     static PlayerPtr Create(const TeamName & inTeamName,

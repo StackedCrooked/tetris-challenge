@@ -47,9 +47,9 @@ static const unsigned cDefaultWorkerCount = 8;
 namespace {
 
 
-struct ExclusiveResources
+struct NonMemoryResources
 {
-    ExclusiveResources() :
+    NonMemoryResources() :
         mMainWorker("Computer main worker"),
         mWorkerPool("Computer worker pool", cDefaultWorkerCount),
         mNodeCalculator()
@@ -114,12 +114,20 @@ struct GameOver : public std::runtime_error
 
 struct Computer::Impl : boost::noncopyable
 {
-public:
     typedef std::vector<GameState> Result;
 
+    const Evaluator * mEvaluator;
+    ThreadSafe<NonMemoryResources> mNonMemoryResources;
+    Game & mGame; // Game uses STM internally.
+    mutable stm::shared<Precalculated> mPrecalculated;
+    mutable stm::shared<Intermediates> mIntermediates;
+    mutable stm::shared<int> mSearchDepth;
+    mutable stm::shared<int> mSearchWidth;
+    mutable stm::shared<int> mWorkerCount;
+
     Impl(Game & inGame) :
-        mExclusiveResources(new ExclusiveResources),
         mEvaluator(&MakeTetrises::Instance()),
+        mNonMemoryResources(new NonMemoryResources),
         mGame(inGame),
         mPrecalculated(Precalculated()),
         mIntermediates(Intermediates()),
@@ -131,7 +139,7 @@ public:
 
     ~Impl()
     {
-        FUTILE_LOCK(ExclusiveResources & res, mExclusiveResources)
+        FUTILE_LOCK(NonMemoryResources & res, mNonMemoryResources)
         {
             if (res.mNodeCalculator)
             {
@@ -178,7 +186,7 @@ public:
 
     void restartNodeCalculator();
 
-    void startNodeCalculator(ExclusiveResources & res,
+    void startNodeCalculator(NonMemoryResources & res,
                              const GameState & inGameState,
                              const std::vector<BlockType> & inBlockTypes,
                              const std::vector<int> & inWidths,
@@ -206,18 +214,6 @@ public:
         return cPrecalculated.empty() ? mGame.activeBlock(tx)
                                       : cPrecalculated.back().originalBlock();
     }
-
-    // Can't use STM on this
-    ThreadSafe<ExclusiveResources> mExclusiveResources;
-
-    const Evaluator * mEvaluator;
-    Game & mGame;
-
-    mutable stm::shared<Precalculated> mPrecalculated;
-    mutable stm::shared<Intermediates> mIntermediates;
-    mutable stm::shared<int> mSearchDepth;
-    mutable stm::shared<int> mSearchWidth;
-    mutable stm::shared<int> mWorkerCount;
 };
 
 
@@ -263,7 +259,7 @@ void Computer::Impl::moveTimerEvent()
     {
         std::vector<GameState> result;
 
-        FUTILE_LOCK(ExclusiveResources & res, mExclusiveResources)
+        FUTILE_LOCK(NonMemoryResources & res, mNonMemoryResources)
         {
             if (!res.mNodeCalculator)
             {
@@ -303,7 +299,7 @@ void Computer::Impl::moveTimerEvent()
 void Computer::Impl::restartNodeCalculator()
 {
     NodeCalculatorParams params = getNodeCalculatorParams();
-    FUTILE_LOCK(ExclusiveResources & res, mExclusiveResources)
+    FUTILE_LOCK(NonMemoryResources & res, mNonMemoryResources)
     {
         startNodeCalculator(res,
                             params.mGameState,
@@ -343,12 +339,6 @@ void Computer::setSearchWidth(int inSearchWidth)
     stm::atomic([&](stm::transaction & tx){
         mImpl->mSearchDepth.open_rw(tx) = inSearchWidth;
     });
-}
-
-
-int Computer::depth() const
-{
-    return mImpl->mExclusiveResources.lock()->mNodeCalculator->getCurrentSearchDepth();
 }
 
 
@@ -519,7 +509,7 @@ NodeCalculatorParams Computer::Impl::getNodeCalculatorParams(stm::transaction & 
 }
 
 
-void Computer::Impl::startNodeCalculator(ExclusiveResources & res,
+void Computer::Impl::startNodeCalculator(NonMemoryResources & res,
                                          const GameState & inGameState,
                                          const std::vector<BlockType> & inBlockTypes,
                                          const std::vector<int> & inWidths,

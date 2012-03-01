@@ -2,6 +2,7 @@ STM Version
 -----------
 - Use STM in TreeRowInfos
 - Redesign Model, MultiplayerGame, Player classes.
+- Use unsigned where applicable
 v Future blocks shows current block as next block.
 v Check out Google Perftools (http://code.google.com/p/google-perftools/wiki/GooglePerformanceTools)
 v Remove Computer's dependency to MainThread.
