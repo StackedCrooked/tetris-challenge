@@ -62,9 +62,9 @@ NodeCalculator::~NodeCalculator()
 }
 
 
-void NodeCalculator::start(const Callback & inCallback)
+void NodeCalculator::start()
 {
-    return mImpl->start(inCallback);
+    return mImpl->start();
 }
 
 
@@ -98,7 +98,7 @@ unsigned NodeCalculator::getMaxNodeCount() const
 }
 
 
-std::vector<GameState> NodeCalculator::result() const
+std::vector<GameState> NodeCalculator::getCurrentResults() const
 {
     Assert(status() != Status_Error);
     return mImpl->result();

@@ -157,7 +157,7 @@ public:
 
     virtual ~NodeCalculatorImpl() = 0;
 
-    void start(const NodeCalculator::Callback & inCallback);
+    void start();
 
     void stop();
 
@@ -178,7 +178,7 @@ public:
 protected:
     virtual void populate() = 0;
 
-    void startImpl(const NodeCalculator::Callback & inCallback);
+    void startImpl();
 
     void setQuitFlag();
     bool getQuitFlag() const;

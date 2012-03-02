@@ -187,12 +187,10 @@ void NodeCalculatorImpl::calculateResult(stm::transaction & tx)
         results.push(endNode);
         endNode = endNode->parent();
         unsigned parentId = endNode->gameState().id();
-        mResult.push_back(endNode->gameState());
+        mResult.insert(mResult.begin(), endNode->gameState());
         Assert(currentId == parentId + 1);
         currentId = parentId;
     }
-
-    std::reverse(mResult.begin(), mResult.end());
 }
 
 
@@ -216,7 +214,7 @@ void NodeCalculatorImpl::stop()
 }
 
 
-void NodeCalculatorImpl::startImpl(const NodeCalculator::Callback & inCallback)
+void NodeCalculatorImpl::startImpl()
 {
     // Thread entry point has try/catch block
     try
@@ -224,10 +222,6 @@ void NodeCalculatorImpl::startImpl(const NodeCalculator::Callback & inCallback)
         setStatus(NodeCalculator::Status_Working);
         populate();
         stm::atomic([&](stm::transaction & tx) { calculateResult(tx); });
-        if (inCallback)
-        {
-            inCallback(mResult);
-        }
         setStatus(NodeCalculator::Status_Finished);
     }
     catch (const std::exception & inException)
@@ -238,9 +232,9 @@ void NodeCalculatorImpl::startImpl(const NodeCalculator::Callback & inCallback)
 }
 
 
-void NodeCalculatorImpl::start(const NodeCalculator::Callback & inCallback)
+void NodeCalculatorImpl::start()
 {
-    mMainWorker.schedule(boost::bind(&NodeCalculatorImpl::startImpl, this, inCallback));
+    mMainWorker.schedule(boost::bind(&NodeCalculatorImpl::startImpl, this));
     mStatus = NodeCalculator::Status_Started;
 }
 
