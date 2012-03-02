@@ -147,7 +147,7 @@ void NodeCalculatorTest::testInterrupt(Depth inDepth, Width inWidth, WorkerCount
     ASSERT_TRUE(nodeCalculator.getCurrentSearchDepth() == 0);
     ASSERT_TRUE(blockTypes.size() == widths.size());
     ASSERT_TRUE(std::size_t(nodeCalculator.getMaxSearchDepth()) == blockTypes.size());
-    ASSERT_TRUE(std::size_t(nodeCalculator.status()) == NodeCalculator::Status_Nil);
+    ASSERT_TRUE(std::size_t(nodeCalculator.status()) == NodeCalculator::Status_Initial);
 
     nodeCalculator.start(NodeCalculator::Callback());
 
@@ -237,7 +237,7 @@ void NodeCalculatorTest::testDestroy(Worker & inMainWorker, WorkerPool & inWorke
     ASSERT_TRUE(nodeCalculator.getCurrentSearchDepth() == 0);
     ASSERT_TRUE(blockTypes.size() == widths.size());
     ASSERT_TRUE(std::size_t(nodeCalculator.getMaxSearchDepth()) == blockTypes.size());
-    ASSERT_TRUE(nodeCalculator.status() == NodeCalculator::Status_Nil);
+    ASSERT_TRUE(nodeCalculator.status() == NodeCalculator::Status_Initial);
 
     nodeCalculator.start(NodeCalculator::Callback());
 

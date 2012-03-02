@@ -2,7 +2,6 @@
 #define TETRIS_COMPUTER_H
 
 
-#include "Futile/Timer.h"
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
 
@@ -11,7 +10,7 @@ namespace Tetris {
 
 
 class Game;
-class GameState;
+
 
 class Computer : boost::noncopyable
 {
