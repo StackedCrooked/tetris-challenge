@@ -29,9 +29,9 @@ public:
 
     int searchWidth() const;
 
-    void setMoveSpeed(int inMoveSpeed);
+    void setMoveSpeed(unsigned inMoveSpeed);
 
-    int moveSpeed() const;
+    unsigned moveSpeed() const;
 
     void setWorkerCount(int inWorkerCount);
 
