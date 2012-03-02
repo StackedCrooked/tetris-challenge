@@ -21,6 +21,7 @@ add_library(Futile
     include/Futile/MainThread.h
     include/Futile/MainThreadImpl.h
     include/Futile/MakeString.h
+    include/Futile/PrettyPrint.h
     include/Futile/Stopwatch.h
     include/Futile/Threading.h
     include/Futile/Timer.h
@@ -31,6 +32,7 @@ add_library(Futile
     src/Logger.cpp
     src/Logging.cpp
     src/MainThread.cpp
+    src/PrettyPrint.cpp
     src/Stopwatch.cpp
     src/Threading.cpp
     src/Timer.cpp
