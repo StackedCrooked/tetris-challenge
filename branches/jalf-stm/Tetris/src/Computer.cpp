@@ -80,12 +80,12 @@ void Computer::Impl::coordinate()
     Preliminaries prelim;
     if (mNodeCalculator)
     {
+        LogDebug(SS() << mNodeCalculator->getCurrentNodeCount() << ": " << mNodeCalculator->getCurrentSearchDepth() << "/" << mNodeCalculator->getMaxSearchDepth());
         prelim = mNodeCalculator->getCurrentResults();
         if (prelim.empty())
         {
             return;
         }
-        LogDebug(SS() << mNodeCalculator->getCurrentNodeCount() << ": " << mNodeCalculator->getCurrentSearchDepth() << "/" << mNodeCalculator->getMaxSearchDepth());
     }
 
 
@@ -110,7 +110,7 @@ void Computer::Impl::coordinate()
 
     if (!blockTypes.empty())
     {
-        Widths widths(blockTypes.size(), 4);
+        Widths widths(blockTypes.size(), 5);
         Assert(widths.size() == blockTypes.size());
         const Evaluator & evaluator = MakeTetrises::Instance();
         mNodeCalculator.reset(new NodeCalculator(*lastGameState,
