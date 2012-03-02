@@ -83,13 +83,21 @@ void Computer::Impl::coordinate()
 {
     std::cout << "\n\nCoordinate" << std::endl;
 
-    if (get(mPrecalculated).size() >= 4)
-    {
-        return;
-    }
-
     BlockTypes blockTypes;
     boost::scoped_ptr<GameState> lastGameState;
+
+    Preliminaries prelim;
+    if (mNodeCalculator)
+    {
+        prelim = mNodeCalculator->result();
+        if (prelim.empty())
+        {
+            return;
+        }
+        std::cout << "Yes prelim: " << prelim.size() << std::endl;
+    }
+
+    std::cout << "Prelim outside: " << prelim.size() << std::endl;
 
     stm::atomic([&](stm::transaction & tx)
     {
@@ -101,16 +109,15 @@ void Computer::Impl::coordinate()
         }
 
         Precalculated & prec = mPrecalculated.open_rw(tx);
-
-        if (mNodeCalculator) {
-            Preliminaries prelim = mNodeCalculator->result();
-            if (prelim.empty())
-            {
-                return;
-            }
+        std::cout << "Prelim inside: " << prelim.size() << std::endl;
+        if (!prelim.empty()) {
             std::cout << "Got preliminaries: " << prelim.size() << std::endl;
             std::copy(prelim.begin(), prelim.end(), std::back_inserter(prec));
             std::cout << "Move prelim to prec. Now we have " << prec.size() << " precalculated." << std::endl;
+        }
+        else
+        {
+
         }
 
         blockTypes = mGame.getFutureBlocks(tx, cPrec.size() + 8);
@@ -121,7 +128,8 @@ void Computer::Impl::coordinate()
     });
 
     if (!blockTypes.empty())
-    {
+    {    
+        std::cout << "Starting node calculator: " << blockTypes.size() << std::endl;
         Widths widths(blockTypes.size(), 4);
         Assert(widths.size() == blockTypes.size());
         const Evaluator & evaluator = MakeTetrises::Instance();
@@ -207,23 +215,26 @@ void Computer::Impl::move()
 {
     stm::atomic([&](stm::transaction & tx)
     {
-        const Precalculated & cPrec = mPrecalculated.open_r(tx);
-        if (cPrec.empty())
+        Precalculated & prec = mPrecalculated.open_rw(tx);
+        if (prec.empty())
         {
             return;
         }
 
-        if (cPrec.front().originalBlock().type() == mGame.activeBlock(tx).type())
+        if (prec.front().originalBlock().type() == mGame.activeBlock(tx).type())
         {
-            if (Game::MoveResult_Commited == move(tx, mGame, cPrec.front().originalBlock()))
+            if (Game::MoveResult_Commited == move(tx, mGame, prec.front().originalBlock()))
             {
-                Precalculated & prec = mPrecalculated.open_rw(tx);
+                std::cout << "Committed" << std::endl;
                 prec.erase(prec.begin());
+                mNodeCalculator.reset();
             }
         }
         else
         {
+            std::cout << "Sync error" << std::endl;
             mPrecalculated.open_rw(tx).clear();
+            mNodeCalculator.reset();
         }
     });
 }
