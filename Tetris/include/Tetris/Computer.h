@@ -3,6 +3,7 @@
 
 
 #include "Futile/Timer.h"
+#include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
 
 
@@ -12,12 +13,12 @@ namespace Tetris {
 class Game;
 class GameState;
 
-class Computer
+class Computer : boost::noncopyable
 {
 public:
     Computer(Game & inGame);
 
-    virtual ~Computer();
+    ~Computer();
 
     void setSearchDepth(int inSearchDepth);
 
@@ -41,7 +42,6 @@ private:
     struct Impl;
     friend struct Impl;
     boost::scoped_ptr<Impl> mImpl;
-    boost::scoped_ptr<Futile::Timer> mMoveTimer;
 };
 
 
