@@ -35,13 +35,12 @@ public:
 
     ~NodeCalculator();
 
-    typedef std::function<void(const std::vector<GameState> &)> Callback;
-
-    void start(const Callback & inCallback);
+    void start();
 
     void stop();
 
-    std::vector<GameState> result() const;
+    // Returns curent results.
+    std::vector<GameState> getCurrentResults() const;
 
     int getCurrentSearchDepth() const;
 

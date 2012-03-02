@@ -41,14 +41,15 @@ struct Computer::Impl : boost::noncopyable
     Impl(Game & inGame) :
         mGame(inGame),
         mPrecalculated(Precalculated()),
-        mNumMovesPerSecond(50),
+        mNumMovesPerSecond(10),
         mSearchDepth(4),
         mSearchWidth(4),
         mWorkerCount(4),
-        mMoveTimer(20),
-        mCoordinationTimer(1000),
+        mSyncError(false),
         mWorker("Computer"),
-        mWorkerPool("Computer", 4)
+        mWorkerPool("Computer", 4),
+        mMoveTimer(20),
+        mCoordinationTimer(50)
     {
     }
 
@@ -72,28 +73,42 @@ struct Computer::Impl : boost::noncopyable
     mutable stm::shared<unsigned> mSearchDepth;
     mutable stm::shared<unsigned> mSearchWidth;
     mutable stm::shared<unsigned> mWorkerCount;
-    Futile::Timer mMoveTimer;
-    Futile::Timer mCoordinationTimer;
+    mutable stm::shared<bool> mSyncError;
     Worker mWorker;
     WorkerPool mWorkerPool;
     boost::shared_ptr<NodeCalculator> mNodeCalculator;
+    Futile::Timer mMoveTimer;
+    Futile::Timer mCoordinationTimer;
 };
 
 
 void Computer::Impl::coordinate()
 {
-    BlockTypes blockTypes;
-    boost::scoped_ptr<GameState> lastGameState;
+    if (get(mSyncError))
+    {
+        mNodeCalculator.reset();
+        set(mSyncError, false);
+    }
+
+    if (get(mPrecalculated).size() > 4)
+    {
+        return;
+    }
 
     Preliminaries prelim;
     if (mNodeCalculator)
     {
-        prelim = mNodeCalculator->result();
+        prelim = mNodeCalculator->getCurrentResults();
         if (prelim.empty())
         {
             return;
         }
+        LogDebug(SS() << mNodeCalculator->getCurrentNodeCount() << ": " << mNodeCalculator->getCurrentSearchDepth() << "/" << mNodeCalculator->getMaxSearchDepth());
     }
+
+
+    BlockTypes blockTypes;
+    boost::scoped_ptr<GameState> lastGameState;
 
     stm::atomic([&](stm::transaction & tx)
     {
@@ -106,9 +121,9 @@ void Computer::Impl::coordinate()
         Precalculated & prec = mPrecalculated.open_rw(tx);
         prec.insert(prec.end(), prelim.begin(), prelim.end());
 
-        blockTypes = mGame.getFutureBlocks(tx, cPrec.size() + 8);
-        blockTypes.erase(blockTypes.begin(), blockTypes.begin() + cPrec.size());
-        lastGameState.reset(new GameState(cPrec.empty() ? mGame.gameState(tx) : cPrec.back()));
+        blockTypes = mGame.getFutureBlocks(tx, prec.size() + 8);
+        blockTypes.erase(blockTypes.begin(), blockTypes.begin() + prec.size());
+        lastGameState.reset(new GameState(prec.empty() ? mGame.gameState(tx) : prec.back()));
     });
 
     if (!blockTypes.empty())
@@ -123,7 +138,7 @@ void Computer::Impl::coordinate()
                                                  mWorker,
                                                  mWorkerPool));
 
-        mNodeCalculator->start(NodeCalculator::Callback());
+        mNodeCalculator->start();
     }
 }
 
@@ -207,16 +222,13 @@ void Computer::Impl::move()
         {
             if (Game::MoveResult_Commited == move(tx, mGame, prec.front().originalBlock()))
             {
-                LogDebug(SS() << "Committed " << prec.front().id());
                 prec.erase(prec.begin());
-                mNodeCalculator.reset();
             }
         }
         else
         {
-            LogDebug("Sync error");
             mPrecalculated.open_rw(tx).clear();
-            mNodeCalculator.reset();
+            set(mSyncError, true);
         }
     });
 }
@@ -232,6 +244,7 @@ Computer::Computer(Game &inGame) :
 
 Computer::~Computer()
 {
+    mImpl->mCoordinationTimer.stop();
     mImpl->mMoveTimer.stop();
     mImpl.reset();
 }

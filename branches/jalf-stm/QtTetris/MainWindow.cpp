@@ -123,9 +123,9 @@ MainWindow::~MainWindow()
 
 void MainWindow::logMessage(const std::string & inMessage)
 {
-    static UInt64 fBegin = GetCurrentTimeMs();
-    UInt64 time = GetCurrentTimeMs() - fBegin;
-    std::cout << std::setw(8) << std::setfill('0') << unsigned(time) << " " << inMessage << std::endl;
+    static std::string fAllMessages;
+    fAllMessages += "\n" + inMessage;
+    mLogField->setText(QString(fAllMessages.c_str()));
 }
 
 

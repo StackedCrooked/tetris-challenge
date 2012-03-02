@@ -9,19 +9,13 @@
 namespace Futile {
 
 
-void LogInfoImpl(const std::string & inMessage);
-void LogWarningImpl(const std::string & inMessage);
-void LogErrorImpl(const std::string & inMessage);
+void LogInfo(const std::string & inMessage);
+void LogWarning(const std::string & inMessage);
+void LogError(const std::string & inMessage);
 
-
-#define LogInfo(msg) LogInfoImpl(Futile::SS() << __FILE__ << ":" << __LINE__ << ": " << std::string(msg))
-
-#define LogWarning(msg) LogWarningImpl(Futile::SS() << __FILE__ << ":" << __LINE__ << ": " << std::string(msg))
-
-#define LogError(msg) LogErrorImpl(Futile::SS() << __FILE__ << ":" << __LINE__ << ": " << std::string(msg))
 
 #ifndef NDEBUG
-#define LogDebug(msg) LogInfoImpl(Futile::SS() << __FILE__ << ":" << __LINE__ << "(debug): " << std::string(msg))
+#define LogDebug(msg) LogInfo("(debug)" + std::string(msg));
 #else
 #define LogDebug(...)
 #endif
