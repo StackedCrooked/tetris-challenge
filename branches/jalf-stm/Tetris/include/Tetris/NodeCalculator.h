@@ -52,14 +52,12 @@ public:
 
     enum Status
     {
-        Status_Begin,
-        Status_Initial = Status_Begin,
-        Status_Started = Status_Begin,
+        Status_Initial,
+        Status_Starting,
         Status_Working,
-        Status_Stopped,
+        Status_Stopping,
         Status_Finished,
-        Status_Error,
-        Status_End
+        Status_Error = -1
     };
 
     Status status() const;

@@ -143,6 +143,10 @@ unsigned NodeCalculatorImpl::getMaxNodeCount() const
 
 std::vector<GameState> NodeCalculatorImpl::result() const
 {
+    if (mStatus == NodeCalculator::Status_Error)
+    {
+        throw std::runtime_error(mErrorMessage.c_str());
+    }
     return Futile::STM::get(mResult);
 }
 
@@ -202,13 +206,13 @@ void NodeCalculatorImpl::stop()
 {
     switch (status())
     {
-        case NodeCalculator::Status_Started:
         case NodeCalculator::Status_Working:
         {
-            setStatus(NodeCalculator::Status_Stopped);
+            setStatus(NodeCalculator::Status_Stopping);
             Assert(mMainWorker.size() <= 1);
             mMainWorker.interruptAndClearQueue();
             mWorkerPool.interruptAndClearQueue();
+            setStatus(NodeCalculator::Status_Finished);
         }
         default:
         {
@@ -238,7 +242,7 @@ void NodeCalculatorImpl::startImpl()
 void NodeCalculatorImpl::start()
 {
     mMainWorker.schedule(boost::bind(&NodeCalculatorImpl::startImpl, this));
-    mStatus = NodeCalculator::Status_Started;
+    mStatus = NodeCalculator::Status_Starting;
 }
 
 

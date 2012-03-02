@@ -151,7 +151,7 @@ void NodeCalculatorTest::testInterrupt(Depth inDepth, Width inWidth, WorkerCount
 
     nodeCalculator.start();
 
-    ASSERT_TRUE(nodeCalculator.status() == NodeCalculator::Status_Started);
+    ASSERT_TRUE(nodeCalculator.status() == NodeCalculator::Status_Starting);
 
     Futile::Stopwatch stopwatch;
     stopwatch.start();
@@ -166,14 +166,14 @@ void NodeCalculatorTest::testInterrupt(Depth inDepth, Width inWidth, WorkerCount
                             std::make_pair(nodeCalculator.getCurrentSearchDepth(), nodeCalculator.getMaxSearchDepth()));
         std::cout << std::flush;
 
-        if (nodeCalculator.status() != NodeCalculator::Status_Stopped)
+        if (nodeCalculator.status() != NodeCalculator::Status_Stopping)
         {
             if (duration > inTimeMs)
             {
                 nodeCalculator.stop();
                 stopwatch.stop();
                 ASSERT_TRUE(
-                    nodeCalculator.status() == NodeCalculator::Status_Stopped ||
+                    nodeCalculator.status() == NodeCalculator::Status_Stopping ||
                     nodeCalculator.status() == NodeCalculator::Status_Finished);
                 break;
             }
@@ -241,7 +241,7 @@ void NodeCalculatorTest::testDestroy(Worker & inMainWorker, WorkerPool & inWorke
 
     nodeCalculator.start();
 
-    ASSERT_TRUE(nodeCalculator.status() >= NodeCalculator::Status_Started);
+    ASSERT_TRUE(nodeCalculator.status() >= NodeCalculator::Status_Starting);
     Futile::Sleep(10);
     ASSERT_TRUE(nodeCalculator.status() != NodeCalculator::Status_Error);
 }
