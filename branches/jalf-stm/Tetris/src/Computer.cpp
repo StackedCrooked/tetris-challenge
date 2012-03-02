@@ -4,9 +4,10 @@
 #include "Tetris/Game.h"
 #include "Tetris/GameState.h"
 #include "Tetris/NodeCalculator.h"
+#include "Futile/Logging.h"
+#include "Futile/Timer.h"
 #include "Futile/Worker.h"
 #include "Futile/WorkerPool.h"
-#include "Futile/Timer.h"
 #include <vector>
 
 
@@ -81,8 +82,6 @@ struct Computer::Impl : boost::noncopyable
 
 void Computer::Impl::coordinate()
 {
-    std::cout << "\n\nCoordinate" << std::endl;
-
     BlockTypes blockTypes;
     boost::scoped_ptr<GameState> lastGameState;
 
@@ -94,42 +93,26 @@ void Computer::Impl::coordinate()
         {
             return;
         }
-        std::cout << "Yes prelim: " << prelim.size() << std::endl;
     }
-
-    std::cout << "Prelim outside: " << prelim.size() << std::endl;
 
     stm::atomic([&](stm::transaction & tx)
     {
         const Precalculated & cPrec = mPrecalculated.open_r(tx);
         if (!cPrec.empty())
         {
-            std::cout << "We still have precalculated items: " << cPrec.size() << std::endl;
             return;
         }
 
         Precalculated & prec = mPrecalculated.open_rw(tx);
-        std::cout << "Prelim inside: " << prelim.size() << std::endl;
-        if (!prelim.empty()) {
-            std::cout << "Got preliminaries: " << prelim.size() << std::endl;
-            std::copy(prelim.begin(), prelim.end(), std::back_inserter(prec));
-            std::cout << "Move prelim to prec. Now we have " << prec.size() << " precalculated." << std::endl;
-        }
-        else
-        {
-
-        }
+        prec.insert(prec.end(), prelim.begin(), prelim.end());
 
         blockTypes = mGame.getFutureBlocks(tx, cPrec.size() + 8);
-        std::cout << "Got future blocks: " << blockTypes.size() << std::endl;
         blockTypes.erase(blockTypes.begin(), blockTypes.begin() + cPrec.size());
-        std::cout << "After correction: " << blockTypes.size() << std::endl;
         lastGameState.reset(new GameState(cPrec.empty() ? mGame.gameState(tx) : cPrec.back()));
     });
 
     if (!blockTypes.empty())
-    {    
-        std::cout << "Starting node calculator: " << blockTypes.size() << std::endl;
+    {
         Widths widths(blockTypes.size(), 4);
         Assert(widths.size() == blockTypes.size());
         const Evaluator & evaluator = MakeTetrises::Instance();
@@ -147,7 +130,6 @@ void Computer::Impl::coordinate()
 
 Game::MoveResult Computer::Impl::move(stm::transaction & tx, Game & ioGame, const Block & targetBlock)
 {
-    std::cout << "Moving" << std::endl;
     const Block & block = ioGame.activeBlock(tx);
     Assert(block.type() == targetBlock.type());
 
@@ -225,14 +207,14 @@ void Computer::Impl::move()
         {
             if (Game::MoveResult_Commited == move(tx, mGame, prec.front().originalBlock()))
             {
-                std::cout << "Committed" << std::endl;
+                LogDebug(SS() << "Committed " << prec.front().id());
                 prec.erase(prec.begin());
                 mNodeCalculator.reset();
             }
         }
         else
         {
-            std::cout << "Sync error" << std::endl;
+            LogDebug("Sync error");
             mPrecalculated.open_rw(tx).clear();
             mNodeCalculator.reset();
         }

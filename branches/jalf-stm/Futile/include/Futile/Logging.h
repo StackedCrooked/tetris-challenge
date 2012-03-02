@@ -20,6 +20,12 @@ void LogErrorImpl(const std::string & inMessage);
 
 #define LogError(msg) LogErrorImpl(Futile::SS() << __FILE__ << ":" << __LINE__ << ": " << std::string(msg))
 
+#ifndef NDEBUG
+#define LogDebug(msg) LogInfoImpl(Futile::SS() << __FILE__ << ":" << __LINE__ << "(debug): " << std::string(msg))
+#else
+#define LogDebug(...)
+#endif
+
 
 } // namespace Futile
 

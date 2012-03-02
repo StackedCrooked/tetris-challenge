@@ -57,7 +57,7 @@ void Print(const std::string & msg)
 
 int RunGUI(int argc, char *argv[], Model & model)
 {
-    Futile::Logger::Instance().setLogHandler(boost::bind(&Print, _1));
+    Futile::Logger::Instance().addLogHandler(boost::bind(&Print, _1));
 
     QApplication app(argc, argv);
     app.setApplicationName("QtTetris");

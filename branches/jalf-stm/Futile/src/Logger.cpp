@@ -40,27 +40,27 @@ std::string GetMessage(LogLevel inLogLevel, const std::string & inMessage)
 Logger::Logger() :
     mSharedMessageList(MessageList()),
     mLogHandlerMutex(),
-    mLogHandler()
+    mLogHandlers()
 {
 }
 
 
-void Logger::setLogHandler(const LogHandler & inHandler)
+void Logger::addLogHandler(const LogHandler & inHandler)
 {
     ScopedLock lock(mLogHandlerMutex);
-    mLogHandler = inHandler;
+    mLogHandlers.push_back(inHandler);
 }
 
 
 void Logger::flush()
 {
-    MessageList localCopy;
+    MessageList messagesCopy;
 
     // Don't perform the logging (slow IO operations) inside the transaction.
     // Use a local copy instead.
     stm::atomic([&](stm::transaction & tx) {
         MessageList & messages = mSharedMessageList.open_rw(tx);
-        localCopy = messages;
+        messagesCopy = messages;
         messages.clear();
     });
 
@@ -69,9 +69,12 @@ void Logger::flush()
     // Technically we may have a race condition on the mLogHandler here.
 
     ScopedLock lock(mLogHandlerMutex);
-    if (mLogHandler)
+    for (auto handler : mLogHandlers)
     {
-        std::for_each(localCopy.begin(), localCopy.end(), mLogHandler);
+        for (auto message : messagesCopy)
+        {
+            handler(message);
+        }
     }
 }
 
