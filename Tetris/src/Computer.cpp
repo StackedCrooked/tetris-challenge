@@ -86,32 +86,33 @@ void Computer::Impl::tick()
         return;
     }
 
-    auto status = mNodeCalculator->status();
     BlockTypes blockTypes;
     boost::scoped_ptr<GameState> lastGameState;
 
     stm::atomic([&](stm::transaction & tx)
     {
-        const Preliminaries & prelim = mPreliminaries.open_r(tx);
-        if (prelim.size() < 4 && status != NodeCalculator::Status_Finished)
+        const Precalculated & cPrec = mPrecalculated.open_r(tx);
+        if (!cPrec.empty())
         {
             return;
         }
 
-        Precalculated & prec = mPrecalculated.open_rw(tx);
-        for (auto p : prelim)
+        if (!mPreliminaries.open_r(tx).empty())
         {
-            prec.push_back(p);
+            Precalculated & prec = mPrecalculated.open_rw(tx);
+            Preliminaries & prelim = mPreliminaries.open_rw(tx);
+            prec.insert(prec.end(), prelim.begin(), prelim.end());
+            prelim.clear();
         }
 
-        mPreliminaries.open_rw(tx).clear();
-        blockTypes = mGame.getFutureBlocks(tx, prec.size() + 8);
-        lastGameState.reset(new GameState(prec.back()));
+        blockTypes = mGame.getFutureBlocks(tx, cPrec.size() + 8);
+        lastGameState.reset(new GameState(cPrec.empty() ? mGame.gameState(tx) : cPrec.back()));
     });
 
     if (!blockTypes.empty())
     {
-        Widths widths(4, blockTypes.size());
+        Widths widths(blockTypes.size(), 4);
+        Assert(widths.size() == blockTypes.size());
         const Evaluator & evaluator = MakeTetrises::Instance();
         mNodeCalculator.reset(new NodeCalculator(*lastGameState,
                                                  blockTypes,
@@ -119,13 +120,6 @@ void Computer::Impl::tick()
                                                  evaluator,
                                                  mWorker,
                                                  mWorkerPool));
-    }
-
-
-    if (mNodeCalculator->status() > NodeCalculator::Status_Initial && !get(mPreliminaries).empty())
-    {
-        // use current results
-        // kill node calculator in sep thread
     }
 }
 
