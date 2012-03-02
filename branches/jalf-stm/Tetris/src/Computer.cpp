@@ -1,4 +1,5 @@
 #include "Tetris/Computer.h"
+#include "Tetris/Evaluator.h"
 #include "Tetris/Game.h"
 #include "Tetris/GameState.h"
 #include "Tetris/NodeCalculator.h"
@@ -57,6 +58,8 @@ struct Computer::Impl : boost::noncopyable
 
     void move();
 
+    GameState lastPrecalculatedGameState() const;
+
     typedef std::vector<GameState> GameStates;
     typedef GameStates Precalculated;
     typedef GameStates Preliminaries;
@@ -105,10 +108,17 @@ void Computer::Impl::tick()
         restart = true;
     });
 
-
     if (restart)
     {
-        // ...
+        BlockTypes blockTypes;
+        Widths widths;
+        const Evaluator & evaluator = MakeTetrises::Instance();
+        mNodeCalculator.reset(new NodeCalculator(lastPrecalculatedGameState(),
+                                                 blockTypes,
+                                                 widths,
+                                                 evaluator,
+                                                 mWorker,
+                                                 mWorkerPool));
     }
 
 
@@ -118,6 +128,24 @@ void Computer::Impl::tick()
         // use current results
         // kill node calculator in sep thread
     }
+}
+
+
+GameState Computer::Impl::lastPrecalculatedGameState() const
+{
+    return stm::atomic<GameState>([&](stm::transaction & tx)
+    {
+        assert(mPreliminaries.open_r(tx).empty());
+        const Precalculated & pc = mPrecalculated.open_r(tx);
+        if (!pc.empty())
+        {
+            return pc.back();
+        }
+        else
+        {
+            return mGame.gameState(tx);
+        }
+    });
 }
 
 
