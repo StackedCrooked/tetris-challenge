@@ -213,10 +213,17 @@ void Computer::Impl::move()
             return;
         }
 
-        if (move(tx, mGame, cPrec.front().originalBlock()) == Game::MoveResult_Commited)
+        if (cPrec.front().originalBlock().type() == mGame.activeBlock(tx).type())
         {
-            Precalculated & prec = mPrecalculated.open_rw(tx);
-            prec.erase(prec.begin());
+            if (Game::MoveResult_Commited == move(tx, mGame, cPrec.front().originalBlock()))
+            {
+                Precalculated & prec = mPrecalculated.open_rw(tx);
+                prec.erase(prec.begin());
+            }
+        }
+        else
+        {
+            mPrecalculated.open_rw(tx).clear();
         }
     });
 }
