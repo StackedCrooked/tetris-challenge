@@ -179,22 +179,22 @@ void NodeCalculatorImpl::calculateResult(stm::transaction & tx)
     }
 
     // Backtrack the best end-node to its starting node.
-    std::stack<NodePtr> results;
-    NodePtr endNode = mAllResults.bestNode(tx);
-    unsigned startId = mNode->gameState().id();
-    unsigned currentId = endNode->gameState().id();
-    while (currentId > startId + 1)
+
+    stm::atomic([&](stm::transaction & tx)
     {
-        results.push(endNode);
-        endNode = endNode->parent();
-        unsigned parentId = endNode->gameState().id();
-        stm::atomic([&](stm::transaction & tx) {
-            Result & result = mResult.open_rw(tx);
+        NodePtr endNode = mAllResults.bestNode(tx);
+        unsigned startId = mNode->gameState().id();
+        unsigned currentId = endNode->gameState().id();
+        Result & result = mResult.open_rw(tx);
+        while (currentId > startId + 1)
+        {
+            endNode = endNode->parent();
+            unsigned parentId = endNode->gameState().id();
             result.insert(result.begin(), endNode->gameState());
-        });
-        Assert(currentId == parentId + 1);
-        currentId = parentId;
-    }
+            Assert(currentId == parentId + 1);
+            currentId = parentId;
+        }
+    });
 }
 
 
@@ -225,7 +225,6 @@ void NodeCalculatorImpl::startImpl()
     {
         setStatus(NodeCalculator::Status_Working);
         populate();
-        stm::atomic([&](stm::transaction & tx) { calculateResult(tx); });
         setStatus(NodeCalculator::Status_Finished);
     }
     catch (const std::exception & inException)

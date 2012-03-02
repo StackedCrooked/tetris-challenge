@@ -147,6 +147,7 @@ void MultiThreadedNodeCalculator::populate()
             stm::atomic([&](stm::transaction & tx)
             {
                 mAllResults.setFinished(tx);
+                calculateResult(tx);
             });
 
             targetDepth++;

@@ -64,6 +64,7 @@ void SingleThreadedNodeCalculator::populate()
                            boost::bind(&SingleThreadedNodeCalculator::onChildNodeGenerated, this, _1, _2));
             stm::atomic([&](stm::transaction & tx) {
                 mAllResults.setFinished(tx);
+                calculateResult(tx);
             });
             targetDepth++;
         }
