@@ -1,4 +1,5 @@
 #include "Tetris/Computer.h"
+#include "Tetris/AISupport.h"
 #include "Tetris/Evaluator.h"
 #include "Tetris/Game.h"
 #include "Tetris/GameState.h"
@@ -58,8 +59,6 @@ struct Computer::Impl : boost::noncopyable
 
     void move();
 
-    GameState lastPrecalculatedGameState() const;
-
     typedef std::vector<GameState> GameStates;
     typedef GameStates Precalculated;
     typedef GameStates Preliminaries;
@@ -88,7 +87,8 @@ void Computer::Impl::tick()
     }
 
     auto status = mNodeCalculator->status();
-    bool restart = false;
+    BlockTypes blockTypes;
+    boost::scoped_ptr<GameState> lastGameState;
 
     stm::atomic([&](stm::transaction & tx)
     {
@@ -105,22 +105,21 @@ void Computer::Impl::tick()
         }
 
         mPreliminaries.open_rw(tx).clear();
-        restart = true;
+        blockTypes = mGame.getFutureBlocks(tx, prec.size() + 8);
+        lastGameState.reset(new GameState(prec.back()));
     });
 
-    if (restart)
+    if (!blockTypes.empty())
     {
-        BlockTypes blockTypes;
-        Widths widths;
+        Widths widths(4, blockTypes.size());
         const Evaluator & evaluator = MakeTetrises::Instance();
-        mNodeCalculator.reset(new NodeCalculator(lastPrecalculatedGameState(),
+        mNodeCalculator.reset(new NodeCalculator(*lastGameState,
                                                  blockTypes,
                                                  widths,
                                                  evaluator,
                                                  mWorker,
                                                  mWorkerPool));
     }
-
 
 
     if (mNodeCalculator->status() > NodeCalculator::Status_Initial && !get(mPreliminaries).empty())
@@ -131,26 +130,82 @@ void Computer::Impl::tick()
 }
 
 
-GameState Computer::Impl::lastPrecalculatedGameState() const
+Game::MoveResult Move(stm::transaction & tx, Game & ioGame, const Block & targetBlock)
 {
-    return stm::atomic<GameState>([&](stm::transaction & tx)
+    const Block & block = ioGame.activeBlock(tx);
+    Assert(block.type() == targetBlock.type());
+
+    // Try rotation first, if it fails then skip rotation and try horizontal move
+    if (block.rotation() != targetBlock.rotation())
     {
-        assert(mPreliminaries.open_r(tx).empty());
-        const Precalculated & pc = mPrecalculated.open_r(tx);
-        if (!pc.empty())
+        if (ioGame.rotate(tx) == Game::MoveResult_Moved)
         {
-            return pc.back();
+            return Game::MoveResult_Moved;
+        }
+        // else: try left or right move below
+    }
+
+    if (block.column() < targetBlock.column())
+    {
+        if (ioGame.move(tx, MoveDirection_Right) == Game::MoveResult_Moved)
+        {
+            return Game::MoveResult_Moved;
         }
         else
         {
-            return mGame.gameState(tx);
+            // Can't move the block to the left.
+            // Our path is blocked.
+            // Give up on this block and just drop it.
+            ioGame.dropAndCommit(tx);
+            return Game::MoveResult_Commited;
         }
-    });
+    }
+
+    if (block.column() > targetBlock.column())
+    {
+        if (ioGame.move(tx, MoveDirection_Left) == Game::MoveResult_Moved)
+        {
+            return Game::MoveResult_Moved;
+        }
+        else
+        {
+            // Damn we can't move this block anymore.
+            // Give up on this block.
+            ioGame.dropAndCommit(tx);
+            return Game::MoveResult_Commited;
+        }
+    }
+
+    // Horizontal position is OK.
+    // Retry rotation again. If it fails here then drop the block.
+    if (block.rotation() != targetBlock.rotation())
+    {
+        if (ioGame.rotate(tx) == Game::MoveResult_Moved)
+        {
+            return Game::MoveResult_Moved;
+        }
+        else
+        {
+            ioGame.dropAndCommit(tx);
+            return Game::MoveResult_Commited;
+        }
+    }
+
+    return ioGame.move(tx, MoveDirection_Down);
 }
 
 
 void Computer::Impl::move()
 {
+    stm::atomic([&](stm::transaction & tx)
+    {
+        Precalculated prec = mPrecalculated.open_r(tx);
+        if (prec.empty())
+        {
+            return;
+        }
+        Move(tx, mGame, prec.front().originalBlock());
+    });
 }
 
 
