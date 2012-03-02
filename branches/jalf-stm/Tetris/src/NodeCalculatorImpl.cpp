@@ -7,10 +7,11 @@
 #include "Tetris/GameState.h"
 #include "Tetris/Block.h"
 #include "Tetris/BlockTypes.h"
-#include "Futile/WorkerPool.h"
 #include "Futile/Logging.h"
 #include "Futile/MakeString.h"
+#include "Futile/STMSupport.h"
 #include "Futile/Threading.h"
+#include "Futile/WorkerPool.h"
 #include <boost/function.hpp>
 #include <boost/shared_ptr.hpp>
 #include <memory>
@@ -61,7 +62,7 @@ NodeCalculatorImpl::NodeCalculatorImpl(const GameState & inGameState,
                                        Worker & inMainWorker,
                                        WorkerPool & inWorkerPool) :
     mNode(new GameStateNode(inGameState, inEvaluator)),
-    mResult(),
+    mResult(Result()),
     mQuitFlag(false),
     mStatus(0),
     mAllResults(AllResults(inEvaluator, inBlockTypes.size())),
@@ -142,7 +143,7 @@ unsigned NodeCalculatorImpl::getMaxNodeCount() const
 
 std::vector<GameState> NodeCalculatorImpl::result() const
 {
-    return mResult;
+    return Futile::STM::get(mResult);
 }
 
 
@@ -187,7 +188,10 @@ void NodeCalculatorImpl::calculateResult(stm::transaction & tx)
         results.push(endNode);
         endNode = endNode->parent();
         unsigned parentId = endNode->gameState().id();
-        mResult.insert(mResult.begin(), endNode->gameState());
+        stm::atomic([&](stm::transaction & tx) {
+            Result & result = mResult.open_rw(tx);
+            result.insert(result.begin(), endNode->gameState());
+        });
         Assert(currentId == parentId + 1);
         currentId = parentId;
     }

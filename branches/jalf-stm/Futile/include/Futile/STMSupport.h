@@ -10,23 +10,17 @@ namespace Futile {
 namespace STM {
 
 
-
-template<class T>
-inline T get(stm::shared<T> & inSharedValue)
+template<typename T>
+inline void set(stm::shared<T> & dst, const T & val)
 {
-    return stm::atomic<T>([&](stm::transaction & tx) {
-        return inSharedValue.open_r(tx);
-    });
+    stm::atomic([&](stm::transaction & tx){ dst.open_rw(tx) = val; });
 }
 
 
-template<class T>
-inline void set(stm::shared<T> & outSharedValue, const T & inValue)
+template<typename T>
+inline T get(stm::shared<T> & src)
 {
-    return stm::atomic([&](stm::transaction & tx) {
-        T & value = outSharedValue.open_rw(tx);
-        value = inValue;
-    });
+    return stm::atomic<T>([&](stm::transaction & tx){ return src.open_r(tx); });
 }
 
 

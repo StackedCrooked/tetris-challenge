@@ -5,29 +5,11 @@
 #include "Tetris/GameState.h"
 #include "Tetris/NodeCalculator.h"
 #include "Futile/Logging.h"
+#include "Futile/STMSupport.h"
 #include "Futile/Timer.h"
 #include "Futile/Worker.h"
 #include "Futile/WorkerPool.h"
 #include <vector>
-
-
-namespace {
-
-
-template<typename T>
-static void set(stm::shared<T> & dst, const T & val)
-{
-    stm::atomic([&](stm::transaction & tx){ dst.open_rw(tx) = val; });
-}
-
-template<typename T>
-static T get(stm::shared<T> & src)
-{
-    return stm::atomic<T>([&](stm::transaction & tx){ return src.open_r(tx); });
-}
-
-
-} // anonymous namespace
 
 
 namespace Tetris {
@@ -84,13 +66,13 @@ struct Computer::Impl : boost::noncopyable
 
 void Computer::Impl::coordinate()
 {
-    if (get(mSyncError))
+    if (STM::get(mSyncError))
     {
         mNodeCalculator.reset();
-        set(mSyncError, false);
+        STM::set(mSyncError, false);
     }
 
-    if (get(mPrecalculated).size() > 4)
+    if (STM::get(mPrecalculated).size() > 4)
     {
         return;
     }
@@ -228,7 +210,7 @@ void Computer::Impl::move()
         else
         {
             mPrecalculated.open_rw(tx).clear();
-            set(mSyncError, true);
+            STM::set(mSyncError, true);
         }
     });
 }
@@ -252,49 +234,49 @@ Computer::~Computer()
 
 void Computer::setSearchDepth(unsigned inSearchDepth)
 {
-    set(mImpl->mNumMovesPerSecond, inSearchDepth);
+    STM::set(mImpl->mNumMovesPerSecond, inSearchDepth);
 }
 
 
 unsigned Computer::searchDepth() const
 {
-    return get(mImpl->mSearchDepth);
+    return STM::get(mImpl->mSearchDepth);
 }
 
 
 void Computer::setSearchWidth(unsigned inSearchWidth)
 {
-    set(mImpl->mSearchWidth, inSearchWidth);
+    STM::set(mImpl->mSearchWidth, inSearchWidth);
 }
 
 
 unsigned Computer::searchWidth() const
 {
-    return get(mImpl->mSearchWidth);
+    return STM::get(mImpl->mSearchWidth);
 }
 
 
 void Computer::setWorkerCount(unsigned inWorkerCount)
 {
-    set(mImpl->mWorkerCount, inWorkerCount);
+    STM::set(mImpl->mWorkerCount, inWorkerCount);
 }
 
 
 unsigned Computer::workerCount() const
 {
-    return get(mImpl->mWorkerCount);
+    return STM::get(mImpl->mWorkerCount);
 }
 
 
 void Computer::setMoveSpeed(unsigned inMovesPerSecond)
 {
-    set(mImpl->mNumMovesPerSecond, inMovesPerSecond);
+    STM::set(mImpl->mNumMovesPerSecond, inMovesPerSecond);
 }
 
 
 unsigned Computer::moveSpeed() const
 {
-    return get(mImpl->mNumMovesPerSecond);
+    return STM::get(mImpl->mNumMovesPerSecond);
 }
 
 
