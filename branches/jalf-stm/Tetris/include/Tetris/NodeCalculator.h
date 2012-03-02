@@ -53,8 +53,8 @@ public:
 
     enum Status
     {
-        Status_Nil,
         Status_Begin,
+        Status_Initial = Status_Begin,
         Status_Started = Status_Begin,
         Status_Working,
         Status_Stopped,
