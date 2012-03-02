@@ -31,7 +31,7 @@ int main(int argc, char **argv)
 {
     Logger::ScopedInitializer initLogger;
     Logger & logger = Logger::Instance();
-    logger.setLogHandler(boost::bind(&Print, _1));
+    logger.addLogHandler(boost::bind(&Print, _1));
     InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }

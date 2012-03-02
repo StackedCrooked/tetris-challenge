@@ -29,7 +29,7 @@ class Logger : public Singleton<Logger>
 public:
     typedef boost::function<void(const std::string &)> LogHandler;
 
-    void setLogHandler(const LogHandler & inHandler);
+    void addLogHandler(const LogHandler & inHandler);
 
     void log(LogLevel inLogLevel, const std::string & inMessage);
 
@@ -52,7 +52,7 @@ private:
     SharedMessageList mSharedMessageList;
 
     Mutex mLogHandlerMutex;
-    LogHandler mLogHandler;
+    std::vector<LogHandler> mLogHandlers;
 };
 
 

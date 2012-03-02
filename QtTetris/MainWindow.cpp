@@ -63,7 +63,7 @@ MainWindow::MainWindow(QWidget *parent, Model & inModel) :
     mTetrisWidgets(),
     mSpacing(12),
     mLogField(0),
-    mShowLog(false),
+    mShowLog(true),
     mGameOver(false)
 {
     setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum));
@@ -104,7 +104,7 @@ MainWindow::MainWindow(QWidget *parent, Model & inModel) :
         mLogField = new QTextEdit(theCentralWidget);
         mLogField->setReadOnly(true);
         vbox->addWidget(mLogField, 1);
-        Logger::Instance().setLogHandler(boost::bind(&MainWindow::logMessage, this, _1));
+        Logger::Instance().addLogHandler(boost::bind(&MainWindow::logMessage, this, _1));
         LogInfo(Poco::Path::current());
     }
 
