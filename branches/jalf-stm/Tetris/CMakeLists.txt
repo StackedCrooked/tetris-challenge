@@ -18,6 +18,7 @@ add_library(Tetris
     include/Tetris/BlockType.h
     include/Tetris/BlockTypes.h
     include/Tetris/ComputerPlayer.h
+    include/Tetris/Computer.h
     include/Tetris/Direction.h
     include/Tetris/Evaluator.h
     include/Tetris/SimpleGame.h
@@ -43,6 +44,7 @@ add_library(Tetris
     src/Block.cpp
     src/BlockFactory.cpp
     src/BlockType.cpp
+    src/Computer.cpp
     src/ComputerPlayer.cpp
     src/Evaluator.cpp
     src/SimpleGame.cpp

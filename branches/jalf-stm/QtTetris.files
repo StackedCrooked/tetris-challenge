@@ -208,3 +208,5 @@ Scripts/Configure/configure-qttetris-release.sh
 Scripts/Configure/configure-qttetris-debug.sh
 Scripts/Linux/run.sh
 Tetris/testing/src/Benchmark.cpp
+Tetris/include/Tetris/Computer.h
+Tetris/src/Computer.cpp
