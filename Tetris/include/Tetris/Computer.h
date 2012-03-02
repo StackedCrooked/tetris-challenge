@@ -20,21 +20,21 @@ public:
 
     ~Computer();
 
-    void setSearchDepth(int inSearchDepth);
+    void setSearchDepth(unsigned inSearchDepth);
 
-    int searchDepth() const;
+    unsigned searchDepth() const;
 
-    void setSearchWidth(int inSearchWidth);
+    void setSearchWidth(unsigned inSearchWidth);
 
-    int searchWidth() const;
+    unsigned searchWidth() const;
 
-    void setMoveSpeed(unsigned inMoveSpeed);
+    void setWorkerCount(unsigned inWorkerCount);
+
+    unsigned workerCount() const;
+
+    void setMoveSpeed(unsigned inMovesPerSecond);
 
     unsigned moveSpeed() const;
-
-    void setWorkerCount(int inWorkerCount);
-
-    int workerCount() const;
 
 private:
     void onMoveTimerEvent();
