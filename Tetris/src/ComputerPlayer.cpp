@@ -42,6 +42,7 @@ ComputerPlayer::ComputerPlayer(const TeamName & inTeamName,
 
 
 static const unsigned cDefaultWorkerCount = 8;
+static const unsigned cDefaultNumMovesPerSecond = 50;
 
 
 namespace {
@@ -121,6 +122,7 @@ struct Computer::Impl : boost::noncopyable
     Game & mGame; // Game uses STM internally.
     mutable stm::shared<Precalculated> mPrecalculated;
     mutable stm::shared<Intermediates> mIntermediates;
+    mutable stm::shared<unsigned> mNumMovesPerSecond;
     mutable stm::shared<int> mSearchDepth;
     mutable stm::shared<int> mSearchWidth;
     mutable stm::shared<int> mWorkerCount;
@@ -131,6 +133,7 @@ struct Computer::Impl : boost::noncopyable
         mGame(inGame),
         mPrecalculated(Precalculated()),
         mIntermediates(Intermediates()),
+        mNumMovesPerSecond(50),
         mSearchDepth(8),
         mSearchWidth(5),
         mWorkerCount(cDefaultWorkerCount)
@@ -221,7 +224,7 @@ Computer::Computer(Game & inGame) :
     mImpl(new Impl(inGame)),
     mMoveTimer(new Futile::Timer(10))
 {
-    this->setMoveSpeed(50);
+    setMoveSpeed(cDefaultNumMovesPerSecond);
     mMoveTimer->start(boost::bind(&Computer::onMoveTimerEvent, this));
 }
 
@@ -342,23 +345,24 @@ void Computer::setSearchWidth(int inSearchWidth)
 }
 
 
-int Computer::moveSpeed() const
+unsigned Computer::moveSpeed() const
 {
-    return mMoveTimer->interval();
+    return stm::atomic<unsigned>([&](stm::transaction & tx) {
+        return mImpl->mNumMovesPerSecond.open_r(tx);
+    });
 }
 
 
-void Computer::setMoveSpeed(int inNumMovesPerSecond)
+void Computer::setMoveSpeed(unsigned inNumMovesPerSecond)
 {
     if (inNumMovesPerSecond > 1000)
     {
         inNumMovesPerSecond = 1000;
     }
 
-    if (inNumMovesPerSecond < 1)
-    {
-        inNumMovesPerSecond = 1;
-    }
+    stm::atomic([&](stm::transaction & tx){
+        mImpl->mNumMovesPerSecond.open_rw(tx) = inNumMovesPerSecond;
+    });
 
     mMoveTimer->setInterval(Impl::GetTimerIntervalMs(inNumMovesPerSecond));
 }
