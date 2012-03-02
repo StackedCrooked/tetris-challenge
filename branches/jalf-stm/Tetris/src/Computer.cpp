@@ -40,12 +40,12 @@ struct Computer::Impl : boost::noncopyable
     Impl(Game & inGame) :
         mGame(inGame),
         mPrecalculated(Precalculated()),
-        mPreliminaries(Preliminaries()),
         mNumMovesPerSecond(50),
         mSearchDepth(4),
         mSearchWidth(4),
         mWorkerCount(4),
-        mTimer(10),
+        mMoveTimer(20),
+        mCoordinationTimer(1000),
         mWorker("Computer"),
         mWorkerPool("Computer", 4)
     {
@@ -55,9 +55,11 @@ struct Computer::Impl : boost::noncopyable
     {
     }
 
-    void tick();
-
     void move();
+
+    static Game::MoveResult move(stm::transaction & tx, Game & ioGame, const Block & targetBlock);
+
+    void coordinate();
 
     typedef std::vector<GameState> GameStates;
     typedef GameStates Precalculated;
@@ -65,21 +67,21 @@ struct Computer::Impl : boost::noncopyable
 
     Game & mGame;
     mutable stm::shared<Precalculated> mPrecalculated;
-    mutable stm::shared<Preliminaries> mPreliminaries;
     mutable stm::shared<unsigned> mNumMovesPerSecond;
     mutable stm::shared<unsigned> mSearchDepth;
     mutable stm::shared<unsigned> mSearchWidth;
     mutable stm::shared<unsigned> mWorkerCount;
-    Futile::Timer mTimer;
+    Futile::Timer mMoveTimer;
+    Futile::Timer mCoordinationTimer;
     Worker mWorker;
     WorkerPool mWorkerPool;
     boost::shared_ptr<NodeCalculator> mNodeCalculator;
 };
 
 
-void Computer::Impl::tick()
+void Computer::Impl::coordinate()
 {
-    move();
+    std::cout << "\n\nCoordinate" << std::endl;
 
     if (get(mPrecalculated).size() >= 4)
     {
@@ -94,18 +96,27 @@ void Computer::Impl::tick()
         const Precalculated & cPrec = mPrecalculated.open_r(tx);
         if (!cPrec.empty())
         {
+            std::cout << "We still have precalculated items: " << cPrec.size() << std::endl;
             return;
         }
 
-        if (!mPreliminaries.open_r(tx).empty())
-        {
-            Precalculated & prec = mPrecalculated.open_rw(tx);
-            Preliminaries & prelim = mPreliminaries.open_rw(tx);
-            prec.insert(prec.end(), prelim.begin(), prelim.end());
-            prelim.clear();
+        Precalculated & prec = mPrecalculated.open_rw(tx);
+
+        if (mNodeCalculator) {
+            Preliminaries prelim = mNodeCalculator->result();
+            if (prelim.empty())
+            {
+                return;
+            }
+            std::cout << "Got preliminaries: " << prelim.size() << std::endl;
+            std::copy(prelim.begin(), prelim.end(), std::back_inserter(prec));
+            std::cout << "Move prelim to prec. Now we have " << prec.size() << " precalculated." << std::endl;
         }
 
         blockTypes = mGame.getFutureBlocks(tx, cPrec.size() + 8);
+        std::cout << "Got future blocks: " << blockTypes.size() << std::endl;
+        blockTypes.erase(blockTypes.begin(), blockTypes.begin() + cPrec.size());
+        std::cout << "After correction: " << blockTypes.size() << std::endl;
         lastGameState.reset(new GameState(cPrec.empty() ? mGame.gameState(tx) : cPrec.back()));
     });
 
@@ -120,12 +131,15 @@ void Computer::Impl::tick()
                                                  evaluator,
                                                  mWorker,
                                                  mWorkerPool));
+
+        mNodeCalculator->start(NodeCalculator::Callback());
     }
 }
 
 
-Game::MoveResult Move(stm::transaction & tx, Game & ioGame, const Block & targetBlock)
+Game::MoveResult Computer::Impl::move(stm::transaction & tx, Game & ioGame, const Block & targetBlock)
 {
+    std::cout << "Moving" << std::endl;
     const Block & block = ioGame.activeBlock(tx);
     Assert(block.type() == targetBlock.type());
 
@@ -193,12 +207,17 @@ void Computer::Impl::move()
 {
     stm::atomic([&](stm::transaction & tx)
     {
-        Precalculated prec = mPrecalculated.open_r(tx);
-        if (prec.empty())
+        const Precalculated & cPrec = mPrecalculated.open_r(tx);
+        if (cPrec.empty())
         {
             return;
         }
-        Move(tx, mGame, prec.front().originalBlock());
+
+        if (move(tx, mGame, cPrec.front().originalBlock()) == Game::MoveResult_Commited)
+        {
+            Precalculated & prec = mPrecalculated.open_rw(tx);
+            prec.erase(prec.begin());
+        }
     });
 }
 
@@ -206,13 +225,14 @@ void Computer::Impl::move()
 Computer::Computer(Game &inGame) :
     mImpl(new Impl(inGame))
 {
-    mImpl->mTimer.start(boost::bind(&Computer::Impl::tick, mImpl.get()));
+    mImpl->mMoveTimer.start(boost::bind(&Computer::Impl::move, mImpl.get()));
+    mImpl->mCoordinationTimer.start(boost::bind(&Computer::Impl::coordinate, mImpl.get()));
 }
 
 
 Computer::~Computer()
 {
-    mImpl->mTimer.stop();
+    mImpl->mMoveTimer.stop();
     mImpl.reset();
 }
 
