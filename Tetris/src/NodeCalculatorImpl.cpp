@@ -142,7 +142,6 @@ unsigned NodeCalculatorImpl::getMaxNodeCount() const
 
 std::vector<GameState> NodeCalculatorImpl::result() const
 {
-    Assert(status() == NodeCalculator::Status_Finished);
     return mResult;
 }
 
