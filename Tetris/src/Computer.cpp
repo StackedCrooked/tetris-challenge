@@ -9,6 +9,7 @@
 #include "Futile/Timer.h"
 #include "Futile/Worker.h"
 #include "Futile/WorkerPool.h"
+#include <future>
 #include <vector>
 
 
@@ -23,15 +24,16 @@ struct Computer::Impl : boost::noncopyable
     Impl(Game & inGame) :
         mGame(inGame),
         mPrecalculated(Precalculated()),
-        mNumMovesPerSecond(10),
-        mSearchDepth(4),
+        mNumMovesPerSecond(5),
+        mSearchDepth(10),
         mSearchWidth(4),
-        mWorkerCount(4),
+        mWorkerCount(6),
         mSyncError(false),
         mWorker("Computer"),
-        mWorkerPool("Computer", 4),
+        mWorkerPool("Computer", STM::get(mWorkerCount)),
+        mCleanup("Cleanup"),
         mMoveTimer(20),
-        mCoordinationTimer(50)
+        mCoordinationTimer(200)
     {
     }
 
@@ -58,7 +60,9 @@ struct Computer::Impl : boost::noncopyable
     mutable stm::shared<bool> mSyncError;
     Worker mWorker;
     WorkerPool mWorkerPool;
-    boost::shared_ptr<NodeCalculator> mNodeCalculator;
+    Worker mCleanup;
+    typedef boost::shared_ptr<NodeCalculator> NodeCalculatorPtr;
+    NodeCalculatorPtr mNodeCalculator;
     Futile::Timer mMoveTimer;
     Futile::Timer mCoordinationTimer;
 };
@@ -68,51 +72,76 @@ void Computer::Impl::coordinate()
 {
     if (STM::get(mSyncError))
     {
+        LogDebug(SS() << "Sync error. Reset.");
+        //mCleanup.schedule([mNodeCalculator](){});
         mNodeCalculator.reset();
         STM::set(mSyncError, false);
     }
 
-    if (STM::get(mPrecalculated).size() > 4)
-    {
+    std::size_t numPrecalculated = STM::get(mPrecalculated).size();
+    if (numPrecalculated > 20) {
+        LogDebug(SS() << "We have plenty: " << STM::get(mPrecalculated).size());
         return;
     }
 
-    Preliminaries prelim;
-    if (mNodeCalculator)
+    Preliminaries preliminaries = mNodeCalculator ? mNodeCalculator->results() : Preliminaries();
+    if (mNodeCalculator && preliminaries.empty())
     {
-        LogDebug(SS() << mNodeCalculator->progress());
-        prelim = mNodeCalculator->results();
-        if (prelim.empty())
-        {
-            return;
-        }
+        LogWarning(SS() << "No results yet. Progress is " << mNodeCalculator->progress());
+        return;
     }
 
+    if (mNodeCalculator && preliminaries.size() < 6)
+    {
+        LogDebug(SS() << "Wait a little. preliminaries.size() is only " << preliminaries.size());
+        return;
+    }
+
+    if (mNodeCalculator)
+    {
+        LogDebug(SS() << "Interrupt at " << mNodeCalculator->progress());
+    }
 
     BlockTypes blockTypes;
     boost::scoped_ptr<GameState> lastGameState;
 
     stm::atomic([&](stm::transaction & tx)
     {
-        const Precalculated & cPrec = mPrecalculated.open_r(tx);
-        if (!cPrec.empty())
+        Precalculated & precalculated = mPrecalculated.open_rw(tx);
+        for (auto prelim : preliminaries)
         {
-            return;
+            if (!precalculated.empty())
+            {
+                if (prelim.id() <= precalculated.back().id())
+                {
+                    continue;
+                }
+                Assert(prelim.id() == precalculated.back().id() + 1);
+            }
+            else
+            {
+                if (prelim.id() <= mGame.gameState(tx).id())
+                {
+                    continue;
+                }
+                Assert(prelim.id() == mGame.gameState(tx).id() + 1);
+            }
+            precalculated.push_back(prelim);
         }
+        preliminaries.clear();
 
-        Precalculated & prec = mPrecalculated.open_rw(tx);
-        prec.insert(prec.end(), prelim.begin(), prelim.end());
-
-        blockTypes = mGame.getFutureBlocks(tx, prec.size() + 8);
-        blockTypes.erase(blockTypes.begin(), blockTypes.begin() + prec.size());
-        lastGameState.reset(new GameState(prec.empty() ? mGame.gameState(tx) : prec.back()));
+        blockTypes = mGame.getFutureBlocks(tx, precalculated.size() + mSearchDepth.open_r(tx));
+        blockTypes.erase(blockTypes.begin(), blockTypes.begin() + precalculated.size());
+        lastGameState.reset(new GameState(precalculated.empty() ? mGame.gameState(tx) : precalculated.back()));
     });
 
-    if (!blockTypes.empty())
+    if (!blockTypes.empty() && !lastGameState->isGameOver())
     {
-        Widths widths(blockTypes.size(), 5);
+        Widths widths(blockTypes.size(), STM::get(mSearchWidth));
         Assert(widths.size() == blockTypes.size());
         const Evaluator & evaluator = MakeTetrises::Instance();
+
+        //mCleanup.schedule([mNodeCalculator](){});
         mNodeCalculator.reset(new NodeCalculator(*lastGameState,
                                                  blockTypes,
                                                  widths,
@@ -226,6 +255,9 @@ Computer::Computer(Game &inGame) :
 
 Computer::~Computer()
 {
+    mImpl->mWorkerPool.interruptAndClearQueue();
+    mImpl->mWorker.interruptAndClearQueue();
+    mImpl->mCleanup.interruptAndClearQueue(true);
     mImpl->mCoordinationTimer.stop();
     mImpl->mMoveTimer.stop();
     mImpl.reset();
