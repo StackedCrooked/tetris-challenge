@@ -107,7 +107,7 @@ void Logger::flush()
         auto handler = level_and_handler.second;
         for (auto level_and_message : messages)
         {
-            if (level == level_and_message.first)
+            if (level == LogLevel(-1) || level == level_and_message.first)
             {
                 handler(level_and_message.second);
             }

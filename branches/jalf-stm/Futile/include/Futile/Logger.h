@@ -13,6 +13,7 @@ namespace Futile {
 
 enum LogLevel
 {
+    LogLevel_Debug,
     LogLevel_Info,
     LogLevel_Warning,
     LogLevel_Error
