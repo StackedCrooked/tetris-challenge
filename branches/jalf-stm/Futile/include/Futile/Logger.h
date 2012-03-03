@@ -2,12 +2,10 @@
 #define LOGGER_H
 
 
-#include "Futile/LeakDetector.h"
-#include "Futile/Threading.h"
-#include "stm.hpp"
-#include <boost/function.hpp>
+#include "Futile/Singleton.h"
+#include <functional>
+#include <memory>
 #include <string>
-#include <vector>
 
 
 namespace Futile {
@@ -27,9 +25,11 @@ std::string ConvertLogLevelToString(LogLevel inLogLevel);
 class Logger : public Singleton<Logger>
 {
 public:
-    typedef boost::function<void(const std::string &)> LogHandler;
+    typedef std::function<void(const std::string &)> LogHandler;
 
     void addLogHandler(const LogHandler & inHandler);
+
+    void addLogHandler(LogLevel level, const LogHandler & handler);
 
     void log(LogLevel inLogLevel, const std::string & inMessage);
 
@@ -37,22 +37,13 @@ public:
     // The actual logging is delayed until flush() is called.
     void flush();
 
-protected:
-    Logger();
-
-    ~Logger() {}
-
 private:
     friend class Singleton<Logger>;
+    Logger();
+    ~Logger();
 
-    void logImpl(const std::string & inMessage);
-
-    typedef std::vector<std::string> MessageList;
-    typedef stm::shared<MessageList> SharedMessageList;
-    SharedMessageList mSharedMessageList;
-
-    Mutex mLogHandlerMutex;
-    std::vector<LogHandler> mLogHandlers;
+    struct Impl;
+    std::unique_ptr<Impl> mImpl;
 };
 
 
