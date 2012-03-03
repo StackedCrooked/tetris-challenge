@@ -31,7 +31,6 @@ struct Computer::Impl : boost::noncopyable
         mSyncError(false),
         mWorker("Computer"),
         mWorkerPool("Computer", STM::get(mWorkerCount)),
-        mCleanup("Cleanup"),
         mMoveTimer(20),
         mCoordinationTimer(200)
     {
@@ -60,7 +59,6 @@ struct Computer::Impl : boost::noncopyable
     mutable stm::shared<bool> mSyncError;
     Worker mWorker;
     WorkerPool mWorkerPool;
-    Worker mCleanup;
     typedef boost::shared_ptr<NodeCalculator> NodeCalculatorPtr;
     NodeCalculatorPtr mNodeCalculator;
     Futile::Timer mMoveTimer;
@@ -73,7 +71,6 @@ void Computer::Impl::coordinate()
     if (STM::get(mSyncError))
     {
         LogDebug(SS() << "Sync error. Reset.");
-        //mCleanup.schedule([mNodeCalculator](){});
         mNodeCalculator.reset();
         STM::set(mSyncError, false);
     }
@@ -139,13 +136,16 @@ void Computer::Impl::coordinate()
     {
         Widths widths(blockTypes.size(), STM::get(mSearchWidth));
         Assert(widths.size() == blockTypes.size());
-        const Evaluator & evaluator = MakeTetrises::Instance();
-
-        //mCleanup.schedule([mNodeCalculator](){});
+        const GameState & gs = *lastGameState;
+        const Evaluator * ev = &MakeTetrises::Instance();
+        if (gs.firstOccupiedRow() <= 10)
+        {
+            ev = &Survival::Instance();
+        }
         mNodeCalculator.reset(new NodeCalculator(*lastGameState,
                                                  blockTypes,
                                                  widths,
-                                                 evaluator,
+                                                 *ev,
                                                  mWorker,
                                                  mWorkerPool));
 
@@ -257,7 +257,6 @@ Computer::~Computer()
 {
     mImpl->mWorkerPool.interruptAndClearQueue();
     mImpl->mWorker.interruptAndClearQueue();
-    mImpl->mCleanup.interruptAndClearQueue(true);
     mImpl->mCoordinationTimer.stop();
     mImpl->mMoveTimer.stop();
     mImpl.reset();
