@@ -6,6 +6,7 @@
 #include "Tetris/BlockTypes.h"
 #include "Tetris/NodePtr.h"
 #include <boost/function.hpp>
+#include <ostream>
 
 
 namespace Tetris {
@@ -42,7 +43,7 @@ void GenerateOffspring(const NodePtr & ioGameStateNode,
 class Progress
 {
 public:
-    Progress(unsigned inMaxValue) :
+    explicit Progress(unsigned inMaxValue) :
         mCurrent(0),
         mMaximum(inMaxValue)
     {
@@ -73,7 +74,8 @@ private:
 
 inline std::ostream & operator<<(std::ostream & os, const Progress & progress)
 {
-    return os << progress.current() << "/" << progress.limit();
+    os << progress.current() << "/" << progress.limit();
+	return os;
 }
 
 

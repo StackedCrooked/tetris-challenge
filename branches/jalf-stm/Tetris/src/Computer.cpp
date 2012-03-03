@@ -146,8 +146,8 @@ void Computer::Impl::coordinate()
         auto t = GetCurrentTimeMs();
         fCleanup.schedule([=](){ sleep(1); mNodeCalculator.reset(); });
         mNodeCalculator.reset();
-        auto dur = (GetCurrentTimeMs() - t);
-        LogDebug(SS() << "Duration: " << dur);
+        LogDebug(SS() << "Duration: " << (GetCurrentTimeMs() - t));
+		(void)t;
         mNodeCalculator.reset(new NodeCalculator(*lastGameState,
                                                  blockTypes,
                                                  widths,
