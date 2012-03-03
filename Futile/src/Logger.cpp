@@ -118,9 +118,12 @@ void Logger::flush()
 
 void Logger::log(LogLevel inLogLevel, const std::string & inMessage)
 {
+    std::stringstream ss;
+    ss << GetCurrentTimeMs() << ": " << inMessage;
+    std::string msg = ss.str();
     stm::atomic([&](stm::transaction & tx) {
         MessageList & messages = mImpl->mSharedMessageList.open_rw(tx);
-        messages.push_back(std::make_pair(inLogLevel, inMessage));
+        messages.push_back(std::make_pair(inLogLevel, msg));
     });
 }
 

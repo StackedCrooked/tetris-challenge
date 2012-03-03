@@ -26,7 +26,7 @@ struct Computer::Impl : boost::noncopyable
         mPrecalculated(Precalculated()),
         mNumMovesPerSecond(5),
         mSearchDepth(10),
-        mSearchWidth(4),
+        mSearchWidth(5),
         mWorkerCount(6),
         mSyncError(false),
         mWorker("Computer"),
@@ -76,7 +76,7 @@ void Computer::Impl::coordinate()
     }
 
     std::size_t numPrecalculated = STM::get(mPrecalculated).size();
-    if (numPrecalculated > 20) {
+    if (numPrecalculated > 0) {
         LogDebug(SS() << "We have plenty: " << STM::get(mPrecalculated).size());
         return;
     }
@@ -142,6 +142,10 @@ void Computer::Impl::coordinate()
         {
             ev = &Survival::Instance();
         }
+        LogDebug("Resetting the old node calculator.");
+        mNodeCalculator.reset();
+
+        LogDebug("Creating the node calculator.");
         mNodeCalculator.reset(new NodeCalculator(*lastGameState,
                                                  blockTypes,
                                                  widths,
@@ -149,7 +153,9 @@ void Computer::Impl::coordinate()
                                                  mWorker,
                                                  mWorkerPool));
 
+        LogDebug("Starting the node calculator...");
         mNodeCalculator->start();
+        LogDebug("Started the node calculator.");
     }
 }
 
