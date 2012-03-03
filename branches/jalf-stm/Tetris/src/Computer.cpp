@@ -142,12 +142,6 @@ void Computer::Impl::coordinate()
         {
             ev = &Survival::Instance();
         }
-        static Worker fCleanup("Cleanup");
-        auto t = GetCurrentTimeMs();
-        fCleanup.schedule([=](){ sleep(1); mNodeCalculator.reset(); });
-        mNodeCalculator.reset();
-        LogDebug(SS() << "Duration: " << (GetCurrentTimeMs() - t));
-		(void)t;
         mNodeCalculator.reset(new NodeCalculator(*lastGameState,
                                                  blockTypes,
                                                  widths,
