@@ -77,7 +77,7 @@ void Computer::Impl::coordinate()
 
     std::size_t numPrecalculated = STM::get(mPrecalculated).size();
     if (numPrecalculated > 0) {
-        LogDebug(SS() << "We have plenty: " << STM::get(mPrecalculated).size());
+        //LogDebug(SS() << "We have plenty: " << STM::get(mPrecalculated).size());
         return;
     }
 
