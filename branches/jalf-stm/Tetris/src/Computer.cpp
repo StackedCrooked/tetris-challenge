@@ -80,8 +80,8 @@ void Computer::Impl::coordinate()
     Preliminaries prelim;
     if (mNodeCalculator)
     {
-        LogDebug(SS() << mNodeCalculator->getCurrentNodeCount() << ": " << mNodeCalculator->getCurrentSearchDepth() << "/" << mNodeCalculator->getMaxSearchDepth());
-        prelim = mNodeCalculator->getCurrentResults();
+        LogDebug(SS() << mNodeCalculator->progress());
+        prelim = mNodeCalculator->results();
         if (prelim.empty())
         {
             return;

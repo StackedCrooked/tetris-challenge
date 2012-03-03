@@ -74,31 +74,19 @@ void NodeCalculator::stop()
 }
 
 
-int NodeCalculator::getCurrentSearchDepth() const
+Progress NodeCalculator::progress() const
 {
-    return mImpl->getCurrentSearchDepth();
+    return Progress(mImpl->getCurrentSearchDepth(), mImpl->getMaxSearchDepth());
 }
 
 
-int NodeCalculator::getMaxSearchDepth() const
+Progress NodeCalculator::nodeCount() const
 {
-    return mImpl->getMaxSearchDepth();
+    return Progress(mImpl->getCurrentNodeCount(), mImpl->getMaxNodeCount());
 }
 
 
-unsigned NodeCalculator::getCurrentNodeCount() const
-{
-    return mImpl->getCurrentNodeCount();
-}
-
-
-unsigned NodeCalculator::getMaxNodeCount() const
-{
-    return mImpl->getMaxNodeCount();
-}
-
-
-std::vector<GameState> NodeCalculator::getCurrentResults() const
+std::vector<GameState> NodeCalculator::results() const
 {
     Assert(status() != Status_Error);
     return mImpl->result();

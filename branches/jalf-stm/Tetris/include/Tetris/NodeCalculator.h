@@ -2,6 +2,7 @@
 #define TETRIS_NODECALCULATOR_H
 
 
+#include "Tetris/AISupport.h"
 #include "Tetris/BlockTypes.h"
 #include "Tetris/NodePtr.h"
 #include "Futile/WorkerPool.h"
@@ -39,16 +40,13 @@ public:
 
     void stop();
 
-    // Returns curent results.
-    std::vector<GameState> getCurrentResults() const;
+    //! Returns current results.
+    std::vector<GameState> results() const;
 
-    int getCurrentSearchDepth() const;
+    //! Returns current depth / max depth.
+    Progress progress() const;
 
-    int getMaxSearchDepth() const;
-
-    unsigned getCurrentNodeCount() const;
-
-    unsigned getMaxNodeCount() const;
+    Progress nodeCount() const;
 
     enum Status
     {
