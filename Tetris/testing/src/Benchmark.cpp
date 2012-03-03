@@ -59,10 +59,10 @@ void PerformBenchmark(unsigned inWidth, unsigned inDepth)
     while (nodeCalculator.status() != NodeCalculator::Status_Finished)
     {
         Sleep(UInt64(50));
-        std::cout << "\rNode count: " << nodeCalculator.getCurrentNodeCount() << "/" << nodeCalculator.getMaxNodeCount() << " (" << c++ << ")" << std::flush;
+        std::cout << "\rNode count: " << nodeCalculator.nodeCount() << " (" << c++ << ")" << std::flush;
     }
 
-    std::cout << "\rNode count: " << nodeCalculator.getCurrentNodeCount() << "/" << nodeCalculator.getMaxNodeCount() << std::endl;
+    std::cout << "\rNode count: " << nodeCalculator.nodeCount() << std::endl;
     std::cout << "Finished in " << (GetCurrentTimeMs() - startTime) << "ms." << std::endl;
 }
 

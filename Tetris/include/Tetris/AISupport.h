@@ -71,6 +71,12 @@ private:
 };
 
 
+inline std::ostream & operator<<(std::ostream & os, const Progress & progress)
+{
+    return os << progress.current() << "/" << progress.limit();
+}
+
+
 typedef boost::function<void(const Progress &, const NodePtr &)> ChildNodeGeneratedCallback;
 
 

@@ -144,9 +144,9 @@ void NodeCalculatorTest::testInterrupt(Depth inDepth, Width inWidth, WorkerCount
 
     NodeCalculator nodeCalculator(rootNode.gameState(), blockTypes, widths, rootNode.evaluator(), mainWorker, workerPool);
 
-    ASSERT_TRUE(nodeCalculator.getCurrentSearchDepth() == 0);
+    ASSERT_TRUE(nodeCalculator.progress().current() == 0);
     ASSERT_TRUE(blockTypes.size() == widths.size());
-    ASSERT_TRUE(std::size_t(nodeCalculator.getMaxSearchDepth()) == blockTypes.size());
+    ASSERT_TRUE(std::size_t(nodeCalculator.progress().limit()) == blockTypes.size());
     ASSERT_TRUE(std::size_t(nodeCalculator.status()) == NodeCalculator::Status_Initial);
 
     nodeCalculator.start();
@@ -163,7 +163,7 @@ void NodeCalculatorTest::testInterrupt(Depth inDepth, Width inWidth, WorkerCount
         std::cout << format(inWorkerCount,
                             std::make_pair(inWidth, inDepth),
                             std::make_pair(duration, inTimeMs),
-                            std::make_pair(nodeCalculator.getCurrentSearchDepth(), nodeCalculator.getMaxSearchDepth()));
+                            std::make_pair(nodeCalculator.progress().current(), nodeCalculator.progress().limit()));
         std::cout << std::flush;
 
         if (nodeCalculator.status() != NodeCalculator::Status_Stopping)
@@ -188,12 +188,12 @@ void NodeCalculatorTest::testInterrupt(Depth inDepth, Width inWidth, WorkerCount
     std::cout << format(inWorkerCount,
                         std::make_pair(inWidth, inDepth),
                         std::make_pair(duration, inTimeMs),
-                        std::make_pair(nodeCalculator.getCurrentSearchDepth(), nodeCalculator.getMaxSearchDepth()));
+                        std::make_pair(nodeCalculator.progress().current(), nodeCalculator.progress().limit()));
     std::cout << std::endl;
 
-    ASSERT_LE(nodeCalculator.getCurrentSearchDepth(), nodeCalculator.getMaxSearchDepth());
+    ASSERT_LE(nodeCalculator.progress().current(), nodeCalculator.progress().limit());
 
-    std::vector<GameState> result = nodeCalculator.getCurrentResults();
+    std::vector<GameState> result = nodeCalculator.results();
 
     for (std::size_t idx = 0; idx + 1 < result.size(); ++idx)
     {
@@ -234,9 +234,9 @@ void NodeCalculatorTest::testDestroy(Worker & inMainWorker, WorkerPool & inWorke
 
     NodeCalculator nodeCalculator(rootNode.gameState(), blockTypes, widths, rootNode.evaluator(), inMainWorker, inWorkerPool);
 
-    ASSERT_TRUE(nodeCalculator.getCurrentSearchDepth() == 0);
+    ASSERT_TRUE(nodeCalculator.progress().current() == 0);
     ASSERT_TRUE(blockTypes.size() == widths.size());
-    ASSERT_TRUE(std::size_t(nodeCalculator.getMaxSearchDepth()) == blockTypes.size());
+    ASSERT_TRUE(std::size_t(nodeCalculator.progress().limit()) == blockTypes.size());
     ASSERT_TRUE(nodeCalculator.status() == NodeCalculator::Status_Initial);
 
     nodeCalculator.start();
