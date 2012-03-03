@@ -142,20 +142,19 @@ void Computer::Impl::coordinate()
         {
             ev = &Survival::Instance();
         }
-        LogDebug("Resetting the old node calculator.");
+        static Worker fCleanup("Cleanup");
+        auto t = GetCurrentTimeMs();
+        fCleanup.schedule([=](){ sleep(1); mNodeCalculator.reset(); });
         mNodeCalculator.reset();
-
-        LogDebug("Creating the node calculator.");
+        auto dur = (GetCurrentTimeMs() - t);
+        LogDebug(SS() << "Duration: " << dur);
         mNodeCalculator.reset(new NodeCalculator(*lastGameState,
                                                  blockTypes,
                                                  widths,
                                                  *ev,
                                                  mWorker,
                                                  mWorkerPool));
-
-        LogDebug("Starting the node calculator...");
         mNodeCalculator->start();
-        LogDebug("Started the node calculator.");
     }
 }
 
