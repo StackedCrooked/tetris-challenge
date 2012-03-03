@@ -27,11 +27,11 @@ struct Computer::Impl : boost::noncopyable
         mNumMovesPerSecond(5),
         mSearchDepth(15),
         mSearchWidth(2),
-        mWorkerCount(6),
+        mWorkerCount(8),
         mSyncError(false),
         mWorker("Computer"),
         mWorkerPool("Computer", STM::get(mWorkerCount)),
-        mMoveTimer(20),
+        mMoveTimer(25),
         mCoordinationTimer(500)
     {
     }

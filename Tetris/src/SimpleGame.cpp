@@ -48,7 +48,6 @@ struct SimpleGame::Impl : boost::enable_shared_from_this<SimpleGame::Impl>
         // This method is triggered in a worker thread. Dispatch to main thread.
         boost::weak_ptr<Impl> weakSelf(shared_from_this());
         InvokeLater(boost::bind(&Impl::OnGameStateChangedLater, weakSelf));
-
     }
 
     static void OnGameStateChangedLater(boost::weak_ptr<Impl> inWeakImpl)
@@ -219,11 +218,11 @@ int SimpleGame::columnCount() const
 
 bool SimpleGame::move(Direction inDirection)
 {
-    bool result = stm::atomic<bool>([&](stm::transaction & tx) {
+    Game::MoveResult result = stm::atomic<Game::MoveResult>([&](stm::transaction & tx) {
         return mImpl->mGame.move(tx, inDirection);
     });
 
-    if (result) {
+    if (result != Game::MoveResult_NotMoved) {
         mImpl->mGame.GameStateChanged();
     }
 
