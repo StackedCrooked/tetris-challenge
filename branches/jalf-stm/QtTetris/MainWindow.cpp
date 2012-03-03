@@ -99,7 +99,7 @@ MainWindow::MainWindow(QWidget *parent, Model & inModel) :
         mTetrisWidgetHolder->addWidget(mTetrisWidgets.back(), 0);
     }
 
-    if ()
+    if (mShowLog)
     {
         mLogField = new QTextEdit(theCentralWidget);
         mLogField->setReadOnly(true);
