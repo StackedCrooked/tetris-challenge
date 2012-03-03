@@ -104,7 +104,9 @@ MainWindow::MainWindow(QWidget *parent, Model & inModel) :
         mLogField = new QTextEdit(theCentralWidget);
         mLogField->setReadOnly(true);
         vbox->addWidget(mLogField, 1);
-        Logger::Instance().addLogHandler(boost::bind(&MainWindow::logMessage, this, _1));
+        Logger::Instance().addLogHandler(LogLevel_Info, boost::bind(&MainWindow::logMessage, this, _1));
+        Logger::Instance().addLogHandler(LogLevel_Warning, boost::bind(&MainWindow::logMessage, this, _1));
+        Logger::Instance().addLogHandler(LogLevel_Error, boost::bind(&MainWindow::logMessage, this, _1));
         LogInfo(Poco::Path::current());
     }
 

@@ -6,6 +6,12 @@
 namespace Futile {
 
 
+void LogDebugImpl(const std::string & inMessage)
+{
+    Logger::Instance().log(LogLevel_Debug, inMessage);
+}
+
+
 void LogInfo(const std::string & inMessage)
 {
     Logger::Instance().log(LogLevel_Info, inMessage);
