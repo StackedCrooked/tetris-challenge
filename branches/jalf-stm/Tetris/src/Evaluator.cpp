@@ -208,7 +208,7 @@ MakeTetrises::MakeTetrises() :
               NumHolesFactor(-4),
               NumSinglesFactor(-4),
               NumDoublesFactor(-8),
-              NumTriplesFactor(-8),
+              NumTriplesFactor(-16),
               NumTetrisesFactor(16),
               SearchDepth(8),
               SearchWidth(5))

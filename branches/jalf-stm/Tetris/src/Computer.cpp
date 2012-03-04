@@ -26,7 +26,7 @@ struct Computer::Impl : boost::noncopyable
         mPrecalculated(Precalculated()),
         mNumMovesPerSecond(5),
         mSearchDepth(20),
-        mSearchWidth(4),
+        mSearchWidth(3),
         mWorkerCount(8),
         mSyncError(false),
         mWorker("Computer"),
@@ -88,11 +88,11 @@ void Computer::Impl::coordinate()
         return;
     }
 
-    if (mNodeCalculator && preliminaries.size() < 6)
-    {
-        LogDebug(SS() << "Wait a little. preliminaries.size() is only " << preliminaries.size());
-        return;
-    }
+//    if (mNodeCalculator && preliminaries.size() < 6)
+//    {
+//        LogDebug(SS() << "Wait a little. preliminaries.size() is only " << preliminaries.size());
+//        return;
+//    }
 
     if (mNodeCalculator)
     {
@@ -138,7 +138,7 @@ void Computer::Impl::coordinate()
         Assert(widths.size() == blockTypes.size());
         const GameState & gs = *lastGameState;
         const Evaluator * ev = &MakeTetrises::Instance();
-        if (gs.firstOccupiedRow() <= 10)
+        if (gs.firstOccupiedRow() < 8)
         {
             ev = &Survival::Instance();
         }
