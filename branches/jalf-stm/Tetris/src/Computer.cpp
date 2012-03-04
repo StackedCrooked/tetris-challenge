@@ -31,7 +31,7 @@ struct Computer::Impl : boost::noncopyable
         mSyncError(false),
         mWorker("Computer"),
         mWorkerPool("Computer", STM::get(mWorkerCount)),
-        mMoveTimer(25),
+        mMoveTimer(10),
         mCoordinationTimer(500)
     {
     }
@@ -181,7 +181,7 @@ Game::MoveResult Computer::Impl::move(stm::transaction & tx, Game & ioGame, cons
             // Give up on this block and just drop it.
             ioGame.dropAndCommit(tx);
             STM::set(mSyncError, true);
-            return Game::MoveResult_Commited;
+            return Game::MoveResult_Committed;
         }
     }
 
@@ -197,7 +197,7 @@ Game::MoveResult Computer::Impl::move(stm::transaction & tx, Game & ioGame, cons
             // Give up on this block.
             ioGame.dropAndCommit(tx);
             STM::set(mSyncError, true);
-            return Game::MoveResult_Commited;
+            return Game::MoveResult_Committed;
         }
     }
 
@@ -213,11 +213,12 @@ Game::MoveResult Computer::Impl::move(stm::transaction & tx, Game & ioGame, cons
         {
             ioGame.dropAndCommit(tx);
             STM::set(mSyncError, true);
-            return Game::MoveResult_Commited;
+            return Game::MoveResult_Committed;
         }
     }
 
-    return ioGame.move(tx, MoveDirection_Down);
+    ioGame.dropWithoutCommit(tx);
+    return Game::MoveResult_Moved;
 }
 
 
@@ -238,7 +239,7 @@ void Computer::Impl::move()
 
         if (prec.front().originalBlock().type() == mGame.activeBlock(tx).type())
         {
-            if (Game::MoveResult_Commited == move(tx, mGame, prec.front().originalBlock()))
+            if (Game::MoveResult_Committed == move(tx, mGame, prec.front().originalBlock()))
             {
                 prec.erase(prec.begin());
             }

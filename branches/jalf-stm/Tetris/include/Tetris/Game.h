@@ -68,7 +68,7 @@ public:
     {
         MoveResult_Moved,
         MoveResult_NotMoved,
-        MoveResult_Commited
+        MoveResult_Committed
     };
 
     virtual MoveResult move(stm::transaction & tx, Direction inDirection);
@@ -78,6 +78,11 @@ public:
     void dropWithoutCommit(stm::transaction & tx);
 
     void dropAndCommit(stm::transaction & tx);
+
+    int level() const
+    {
+        return stm::atomic<int>([this](stm::transaction & tx){ return this->level(tx); });
+    }
 
     int level(stm::transaction & tx) const;
 

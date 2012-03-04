@@ -351,7 +351,7 @@ Game::MoveResult Game::move(stm::transaction & tx, Direction inDirection)
     const GameState & newGameState = this->gameState(tx);
 
     assignActiveBlock = CreateDefaultBlock(mBlockTypes.get(newGameState.id()), newGameState.grid().columnCount());
-    return MoveResult_Commited;
+    return MoveResult_Committed;
 }
 
 
