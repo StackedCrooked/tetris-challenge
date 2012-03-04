@@ -59,8 +59,7 @@ struct Computer::Impl : boost::noncopyable
     mutable stm::shared<bool> mSyncError;
     Worker mWorker;
     WorkerPool mWorkerPool;
-    typedef boost::shared_ptr<NodeCalculator> NodeCalculatorPtr;
-    NodeCalculatorPtr mNodeCalculator;
+    boost::shared_ptr<NodeCalculator> mNodeCalculator;
     Futile::Timer mMoveTimer;
     Futile::Timer mCoordinationTimer;
 };
