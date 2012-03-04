@@ -25,8 +25,8 @@ struct Computer::Impl : boost::noncopyable
         mGame(inGame),
         mPrecalculated(Precalculated()),
         mNumMovesPerSecond(5),
-        mSearchDepth(15),
-        mSearchWidth(2),
+        mSearchDepth(20),
+        mSearchWidth(4),
         mWorkerCount(8),
         mSyncError(false),
         mWorker("Computer"),
@@ -42,7 +42,7 @@ struct Computer::Impl : boost::noncopyable
 
     void move();
 
-    static Game::MoveResult move(stm::transaction & tx, Game & ioGame, const Block & targetBlock);
+    Game::MoveResult move(stm::transaction & tx, Game & ioGame, const Block & targetBlock);
 
     void coordinate();
 
@@ -180,6 +180,7 @@ Game::MoveResult Computer::Impl::move(stm::transaction & tx, Game & ioGame, cons
             // Our path is blocked.
             // Give up on this block and just drop it.
             ioGame.dropAndCommit(tx);
+            STM::set(mSyncError, true);
             return Game::MoveResult_Commited;
         }
     }
@@ -195,6 +196,7 @@ Game::MoveResult Computer::Impl::move(stm::transaction & tx, Game & ioGame, cons
             // Damn we can't move this block anymore.
             // Give up on this block.
             ioGame.dropAndCommit(tx);
+            STM::set(mSyncError, true);
             return Game::MoveResult_Commited;
         }
     }
@@ -210,6 +212,7 @@ Game::MoveResult Computer::Impl::move(stm::transaction & tx, Game & ioGame, cons
         else
         {
             ioGame.dropAndCommit(tx);
+            STM::set(mSyncError, true);
             return Game::MoveResult_Commited;
         }
     }
@@ -226,6 +229,11 @@ void Computer::Impl::move()
         if (prec.empty())
         {
             return;
+        }
+
+        while (!prec.empty() && prec.front().originalBlock().type() < mGame.activeBlock(tx).type())
+        {
+            prec.erase(prec.begin());
         }
 
         if (prec.front().originalBlock().type() == mGame.activeBlock(tx).type())
