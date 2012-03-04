@@ -19,15 +19,18 @@ using namespace Tetris;
 using namespace QtTetris;
 
 
+enum { factor = 8 };
+
+
 int Tetris_RowCount()
 {
-    return 20;
+    return 512/factor;
 }
 
 
 int Tetris_ColumnCount()
 {
-    return 40;
+    return 256/factor;
 }
 
 

@@ -208,8 +208,8 @@ MakeTetrises::MakeTetrises() :
               NumHolesFactor(-4),
               NumSinglesFactor(-4),
               NumDoublesFactor(-8),
-              NumTriplesFactor(-16),
-              NumTetrisesFactor(16),
+              NumTriplesFactor(-32),
+              NumTetrisesFactor(1),
               SearchDepth(8),
               SearchWidth(5))
 {
@@ -226,7 +226,7 @@ int MakeTetrises::evaluate(const GameState & inGameState) const
     std::size_t c = grid.columnCount() - 1;
     if (grid.rowCount() >= 4)
     {
-        std::size_t r = grid.rowCount() - 4;
+        std::size_t r = inGameState.firstOccupiedRow() - 4;
         for (; r != grid.rowCount(); ++r)
         {
             if (grid.get(r, c))
