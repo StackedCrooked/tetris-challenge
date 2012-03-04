@@ -24,15 +24,15 @@ struct Computer::Impl : boost::noncopyable
     Impl(Game & inGame) :
         mGame(inGame),
         mPrecalculated(Precalculated()),
-        mNumMovesPerSecond(5),
-        mSearchDepth(20),
-        mSearchWidth(3),
-        mWorkerCount(8),
+        mNumMovesPerSecond(25),
+        mSearchDepth(10),
+        mSearchWidth(2),
+        mWorkerCount(16),
         mSyncError(false),
         mWorker("Computer"),
         mWorkerPool("Computer", STM::get(mWorkerCount)),
         mMoveTimer(10),
-        mCoordinationTimer(500)
+        mCoordinationTimer(20)
     {
     }
 
@@ -76,8 +76,7 @@ void Computer::Impl::coordinate()
     }
 
     std::size_t numPrecalculated = STM::get(mPrecalculated).size();
-    if (numPrecalculated > 20) {
-        //LogDebug(SS() << "We have plenty: " << STM::get(mPrecalculated).size());
+    if (numPrecalculated > 4) {
         return;
     }
 

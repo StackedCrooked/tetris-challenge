@@ -29,13 +29,12 @@ namespace {
 unsigned GetMaxDuration()
 {
     static unsigned fMaxDuration = 1000;
-    Assert(fMaxDuration % 10 == 0);
-    if (fMaxDuration == 10)
+    if (fMaxDuration == 1)
     {
         fMaxDuration = 1000;
     }
-    fMaxDuration -= 10;
-    Assert(fMaxDuration >= 10);
+    fMaxDuration -= 1;
+    Assert(fMaxDuration >= 1);
     return fMaxDuration;
 }
 
