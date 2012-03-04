@@ -27,7 +27,7 @@ int Tetris_RowCount()
 
 int Tetris_ColumnCount()
 {
-    return 10;
+    return 40;
 }
 
 

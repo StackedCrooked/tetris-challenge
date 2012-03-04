@@ -71,10 +71,8 @@ Gravity::Gravity(Game & inGame) :
     mImpl(new Impl(this, inGame)),
     mTimer()
 {
-    stm::atomic([&](stm::transaction & tx){
-        mTimer.reset(new Timer(sIntervals[inGame.level(tx)]));
-        mTimer->start(boost::bind(&Gravity::onTimerEvent, this));
-    });
+    mTimer.reset(new Timer(sIntervals[inGame.level()]));
+    mTimer->start(boost::bind(&Gravity::onTimerEvent, this));
 }
 
 
