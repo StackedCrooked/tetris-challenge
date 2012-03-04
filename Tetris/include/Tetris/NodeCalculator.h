@@ -5,6 +5,7 @@
 #include "Tetris/AISupport.h"
 #include "Tetris/BlockTypes.h"
 #include "Tetris/NodePtr.h"
+#include "Futile/MakeString.h"
 #include "Futile/WorkerPool.h"
 #include <boost/function.hpp>
 #include <boost/noncopyable.hpp>
@@ -12,6 +13,7 @@
 #include <cstddef>
 #include <functional>
 #include <memory>
+#include <stdexcept>
 #include <vector>
 
 
@@ -22,6 +24,7 @@ class Evaluator;
 class GameStateNode;
 class NodeCalculatorImpl;
 typedef std::vector<int> Widths;
+using namespace Futile;
 
 
 class NodeCalculator : boost::noncopyable
@@ -59,6 +62,20 @@ public:
     };
 
     Status status() const;
+
+    static std::string ConvertStatusToString(Status inStatus)
+    {
+        switch (inStatus)
+        {
+            case Status_Initial: return "Initial";
+            case Status_Starting: return "Starting";
+            case Status_Working: return "Working";
+            case Status_Stopping: return "Stopping";
+            case Status_Finished: return "Finished";
+            case Status_Error: return "Error";
+            default: throw std::logic_error(SS() << "Invalid Status: " << int(inStatus));
+        }
+    }
 
     // Returns the error message (in case of Status_Error).
     std::string errorMessage() const;

@@ -241,8 +241,8 @@ void NodeCalculatorImpl::startImpl()
 
 void NodeCalculatorImpl::start()
 {
-    mMainWorker.schedule(boost::bind(&NodeCalculatorImpl::startImpl, this));
     mStatus = NodeCalculator::Status_Starting;
+    mMainWorker.schedule(boost::bind(&NodeCalculatorImpl::startImpl, this));
 }
 
 
