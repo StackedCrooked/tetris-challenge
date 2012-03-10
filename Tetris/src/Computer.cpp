@@ -21,7 +21,7 @@ using namespace Futile;
 
 struct Computer::Impl : boost::noncopyable
 {
-    static const int cDefaultNumMovesPerSecond = 40;
+    static const int cDefaultNumMovesPerSecond = 50;
     static const int cDefaultSearchDepth = 10;
     static const int cDefaultSearchWidth = 2;
     static const int cDefaultWorkerCount = 4;
@@ -37,7 +37,7 @@ struct Computer::Impl : boost::noncopyable
         mWorker("Computer"),
         mWorkerPool("Computer", STM::get(mWorkerCount)),
         mMoveTimer(intervalMs(cDefaultNumMovesPerSecond)),
-        mCoordinationTimer(100)
+        mCoordinationTimer(50)
     {
     }
 
@@ -219,8 +219,8 @@ Game::MoveResult Computer::Impl::move(stm::transaction & tx, Game & ioGame, cons
         }
     }
 
-    ioGame.move(tx, MoveDirection_Down);
-    return Game::MoveResult_Moved;
+    //return ioGame.move(tx, MoveDirection_Down);
+    return Game::MoveResult_NotMoved;
 }
 
 
@@ -239,17 +239,14 @@ void Computer::Impl::move()
             prec.erase(prec.begin());
         }
 
-        if (prec.front().originalBlock().type() == mGame.activeBlock(tx).type())
+        while (prec.front().originalBlock().type() != mGame.activeBlock(tx).type())
         {
-            if (Game::MoveResult_Committed == move(tx, mGame, prec.front().originalBlock()))
-            {
-                prec.erase(prec.begin());
-            }
+            prec.erase(prec.begin());
         }
-        else
+
+        if (!prec.empty())
         {
-            mPrecalculated.open_rw(tx).clear();
-            STM::set(mSyncError, true);
+            move(tx, mGame, prec.front().originalBlock());
         }
     });
 }
