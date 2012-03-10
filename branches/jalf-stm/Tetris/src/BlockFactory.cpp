@@ -9,7 +9,7 @@
 
 
 #ifndef TETRIS_BLOCKFACTORY_RANDOMIZE
-#define TETRIS_BLOCKFACTORY_RANDOMIZE 0 // Temporary disable randomization
+#define TETRIS_BLOCKFACTORY_RANDOMIZE 1 // Temporary disable randomization
 #endif
 
 
@@ -76,7 +76,7 @@ BlockType BlockFactory::getNext()
     {
         // Reshuffle the bag.
         #if TETRIS_BLOCKFACTORY_RANDOMIZE
-        std::random_shuffle(bag.begin(), bag.end());
+        std::random_shuffle(mImpl->mBag.begin(), mImpl->mBag.end());
         #endif
         mImpl->mCurrentIndex = 0;
         return mImpl->mBag[mImpl->mCurrentIndex++];
