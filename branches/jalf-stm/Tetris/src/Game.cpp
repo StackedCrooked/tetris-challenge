@@ -286,9 +286,9 @@ void Game::dropWithoutCommit(stm::transaction & tx)
 {
     while (canMove(tx, MoveDirection_Down))
     {
-        bool result = move(tx, MoveDirection_Down);
-        Assert(result); // no commit
-        (void)result; // silence unused variable warning
+        MoveResult result = move(tx, MoveDirection_Down);
+        Assert(result != MoveResult_Committed);
+        (void)result;
     }
 }
 
