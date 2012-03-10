@@ -1,0 +1,5 @@
+#!/bin/sh
+rm -rf Build
+TETRIS_BUILD_TYPE=Debug ./configure
+cd Build
+make $*
