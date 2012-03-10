@@ -21,23 +21,33 @@ using namespace Futile;
 
 struct Computer::Impl : boost::noncopyable
 {
+    static const int cDefaultNumMovesPerSecond = 40;
+    static const int cDefaultSearchDepth = 10;
+    static const int cDefaultSearchWidth = 2;
+    static const int cDefaultWorkerCount = 4;
+
     Impl(Game & inGame) :
         mGame(inGame),
         mPrecalculated(Precalculated()),
-        mNumMovesPerSecond(25),
-        mSearchDepth(10),
-        mSearchWidth(2),
-        mWorkerCount(16),
+        mNumMovesPerSecond(cDefaultNumMovesPerSecond),
+        mSearchDepth(cDefaultSearchDepth),
+        mSearchWidth(cDefaultSearchWidth),
+        mWorkerCount(cDefaultWorkerCount),
         mSyncError(false),
         mWorker("Computer"),
         mWorkerPool("Computer", STM::get(mWorkerCount)),
-        mMoveTimer(10),
-        mCoordinationTimer(20)
+        mMoveTimer(intervalMs(cDefaultNumMovesPerSecond)),
+        mCoordinationTimer(100)
     {
     }
 
     ~Impl()
     {
+    }
+
+    static UInt64 intervalMs(int inFrequency)
+    {
+        return UInt64(0.5 + (1000.0 / inFrequency));
     }
 
     void move();
@@ -85,12 +95,6 @@ void Computer::Impl::coordinate()
         LogWarning(SS() << "No results yet. Progress is " << mNodeCalculator->progress());
         return;
     }
-
-//    if (mNodeCalculator && preliminaries.size() < 6)
-//    {
-//        LogDebug(SS() << "Wait a little. preliminaries.size() is only " << preliminaries.size());
-//        return;
-//    }
 
     if (mNodeCalculator)
     {
@@ -215,7 +219,7 @@ Game::MoveResult Computer::Impl::move(stm::transaction & tx, Game & ioGame, cons
         }
     }
 
-    ioGame.dropWithoutCommit(tx);
+    ioGame.move(tx, MoveDirection_Down);
     return Game::MoveResult_Moved;
 }
 
