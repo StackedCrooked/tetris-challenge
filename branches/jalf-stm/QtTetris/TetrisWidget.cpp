@@ -52,7 +52,7 @@ TetrisWidget::TetrisWidget(QWidget * inParent, int inSquareWidth, int inSquareHe
     AbstractWidget(inSquareWidth, inSquareHeight),
     mMinSize(),
     mPainter(),
-    mTimer(16)
+    mTimer(16) // refresh-interval aims for 60 FPS
 {
     mTimer.start(boost::bind(&TetrisWidget::update, this));
     setUpdatesEnabled(true);
