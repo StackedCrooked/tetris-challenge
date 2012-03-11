@@ -11,7 +11,6 @@
 #include "Futile/Threading.h"
 #include <QtGui/QPainter>
 #include <QtGui/QWidget>
-#include <QtCore/QMutex>
 #include <set>
 
 
