@@ -87,7 +87,9 @@ const GameState & Game::gameState(stm::transaction & tx) const
 void Game::commit(stm::transaction & tx, const Block & inBlock)
 {
     GameState & gameState = mGameState.open_rw(tx);
-    gameState = gameState.commit(inBlock);
+    int lines = gameState.numLines();
+    gameState = gameState.commit(inBlock);    
+    LinesCleared(gameState.numLines() - lines);
 }
 
 
