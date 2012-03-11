@@ -9,13 +9,13 @@
 namespace Futile {
 
 
-void LogDebugImpl(const std::string & inMessage);
 void LogInfo(const std::string & inMessage);
 void LogWarning(const std::string & inMessage);
 void LogError(const std::string & inMessage);
 
 
 #ifndef NDEBUG
+void LogDebugImpl(const std::string & inMessage);
 #define LogDebug(msg) LogDebugImpl(std::string(msg));
 #else
 #define LogDebug(...)
