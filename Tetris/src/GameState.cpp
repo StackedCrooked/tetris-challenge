@@ -45,12 +45,17 @@ bool GameState::checkPositionValid(const Block & inBlock, unsigned inRowIdx, uns
 {
     const Grid & blockGrid(inBlock.grid());
 
-    if (inColIdx < blockGrid.columnCount() && (inRowIdx + blockGrid.rowCount()) < mFirstOccupiedRow)
+    if (inColIdx + blockGrid.columnCount() > mGrid.columnCount())
+    {
+        return false;
+    }
+
+    if ((inRowIdx + blockGrid.rowCount()) <= mFirstOccupiedRow)
     {
         return true;
     }
 
-    if (inRowIdx >= mGrid.rowCount())
+    if (inRowIdx + blockGrid.rowCount() > mGrid.rowCount())
     {
         return false;
     }
