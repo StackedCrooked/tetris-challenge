@@ -23,7 +23,7 @@ struct Computer::Impl : boost::noncopyable
 {
     static const int cDefaultNumMovesPerSecond = 50;
     static const int cDefaultSearchDepth = 10;
-    static const int cDefaultSearchWidth = 2;
+    static const int cDefaultSearchWidth = 10;
     static const int cDefaultWorkerCount = 4;
 
     Impl(Game & inGame) :

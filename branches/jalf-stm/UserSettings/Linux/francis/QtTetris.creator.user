@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by Qt Creator 2.4.1, 2012-03-10T22:32:23. -->
+<!-- Written by Qt Creator 2.4.1, 2012-03-11T04:09:49. -->
 <qtcreator>
  <data>
   <variable>GenericProjectManager.GenericProject.Toolchain</variable>
@@ -100,7 +100,7 @@
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">GenericProjectManager.GenericBuildConfiguration</value>
    </valuemap>
    <valuemap type="QVariantMap" key="ProjectExplorer.Target.BuildConfiguration.1">
-    <value type="QString" key="GenericProjectManager.GenericBuildConfiguration.BuildDirectory">/home/francis/svn/jalf-stm</value>
+    <value type="QString" key="GenericProjectManager.GenericBuildConfiguration.BuildDirectory">/home/francis/programming/repositories/jalf-stm</value>
     <value type="QString" key="ProjectExplorer.BuildCOnfiguration.ToolChain">ProjectExplorer.ToolChain.Gcc:/home/francis/bin/g++.x86-linux-generic-elf-64bit.gdb</value>
     <valuemap type="QVariantMap" key="ProjectExplorer.BuildConfiguration.BuildStepList.0">
      <valuemap type="QVariantMap" key="ProjectExplorer.BuildStepList.Step.0">
@@ -136,7 +136,7 @@
     <valuelist type="QVariantList" key="ProjectExplorer.BuildConfiguration.UserEnvironmentChanges">
      <value type="QString">PATH=/home/francis/bin:/home/francis/qtsdk-2010.05/qt/bin:/usr/local/bin:/usr/bin:/bin</value>
      <value type="QString">TETRIS_BUILD_TYPE=RelWithDebInfo</value>
-     <value type="QString">TETRIS_TARGET=Tetris/testing</value>
+     <value type="QString">TETRIS_TARGET=QtTetris</value>
     </valuelist>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Make</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Configure Tetris/testing RelWithDebInfo</value>
