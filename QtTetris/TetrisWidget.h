@@ -7,6 +7,7 @@
 
 #include "Tetris/AbstractWidget.h"
 #include "Futile/MainThread.h"
+#include "Futile/Timer.h"
 #include "Futile/Threading.h"
 #include <QtGui/QPainter>
 #include <QtGui/QWidget>
@@ -60,6 +61,7 @@ private:
 
     boost::scoped_ptr<QImage> mImage;
     std::string mImageFileName;
+    Futile::Timer mTimer;
 };
 
 

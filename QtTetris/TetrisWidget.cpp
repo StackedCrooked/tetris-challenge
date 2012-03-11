@@ -51,8 +51,10 @@ TetrisWidget::TetrisWidget(QWidget * inParent, int inSquareWidth, int inSquareHe
     QWidget(inParent),
     AbstractWidget(inSquareWidth, inSquareHeight),
     mMinSize(),
-    mPainter()
+    mPainter(),
+    mTimer(16)
 {
+    mTimer.start(boost::bind(&TetrisWidget::update, this));
     setUpdatesEnabled(true);
     setFocusPolicy(Qt::StrongFocus);
     sInstances.insert(this);

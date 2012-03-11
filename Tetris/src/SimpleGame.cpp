@@ -1,13 +1,14 @@
+#include "Futile/AutoPtrSupport.h"
 #include "Tetris/ComputerPlayer.h"
-#include "Tetris/SimpleGame.h"
 #include "Tetris/Evaluator.h"
 #include "Tetris/Game.h"
 #include "Tetris/Gravity.h"
 #include "Futile/Logging.h"
-#include "Futile/Threading.h"
-#include "Futile/AutoPtrSupport.h"
 #include "Futile/MainThread.h"
 #include "Futile/MakeString.h"
+#include "Tetris/SimpleGame.h"
+#include "Futile/Threading.h"
+#include "Futile/Timer.h"
 #include <boost/bind.hpp>
 #include <boost/signals2.hpp>
 #include <boost/weak_ptr.hpp>
