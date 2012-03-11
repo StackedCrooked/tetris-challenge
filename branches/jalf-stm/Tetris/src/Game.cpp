@@ -60,7 +60,7 @@ Game::Game(std::size_t inNumRows, std::size_t inNumColumns) :
     mGarbage(1),
     mGarbageIndex(0),
     mActiveBlock(CreateDefaultBlock(mBlockTypes.get(0), inNumColumns)),
-    mStartingLevel(30),
+    mStartingLevel(40),
     mPaused(false),
     mGameState(GameState(inNumRows, inNumColumns))
 {

@@ -220,7 +220,6 @@ Game::MoveResult Computer::Impl::move(stm::transaction & tx, Game & ioGame, cons
         }
     }
 
-    //return ioGame.move(tx, MoveDirection_Down);
     return Game::MoveResult_NotMoved;
 }
 
@@ -230,19 +229,20 @@ void Computer::Impl::move()
     stm::atomic([&](stm::transaction & tx)
     {
         Precalculated & prec = mPrecalculated.open_rw(tx);
-        if (prec.empty())
-        {
-            return;
-        }
 
         while (!prec.empty() && prec.front().originalBlock().type() != mGame.activeBlock(tx).type())
         {
             prec.erase(prec.begin());
         }
 
-        if (!prec.empty())
+        if (prec.empty())
         {
-            move(tx, mGame, prec.front().originalBlock());
+            return;
+        }
+
+        if (Game::MoveResult_Committed == move(tx, mGame, prec.front().originalBlock()))
+        {
+            prec.clear();
         }
     });
 }
