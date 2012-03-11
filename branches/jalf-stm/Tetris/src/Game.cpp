@@ -61,7 +61,7 @@ Game::Game(std::size_t inNumRows, std::size_t inNumColumns) :
     mGarbage(1),
     mGarbageIndex(0),
     mActiveBlock(CreateDefaultBlock(mBlockTypes.get(0), inNumColumns)),
-    mStartingLevel(20),
+    mStartingLevel(50),
     mPaused(false),
     mGameState(GameState(inNumRows, inNumColumns))
 {
@@ -278,7 +278,7 @@ Game::MoveResult Game::rotate(stm::transaction & tx)
 
 void Game::dropAndCommit(stm::transaction & tx)
 {
-    while (move(tx, MoveDirection_Down));
+    while (move(tx, MoveDirection_Down) == MoveResult_Moved);
 }
 
 
