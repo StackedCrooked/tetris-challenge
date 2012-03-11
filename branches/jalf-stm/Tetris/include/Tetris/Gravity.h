@@ -2,9 +2,10 @@
 #define TETRIS_GRAVITY_H
 
 
-#include "Futile/Threading.h"
-#include "Futile/Timer.h"
 #include <boost/scoped_ptr.hpp>
+
+
+namespace Futile { class Timer; }
 
 
 namespace Tetris {
@@ -27,19 +28,12 @@ public:
 
     ~Gravity();
 
-    // Number of rows per second
-    double speed() const;
-
-    static double CalculateSpeed(int inLevel);
-
 private:
     Gravity(const Gravity &);
     Gravity & operator=(const Gravity &);
 
-    void onTimerEvent();
-
     struct Impl;
-    Futile::ThreadSafe<Impl> mImpl;
+    boost::scoped_ptr<Impl> mImpl;
     boost::scoped_ptr<Futile::Timer> mTimer;
 };
 

@@ -1,13 +1,13 @@
 #include "Poco/Foundation.h"
 #include "Tetris/Gravity.h"
-#include "Tetris/GameStateNode.h"
-#include "Tetris/GameState.h"
-#include "Tetris/Game.h"
 #include "Tetris/Direction.h"
-#include "Futile/Stopwatch.h"
+#include "Tetris/Game.h"
+#include "Tetris/GameState.h"
+#include "Tetris/GameStateNode.h"
+#include "Futile/Assert.h"
 #include "Futile/Logging.h"
 #include "Futile/MakeString.h"
-#include "Futile/Assert.h"
+#include "Futile/Stopwatch.h"
 #include "Futile/Timer.h"
 #include <boost/noncopyable.hpp>
 #include <algorithm>
@@ -35,13 +35,11 @@ extern const int cMaxLevel = sizeof(sIntervals)/sizeof(int) - 1;
 
 struct Gravity::Impl : boost::noncopyable
 {
-    Impl(Gravity * inGravity, Game & inGame) :
+    Impl(Gravity & inGravity, Game & inGame) :
         mGravity(inGravity),
         mGame(inGame),
-        mLevel(0),
-        mStopwatch()
+        mLevel(0)
     {
-        mStopwatch.start();
     }
 
     ~Impl()
@@ -50,29 +48,18 @@ struct Gravity::Impl : boost::noncopyable
 
     void onTimerEvent();
 
-    std::size_t intervalMs() const
-    {
-        return static_cast<int>(0.5 + CalculateSpeed(mLevel) / 1000.0);
-    }
-
-    static double CalculateSpeed(int inLevel)
-    {
-        return static_cast<double>(1000.0 / static_cast<double>(sIntervals[inLevel]));
-    }
-
-    Gravity * mGravity;
+    Gravity & mGravity;
     Game & mGame;
-    int mLevel;
-    Futile::Stopwatch mStopwatch;
+    stm::shared<int> mLevel;
 };
 
 
 Gravity::Gravity(Game & inGame) :
-    mImpl(new Impl(this, inGame)),
+    mImpl(new Impl(*this, inGame)),
     mTimer()
 {
     mTimer.reset(new Timer(sIntervals[std::max(inGame.level(), cMaxLevel)]));
-    mTimer->start(boost::bind(&Gravity::onTimerEvent, this));
+    mTimer->start(boost::bind(&Gravity::Impl::onTimerEvent, mImpl.get()));
 }
 
 
@@ -94,67 +81,41 @@ Gravity::~Gravity()
 }
 
 
-void Gravity::onTimerEvent()
-{
-    FUTILE_LOCK(Impl & impl, mImpl)
-    {
-        impl.onTimerEvent();
-    }
-}
-
-
 void Gravity::Impl::onTimerEvent()
 {
     try
     {
-        int oldLevel = mLevel;
-        if (mStopwatch.elapsedMs() > intervalMs())
-        {
-            mStopwatch.restart();
-                // If our block was "caught" by the sudden appearance of new blocks, then we solidify it in that state.
-            stm::atomic([&](stm::transaction & tx) {
-                const Block & block = mGame.activeBlock(tx);
-                if (!mGame.gameState(tx).checkPositionValid(block))
-                {
-                     mGame.move(tx, MoveDirection_Down);
-                     return;
-                }
+        int newLevel = -1;
+        // If our block was "caught" by the sudden appearance of new blocks, then we solidify it in that state.
+        stm::atomic([&](stm::transaction & tx) {
+            const Block & block = mGame.activeBlock(tx);
+            if (!mGame.gameState(tx).checkPositionValid(block))
+            {
+                 mGame.move(tx, MoveDirection_Down);
+                 return;
+            }
 
-                if (mGame.isGameOver(tx) || mGame.isPaused(tx))
-                {
-                    return;
-                }
+            if (mGame.isGameOver(tx) || mGame.isPaused(tx))
+            {
+                return;
+            }
 
-                mGame.move(tx, MoveDirection_Down);
-                mLevel = mGame.level(tx);
-                if (mLevel > cMaxLevel)
-                {
-                    mLevel = cMaxLevel;
-                }
-            });
-        }
-        if (mLevel != oldLevel)
+            mGame.move(tx, MoveDirection_Down);
+            int & level = mLevel.open_rw(tx);
+            level = std::max(mGame.level(tx), cMaxLevel);
+            newLevel = level;
+        });
+
+        if (newLevel != -1)
         {
-            Assert(mLevel < cIntervalCount);
-            mGravity->mTimer->setInterval(sIntervals[mLevel]);
+            Assert(newLevel < cIntervalCount);
+            mGravity.mTimer->setInterval(sIntervals[newLevel]);
         }
     }
     catch (const std::exception & inException)
     {
         LogError(inException.what());
     }
-}
-
-
-double Gravity::speed() const
-{
-    return CalculateSpeed(mImpl.lock()->mLevel);
-}
-
-
-double Gravity::CalculateSpeed(int inLevel)
-{
-    return Impl::CalculateSpeed(inLevel);
 }
 
 

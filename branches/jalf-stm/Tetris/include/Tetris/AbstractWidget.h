@@ -72,16 +72,12 @@ private:
 };
 
 
-class AbstractWidget : public SimpleGame::EventHandler
+class AbstractWidget
 {
 public:
     AbstractWidget(int insquareWidth, int inSquareHeight);
 
     virtual ~AbstractWidget();
-
-    virtual void onGameStateChanged(SimpleGame * inGame);
-
-    virtual void onLinesCleared(SimpleGame * inGame, std::size_t inLineCount);
 
     void setPlayer(Player * inPlayer);
 
@@ -106,8 +102,6 @@ public:
     int statsItemCount() const;
 
     virtual const RGBColor & getColor(BlockType inBlockType) const;
-
-    virtual void refresh() = 0;
 
     virtual Rect userInfoRect() const;
 
