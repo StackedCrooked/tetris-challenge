@@ -1,6 +1,7 @@
 #include "Tetris/BlockFactory.h"
 #include "Tetris/BlockType.h"
 #include "Tetris/BlockTypes.h"
+#include "Futile/Assert.h"
 #include "Poco/Timestamp.h"
 #include "stm.hpp"
 #include <boost/noncopyable.hpp>
@@ -9,14 +10,11 @@
 
 
 #ifndef TETRIS_BLOCKFACTORY_RANDOMIZE
-#define TETRIS_BLOCKFACTORY_RANDOMIZE 1 // Temporary disable randomization
+#define TETRIS_BLOCKFACTORY_RANDOMIZE 1
 #endif
 
 
 namespace Tetris {
-
-
-using namespace Futile;
 
 
 struct BlockFactory::Impl : boost::noncopyable

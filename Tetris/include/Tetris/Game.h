@@ -8,7 +8,6 @@
 #include "Tetris/GameState.h"
 #include "Tetris/Grid.h"
 #include "Tetris/NodePtr.h"
-#include "Futile/Threading.h"
 #include "stm.hpp"
 #include <boost/noncopyable.hpp>
 #include <boost/signals2.hpp>

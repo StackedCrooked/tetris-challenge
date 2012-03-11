@@ -2,7 +2,6 @@
 #include "Tetris/Game.h"
 #include "Futile/Logging.h"
 #include "Futile/MakeString.h"
-#include "Futile/Threading.h"
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <algorithm>

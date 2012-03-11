@@ -9,7 +9,6 @@
 #include "Futile/Logging.h"
 #include "Futile/Assert.h"
 #include "Futile/MakeString.h"
-#include "Futile/Threading.h"
 #include <boost/shared_ptr.hpp>
 #include <functional>
 #include <iostream>
