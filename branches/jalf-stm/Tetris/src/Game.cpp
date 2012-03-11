@@ -192,6 +192,14 @@ bool Game::isPaused(stm::transaction & tx) const
 }
 
 
+bool Game::isGameOver() const
+{
+    return stm::atomic<bool>([&](stm::transaction & tx) {
+        return isGameOver(tx);
+    });
+}
+
+
 bool Game::isGameOver(stm::transaction & tx) const
 {
     return mGameState.open_r(tx).isGameOver();

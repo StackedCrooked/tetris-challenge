@@ -76,7 +76,12 @@ struct Computer::Impl : boost::noncopyable
 
 
 void Computer::Impl::coordinate()
-{
+{    
+    if (mGame.isGameOver())
+    {
+        return;
+    }
+
     if (STM::get(mSyncError))
     {
         LogDebug(SS() << "Sync error. Reset.");
@@ -85,7 +90,8 @@ void Computer::Impl::coordinate()
     }
 
     std::size_t numPrecalculated = STM::get(mPrecalculated).size();
-    if (numPrecalculated > 1) {
+    if (numPrecalculated > 1)
+    {
         return;
     }
 
@@ -98,7 +104,7 @@ void Computer::Impl::coordinate()
 
     if (mNodeCalculator)
     {
-        LogInfo(SS() << "Interrupt at " << mNodeCalculator->progress());
+        LogDebug(SS() << "Interrupt at " << mNodeCalculator->progress());
     }
 
     BlockTypes blockTypes;
@@ -220,8 +226,7 @@ Game::MoveResult Computer::Impl::move(stm::transaction & tx, Game & ioGame, cons
         }
     }
 
-    //return ioGame.move(tx, MoveDirection_Down);
-    return Game::MoveResult_NotMoved;
+    return ioGame.move(tx, MoveDirection_Down);
 }
 
 
@@ -235,14 +240,19 @@ void Computer::Impl::move()
             return;
         }
 
-        while (!prec.empty() && prec.front().originalBlock().type() != mGame.activeBlock(tx).type())
+        if (prec.front().originalBlock().type() != mGame.activeBlock(tx).type())
         {
-            prec.erase(prec.begin());
+            LogDebug("Possible sync error");
+            prec.clear();
+            return;
         }
 
         if (!prec.empty())
         {
-            move(tx, mGame, prec.front().originalBlock());
+            if (Game::MoveResult_Committed == move(tx, mGame, prec.front().originalBlock()))
+            {
+                prec.erase(prec.begin());
+            }
         }
     });
 }
