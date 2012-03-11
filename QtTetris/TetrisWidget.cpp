@@ -6,9 +6,6 @@
 #include <QtGui/QApplication>
 #include <QtGui/QColor>
 #include <QtGui/QKeyEvent>
-#include <QtGui/QPainter>
-#include <QtCore/QMutexLocker>
-#include <QtCore/QTimer>
 #include <boost/noncopyable.hpp>
 #include <stdexcept>
 #include <iostream>

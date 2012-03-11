@@ -12,9 +12,6 @@
 #include <vector>
 
 
-namespace Futile { template<class Variable> class ThreadSafe; }
-
-
 namespace Tetris {
 
 

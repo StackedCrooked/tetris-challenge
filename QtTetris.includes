@@ -6,6 +6,7 @@ Futile/include
 3rdParty/GTest/include
 3rdParty/Poco/Foundation/include
 3rdParty/STM
+/Users/francis/QtSDK/Desktop/Qt/4.8.0/gcc/include
 /usr/include/c++/4.6
 /usr/include/c++/4.6/x86_64-linux-gnu
 /usr/include/c++/4.6/backward
