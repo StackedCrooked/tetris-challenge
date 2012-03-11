@@ -51,8 +51,6 @@ public:
 
     bool isPaused(stm::transaction & tx) const;
 
-    bool isGameOver() const;
-
     bool isGameOver(stm::transaction & tx) const;
 
     const Block & activeBlock(stm::transaction & tx) const;
