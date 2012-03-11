@@ -8,6 +8,7 @@
 #include "Tetris/Grid.h"
 #include "Tetris/Utilities.h"
 #include "Futile/Logging.h"
+#include <boost/thread/thread.hpp>
 #include <algorithm>
 
 

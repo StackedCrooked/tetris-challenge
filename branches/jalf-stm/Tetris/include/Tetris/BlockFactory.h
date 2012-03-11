@@ -3,7 +3,6 @@
 
 
 #include "Tetris/BlockType.h"
-#include "Futile/Threading.h"
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
 

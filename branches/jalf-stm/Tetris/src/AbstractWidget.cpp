@@ -3,7 +3,6 @@
 #include "Tetris/SimpleGame.h"
 #include "Futile/Logging.h"
 #include "Futile/MakeString.h"
-#include "Futile/Threading.h"
 #include "Futile/Types.h"
 #include <boost/bind.hpp>
 

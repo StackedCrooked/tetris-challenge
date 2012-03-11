@@ -4,7 +4,6 @@
 
 #include "Futile/AutoPtrSupport.h"
 #include "Futile/Singleton.h"
-#include "Futile/Threading.h"
 #include "Futile/TypedWrapper.h"
 #include <memory>
 #include <string>
