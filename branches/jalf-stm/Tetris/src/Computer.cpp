@@ -234,12 +234,7 @@ void Computer::Impl::move()
             return;
         }
 
-        while (!prec.empty() && prec.front().originalBlock().type() < mGame.activeBlock(tx).type())
-        {
-            prec.erase(prec.begin());
-        }
-
-        while (prec.front().originalBlock().type() != mGame.activeBlock(tx).type())
+        while (!prec.empty() && prec.front().originalBlock().type() != mGame.activeBlock(tx).type())
         {
             prec.erase(prec.begin());
         }
