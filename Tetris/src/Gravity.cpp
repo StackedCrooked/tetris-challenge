@@ -19,18 +19,58 @@ namespace Tetris {
 using namespace Futile;
 
 
-// Number of milliseconds between two drops.
-static const int sIntervals[] =
+namespace { // anonymous
+
+
+std::vector<int> GetIntervals()
 {
-    887, 820, 753, 686, 619,
-    552, 469, 368, 285, 184,
-    167, 151, 134, 117, 100,
-    100, 84, 84, 67, 67, 50
-};
+    // Number of milliseconds between two drops.
+    static const int sIntervals[] =
+    {
+        // Gameboy values
+        887, 820, 753, 686, 619,
+        552, 469, 368, 285, 184,
+        167, 151, 134, 117, 100,
+        100, 84, 84, 67, 67, 50,
+
+        // Additional higher levels
+        49, 48, 47, 46, 45, 44, 43, 42, 41, 40,
+        39, 38, 37, 36, 35, 34, 33, 32, 31, 30,
+        29, 28, 27, 26, 25, 24, 23, 22, 21, 20,
+        19, 18, 17, 16, 15
+    };
+
+    std::vector<int> result;
+    for (unsigned i = 0; i < sizeof(sIntervals)/sizeof(sIntervals[0]); ++i)
+    {
+        result.push_back(sIntervals[i]);
+    }
+    return result;
+}
 
 
-const int cIntervalCount = sizeof(sIntervals)/sizeof(int);
-extern const int cMaxLevel = sizeof(sIntervals)/sizeof(int) - 1;
+static const std::vector<int> sIntervals = GetIntervals();
+const int cMaxLevel = sIntervals.size() - 1;
+
+
+int GetInterval(int inLevel)
+{
+    if (inLevel < 0)
+    {
+        return sIntervals.front();
+    }
+    else if (inLevel < int(sIntervals.size()))
+    {
+        return sIntervals[inLevel];
+    }
+    else
+    {
+        return sIntervals.back();
+    }
+}
+
+
+} // anonymous namespace
 
 
 struct Gravity::Impl : boost::noncopyable
@@ -58,7 +98,7 @@ Gravity::Gravity(Game & inGame) :
     mImpl(new Impl(*this, inGame)),
     mTimer()
 {
-    mTimer.reset(new Timer(sIntervals[std::max(inGame.level(), cMaxLevel)]));
+    mTimer.reset(new Timer(GetInterval(inGame.level())));
     mTimer->start(boost::bind(&Gravity::Impl::onTimerEvent, mImpl.get()));
 }
 
@@ -102,14 +142,13 @@ void Gravity::Impl::onTimerEvent()
 
             mGame.move(tx, MoveDirection_Down);
             int & level = mLevel.open_rw(tx);
-            level = std::max(mGame.level(tx), cMaxLevel);
+            level = std::min(mGame.level(tx), cMaxLevel);
             newLevel = level;
         });
 
         if (newLevel != -1)
         {
-            Assert(newLevel < cIntervalCount);
-            mGravity.mTimer->setInterval(sIntervals[newLevel]);
+            mGravity.mTimer->setInterval(GetInterval(newLevel));
         }
     }
     catch (const std::exception & inException)

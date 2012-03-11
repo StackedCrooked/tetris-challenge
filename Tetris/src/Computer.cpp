@@ -85,7 +85,7 @@ void Computer::Impl::coordinate()
     }
 
     std::size_t numPrecalculated = STM::get(mPrecalculated).size();
-    if (numPrecalculated > 4) {
+    if (numPrecalculated > 1) {
         return;
     }
 
@@ -142,6 +142,7 @@ void Computer::Impl::coordinate()
         const Evaluator * ev = &MakeTetrises::Instance();
         if (gs.firstOccupiedRow() < 8)
         {
+            LogWarning("Switch to survival mode");
             ev = &Survival::Instance();
         }
         mNodeCalculator.reset(new NodeCalculator(*lastGameState,
