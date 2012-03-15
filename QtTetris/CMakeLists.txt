@@ -98,12 +98,16 @@ add_subdirectory(${SOLUTIONDIR}Futile ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Futile)
 #
 # Includes
 #
+include_directories(SYSTEM
+    ${SOLUTIONDIR}3rdParty/Boost
+    ${SOLUTIONDIR}3rdParty/STM
+    ${SOLUTIONDIR}3rdParty/Poco/Foundation/include)
+
+set(CMAKE_INCLUDE_SYSTEM_FLAG_CXX "-isystem ")
+
 include_directories(
     ${SOLUTIONDIR}Tetris/include
-    ${SOLUTIONDIR}Futile/include
-    ${SOLUTIONDIR}3rdParty/Boost
-    ${SOLUTIONDIR}3rdParty/Poco/Foundation/include
-    ${SOLUTIONDIR}3rdParty/STM)
+    ${SOLUTIONDIR}Futile/include)
 
 
 #

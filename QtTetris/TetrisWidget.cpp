@@ -11,6 +11,7 @@
 #include <iostream>
 
 
+using namespace Futile;
 using namespace Tetris;
 
 
@@ -41,6 +42,31 @@ struct RestorePainter : boost::noncopyable
 };
 
 
+struct TimerHolder
+{
+    enum {
+        cInterval = 20
+    };
+
+    boost::signals2::signal<void()> OnTimer;
+
+    static TimerHolder & Get()
+    {
+        static TimerHolder fTimerHolder;
+        return fTimerHolder;
+    }
+
+private:
+    TimerHolder() :
+        mTimer(std::make_shared<Timer>(cInterval))
+    {
+        mTimer->start([&](){ OnTimer(); });
+    }
+
+    std::shared_ptr<Futile::Timer> mTimer;
+};
+
+
 } // anomymous namespace
 
 
@@ -48,10 +74,9 @@ TetrisWidget::TetrisWidget(QWidget * inParent, int inSquareWidth, int inSquareHe
     QWidget(inParent),
     AbstractWidget(inSquareWidth, inSquareHeight),
     mMinSize(),
-    mPainter(),
-    mTimer(16) // refresh-interval aims for 60 FPS
+    mPainter()
 {
-    mTimer.start(boost::bind(&TetrisWidget::update, this));
+    mConnection = TimerHolder::Get().OnTimer.connect(boost::bind(&TetrisWidget::refreshLater, this));
     setUpdatesEnabled(true);
     setFocusPolicy(Qt::StrongFocus);
     sInstances.insert(this);
@@ -67,6 +92,13 @@ TetrisWidget::~TetrisWidget()
 void TetrisWidget::refresh()
 {
     update();
+}
+
+
+
+void TetrisWidget::refreshLater()
+{
+    InvokeLater(boost::bind(&TetrisWidget::update, this));
 }
 
 
