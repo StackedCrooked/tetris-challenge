@@ -45,7 +45,7 @@ struct RestorePainter : boost::noncopyable
 struct TimerHolder
 {
     enum {
-        cInterval = 20
+        cInterval = 16
     };
 
     boost::signals2::signal<void()> OnTimer;
@@ -74,9 +74,9 @@ TetrisWidget::TetrisWidget(QWidget * inParent, int inSquareWidth, int inSquareHe
     QWidget(inParent),
     AbstractWidget(inSquareWidth, inSquareHeight),
     mMinSize(),
-    mPainter()
+    mPainter(),
+    mConnection(TimerHolder::Get().OnTimer.connect(boost::bind(&TetrisWidget::refresh, this)))
 {
-    mConnection = TimerHolder::Get().OnTimer.connect(boost::bind(&TetrisWidget::refreshLater, this));
     setUpdatesEnabled(true);
     setFocusPolicy(Qt::StrongFocus);
     sInstances.insert(this);
@@ -90,13 +90,6 @@ TetrisWidget::~TetrisWidget()
 
 
 void TetrisWidget::refresh()
-{
-    update();
-}
-
-
-
-void TetrisWidget::refreshLater()
 {
     InvokeLater(boost::bind(&TetrisWidget::update, this));
 }
