@@ -11,6 +11,8 @@
 #include "Futile/Threading.h"
 #include <QtGui/QPainter>
 #include <QtGui/QWidget>
+#include <boost/signals2.hpp>
+#include <memory>
 #include <set>
 
 
@@ -49,6 +51,7 @@ protected:
 private:
     virtual void paintEvent(QPaintEvent * event);
     virtual QSize minimumSizeHint() const;
+    virtual void refreshLater();
 
     QSize mMinSize;
     std::auto_ptr<QPainter> mPainter;
@@ -60,7 +63,7 @@ private:
 
     boost::scoped_ptr<QImage> mImage;
     std::string mImageFileName;
-    Futile::Timer mTimer;
+    boost::signals2::scoped_connection mConnection;
 };
 
 
