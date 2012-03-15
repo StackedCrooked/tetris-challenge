@@ -7,6 +7,7 @@
 #include "Tetris/GameStateStats.h"
 #include "Tetris/PlayerType.h"
 #include <boost/shared_ptr.hpp>
+#include <boost/signals2.hpp>
 #include <cstddef>
 #include <stdexcept>
 #include <vector>
@@ -24,32 +25,14 @@ class Game;
 class SimpleGame
 {
 public:
-    /**
-     * EventHandler allows you to listen to game events.
-     */
-    class EventHandler
-    {
-    public:
-        EventHandler() {}
-
-        virtual void onGameStateChanged(SimpleGame * inGame) = 0;
-
-        virtual void onLinesCleared(SimpleGame * inGame, std::size_t inLineCount) = 0;
-
-    private:
-        EventHandler(const EventHandler&);
-        EventHandler& operator=(const EventHandler&);
-    };
-
     SimpleGame(PlayerType inPlayerType,
                std::size_t inRowCount,
                std::size_t inColumnCount);
 
     ~SimpleGame();
 
-    void registerEventHandler(EventHandler * inEventHandler);
-
-    void unregisterEventHandler(EventHandler * inEventHandler);
+    boost::signals2::signal<void(const SimpleGame &)> Changed;
+    boost::signals2::signal<void(const SimpleGame &, unsigned)> LinesCleared;
 
     bool checkPositionValid(const Block & inBlock) const;
 

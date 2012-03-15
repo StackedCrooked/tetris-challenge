@@ -45,7 +45,7 @@ public:
     boost::signals2::signal<void()> GameStateChanged;
 
     // Threaded!
-    boost::signals2::signal<void(int)> LinesCleared;
+    boost::signals2::signal<void(unsigned)> LinesCleared;
 
     void setPaused(stm::transaction & tx, bool inPause);
 

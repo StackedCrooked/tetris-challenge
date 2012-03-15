@@ -268,7 +268,7 @@ Computer::~Computer()
 
 void Computer::setSearchDepth(unsigned inSearchDepth)
 {
-    STM::set(mImpl->mNumMovesPerSecond, inSearchDepth);
+    STM::set(mImpl->mSearchDepth, inSearchDepth);
 }
 
 

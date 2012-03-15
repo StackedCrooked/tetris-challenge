@@ -35,8 +35,8 @@ struct SimpleGame::Impl : boost::enable_shared_from_this<SimpleGame::Impl>
         mTimer(10)
     {
         mTimer.start([&](){ this->mGame.GameStateChanged(); });
-        mGame.GameStateChanged.connect(boost::bind(&Impl::onGameStateChanged, this));
-        mGame.LinesCleared.connect(boost::bind(&Impl::onLinesCleared, this, _1));
+        mGameStateChanged = mGame.GameStateChanged.connect(boost::bind(&Impl::onGameStateChanged, this));
+        mLinesCleared = mGame.LinesCleared.connect(boost::bind(&Impl::onLinesCleared, this, _1));
     }
 
     ~Impl()
@@ -55,44 +55,22 @@ struct SimpleGame::Impl : boost::enable_shared_from_this<SimpleGame::Impl>
     {
         if (boost::shared_ptr<Impl> impl = inWeakImpl.lock())
         {
-            impl->handleGameStateChanged();
+            impl->mSimpleGame->Changed(*impl->mSimpleGame);
         }
     }
 
-    typedef std::set<SimpleGame::EventHandler*> EventHandlers;
-
-    void handleGameStateChanged()
-    {
-        EventHandlers::iterator it = mEventHandlers.begin(), end = mEventHandlers.end();
-        for (; it != end; ++it)
-        {
-            SimpleGame::EventHandler * eventHandler(*it);
-            eventHandler->onGameStateChanged(mSimpleGame);
-        }
-    }
-
-    virtual void onLinesCleared(std::size_t inLineCount)
+    virtual void onLinesCleared(unsigned inLineCount)
     {
         // This method is triggered in a worker thread. Dispatch to main thread.
         boost::weak_ptr<Impl> weakSelf(shared_from_this());
         InvokeLater(boost::bind(&Impl::OnLinesClearedLater, weakSelf, inLineCount));
     }
 
-    static void OnLinesClearedLater(boost::weak_ptr<Impl> inWeakImpl, std::size_t inLineCount)
+    static void OnLinesClearedLater(boost::weak_ptr<Impl> inWeakImpl, unsigned inLineCount)
     {
         if (boost::shared_ptr<Impl> impl = inWeakImpl.lock())
         {
-            impl->handleLinesCleared(inLineCount);
-        }
-    }
-
-    void handleLinesCleared(std::size_t inLineCount)
-    {
-        EventHandlers::iterator it = mEventHandlers.begin(), end = mEventHandlers.end();
-        for (; it != end; ++it)
-        {
-            SimpleGame::EventHandler * eventHandler(*it);
-            eventHandler->onLinesCleared(mSimpleGame, inLineCount);
+            impl->mSimpleGame->LinesCleared(*impl->mSimpleGame, inLineCount);
         }
     }
 
@@ -105,7 +83,6 @@ struct SimpleGame::Impl : boost::enable_shared_from_this<SimpleGame::Impl>
     typedef boost::signals2::scoped_connection ScopedConnection;
     ScopedConnection mGameStateChanged;
     ScopedConnection mLinesCleared;
-    EventHandlers mEventHandlers;
     Futile::Timer mTimer;
 };
 
@@ -139,18 +116,6 @@ bool SimpleGame::checkPositionValid(const Block & inBlock) const
 PlayerType SimpleGame::playerType() const
 {
     return mImpl->mPlayerType;
-}
-
-
-void SimpleGame::registerEventHandler(EventHandler * inEventHandler)
-{
-    mImpl->mEventHandlers.insert(inEventHandler);
-}
-
-
-void SimpleGame::unregisterEventHandler(EventHandler * inEventHandler)
-{
-    mImpl->mEventHandlers.erase(inEventHandler);
 }
 
 
