@@ -5,6 +5,7 @@
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <algorithm>
+#include <functional>
 #include <vector>
 
 
@@ -14,8 +15,7 @@ namespace Tetris {
 using namespace Futile;
 
 
-struct MultiplayerGame::Impl : public SimpleGame::EventHandler,
-                               boost::noncopyable
+struct MultiplayerGame::Impl : boost::noncopyable
 {
     Impl(unsigned inRowCount, unsigned inColumnCount) :
         mRowCount(inRowCount),
@@ -27,29 +27,28 @@ struct MultiplayerGame::Impl : public SimpleGame::EventHandler,
     {
     }
 
-
-    virtual void onGameStateChanged(SimpleGame * )
+    Player & addPlayer(PlayerType inPlayerType, const TeamName & inTeamName, const PlayerName & inPlayerName)
     {
-        // Not interested.
+        PlayerPtr playerPtr(Player::Create(inPlayerType, inTeamName, inPlayerName, mRowCount, mColumnCount));
+        mPlayers.push_back(playerPtr);
+        playerPtr->game().LinesCleared.connect(boost::bind(&Impl::onLinesCleared, this, _1, _2));
+        return *playerPtr;
     }
 
-    Player * addPlayer(PlayerType inPlayerType, const TeamName & inTeamName, const PlayerName & inPlayerName);
-
-    Player & findPlayer(SimpleGame * inGame) const
+    const Player & findPlayer(const SimpleGame & inGame) const
     {
-        Players::const_iterator it = mPlayers.begin(), end = mPlayers.end();
-        for (; it != end; ++it)
+        Players::const_iterator it = std::find_if(mPlayers.begin(),
+                                                  mPlayers.end(),
+                                                  [&](const PlayerPtr & playerPtr) { return &playerPtr->game() == &inGame; });
+        if (it == mPlayers.end())
         {
-            Player & player(**it);
-            if (&player.game() == inGame)
-            {
-                return player;
-            }
+            throw std::runtime_error("Player not found!");
         }
-        throw std::runtime_error("Player not found!");
+        PlayerPtr playerPtr(*it);
+        return **it;
     }
 
-    virtual void onLinesCleared(SimpleGame * inGame, std::size_t inLineCount)
+    void onLinesCleared(const SimpleGame & inGame, std::size_t inLineCount)
     {
         // Penalty to oppononent start from 2 lines.
         if (inLineCount < 2)
@@ -58,7 +57,7 @@ struct MultiplayerGame::Impl : public SimpleGame::EventHandler,
         }
 
         // If number of lines >= 2 then apply a line penalty to each non-allied player.
-        Player & activePlayer(findPlayer(inGame));
+        const Player & activePlayer(findPlayer(inGame));
 
         Players::iterator it = mPlayers.begin(), end = mPlayers.end();
         for (; it != end; ++it)
@@ -99,29 +98,14 @@ MultiplayerGame::~MultiplayerGame()
 }
 
 
-Player * MultiplayerGame::Impl::addPlayer(PlayerType inPlayerType,
-                                          const TeamName & inTeamName,
-                                          const PlayerName & inPlayerName)
-{
-    PlayerPtr playerPtr(Player::Create(inPlayerType,
-                                       inTeamName,
-                                       inPlayerName,
-                                       mRowCount,
-                                       mColumnCount));
-    mPlayers.push_back(playerPtr);
-    playerPtr->game().registerEventHandler(this);
-    return playerPtr.get();
-}
-
-
-Player * MultiplayerGame::addHumanPlayer(const TeamName & inTeamName,
+Player & MultiplayerGame::addHumanPlayer(const TeamName & inTeamName,
                                          const PlayerName & inPlayerName)
 {
     return mImpl->addPlayer(PlayerType_Human, inTeamName, inPlayerName);
 }
 
 
-Player * MultiplayerGame::addComputerPlayer(const TeamName & inTeamName,
+Player & MultiplayerGame::addComputerPlayer(const TeamName & inTeamName,
                                             const PlayerName & inPlayerName)
 {
     return mImpl->addPlayer(PlayerType_Computer, inTeamName, inPlayerName);
@@ -130,7 +114,6 @@ Player * MultiplayerGame::addComputerPlayer(const TeamName & inTeamName,
 
 void MultiplayerGame::removePlayer(Player * inPlayer)
 {
-    inPlayer->game().unregisterEventHandler(mImpl.get());
     Impl::Players::iterator it = std::find_if(mImpl->mPlayers.begin(), mImpl->mPlayers.end(), boost::bind(&Impl::PlayerPtr::get, _1) == inPlayer);
     if (it == mImpl->mPlayers.end())
     {

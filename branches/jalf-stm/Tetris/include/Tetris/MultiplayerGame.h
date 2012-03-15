@@ -18,11 +18,11 @@ public:
     ~MultiplayerGame();
 
     // Creates the player object and retains ownership
-    Player * addHumanPlayer(const TeamName & inTeamName,
+    Player & addHumanPlayer(const TeamName & inTeamName,
                             const PlayerName & inPlayerName);
 
     // Creates the player object and retains ownership
-    Player * addComputerPlayer(const TeamName & inTeamName,
+    Player & addComputerPlayer(const TeamName & inTeamName,
                                const PlayerName & inPlayerName);
 
     void removePlayer(Player * inPlayer);

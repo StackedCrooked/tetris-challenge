@@ -106,14 +106,22 @@ MultiplayerGame & Model::multiplayerGame()
 namespace {
 
 
+#define FORCE_TETRIS_WORKER_COUNT 1
+
+
 unsigned CalculateOptimalWorkerCount(std::size_t numComputerPlayers)
 {
+#if FORCE_TETRIS_WORKER_COUNT != 0
+    (void)numComputerPlayers;
+    return FORCE_TETRIS_WORKER_COUNT;
+#else
     if (numComputerPlayers == 0)
     {
         throw std::invalid_argument("numComputerPlayers == 0");
     }
 
     return std::max<unsigned>(Poco::Environment::processorCount() / numComputerPlayers, 1);
+#endif
 }
 
 
@@ -152,10 +160,10 @@ void Model::newGame(const PlayerTypes & inPlayerTypes, std::size_t inRowCount, s
         }
         else if (playerType == PlayerType_Computer)
         {
-            Player * player = mMultiplayerGame->addComputerPlayer(TeamName(teamName),
+            Player & player = mMultiplayerGame->addComputerPlayer(TeamName(teamName),
                                                                   PlayerName(GetPlayerName(inPlayerTypes[idx])));
 
-            if (ComputerPlayer * computerPlayer = dynamic_cast<ComputerPlayer*>(player))
+            if (ComputerPlayer * computerPlayer = dynamic_cast<ComputerPlayer*>(&player))
             {
                 computerPlayer->setMoveSpeed(allComputer ? 40 : 10);
             }
