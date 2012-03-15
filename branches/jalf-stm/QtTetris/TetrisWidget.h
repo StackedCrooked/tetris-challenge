@@ -53,17 +53,8 @@ private:
     virtual void paintEvent(QPaintEvent * event);
     virtual QSize minimumSizeHint() const;
 
-    QSize mMinSize;
-    std::auto_ptr<QPainter> mPainter;
-
-    friend void Futile::InvokeLater(const Futile::Action &);
-
-    typedef std::set<TetrisWidget*> Instances;
-    static Instances sInstances;
-
-    boost::scoped_ptr<QImage> mImage;
-    std::string mImageFileName;
-    boost::signals2::scoped_connection mConnection;
+    struct Impl;
+    boost::scoped_ptr<Impl> mImpl;
 };
 
 
