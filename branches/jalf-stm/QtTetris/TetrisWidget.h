@@ -33,6 +33,7 @@ public:
 
     virtual void keyPressEvent(QKeyEvent * inKeyEvent);
 
+    //! Thread-safe update.
     virtual void refresh();
 
 protected:
@@ -51,7 +52,6 @@ protected:
 private:
     virtual void paintEvent(QPaintEvent * event);
     virtual QSize minimumSizeHint() const;
-    virtual void refreshLater();
 
     QSize mMinSize;
     std::auto_ptr<QPainter> mPainter;
