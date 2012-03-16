@@ -39,50 +39,104 @@ struct RestorePainter : boost::noncopyable
 };
 
 
-struct TimerHolder
+struct RefreshTimer
 {
-    enum {
-        cInterval = 16
+    enum
+    {
+        cRefreshRate = 60, // fps
+        cTimerInterval = 1000 / cRefreshRate
     };
 
     boost::signals2::signal<void()> OnTimer;
 
-    static TimerHolder & Get()
+    RefreshTimer() :
+        mTimer(cTimerInterval)
     {
-        static TimerHolder fTimerHolder;
-        return fTimerHolder;
+        mTimer.start([&](){ OnTimer(); });
     }
 
 private:
-    TimerHolder() :
-        mTimer(std::make_shared<Timer>(cInterval))
-    {
-        mTimer->start([&](){ OnTimer(); });
-    }
-
-    std::shared_ptr<Futile::Timer> mTimer;
+    Futile::Timer mTimer;
 };
+
+
+static boost::scoped_ptr<RefreshTimer> gSharedTimer;
+
+
+struct NullDeleter
+{
+    void operator()(void const *) const
+    {
+    }
+};
+
+
+static unsigned sTetrisWidgetInstanceCount = 0;
 
 
 } // anomymous namespace
 
 
-struct TetrisWidget::Impl
+struct TetrisWidget::Impl : boost::noncopyable
 {
-    template<typename Callback>
-    Impl(const Callback & inCallback) :
-        mConnection(inCallback)
+
+    Impl(TetrisWidget & inTetrisWidget) :
+        mTetrisWidget(inTetrisWidget),
+        mThis(this, NullDeleter()),
+        mWeakPtr(mThis),
+        mConnection()
     {
+        if (++sTetrisWidgetInstanceCount == 1)
+        {
+            Assert(!gSharedTimer);
+            gSharedTimer.reset(new RefreshTimer);
+        }
+
     }
 
     ~Impl()
     {
+        if (--sTetrisWidgetInstanceCount == 0)
+        {
+            Assert(gSharedTimer);
+            gSharedTimer.reset();
+        }
     }
+
+    typedef boost::weak_ptr<Impl> WeakPtr;
+
+    WeakPtr getWeakPtr()
+    {
+        return WeakPtr(mThis);
+    }
+
+    // Schedules a call to 'sendRefresh' on the main thread.
+    // We must do it this way because we are using threaded callbacks.
+    void postRefresh()
+    {
+        InvokeLater(boost::bind(&Impl::sendRefresh, mWeakPtr));
+    }
+
+    // Performs an immediate referesh.
+    static void sendRefresh(WeakPtr inWeakPtr)
+    {
+        typedef boost::shared_ptr<Impl> SharedPtr;
+        if (SharedPtr sharedPtr = inWeakPtr.lock())
+        {
+            Impl & impl = *sharedPtr;
+            impl.mTetrisWidget.update();
+        }
+    }
+
+    TetrisWidget & mTetrisWidget;
+    boost::shared_ptr<Impl> mThis;
+    WeakPtr mWeakPtr;
 
     QSize mMinSize;
     std::auto_ptr<QPainter> mPainter;
     boost::scoped_ptr<QImage> mImage;
     std::string mImageFileName;
+
     typedef boost::signals2::scoped_connection ScopedConnection;
     ScopedConnection mConnection;
 };
@@ -91,8 +145,13 @@ struct TetrisWidget::Impl
 TetrisWidget::TetrisWidget(QWidget * inParent, int inSquareWidth, int inSquareHeight) :
     QWidget(inParent),
     AbstractWidget(inSquareWidth, inSquareHeight),
-    mImpl(new Impl(TimerHolder::Get().OnTimer.connect(boost::bind(&TetrisWidget::refresh, this))))
+    mImpl(new Impl(*this))
 {
+    Assert(gSharedTimer);
+    if (gSharedTimer)
+    {
+        mImpl->mConnection = gSharedTimer->OnTimer.connect(boost::bind(&Impl::postRefresh, mImpl.get()));
+    }
     setUpdatesEnabled(true);
     setFocusPolicy(Qt::StrongFocus);
 }
@@ -100,8 +159,15 @@ TetrisWidget::TetrisWidget(QWidget * inParent, int inSquareWidth, int inSquareHe
 
 TetrisWidget::~TetrisWidget()
 {
+    destroy();
+}
+
+
+void TetrisWidget::destroy()
+{
     try
     {
+        mImpl->mConnection.release();
         mImpl.reset();
     }
     catch (const std::exception & exc)
@@ -113,7 +179,7 @@ TetrisWidget::~TetrisWidget()
 
 void TetrisWidget::refresh()
 {
-    InvokeLater(boost::bind(&TetrisWidget::update, this));
+    mImpl->postRefresh();
 }
 
 

@@ -28,6 +28,14 @@ FUTILE_BOX_TYPE(SearchDepth, int);
 FUTILE_BOX_TYPE(SearchWidth, int);
 
 
+enum MoveDownBehavior
+{
+    MoveDownBehavior_None,     // wait for gravity to pull the block down
+    MoveDownBehavior_MoveDown, // move it down at move speed
+    MoveDownBehavior_DropDown  // drop the block
+};
+
+
 class Evaluator
 {
 public:
@@ -54,6 +62,8 @@ public:
 
     int recommendedSearchWidth() const;
 
+    MoveDownBehavior moveDownBehavior() const { return mMoveDownBehavior; }
+
 protected:
     Evaluator(const std::string & inName,
               GameHeightFactor inGameHeightFactor,
@@ -64,7 +74,8 @@ protected:
               NumTriplesFactor inNumTriplesFactor,
               NumTetrisesFactor inNumTetrisesFactor,
               SearchDepth inRecommendedSearchDepth,
-              SearchWidth inRecommendedSearchWidth);
+              SearchWidth inRecommendedSearchWidth,
+              MoveDownBehavior inMoveDownBehavior);
 
 private:
     Evaluator(const Evaluator &);
@@ -80,6 +91,7 @@ private:
     int mNumTetrisesFactor;
     int mRecommendedSearchDepth;
     int mRecommendedSearchWidth;
+    MoveDownBehavior mMoveDownBehavior;
 };
 
 
@@ -94,7 +106,8 @@ protected:
                     NumTriplesFactor inNumTriplesFactor,
                     NumTetrisesFactor inNumTetrisesFactor,
                     SearchDepth inRecommendedSearchDepth,
-                    SearchWidth inRecommendedSearchWidth);
+                    SearchWidth inRecommendedSearchWidth,
+                    MoveDownBehavior inMoveDownBehavior);
 };
 
 
@@ -118,7 +131,8 @@ protected:
                       NumTriplesFactor inNumTriplesFactor,
                       NumTetrisesFactor inNumTetrisesFactor,
                       SearchDepth inRecommendedSearchDepth,
-                      SearchWidth inRecommendedSearchWidth) :
+                      SearchWidth inRecommendedSearchWidth,
+                      MoveDownBehavior inMoveDownBehavior) :
         Evaluator(inName,
                   inGameHeightFactor,
                   inLastBlockHeightFactor,
@@ -128,7 +142,8 @@ protected:
                   inNumTriplesFactor,
                   inNumTetrisesFactor,
                   inRecommendedSearchDepth,
-                  inRecommendedSearchWidth)
+                  inRecommendedSearchWidth,
+                  inMoveDownBehavior)
     {
     }
 };

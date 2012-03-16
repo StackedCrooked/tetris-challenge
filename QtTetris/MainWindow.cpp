@@ -133,6 +133,10 @@ void MainWindow::logMessage(const std::string & inMessage)
 
 void MainWindow::closeEvent(QCloseEvent*)
 {
+    for (TetrisWidget * tetrisWidget : mTetrisWidgets)
+    {
+        tetrisWidget->destroy();
+    }
 }
 
 

@@ -31,6 +31,8 @@ public:
 
     virtual ~TetrisWidget();
 
+    void destroy();
+
     virtual void keyPressEvent(QKeyEvent * inKeyEvent);
 
     //! Thread-safe update.

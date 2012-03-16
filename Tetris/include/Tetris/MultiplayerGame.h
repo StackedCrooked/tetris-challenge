@@ -29,6 +29,8 @@ public:
 
     unsigned playerCount() const;
 
+    unsigned playerCount(PlayerType inPlayerType) const;
+
     const Player * getPlayer(unsigned inIndex) const;
 
     Player * getPlayer(unsigned inIndex);

@@ -106,7 +106,7 @@ MultiplayerGame & Model::multiplayerGame()
 namespace {
 
 
-#define FORCE_TETRIS_WORKER_COUNT 1
+#define FORCE_TETRIS_WORKER_COUNT 0
 
 
 unsigned CalculateOptimalWorkerCount(std::size_t numComputerPlayers)
@@ -166,6 +166,7 @@ void Model::newGame(const PlayerTypes & inPlayerTypes, std::size_t inRowCount, s
             if (ComputerPlayer * computerPlayer = dynamic_cast<ComputerPlayer*>(&player))
             {
                 computerPlayer->setMoveSpeed(allComputer ? 40 : 10);
+                computerPlayer->setWorkerCount(CalculateOptimalWorkerCount(mMultiplayerGame->playerCount(PlayerType_Computer)));
             }
         }
         else
