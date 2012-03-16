@@ -129,6 +129,20 @@ unsigned MultiplayerGame::playerCount() const
 }
 
 
+unsigned MultiplayerGame::playerCount(PlayerType inPlayerType) const
+{
+    unsigned result = 0;
+    for (PlayerPtr player : mImpl->mPlayers)
+    {
+        if (player->type() == inPlayerType)
+        {
+            result++;
+        }
+    }
+    return result;
+}
+
+
 const Player * MultiplayerGame::getPlayer(unsigned inIndex) const
 {
     return mImpl->mPlayers[inIndex].get();

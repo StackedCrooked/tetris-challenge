@@ -21,7 +21,8 @@ Evaluator::Evaluator(const std::string & inName,
                      NumTriplesFactor inNumTriplesFactor,
                      NumTetrisesFactor inNumTetrisesFactor,
                      SearchDepth inRecommendedSearchDepth,
-                     SearchWidth inRecommendedSearchWidth) :
+                     SearchWidth inRecommendedSearchWidth,
+                     MoveDownBehavior inMoveDownBehavior) :
     mName(inName),
     mGameHeightFactor(inGameHeightFactor),
     mLastBlockHeightFactor(inLastBlockHeightFactor),
@@ -31,7 +32,8 @@ Evaluator::Evaluator(const std::string & inName,
     mNumTriplesFactor(inNumTriplesFactor),
     mNumTetrisesFactor(inNumTetrisesFactor),
     mRecommendedSearchDepth(inRecommendedSearchDepth),
-    mRecommendedSearchWidth(inRecommendedSearchWidth)
+    mRecommendedSearchWidth(inRecommendedSearchWidth),
+    mMoveDownBehavior(inMoveDownBehavior)
 {
 }
 
@@ -157,7 +159,8 @@ CustomEvaluator::CustomEvaluator(GameHeightFactor inGameHeightFactor,
                                  NumTriplesFactor inNumTriplesFactor,
                                  NumTetrisesFactor inNumTetrisesFactor,
                                  SearchDepth inRecommendedSearchDepth,
-                                 SearchWidth inRecommendedSearchWidth) :
+                                 SearchWidth inRecommendedSearchWidth,
+                                 MoveDownBehavior inMoveDownBehavior) :
     Evaluator("Custom",
               inGameHeightFactor,
               inLastBlockHeightFactor,
@@ -167,7 +170,8 @@ CustomEvaluator::CustomEvaluator(GameHeightFactor inGameHeightFactor,
               inNumTriplesFactor,
               inNumTetrisesFactor,
               inRecommendedSearchDepth,
-              inRecommendedSearchWidth)
+              inRecommendedSearchWidth,
+              inMoveDownBehavior)
 {
 }
 
@@ -182,7 +186,8 @@ Balanced::Balanced() :
           NumTriplesFactor(4),
           NumTetrisesFactor(8),
           SearchDepth(6),
-          SearchWidth(6))
+          SearchWidth(6),
+          MoveDownBehavior_None)
 {
 }
 
@@ -195,24 +200,26 @@ Survival::Survival() :
           NumSinglesFactor(1),
           NumDoublesFactor(2),
           NumTriplesFactor(4),
-              NumTetrisesFactor(8),
-              SearchDepth(6),
-              SearchWidth(4))
+          NumTetrisesFactor(8),
+          SearchDepth(4),
+          SearchWidth(4),
+          MoveDownBehavior_DropDown)
 {
 }
 
 
 MakeTetrises::MakeTetrises() :
     Super("Make Tetrises",
-              GameHeightFactor(-2),
-              LastBlockHeightFactor(-1),
-              NumHolesFactor(-4),
-              NumSinglesFactor(-4),
-              NumDoublesFactor(-8),
-              NumTriplesFactor(-32),
-              NumTetrisesFactor(1),
-              SearchDepth(8),
-              SearchWidth(5))
+          GameHeightFactor(-2),
+          LastBlockHeightFactor(-1),
+          NumHolesFactor(-4),
+          NumSinglesFactor(-4),
+          NumDoublesFactor(-8),
+          NumTriplesFactor(-32),
+          NumTetrisesFactor(1),
+          SearchDepth(10),
+          SearchWidth(10),
+          MoveDownBehavior_None)
 {
 }
 
@@ -244,30 +251,32 @@ int MakeTetrises::evaluate(const GameState & inGameState) const
 
 Multiplayer::Multiplayer() :
     Super("Multiplayer",
-              GameHeightFactor(-2),
-              LastBlockHeightFactor(-1),
-              NumHolesFactor(-4),
-              NumSinglesFactor(-4),
-              NumDoublesFactor(-4),
-              NumTriplesFactor(8),
-              NumTetrisesFactor(16),
-              SearchDepth(8),
-              SearchWidth(4))
+          GameHeightFactor(-2),
+          LastBlockHeightFactor(-1),
+          NumHolesFactor(-4),
+          NumSinglesFactor(-4),
+          NumDoublesFactor(-4),
+          NumTriplesFactor(8),
+          NumTetrisesFactor(16),
+          SearchDepth(8),
+          SearchWidth(4),
+          MoveDownBehavior_MoveDown)
 {
 }
 
 
 Depressed::Depressed() :
     Super("Depressed",
-              GameHeightFactor(0),
-              LastBlockHeightFactor(0),
-              NumHolesFactor(0),
-              NumSinglesFactor(0),
-              NumDoublesFactor(0),
-              NumTriplesFactor(0),
-              NumTetrisesFactor(0),
-              SearchDepth(1),
-              SearchWidth(1))
+          GameHeightFactor(0),
+          LastBlockHeightFactor(0),
+          NumHolesFactor(0),
+          NumSinglesFactor(0),
+          NumDoublesFactor(0),
+          NumTriplesFactor(0),
+          NumTetrisesFactor(0),
+          SearchDepth(1),
+          SearchWidth(1),
+          MoveDownBehavior_DropDown)
 {
 }
 

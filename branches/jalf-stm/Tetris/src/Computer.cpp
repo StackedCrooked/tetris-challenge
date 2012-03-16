@@ -4,12 +4,13 @@
 #include "Tetris/Game.h"
 #include "Tetris/GameState.h"
 #include "Tetris/NodeCalculator.h"
+#include "Futile/PrettyPrint.h"
 #include "Futile/Logging.h"
 #include "Futile/STMSupport.h"
 #include "Futile/Timer.h"
 #include "Futile/Worker.h"
 #include "Futile/WorkerPool.h"
-#include <future>
+#include <iostream>
 #include <vector>
 
 
@@ -34,6 +35,7 @@ struct Computer::Impl : boost::noncopyable
         mSearchWidth(cDefaultSearchWidth),
         mWorkerCount(cDefaultWorkerCount),
         mSyncError(false),
+        mEvaluator(&MakeTetrises::Instance()),
         mWorker("Computer"),
         mWorkerPool("Computer", STM::get(mWorkerCount)),
         mMoveTimer(intervalMs(cDefaultNumMovesPerSecond)),
@@ -52,7 +54,7 @@ struct Computer::Impl : boost::noncopyable
 
     void move();
 
-    Game::MoveResult move(stm::transaction & tx, Game & ioGame, const Block & targetBlock);
+    Game::MoveResult move(stm::transaction & tx, Game & ioGame, const Block & targetBlock, const Evaluator & inEvaluator);
 
     void coordinate();
 
@@ -67,6 +69,7 @@ struct Computer::Impl : boost::noncopyable
     mutable stm::shared<unsigned> mSearchWidth;
     mutable stm::shared<unsigned> mWorkerCount;
     mutable stm::shared<bool> mSyncError;
+    mutable stm::shared<const Evaluator*> mEvaluator;
     Worker mWorker;
     WorkerPool mWorkerPool;
     boost::shared_ptr<NodeCalculator> mNodeCalculator;
@@ -85,8 +88,14 @@ void Computer::Impl::coordinate()
     }
 
     std::size_t numPrecalculated = STM::get(mPrecalculated).size();
-    if (numPrecalculated > 1) {
+    if (numPrecalculated > 2)
+    {
         return;
+    }
+
+    if (mNodeCalculator && mNodeCalculator->status() >= NodeCalculator::Status_Working)
+    {
+        mNodeCalculator->stop();
     }
 
     Preliminaries preliminaries = mNodeCalculator ? mNodeCalculator->results() : Preliminaries();
@@ -103,9 +112,11 @@ void Computer::Impl::coordinate()
 
     BlockTypes blockTypes;
     boost::scoped_ptr<GameState> lastGameState;
+    unsigned workerCount = mWorkerPool.size();
 
     stm::atomic([&](stm::transaction & tx)
     {
+        workerCount = mWorkerCount.open_r(tx);
         Precalculated & precalculated = mPrecalculated.open_rw(tx);
         for (auto prelim : preliminaries)
         {
@@ -123,10 +134,18 @@ void Computer::Impl::coordinate()
                 {
                     continue;
                 }
-                Assert(prelim.id() == mGame.gameState(tx).id() + 1);
+
+
+                if (prelim.id() != mGame.gameState(tx).id() + 1)
+                {
+                    LogWarning("A not-yet-understood sync error has occured.");
+                    precalculated.clear();
+                    break;
+                }
             }
             precalculated.push_back(prelim);
         }
+
         preliminaries.clear();
 
         blockTypes = mGame.getFutureBlocks(tx, precalculated.size() + mSearchDepth.open_r(tx));
@@ -136,15 +155,32 @@ void Computer::Impl::coordinate()
 
     if (!blockTypes.empty() && !lastGameState->isGameOver())
     {
-        Widths widths(blockTypes.size(), STM::get(mSearchWidth));
-        Assert(widths.size() == blockTypes.size());
         const GameState & gs = *lastGameState;
         const Evaluator * ev = &MakeTetrises::Instance();
-        if (gs.firstOccupiedRow() < 8)
+        if (gs.firstOccupiedRow() <= 10)
         {
             LogWarning("Switch to survival mode");
             ev = &Survival::Instance();
         }
+        blockTypes.resize(std::min(int(blockTypes.size()), ev->recommendedSearchWidth()));
+        Widths widths(blockTypes.size(), ev->recommendedSearchWidth());
+        Assert(widths.size() == blockTypes.size());
+
+        std::cout << "Evaluator: " << ev->name() << std::endl;
+        for (unsigned i = 0; i < widths.size(); ++i)
+        {
+            if (i != 0)
+            {
+                std::cout << ", ";
+            }
+            std::cout << widths[i];
+        }
+        std::cout << std::endl;
+
+        mWorkerPool.resize(workerCount);
+        std::cout << "WorkerPool.size(): " << mWorkerPool.size() << std::endl;
+
+        STM::set(mEvaluator, ev);
         mNodeCalculator.reset(new NodeCalculator(*lastGameState,
                                                  blockTypes,
                                                  widths,
@@ -156,7 +192,7 @@ void Computer::Impl::coordinate()
 }
 
 
-Game::MoveResult Computer::Impl::move(stm::transaction & tx, Game & ioGame, const Block & targetBlock)
+Game::MoveResult Computer::Impl::move(stm::transaction & tx, Game & ioGame, const Block & targetBlock, const Evaluator & inEvaluator)
 {
     const Block & block = ioGame.activeBlock(tx);
     Assert(block.type() == targetBlock.type());
@@ -220,7 +256,28 @@ Game::MoveResult Computer::Impl::move(stm::transaction & tx, Game & ioGame, cons
         }
     }
 
-    return Game::MoveResult_NotMoved;
+    if (inEvaluator.moveDownBehavior() == MoveDownBehavior_DropDown)
+    {
+        unsigned id = ioGame.gameState(tx).id();
+        unsigned row = ioGame.activeBlock(tx).row();
+        ioGame.dropWithoutCommit(tx);
+        if (ioGame.activeBlock(tx).row() == row)
+        {
+            return Game::MoveResult_NotMoved;
+        }
+        else
+        {
+            return ioGame.gameState(tx).id() == id ? Game::MoveResult_Moved : Game::MoveResult_Committed;
+        }
+    }
+    else if (inEvaluator.moveDownBehavior() == MoveDownBehavior_MoveDown)
+    {
+        return ioGame.move(tx, MoveDirection_Down);
+    }
+    else
+    {
+        return Game::MoveResult_NotMoved;
+    }
 }
 
 
@@ -240,7 +297,7 @@ void Computer::Impl::move()
             return;
         }
 
-        if (Game::MoveResult_Committed == move(tx, mGame, prec.front().originalBlock()))
+        if (Game::MoveResult_Committed == move(tx, mGame, prec.front().originalBlock(), *mEvaluator.open_r(tx)))
         {
             prec.clear();
         }
