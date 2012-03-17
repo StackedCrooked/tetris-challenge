@@ -87,11 +87,9 @@ typedef std::vector<Etage> Etages;
 class AllResults
 {
 public:
-    AllResults(const Evaluator & inEvaluator, std::size_t inMaxDepth) :
-        mEtages(inMaxDepth),
-        mMaxDepth(mEtages.size()),
-        mCurrentIndex(0),
-        mEvaluator(&inEvaluator)
+    AllResults(std::size_t inMaxDepth) :
+        cEtages(inMaxDepth),
+        mCurrentIndex(0)
     {
     }
 
@@ -103,42 +101,40 @@ public:
 
     std::size_t maxDepth() const
     {
-        return mMaxDepth;
+        return cEtages.size();
     }
 
     void registerNode(stm::transaction & tx, const NodePtr & inNode)
     {
         int quality = inNode->quality();
         const std::size_t & cIndex = mCurrentIndex.open_r(tx);
-        mEtages[cIndex].registerNode(tx, inNode, quality);
+        cEtages[cIndex].registerNode(tx, inNode, quality);
         Assert(cIndex == 0 || bestNode(tx));
     }
 
     const NodePtr & bestNode(stm::transaction & tx) const
     {
         const std::size_t & cIndex = mCurrentIndex.open_r(tx);
-        return mEtages[cIndex - 1].bestNode(tx);
+        return cEtages[cIndex - 1].bestNode(tx);
     }
 
     bool finished(stm::transaction & tx) const
     {
         const std::size_t & cIndex = mCurrentIndex.open_r(tx);
-        return cIndex == mMaxDepth;
+        return cIndex == maxDepth();
     }
 
     void setFinished(stm::transaction & tx)
     {
         std::size_t & currentIndex = mCurrentIndex.open_rw(tx);
-        mEtages[currentIndex].setFinished(tx);
+        cEtages[currentIndex].setFinished(tx);
         currentIndex++;
-        Assert(currentIndex <= mMaxDepth);
+        Assert(currentIndex <= maxDepth());
     }
 
 private:
-    Etages mEtages;
-    const std::size_t mMaxDepth;
+    Etages cEtages; // vector is const but not the contained elements
     mutable stm::shared<std::size_t> mCurrentIndex;
-    const Evaluator * mEvaluator;
 };
 
 
