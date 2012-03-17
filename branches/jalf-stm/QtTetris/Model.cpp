@@ -120,7 +120,7 @@ unsigned CalculateOptimalWorkerCount(std::size_t numComputerPlayers)
         throw std::invalid_argument("numComputerPlayers == 0");
     }
 
-    return std::max<unsigned>(Poco::Environment::processorCount() / numComputerPlayers, 1);
+    return std::max<unsigned>(Poco::Environment::processorCount() / numComputerPlayers, 2) - 1;
 #endif
 }
 

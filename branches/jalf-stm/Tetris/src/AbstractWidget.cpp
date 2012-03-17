@@ -155,7 +155,7 @@ int AbstractWidget::statsItemHeight() const
 
 int AbstractWidget::statsItemCount() const
 {
-    return 4; // Score, Level, Line and Fps.
+    return 9; // Score, Level, Line and Fps.
 }
 
 
@@ -372,7 +372,23 @@ void AbstractWidget::paintStats(const Rect & inRect, const GameStateStats & inSt
 
     rect = Rect(rect.left(), rect.bottom() + margin(), rect.width(), rect.height());
     fillRect(rect, RGBColor(255, 255, 255));
-    paintStatItem(rect, "Lines", SS() << inStats.numLines());
+    paintStatItem(rect, "Lines x1", SS() << inStats.numSingles());
+
+    rect = Rect(rect.left(), rect.bottom() + margin(), rect.width(), rect.height());
+    fillRect(rect, RGBColor(255, 255, 255));
+    paintStatItem(rect, "Lines x2", SS() << inStats.numDoubles());
+
+    rect = Rect(rect.left(), rect.bottom() + margin(), rect.width(), rect.height());
+    fillRect(rect, RGBColor(255, 255, 255));
+    paintStatItem(rect, "Lines x3", SS() << inStats.numTriples());
+
+    rect = Rect(rect.left(), rect.bottom() + margin(), rect.width(), rect.height());
+    fillRect(rect, RGBColor(255, 255, 255));
+    paintStatItem(rect, "Lines x4", SS() << inStats.numTetrises());
+
+    rect = Rect(rect.left(), rect.bottom() + margin(), rect.width(), rect.height());
+    fillRect(rect, RGBColor(255, 255, 255));
+    paintStatItem(rect, "Lines Total", SS() << inStats.numLines());
 
     rect = Rect(rect.left(), rect.bottom() + margin(), rect.width(), rect.height());
     fillRect(rect, RGBColor(255, 255, 255));

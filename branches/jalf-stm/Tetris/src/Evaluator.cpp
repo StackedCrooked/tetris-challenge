@@ -219,7 +219,7 @@ MakeTetrises::MakeTetrises() :
           NumTetrisesFactor(1),
           SearchDepth(8),
           SearchWidth(4),
-          MoveDownBehavior_None)
+          MoveDownBehavior_DropDown)
 {
 }
 
