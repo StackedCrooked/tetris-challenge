@@ -55,7 +55,7 @@ void SingleThreadedNodeCalculator::populate()
         std::size_t targetDepth = 1;
         while (targetDepth <= mBlockTypes.size())
         {
-            CalculateNodes(mNode,
+            CalculateNodes(mRootNode,
                            mEvaluator,
                            mBlockTypes,
                            mWidths,

@@ -135,10 +135,10 @@ void MultiThreadedNodeCalculator::populate()
         std::size_t targetDepth = 1;
         while (targetDepth <= mBlockTypes.size())
         {
-            populateNodes(mNode, mBlockTypes, mWidths, 0, targetDepth);
+            populateNodes(mRootNode, mBlockTypes, mWidths, 0, targetDepth);
             mWorkerPool.wait();
             Assert(mWorkerPool.getActiveWorkerCount() == 0);
-            if (mNode->endNode()->gameState().isGameOver())
+            if (mRootNode->endNode()->gameState().isGameOver())
             {
                 break;
             }
