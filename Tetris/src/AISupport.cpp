@@ -59,7 +59,6 @@ bool IsGameOver(const GameState & inGameState, BlockType inBlockType, int inRota
 
 
 void CalculateNodes(const NodePtr & ioNode,
-                    unsigned & outTotalNodeCount,
                     const Evaluator & inEvaluator,
                     const BlockTypes & inBlockTypes,
                     const std::vector<int> & inWidths,
@@ -102,7 +101,7 @@ void CalculateNodes(const NodePtr & ioNode,
     if (generatedChildNodes.empty())
     {
         generatedChildNodes = ChildNodes(GameStateComparator());
-        GenerateOffspring(ioNode, inBlockTypes[inProgress.current()], inEvaluator, generatedChildNodes, outTotalNodeCount);
+        GenerateOffspring(ioNode, inBlockTypes[inProgress.current()], inEvaluator, generatedChildNodes);
 
         ChildNodes::iterator it = generatedChildNodes.begin(), end = generatedChildNodes.end();
         while (numNewChildren < inWidths[inProgress.current()] && it != end)
@@ -128,7 +127,7 @@ void CalculateNodes(const NodePtr & ioNode,
     for (ChildNodes::iterator it = generatedChildNodes.begin(); it != generatedChildNodes.end(); ++it)
     {
         const NodePtr & child = *it;
-        CalculateNodes(child, outTotalNodeCount, inEvaluator, inBlockTypes, inWidths, inProgress.increment(), inCallback, _checkChildCount + numNewChildren);
+        CalculateNodes(child, inEvaluator, inBlockTypes, inWidths, inProgress.increment(), inCallback, _checkChildCount + numNewChildren);
     }
 }
 
@@ -136,8 +135,7 @@ void CalculateNodes(const NodePtr & ioNode,
 void GenerateOffspring(const NodePtr & ioGameStateNode,
                        const BlockTypes & inBlockTypes,
                        std::size_t inOffset,
-                       const Evaluator & inEvaluator,
-                       unsigned & outTotalCounter)
+                       const Evaluator & inEvaluator)
 {
     Assert(inOffset < inBlockTypes.size());
     Assert(ioGameStateNode->children().empty());
@@ -146,8 +144,7 @@ void GenerateOffspring(const NodePtr & ioGameStateNode,
     GenerateOffspring(ioGameStateNode,
                       inBlockTypes[inOffset],
                       inEvaluator,
-                      children,
-                      outTotalCounter);
+                      children);
 
     std::for_each(children.begin(), children.end(), [&](const NodePtr & child) { ioGameStateNode->addChild(child); });
 
@@ -161,8 +158,7 @@ void GenerateOffspring(const NodePtr & ioGameStateNode,
             GenerateOffspring(childNode,
                               inBlockTypes,
                               inOffset + 1,
-                              inEvaluator,
-                              outTotalCounter);
+                              inEvaluator);
         }
     }
 }
@@ -171,8 +167,7 @@ void GenerateOffspring(const NodePtr & ioGameStateNode,
 void GenerateOffspring(const NodePtr & inNode,
                        BlockType inBlockType,
                        const Evaluator & inEvaluator,
-                       ChildNodes & outChildNodes,
-                       unsigned & outTotalCounter)
+                       ChildNodes & outChildNodes)
 {
     Assert(outChildNodes.empty());
     const GameState & gameState = inNode->gameState();
@@ -193,7 +188,6 @@ void GenerateOffspring(const NodePtr & inNode,
         Assert(childState->gameState().isGameOver());
         Assert(childState->depth() == (inNode->depth() + 1));
         outChildNodes.insert(childState);
-        outTotalCounter++;
         return;
     }
 
@@ -217,7 +211,6 @@ void GenerateOffspring(const NodePtr & inNode,
                                                      inEvaluator));
                 Assert(childState->depth() == inNode->depth() + 1);
                 outChildNodes.insert(childState);
-                outTotalCounter++;
             }
         }
     }

@@ -54,15 +54,12 @@ void PerformBenchmark(unsigned inWidth, unsigned inDepth)
                                   workerPool);
 
     nodeCalculator.start();
-    unsigned c = 0;
     std::cout << std::endl;
     while (nodeCalculator.status() != NodeCalculator::Status_Finished)
     {
         Sleep(UInt64(50));
-        std::cout << "\rNode count: " << nodeCalculator.nodeCount() << " (" << c++ << ")" << std::flush;
     }
 
-    std::cout << "\rNode count: " << nodeCalculator.nodeCount() << std::endl;
     std::cout << "Finished in " << (GetCurrentTimeMs() - startTime) << "ms." << std::endl;
 }
 

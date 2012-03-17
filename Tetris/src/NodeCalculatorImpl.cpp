@@ -25,6 +25,7 @@ namespace Tetris {
 using namespace Futile;
 
 
+#if 0 // disabled code
 namespace { // anonymous
 
 
@@ -53,6 +54,7 @@ std::size_t calculateMaxNodeCount(const std::vector<int> & inWidths)
 
 
 } // anonymous namespace
+#endif
 
 
 NodeCalculatorImpl::NodeCalculatorImpl(const GameState & inGameState,
@@ -68,7 +70,6 @@ NodeCalculatorImpl::NodeCalculatorImpl(const GameState & inGameState,
     mAllResults(AllResults(inEvaluator, inBlockTypes.size())),
     mBlockTypes(inBlockTypes),
     mWidths(inWidths),
-    mMaxNodeCount(calculateMaxNodeCount(inWidths)),
     mEvaluator(inEvaluator),
     mMainWorker(inMainWorker),
     mWorkerPool(inWorkerPool)
@@ -126,18 +127,6 @@ int NodeCalculatorImpl::getCurrentSearchDepth() const
 int NodeCalculatorImpl::getMaxSearchDepth() const
 {
     return mWidths.size();
-}
-
-
-unsigned NodeCalculatorImpl::getCurrentNodeCount() const
-{
-    return mCurrentNodeCount;
-}
-
-
-unsigned NodeCalculatorImpl::getMaxNodeCount() const
-{
-    return mMaxNodeCount;
 }
 
 

@@ -80,12 +80,6 @@ Progress NodeCalculator::progress() const
 }
 
 
-Progress NodeCalculator::nodeCount() const
-{
-    return Progress(mImpl->getCurrentNodeCount(), mImpl->getMaxNodeCount());
-}
-
-
 std::vector<GameState> NodeCalculator::results() const
 {
     Assert(status() != Status_Error);
