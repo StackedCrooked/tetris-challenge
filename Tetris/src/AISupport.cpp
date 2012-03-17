@@ -86,8 +86,6 @@ void CalculateNodes(const NodePtr & ioNode,
 
     if (ioNode->gameState().isGameOver())
     {
-        // GameOver state has no children.
-        Assert(_checkChildCount  > 0);
         return;
     }
 
