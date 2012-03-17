@@ -167,27 +167,18 @@ void NodeCalculatorImpl::calculateResult(stm::transaction & tx)
 
     if (getCurrentSearchDepth() == 0 || !mAllResults.bestNode(tx))
     {
-        Assert(mNode->endNode()->gameState().isGameOver());
         return;
     }
 
     // Backtrack the best end-node to its starting node.
-
-    stm::atomic([&](stm::transaction & tx)
+    Result & result = mResult.open_rw(tx);
+    NodePtr endNode = mAllResults.bestNode(tx);
+    while (endNode != this->mNode)
     {
-        NodePtr endNode = mAllResults.bestNode(tx);
-        unsigned startId = mNode->gameState().id();
-        unsigned currentId = endNode->gameState().id();
-        Result & result = mResult.open_rw(tx);
-        while (currentId > startId + 1)
-        {
-            endNode = endNode->parent();
-            unsigned parentId = endNode->gameState().id();
-            result.insert(result.begin(), endNode->gameState());
-            Assert(currentId == parentId + 1);
-            currentId = parentId;
-        }
-    });
+        result.push_back(endNode->gameState());
+        endNode = endNode->parent();
+    }
+    std::reverse(result.begin(), result.end());
 }
 
 
