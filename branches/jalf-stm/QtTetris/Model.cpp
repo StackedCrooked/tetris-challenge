@@ -160,18 +160,21 @@ void Model::newGame(const PlayerTypes & inPlayerTypes, std::size_t inRowCount, s
         }
         else if (playerType == PlayerType_Computer)
         {
-            Player & player = mMultiplayerGame->addComputerPlayer(TeamName(teamName),
-                                                                  PlayerName(GetPlayerName(inPlayerTypes[idx])));
-
-            if (ComputerPlayer * computerPlayer = dynamic_cast<ComputerPlayer*>(&player))
-            {
-                computerPlayer->setMoveSpeed(allComputer ? 40 : 10);
-                computerPlayer->setWorkerCount(CalculateOptimalWorkerCount(mMultiplayerGame->playerCount(PlayerType_Computer)));
-            }
+            mMultiplayerGame->addComputerPlayer(TeamName(teamName), PlayerName(GetPlayerName(inPlayerTypes[idx])));
         }
         else
         {
             throw std::invalid_argument("Invalid enum value for PlayerType.");
+        }
+    }
+
+    const unsigned cComputerPlayerCount = mMultiplayerGame->playerCount(PlayerType_Computer);
+    for (PlayerPtr player : mMultiplayerGame->getPlayers())
+    {
+        if (ComputerPlayer * computerPlayer = dynamic_cast<ComputerPlayer*>(player.get()))
+        {
+            computerPlayer->setMoveSpeed(allComputer ? 40 : 10);
+            computerPlayer->setWorkerCount(CalculateOptimalWorkerCount(cComputerPlayerCount));
         }
     }
 }

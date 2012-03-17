@@ -6,6 +6,9 @@
 #include <vector>
 
 
+namespace Futile {
+
+
 template<class T>
 inline std::ostream & operator<<(std::ostream & os, const std::vector<T> & vec)
 {
@@ -21,6 +24,9 @@ inline std::ostream & operator<<(std::ostream & os, const std::vector<T> & vec)
     os << "]";
     return os;
 }
+
+
+} // namespace Futile
 
 
 #endif // PRETTYPRINT_H

@@ -70,8 +70,9 @@ struct MultiplayerGame::Impl : boost::noncopyable
         }
     }
 
-    typedef boost::shared_ptr<Player> PlayerPtr;
-    typedef std::vector<PlayerPtr> Players;
+    typedef MultiplayerGame::PlayerPtr PlayerPtr;
+    typedef MultiplayerGame::Players Players;
+
     Players mPlayers;
     unsigned mRowCount;
     unsigned mColumnCount;
@@ -95,6 +96,12 @@ MultiplayerGame::~MultiplayerGame()
     {
         LogError(SS() << "~MultiplayerGame throws: " << exc.what());
     }
+}
+
+
+MultiplayerGame::Players MultiplayerGame::getPlayers()
+{
+    return mImpl->mPlayers;
 }
 
 
