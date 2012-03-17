@@ -179,7 +179,7 @@ protected:
 
     void calculateResult(stm::transaction & tx);
 
-    NodePtr mNode;
+    NodePtr mRootNode;
     typedef std::vector<GameState> Result;
     mutable stm::shared<Result> mResult;
     std::atomic_bool mQuitFlag;

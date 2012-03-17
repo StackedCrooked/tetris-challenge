@@ -63,7 +63,7 @@ NodeCalculatorImpl::NodeCalculatorImpl(const GameState & inGameState,
                                        const Evaluator & inEvaluator,
                                        Worker & inMainWorker,
                                        WorkerPool & inWorkerPool) :
-    mNode(new GameStateNode(inGameState, inEvaluator)),
+    mRootNode(new GameStateNode(inGameState, inEvaluator)),
     mResult(Result()),
     mQuitFlag(false),
     mStatus(0),
@@ -92,14 +92,13 @@ NodeCalculatorImpl::NodeCalculatorImpl(const GameState & inGameState,
         }
     }
 
-    Assert(!mNode->gameState().isGameOver());
-    Assert(mNode->children().empty());
+    Assert(!mRootNode->gameState().isGameOver());
+    Assert(mRootNode->children().empty());
 }
 
 
 NodeCalculatorImpl::~NodeCalculatorImpl()
 {
-    mNode.reset();
 }
 
 
@@ -173,7 +172,7 @@ void NodeCalculatorImpl::calculateResult(stm::transaction & tx)
     // Backtrack the best end-node to its starting node.
     Result & result = mResult.open_rw(tx);
     NodePtr endNode = mAllResults.bestNode(tx);
-    while (endNode != this->mNode)
+    while (endNode != this->mRootNode)
     {
         result.push_back(endNode->gameState());
         endNode = endNode->parent();
