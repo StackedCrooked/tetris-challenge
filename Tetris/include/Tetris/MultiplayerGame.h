@@ -35,6 +35,10 @@ public:
 
     Player * getPlayer(unsigned inIndex);
 
+    typedef boost::shared_ptr<Player> PlayerPtr;
+    typedef std::vector<PlayerPtr> Players;
+    Players getPlayers();
+
     unsigned rowCount() const;
 
     unsigned columnCount() const;

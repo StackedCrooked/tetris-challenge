@@ -43,7 +43,7 @@ struct RefreshTimer
 {
     enum
     {
-        cRefreshRate = 60, // fps
+        cRefreshRate = 50, // fps
         cTimerInterval = 1000 / cRefreshRate
     };
 
@@ -124,7 +124,9 @@ struct TetrisWidget::Impl : boost::noncopyable
         if (SharedPtr sharedPtr = inWeakPtr.lock())
         {
             Impl & impl = *sharedPtr;
-            impl.mTetrisWidget.update();
+            impl.mTetrisWidget.setUpdatesEnabled(false);
+            impl.mTetrisWidget.repaint();
+            impl.mTetrisWidget.setUpdatesEnabled(true);
         }
     }
 
@@ -152,7 +154,6 @@ TetrisWidget::TetrisWidget(QWidget * inParent, int inSquareWidth, int inSquareHe
     {
         mImpl->mConnection = gSharedTimer->OnTimer.connect(boost::bind(&Impl::postRefresh, mImpl.get()));
     }
-    setUpdatesEnabled(true);
     setFocusPolicy(Qt::StrongFocus);
 }
 
@@ -244,11 +245,6 @@ Tetris::Size TetrisWidget::getMinSize() const
 
 void TetrisWidget::fillRect(const Tetris::Rect & inRect, const Tetris::RGBColor & inColor)
 {
-    if (!mImpl->mPainter.get())
-    {
-        throw std::logic_error("Painter is not set.");
-    }
-
     QColor color(inColor.red(), inColor.green(), inColor.blue());
     int x = inRect.x();
     int y = inRect.y();
@@ -261,10 +257,6 @@ void TetrisWidget::fillRect(const Tetris::Rect & inRect, const Tetris::RGBColor 
 
 void TetrisWidget::drawRect(const Tetris::Rect & inRect, const Tetris::RGBColor & inColor)
 {
-    if (!mImpl->mPainter.get())
-    {
-        throw std::logic_error("Painter is not set.");
-    }
     RestorePainter restorePainter(*mImpl->mPainter);
 
     QColor color(inColor.red(), inColor.green(), inColor.blue());
@@ -280,11 +272,6 @@ void TetrisWidget::drawRect(const Tetris::Rect & inRect, const Tetris::RGBColor 
 
 void TetrisWidget::paintSquare(const Rect & inRect, const RGBColor & inColor)
 {
-    if (!mImpl->mPainter.get())
-    {
-        throw std::logic_error("Painter is not set.");
-    }
-
     RestorePainter restorePainter(*mImpl->mPainter);
 
     QColor color(inColor.red(), inColor.green(), inColor.blue());
@@ -307,10 +294,6 @@ void TetrisWidget::paintSquare(const Rect & inRect, const RGBColor & inColor)
 
 void TetrisWidget::paintStatItem(const Tetris::Rect & inRect, const std::string & inName, const std::string & inValue)
 {
-    if (!mImpl->mPainter.get())
-    {
-        throw std::logic_error("Painter is not set.");
-    }
     RestorePainter restorePainter(*mImpl->mPainter);
 
     QPainter & painter(*mImpl->mPainter);
@@ -359,10 +342,6 @@ void TetrisWidget::paintImage(const Tetris::Rect & inRect, const std::string & i
 
 void TetrisWidget::drawLine(int x1, int y1, int x2, int y2, const RGBColor & inColor)
 {
-    if (!mImpl->mPainter.get())
-    {
-        throw std::logic_error("Painter is not set.");
-    }
     RestorePainter restorePainter(*mImpl->mPainter);
 
     mImpl->mPainter->setPen(QColor(inColor.red(), inColor.green(), inColor.blue()));
@@ -373,11 +352,6 @@ void TetrisWidget::drawLine(int x1, int y1, int x2, int y2, const RGBColor & inC
 
 void TetrisWidget::drawText(int x, int y, const std::string & inText)
 {
-    if (!mImpl->mPainter.get())
-    {
-        throw std::logic_error("Painter is not set.");
-    }
-
     RestorePainter restorePainter(*mImpl->mPainter);
     QPainter & painter(*mImpl->mPainter);
 
@@ -388,11 +362,6 @@ void TetrisWidget::drawText(int x, int y, const std::string & inText)
 
 void TetrisWidget::drawTextCentered(const Rect & inRect, const std::string & inText, int inFontSize, const RGBColor & inColor)
 {
-    if (!mImpl->mPainter.get())
-    {
-        throw std::logic_error("Painter is not set.");
-    }
-
     RestorePainter restorePainter(*mImpl->mPainter);
     QPainter & painter(*mImpl->mPainter);
 
@@ -417,11 +386,6 @@ void TetrisWidget::drawTextCentered(const Rect & inRect, const std::string & inT
 
 void TetrisWidget::drawTextRightAligned(const Rect & inRect, const std::string & inText, int inFontSize, const RGBColor & inColor)
 {
-    if (!mImpl->mPainter.get())
-    {
-        throw std::logic_error("Painter is not set.");
-    }
-
     RestorePainter restorePainter(*mImpl->mPainter);
     QPainter & painter(*mImpl->mPainter);
 
@@ -448,7 +412,6 @@ void TetrisWidget::paintEvent(QPaintEvent * )
     {
         return;
     }
-
     mImpl->mPainter.reset(new QPainter(this));
     coordinateRepaint(*game());
     mImpl->mPainter.reset();

@@ -22,10 +22,10 @@ using namespace Futile;
 
 struct Computer::Impl : boost::noncopyable
 {
-    static const int cDefaultNumMovesPerSecond = 50;
-    static const int cDefaultSearchDepth = 10;
+    static const int cDefaultNumMovesPerSecond = 40;
+    static const int cDefaultSearchDepth = 8;
     static const int cDefaultSearchWidth = 2;
-    static const int cDefaultWorkerCount = 4;
+    static const int cDefaultWorkerCount = 1;
 
     Impl(Game & inGame) :
         mGame(inGame),
@@ -88,7 +88,9 @@ void Computer::Impl::coordinate()
     }
 
     std::size_t numPrecalculated = STM::get(mPrecalculated).size();
-    if (numPrecalculated > 2)
+    unsigned firstOccupiedRow = stm::atomic<unsigned>([&](stm::transaction & tx) { return mGame.gameState(tx).firstOccupiedRow(); });
+    bool danger = firstOccupiedRow <= 10;
+    if (!danger && numPrecalculated > 2)
     {
         return;
     }
@@ -101,21 +103,17 @@ void Computer::Impl::coordinate()
     Preliminaries preliminaries = mNodeCalculator ? mNodeCalculator->results() : Preliminaries();
     if (mNodeCalculator && preliminaries.empty())
     {
-        LogWarning(SS() << "No results yet. Progress is " << mNodeCalculator->progress());
         return;
-    }
-
-    if (mNodeCalculator)
-    {
-        LogInfo(SS() << "Interrupt at " << mNodeCalculator->progress());
     }
 
     BlockTypes blockTypes;
     boost::scoped_ptr<GameState> lastGameState;
     unsigned workerCount = mWorkerPool.size();
+    const Evaluator * ev;
 
     stm::atomic([&](stm::transaction & tx)
     {
+        ev = mEvaluator.open_r(tx);
         workerCount = mWorkerCount.open_r(tx);
         Precalculated & precalculated = mPrecalculated.open_rw(tx);
         for (auto prelim : preliminaries)
@@ -138,7 +136,7 @@ void Computer::Impl::coordinate()
 
                 if (prelim.id() != mGame.gameState(tx).id() + 1)
                 {
-                    LogWarning("A not-yet-understood sync error has occured.");
+                    LogError("A not-yet-understood sync error has occured.");
                     precalculated.clear();
                     break;
                 }
@@ -148,7 +146,15 @@ void Computer::Impl::coordinate()
 
         preliminaries.clear();
 
-        blockTypes = mGame.getFutureBlocks(tx, precalculated.size() + mSearchDepth.open_r(tx));
+        if (danger)
+        {
+            while (precalculated.size() > 2)
+            {
+                precalculated.pop_back();
+            }
+        }
+
+        blockTypes = mGame.getFutureBlocks(tx, precalculated.size() + ev->recommendedSearchDepth());
         blockTypes.erase(blockTypes.begin(), blockTypes.begin() + precalculated.size());
         lastGameState.reset(new GameState(precalculated.empty() ? mGame.gameState(tx) : precalculated.back()));
     });
@@ -156,29 +162,20 @@ void Computer::Impl::coordinate()
     if (!blockTypes.empty() && !lastGameState->isGameOver())
     {
         const GameState & gs = *lastGameState;
-        const Evaluator * ev = &MakeTetrises::Instance();
-        if (gs.firstOccupiedRow() <= 10)
+        if (gs.firstOccupiedRow() <= 8)
         {
-            LogWarning("Switch to survival mode");
             ev = &Survival::Instance();
         }
-        blockTypes.resize(std::min(int(blockTypes.size()), ev->recommendedSearchWidth()));
+        else if (gs.firstOccupiedRow() > 12)
+        {
+            ev = &MakeTetrises::Instance();
+        }
+
+        blockTypes.resize(std::min(int(blockTypes.size()), ev->recommendedSearchDepth()));
         Widths widths(blockTypes.size(), ev->recommendedSearchWidth());
         Assert(widths.size() == blockTypes.size());
 
-        std::cout << "Evaluator: " << ev->name() << std::endl;
-        for (unsigned i = 0; i < widths.size(); ++i)
-        {
-            if (i != 0)
-            {
-                std::cout << ", ";
-            }
-            std::cout << widths[i];
-        }
-        std::cout << std::endl;
-
         mWorkerPool.resize(workerCount);
-        std::cout << "WorkerPool.size(): " << mWorkerPool.size() << std::endl;
 
         STM::set(mEvaluator, ev);
         mNodeCalculator.reset(new NodeCalculator(*lastGameState,
