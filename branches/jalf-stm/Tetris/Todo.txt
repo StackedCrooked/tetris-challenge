@@ -12,7 +12,7 @@ v Improve encapsulation by obeying the Law of Demeter
 
 STM Notes
 ---------
-stm::shared<std::string> s(std::string()); // a little weird
+- stm::shared<std::string> s(std::string()); // a little weird
 
 @StackedCrooked btw, if you need something like a condition variable in the STM lib,
 simply open the variables you want to wait for changes in, check their value, and

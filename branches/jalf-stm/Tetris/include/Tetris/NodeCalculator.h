@@ -49,8 +49,6 @@ public:
     //! Returns current depth / max depth.
     Progress progress() const;
 
-    Progress nodeCount() const;
-
     enum Status
     {
         Status_Initial,

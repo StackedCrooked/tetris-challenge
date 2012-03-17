@@ -47,7 +47,7 @@ void MultiThreadedNodeCalculator::generateChildNodes(const NodePtr & ioNode,
                                                      int inMaxChildCount)
 {
     ChildNodes childNodes;
-    GenerateOffspring(ioNode, inBlockType, *inEvaluator, childNodes, mCurrentNodeCount);
+    GenerateOffspring(ioNode, inBlockType, *inEvaluator, childNodes);
     if (childNodes.empty())
     {
         throw std::logic_error("GenerateOffspring produced zero children. This should not happen!");
