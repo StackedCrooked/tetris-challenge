@@ -41,7 +41,7 @@ SingleThreadedNodeCalculator::~SingleThreadedNodeCalculator()
 void SingleThreadedNodeCalculator::onChildNodeGenerated(const Progress & , const NodePtr & inChildNode)
 {
     stm::atomic([&](stm::transaction & tx) {
-        mAllResults.registerNode(tx, inChildNode);
+        mVerticalResults.registerNode(tx, inChildNode);
     });
 }
 
@@ -53,16 +53,16 @@ void SingleThreadedNodeCalculator::populate()
         // The nodes are populated using a "Iterative deepening" algorithm.
         // See: http://en.wikipedia.org/wiki/Iterative_deepening_depth-first_search for more information.
         std::size_t targetDepth = 1;
-        while (targetDepth <= mBlockTypes.size())
+        while (targetDepth <= cBlockTypes.size())
         {
             CalculateNodes(mRootNode,
-                           mEvaluator,
-                           mBlockTypes,
-                           mWidths,
+                           cEvaluator,
+                           cBlockTypes,
+                           cWidths,
                            Progress(0, targetDepth),
                            boost::bind(&SingleThreadedNodeCalculator::onChildNodeGenerated, this, _1, _2));
             stm::atomic([&](stm::transaction & tx) {
-                mAllResults.setFinished(tx);
+                mVerticalResults.setFinished(tx);
                 calculateResult(tx);
             });
             targetDepth++;

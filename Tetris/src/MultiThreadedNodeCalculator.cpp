@@ -64,7 +64,7 @@ void MultiThreadedNodeCalculator::generateChildNodes(const NodePtr & ioNode,
 
 
     stm::atomic([&](stm::transaction & tx) {
-        mAllResults.registerNode(tx, *ioNode->children().begin());
+        mVerticalResults.registerNode(tx, *ioNode->children().begin());
     });
 }
 
@@ -104,7 +104,7 @@ void MultiThreadedNodeCalculator::populateNodes(const NodePtr & ioNode,
 
         const BlockType cBlockType = inBlockTypes[inIndex];
         mWorkerPool.schedule([=]() {
-            generateChildNodes(ioNode, &mEvaluator, cBlockType, cWidth);
+            generateChildNodes(ioNode, &cEvaluator, cBlockType, cWidth);
         });
 
         // End of recursion.
@@ -133,9 +133,9 @@ void MultiThreadedNodeCalculator::populate()
         // The nodes are populated using a "Iterative deepening" algorithm.
         // See: http://en.wikipedia.org/wiki/Iterative_deepening_depth-first_search for more information.
         std::size_t targetDepth = 1;
-        while (targetDepth <= mBlockTypes.size())
+        while (targetDepth <= cBlockTypes.size())
         {
-            populateNodes(mRootNode, mBlockTypes, mWidths, 0, targetDepth);
+            populateNodes(mRootNode, cBlockTypes, cWidths, 0, targetDepth);
             mWorkerPool.wait();
             Assert(mWorkerPool.getActiveWorkerCount() == 0);
             if (mRootNode->endNode()->gameState().isGameOver())
@@ -145,7 +145,7 @@ void MultiThreadedNodeCalculator::populate()
 
             stm::atomic([&](stm::transaction & tx)
             {
-                mAllResults.setFinished(tx);
+                mVerticalResults.setFinished(tx);
                 calculateResult(tx);
             });
 

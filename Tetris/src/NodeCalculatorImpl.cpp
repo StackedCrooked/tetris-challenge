@@ -64,29 +64,29 @@ NodeCalculatorImpl::NodeCalculatorImpl(const GameState & inGameState,
                                        Worker & inMainWorker,
                                        WorkerPool & inWorkerPool) :
     mRootNode(new GameStateNode(inGameState, inEvaluator)),
-    mResult(Result()),
-    mQuitFlag(false),
-    mStatus(0),
-    mAllResults(AllResults(inBlockTypes.size())),
-    mBlockTypes(inBlockTypes),
-    mWidths(inWidths),
-    mEvaluator(inEvaluator),
+    mResults(Results()),
+    mVerticalResults(VerticalResults(inBlockTypes.size())),
+    cBlockTypes(inBlockTypes),
+    cWidths(inWidths),
+    cEvaluator(inEvaluator),
     mMainWorker(inMainWorker),
-    mWorkerPool(inWorkerPool)
+    mWorkerPool(inWorkerPool),
+    mQuitFlag(false),
+    mStatus(0)
 {
-    if (mBlockTypes.empty())
+    if (cBlockTypes.empty())
     {
         throw std::logic_error("Blocktypes must not be empty!");
     }
 
-    if (mBlockTypes.size() != mWidths.size())
+    if (cBlockTypes.size() != cWidths.size())
     {
         throw std::logic_error("Number of provided blocks does not equal number of provided widths.");
     }
 
-    for (std::size_t idx = 0; idx < mWidths.size(); ++idx)
+    for (std::size_t idx = 0; idx < cWidths.size(); ++idx)
     {
-        if (mWidths[idx] == 0)
+        if (cWidths[idx] == 0)
         {
             throw std::logic_error("Width must be > 0.");
         }
@@ -118,14 +118,14 @@ int NodeCalculatorImpl::getCurrentSearchDepth() const
 {
     return stm::atomic<int>([&](stm::transaction & tx)
     {
-        return mAllResults.depth(tx);
+        return mVerticalResults.depth(tx);
     });
 }
 
 
 int NodeCalculatorImpl::getMaxSearchDepth() const
 {
-    return mWidths.size();
+    return cWidths.size();
 }
 
 
@@ -135,7 +135,7 @@ std::vector<GameState> NodeCalculatorImpl::result() const
     {
         throw std::runtime_error(mErrorMessage.c_str());
     }
-    return Futile::STM::get(mResult);
+    return Futile::STM::get(mResults);
 }
 
 
@@ -164,14 +164,14 @@ void NodeCalculatorImpl::calculateResult(stm::transaction & tx)
         return;
     }
 
-    if (getCurrentSearchDepth() == 0 || !mAllResults.bestNode(tx))
+    if (getCurrentSearchDepth() == 0 || !mVerticalResults.bestNode(tx))
     {
         return;
     }
 
     // Backtrack the best end-node to its starting node.
-    Result & result = mResult.open_rw(tx);
-    NodePtr endNode = mAllResults.bestNode(tx);
+    Results & result = mResults.open_rw(tx);
+    NodePtr endNode = mVerticalResults.bestNode(tx);
     while (endNode != this->mRootNode)
     {
         result.push_back(endNode->gameState());
