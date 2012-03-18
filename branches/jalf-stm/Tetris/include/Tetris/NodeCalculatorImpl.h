@@ -84,10 +84,10 @@ private:
 typedef std::vector<Etage> Etages;
 
 
-class AllResults
+class VerticalResults
 {
 public:
-    AllResults(std::size_t inMaxDepth) :
+    VerticalResults(std::size_t inMaxDepth) :
         cEtages(inMaxDepth),
         mCurrentIndex(0)
     {
@@ -179,18 +179,20 @@ protected:
 
     void calculateResult(stm::transaction & tx);
 
+    typedef std::vector<GameState> Results;
+
+
     NodePtr mRootNode;
-    typedef std::vector<GameState> Result;
-    mutable stm::shared<Result> mResult;
-    std::atomic_bool mQuitFlag;
-    std::atomic_int mStatus;
-    AllResults mAllResults;
-    BlockTypes mBlockTypes;
-    const std::vector<int> mWidths;
-    const Evaluator & mEvaluator;
+    mutable stm::shared<Results> mResults;
+    VerticalResults mVerticalResults; // uses stm internally
+    const BlockTypes cBlockTypes;
+    const std::vector<int> cWidths;
+    const Evaluator & cEvaluator;
     std::string mErrorMessage;
     Futile::Worker & mMainWorker;
     Futile::WorkerPool & mWorkerPool;
+    std::atomic_bool mQuitFlag;
+    std::atomic_int mStatus;
 };
 
 
