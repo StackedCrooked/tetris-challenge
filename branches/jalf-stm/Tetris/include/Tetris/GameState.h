@@ -86,6 +86,23 @@ private:
 };
 
 
+struct GameOver : public std::runtime_error
+{
+    GameOver(const GameState & inGameState) :
+        std::runtime_error("Game Over"),
+        mGameState(inGameState)
+    {
+    }
+
+    virtual ~GameOver() throw() {}
+
+    const GameState & gameState() const { return mGameState; }
+
+private:
+    GameState mGameState;
+};
+
+
 } // namespace Tetris
 
 

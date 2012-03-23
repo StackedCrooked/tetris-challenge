@@ -25,10 +25,10 @@ namespace Tetris {
 using namespace Futile;
 
 
-#if 0 // disabled code
+
 namespace { // anonymous
 
-
+#if 0 // disabled code
 std::size_t calculateMaxNodeCount(const std::vector<int> & inWidths)
 {
     std::vector<std::size_t> results;
@@ -51,10 +51,21 @@ std::size_t calculateMaxNodeCount(const std::vector<int> & inWidths)
     }
     return result;
 }
+#endif
+
+
+const GameState & NotGameOver(const GameState & inGameState)
+{
+    if (inGameState.isGameOver())
+    {
+        throw GameOver(inGameState);
+    }
+
+    return inGameState;
+}
 
 
 } // anonymous namespace
-#endif
 
 
 NodeCalculatorImpl::NodeCalculatorImpl(const GameState & inGameState,
@@ -63,7 +74,7 @@ NodeCalculatorImpl::NodeCalculatorImpl(const GameState & inGameState,
                                        const Evaluator & inEvaluator,
                                        Worker & inMainWorker,
                                        WorkerPool & inWorkerPool) :
-    mRootNode(new GameStateNode(inGameState, inEvaluator)),
+    mRootNode(new GameStateNode(NotGameOver(inGameState), inEvaluator)),
     mResults(Results()),
     mVerticalResults(VerticalResults(inBlockTypes.size())),
     cBlockTypes(inBlockTypes),
