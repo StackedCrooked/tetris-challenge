@@ -106,7 +106,11 @@ MultiplayerGame & Model::multiplayerGame()
 namespace {
 
 
+#if POCO_OS_MAC_OS_X
+#define FORCE_TETRIS_WORKER_COUNT 1
+#else
 #define FORCE_TETRIS_WORKER_COUNT 0
+#endif
 
 
 unsigned CalculateOptimalWorkerCount(std::size_t numComputerPlayers)

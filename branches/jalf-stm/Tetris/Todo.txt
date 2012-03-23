@@ -1,5 +1,6 @@
 STM Version
 -----------
+- On Mac the FPS is very slow.
 v Use STM in TreeRowInfos
 v Future blocks shows current block as next block.
 v Check out Google Perftools (http://code.google.com/p/google-perftools/wiki/GooglePerformanceTools)
