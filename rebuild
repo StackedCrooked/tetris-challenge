@@ -1,5 +1,4 @@
 #!/bin/sh
-rm -rf Build
-./configure
+rm -rf Build && mkdir Build
 cd Build
-make $*
+../configure && make $*

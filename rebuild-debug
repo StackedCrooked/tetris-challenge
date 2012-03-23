@@ -1,5 +1,4 @@
 #!/bin/sh
-rm -rf Build
-TETRIS_BUILD_TYPE=Debug ./configure
+rm -rf Build && mkdir Build
 cd Build
-make $*
+TETRIS_BUILD_TYPE=Debug ../configure && make $*
