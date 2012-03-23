@@ -26,6 +26,18 @@
 namespace Tetris {
 
 
+class SetFinishedException : public std::runtime_error
+{
+public:
+    SetFinishedException() :
+        std::runtime_error("SetFinished failed. This is likely caused by a game-over situation.")
+    {
+    }
+
+    virtual ~SetFinishedException() throw() {}
+};
+
+
 /// Etage stores the best scoring game state for a given etage.
 /// A tree has an etage for each depth level:
 ///      *    Etage 0 (root)
@@ -70,6 +82,10 @@ public:
     void setFinished(stm::transaction & tx)
     {
         Assert(!mFinished.open_r(tx));
+        if (!mBestNode.open_r(tx))
+        {
+            throw SetFinishedException();
+        }
         Assert(mBestNode.open_r(tx));
         mFinished.open_rw(tx) = true;
     }

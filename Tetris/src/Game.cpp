@@ -200,6 +200,12 @@ bool Game::isGameOver(stm::transaction & tx) const
 }
 
 
+bool Game::isGameOver() const
+{
+    return stm::atomic<bool>([&](stm::transaction & tx) { return this->isGameOver(tx); });
+}
+
+
 const Block & Game::activeBlock(stm::transaction & tx) const
 {
     return mActiveBlock.open_r(tx);

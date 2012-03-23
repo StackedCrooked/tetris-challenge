@@ -228,8 +228,14 @@ void NodeCalculatorImpl::startImpl()
         populate();
         setStatus(NodeCalculator::Status_Finished);
     }
+    catch (const SetFinishedException & inException)
+    {
+        LogWarning(inException.what());
+        setStatus(NodeCalculator::Status_Finished);
+    }
     catch (const std::exception & inException)
     {
+        LogError(inException.what());
         mErrorMessage = inException.what();
         setStatus(NodeCalculator::Status_Error);
     }
