@@ -135,7 +135,7 @@ std::vector<GameState> NodeCalculatorImpl::result() const
     {
         throw std::runtime_error(mErrorMessage.c_str());
     }
-    return Futile::STM::get(mResults);
+    return Futile::STM::get(mResults).get();
 }
 
 
@@ -170,14 +170,21 @@ void NodeCalculatorImpl::calculateResult(stm::transaction & tx)
     }
 
     // Backtrack the best end-node to its starting node.
-    Results & result = mResults.open_rw(tx);
+    Results result;
     NodePtr endNode = mVerticalResults.bestNode(tx);
     while (endNode != this->mRootNode)
     {
-        result.push_back(endNode->gameState());
+        result.push_front(endNode->gameState());
         endNode = endNode->parent();
     }
-    std::reverse(result.begin(), result.end());
+
+    #ifndef NDEBUG
+    auto oldSize = mResults.open_r(tx).size();
+    auto newSize = result.size();
+    Assert(newSize >= oldSize);
+    #endif
+
+    mResults.open_rw(tx) = result;
 }
 
 

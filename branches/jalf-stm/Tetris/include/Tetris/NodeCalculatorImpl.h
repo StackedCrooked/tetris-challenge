@@ -3,6 +3,7 @@
 
 
 #include "Tetris/BlockTypes.h"
+#include "Tetris/GameState.h"
 #include "Tetris/GameStateNode.h"
 #include "Tetris/Evaluator.h"
 #include "Tetris/NodeCalculator.h"
@@ -15,6 +16,7 @@
 #include "Futile/Assert.h"
 #include "stm.hpp"
 #include <boost/static_assert.hpp>
+#include <algorithm>
 #include <atomic>
 #include <cstddef>
 #include <memory>
@@ -179,7 +181,41 @@ protected:
 
     void calculateResult(stm::transaction & tx);
 
-    typedef std::vector<GameState> Results;
+    // Wrapper around vector with some error checking.
+    // This helps us to detect errors at an early stage.
+    class Results
+    {
+    public:
+        void push_back(const GameState & inGameState)
+        {
+            Assert(mGameStates.empty() || mGameStates.back().id() + 1 == inGameState.id());
+            mGameStates.push_back(inGameState);
+        }
+
+        void push_front(const GameState & inGameState)
+        {
+            Assert(mGameStates.empty() || inGameState.id() + 1 == mGameStates.front().id());
+            mGameStates.push_back(inGameState);
+            std::sort(mGameStates.begin(),
+                      mGameStates.end(),
+                      [](const GameState & lhs, const GameState & rhs){ return lhs.id() < rhs.id(); });
+        }
+
+        std::size_t size() const { return mGameStates.size(); }
+
+        bool empty() const { return mGameStates.empty(); }
+
+        const std::vector<GameState> & get() const { return mGameStates; }
+
+        std::vector<GameState>::iterator begin() { return mGameStates.begin(); }
+        std::vector<GameState>::iterator end() { return mGameStates.end(); }
+
+        std::vector<GameState>::const_iterator begin() const { return mGameStates.begin(); }
+        std::vector<GameState>::const_iterator end() const { return mGameStates.end(); }
+
+    private:
+        std::vector<GameState> mGameStates;
+    };
 
 
     NodePtr mRootNode;
