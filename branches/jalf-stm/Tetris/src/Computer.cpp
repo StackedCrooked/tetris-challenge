@@ -80,6 +80,15 @@ struct Computer::Impl : boost::noncopyable
 
 void Computer::Impl::coordinate()
 {
+    if (mGame.isGameOver())
+    {
+        if (mNodeCalculator)
+        {
+            mNodeCalculator->stop();
+        }
+        return;
+    }
+
     if (STM::get(mSyncError))
     {
         LogDebug(SS() << "Sync error. Reset.");
