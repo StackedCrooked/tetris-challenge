@@ -42,13 +42,12 @@ message("ARCH:     ${ARCH}")
 #
 set(EXECUTABLE QtTetris)
 set(SOLUTIONDIR "${QtTetris_SOURCE_DIR}/../")
-set(BUILD_ROOT ${SOLUTIONDIR}Build/)
 
 
 #
 # Set output directory variable
 #
-set(OUTDIR ${BUILD_ROOT}${CMAKE_BUILD_TYPE}/${PLATFORM}/${ARCH}/)
+set(OUTDIR ${CMAKE_BUILD_TYPE}/${PLATFORM}/${ARCH}/)
 
 
 #
@@ -195,9 +194,9 @@ if(WIN32)
 else()
 add_custom_command(TARGET QtTetris
                    POST_BUILD
-                   COMMAND /bin/rm ARGS -f ${BUILD_ROOT}LastBuild
-                   COMMAND /bin/ln ARGS -s ${OUTDIR} ${BUILD_ROOT}LastBuild
-                   WORKING_DIRECTORY    ${BUILD_ROOT})
+                   COMMAND /bin/rm ARGS -f LastBuild
+                   COMMAND /bin/ln ARGS -s ${OUTDIR} LastBuild
+                   WORKING_DIRECTORY    )
 endif()
 
 #
@@ -223,6 +222,6 @@ add_custom_command(TARGET QtTetris
                    COMMAND /bin/cp                  ARGS  "${SOLUTIONDIR}Tetris/res/Tetris.icns"
                                                           "${BUNDLE}/Contents/Resources/Tetris.icns"
                    COMMAND /usr/libexec/PlistBuddy  ARGS  "-c" \"Set :CFBundleIconFile Tetris\" "${BUNDLE}/Contents/Info.plist"
-                   WORKING_DIRECTORY  ${BUILD_ROOT})
+                   WORKING_DIRECTORY  )
 endif(APPLE)
 

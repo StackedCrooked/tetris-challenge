@@ -8,9 +8,4 @@ export TETRIS_DEPLOY_DMG=${TETRIS_DEPLOY_DMG:-No}
 echo "TETRIS_BUILD_TYPE=Debug|Release|RelWithDebInfo -> ${TETRIS_BUILD_TYPE}"
 echo "TETRIS_DEPLOY_DMG=Yes|No -> ${TETRIS_DEPLOY_DMG}"
 
-mkdir -p Build
-cd Build
-cmake ../QtTetris
-
-echo "Delete the \"Build\" directory to erase all configure and build files."
-echo "Type \"cd Build ; make\" to start building."
+cmake $(dirname $0)/QtTetris
