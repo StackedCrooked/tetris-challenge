@@ -2,8 +2,13 @@
 #define NEWGAMEDIALOG_H
 
 
+#ifndef QT_NO_KEYWORDS
 #define QT_NO_KEYWORDS
+#endif
+
+#ifndef QT_NO_DEBUG
 #define QT_NO_DEBUG
+#endif
 
 
 #include <QtGui/QtGui>
