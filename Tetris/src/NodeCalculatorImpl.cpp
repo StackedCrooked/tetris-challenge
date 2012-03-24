@@ -75,7 +75,7 @@ NodeCalculatorImpl::NodeCalculatorImpl(const GameState & inGameState,
                                        Worker & inMainWorker,
                                        WorkerPool & inWorkerPool) :
     mRootNode(new GameStateNode(NotGameOver(inGameState), inEvaluator)),
-    mResults(Results()),
+    mResults(GameStateList()),
     mVerticalResults(VerticalResults(inBlockTypes.size())),
     cBlockTypes(inBlockTypes),
     cWidths(inWidths),
@@ -181,7 +181,7 @@ void NodeCalculatorImpl::calculateResult(stm::transaction & tx)
     }
 
     // Backtrack the best end-node to its starting node.
-    Results result;
+    GameStateList result;
     NodePtr endNode = mVerticalResults.bestNode(tx);
     while (endNode != this->mRootNode)
     {

@@ -4,6 +4,7 @@
 #include "Tetris/Game.h"
 #include "Tetris/GameState.h"
 #include "Tetris/NodeCalculator.h"
+#include "Futile/Assert.h"
 #include "Futile/PrettyPrint.h"
 #include "Futile/Logging.h"
 #include "Futile/STMSupport.h"
@@ -58,9 +59,8 @@ struct Computer::Impl : boost::noncopyable
 
     void coordinate();
 
-    typedef std::vector<GameState> GameStates;
-    typedef GameStates Precalculated;
-    typedef GameStates Preliminaries;
+    typedef GameStateList Precalculated;
+    typedef GameStateList Preliminaries;
 
     Game & mGame;
     mutable stm::shared<Precalculated> mPrecalculated;
@@ -109,7 +109,7 @@ void Computer::Impl::coordinate()
         mNodeCalculator->stop();
     }
 
-    Preliminaries preliminaries = mNodeCalculator ? mNodeCalculator->results() : Preliminaries();
+    Preliminaries preliminaries = mNodeCalculator ? Preliminaries(mNodeCalculator->results()) : Preliminaries();
     if (mNodeCalculator && preliminaries.empty())
     {
         return;
@@ -293,9 +293,21 @@ void Computer::Impl::move()
     {
         Precalculated & prec = mPrecalculated.open_rw(tx);
 
-        while (!prec.empty() && prec.front().originalBlock().type() != mGame.activeBlock(tx).type())
+        if (prec.empty())
         {
-            prec.erase(prec.begin());
+            return;
+        }
+
+        int count = 0;
+        while (prec.front().id() <= mGame.gameState(tx).id())
+        {
+            prec.pop_front();
+            count++;
+        }
+
+        if (count > 0)
+        {
+            LogWarning(SS() << "Popped " << count << " precalculated before move");
         }
 
         if (prec.empty())
@@ -303,9 +315,20 @@ void Computer::Impl::move()
             return;
         }
 
-        if (Game::MoveResult_Committed == move(tx, mGame, prec.front().originalBlock(), *mEvaluator.open_r(tx)))
+		#ifndef NDEBUG
+        auto id1 = mGame.gameState(tx).id();
+        auto id2 = prec.front().id();
+        Assert(id1 + 1 == id2);
+
+        auto t1 = prec.front().originalBlock().type();
+        auto t2 = mGame.activeBlock(tx).type();
+        Assert(t1 == t2); // Is often triggered!
+		#endif
+
+        Game::MoveResult result = move(tx, mGame, prec.front().originalBlock(), *mEvaluator.open_r(tx));
+        if (Game::MoveResult_Committed == result)
         {
-            prec.clear();
+            prec.pop_front();
         }
     });
 }
