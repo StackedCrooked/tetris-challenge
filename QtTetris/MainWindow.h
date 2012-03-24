@@ -3,6 +3,7 @@
 
 
 #define QT_NO_KEYWORDS
+#define QT_NO_DEBUG
 
 
 #include <QtGui/QtGui>
