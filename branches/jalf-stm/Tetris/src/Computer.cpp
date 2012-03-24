@@ -289,6 +289,12 @@ Game::MoveResult Computer::Impl::move(stm::transaction & tx, Game & ioGame, cons
 
 void Computer::Impl::move()
 {
+    #ifndef NDEBUG
+    typedef std::map<unsigned, unsigned> Corrections;
+    static Corrections initial;
+    static stm::shared<Corrections> fCorrections(initial);
+    #endif
+
     stm::atomic([&](stm::transaction & tx)
     {
         Precalculated & prec = mPrecalculated.open_rw(tx);
@@ -298,17 +304,24 @@ void Computer::Impl::move()
             return;
         }
 
-        int count = 0;
+        #ifndef NDEBUG
+        unsigned count = 0;
+        #endif
+
+        Assert(!prec.empty());
         while (prec.front().id() <= mGame.gameState(tx).id())
         {
             prec.pop_front();
+
+            #ifndef NDEBUG
             count++;
+            #endif
         }
 
-        if (count > 0)
-        {
-            LogWarning(SS() << "Popped " << count << " precalculated before move");
-        }
+        #ifndef NDEBUG
+        auto corr = fCorrections.open_rw(tx);
+        corr[count]++;
+        #endif
 
         if (prec.empty())
         {

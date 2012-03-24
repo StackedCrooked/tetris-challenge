@@ -22,7 +22,7 @@ TEST_F(ComputerPlayerTest, All)
         cSearchDepth = 4,
         cSearchWidth = 5,
         cWorkerCount = 6,
-        cDuration = 500
+        cDuration = 5000
     };
 
     Game game(20, 10);
