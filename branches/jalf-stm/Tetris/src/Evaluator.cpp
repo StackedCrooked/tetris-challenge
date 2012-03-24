@@ -231,12 +231,14 @@ int MakeTetrises::evaluate(const GameState & inGameState) const
     double result = std::pow(inGameState.firstOccupiedRow(), 0.5);
 
 
-    std::size_t c = grid.columnCount() - 1;
+    int c = grid.columnCount() - 1;
     if (grid.rowCount() >= 4)
     {
         int r = std::min(0, inGameState.firstOccupiedRow() - 4);
         for (; r < int(grid.rowCount()); ++r)
         {
+            Assert(r < int(grid.rowCount()));
+            Assert(c < int(grid.columnCount()));
             if (grid.get(r, c))
             {
                 // Penalty for occupying the last column,

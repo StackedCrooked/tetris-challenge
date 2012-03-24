@@ -123,9 +123,9 @@ public:
                   boost::bind(&GameState::id, _1) < boost::bind(&GameState::id, _2));
     }
 
-    void pop_back() { mGameStates.pop_back(); }
+    void pop_back() { Assert(!mGameStates.empty()); mGameStates.pop_back(); }
 
-    void pop_front() { mGameStates.erase(mGameStates.begin()); }
+    void pop_front() { Assert(!mGameStates.empty()); mGameStates.erase(mGameStates.begin()); }
 
     void clear() { mGameStates.clear(); }
 
