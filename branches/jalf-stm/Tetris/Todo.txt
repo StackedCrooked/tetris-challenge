@@ -1,5 +1,6 @@
 STM Version
 -----------
+- Move active block to GameState. This allows additional sync checks.
 - Sync errors.
 - Occasional crashes.
 v On Mac the FPS is very slow.
