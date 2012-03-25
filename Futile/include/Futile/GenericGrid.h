@@ -2,6 +2,7 @@
 #define GENERICGRID_H
 
 
+#include "Futile/Assert.h"
 #include <cstring>
 #include <vector>
 #include <memory>
@@ -75,6 +76,7 @@ std::size_t GenericGrid<T>::columnCount() const
 template<class T>
 const T & GenericGrid<T>::get(std::size_t inRow, std::size_t inColumn) const
 {
+    Assert(int(inRow) >= 0 && inRow < rowCount() && int(inColumn) >= 0 && inColumn < columnCount());
     return mData[inRow * mColumnCount + inColumn];
 }
 
@@ -82,6 +84,7 @@ const T & GenericGrid<T>::get(std::size_t inRow, std::size_t inColumn) const
 template<class T>
 void GenericGrid<T>::set(std::size_t inRow, std::size_t inColumn, const T & inValue)
 {
+    Assert(int(inRow) >= 0 && inRow < rowCount() && int(inColumn) >= 0 && inColumn < columnCount());
     mData[inRow * mColumnCount + inColumn] = inValue;
 }
 

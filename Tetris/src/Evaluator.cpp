@@ -234,7 +234,11 @@ int MakeTetrises::evaluate(const GameState & inGameState) const
     int c = grid.columnCount() - 1;
     if (grid.rowCount() >= 4)
     {
-        int r = std::min(0, inGameState.firstOccupiedRow() - 4);
+        int r = 0;
+        if (inGameState.firstOccupiedRow() > 4)
+        {
+            r = inGameState.firstOccupiedRow() - 4;
+        }
         for (; r < int(grid.rowCount()); ++r)
         {
             Assert(r >= 0 && r < int(grid.rowCount()));
