@@ -1,5 +1,6 @@
 STM Version
 -----------
+- LinesCleared is called from within transaction.
 - Move active block to GameState. This allows additional sync checks.
 - Sync errors.
 - Occasional crashes.
