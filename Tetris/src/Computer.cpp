@@ -168,6 +168,7 @@ void Computer::Impl::coordinate()
         else if (gs.firstOccupiedRow() > 12)
         {
             ev = &MakeTetrises::Instance();
+            //ev = &Survival::Instance();
         }
 
         blockTypes.resize(std::min(int(blockTypes.size()), ev->recommendedSearchDepth()));
