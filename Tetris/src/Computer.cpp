@@ -96,10 +96,8 @@ void Computer::Impl::coordinate()
         STM::set(mSyncError, false);
     }
 
-    std::size_t numPrecalculated = STM::get(mPrecalculated).size();
-    unsigned firstOccupiedRow = stm::atomic<unsigned>([&](stm::transaction & tx) { return mGame.gameState(tx).firstOccupiedRow(); });
-    bool danger = firstOccupiedRow <= 10;
-    if (!danger && numPrecalculated > 2)
+    const unsigned cMinimumReserve = 0; // NOTE: Sync errors occur if cReserve > 0.
+    if (STM::get(mPrecalculated).size() > cMinimumReserve)
     {
         return;
     }
@@ -154,14 +152,6 @@ void Computer::Impl::coordinate()
         }
 
         preliminaries.clear();
-
-        if (danger)
-        {
-            while (precalculated.size() > 2)
-            {
-                precalculated.pop_back();
-            }
-        }
 
         blockTypes = mGame.getFutureBlocks(tx, precalculated.size() + ev->recommendedSearchDepth());
         blockTypes.erase(blockTypes.begin(), blockTypes.begin() + precalculated.size());
@@ -289,12 +279,6 @@ Game::MoveResult Computer::Impl::move(stm::transaction & tx, Game & ioGame, cons
 
 void Computer::Impl::move()
 {
-    #ifndef NDEBUG
-    typedef std::map<unsigned, unsigned> Corrections;
-    static Corrections initial;
-    static stm::shared<Corrections> fCorrections(initial);
-    #endif
-
     stm::atomic([&](stm::transaction & tx)
     {
         Precalculated & prec = mPrecalculated.open_rw(tx);
@@ -304,42 +288,35 @@ void Computer::Impl::move()
             return;
         }
 
-        #ifndef NDEBUG
-        unsigned count = 0;
-        #endif
+        auto idPrec = prec.front().id();
+        auto idCurr = mGame.gameState(tx).id();
 
-        Assert(!prec.empty());
-        while (prec.front().id() <= mGame.gameState(tx).id())
+        if (idPrec != idCurr + 1)
         {
+            Assert(idPrec == idCurr);
             prec.pop_front();
-
-            #ifndef NDEBUG
-            count++;
-            #endif
         }
-
-        #ifndef NDEBUG
-        auto corr = fCorrections.open_rw(tx);
-        corr[count]++;
-        #endif
 
         if (prec.empty())
         {
             return;
         }
 
-		#ifndef NDEBUG
-        auto id1 = mGame.gameState(tx).id();
-        auto id2 = prec.front().id();
-        Assert(id1 + 1 == id2);
-
+        // This may happen if a block was dropped after starting the node calculator
         auto t1 = prec.front().originalBlock().type();
         auto t2 = mGame.activeBlock(tx).type();
-        Assert(t1 == t2); // Is often triggered!
-		#endif
+        if (t1 != t2)
+        {
+            LogDebug(SS() << "Clear all precalculated.");
+            prec.clear();
+            return;
+        }
 
-        Game::MoveResult result = move(tx, mGame, prec.front().originalBlock(), *mEvaluator.open_r(tx));
-        if (Game::MoveResult_Committed == result)
+        auto oldId = mGame.gameStateId(tx);
+        move(tx, mGame, prec.front().originalBlock(), *mEvaluator.open_r(tx));
+        auto newId = mGame.gameStateId(tx);
+        Assert(oldId == newId || oldId + 1 == newId);
+        if (oldId + 1 == newId)
         {
             prec.pop_front();
         }

@@ -78,6 +78,12 @@ unsigned Game::gameStateId(stm::transaction & tx) const
 }
 
 
+unsigned Game::gameStateId() const
+{
+    return stm::atomic<unsigned>([&](stm::transaction & tx){ return mGameState.open_r(tx).id(); });
+}
+
+
 const GameState & Game::gameState(stm::transaction & tx) const
 {
     return mGameState.open_r(tx);

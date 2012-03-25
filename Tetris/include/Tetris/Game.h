@@ -39,6 +39,8 @@ public:
 
     ~Game();
 
+
+    unsigned gameStateId() const;
     unsigned gameStateId(stm::transaction & tx) const;
 
     // Threaded!
