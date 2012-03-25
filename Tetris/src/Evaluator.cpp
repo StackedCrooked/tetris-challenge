@@ -106,9 +106,9 @@ int Evaluator::evaluate(const GameState & inGameState) const
     int numHoles = 0;
     int numOccupiedUnderTop = 0;
 
-    for (std::size_t rowIdx = 0; rowIdx != grid.rowCount(); ++rowIdx)
+    for (std::size_t rowIdx = inGameState.firstOccupiedRow(); rowIdx < grid.rowCount(); ++rowIdx)
     {
-        for (std::size_t colIdx = 0; colIdx != grid.columnCount(); ++colIdx)
+        for (std::size_t colIdx = 0; colIdx < grid.columnCount(); ++colIdx)
         {
             const int & value = grid.get(rowIdx, colIdx);
             if (value != BlockType_Nil)
