@@ -1,10 +1,9 @@
 STM Version
 -----------
-- LinesCleared is called from within transaction.
-- Survival mode is slow and choppy.
-- Move active block to GameState. This allows additional sync checks.
-- Sync errors.
-- Occasional crashes.
+- LinesCleared and GameStateChanged should not be called from within transaction.
+v Occasional crashes.
+v Survival mode is slow and choppy.
+v Sync errors.
 v On Mac the FPS is very slow.
 v Use STM in TreeRowInfos
 v Future blocks shows current block as next block.
