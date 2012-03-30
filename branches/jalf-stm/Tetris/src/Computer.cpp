@@ -96,7 +96,7 @@ void Computer::Impl::coordinate()
         STM::set(mSyncError, false);
     }
 
-    const unsigned cMinimumReserve = 0; // NOTE: Sync error will occur if cReserve > 0.
+    const unsigned cMinimumReserve = 0; // NOTE: Sync error will occur if cMinimumReserve > 0.
     if (STM::get(mPrecalculated).size() > cMinimumReserve)
     {
         return;
