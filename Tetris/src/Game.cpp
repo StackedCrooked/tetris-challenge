@@ -109,7 +109,7 @@ int Game::columnCount() const
 
 int Game::level() const
 {
-    return std::max<int>(stats().numLines() / 10, mStartingLevel.copy());
+    return std::max<int>(stats().numLines() / 10, STM::get(mStartingLevel));
 }
 
 
@@ -307,7 +307,7 @@ void Game::dropWithoutCommit()
 
 void Game::setStartingLevel(stm::transaction & tx, int inLevel)
 {
-    mStartingLevel.set(tx, inLevel);
+    mStartingLevel.open_rw(tx) = inLevel;
 }
 
 
