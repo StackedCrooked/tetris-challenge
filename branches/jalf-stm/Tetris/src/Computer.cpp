@@ -27,7 +27,7 @@ struct Computer::Impl : boost::noncopyable
     static const int cDefaultSearchDepth = 8;
     static const int cDefaultSearchWidth = 2;
     static const int cDefaultWorkerCount = 1;
-    static const int cSurvivalModeTreshold = 16;
+    static const int cSurvivalModeTreshold = 18;
 
     Impl(Game & inGame) :
         mGame(inGame),

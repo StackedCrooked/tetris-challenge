@@ -74,27 +74,27 @@ Game::~Game()
 
 unsigned Game::gameStateId(stm::transaction & tx) const
 {
-    return mGameState.open_r(tx).id();
+    return mGameState.get(tx).id();
 }
 
 
 unsigned Game::gameStateId() const
 {
-    return stm::atomic<unsigned>([&](stm::transaction & tx){ return mGameState.open_r(tx).id(); });
+    return stm::atomic<unsigned>([&](stm::transaction & tx){ return gameStateId(tx); });
 }
 
 
 const GameState & Game::gameState(stm::transaction & tx) const
 {
-    return mGameState.open_r(tx);
+    return mGameState.get(tx);
 }
 
 
 void Game::commit(stm::transaction & tx, const Block & inBlock)
 {
-    GameState & gameState = mGameState.open_rw(tx);
+    GameState & gameState = mGameState.get(tx);
     int lines = gameState.numLines();
-    gameState = gameState.commit(inBlock);    
+    gameState = gameState.commit(inBlock);
     LinesCleared(gameState.numLines() - lines);
 }
 
@@ -147,7 +147,7 @@ void Game::applyLinePenalty(stm::transaction & tx, std::size_t inLineCount)
         newFirstOccupiedRow = 0;
     }
 
-    const GameState & gameState = mGameState.open_r(tx);
+    const GameState & gameState = mGameState.get(tx);
     Grid grid = gameState.grid();
 
     std::size_t garbageStart = grid.rowCount() - lineIncrement;
@@ -173,7 +173,7 @@ void Game::applyLinePenalty(stm::transaction & tx, std::size_t inLineCount)
         }
     }
 
-    mGameState.open_rw(tx).setGrid(grid);
+    mGameState.get(tx).setGrid(grid);
 
     // Check if the active block has been caught in the penalty lines that were added.
     // If yes then we need to commit the current gamestate.
@@ -190,7 +190,7 @@ void Game::applyLinePenalty(stm::transaction & tx, std::size_t inLineCount)
 
 bool Game::isGameOver(stm::transaction & tx) const
 {
-    return mGameState.open_r(tx).isGameOver();
+    return mGameState.get(tx).isGameOver();
 }
 
 
@@ -306,9 +306,9 @@ void Game::setStartingLevel(stm::transaction & tx, int inLevel)
 }
 
 
-void Game::setGrid(stm::transaction & tx, const Grid & inGrid)
+void Game::setGrid(const Grid & inGrid)
 {
-    mGameState.open_rw(tx).setGrid(inGrid);
+    mGameState.get().setGrid(inGrid);
 }
 
 
