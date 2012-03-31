@@ -23,10 +23,11 @@ using namespace Futile;
 
 struct Computer::Impl : boost::noncopyable
 {
-    static const int cDefaultNumMovesPerSecond = 40;
+    static const int cDefaultNumMovesPerSecond = 50;
     static const int cDefaultSearchDepth = 8;
     static const int cDefaultSearchWidth = 2;
     static const int cDefaultWorkerCount = 1;
+    static const int cSurvivalModeTreshold = 16;
 
     Impl(Game & inGame) :
         mGame(inGame),
@@ -104,8 +105,32 @@ void Computer::Impl::coordinate()
 
     if (mNodeCalculator && mNodeCalculator->status() >= NodeCalculator::Status_Working)
     {
+        if (mNodeCalculator->progress().current() == 0)
+        {
+            return;
+        }
         mNodeCalculator->stop();
     }
+
+
+    if (mNodeCalculator)
+    {
+
+        // If make-tetrises mode and danger then remove all precalculated results and restart in survival mode.
+        std::pair<bool, int> survival_and_firstOccupiedRow = stm::atomic<std::pair<bool, int>>([&](stm::transaction & tx) {
+            return std::make_pair(NULL != dynamic_cast<const Survival*>(mEvaluator.open_r(tx)),
+                                  mGame.firstOccupiedRow(tx));
+        });
+
+        if (!survival_and_firstOccupiedRow.first && survival_and_firstOccupiedRow.second < cSurvivalModeTreshold)
+        {
+            LogDebug(SS() << "Switch to Survival!");
+            mNodeCalculator.reset();
+            stm::atomic([&](stm::transaction & tx) { mPrecalculated.open_rw(tx).clear(); });
+            return;
+        }
+    }
+
 
     Preliminaries preliminaries = mNodeCalculator ? Preliminaries(mNodeCalculator->results()) : Preliminaries();
     if (mNodeCalculator && preliminaries.empty())
@@ -135,13 +160,13 @@ void Computer::Impl::coordinate()
             }
             else
             {
-                if (prelim.id() <= mGame.gameState(tx).id())
+                if (prelim.id() <= mGame.gameStateId(tx))
                 {
                     continue;
                 }
 
 
-                if (prelim.id() != mGame.gameState(tx).id() + 1)
+                if (prelim.id() != mGame.gameStateId(tx) + 1)
                 {
                     LogError("A not-yet-understood sync error has occured.");
                     precalculated.clear();
@@ -161,14 +186,13 @@ void Computer::Impl::coordinate()
     if (!blockTypes.empty() && !lastGameState->isGameOver())
     {
         const GameState & gs = *lastGameState;
-        if (gs.firstOccupiedRow() <= 8)
+        if (gs.firstOccupiedRow() < cSurvivalModeTreshold)
         {
             ev = &Survival::Instance();
         }
-        else if (gs.firstOccupiedRow() > 12)
+        else
         {
             ev = &MakeTetrises::Instance();
-            //ev = &Survival::Instance();
         }
 
         blockTypes.resize(std::min(int(blockTypes.size()), ev->recommendedSearchDepth()));
@@ -255,17 +279,8 @@ Game::MoveResult Computer::Impl::move(stm::transaction & tx, Game & ioGame, cons
 
     if (inEvaluator.moveDownBehavior() == MoveDownBehavior_DropDown)
     {
-        unsigned id = ioGame.gameState(tx).id();
-        unsigned row = ioGame.activeBlock(tx).row();
-        ioGame.dropWithoutCommit(tx);
-        if (ioGame.activeBlock(tx).row() == row)
-        {
-            return Game::MoveResult_NotMoved;
-        }
-        else
-        {
-            return ioGame.gameState(tx).id() == id ? Game::MoveResult_Moved : Game::MoveResult_Committed;
-        }
+        ioGame.dropAndCommit(tx);
+        return Game::MoveResult_Committed;
     }
     else if (inEvaluator.moveDownBehavior() == MoveDownBehavior_MoveDown)
     {
@@ -290,7 +305,7 @@ void Computer::Impl::move()
         }
 
         auto idPrec = prec.front().id();
-        auto idCurr = mGame.gameState(tx).id();
+        auto idCurr = mGame.gameStateId();
 
         if (idPrec != idCurr + 1)
         {
