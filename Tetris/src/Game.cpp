@@ -200,9 +200,21 @@ bool Game::isGameOver() const
 }
 
 
+Block Game::activeBlock() const
+{
+    return stm::atomic<Block>([&](stm::transaction & tx){ return activeBlock(tx); });
+}
+
+
 const Block & Game::activeBlock(stm::transaction & tx) const
 {
     return mActiveBlock.open_r(tx);
+}
+
+
+int Game::rowCount() const
+{
+    return stm::atomic<int>([&](stm::transaction & tx) { return rowCount(tx);});
 }
 
 
@@ -212,9 +224,21 @@ int Game::rowCount(stm::transaction & tx) const
 }
 
 
+int Game::columnCount() const
+{
+    return stm::atomic<int>([&](stm::transaction & tx) { return columnCount(tx);});
+}
+
+
 int Game::columnCount(stm::transaction & tx) const
 {
     return gameGrid(tx).columnCount();
+}
+
+
+bool Game::checkPositionValid(const Block & inBlock) const
+{
+    return stm::atomic<bool>([&](stm::transaction & tx) { return checkPositionValid(tx, inBlock); });
 }
 
 
@@ -235,6 +259,12 @@ bool Game::canMove(stm::transaction & tx, Direction inDirection) const
     std::size_t newRow = block.row()    + GetRowDelta(inDirection);
     std::size_t newCol = block.column() + GetColumnDelta(inDirection);
     return gameState(tx).checkPositionValid(block, newRow, newCol);
+}
+
+
+bool Game::canMove(Direction inDirection) const
+{
+    return stm::atomic<bool>([&](stm::transaction & tx) { return canMove(tx, inDirection); });
 }
 
 
