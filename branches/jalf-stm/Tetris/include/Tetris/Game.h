@@ -8,6 +8,7 @@
 #include "Tetris/GameState.h"
 #include "Tetris/Grid.h"
 #include "Tetris/NodePtr.h"
+#include "Futile/STMSupport.h"
 #include "stm.hpp"
 #include <boost/noncopyable.hpp>
 #include <boost/signals2.hpp>
@@ -23,44 +24,6 @@ namespace Tetris {
 class Block;
 class GameStateNode;
 class Game;
-
-
-template<typename T>
-struct Property
-{
-    Property(const T & inValue = T()) :
-        mValue(inValue)
-    {
-    }
-
-    const T & open_r(stm::transaction & tx) const
-    {
-        return mValue.open_r(tx);
-    }
-
-    T & open_rw(stm::transaction & tx)
-    {
-        return mValue.open_rw(tx);
-    }
-
-    T copy() const
-    {
-        return stm::atomic<T>([&](stm::transaction & tx) { return mValue.open_r(tx); });
-    }
-
-    void set(stm::transaction & tx, const T & inValue)
-    {
-        mValue.open_rw(tx) = inValue;
-    }
-
-    void set(const T & inValue)
-    {
-        stm::atomic([&](stm::transaction & tx){ this->set(tx, inValue); });
-    }
-
-private:
-    mutable stm::shared<T> mValue;
-};
 
 
 /**
@@ -85,9 +48,9 @@ public:
 
     unsigned gameStateId() const;
 
-    void setPaused(bool inPause) { mPaused.set(inPause); }
+    void setPaused(bool inPause) { Futile::STM::set(mPaused, inPause); }
 
-    bool isPaused() const { return mPaused.copy(); }
+    bool isPaused() const { return Futile::STM::get(mPaused); }
 
     bool isGameOver() const;
 
@@ -95,7 +58,7 @@ public:
 
     Grid grid() const;
 
-    Block activeBlock() const { return mActiveBlock.copy(); }
+    Block activeBlock() const { return Futile::STM::get(mActiveBlock); }
 
     int rowCount() const;
 
@@ -164,10 +127,10 @@ private:
     const CircularBlockTypes mBlockTypes;
     const CircularBlockTypes mGarbage;
     mutable stm::shared<BlockTypes::size_type> mGarbageIndex;
-    Property<Block> mActiveBlock;
-    Property<int> mStartingLevel;
-    Property<bool> mPaused;
-    Property<GameState> mGameState;
+    mutable stm::shared<Block> mActiveBlock;
+    mutable stm::shared<int> mStartingLevel;
+    mutable stm::shared<bool> mPaused;
+    mutable stm::shared<GameState> mGameState;
 };
 
 
