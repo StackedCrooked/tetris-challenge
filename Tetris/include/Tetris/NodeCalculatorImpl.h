@@ -81,12 +81,10 @@ public:
 
     void setFinished(stm::transaction & tx)
     {
-        Assert(!mFinished.open_r(tx));
         if (!mBestNode.open_r(tx))
         {
             throw SetFinishedException();
         }
-        Assert(mBestNode.open_r(tx));
         mFinished.open_rw(tx) = true;
     }
 
@@ -113,8 +111,7 @@ public:
 
     std::size_t depth(stm::transaction & tx) const
     {
-        const std::size_t & cIndex = mCurrentIndex.open_r(tx);
-        return cIndex;
+        return mCurrentIndex.open_r(tx);
     }
 
     std::size_t maxDepth() const

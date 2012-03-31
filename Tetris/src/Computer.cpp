@@ -54,9 +54,9 @@ struct Computer::Impl : boost::noncopyable
         return UInt64(0.5 + (1000.0 / inFrequency));
     }
 
-    void move();
+    void onMoveTimer();
 
-    Game::MoveResult move(stm::transaction & tx, Game & ioGame, const Block & targetBlock, const Evaluator & inEvaluator);
+    Game::MoveResult move(Game & ioGame, const Block & targetBlock, const Evaluator & inEvaluator);
 
     void coordinate();
 
@@ -141,7 +141,7 @@ void Computer::Impl::coordinate()
     BlockTypes blockTypes;
     boost::scoped_ptr<GameState> lastGameState;
     unsigned workerCount = mWorkerPool.size();
-    const Evaluator * ev;
+    const Evaluator * ev = NULL;
 
     stm::atomic([&](stm::transaction & tx)
     {
@@ -183,6 +183,8 @@ void Computer::Impl::coordinate()
         lastGameState.reset(new GameState(precalculated.empty() ? mGame.gameState(tx) : precalculated.back()));
     });
 
+    Assert(ev);
+
     if (!blockTypes.empty() && !lastGameState->isGameOver())
     {
         const GameState & gs = *lastGameState;
@@ -213,7 +215,7 @@ void Computer::Impl::coordinate()
 }
 
 
-Game::MoveResult Computer::Impl::move(stm::transaction & tx, Game & ioGame, const Block & targetBlock, const Evaluator & inEvaluator)
+Game::MoveResult Computer::Impl::move(Game & ioGame, const Block & targetBlock, const Evaluator & inEvaluator)
 {
     Block block = ioGame.activeBlock();
     Assert(block.type() == targetBlock.type());
@@ -230,7 +232,7 @@ Game::MoveResult Computer::Impl::move(stm::transaction & tx, Game & ioGame, cons
 
     if (block.column() < targetBlock.column())
     {
-        if (ioGame.move(tx, MoveDirection_Right) == Game::MoveResult_Moved)
+        if (ioGame.move(MoveDirection_Right) == Game::MoveResult_Moved)
         {
             return Game::MoveResult_Moved;
         }
@@ -247,7 +249,7 @@ Game::MoveResult Computer::Impl::move(stm::transaction & tx, Game & ioGame, cons
 
     if (block.column() > targetBlock.column())
     {
-        if (ioGame.move(tx, MoveDirection_Left) == Game::MoveResult_Moved)
+        if (ioGame.move(MoveDirection_Left) == Game::MoveResult_Moved)
         {
             return Game::MoveResult_Moved;
         }
@@ -284,7 +286,7 @@ Game::MoveResult Computer::Impl::move(stm::transaction & tx, Game & ioGame, cons
     }
     else if (inEvaluator.moveDownBehavior() == MoveDownBehavior_MoveDown)
     {
-        return ioGame.move(tx, MoveDirection_Down);
+        return ioGame.move(MoveDirection_Down);
     }
     else
     {
@@ -293,7 +295,7 @@ Game::MoveResult Computer::Impl::move(stm::transaction & tx, Game & ioGame, cons
 }
 
 
-void Computer::Impl::move()
+void Computer::Impl::onMoveTimer()
 {
     stm::atomic([&](stm::transaction & tx)
     {
@@ -329,7 +331,7 @@ void Computer::Impl::move()
         }
 
         auto oldId = mGame.gameStateId();
-        move(tx, mGame, prec.front().originalBlock(), *mEvaluator.open_r(tx));
+        move(mGame, prec.front().originalBlock(), *mEvaluator.open_r(tx));
         auto newId = mGame.gameStateId();
         Assert(oldId == newId || oldId + 1 == newId);
         if (oldId + 1 == newId)
@@ -343,7 +345,7 @@ void Computer::Impl::move()
 Computer::Computer(Game &inGame) :
     mImpl(new Impl(inGame))
 {
-    mImpl->mMoveTimer.start(boost::bind(&Computer::Impl::move, mImpl.get()));
+    mImpl->mMoveTimer.start(boost::bind(&Computer::Impl::onMoveTimer, mImpl.get()));
     mImpl->mCoordinationTimer.start(boost::bind(&Computer::Impl::coordinate, mImpl.get()));
 }
 

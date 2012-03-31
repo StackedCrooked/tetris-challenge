@@ -131,7 +131,7 @@ void Gravity::Impl::onTimerEvent()
             const Block & block = mGame.activeBlock();
             if (!mGame.checkPositionValid(block))
             {
-                 mGame.move(tx, MoveDirection_Down);
+                 mGame.move(MoveDirection_Down);
                  return;
             }
 
@@ -140,7 +140,7 @@ void Gravity::Impl::onTimerEvent()
                 return;
             }
 
-            mGame.move(tx, MoveDirection_Down);
+            mGame.move(MoveDirection_Down);
             int & level = mLevel.open_rw(tx);
             level = std::min(mGame.level(), cMaxLevel);
             newLevel = level;
