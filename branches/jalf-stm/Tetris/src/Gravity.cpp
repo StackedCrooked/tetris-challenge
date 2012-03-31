@@ -129,13 +129,13 @@ void Gravity::Impl::onTimerEvent()
         // If our block was "caught" by the sudden appearance of new blocks, then we solidify it in that state.
         stm::atomic([&](stm::transaction & tx) {
             const Block & block = mGame.activeBlock(tx);
-            if (!mGame.gameState(tx).checkPositionValid(block))
+            if (!mGame.checkPositionValid(block))
             {
                  mGame.move(tx, MoveDirection_Down);
                  return;
             }
 
-            if (mGame.isGameOver(tx) || mGame.isPaused(tx))
+            if (mGame.isGameOver(tx) || mGame.isPaused())
             {
                 return;
             }

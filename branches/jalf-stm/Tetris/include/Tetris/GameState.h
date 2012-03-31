@@ -50,6 +50,11 @@ public:
     bool checkPositionValid(const Block & inBlock) const
     { return checkPositionValid(inBlock, inBlock.row(), inBlock.column()); }
 
+    GameStateStats stats() const
+    {
+        return GameStateStats(numLines(), numSingles(), numDoubles(), numTriples(), numTetrises());
+    }
+
     int numLines() const
     { return mStats.mNumLines; }
 
