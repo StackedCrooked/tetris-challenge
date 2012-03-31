@@ -58,20 +58,6 @@ struct Property
         stm::atomic([&](stm::transaction & tx){ this->set(tx, inValue); });
     }
 
-    typedef std::function<void(T &)> Mutator;
-
-    void mutate(const Mutator & inMutator)
-    {
-        return stm::atomic<T>([&](stm::transaction & tx) { inMutator(mValue.open_rw(tx)); });
-    }
-
-    typedef std::function<void(const T &)> Reader;
-
-    void read(const Reader & inReader)
-    {
-        return stm::atomic<T>([&](stm::transaction & tx) { inReader(mValue.open_r(tx)); });
-    }
-
 private:
     mutable stm::shared<T> mValue;
 };
@@ -208,7 +194,7 @@ private:
     const CircularBlockTypes mGarbage;
     mutable stm::shared<BlockTypes::size_type> mGarbageIndex;
     mutable stm::shared<Block> mActiveBlock;
-    mutable stm::shared<int> mStartingLevel;
+    Property<int> mStartingLevel;
     Property<bool> mPaused;
     Property<GameState> mGameState;
 };
