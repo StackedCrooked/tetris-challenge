@@ -207,9 +207,7 @@ void SimpleGame::setStartingLevel(int inLevel)
 
 int SimpleGame::level() const
 {
-    return stm::atomic<int>([&](stm::transaction & tx) {
-        return mImpl->mGame.level(tx);
-    });
+    return mImpl->mGame.level();
 }
 
 

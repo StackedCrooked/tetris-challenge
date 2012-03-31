@@ -142,7 +142,7 @@ void Gravity::Impl::onTimerEvent()
 
             mGame.move(tx, MoveDirection_Down);
             int & level = mLevel.open_rw(tx);
-            level = std::min(mGame.level(tx), cMaxLevel);
+            level = std::min(mGame.level(), cMaxLevel);
             newLevel = level;
         });
 
