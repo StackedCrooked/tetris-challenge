@@ -114,7 +114,7 @@ public:
         MoveResult_Committed
     };
 
-    virtual MoveResult move(Direction inDirection);
+    virtual MoveResult move(stm::transaction & tx, Direction inDirection);
 
     MoveResult rotate();
 
@@ -138,7 +138,6 @@ public:
     const GameState & gameState(stm::transaction & tx) const;
 
 private:
-    MoveResult moveImpl(stm::transaction & tx, Direction inDirection);
     void commit(stm::transaction & tx, const Block & inBlock);
     void setGrid(const Grid & inGrid);
     std::vector<BlockType> getGarbageRow(stm::transaction & tx);

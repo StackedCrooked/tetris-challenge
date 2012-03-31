@@ -36,6 +36,8 @@ public:
     unsigned moveSpeed() const;
 
 private:
+    void onMoveTimerEvent();
+
     struct Impl;
     friend struct Impl;
     boost::scoped_ptr<Impl> mImpl;
