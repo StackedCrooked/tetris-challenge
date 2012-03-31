@@ -190,7 +190,7 @@ public:
 
 private:
     void commit(stm::transaction & tx, const Block & inBlock);
-    void setGrid(stm::transaction & tx, const Grid & inGrid);
+    void setGrid(const Grid & inGrid);
     std::vector<BlockType> getGarbageRow(stm::transaction & tx);
 
     class CircularBlockTypes
@@ -218,7 +218,7 @@ private:
     mutable stm::shared<Block> mActiveBlock;
     mutable stm::shared<int> mStartingLevel;
     Property<bool> mPaused;
-    mutable stm::shared<GameState> mGameState;
+    Property<GameState> mGameState;
 };
 
 
