@@ -33,19 +33,19 @@ struct Property
     {
     }
 
-    const T & get(stm::transaction & tx) const
+    const T & open_r(stm::transaction & tx) const
     {
         return mValue.open_r(tx);
     }
 
-    T & get(stm::transaction & tx)
+    T & open_rw(stm::transaction & tx)
     {
         return mValue.open_rw(tx);
     }
 
-    T get() const
+    T copy() const
     {
-        return stm::atomic<T>([&](stm::transaction & tx) { return this->get(tx); });
+        return stm::atomic<T>([&](stm::transaction & tx) { return mValue.open_r(tx); });
     }
 
     void set(stm::transaction & tx, const T & inValue)
@@ -77,61 +77,33 @@ public:
 
     ~Game();
 
-    GameStateStats stats(stm::transaction & tx) const
-    {
-        return gameState(tx).stats();
-    }
-
-    GameStateStats stats()
-    {
-        return stm::atomic<GameStateStats>([&](stm::transaction & tx) { return stats(tx); });
-    }
-
-    unsigned gameStateId() const;
-    unsigned gameStateId(stm::transaction & tx) const;
-
     // Threaded!
     boost::signals2::signal<void()> GameStateChanged;
 
     // Threaded!
     boost::signals2::signal<void(unsigned)> LinesCleared;
 
-    const Grid & grid(stm::transaction & tx) const
-    {
-        return gameState(tx).grid();
-    }
+    unsigned gameStateId() const;
 
-    // Return a copy
-    Grid grid() const
-    {
-        return stm::atomic<Grid>([&](stm::transaction & tx){ return grid(tx); });
-    }
+    void setPaused(bool inPause) { mPaused.set(inPause); }
 
-    void setPaused(bool inPause)
-    {
-        mPaused.set(inPause);
-    }
-
-    bool isPaused() const { return mPaused.get(); }
-    bool isPaused(stm::transaction & tx) const { return mPaused.get(tx); }
+    bool isPaused() const { return mPaused.copy(); }
 
     bool isGameOver() const;
-    bool isGameOver(stm::transaction & tx) const;
 
-    Block activeBlock() const;
-    const Block & activeBlock(stm::transaction & tx) const;
+    GameStateStats stats() const;
+
+    Grid grid() const;
+
+    Block activeBlock() const { return mActiveBlock.copy(); }
 
     int rowCount() const;
-    int rowCount(stm::transaction & tx) const;
 
     int columnCount() const;
-    int columnCount(stm::transaction & tx) const;
 
     bool checkPositionValid(const Block & inBlock) const;
-    bool checkPositionValid(stm::transaction & tx, const Block & inBlock) const;
 
     bool canMove(Direction inDirection) const;
-    bool canMove(stm::transaction & tx, Direction inDirection) const;
 
     enum MoveResult
     {
@@ -142,7 +114,7 @@ public:
 
     virtual MoveResult move(stm::transaction & tx, Direction inDirection);
 
-    MoveResult rotate(stm::transaction & tx);
+    MoveResult rotate();
 
     void dropWithoutCommit(stm::transaction & tx);
 
@@ -160,7 +132,7 @@ public:
 
     const Grid & gameGrid(stm::transaction & tx) const;
 
-    BlockTypes getFutureBlocks(stm::transaction & tx, std::size_t inCount);
+    BlockTypes getFutureBlocks(std::size_t inCount);
 
     virtual void applyLinePenalty(stm::transaction & tx, std::size_t inLineCount);
 
@@ -193,7 +165,7 @@ private:
     const CircularBlockTypes mBlockTypes;
     const CircularBlockTypes mGarbage;
     mutable stm::shared<BlockTypes::size_type> mGarbageIndex;
-    mutable stm::shared<Block> mActiveBlock;
+    Property<Block> mActiveBlock;
     Property<int> mStartingLevel;
     Property<bool> mPaused;
     Property<GameState> mGameState;
