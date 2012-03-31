@@ -326,19 +326,19 @@ void Game::dropWithoutCommit(stm::transaction & tx)
 
 int Game::level(stm::transaction & tx) const
 {
-    return std::max<int>(gameState(tx).numLines() / 10, mStartingLevel.open_r(tx));
+    return std::max<int>(gameState(tx).numLines() / 10, mStartingLevel.get(tx));
 }
 
 
 void Game::setStartingLevel(stm::transaction & tx, int inLevel)
 {
-    mStartingLevel.open_rw(tx) = inLevel;
+    mStartingLevel.set(tx, inLevel);
 }
 
 
 void Game::setGrid(const Grid & inGrid)
 {
-    mGameState.get().setGrid(inGrid);
+    stm::atomic([&](stm::transaction& tx){ mGameState.get(tx).setGrid(inGrid); });
 }
 
 
