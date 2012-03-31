@@ -126,34 +126,26 @@ public:
         mPaused.set(inPause);
     }
 
-    bool isPaused() const
-    {
-        return mPaused.get();
-    }
+    bool isPaused() const { return mPaused.get(); }
+    bool isPaused(stm::transaction & tx) const { return mPaused.get(tx); }
 
     bool isGameOver() const;
-
     bool isGameOver(stm::transaction & tx) const;
 
+    Block activeBlock() const;
     const Block & activeBlock(stm::transaction & tx) const;
 
+    int rowCount() const;
     int rowCount(stm::transaction & tx) const;
 
+    int columnCount() const;
     int columnCount(stm::transaction & tx) const;
 
+    bool checkPositionValid(const Block & inBlock) const;
     bool checkPositionValid(stm::transaction & tx, const Block & inBlock) const;
 
-    bool checkPositionValid(const Block & inBlock) const
-    {
-        return stm::atomic<bool>([&](stm::transaction & tx) { return checkPositionValid(tx, inBlock); });
-    }
-
+    bool canMove(Direction inDirection) const;
     bool canMove(stm::transaction & tx, Direction inDirection) const;
-
-    bool canMove(Direction inDirection) const
-    {
-        return stm::atomic<bool>([&](stm::transaction & tx) { return canMove(tx, inDirection); });
-    }
 
     enum MoveResult
     {
