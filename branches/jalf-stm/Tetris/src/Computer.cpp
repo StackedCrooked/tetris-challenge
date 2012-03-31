@@ -239,7 +239,7 @@ Game::MoveResult Computer::Impl::move(stm::transaction & tx, Game & ioGame, cons
             // Can't move the block to the left.
             // Our path is blocked.
             // Give up on this block and just drop it.
-            ioGame.dropAndCommit(tx);
+            ioGame.dropAndCommit();
             STM::set(mSyncError, true);
             return Game::MoveResult_Committed;
         }
@@ -255,7 +255,7 @@ Game::MoveResult Computer::Impl::move(stm::transaction & tx, Game & ioGame, cons
         {
             // Damn we can't move this block anymore.
             // Give up on this block.
-            ioGame.dropAndCommit(tx);
+            ioGame.dropAndCommit();
             STM::set(mSyncError, true);
             return Game::MoveResult_Committed;
         }
@@ -271,7 +271,7 @@ Game::MoveResult Computer::Impl::move(stm::transaction & tx, Game & ioGame, cons
         }
         else
         {
-            ioGame.dropAndCommit(tx);
+            ioGame.dropAndCommit();
             STM::set(mSyncError, true);
             return Game::MoveResult_Committed;
         }
@@ -279,7 +279,7 @@ Game::MoveResult Computer::Impl::move(stm::transaction & tx, Game & ioGame, cons
 
     if (inEvaluator.moveDownBehavior() == MoveDownBehavior_DropDown)
     {
-        ioGame.dropAndCommit(tx);
+        ioGame.dropAndCommit();
         return Game::MoveResult_Committed;
     }
     else if (inEvaluator.moveDownBehavior() == MoveDownBehavior_MoveDown)

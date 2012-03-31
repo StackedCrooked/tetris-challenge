@@ -191,9 +191,7 @@ bool SimpleGame::rotate()
 
 void SimpleGame::drop()
 {
-    stm::atomic([&](stm::transaction & tx) {
-        mImpl->mGame.dropAndCommit(tx);
-    });
+    mImpl->mGame.dropAndCommit();
 }
 
 

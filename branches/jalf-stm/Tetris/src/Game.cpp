@@ -282,20 +282,26 @@ Game::MoveResult Game::rotate()
 }
 
 
-void Game::dropAndCommit(stm::transaction & tx)
+void Game::dropAndCommit()
 {
-    while (move(tx, MoveDirection_Down) == MoveResult_Moved);
+    stm::atomic([&](stm::transaction & tx)
+    {
+        while (move(tx, MoveDirection_Down) == MoveResult_Moved);
+    });
 }
 
 
-void Game::dropWithoutCommit(stm::transaction & tx)
+void Game::dropWithoutCommit()
 {
-    while (canMove(MoveDirection_Down))
+    stm::atomic([&](stm::transaction & tx)
     {
-        MoveResult result = move(tx, MoveDirection_Down);
-        Assert(result != MoveResult_Committed);
-        (void)result;
-    }
+        while (canMove(MoveDirection_Down))
+        {
+            MoveResult result = move(tx, MoveDirection_Down);
+            Assert(result != MoveResult_Committed);
+            (void)result;
+        }
+    });
 }
 
 

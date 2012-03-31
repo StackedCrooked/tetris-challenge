@@ -118,9 +118,9 @@ public:
 
     MoveResult rotate();
 
-    void dropWithoutCommit(stm::transaction & tx);
+    void dropWithoutCommit();
 
-    void dropAndCommit(stm::transaction & tx);
+    void dropAndCommit();
 
     int firstOccupiedRow(stm::transaction & tx) const
     { return gameState(tx).firstOccupiedRow(); }
