@@ -160,13 +160,13 @@ void Computer::Impl::coordinate()
             }
             else
             {
-                if (prelim.id() <= mGame.gameStateId(tx))
+                if (prelim.id() <= mGame.gameStateId())
                 {
                     continue;
                 }
 
 
-                if (prelim.id() != mGame.gameStateId(tx) + 1)
+                if (prelim.id() != mGame.gameStateId() + 1)
                 {
                     LogError("A not-yet-understood sync error has occured.");
                     precalculated.clear();
@@ -178,7 +178,7 @@ void Computer::Impl::coordinate()
 
         preliminaries.clear();
 
-        blockTypes = mGame.getFutureBlocks(tx, precalculated.size() + ev->recommendedSearchDepth());
+        blockTypes = mGame.getFutureBlocks(precalculated.size() + ev->recommendedSearchDepth());
         blockTypes.erase(blockTypes.begin(), blockTypes.begin() + precalculated.size());
         lastGameState.reset(new GameState(precalculated.empty() ? mGame.gameState(tx) : precalculated.back()));
     });
@@ -215,13 +215,13 @@ void Computer::Impl::coordinate()
 
 Game::MoveResult Computer::Impl::move(stm::transaction & tx, Game & ioGame, const Block & targetBlock, const Evaluator & inEvaluator)
 {
-    const Block & block = ioGame.activeBlock(tx);
+    Block block = ioGame.activeBlock();
     Assert(block.type() == targetBlock.type());
 
     // Try rotation first, if it fails then skip rotation and try horizontal move
     if (block.rotation() != targetBlock.rotation())
     {
-        if (ioGame.rotate(tx) == Game::MoveResult_Moved)
+        if (ioGame.rotate() == Game::MoveResult_Moved)
         {
             return Game::MoveResult_Moved;
         }
@@ -265,7 +265,7 @@ Game::MoveResult Computer::Impl::move(stm::transaction & tx, Game & ioGame, cons
     // Retry rotation again. If it fails here then drop the block.
     if (block.rotation() != targetBlock.rotation())
     {
-        if (ioGame.rotate(tx) == Game::MoveResult_Moved)
+        if (ioGame.rotate() == Game::MoveResult_Moved)
         {
             return Game::MoveResult_Moved;
         }
@@ -320,7 +320,7 @@ void Computer::Impl::move()
 
         // This may happen if a block was dropped after starting the node calculator
         auto t1 = prec.front().originalBlock().type();
-        auto t2 = mGame.activeBlock(tx).type();
+        auto t2 = mGame.activeBlock().type();
         if (t1 != t2)
         {
             LogDebug(SS() << "Clear all precalculated.");
@@ -328,9 +328,9 @@ void Computer::Impl::move()
             return;
         }
 
-        auto oldId = mGame.gameStateId(tx);
+        auto oldId = mGame.gameStateId();
         move(tx, mGame, prec.front().originalBlock(), *mEvaluator.open_r(tx));
-        auto newId = mGame.gameStateId(tx);
+        auto newId = mGame.gameStateId();
         Assert(oldId == newId || oldId + 1 == newId);
         if (oldId + 1 == newId)
         {

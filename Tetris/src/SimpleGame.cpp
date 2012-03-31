@@ -153,25 +153,19 @@ void SimpleGame::applyLinePenalty(int inNumberOfLinesMadeByOpponent)
 
 bool SimpleGame::isGameOver() const
 {
-    return stm::atomic<bool>([&](stm::transaction & tx) {
-        return mImpl->mGame.isGameOver(tx);
-    });
+    return mImpl->mGame.isGameOver();
 }
 
 
 int SimpleGame::rowCount() const
 {
-    return stm::atomic<int>([&](stm::transaction & tx) {
-        return mImpl->mGame.rowCount(tx);
-    });
+    return mImpl->mGame.rowCount();
 }
 
 
 int SimpleGame::columnCount() const
 {
-    return stm::atomic<int>([&](stm::transaction & tx) {
-        return mImpl->mGame.columnCount(tx);
-    });
+    return mImpl->mGame.columnCount();
 }
 
 
@@ -191,9 +185,7 @@ bool SimpleGame::move(Direction inDirection)
 
 bool SimpleGame::rotate()
 {
-    return stm::atomic<bool>([&](stm::transaction & tx) {
-        return mImpl->mGame.rotate(tx);
-    });
+    return mImpl->mGame.rotate();
 }
 
 
@@ -223,9 +215,7 @@ int SimpleGame::level() const
 
 Block SimpleGame::activeBlock() const
 {
-    return stm::atomic<Block>([&](stm::transaction & tx) {
-        return mImpl->mGame.activeBlock(tx);
-    });
+    return mImpl->mGame.activeBlock();
 }
 
 
@@ -237,36 +227,30 @@ Grid SimpleGame::gameGrid() const
 
 Block SimpleGame::getNextBlock() const
 {
-    return stm::atomic<Block>([&](stm::transaction & tx) {
-        std::vector<BlockType> blockTypes = mImpl->mGame.getFutureBlocks(tx, 2);
-        if (blockTypes.size() != 2)
-        {
-            throw std::logic_error("Failed to get the next block from the factory.");
-        }
-
-        return Block(blockTypes.back(), Rotation(0), Row(0), Column((columnCount() - mImpl->mCenterColumn)/2));
-    });
+    std::vector<BlockType> blockTypes = mImpl->mGame.getFutureBlocks(2);
+    return Block(blockTypes.back(),
+                 Rotation(0),
+                 Row(0),
+                 Column((columnCount() - mImpl->mCenterColumn)/2));
 }
 
 
 std::vector<Block> SimpleGame::getNextBlocks(std::size_t inCount) const
 {
-    return stm::atomic< std::vector<Block> >([&](stm::transaction & tx) {
-        std::vector<BlockType> blockTypes;
-        blockTypes = mImpl->mGame.getFutureBlocks(tx, inCount);
-        Assert(blockTypes.size() == inCount);
+    std::vector<BlockType> blockTypes;
+    blockTypes = mImpl->mGame.getFutureBlocks(inCount);
+    Assert(blockTypes.size() == inCount);
 
-        std::vector<Block> result;
-        for (std::vector<BlockType>::size_type idx = 0; idx != blockTypes.size(); ++idx)
-        {
-            result.push_back(Block(blockTypes[idx],
-                                   Rotation(0),
-                                   Row(0),
-                                   Column((columnCount() - mImpl->mCenterColumn)/2)));
-        }
-        Assert(result.size() == inCount);
-        return result;
-    });
+    std::vector<Block> result;
+    for (std::vector<BlockType>::size_type idx = 0; idx != blockTypes.size(); ++idx)
+    {
+        result.push_back(Block(blockTypes[idx],
+                               Rotation(0),
+                               Row(0),
+                               Column((columnCount() - mImpl->mCenterColumn)/2)));
+    }
+    Assert(result.size() == inCount);
+    return result;
 }
 
 
