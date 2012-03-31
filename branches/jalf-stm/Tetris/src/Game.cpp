@@ -210,7 +210,7 @@ void Game::applyLinePenalty(stm::transaction & tx, std::size_t inLineCount)
     if (!gameState.checkPositionValid(block, block.row(), block.column()))
     {
         // Commit the game state.
-        bool result = move(MoveDirection_Down);
+        bool result = move(tx, MoveDirection_Down);
         Assert(!result); // verify commit
         (void)result; // silence compiler warning about unused variable
     }
@@ -286,7 +286,7 @@ void Game::dropAndCommit()
 {
     stm::atomic([&](stm::transaction & tx)
     {
-        while (moveImpl(tx, MoveDirection_Down) == MoveResult_Moved);
+        while (move(tx, MoveDirection_Down) == MoveResult_Moved);
     });
 }
 
@@ -297,7 +297,7 @@ void Game::dropWithoutCommit()
     {
         while (canMove(MoveDirection_Down))
         {
-            MoveResult result = moveImpl(tx, MoveDirection_Down);
+            MoveResult result = move(tx, MoveDirection_Down);
             Assert(result != MoveResult_Committed);
             (void)result;
         }
@@ -317,13 +317,7 @@ void Game::setGrid(const Grid & inGrid)
 }
 
 
-Game::MoveResult Game::move(Direction inDirection)
-{
-    return stm::atomic<Game::MoveResult>([&](stm::transaction & tx){ return moveImpl(tx, inDirection); });
-}
-
-
-Game::MoveResult Game::moveImpl(stm::transaction & tx, Direction inDirection)
+Game::MoveResult Game::move(stm::transaction & tx, Direction inDirection)
 {
     if (isGameOver())
     {

@@ -171,11 +171,14 @@ int SimpleGame::columnCount() const
 
 bool SimpleGame::move(Direction inDirection)
 {
-    Game::MoveResult result = mImpl->mGame.move(inDirection);
-    if (result != Game::MoveResult_NotMoved)
-    {
+    Game::MoveResult result = stm::atomic<Game::MoveResult>([&](stm::transaction & tx) {
+        return mImpl->mGame.move(tx, inDirection);
+    });
+
+    if (result != Game::MoveResult_NotMoved) {
         mImpl->mGame.GameStateChanged();
     }
+
     return result;
 }
 
