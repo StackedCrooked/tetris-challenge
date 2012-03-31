@@ -101,6 +101,8 @@ public:
 
     int columnCount() const;
 
+    int level() const;
+
     bool checkPositionValid(const Block & inBlock) const;
 
     bool canMove(Direction inDirection) const;
@@ -119,9 +121,6 @@ public:
     void dropWithoutCommit(stm::transaction & tx);
 
     void dropAndCommit(stm::transaction & tx);
-
-    int level(stm::transaction & tx) const;
-    int level() const { return stm::atomic<int>([this](stm::transaction & tx){ return this->level(tx); }); }
 
     int firstOccupiedRow(stm::transaction & tx) const
     { return gameState(tx).firstOccupiedRow(); }

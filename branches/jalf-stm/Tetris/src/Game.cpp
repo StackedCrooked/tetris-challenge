@@ -107,6 +107,12 @@ int Game::columnCount() const
 }
 
 
+int Game::level() const
+{
+    return std::max<int>(stats().numLines() / 10, mStartingLevel.copy());
+}
+
+
 const GameState & Game::gameState(stm::transaction & tx) const
 {
     return mGameState.open_r(tx);
@@ -290,12 +296,6 @@ void Game::dropWithoutCommit(stm::transaction & tx)
         Assert(result != MoveResult_Committed);
         (void)result;
     }
-}
-
-
-int Game::level(stm::transaction & tx) const
-{
-    return std::max<int>(gameState(tx).numLines() / 10, mStartingLevel.open_r(tx));
 }
 
 
