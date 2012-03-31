@@ -105,11 +105,15 @@ Game & SimpleGame::game()
 }
 
 
+const Game & SimpleGame::game() const
+{
+    return mImpl->mGame;
+}
+
+
 bool SimpleGame::checkPositionValid(const Block & inBlock) const
 {
-    return stm::atomic<bool>([&](stm::transaction & tx) {
-        return mImpl->mGame.checkPositionValid(tx, inBlock);
-    });
+    return game().checkPositionValid(inBlock);
 }
 
 
@@ -120,31 +124,20 @@ PlayerType SimpleGame::playerType() const
 
 
 void SimpleGame::setPaused(bool inPaused)
-{
-    stm::atomic([&](stm::transaction & tx) {
-        mImpl->mGame.setPaused(tx, inPaused);
-    });
+{    
+    return game().setPaused(inPaused);
 }
 
 
 bool SimpleGame::isPaused() const
 {
-    return stm::atomic<bool>([&](stm::transaction & tx) {
-        return mImpl->mGame.isPaused(tx);
-    });
+    return game().isPaused();
 }
 
 
 GameStateStats SimpleGame::stats() const
 {
-    return stm::atomic<GameStateStats>([&](stm::transaction & tx) {
-        const GameState & gameState =  mImpl->mGame.gameState(tx);
-        return GameStateStats(gameState.numLines(),
-                              gameState.numSingles(),
-                              gameState.numDoubles(),
-                              gameState.numTriples(),
-                              gameState.numTetrises());
-    });
+    return mImpl->mGame.stats();
 }
 
 
@@ -238,9 +231,7 @@ Block SimpleGame::activeBlock() const
 
 Grid SimpleGame::gameGrid() const
 {
-    return stm::atomic<Grid>([&](stm::transaction & tx) {
-        return mImpl->mGame.gameState(tx).grid();
-    });
+    return mImpl->mGame.grid();
 }
 
 

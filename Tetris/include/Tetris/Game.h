@@ -25,6 +25,58 @@ class GameStateNode;
 class Game;
 
 
+template<typename T>
+struct Property
+{
+    Property(const T & inValue = T()) :
+        mValue(inValue)
+    {
+    }
+
+    const T & get(stm::transaction & tx) const
+    {
+        return mValue.open_r(tx);
+    }
+
+    T & get(stm::transaction & tx)
+    {
+        return mValue.open_rw(tx);
+    }
+
+    T get() const
+    {
+        return stm::atomic<T>([&](stm::transaction & tx) { return this->get(tx); });
+    }
+
+    void set(stm::transaction & tx, const T & inValue)
+    {
+        mValue.open_rw(tx) = inValue;
+    }
+
+    void set(const T & inValue)
+    {
+        stm::atomic([&](stm::transaction & tx){ this->set(tx, inValue); });
+    }
+
+    typedef std::function<void(T &)> Mutator;
+
+    void mutate(const Mutator & inMutator)
+    {
+        return stm::atomic<T>([&](stm::transaction & tx) { inMutator(mValue.open_rw(tx)); });
+    }
+
+    typedef std::function<void(const T &)> Reader;
+
+    void read(const Reader & inReader)
+    {
+        return stm::atomic<T>([&](stm::transaction & tx) { inReader(mValue.open_r(tx)); });
+    }
+
+private:
+    mutable stm::shared<T> mValue;
+};
+
+
 /**
  * Game manages the following things:
  *   - the currently active block
@@ -39,6 +91,15 @@ public:
 
     ~Game();
 
+    GameStateStats stats(stm::transaction & tx) const
+    {
+        return gameState(tx).stats();
+    }
+
+    GameStateStats stats()
+    {
+        return stm::atomic<GameStateStats>([&](stm::transaction & tx) { return stats(tx); });
+    }
 
     unsigned gameStateId() const;
     unsigned gameStateId(stm::transaction & tx) const;
@@ -49,9 +110,26 @@ public:
     // Threaded!
     boost::signals2::signal<void(unsigned)> LinesCleared;
 
-    void setPaused(stm::transaction & tx, bool inPause);
+    const Grid & grid(stm::transaction & tx) const
+    {
+        return gameState(tx).grid();
+    }
 
-    bool isPaused(stm::transaction & tx) const;
+    // Return a copy
+    Grid grid() const
+    {
+        return stm::atomic<Grid>([&](stm::transaction & tx){ return grid(tx); });
+    }
+
+    void setPaused(bool inPause)
+    {
+        mPaused.set(inPause);
+    }
+
+    bool isPaused() const
+    {
+        return mPaused.get();
+    }
 
     bool isGameOver() const;
 
@@ -65,7 +143,17 @@ public:
 
     bool checkPositionValid(stm::transaction & tx, const Block & inBlock) const;
 
-    bool canMove(stm::transaction & tx, Direction inDirection);
+    bool checkPositionValid(const Block & inBlock) const
+    {
+        return stm::atomic<bool>([&](stm::transaction & tx) { return checkPositionValid(tx, inBlock); });
+    }
+
+    bool canMove(stm::transaction & tx, Direction inDirection) const;
+
+    bool canMove(Direction inDirection) const
+    {
+        return stm::atomic<bool>([&](stm::transaction & tx) { return canMove(tx, inDirection); });
+    }
 
     enum MoveResult
     {
@@ -82,12 +170,13 @@ public:
 
     void dropAndCommit(stm::transaction & tx);
 
-    int level() const
-    {
-        return stm::atomic<int>([this](stm::transaction & tx){ return this->level(tx); });
-    }
-
     int level(stm::transaction & tx) const;
+    int level() const { return stm::atomic<int>([this](stm::transaction & tx){ return this->level(tx); }); }
+
+    int firstOccupiedRow(stm::transaction & tx) const
+    { return gameState(tx).firstOccupiedRow(); }
+
+    int firstOccupiedRow() const { return stm::atomic<int>([this](stm::transaction & tx){ return firstOccupiedRow(tx); }); }
 
     void setStartingLevel(stm::transaction & tx, int inLevel);
 
@@ -95,9 +184,9 @@ public:
 
     BlockTypes getFutureBlocks(stm::transaction & tx, std::size_t inCount);
 
-    const GameState & gameState(stm::transaction & tx) const;
-
     virtual void applyLinePenalty(stm::transaction & tx, std::size_t inLineCount);
+
+    const GameState & gameState(stm::transaction & tx) const;
 
 private:
     void commit(stm::transaction & tx, const Block & inBlock);
@@ -128,7 +217,7 @@ private:
     mutable stm::shared<BlockTypes::size_type> mGarbageIndex;
     mutable stm::shared<Block> mActiveBlock;
     mutable stm::shared<int> mStartingLevel;
-    mutable stm::shared<bool> mPaused;
+    Property<bool> mPaused;
     mutable stm::shared<GameState> mGameState;
 };
 

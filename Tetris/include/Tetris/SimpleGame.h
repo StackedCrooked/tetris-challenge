@@ -80,6 +80,8 @@ private:
 
     Game & game();
 
+    const Game & game() const;
+
     struct Impl;
     boost::shared_ptr<Impl> mImpl;
 };

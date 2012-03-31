@@ -188,18 +188,6 @@ void Game::applyLinePenalty(stm::transaction & tx, std::size_t inLineCount)
 }
 
 
-void Game::setPaused(stm::transaction & tx, bool inPause)
-{
-    mPaused.open_rw(tx) = inPause;
-}
-
-
-bool Game::isPaused(stm::transaction & tx) const
-{
-    return mPaused.open_r(tx);
-}
-
-
 bool Game::isGameOver(stm::transaction & tx) const
 {
     return mGameState.open_r(tx).isGameOver();
@@ -236,7 +224,7 @@ bool Game::checkPositionValid(stm::transaction & tx, const Block & inBlock) cons
 }
 
 
-bool Game::canMove(stm::transaction & tx, Direction inDirection)
+bool Game::canMove(stm::transaction & tx, Direction inDirection) const
 {
     if (isGameOver(tx))
     {
