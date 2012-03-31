@@ -203,7 +203,7 @@ Survival::Survival() :
           NumTetrisesFactor(8),
           SearchDepth(4),
           SearchWidth(4),
-          MoveDownBehavior_MoveDown)
+          MoveDownBehavior_DropDown)
 {
 }
 
