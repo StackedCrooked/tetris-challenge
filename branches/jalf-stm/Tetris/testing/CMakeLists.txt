@@ -7,7 +7,7 @@ set(CMAKE_INCLUDE_SYSTEM_FLAG_CXX "-isystem ")
 include_directories(SYSTEM
     ${SOLUTIONDIR}3rdParty/Boost
     ${SOLUTIONDIR}3rdParty/GTest/include
-    ${SOLUTIONDIR}3rdParty/STM
+    ${SOLUTIONDIR}3rdParty/stm
     ${SOLUTIONDIR}3rdParty/Poco/Foundation/include)
 
 

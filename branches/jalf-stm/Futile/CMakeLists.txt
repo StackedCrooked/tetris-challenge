@@ -6,7 +6,7 @@ set(CMAKE_INCLUDE_SYSTEM_FLAG_CXX "-isystem ")
 
 include_directories(SYSTEM
     ${SOLUTIONDIR}3rdParty/Boost
-    ${SOLUTIONDIR}3rdParty/STM)
+    ${SOLUTIONDIR}3rdParty/stm)
 
 add_library(Futile
     include/Futile/Array.h
