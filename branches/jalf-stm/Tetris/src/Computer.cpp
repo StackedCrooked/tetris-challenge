@@ -141,11 +141,11 @@ void Computer::Impl::coordinate()
     BlockTypes blockTypes;
     boost::scoped_ptr<GameState> lastGameState;
     unsigned workerCount = mWorkerPool.size();
-    const Evaluator * ev;
+    typedef const Evaluator ConstEvaluator;
+    ConstEvaluator * evaluator = NULL;
 
     stm::atomic([&](stm::transaction & tx)
     {
-        ev = mEvaluator.open_r(tx);
         workerCount = mWorkerCount.open_r(tx);
         Precalculated & precalculated = mPrecalculated.open_rw(tx);
         for (auto prelim : preliminaries)
@@ -178,34 +178,34 @@ void Computer::Impl::coordinate()
 
         preliminaries.clear();
 
-        blockTypes = mGame.getFutureBlocks(precalculated.size() + ev->recommendedSearchDepth());
+        if (mGame.gameState(tx).firstOccupiedRow() < cSurvivalModeTreshold)
+        {
+            LogDebug("Survival");
+            evaluator = mEvaluator.open_rw(tx) = &Survival::Instance();
+        }
+        else
+        {
+            LogDebug("MakeTetrises");
+            evaluator = mEvaluator.open_rw(tx) = &MakeTetrises::Instance();
+        }
+
+        blockTypes = mGame.getFutureBlocks(precalculated.size() + evaluator->recommendedSearchDepth());
         blockTypes.erase(blockTypes.begin(), blockTypes.begin() + precalculated.size());
         lastGameState.reset(new GameState(precalculated.empty() ? mGame.gameState(tx) : precalculated.back()));
     });
 
     if (!blockTypes.empty() && !lastGameState->isGameOver())
     {
-        const GameState & gs = *lastGameState;
-        if (gs.firstOccupiedRow() < cSurvivalModeTreshold)
-        {
-            ev = &Survival::Instance();
-        }
-        else
-        {
-            ev = &MakeTetrises::Instance();
-        }
-
-        blockTypes.resize(std::min(int(blockTypes.size()), ev->recommendedSearchDepth()));
-        Widths widths(blockTypes.size(), ev->recommendedSearchWidth());
+        blockTypes.resize(std::min(int(blockTypes.size()), evaluator->recommendedSearchDepth()));
+        Widths widths(blockTypes.size(), evaluator->recommendedSearchWidth());
         Assert(widths.size() == blockTypes.size());
 
         mWorkerPool.resize(workerCount);
 
-        STM::set(mEvaluator, ev);
         mNodeCalculator.reset(new NodeCalculator(*lastGameState,
                                                  blockTypes,
                                                  widths,
-                                                 *ev,
+                                                 *evaluator,
                                                  mWorker,
                                                  mWorkerPool));
         mNodeCalculator->start();
