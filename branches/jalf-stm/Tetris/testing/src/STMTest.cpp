@@ -1,6 +1,8 @@
 #include "TetrisTest.h"
 #include "Futile/WorkerPool.h"
 #include "Futile/Worker.h"
+#include "Futile/Logger.h"
+#include "Futile/Logging.h"
 #include "stm.hpp"
 #include <atomic>
 #include <string>
@@ -75,11 +77,13 @@ public:
 
     void check()
     {
+        printValues();
         stm::atomic([&](stm::transaction & tx) {
             ASSERT_TRUE(a.open_r(tx) + b.open_r(tx) == sum_ab.open_r(tx));
             ASSERT_TRUE(a.open_r(tx) + c.open_r(tx) == sum_ac.open_r(tx));
             ASSERT_TRUE(b.open_r(tx) + c.open_r(tx) == sum_bc.open_r(tx));
         });
+        FlushLogs();
     }
 
     void test()
@@ -131,13 +135,14 @@ public:
     void printValues()
     {
         stm::atomic([&](stm::transaction & tx) {
-            std::cout << "a: " << a.open_r(tx) << std::endl;
-            std::cout << "b: " << b.open_r(tx) << std::endl;
-            std::cout << "c: " << c.open_r(tx) << std::endl;
-            std::cout << "sum_ab: " << sum_ab.open_r(tx) << std::endl;
-            std::cout << "sum_ac: " << sum_ac.open_r(tx) << std::endl;
-            std::cout << "sum_bc: " << sum_bc.open_r(tx) << std::endl;
+            LogInfo(SS() << "a: " << a.open_r(tx));
+            LogInfo(SS() << "b: " << b.open_r(tx));
+            LogInfo(SS() << "c: " << c.open_r(tx));
+            LogInfo(SS() << "sum_ab: " << sum_ab.open_r(tx));
+            LogInfo(SS() << "sum_ac: " << sum_ac.open_r(tx));
+            LogInfo(SS() << "sum_bc: " << sum_bc.open_r(tx));
         });
+        FlushLogs();
     }
 };
 
@@ -153,17 +158,17 @@ TEST_F(STMTest, CoordinatedChanges)
 
     static const unsigned cDuration = 1000;
 
-    std::cout << "Wait for " << cDuration << "ms..." << std::endl;
+    LogInfo(SS() << "Wait for " << cDuration << "ms...");
     Sleep(cDuration);
 
-    std::cout << "Stopping the workers..." << std::endl;
+    LogInfo(SS() << "Stopping the workers...");
     stop = true;
     workers.wait();
 
-    std::cout << "Results:" << std::endl;
+    LogInfo(SS() << "Results:");
     printValues();
 
-    std::cout << "Finished." << std::endl;
+    LogInfo(SS() << "Finished.");
 }
 
 

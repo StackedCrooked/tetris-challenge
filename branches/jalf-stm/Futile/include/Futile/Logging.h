@@ -9,6 +9,7 @@
 namespace Futile {
 
 
+void FlushLogs();
 void LogInfo(const std::string & inMessage);
 void LogWarning(const std::string & inMessage);
 void LogError(const std::string & inMessage);
