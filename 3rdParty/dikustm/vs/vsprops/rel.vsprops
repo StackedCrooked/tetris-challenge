@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioPropertySheet
+	ProjectType="Visual C++"
+	Version="8.00"
+	Name="rel"
+	InheritedPropertySheets=".\common.vsprops"
+	>
+	<Tool
+		Name="VCCLCompilerTool"
+		Optimization="3"
+		InlineFunctionExpansion="2"
+		OmitFramePointers="true"
+		PreprocessorDefinitions="NDEBUG;_HAS_ITERATOR_DEBUGGING=0"
+	/>
+	<Tool
+		Name="VCLinkerTool"
+		LinkIncremental="1"
+		GenerateDebugInformation="true"
+		OptimizeReferences="2"
+		EnableCOMDATFolding="2"
+	/>
+</VisualStudioPropertySheet>
