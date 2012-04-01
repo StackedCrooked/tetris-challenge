@@ -74,7 +74,8 @@ Game::~Game()
 
 unsigned Game::gameStateId() const
 {
-    return stm::atomic<unsigned>([&](stm::transaction & tx){ return mGameState.open_r(tx).id(); });
+	// open_rw => eternal loop in 'Computer::Impl::move()' 
+    return stm::atomic<unsigned>([&](stm::transaction & tx){ return mGameState.open_rw(tx).id(); });
 }
 
 
