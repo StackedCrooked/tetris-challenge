@@ -6,6 +6,12 @@
 namespace Futile {
 
 
+void FlushLogs()
+{
+    Futile::Logger::Instance().flush();
+}
+
+
 void LogInfo(const std::string & inMessage)
 {
     Logger::Instance().log(LogLevel_Info, inMessage);
