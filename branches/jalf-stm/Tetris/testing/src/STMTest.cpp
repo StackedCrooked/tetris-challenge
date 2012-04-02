@@ -41,7 +41,7 @@ public:
 
     void increment_a()
     {
-        stm::atomic([this](stm::transaction& tx{
+        stm::atomic([this](stm::transaction& tx) {
         int & a = this->a.open_rw(tx);
         a++;
 
@@ -55,7 +55,7 @@ public:
 
     void increment_b()
     {
-        stm::atomic([this](stm::transaction& tx{
+        stm::atomic([this](stm::transaction& tx) {
         int & b = this->b.open_rw(tx);
         b++;
 
@@ -69,7 +69,7 @@ public:
 
     void increment_c()
     {
-        stm::atomic([this](stm::transaction& tx{
+        stm::atomic([this](stm::transaction& tx) {
         int & c = this->c.open_rw(tx);
         c++;
 
@@ -96,40 +96,40 @@ public:
     {
         while (!stop)
         {
-            stm::atomic([&](stm::transaction & tx) {
+            stm::atomic([&](stm::transaction & ) {
                 increment_a();
             });
             check();
 
-            stm::atomic([&](stm::transaction & tx) {
+            stm::atomic([&](stm::transaction & ) {
                 increment_b();
             });
             check();
 
-            stm::atomic([&](stm::transaction & tx) {
+            stm::atomic([&](stm::transaction & ) {
                 increment_c();
             });
             check();
 
-            stm::atomic([&](stm::transaction & tx) {
+            stm::atomic([&](stm::transaction & ) {
                 increment_a();
                 increment_b();
             });
             check();
 
-            stm::atomic([&](stm::transaction & tx) {
+            stm::atomic([&](stm::transaction & ) {
                 increment_b();
                 increment_c();
             });
             check();
 
-            stm::atomic([&](stm::transaction & tx) {
+            stm::atomic([&](stm::transaction & ) {
                 increment_a();
                 increment_c();
             });
             check();
 
-            stm::atomic([&](stm::transaction & tx) {
+            stm::atomic([&](stm::transaction & ) {
                 increment_a();
                 increment_b();
                 increment_c();
