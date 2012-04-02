@@ -21,13 +21,13 @@ class STMTest : public TetrisTest
 {
 public:
     STMTest() :
-        stop(false),
-        a(0),
-        b(0),
-        c(0),
-        sum_ab(0),
-        sum_bc(0),
-        sum_ac(0)
+    stop(false),
+    a(0),
+    b(0),
+    c(0),
+    sum_ab(0),
+    sum_bc(0),
+    sum_ac(0)
     {
     }
 
@@ -39,8 +39,9 @@ public:
     shared_int sum_bc;
     shared_int sum_ac;
 
-    void increment_a(stm::transaction & tx)
+    void increment_a()
     {
+        stm::atomic([this](stm::transaction& tx{
         int & a = this->a.open_rw(tx);
         a++;
 
@@ -49,10 +50,12 @@ public:
 
         int & sum_ac = this->sum_ac.open_rw(tx);
         sum_ac = a + c.open_r(tx);
+        });
     }
 
-    void increment_b(stm::transaction & tx)
+    void increment_b()
     {
+        stm::atomic([this](stm::transaction& tx{
         int & b = this->b.open_rw(tx);
         b++;
 
@@ -61,10 +64,12 @@ public:
 
         int & sum_bc = this->sum_bc.open_rw(tx);
         sum_bc = b + c.open_r(tx);
+        });
     }
 
-    void increment_c(stm::transaction & tx)
+    void increment_c()
     {
+        stm::atomic([this](stm::transaction& tx{
         int & c = this->c.open_rw(tx);
         c++;
 
@@ -73,6 +78,7 @@ public:
 
         int & sum_bc = this->sum_bc.open_rw(tx);
         sum_bc = b.open_r(tx) + c;
+        });
     }
 
     void check()
@@ -91,42 +97,42 @@ public:
         while (!stop)
         {
             stm::atomic([&](stm::transaction & tx) {
-                increment_a(tx);
+                increment_a();
             });
             check();
 
             stm::atomic([&](stm::transaction & tx) {
-                increment_b(tx);
+                increment_b();
             });
             check();
 
             stm::atomic([&](stm::transaction & tx) {
-                increment_c(tx);
+                increment_c();
             });
             check();
 
             stm::atomic([&](stm::transaction & tx) {
-                increment_a(tx);
-                increment_b(tx);
+                increment_a();
+                increment_b();
             });
             check();
 
             stm::atomic([&](stm::transaction & tx) {
-                increment_b(tx);
-                increment_c(tx);
+                increment_b();
+                increment_c();
             });
             check();
 
             stm::atomic([&](stm::transaction & tx) {
-                increment_a(tx);
-                increment_c(tx);
+                increment_a();
+                increment_c();
             });
             check();
 
             stm::atomic([&](stm::transaction & tx) {
-                increment_a(tx);
-                increment_b(tx);
-                increment_c(tx);
+                increment_a();
+                increment_b();
+                increment_c();
             });
             check();
         }
