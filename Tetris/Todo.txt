@@ -1,5 +1,6 @@
 STM Version
 -----------
+- Review unit tests. Try to identify which ones are essential. Which ones are missing? This is the basis on which I can start the refactoring to nested transactions.
 - LinesCleared and GameStateChanged should not be called from within transaction.
 v Occasional crashes.
 v Survival mode is slow and choppy.
