@@ -24,6 +24,17 @@ inline T get(stm::shared<T> & src)
 }
 
 
+template<typename T>
+struct Shared : stm::shared<T>
+{
+    Shared(const T & inValue = T()) : stm::shared<T>(inValue) {}
+
+    void setValue(const T & inValue) { STM::set(*this, inValue); }
+
+    T getValue() const { return STM::get(*this); }
+};
+
+
 class Transaction
 {
 public:
