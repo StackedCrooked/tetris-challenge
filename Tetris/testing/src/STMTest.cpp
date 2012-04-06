@@ -176,4 +176,16 @@ TEST_F(STMTest, CoordinatedChanges)
 }
 
 
+TEST_F(STMTest, Behavior)
+{
+    stm::shared<bool> flag(false);
+
+    stm::atomic([&](stm::transaction & ){
+        ASSERT_FALSE(stm::atomic<bool>([&](stm::transaction & tx){ return flag.open_r(tx); }));
+        stm::atomic([&](stm::transaction & tx){ return flag.open_rw(tx) = true; });
+        ASSERT_TRUE(stm::atomic<bool>([&](stm::transaction & tx){ return flag.open_r(tx); }));
+    });
+}
+
+
 } // namespace testing
