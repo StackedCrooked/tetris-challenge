@@ -21,13 +21,13 @@ class STMTest : public TetrisTest
 {
 public:
     STMTest() :
-    stop(false),
-    a(0),
-    b(0),
-    c(0),
-    sum_ab(0),
-    sum_bc(0),
-    sum_ac(0)
+        stop(false),
+        a(0),
+        b(0),
+        c(0),
+        sum_ab(0),
+        sum_bc(0),
+        sum_ac(0)
     {
     }
 
@@ -83,13 +83,11 @@ public:
 
     void check()
     {
-        printValues();
         stm::atomic([&](stm::transaction & tx) {
             ASSERT_TRUE(a.open_r(tx) + b.open_r(tx) == sum_ab.open_r(tx));
             ASSERT_TRUE(a.open_r(tx) + c.open_r(tx) == sum_ac.open_r(tx));
             ASSERT_TRUE(b.open_r(tx) + c.open_r(tx) == sum_bc.open_r(tx));
         });
-        FlushLogs();
     }
 
     void test()
@@ -148,7 +146,6 @@ public:
             LogInfo(SS() << "sum_ac: " << sum_ac.open_r(tx));
             LogInfo(SS() << "sum_bc: " << sum_bc.open_r(tx));
         });
-        FlushLogs();
     }
 };
 
@@ -175,6 +172,7 @@ TEST_F(STMTest, CoordinatedChanges)
     printValues();
 
     LogInfo(SS() << "Finished.");
+    FlushLogs();
 }
 
 
