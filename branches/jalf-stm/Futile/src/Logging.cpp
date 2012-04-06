@@ -8,7 +8,7 @@ namespace Futile {
 
 void FlushLogs()
 {
-    Futile::Logger::Instance().flush();
+    Logger::Instance().flush();
 }
 
 
