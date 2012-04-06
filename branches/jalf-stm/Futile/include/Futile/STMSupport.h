@@ -24,26 +24,29 @@ inline T get(stm::shared<T> & src)
 }
 
 
-#if 0
-template<class T>
-inline void read(const stm::shared<T> & inSharedValue, std::function<void(const T&)> inFunctor)
+class Transaction
 {
-    stm::atomic([&](stm::transaction & tx) {
-        const T & value = inSharedValue.open_r(tx);
-        inFunctor(value);
-    });
-}
+public:
+    void operator()(stm::transaction & tx)
+    {
+        run(tx);
+        for (auto fun : mFunctions) { fun(); }
+    }
 
+    typedef std::function<void(stm::transaction & tx)> TxFunction;
 
-template<class T>
-inline void write(stm::shared<T> & inSharedValue, std::function<void(T&)> inFunctor)
-{
-    stm::atomic([&](stm::transaction & tx) {
-        T & value = inSharedValue.open_rw(tx);
-        inFunctor(value);
-    });
-}
-#endif
+protected:
+    typedef std::function<void()> Function;
+
+    void invokeLater(const Function & inFunction)
+    { mFunctions.push_back(inFunction); }
+
+private:
+    virtual void run(stm::transaction & ) = 0;
+
+    typedef std::vector<Function> Functions;
+    Functions mFunctions;
+};
 
 
 } } // namespace Futile::STM
