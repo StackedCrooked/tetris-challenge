@@ -3,6 +3,7 @@
 #include "stm.hpp"
 #include <algorithm>
 #include <utility>
+#include <vector>
 
 
 namespace Futile {
@@ -92,7 +93,7 @@ void Logger::flush()
 {
     // Don't perform the logging (slow IO operations) inside the transaction.
     // Use a local copy instead.
-    MessageList messages = stm::atomic<MessageList>([this](stm::transaction & tx) {
+    MessageList messages = stm::atomic<MessageList>([this](stm::transaction & tx) -> MessageList {
         MessageList & messages = mImpl->mSharedMessageList.open_rw(tx);
         MessageList copy = messages;
         messages.clear();

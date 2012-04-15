@@ -3,6 +3,7 @@
 #include "Futile/Stopwatch.h"
 #include "Futile/WorkerPool.h"
 #include "Futile/Threading.h"
+#include <boost/bind.hpp>
 #include <iostream>
 
 

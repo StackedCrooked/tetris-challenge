@@ -1,6 +1,7 @@
 #include "Futile/Timer.h"
 #include "Futile/Logging.h"
 #include "Futile/MakeString.h"
+#include <boost/bind.hpp>
 #include <iostream>
 #include <stdexcept>
 

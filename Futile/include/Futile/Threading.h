@@ -6,9 +6,11 @@
 #include "Futile/Types.h"
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
-#include <boost/thread.hpp>
+#include <boost/thread/recursive_mutex.hpp>
+#include <boost/thread/thread.hpp>
 #include <memory>
 #include <set>
+#include <vector>
 
 
 namespace Futile {

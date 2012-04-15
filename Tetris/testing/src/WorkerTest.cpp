@@ -4,6 +4,7 @@
 #include "Futile/Threading.h"
 #include "Futile/Assert.h"
 #include "Futile/Stopwatch.h"
+#include <boost/bind.hpp>
 #include <iostream>
 
 

@@ -100,7 +100,7 @@ void CalculateNodes(const NodePtr & ioNode,
     int numNewChildren = 0;
     if (generatedChildNodes.empty())
     {
-        generatedChildNodes = ChildNodes(GameStateComparator());
+        ChildNodes(GameStateComparator()).swap(generatedChildNodes);
         GenerateOffspring(ioNode, inBlockTypes[inProgress.current()], inEvaluator, generatedChildNodes);
 
         ChildNodes::iterator it = generatedChildNodes.begin(), end = generatedChildNodes.end();
