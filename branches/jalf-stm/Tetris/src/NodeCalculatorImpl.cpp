@@ -82,8 +82,8 @@ NodeCalculatorImpl::NodeCalculatorImpl(const GameState & inGameState,
     cEvaluator(inEvaluator),
     mMainWorker(inMainWorker),
     mWorkerPool(inWorkerPool),
-    mQuitFlag(false),
-    mStatus(0)
+    mQuitFlag(new bool(false)),
+    mStatus(new int(0))
 {
     if (cBlockTypes.empty())
     {
@@ -115,13 +115,13 @@ NodeCalculatorImpl::~NodeCalculatorImpl()
 
 void NodeCalculatorImpl::setQuitFlag()
 {
-    mQuitFlag = true;
+    mQuitFlag.set(true);
 }
 
 
 bool NodeCalculatorImpl::getQuitFlag() const
 {
-    return mQuitFlag;
+    return mQuitFlag.get();
 }
 
 
@@ -142,7 +142,7 @@ int NodeCalculatorImpl::getMaxSearchDepth() const
 
 std::vector<GameState> NodeCalculatorImpl::result() const
 {
-    if (mStatus == NodeCalculator::Status_Error)
+    if (mStatus.get() == NodeCalculator::Status_Error)
     {
         throw std::runtime_error(mErrorMessage.c_str());
     }
@@ -152,7 +152,7 @@ std::vector<GameState> NodeCalculatorImpl::result() const
 
 int NodeCalculatorImpl::status() const
 {
-    return mStatus;
+    return mStatus.get();
 }
 
 
@@ -164,7 +164,7 @@ std::string NodeCalculatorImpl::errorMessage() const
 
 void NodeCalculatorImpl::setStatus(int inStatus)
 {
-    mStatus = inStatus;
+    mStatus.set(inStatus);
 }
 
 
@@ -244,7 +244,7 @@ void NodeCalculatorImpl::startImpl()
 
 void NodeCalculatorImpl::start()
 {
-    mStatus = NodeCalculator::Status_Starting;
+    mStatus.set(NodeCalculator::Status_Starting);
     mMainWorker.schedule(boost::bind(&NodeCalculatorImpl::startImpl, this));
 }
 

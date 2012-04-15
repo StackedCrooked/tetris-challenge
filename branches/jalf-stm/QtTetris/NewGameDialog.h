@@ -11,6 +11,12 @@
 #endif
 
 
+// INFO: Fixes Clang build error. Maybe this can be removed in the future.
+#ifndef QT_NO_STL
+#define QT_NO_STL
+#endif // QT_NO_STL
+
+
 #include <QtGui/QtGui>
 
 

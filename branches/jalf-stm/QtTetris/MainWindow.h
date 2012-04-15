@@ -11,6 +11,12 @@
 #endif
 
 
+// INFO: Fixes Clang build error. Maybe this can be removed in the future.
+#ifndef QT_NO_STL
+#define QT_NO_STL
+#endif // QT_NO_STL
+
+
 #include <QtGui/QtGui>
 #include "Model.h"
 #include "TetrisWidget.h"
@@ -68,7 +74,7 @@ private Q_SLOTS:
 private:
     void onNewGame(const Tetris::PlayerTypes & inPlayerTypes);
 
-    void timerEvent();
+    void timerEventImpl();
 
 private:
     Model & mModel;

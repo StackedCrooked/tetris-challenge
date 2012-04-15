@@ -1,4 +1,5 @@
 #define QT_NO_KEYWORDS
+#define QT_NO_STL
 
 
 #include <QtGui/QApplication>
@@ -12,6 +13,8 @@
 #include "Futile/MakeString.h"
 #include <iostream>
 #include <stdexcept>
+#include <string>
+#include <vector>
 
 
 using namespace Futile;

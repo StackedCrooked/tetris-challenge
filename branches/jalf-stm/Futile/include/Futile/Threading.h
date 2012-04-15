@@ -306,15 +306,16 @@ Locker<T> ThreadSafe<T>::lock()
 template<class T>
 T ThreadSafe<T>::get() const
 {
-    return *lock().get();
+    Locker<T> locker(*this);
+    return *locker.get();
 }
 
 
 template<class T>
 void ThreadSafe<T>::set(const T & v)
 {
-    T & value = *lock().get();
-    value = v;
+    Locker<T> locker(*this);
+    *locker.get() = v;
 }
 
 
