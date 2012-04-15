@@ -211,9 +211,6 @@ protected:
 };
 
 
-BOOST_STATIC_ASSERT(ATOMIC_INT_LOCK_FREE == 2);
-
-
 } // namespace Tetris
 
 

@@ -226,7 +226,7 @@ bool Game::checkPositionValid(const Block & inBlock) const
 
 bool Game::canMove(Direction inDirection) const
 {
-    return stm::atomic<bool>([&](stm::transaction & tx) {
+    return stm::atomic<bool>([&](stm::transaction & tx) -> bool {
         const GameState & gs = mGameState.open_r(tx);
         if (gs.isGameOver()) {
             return false;
@@ -248,7 +248,7 @@ const Grid & Game::gameGrid(stm::transaction & tx) const
 
 BlockTypes Game::getFutureBlocks(std::size_t inCount)
 {
-    return stm::atomic<BlockTypes>([&](stm::transaction & tx) {
+    return stm::atomic<BlockTypes>([&](stm::transaction & tx) -> BlockTypes {
         BlockTypes result;
         const GameState & gs = mGameState.open_r(tx);
         for (std::size_t idx = 0; idx < inCount; ++idx)
@@ -263,7 +263,7 @@ BlockTypes Game::getFutureBlocks(std::size_t inCount)
 
 Game::MoveResult Game::rotate()
 {
-    return stm::atomic<Game::MoveResult>([&](stm::transaction & tx)
+    return stm::atomic<Game::MoveResult>([&](stm::transaction & tx) -> Game::MoveResult
     {
         if (isGameOver())
         {
