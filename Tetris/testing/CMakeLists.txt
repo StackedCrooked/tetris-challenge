@@ -21,7 +21,7 @@ add_executable(TetrisTest
     src/NodeCalculatorTest.cpp
     src/main.cpp)
 
-set_target_properties(TetrisTest  PROPERTIES COMPILE_FLAGS "-std=c++0x -Wall -Wextra -Werror")
+set_target_properties(TetrisTest  PROPERTIES COMPILE_FLAGS "-std=c++0x -Wall -Wextra -Werror") #-stdlib=libc++
 
 target_link_libraries(TetrisTest Tetris Futile pthread
                                  ${SOLUTIONDIR}3rdParty/Boost/lib/${PLATFORM}/${ARCH}/libboost_thread.a

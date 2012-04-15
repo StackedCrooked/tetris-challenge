@@ -117,12 +117,12 @@ void Logger::flush()
 }
 
 
-void Logger::log(LogLevel inLogLevel, const std::string & inMessage)
+void Logger::log(LogLevel , const std::string & )
 {
-    stm::atomic([&](stm::transaction & tx) {
-        MessageList & messages = mImpl->mSharedMessageList.open_rw(tx);
-        messages.push_back(std::make_pair(inLogLevel, inMessage));
-    });
+//    stm::atomic([&](stm::transaction & tx) {
+//        MessageList & messages = mImpl->mSharedMessageList.open_rw(tx);
+//        messages.push_back(std::make_pair(inLogLevel, inMessage));
+//    });
 }
 
 

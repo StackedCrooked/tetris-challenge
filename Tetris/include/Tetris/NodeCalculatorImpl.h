@@ -17,7 +17,6 @@
 #include "stm.hpp"
 #include <boost/static_assert.hpp>
 #include <algorithm>
-#include <atomic>
 #include <cstddef>
 #include <memory>
 #include <vector>
@@ -206,8 +205,8 @@ protected:
     std::string mErrorMessage;
     Futile::Worker & mMainWorker;
     Futile::WorkerPool & mWorkerPool;
-    std::atomic_bool mQuitFlag;
-    std::atomic_int mStatus;
+    Futile::ThreadSafe<bool> mQuitFlag;
+    Futile::ThreadSafe<int> mStatus;
 };
 
 

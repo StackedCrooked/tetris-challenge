@@ -36,7 +36,7 @@ void MainWindow::onTimerEvent()
 {
     try
     {
-        timerEvent();
+        timerEventImpl();
     }
     catch (const std::exception & exc)
     {
@@ -45,7 +45,7 @@ void MainWindow::onTimerEvent()
 }
 
 
-void MainWindow::timerEvent()
+void MainWindow::timerEventImpl()
 {
     // We already know about the GameOver event.
     // No longer interested.

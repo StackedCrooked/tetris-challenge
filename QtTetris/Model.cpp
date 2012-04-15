@@ -4,6 +4,8 @@
 #include "Futile/Logging.h"
 #include "Poco/Environment.h"
 #include <algorithm>
+#include <string>
+#include <vector>
 
 
 namespace QtTetris {
@@ -196,7 +198,7 @@ std::string Model::GetPlayerName(PlayerType inPlayerType)
     {
         if (mHumanName.empty())
         {
-            mHumanName = GetHumanPlayerName();
+            GetHumanPlayerName().swap(mHumanName);
         }
         return mHumanName;
     }

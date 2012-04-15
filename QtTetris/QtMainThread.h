@@ -5,6 +5,12 @@
 #define QT_NO_KEYWORDS
 
 
+// INFO: Fixes Clang build error. Maybe this can be removed in the future.
+#ifndef QT_NO_STL
+#define QT_NO_STL
+#endif
+
+
 #include "Futile/MainThreadImpl.h"
 #include <QtCore/QtCore>
 
