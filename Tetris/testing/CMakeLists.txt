@@ -24,7 +24,7 @@ add_executable(TetrisTest
 
 set(CXX_FLAGS "-std=c++0x -Wall -Wextra -Werror")
 if(${CMAKE_CXX_COMPILER} MATCHES ".*clang.*")
-    set(CXX_FLAGS "${CXX_FLAGS} -stdlib=libc++")
+    set(CXX_FLAGS "${CXX_FLAGS} -stdlib=libc++ -Qunused-arguments ")
 endif()
 set_target_properties(TetrisTest  PROPERTIES COMPILE_FLAGS ${CXX_FLAGS})
 
