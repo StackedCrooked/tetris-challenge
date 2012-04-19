@@ -47,7 +47,7 @@ set(SOLUTIONDIR "${QtTetris_SOURCE_DIR}/../")
 #
 # Set output directory variable
 #
-set(OUTDIR ${CMAKE_BUILD_TYPE}/)
+set(OUTDIR ${CMAKE_BUILD_TYPE})
 
 
 #
@@ -215,8 +215,8 @@ add_custom_command(TARGET QtTetris
                    COMMAND /bin/mkdir               ARGS  "-p"
                                                           "${BUNDLE}/Contents/Frameworks"
                                                           "${BUNDLE}/Contents/Resources"
-                   COMMAND /bin/cp                  ARGS  "${SOLUTIONDIR}Tetris/res/Tetris.icns"
-                                                          "${BUNDLE}/Contents/Resources/Tetris.icns"
+                   COMMAND /bin/cp                  ARGS  "${SOLUTIONDIR}Tetris/res/Tetris.icns" "${BUNDLE}/Contents/Resources/Tetris.icns"
+                   COMMAND /usr/libexec/PlistBuddy  ARGS  "-c" \"Add :CFBundleIconFile string\" "${BUNDLE}/Contents/Info.plist"
                    COMMAND /usr/libexec/PlistBuddy  ARGS  "-c" \"Set :CFBundleIconFile Tetris\" "${BUNDLE}/Contents/Info.plist"
                    WORKING_DIRECTORY  )
 endif(APPLE)
