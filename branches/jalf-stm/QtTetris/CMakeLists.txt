@@ -47,14 +47,7 @@ set(SOLUTIONDIR "${QtTetris_SOURCE_DIR}/../")
 #
 # Set output directory variable
 #
-set(OUTDIR ${CMAKE_BUILD_TYPE}/${PLATFORM}/${ARCH}/)
-
-
-#
-# Now we can set the CMAKE vars
-#
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${OUTDIR}lib/)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OUTDIR}bin/)
+set(OUTDIR ${CMAKE_BUILD_TYPE}/)
 
 
 #
@@ -92,9 +85,9 @@ endif()
 #
 # Dependencies
 #
-add_subdirectory(${SOLUTIONDIR}Tetris ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Tetris)
-add_subdirectory(${SOLUTIONDIR}Tetris/testing ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Tetris/testing)
-add_subdirectory(${SOLUTIONDIR}Futile ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Futile)
+add_subdirectory(${SOLUTIONDIR}Tetris ${OUTDIR}/Tetris)
+add_subdirectory(${SOLUTIONDIR}Futile ${OUTDIR}/Futile)
+add_subdirectory(${SOLUTIONDIR}Tetris/testing ${OUTDIR}/testing)
 
 
 #
@@ -209,7 +202,7 @@ endif()
 #  - Register this icon in the Info.plist using the PlistBuddy utility.
 #
 if(APPLE)
-set(BUNDLE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}QtTetris.app")
+set(BUNDLE "${OUTDIR}/QtTetris/QtTetris.app")
 if("$ENV{TETRIS_DEPLOY_DMG}" STREQUAL "Yes")
 set(MACDEPLOYQT_OPTIONS "-dmg")
 else()
@@ -217,8 +210,8 @@ set(MACDEPLOYQT_OPTIONS "")
 endif()
 add_custom_command(TARGET QtTetris
                    POST_BUILD
-                   COMMAND /bin/rm                  ARGS  "-rf" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}QtTetris.app/Contents/Plugins"
-                   COMMAND /bin/rm                  ARGS  "-f" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}QtTetris.app/Contents/Resources/qt.conf"
+                   COMMAND /bin/rm                  ARGS  "-rf" "${BUNDLE}/Contents/Plugins"
+                   COMMAND /bin/rm                  ARGS  "-f" "${BUNDLE}/Contents/Resources/qt.conf"
                    COMMAND /bin/mkdir               ARGS  "-p"
                                                           "${BUNDLE}/Contents/Frameworks"
                                                           "${BUNDLE}/Contents/Resources"
