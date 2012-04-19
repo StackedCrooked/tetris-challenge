@@ -22,11 +22,7 @@ add_executable(TetrisTest
     src/main.cpp)
 
 
-set(CXX_FLAGS "-std=c++0x -Wall -Wextra -Werror")
-if(${CMAKE_CXX_COMPILER} MATCHES ".*clang.*")
-    set(CXX_FLAGS "${CXX_FLAGS} -stdlib=libc++ -Qunused-arguments ")
-endif()
-set_target_properties(TetrisTest  PROPERTIES COMPILE_FLAGS ${CXX_FLAGS})
+set_target_properties(TetrisTest PROPERTIES COMPILE_FLAGS ${FINAL_COMPILE_FLAGS})
 
 target_link_libraries(TetrisTest Tetris Futile pthread
                                  ${SOLUTIONDIR}3rdParty/Boost/lib/${PLATFORM}/${ARCH}/libboost_thread.a
