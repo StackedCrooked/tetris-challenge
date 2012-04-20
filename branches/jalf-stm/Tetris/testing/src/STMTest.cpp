@@ -1,9 +1,3 @@
-// Force NDEBUG!
-#ifdef NDEBUG
-#undef NDEBUG
-#endif
-
-
 #include "stm.hpp"
 #include <atomic>
 #include <chrono>
@@ -84,12 +78,20 @@ struct STMTest : std::thread
         });
     }
 
+    void assertTrue(bool b)
+    {
+        if (!b)
+        {
+            throw std::logic_error("Assertion failed.");
+        }
+    }
+
     void check()
     {
         stm::atomic([&](stm::transaction & tx) {
-            assert(a.open_r(tx) + b.open_r(tx) == sum_ab.open_r(tx));
-            assert(a.open_r(tx) + c.open_r(tx) == sum_ac.open_r(tx));
-            assert(b.open_r(tx) + c.open_r(tx) == sum_bc.open_r(tx));
+            assertTrue(a.open_r(tx) + b.open_r(tx) == sum_ab.open_r(tx));
+            assertTrue(a.open_r(tx) + c.open_r(tx) == sum_ac.open_r(tx));
+            assertTrue(b.open_r(tx) + c.open_r(tx) == sum_bc.open_r(tx));
         });
     }
 
@@ -177,7 +179,7 @@ void test()
 {
     std::vector<STMTest> workers(16);
 
-    static const unsigned cDuration = 2;
+    static const unsigned cDuration = 5;
 
     std::cout << "Wait for " << cDuration << "s..." << std::endl;
     usleep(cDuration * 1000 * 1000);
