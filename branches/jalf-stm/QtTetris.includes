@@ -7,10 +7,6 @@ Futile/include
 3rdParty/Poco/Foundation/include
 3rdParty/STM
 /Users/francis/QtSDK/Desktop/Qt/4.8.0/gcc/include
-/usr/include/c++/4.6
-/usr/include/c++/4.6/x86_64-linux-gnu
-/usr/include/c++/4.6/backward
-/usr/lib/gcc/x86_64-linux-gnu/4.6.1/include
+/opt/local/include/gcc47/c++
 /usr/local/include
-/usr/lib/gcc/x86_64-linux-gnu/4.6.1/include-fixed
 /usr/include
