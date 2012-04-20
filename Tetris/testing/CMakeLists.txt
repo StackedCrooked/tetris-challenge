@@ -11,15 +11,15 @@ include_directories(SYSTEM
     ${SOLUTIONDIR}3rdParty/Poco/Foundation/include)
 
 
-add_executable(TetrisTest
-    src/STMTest.cpp
-    src/WorkerPoolTest.cpp
-    src/WorkerTest.cpp
-    src/TetrisTest.cpp
-    src/Benchmark.cpp
-    src/ComputerPlayerTest.cpp
-    src/NodeCalculatorTest.cpp
-    src/main.cpp)
+add_executable(TetrisTest src/STMTest.cpp)
+
+#    src/WorkerPoolTest.cpp
+#    src/WorkerTest.cpp
+#    src/TetrisTest.cpp
+#    src/Benchmark.cpp
+#    src/ComputerPlayerTest.cpp
+#    src/NodeCalculatorTest.cpp
+#    src/main.cpp)
 
 
 set_target_properties(TetrisTest PROPERTIES COMPILE_FLAGS ${FINAL_COMPILE_FLAGS})

@@ -1,27 +1,31 @@
-#include "TetrisTest.h"
-#include "Futile/WorkerPool.h"
-#include "Futile/Worker.h"
-#include "Futile/Logger.h"
-#include "Futile/Logging.h"
+// Force NDEBUG!
+#ifdef NDEBUG
+#undef NDEBUG
+#endif
+
+
 #include "stm.hpp"
 #include <atomic>
+#include <chrono>
+#include <iostream>
+#include <memory>
 #include <string>
-
-
-namespace testing {
-
-
-using namespace Futile;
+#include <thread>
+#include <vector>
+#include <unistd.h>
 
 
 typedef stm::shared<int> shared_int;
 
 
-class STMTest : public TetrisTest
+// Global stop flag.
+std::atomic_bool gStop(false);
+
+
+struct STMTest : std::thread
 {
-public:
     STMTest() :
-        stop(false),
+        std::thread(std::bind(&STMTest::test, this)),
         a(0),
         b(0),
         c(0),
@@ -31,7 +35,6 @@ public:
     {
     }
 
-    std::atomic_bool stop;
     shared_int a;
     shared_int b;
     shared_int c;
@@ -84,15 +87,15 @@ public:
     void check()
     {
         stm::atomic([&](stm::transaction & tx) {
-            ASSERT_TRUE(a.open_r(tx) + b.open_r(tx) == sum_ab.open_r(tx));
-            ASSERT_TRUE(a.open_r(tx) + c.open_r(tx) == sum_ac.open_r(tx));
-            ASSERT_TRUE(b.open_r(tx) + c.open_r(tx) == sum_bc.open_r(tx));
+            assert(a.open_r(tx) + b.open_r(tx) == sum_ab.open_r(tx));
+            assert(a.open_r(tx) + c.open_r(tx) == sum_ac.open_r(tx));
+            assert(b.open_r(tx) + c.open_r(tx) == sum_bc.open_r(tx));
         });
     }
 
     void test()
     {
-        while (!stop)
+        while (!gStop)
         {
             stm::atomic([&](stm::transaction & ) {
                 increment_a();
@@ -136,56 +139,65 @@ public:
         }
     }
 
+    typedef std::vector<int> Values;
+    Values getValues(stm::transaction & tx)
+    {
+        Values results;
+        results.push_back(a.open_r(tx));
+        results.push_back(b.open_r(tx));
+        results.push_back(c.open_r(tx));
+        results.push_back(sum_ab.open_r(tx));
+        results.push_back(sum_ac.open_r(tx));
+        results.push_back(sum_bc.open_r(tx));
+        return results;
+    }
+
     void printValues()
     {
-        stm::atomic([&](stm::transaction & tx) {
-            LogInfo(SS() << "a: " << a.open_r(tx));
-            LogInfo(SS() << "b: " << b.open_r(tx));
-            LogInfo(SS() << "c: " << c.open_r(tx));
-            LogInfo(SS() << "sum_ab: " << sum_ab.open_r(tx));
-            LogInfo(SS() << "sum_ac: " << sum_ac.open_r(tx));
-            LogInfo(SS() << "sum_bc: " << sum_bc.open_r(tx));
-        });
+        Values values = stm::atomic<Values>([&](stm::transaction & tx) { return this->getValues(tx); });
+        for (Values::size_type idx = 0; idx < values.size(); ++idx)
+        {
+            if (idx != 0)
+            {
+                std::cout << ", ";
+            }
+
+            if (idx % 6 == 0)
+            {
+                std::cout << std::endl;
+            }
+
+            std::cout << values[idx];
+        }
     }
 };
 
 
-TEST_F(STMTest, CoordinatedChanges)
+void test()
 {
+    std::vector<STMTest> workers(16);
 
-    WorkerPool workers("Incrementers", 16);
-    for (std::size_t idx = 0; idx < workers.size(); ++idx)
+    static const unsigned cDuration = 2;
+
+    std::cout << "Wait for " << cDuration << "s..." << std::endl;
+    usleep(cDuration * 1000 * 1000);
+
+    std::cout << "Stopping the workers..." << std::endl;
+    gStop = true;
+
+    std::cout << "Results:" << std::endl;
+    for (auto & worker : workers)
     {
-        workers.schedule(boost::bind(&STMTest::test, this));
+        worker.join();
+        worker.printValues();
     }
+    std::cout << std::endl;
 
-    static const unsigned cDuration = 1000;
-
-    LogInfo(SS() << "Wait for " << cDuration << "ms...");
-    Sleep(cDuration);
-
-    LogInfo(SS() << "Stopping the workers...");
-    stop = true;
-    workers.wait();
-
-    LogInfo(SS() << "Results:");
-    printValues();
-
-    LogInfo(SS() << "Finished.");
-    FlushLogs();
+    std::cout << "Finished." << std::endl;
 }
 
 
-TEST_F(STMTest, Behavior)
+int main()
 {
-    stm::shared<bool> flag(false);
-
-    stm::atomic([&](stm::transaction & ){
-        ASSERT_FALSE(stm::atomic<bool>([&](stm::transaction & tx){ return flag.open_r(tx); }));
-        stm::atomic([&](stm::transaction & tx){ return flag.open_rw(tx) = true; });
-        ASSERT_TRUE(stm::atomic<bool>([&](stm::transaction & tx){ return flag.open_r(tx); }));
-    });
+    test();
 }
-
-
-} // namespace testing
