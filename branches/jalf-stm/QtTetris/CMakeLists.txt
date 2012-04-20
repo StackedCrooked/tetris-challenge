@@ -68,13 +68,13 @@ else()
     set(CMAKE_INCLUDE_SYSTEM_FLAG_CXX "-isystem ")
     set(CXX_FLAGS         "${CXX_FLAGS} -std=c++0x -DTETRIS_QT=1 ")
     if(${CMAKE_CXX_COMPILER} MATCHES ".*clang.*")
-        set(CXX_FLAGS     "${CXX_FLAGS} -stdlib=libc++ -Qunused-arguments ")
+        set(CXX_FLAGS     "${CXX_FLAGS} -stdlib=libc++ -Qunused-arguments -Wno-reserved-user-defined-literal -Wno-self-assign ")
     endif()
-    set(WARNING_OPTIONS_STM " -Wall -Wextra -Werror -Wno-reserved-user-defined-literal ")
-    set(WARNING_OPTIONS     " ${WARNING_OPTIONS_STM} ")
-    set(CXX_FLAGS_Debug   "${CXX_FLAGS} ${WARNING_OPTIONS} -g3 ")
-    set(CXX_FLAGS_Release "${CXX_FLAGS} ${WARNING_OPTIONS} -O3 -DNDEBUG ")
-    set(CXX_FLAGS_RelWithDebInfo "${CXX_FLAGS} ${WARNING_OPTIONS} -O1 -g3 -DNDEBUG ")
+    set(WARNING_OPTIONS_STM      " -Wall -Wextra -Werror ")
+    set(WARNING_OPTIONS          " ${WARNING_OPTIONS_STM} ")
+    set(CXX_FLAGS_Debug          " ${WARNING_OPTIONS} ${CXX_FLAGS} -g3 ")
+    set(CXX_FLAGS_Release        " ${WARNING_OPTIONS} ${CXX_FLAGS} -O3 -DNDEBUG ")
+    set(CXX_FLAGS_RelWithDebInfo " ${WARNING_OPTIONS} ${CXX_FLAGS} -O1 -g3 -DNDEBUG ")
     set(FINAL_COMPILE_FLAGS "${CXX_FLAGS_${CMAKE_BUILD_TYPE}} -DFUTILE_EVENTLOOP ")
 endif()
 
@@ -94,7 +94,7 @@ endif()
 #
 add_subdirectory(${SOLUTIONDIR}Tetris ${OUTDIR}/Tetris)
 add_subdirectory(${SOLUTIONDIR}Futile ${OUTDIR}/Futile)
-add_subdirectory(${SOLUTIONDIR}Tetris/testing ${OUTDIR}/testing)
+#add_subdirectory(${SOLUTIONDIR}Tetris/testing ${OUTDIR}/testing)
 
 
 #
