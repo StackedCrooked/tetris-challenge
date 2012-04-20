@@ -87,7 +87,7 @@ endif()
 #
 add_subdirectory(${SOLUTIONDIR}Tetris ${OUTDIR}/Tetris)
 add_subdirectory(${SOLUTIONDIR}Futile ${OUTDIR}/Futile)
-#add_subdirectory(${SOLUTIONDIR}Tetris/testing ${OUTDIR}/testing)
+add_subdirectory(${SOLUTIONDIR}Tetris/testing ${OUTDIR}/testing)
 
 
 #
