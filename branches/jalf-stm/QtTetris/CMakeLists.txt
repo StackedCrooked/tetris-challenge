@@ -38,13 +38,6 @@ message("ARCH:     ${ARCH}")
 
 
 #
-# Location of the QtSDK. Change this if needed.
-# TODO: Make this more intelligent.
-#
-set(QtSDK "$ENV{HOME}/QtSDK/Desktop/Qt/4.8.0/gcc")
-
-
-#
 # Path variables
 #
 set(EXECUTABLE QtTetris)
@@ -68,9 +61,9 @@ else()
     set(CMAKE_INCLUDE_SYSTEM_FLAG_CXX "-isystem ")
     set(CXX_FLAGS         "${CXX_FLAGS} -std=c++0x -DTETRIS_QT=1 ")
     if(${CMAKE_CXX_COMPILER} MATCHES ".*clang.*")
-        set(CXX_FLAGS     "${CXX_FLAGS} -stdlib=libc++ -Qunused-arguments -Wno-reserved-user-defined-literal -Wno-self-assign ")
+        set(CXX_FLAGS     "${CXX_FLAGS} -stdlib=libc++ -Qunused-arguments ")
     endif()
-    set(WARNING_OPTIONS_STM      " -Wall -Wextra -Werror ")
+    set(WARNING_OPTIONS_STM " -Wall -Wextra -Werror -Wno-reserved-user-defined-literal ")
     set(WARNING_OPTIONS          " ${WARNING_OPTIONS_STM} ")
     set(CXX_FLAGS_Debug          " ${WARNING_OPTIONS} ${CXX_FLAGS} -g3 ")
     set(CXX_FLAGS_Release        " ${WARNING_OPTIONS} ${CXX_FLAGS} -O3 -DNDEBUG ")
@@ -136,7 +129,7 @@ set(QtTetris_HEADERS ${QtTetris_QT_HEADERS} ${QtTetris_REGULAR_HEADERS})
 #
 # Qt resources
 #
-set(QT_QMAKE_EXECUTABLE /Users/francis/QtSDK/Desktop/Qt/4.8.0/gcc/bin)
+
 QT4_ADD_RESOURCES(QtTetris_Resources "QtTetris.qrc")
 
 
