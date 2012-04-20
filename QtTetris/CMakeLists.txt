@@ -38,6 +38,13 @@ message("ARCH:     ${ARCH}")
 
 
 #
+# Location of the QtSDK. Change this if needed.
+# TODO: Make this more intelligent.
+#
+set(QtSDK "$ENV{HOME}/QtSDK/Desktop/Qt/4.8.0/gcc")
+
+
+#
 # Path variables
 #
 set(EXECUTABLE QtTetris)
@@ -94,6 +101,7 @@ add_subdirectory(${SOLUTIONDIR}Tetris/testing ${OUTDIR}/testing)
 # Includes
 #
 include_directories(SYSTEM
+    ${QtSDK}/include
     ${SOLUTIONDIR}3rdParty/Boost
     ${SOLUTIONDIR}3rdParty/stm
     ${SOLUTIONDIR}3rdParty/Poco/Foundation/include)
