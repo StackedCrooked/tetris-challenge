@@ -13,7 +13,9 @@ std::atomic<bool> & stop_flag()
     return fStop;
 }
 
+
 typedef stm::shared<int> shared_int;
+
 
 struct Globals
 {
@@ -33,73 +35,75 @@ Globals & globals()
 }
 
 
+void increment_a()
+{
+    stm::atomic([&](stm::transaction& tx) {
+    int & a = globals().a.open_rw(tx);
+    a++;
+
+    int & sum_ab = globals().sum_ab.open_rw(tx);
+    sum_ab = a + globals().b.open_r(tx);
+
+    int & sum_ac = globals().sum_ac.open_rw(tx);
+    sum_ac = a + globals().c.open_r(tx);
+    });
+}
+
+
+void increment_b()
+{
+    stm::atomic([&](stm::transaction& tx) {
+    int & b = globals().b.open_rw(tx);
+    b++;
+
+    int & sum_ab = globals().sum_ab.open_rw(tx);
+    sum_ab = globals().a.open_r(tx) + b;
+
+    int & sum_bc = globals().sum_bc.open_rw(tx);
+    sum_bc = b + globals().c.open_r(tx);
+    });
+}
+
+
+void increment_c()
+{
+    stm::atomic([&](stm::transaction& tx) {
+    int & c = globals().c.open_rw(tx);
+    c++;
+
+    int & sum_ac = globals().sum_ac.open_rw(tx);
+    sum_ac = globals().a.open_r(tx) + c;
+
+    int & sum_bc = globals().sum_bc.open_rw(tx);
+    sum_bc = globals().b.open_r(tx) + c;
+    });
+}
+
+
+void assertTrue(bool b)
+{
+    if (!b)
+    {
+        throw std::logic_error("Assertion failed.");
+    }
+}
+
+
+void check()
+{
+    stm::atomic([&](stm::transaction & tx) {
+        assertTrue(globals().a.open_r(tx) + globals().b.open_r(tx) == globals().sum_ab.open_r(tx));
+        assertTrue(globals().a.open_r(tx) + globals().c.open_r(tx) == globals().sum_ac.open_r(tx));
+        assertTrue(globals().b.open_r(tx) + globals().c.open_r(tx) == globals().sum_bc.open_r(tx));
+    });
+}
+
+
 struct STMTest : std::thread
 {
-    STMTest() :
-        std::thread(std::bind(&STMTest::test, this))
-    {
-    }
+    STMTest() : std::thread(std::bind(&STMTest::test)) { }
 
-    void increment_a()
-    {
-        stm::atomic([&](stm::transaction& tx) {
-        int & a = globals().a.open_rw(tx);
-        a++;
-
-        int & sum_ab = globals().sum_ab.open_rw(tx);
-        sum_ab = a + globals().b.open_r(tx);
-
-        int & sum_ac = globals().sum_ac.open_rw(tx);
-        sum_ac = a + globals().c.open_r(tx);
-        });
-    }
-
-    void increment_b()
-    {
-        stm::atomic([&](stm::transaction& tx) {
-        int & b = globals().b.open_rw(tx);
-        b++;
-
-        int & sum_ab = globals().sum_ab.open_rw(tx);
-        sum_ab = globals().a.open_r(tx) + b;
-
-        int & sum_bc = globals().sum_bc.open_rw(tx);
-        sum_bc = b + globals().c.open_r(tx);
-        });
-    }
-
-    void increment_c()
-    {
-        stm::atomic([&](stm::transaction& tx) {
-        int & c = globals().c.open_rw(tx);
-        c++;
-
-        int & sum_ac = globals().sum_ac.open_rw(tx);
-        sum_ac = globals().a.open_r(tx) + c;
-
-        int & sum_bc = globals().sum_bc.open_rw(tx);
-        sum_bc = globals().b.open_r(tx) + c;
-        });
-    }
-
-    void assertTrue(bool b)
-    {
-        if (!b)
-        {
-            throw std::logic_error("Assertion failed.");
-        }
-    }
-
-    void check()
-    {
-        stm::atomic([&](stm::transaction & tx) {
-            assertTrue(globals().a.open_r(tx) + globals().b.open_r(tx) == globals().sum_ab.open_r(tx));
-            assertTrue(globals().a.open_r(tx) + globals().c.open_r(tx) == globals().sum_ac.open_r(tx));
-            assertTrue(globals().b.open_r(tx) + globals().c.open_r(tx) == globals().sum_bc.open_r(tx));
-        });
-    }
-
-    void test()
+    static void test()
     {
         while (!stop_flag())
         {
