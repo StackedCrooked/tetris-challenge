@@ -185,9 +185,9 @@ void printValues()
 
 void test()
 {
-    std::vector<STMTest> workers(2);
+    std::vector<STMTest> workers(4);
 
-    static const unsigned cDuration = 1;
+    static const unsigned cDuration = 5;
 
     std::cout << "Wait for " << cDuration << "s..." << std::endl;
     usleep(cDuration * 1000 * 1000);
