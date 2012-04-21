@@ -24,8 +24,20 @@ add_executable(TetrisTest src/STMTest.cpp)
 
 set_target_properties(TetrisTest PROPERTIES COMPILE_FLAGS ${FINAL_COMPILE_FLAGS})
 
+
+
+#
+# Clang requires explicty dylib.
+#
+if(${CMAKE_CXX_COMPILER} MATCHES ".*clang.*")
+set(CLANG_LIBCPP "/usr/local/lib/libc++.1.dylib")
+else()
+set(CLANG_LIBCPP "")
+endif()
+
+
 target_link_libraries(TetrisTest Tetris Futile pthread
                                  ${SOLUTIONDIR}3rdParty/Boost/lib/${PLATFORM}/${ARCH}/libboost_thread.a
                                  ${SOLUTIONDIR}3rdParty/Poco/lib/${PLATFORM}/${ARCH}/libPocoFoundation.a
                                  ${SOLUTIONDIR}3rdParty/GTest/lib/${PLATFORM}/${ARCH}/libgtest.a
-                                 /usr/local/lib/libc++.1.dylib)
+                                 ${CLANG_LIBCPP})
