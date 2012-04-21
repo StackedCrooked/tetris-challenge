@@ -65,9 +65,9 @@ else()
     endif()
     set(WARNING_OPTIONS_STM " -Wall -Wextra -Werror ")
     set(WARNING_OPTIONS          " ${WARNING_OPTIONS_STM} ")
-    set(CXX_FLAGS_Debug          " ${WARNING_OPTIONS} ${CXX_FLAGS} -g3 ")
+    set(CXX_FLAGS_Debug          " ${WARNING_OPTIONS} ${CXX_FLAGS} -ggdb3 ")
     set(CXX_FLAGS_Release        " ${WARNING_OPTIONS} ${CXX_FLAGS} -O3 -DNDEBUG ")
-    set(CXX_FLAGS_RelWithDebInfo " ${WARNING_OPTIONS} ${CXX_FLAGS} -O1 -g3 -DNDEBUG ")
+    set(CXX_FLAGS_RelWithDebInfo " ${WARNING_OPTIONS} ${CXX_FLAGS} -O1 -g -DNDEBUG ")
     set(FINAL_COMPILE_FLAGS "${CXX_FLAGS_${CMAKE_BUILD_TYPE}} -DFUTILE_EVENTLOOP ")
 endif()
 
@@ -174,13 +174,25 @@ set(LIBEXT "a")
 if(WIN32)
 set(LIBEXT "lib")
 endif()
+
+
+#
+# Clang requires explicty dylib.
+#
+if(${CMAKE_CXX_COMPILER} MATCHES ".*clang.*")
+set(CLANG_LIBCPP "/usr/local/lib/libc++.1.dylib")
+else()
+set(CLANG_LIBCPP "")
+endif()
+
+
 target_link_libraries(QtTetris ${QT_LIBRARIES}
                                Tetris
                                Futile
                                ${EXTRA_LIBS}
                                ${SOLUTIONDIR}3rdParty/Boost/lib/${PLATFORM}/${ARCH}/libboost_thread.${LIBEXT}
                                ${SOLUTIONDIR}3rdParty/Poco/lib/${PLATFORM}/${ARCH}/libPocoFoundation.${LIBEXT}
-                               /usr/local/lib/libc++.1.dylib)
+                               ${CLANG_LIBCPP})
 
 
 
