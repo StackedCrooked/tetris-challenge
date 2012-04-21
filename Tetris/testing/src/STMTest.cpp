@@ -189,30 +189,35 @@ void printValues()
 
 void test()
 {
-    std::vector<STMTest> workers(4);
-
     static const unsigned cDuration = 5;
+    std::cout << "Run 4 workers for " << cDuration << "s..." << std::endl;
 
-    std::cout << "Wait for " << cDuration << "s..." << std::endl;
+    // Creates 4 workers.
+    STMTest worker_1;
+    STMTest worker_2;
+    STMTest worker_3;
+    STMTest worker_4;
+
     usleep(cDuration * 1000 * 1000);
 
-    std::cout << "Stopping the workers..." << std::endl;
+    std::cout << "Setting the stop flag." << std::endl;
     stop_flag() = true;
 
-    std::cout << "Results:" << std::endl;
-    for (auto & worker : workers)
-    {
-        worker.join();
-    }
+	std::cout << "Joining threads." << std::endl;
+	worker_1.join();
+	worker_2.join();
+	worker_3.join();
+	worker_4.join();
 
+    std::cout << "Results:" << std::endl;
     printValues();
-    std::cout << std::endl;
-    std::cout << "Finished." << std::endl;
+
+    std::cout << "\nFinished." << std::endl;
 }
 
 
 int main()
 {
-    std::cout << "STMTest" << std::endl;
+    std::cout << "Starting STMTest" << std::endl;
     test();
 }
