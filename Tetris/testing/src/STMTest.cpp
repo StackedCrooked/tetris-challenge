@@ -203,11 +203,11 @@ void test()
     std::cout << "Setting the stop flag." << std::endl;
     stop_flag() = true;
 
-	std::cout << "Joining threads." << std::endl;
-	worker_1.join();
-	worker_2.join();
-	worker_3.join();
-	worker_4.join();
+    std::cout << "Joining threads." << std::endl;
+    worker_1.join();
+    worker_2.join();
+    worker_3.join();
+    worker_4.join();
 
     std::cout << "Results:" << std::endl;
     printValues();
