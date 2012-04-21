@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by Qt Creator 2.4.82, 2012-04-21T03:48:29. -->
+<!-- Written by Qt Creator 2.4.82, 2012-04-21T04:30:43. -->
 <qtcreator>
  <data>
   <variable>GenericProjectManager.GenericProject.Toolchain</variable>
-  <value type="QString">ProjectExplorer.ToolChain.Gcc:{1364191c-5292-4d53-aa82-00f7e56f4def}</value>
+  <value type="QString">ProjectExplorer.ToolChain.Gcc:{477fff7b-83c7-4ca2-9d6f-5c4c8983f068}</value>
  </data>
  <data>
   <variable>ProjectExplorer.Project.ActiveTarget</variable>
@@ -63,12 +63,12 @@
    <value type="int" key="ProjectExplorer.Target.ActiveRunConfiguration">1</value>
    <valuemap type="QVariantMap" key="ProjectExplorer.Target.BuildConfiguration.0">
     <value type="QString" key="GenericProjectManager.GenericBuildConfiguration.BuildDirectory">Build</value>
-    <value type="QString" key="ProjectExplorer.BuildCOnfiguration.ToolChain">ProjectExplorer.ToolChain.Gcc:{1364191c-5292-4d53-aa82-00f7e56f4def}</value>
+    <value type="QString" key="ProjectExplorer.BuildCOnfiguration.ToolChain">ProjectExplorer.ToolChain.Gcc:{477fff7b-83c7-4ca2-9d6f-5c4c8983f068}</value>
     <valuemap type="QVariantMap" key="ProjectExplorer.BuildConfiguration.BuildStepList.0">
      <valuemap type="QVariantMap" key="ProjectExplorer.BuildStepList.Step.0">
       <valuelist type="QVariantList" key="GenericProjectManager.GenericMakeStep.BuildTargets"/>
       <value type="bool" key="GenericProjectManager.GenericMakeStep.Clean">false</value>
-      <value type="QString" key="GenericProjectManager.GenericMakeStep.MakeArguments">-j8</value>
+      <value type="QString" key="GenericProjectManager.GenericMakeStep.MakeArguments"></value>
       <value type="QString" key="GenericProjectManager.GenericMakeStep.MakeCommand"></value>
       <value type="bool" key="ProjectExplorer.BuildStep.Enabled">true</value>
       <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Make</value>
@@ -107,7 +107,7 @@
    </valuemap>
    <valuemap type="QVariantMap" key="ProjectExplorer.Target.BuildConfiguration.1">
     <value type="QString" key="GenericProjectManager.GenericBuildConfiguration.BuildDirectory"></value>
-    <value type="QString" key="ProjectExplorer.BuildCOnfiguration.ToolChain">ProjectExplorer.ToolChain.Gcc:{1364191c-5292-4d53-aa82-00f7e56f4def}</value>
+    <value type="QString" key="ProjectExplorer.BuildCOnfiguration.ToolChain">ProjectExplorer.ToolChain.Gcc:{477fff7b-83c7-4ca2-9d6f-5c4c8983f068}</value>
     <valuemap type="QVariantMap" key="ProjectExplorer.BuildConfiguration.BuildStepList.0">
      <valuemap type="QVariantMap" key="ProjectExplorer.BuildStepList.Step.0">
       <value type="bool" key="ProjectExplorer.BuildStep.Enabled">true</value>
@@ -150,7 +150,7 @@
    </valuemap>
    <valuemap type="QVariantMap" key="ProjectExplorer.Target.BuildConfiguration.2">
     <value type="QString" key="GenericProjectManager.GenericBuildConfiguration.BuildDirectory"></value>
-    <value type="QString" key="ProjectExplorer.BuildCOnfiguration.ToolChain">ProjectExplorer.ToolChain.Gcc:{1364191c-5292-4d53-aa82-00f7e56f4def}</value>
+    <value type="QString" key="ProjectExplorer.BuildCOnfiguration.ToolChain">ProjectExplorer.ToolChain.Gcc:{477fff7b-83c7-4ca2-9d6f-5c4c8983f068}</value>
     <valuemap type="QVariantMap" key="ProjectExplorer.BuildConfiguration.BuildStepList.0">
      <valuemap type="QVariantMap" key="ProjectExplorer.BuildStepList.Step.0">
       <value type="bool" key="ProjectExplorer.BuildStep.Enabled">true</value>
@@ -193,7 +193,7 @@
    </valuemap>
    <valuemap type="QVariantMap" key="ProjectExplorer.Target.BuildConfiguration.3">
     <value type="QString" key="GenericProjectManager.GenericBuildConfiguration.BuildDirectory"></value>
-    <value type="QString" key="ProjectExplorer.BuildCOnfiguration.ToolChain">ProjectExplorer.ToolChain.Gcc:{1364191c-5292-4d53-aa82-00f7e56f4def}</value>
+    <value type="QString" key="ProjectExplorer.BuildCOnfiguration.ToolChain">ProjectExplorer.ToolChain.Gcc:{477fff7b-83c7-4ca2-9d6f-5c4c8983f068}</value>
     <valuemap type="QVariantMap" key="ProjectExplorer.BuildConfiguration.BuildStepList.0">
      <valuemap type="QVariantMap" key="ProjectExplorer.BuildStepList.Step.0">
       <value type="bool" key="ProjectExplorer.BuildStep.Enabled">true</value>

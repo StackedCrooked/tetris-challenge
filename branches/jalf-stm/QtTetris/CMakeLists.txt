@@ -179,7 +179,8 @@ target_link_libraries(QtTetris ${QT_LIBRARIES}
                                Futile
                                ${EXTRA_LIBS}
                                ${SOLUTIONDIR}3rdParty/Boost/lib/${PLATFORM}/${ARCH}/libboost_thread.${LIBEXT}
-                               ${SOLUTIONDIR}3rdParty/Poco/lib/${PLATFORM}/${ARCH}/libPocoFoundation.${LIBEXT})
+                               ${SOLUTIONDIR}3rdParty/Poco/lib/${PLATFORM}/${ARCH}/libPocoFoundation.${LIBEXT}
+                               /usr/local/lib/libc++.1.dylib)
 
 
 

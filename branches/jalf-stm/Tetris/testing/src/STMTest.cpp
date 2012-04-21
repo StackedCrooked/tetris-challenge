@@ -1,15 +1,41 @@
 #include "stm.hpp"
-#include <atomic>
 #include <chrono>
 #include <iostream>
 #include <memory>
 #include <string>
-#include <thread>
 #include <vector>
 #include <unistd.h>
 
+
 // Global stop flag.
-std::atomic_bool gStop(false);
+// Clang's libc++ doesn't support <atomic> yet so we use this workaround.
+template<typename T>
+class Atomic
+{
+public:
+    explicit Atomic(const T & v = T()) : value(v) {}
+
+    operator T const ()
+    {
+        std::lock_guard<std::mutex> lock(mtx);
+        return value;
+    }
+
+    // return void for the sake of simplicity
+    void operator=(const T & v)
+    {
+        std::lock_guard<std::mutex> lock(mtx);
+        value = v;
+    }
+
+private:
+    std::mutex mtx;
+    T value;
+};
+
+
+Atomic<bool> gStop(false);
+
 
 typedef stm::shared<int> shared_int;
 
