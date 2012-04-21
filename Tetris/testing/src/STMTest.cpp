@@ -1,11 +1,9 @@
 #include "stm.hpp"
 #include <atomic>
 #include <iostream>
-#include <memory>
 #include <string>
-#include <vector>
-#include <mutex>
 #include <thread>
+#include <vector>
 #include <unistd.h>
 
 
