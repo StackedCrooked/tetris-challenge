@@ -1,4 +1,5 @@
 #include "stm.hpp"
+#include <atomic>
 #include <iostream>
 #include <memory>
 #include <string>
@@ -8,34 +9,11 @@
 #include <unistd.h>
 
 
-//// Global stop flag.
-//// Clang's libc++ doesn't support <atomic> yet so we use this workaround.
-//template<typename T>
-//class Atomic
-//{
-//public:
-//    explicit Atomic(const T & v = T()) : value(v) {}
-
-//    operator T const ()
-//    {
-//        std::lock_guard<std::mutex> lock(mtx);
-//        return value;
-//    }
-
-//    // return void for the sake of simplicity
-//    void operator=(const T & v)
-//    {
-//        std::lock_guard<std::mutex> lock(mtx);
-//        value = v;
-//    }
-
-//private:
-//    std::mutex mtx;
-//    T value;
-//};
-
-
-volatile bool gStop = *(new bool(false));
+std::atomic<bool> & stop_flag()
+{
+    static std::atomic<bool> fStop;
+    return fStop;
+}
 
 typedef stm::shared<int> shared_int;
 
@@ -50,7 +28,11 @@ struct Globals
 };
 
 
-Globals & globals = *(new Globals);
+Globals & globals()
+{
+    static Globals fGlobals;
+    return fGlobals;
+}
 
 
 struct STMTest : std::thread
@@ -63,42 +45,42 @@ struct STMTest : std::thread
     void increment_a()
     {
         stm::atomic([&](stm::transaction& tx) {
-        int & a = globals.a.open_rw(tx);
+        int & a = globals().a.open_rw(tx);
         a++;
 
-        int & sum_ab = globals.sum_ab.open_rw(tx);
-        sum_ab = a + globals.b.open_r(tx);
+        int & sum_ab = globals().sum_ab.open_rw(tx);
+        sum_ab = a + globals().b.open_r(tx);
 
-        int & sum_ac = globals.sum_ac.open_rw(tx);
-        sum_ac = a + globals.c.open_r(tx);
+        int & sum_ac = globals().sum_ac.open_rw(tx);
+        sum_ac = a + globals().c.open_r(tx);
         });
     }
 
     void increment_b()
     {
         stm::atomic([&](stm::transaction& tx) {
-        int & b = globals.b.open_rw(tx);
+        int & b = globals().b.open_rw(tx);
         b++;
 
-        int & sum_ab = globals.sum_ab.open_rw(tx);
-        sum_ab = globals.a.open_r(tx) + b;
+        int & sum_ab = globals().sum_ab.open_rw(tx);
+        sum_ab = globals().a.open_r(tx) + b;
 
-        int & sum_bc = globals.sum_bc.open_rw(tx);
-        sum_bc = b + globals.c.open_r(tx);
+        int & sum_bc = globals().sum_bc.open_rw(tx);
+        sum_bc = b + globals().c.open_r(tx);
         });
     }
 
     void increment_c()
     {
         stm::atomic([&](stm::transaction& tx) {
-        int & c = globals.c.open_rw(tx);
+        int & c = globals().c.open_rw(tx);
         c++;
 
-        int & sum_ac = globals.sum_ac.open_rw(tx);
-        sum_ac = globals.a.open_r(tx) + c;
+        int & sum_ac = globals().sum_ac.open_rw(tx);
+        sum_ac = globals().a.open_r(tx) + c;
 
-        int & sum_bc = globals.sum_bc.open_rw(tx);
-        sum_bc = globals.b.open_r(tx) + c;
+        int & sum_bc = globals().sum_bc.open_rw(tx);
+        sum_bc = globals().b.open_r(tx) + c;
         });
     }
 
@@ -113,15 +95,15 @@ struct STMTest : std::thread
     void check()
     {
         stm::atomic([&](stm::transaction & tx) {
-            assertTrue(globals.a.open_r(tx) + globals.b.open_r(tx) == globals.sum_ab.open_r(tx));
-            assertTrue(globals.a.open_r(tx) + globals.c.open_r(tx) == globals.sum_ac.open_r(tx));
-            assertTrue(globals.b.open_r(tx) + globals.c.open_r(tx) == globals.sum_bc.open_r(tx));
+            assertTrue(globals().a.open_r(tx) + globals().b.open_r(tx) == globals().sum_ab.open_r(tx));
+            assertTrue(globals().a.open_r(tx) + globals().c.open_r(tx) == globals().sum_ac.open_r(tx));
+            assertTrue(globals().b.open_r(tx) + globals().c.open_r(tx) == globals().sum_bc.open_r(tx));
         });
     }
 
     void test()
     {
-        while (!gStop)
+        while (!stop_flag())
         {
             stm::atomic([&](stm::transaction & ) {
                 increment_a();
@@ -173,12 +155,12 @@ typedef std::vector<int> Values;
 Values getValues(stm::transaction & tx)
 {
     Values results;
-    results.push_back(globals.a.open_r(tx));
-    results.push_back(globals.b.open_r(tx));
-    results.push_back(globals.c.open_r(tx));
-    results.push_back(globals.sum_ab.open_r(tx));
-    results.push_back(globals.sum_ac.open_r(tx));
-    results.push_back(globals.sum_bc.open_r(tx));
+    results.push_back(globals().a.open_r(tx));
+    results.push_back(globals().b.open_r(tx));
+    results.push_back(globals().c.open_r(tx));
+    results.push_back(globals().sum_ab.open_r(tx));
+    results.push_back(globals().sum_ac.open_r(tx));
+    results.push_back(globals().sum_bc.open_r(tx));
     return results;
 }
 
@@ -205,15 +187,15 @@ void printValues()
 
 void test()
 {
-    std::vector<STMTest> workers(16);
+    std::vector<STMTest> workers(2);
 
-    static const unsigned cDuration = 5;
+    static const unsigned cDuration = 1;
 
     std::cout << "Wait for " << cDuration << "s..." << std::endl;
     usleep(cDuration * 1000 * 1000);
 
     std::cout << "Stopping the workers..." << std::endl;
-    gStop = true;
+    stop_flag() = true;
 
     std::cout << "Results:" << std::endl;
     for (auto & worker : workers)
@@ -229,5 +211,6 @@ void test()
 
 int main()
 {
+    std::cout << "STMTest" << std::endl;
     test();
 }

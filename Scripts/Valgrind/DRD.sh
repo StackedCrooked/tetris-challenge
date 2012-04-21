@@ -1,1 +1,1 @@
-valgrind --tool=drd --check-stack-var=yes --segment-merging=no --first-race-only=no --read-var-info=yes --free-is-write=yes $* 
+valgrind --tool=drd --demangle=yes --log-file=valgrind-drd.log $* 
