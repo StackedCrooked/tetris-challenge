@@ -45,8 +45,44 @@ private:
 };
 
 
-typedef boost::recursive_mutex Mutex;
-typedef boost::recursive_mutex::scoped_lock ScopedLock;
+template<typename LockDecorator,
+         typename Mutex,
+         typename UnlockDecorator>
+struct GenericMutex : LockDecorator,
+                      Mutex,
+                      UnlockDecorator
+{
+    typedef Mutex                           MutexType;
+    typedef typename Mutex::scoped_lock     ScopedLockType;
+    typedef LockDecorator                   LockDecoratorType;
+    typedef UnlockDecorator                 UnlockDecoratorType;
+
+    void lock() throw()
+    {
+        LockDecorator::before();
+        Mutex::lock();
+        LockDecorator::after();
+    }
+
+    void unlock() noexcept
+    {
+        UnlockDecorator::before();
+        MutexType::unlock();
+        UnlockDecorator::after();
+    }
+};
+
+
+template<unsigned n = 0>
+struct EmptyDecorator
+{
+    void before() {}
+    void after() {}
+};
+
+
+typedef GenericMutex<EmptyDecorator<0>, boost::recursive_mutex, EmptyDecorator<1> > Mutex;
+typedef typename Mutex::ScopedLockType ScopedLock;
 
 
 /**

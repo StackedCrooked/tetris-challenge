@@ -25,7 +25,6 @@ namespace Tetris {
 using namespace Futile;
 
 
-
 namespace { // anonymous
 
 #if 0 // disabled code
