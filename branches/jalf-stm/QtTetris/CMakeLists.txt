@@ -224,12 +224,12 @@ set(MACDEPLOYQT_OPTIONS "")
 endif()
 add_custom_command(TARGET QtTetris
                    POST_BUILD
-                   COMMAND /bin/rm                  ARGS  "-rf" "${BUNDLE}/Contents/Plugins"
-                   COMMAND /bin/rm                  ARGS  "-f" "${BUNDLE}/Contents/Resources/qt.conf"
+                   COMMAND /bin/rm                  ARGS  "-rf" "${BUNDLE}"
                    COMMAND /bin/mkdir               ARGS  "-p"
                                                           "${BUNDLE}/Contents/Frameworks"
                                                           "${BUNDLE}/Contents/Resources"
-                   COMMAND /bin/cp                  ARGS  "${SOLUTIONDIR}Tetris/res/Tetris.icns" "${BUNDLE}/Contents/Resources/Tetris.icns"                   
+                   COMMAND /bin/cp                  ARGS  "${SOLUTIONDIR}Tetris/res/Tetris.icns" "${BUNDLE}/Contents/Resources/Tetris.icns"
+                   COMMAND /usr/libexec/PlistBuddy  ARGS  "-c" \"Add :CFBundleIconFile string\" "${BUNDLE}/Contents/Info.plist"
                    COMMAND /usr/libexec/PlistBuddy  ARGS  "-c" \"Set :CFBundleIconFile Tetris\" "${BUNDLE}/Contents/Info.plist"
                    WORKING_DIRECTORY  )
 endif(APPLE)
