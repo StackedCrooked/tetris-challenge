@@ -11,7 +11,6 @@ include_directories(SYSTEM
 add_library(Futile
     include/Futile/Array.h
     include/Futile/Assert.h
-    include/Futile/Atomic.h
     include/Futile/AutoPtrSupport.h
     include/Futile/Boost.h
     include/Futile/GenericGrid.h

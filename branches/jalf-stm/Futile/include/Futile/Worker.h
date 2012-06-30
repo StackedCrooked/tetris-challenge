@@ -2,11 +2,11 @@
 #define WORKERTHREAD_H
 
 
-#include "Futile/Atomic.h"
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread/condition_variable.hpp>
 #include <boost/thread/mutex.hpp>
+#include <atomic>
 #include <functional>
 #include <list>
 
@@ -113,7 +113,7 @@ private:
     mutable boost::mutex mQueueMutex;
     boost::condition_variable mQueueCondition;
 
-    Atomic<bool> mQuitFlag;
+    std::atomic<bool> mQuitFlag;
 
     boost::scoped_ptr<boost::thread> mThread;
 };
