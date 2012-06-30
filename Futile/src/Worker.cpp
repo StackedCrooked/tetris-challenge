@@ -1,6 +1,7 @@
 #include "Futile/Worker.h"
 #include "Futile/Logging.h"
 #include "Futile/MakeString.h"
+#include <boost/thread.hpp>
 
 
 //
@@ -57,7 +58,7 @@ Worker::Worker(const std::string & inName) :
 Worker::~Worker()
 {
     {
-        mQuitFlag.set(true);
+        mQuitFlag = true;
         boost::mutex::scoped_lock queueLock(mQueueMutex);
         boost::mutex::scoped_lock statusLock(mStatusMutex);
         mQueue.clear();
@@ -199,7 +200,7 @@ void Worker::run()
     try
     {
         SetThreadName(::GetCurrentThreadId(), mName);
-        while (!mQuitFlag.get())
+        while (!mQuitFlag)
         {
             processTask();
         }

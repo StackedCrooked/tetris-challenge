@@ -615,7 +615,6 @@
 ./Futile/include/Futile/AutoPtrSupport.h
 ./Futile/include/Futile/Logger.h
 ./Futile/include/Futile/Worker.h
-./Futile/include/Futile/Atomic.h
 ./Futile/include/Futile/GenericGrid.h
 ./Futile/include/Futile/MainThread.h
 ./Futile/include/Futile/WorkerPool.h
