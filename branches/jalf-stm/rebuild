@@ -1,4 +1,9 @@
 #!/bin/sh
+
+if [ ! -d 3rdParty/stm ]; then
+    cd 3rdParty && ./get-dikustm.sh && cd ..
+fi
+    
 rm -rf Build && mkdir Build
 cd Build
 ../configure && make $*
