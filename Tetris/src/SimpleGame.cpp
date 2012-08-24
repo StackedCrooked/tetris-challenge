@@ -144,10 +144,7 @@ GameStateStats SimpleGame::stats() const
 void SimpleGame::applyLinePenalty(int inNumberOfLinesMadeByOpponent)
 {
     LogInfo(SS() << (playerType() == PlayerType_Computer ? "The computer" : "The human being") << " received " << inNumberOfLinesMadeByOpponent << " lines from his crafty opponent");
-
-    stm::atomic([&](stm::transaction & tx) {
-        mImpl->mGame.applyLinePenalty(tx, inNumberOfLinesMadeByOpponent);
-    });
+    mImpl->mGame.applyLinePenalty(inNumberOfLinesMadeByOpponent);
 }
 
 
@@ -171,9 +168,7 @@ int SimpleGame::columnCount() const
 
 bool SimpleGame::move(Direction inDirection)
 {
-    Game::MoveResult result = stm::atomic<Game::MoveResult>([&](stm::transaction & tx) {
-        return mImpl->mGame.move(tx, inDirection);
-    });
+    Game::MoveResult result = mImpl->mGame.move(inDirection);
 
     if (result != Game::MoveResult_NotMoved) {
         mImpl->mGame.GameStateChanged();
@@ -197,9 +192,7 @@ void SimpleGame::drop()
 
 void SimpleGame::setStartingLevel(int inLevel)
 {
-    stm::atomic([&](stm::transaction & tx) {
-        mImpl->mGame.setStartingLevel(tx, inLevel);
-    });
+    mImpl->mGame.setStartingLevel(inLevel);
 }
 
 

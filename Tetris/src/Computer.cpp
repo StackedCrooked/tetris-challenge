@@ -56,7 +56,7 @@ struct Computer::Impl : boost::noncopyable
 
     void move();
 
-    Game::MoveResult move(stm::transaction & tx, Game & ioGame, const Block & targetBlock, const Evaluator & inEvaluator);
+    Game::MoveResult move(Game & ioGame, const Block & targetBlock, const Evaluator & inEvaluator);
 
     void coordinate();
 
@@ -119,7 +119,7 @@ void Computer::Impl::coordinate()
         // If make-tetrises mode and danger then remove all precalculated results and restart in survival mode.
         std::pair<bool, int> survival_and_firstOccupiedRow = stm::atomic<std::pair<bool, int>>([&](stm::transaction & tx) {
             return std::make_pair(NULL != dynamic_cast<const Survival*>(mEvaluator.open_r(tx)),
-                                  mGame.firstOccupiedRow(tx));
+                                  mGame.firstOccupiedRow());
         });
 
         if (!survival_and_firstOccupiedRow.first && survival_and_firstOccupiedRow.second < cSurvivalModeTreshold)
@@ -178,7 +178,7 @@ void Computer::Impl::coordinate()
 
         preliminaries.clear();
 
-        if (mGame.gameState(tx).firstOccupiedRow() < cSurvivalModeTreshold)
+        if (mGame.gameState().firstOccupiedRow() < cSurvivalModeTreshold)
         {
             LogDebug("Survival");
             evaluator = mEvaluator.open_rw(tx) = &Survival::Instance();
@@ -191,7 +191,7 @@ void Computer::Impl::coordinate()
 
         blockTypes = mGame.getFutureBlocks(precalculated.size() + evaluator->recommendedSearchDepth());
         blockTypes.erase(blockTypes.begin(), blockTypes.begin() + precalculated.size());
-        lastGameState.reset(new GameState(precalculated.empty() ? mGame.gameState(tx) : precalculated.back()));
+        lastGameState.reset(new GameState(precalculated.empty() ? mGame.gameState() : precalculated.back()));
     });
 
     if (!blockTypes.empty() && !lastGameState->isGameOver())
@@ -213,7 +213,7 @@ void Computer::Impl::coordinate()
 }
 
 
-Game::MoveResult Computer::Impl::move(stm::transaction & tx, Game & ioGame, const Block & targetBlock, const Evaluator & inEvaluator)
+Game::MoveResult Computer::Impl::move(Game & ioGame, const Block & targetBlock, const Evaluator & inEvaluator)
 {
     Block block = ioGame.activeBlock();
     Assert(block.type() == targetBlock.type());
@@ -230,7 +230,7 @@ Game::MoveResult Computer::Impl::move(stm::transaction & tx, Game & ioGame, cons
 
     if (block.column() < targetBlock.column())
     {
-        if (ioGame.move(tx, MoveDirection_Right) == Game::MoveResult_Moved)
+        if (ioGame.move(MoveDirection_Right) == Game::MoveResult_Moved)
         {
             return Game::MoveResult_Moved;
         }
@@ -247,7 +247,7 @@ Game::MoveResult Computer::Impl::move(stm::transaction & tx, Game & ioGame, cons
 
     if (block.column() > targetBlock.column())
     {
-        if (ioGame.move(tx, MoveDirection_Left) == Game::MoveResult_Moved)
+        if (ioGame.move(MoveDirection_Left) == Game::MoveResult_Moved)
         {
             return Game::MoveResult_Moved;
         }
@@ -284,7 +284,7 @@ Game::MoveResult Computer::Impl::move(stm::transaction & tx, Game & ioGame, cons
     }
     else if (inEvaluator.moveDownBehavior() == MoveDownBehavior_MoveDown)
     {
-        return ioGame.move(tx, MoveDirection_Down);
+        return ioGame.move(MoveDirection_Down);
     }
     else
     {
@@ -329,7 +329,7 @@ void Computer::Impl::move()
         }
 
         auto oldId = mGame.gameStateId();
-        move(tx, mGame, prec.front().originalBlock(), *mEvaluator.open_r(tx));
+        move(mGame, prec.front().originalBlock(), *mEvaluator.open_r(tx));
         auto newId = mGame.gameStateId();
         Assert(oldId == newId || oldId + 1 == newId);
         if (oldId + 1 == newId)

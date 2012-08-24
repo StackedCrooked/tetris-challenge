@@ -47,8 +47,8 @@ add_library(Tetris
     src/Computer.cpp
     src/ComputerPlayer.cpp
     src/Evaluator.cpp
-    src/SimpleGame.cpp
     src/Game.cpp
+    src/SimpleGame.cpp
     src/GameState.cpp
     src/GameStateComparator.cpp
     src/GameStateNode.cpp

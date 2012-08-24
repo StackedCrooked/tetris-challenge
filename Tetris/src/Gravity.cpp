@@ -8,6 +8,7 @@
 #include "Futile/Logging.h"
 #include "Futile/MakeString.h"
 #include "Futile/Stopwatch.h"
+#include "Futile/STMSupport.h"
 #include "Futile/Timer.h"
 #include <boost/noncopyable.hpp>
 #include <algorithm>
@@ -126,12 +127,13 @@ void Gravity::Impl::onTimerEvent()
     try
     {
         int newLevel = -1;
-        // If our block was "caught" by the sudden appearance of new blocks, then we solidify it in that state.
-        stm::atomic([&](stm::transaction & tx) {
+        // If our block was "caught" by the sudden appearance of new blocks, then we solidify it in that state.        
+        stm::atomic([this, &newLevel](stm::transaction & tx)
+        {
             const Block & block = mGame.activeBlock();
             if (!mGame.checkPositionValid(block))
             {
-                 mGame.move(tx, MoveDirection_Down);
+                 mGame.move(MoveDirection_Down);
                  return;
             }
 
@@ -140,7 +142,7 @@ void Gravity::Impl::onTimerEvent()
                 return;
             }
 
-            mGame.move(tx, MoveDirection_Down);
+            mGame.move(MoveDirection_Down);
             int & level = mLevel.open_rw(tx);
             level = std::min(mGame.level(), cMaxLevel);
             newLevel = level;
