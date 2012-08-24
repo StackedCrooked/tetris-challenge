@@ -90,10 +90,10 @@ public:
     }
 
 private:
-    mutable stm::shared<NodePtr> mBestNode;
-    mutable stm::shared<int> mBestQuality;
-    mutable stm::shared<std::size_t> mNodeCount;
-    mutable stm::shared<bool> mFinished;
+    stm::shared<NodePtr> mBestNode;
+    stm::shared<int> mBestQuality;
+    stm::shared<std::size_t> mNodeCount;
+    stm::shared<bool> mFinished;
 };
 
 

@@ -18,7 +18,7 @@ inline void set(stm::shared<T> & dst, const T & val)
 
 
 template<typename T>
-inline T get(stm::shared<T> & src)
+inline T get(const stm::shared<T> & src)
 {
     return stm::atomic<T>([&](stm::transaction & tx){ return src.open_r(tx); });
 }

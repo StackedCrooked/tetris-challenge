@@ -126,11 +126,11 @@ private:
 
     const CircularBlockTypes mBlockTypes;
     const CircularBlockTypes mGarbage;
-    mutable stm::shared<BlockTypes::size_type> mGarbageIndex;
-    mutable stm::shared<Block> mActiveBlock;
-    mutable stm::shared<int> mStartingLevel;
-    mutable stm::shared<bool> mPaused;
-    mutable stm::shared<GameState> mGameState;
+    stm::shared<BlockTypes::size_type> mGarbageIndex;
+    stm::shared<Block> mActiveBlock;
+    stm::shared<int> mStartingLevel;
+    stm::shared<bool> mPaused;
+    stm::shared<GameState> mGameState;
 };
 
 
