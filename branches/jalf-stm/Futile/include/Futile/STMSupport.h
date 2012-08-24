@@ -29,9 +29,9 @@ struct Shared : stm::shared<T>
 {
     Shared(const T & inValue = T()) : stm::shared<T>(inValue) {}
 
-    void setValue(const T & inValue) { STM::set(*this, inValue); }
+    void set(const T & inValue) { STM::set(*this, inValue); }
 
-    T getValue() const { return STM::get(*this); }
+    T get() const { return STM::get(*this); }
 };
 
 

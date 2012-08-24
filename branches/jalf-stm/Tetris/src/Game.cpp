@@ -8,6 +8,7 @@
 #include "Futile/Assert.h"
 #include "Futile/Logging.h"
 #include "Futile/MainThread.h"
+#include "Futile/STMSupport.h"
 #include "Poco/Exception.h"
 #include "Poco/Random.h"
 #include <algorithm>
@@ -19,7 +20,9 @@ namespace Tetris {
 
 
 using namespace Futile;
+using namespace Futile::STM;
 extern const int cMaxLevel;
+using std::placeholders::_1;
 
 
 namespace { // anonymous
@@ -46,111 +49,163 @@ BlockTypes GenerateBlockTypes(unsigned n)
 }
 
 
+class CircularBlockTypes
+{
+public:
+    CircularBlockTypes(unsigned n) :
+        mBlockTypes(GenerateBlockTypes(n))
+    {
+    }
+
+    BlockType get(std::size_t inIndex) const
+    {
+        return mBlockTypes[inIndex % mBlockTypes.size()];
+    }
+
+    BlockTypes::size_type size() const
+    {
+        return mBlockTypes.size();
+    }
+
+private:
+    BlockTypes mBlockTypes;
+};
+
+
 } // anonymous namespace
 
 
-Game::CircularBlockTypes::CircularBlockTypes(unsigned n) :
-    mBlockTypes(GenerateBlockTypes(n))
+struct Game::Impl : boost::noncopyable
 {
-}
+    Impl(Game & inGame,
+         unsigned inRowCount,
+         unsigned inColumnCount) :
+        mGame(inGame),
+        mBlockTypes(1),
+        mGarbage(1),
+        mGarbageIndex(0),
+        mActiveBlock(CreateDefaultBlock(mBlockTypes.get(0), inColumnCount)),
+        mStartingLevel(0),
+        mPaused(false),
+        mGameState(GameState(inRowCount, inColumnCount))
+    {
+    }
+    ~Impl(){}
+
+    void commit(const Block & inBlock)
+    {
+        int lines = stm::atomic<int>([=](stm::transaction & tx) -> int { return this->commit(tx, inBlock); });
+        mGame.LinesCleared(lines);
+    }
+
+    int commit(stm::transaction & tx, const Block & inBlock)
+    {
+        GameState & gameState = mGameState.open_rw(tx);
+        int lines = gameState.numLines();
+        gameState = gameState.commit(inBlock);
+        return gameState.numLines() - lines;
+    }
+
+    void applyLinePenalty(stm::transaction & tx, std::size_t inLineCount);
+
+    std::vector<BlockType> getGarbageRow(stm::transaction &);
+
+    Game::MoveResult move(stm::transaction & tx, Direction inDirection);
+
+    Game & mGame;
+    const CircularBlockTypes mBlockTypes;
+    const CircularBlockTypes mGarbage;
+    Shared<BlockTypes::size_type> mGarbageIndex;
+    Shared<Block> mActiveBlock;
+    Shared<int> mStartingLevel;
+    Shared<bool> mPaused;
+    Shared<GameState> mGameState;
+};
 
 
 Game::Game(std::size_t inNumRows, std::size_t inNumColumns) :
-    mBlockTypes(1),
-    mGarbage(1),
-    mGarbageIndex(0),
-    mActiveBlock(CreateDefaultBlock(mBlockTypes.get(0), inNumColumns)),
-    mStartingLevel(0),
-    mPaused(false),
-    mGameState(GameState(inNumRows, inNumColumns))
+    mImpl(new Impl(*this, inNumRows, inNumColumns))
 {
 }
 
 
 Game::~Game()
 {
+    delete mImpl;
 }
 
 
 void Game::setPaused(bool inPause)
 {
-    Futile::STM::set(mPaused, inPause);
+    mImpl->mPaused.set(inPause);
 }
 
 
 bool Game::isPaused() const
 {
-    return Futile::STM::get(mPaused);
+    return mImpl->mPaused.get();
 }
 
 
 unsigned Game::gameStateId() const
 {
 	// open_rw => eternal loop in 'Computer::Impl::move()' 
-    return stm::atomic<unsigned>([&](stm::transaction & tx){ return mGameState.open_r(tx).id(); });
+    return stm::atomic<unsigned>([=](stm::transaction & tx){ return mImpl->mGameState.open_r(tx).id(); });
 }
 
 
 Block Game::activeBlock() const
 {
-    return Futile::STM::get(mActiveBlock);
+    return mImpl->mActiveBlock.get();
 }
 
 
 GameStateStats Game::stats() const
 {
-    return stm::atomic<GameStateStats>([&](stm::transaction & tx) { return mGameState.open_r(tx).stats(); });
+    return stm::atomic<GameStateStats>([&](stm::transaction & tx) { return mImpl->mGameState.open_r(tx).stats(); });
 }
 
 
 bool Game::isGameOver() const
 {
-    return stm::atomic<bool>([&](stm::transaction & tx) { return mGameState.open_r(tx).isGameOver(); });
+    return stm::atomic<bool>([&](stm::transaction & tx) { return mImpl->mGameState.open_r(tx).isGameOver(); });
 }
 
 
 Grid Game::grid() const
 {
-    return stm::atomic<Grid>([&](stm::transaction & tx){ return mGameState.open_r(tx).grid(); });
+    return stm::atomic<Grid>([&](stm::transaction & tx){ return mImpl->mGameState.open_r(tx).grid(); });
 }
 
 
 int Game::rowCount() const
 {
-    return stm::atomic<int>([&](stm::transaction & tx) { return mGameState.open_r(tx).grid().rowCount(); });
+    return stm::atomic<int>([&](stm::transaction & tx) { return mImpl->mGameState.open_r(tx).grid().rowCount(); });
 }
 
 
 int Game::columnCount() const
 {
-    return stm::atomic<int>([&](stm::transaction & tx) { return mGameState.open_r(tx).grid().columnCount(); });
+    return stm::atomic<int>([&](stm::transaction & tx) { return mImpl->mGameState.open_r(tx).grid().columnCount(); });
 }
 
 
 int Game::level() const
 {
-    return std::max<int>(stats().numLines() / 10, STM::get(mStartingLevel));
+    return std::max<int>(stats().numLines() / 10, STM::get(mImpl->mStartingLevel));
 }
 
 
-const GameState & Game::gameState(stm::transaction & tx) const
+GameState Game::gameState() const
 {
-    return mGameState.open_r(tx);
+    return mImpl->mGameState.get();
 }
 
 
-void Game::commit(stm::transaction & tx, const Block & inBlock)
+std::vector<BlockType> Game::Impl::getGarbageRow(stm::transaction & tx)
 {
-    GameState & gameState = mGameState.open_rw(tx);
-    int lines = gameState.numLines();
-    gameState = gameState.commit(inBlock);
-    LinesCleared(gameState.numLines() - lines);
-}
-
-
-std::vector<BlockType> Game::getGarbageRow(stm::transaction & tx)
-{
-    BlockTypes result(columnCount(), BlockType_Nil);
+    auto numCols = mGame.columnCount();
+    BlockTypes result(numCols, BlockType_Nil);
     BlockTypes::size_type & garbageIndex = mGarbageIndex.open_rw(tx);
 
     static Poco::UInt32 fSeed = static_cast<Poco::UInt32>(time(0) % Poco::UInt32(-1));
@@ -163,7 +218,7 @@ std::vector<BlockType> Game::getGarbageRow(stm::transaction & tx)
     int count = 0;
     while (count < cMinCount)
     {
-        for (unsigned idx = 0; idx < unsigned(columnCount()); ++idx)
+        for (unsigned idx = 0; idx < unsigned(numCols); ++idx)
         {
             if (result[idx] == BlockType_Nil && rand.nextBool())
             {
@@ -180,23 +235,33 @@ std::vector<BlockType> Game::getGarbageRow(stm::transaction & tx)
 }
 
 
-void Game::applyLinePenalty(stm::transaction & tx, std::size_t inLineCount)
+void Game::applyLinePenalty(std::size_t inLineCount)
 {
+    stm::atomic([=](stm::transaction & tx) { mImpl->applyLinePenalty(tx, inLineCount); });
+}
 
-    if (inLineCount < 2 || isGameOver())
+
+void Game::Impl::applyLinePenalty(stm::transaction & tx, std::size_t inLineCount)
+{
+    if (inLineCount <= 1)
+    {
+        return;
+    }
+
+    const GameState & gameState = mGameState.open_r(tx);
+    if (gameState.isGameOver())
     {
         return;
     }
 
     int lineIncrement = inLineCount < 4 ? (inLineCount - 1) : inLineCount;
 
-    int newFirstOccupiedRow = gameState(tx).firstOccupiedRow() - lineIncrement;
+    int newFirstOccupiedRow = gameState.firstOccupiedRow() - lineIncrement;
     if (newFirstOccupiedRow < 0)
     {
         newFirstOccupiedRow = 0;
     }
 
-    const GameState & gameState = mGameState.open_r(tx);
     Grid grid = gameState.grid();
 
     std::size_t garbageStart = grid.rowCount() - lineIncrement;
@@ -226,7 +291,7 @@ void Game::applyLinePenalty(stm::transaction & tx, std::size_t inLineCount)
 
     // Check if the active block has been caught in the penalty lines that were added.
     // If yes then we need to commit the current gamestate.
-    const Block & block = activeBlock();
+    const Block & block = mActiveBlock.open_r(tx);
     if (!gameState.checkPositionValid(block, block.row(), block.column()))
     {
         // Commit the game state.
@@ -239,29 +304,29 @@ void Game::applyLinePenalty(stm::transaction & tx, std::size_t inLineCount)
 
 bool Game::checkPositionValid(const Block & inBlock) const
 {
-    return stm::atomic<bool>([&](stm::transaction & tx) { return mGameState.open_r(tx).checkPositionValid(inBlock); });
+    return stm::atomic<bool>([&](stm::transaction & tx) { return mImpl->mGameState.open_r(tx).checkPositionValid(inBlock); });
 }
 
 
 bool Game::canMove(Direction inDirection) const
 {
     return stm::atomic<bool>([&](stm::transaction & tx) -> bool {
-        const GameState & gs = mGameState.open_r(tx);
+        const GameState & gs = mImpl->mGameState.open_r(tx);
         if (gs.isGameOver()) {
             return false;
         }
 
-        const Block & block = mActiveBlock.open_r(tx);
+        const Block & block = mImpl->mActiveBlock.open_r(tx);
         std::size_t newRow = block.row()    + GetRowDelta(inDirection);
         std::size_t newCol = block.column() + GetColumnDelta(inDirection);
-        return mGameState.open_r(tx).checkPositionValid(block, newRow, newCol);
+        return mImpl->mGameState.open_r(tx).checkPositionValid(block, newRow, newCol);
     });
 }
 
 
-const Grid & Game::gameGrid(stm::transaction & tx) const
+Grid Game::gameGrid() const
 {
-    return gameState(tx).grid();
+    return stm::atomic<Grid>([this](stm::transaction & tx) { return mImpl->mGameState.open_r(tx).grid(); });
 }
 
 
@@ -269,10 +334,12 @@ BlockTypes Game::getFutureBlocks(std::size_t inCount)
 {
     return stm::atomic<BlockTypes>([&](stm::transaction & tx) -> BlockTypes {
         BlockTypes result;
-        const GameState & gs = mGameState.open_r(tx);
+
+        const auto & blockTypes = mImpl->mBlockTypes; // immutible const
+        const GameState & gs = mImpl->mGameState.open_r(tx);
         for (std::size_t idx = 0; idx < inCount; ++idx)
         {
-            result.push_back(mBlockTypes.get(gs.id() + idx));
+            result.push_back(blockTypes.get(gs.id() + idx));
         }
         Assert(result.size() == inCount);
         return result;
@@ -289,10 +356,11 @@ Game::MoveResult Game::rotate()
             return MoveResult_NotMoved;
         }
 
-        Block & block = mActiveBlock.open_rw(tx);
+        Block & block = mImpl->mActiveBlock.open_rw(tx);
         std::size_t oldRotation = block.rotation();
         block.rotate();
-        if (!gameState(tx).checkPositionValid(block, block.row(), block.column()))
+        const GameState & gameState = mImpl->mGameState.open_r(tx);
+        if (!gameState.checkPositionValid(block, block.row(), block.column()))
         {
             block.setRotation(oldRotation);
             return MoveResult_NotMoved;
@@ -304,51 +372,45 @@ Game::MoveResult Game::rotate()
 
 void Game::dropAndCommit()
 {
-    stm::atomic([&](stm::transaction & tx)
-    {
-        while (move(tx, MoveDirection_Down) == MoveResult_Moved);
-    });
+    while (move(MoveDirection_Down) == MoveResult_Moved);
 }
 
 
 void Game::dropWithoutCommit()
 {
-    stm::atomic([&](stm::transaction & tx)
+    while (canMove(MoveDirection_Down))
     {
-        while (canMove(MoveDirection_Down))
-        {
-            MoveResult result = move(tx, MoveDirection_Down);
-            Assert(result != MoveResult_Committed);
-            (void)result;
-        }
-    });
+        MoveResult result = move(MoveDirection_Down);
+        Assert(result != MoveResult_Committed);
+        (void)result;
+    }
 }
 
 
-void Game::setStartingLevel(stm::transaction & tx, int inLevel)
+void Game::setStartingLevel(int inLevel)
 {
-    mStartingLevel.open_rw(tx) = inLevel;
+    mImpl->mStartingLevel.set(inLevel);
 }
 
 
-void Game::setGrid(const Grid & inGrid)
+Game::MoveResult Game::move(Direction inDirection)
 {
-    stm::atomic([&](stm::transaction& tx){ mGameState.open_rw(tx).setGrid(inGrid); });
+    return stm::atomic<Game::MoveResult>([=](stm::transaction & tx) { return mImpl->move(tx, inDirection); });
 }
 
 
-Game::MoveResult Game::move(stm::transaction & tx, Direction inDirection)
+Game::MoveResult Game::Impl::move(stm::transaction & tx, Direction inDirection)
 {
-    if (isGameOver())
+    const GameState & cGameState = this->mGameState.open_r(tx);
+    if (cGameState.isGameOver())
     {
         return MoveResult_NotMoved;
     }
 
-    const Block & block = activeBlock();
+    const Block & block = mActiveBlock.open_r(tx);
     std::size_t newRow = block.row() + GetRowDelta(inDirection);
     std::size_t newCol = block.column() + GetColumnDelta(inDirection);
 
-    const GameState & cGameState = this->gameState(tx);
     if (cGameState.checkPositionValid(block, newRow, newCol))
     {
         Block & block = mActiveBlock.open_rw(tx);
@@ -363,21 +425,22 @@ Game::MoveResult Game::move(stm::transaction & tx, Direction inDirection)
         return MoveResult_NotMoved;
     }
 
-    // Remember the number of lines in the current game state.
-    int oldLineCount = cGameState.numLines();
-
     commit(tx, block);
 
     // Count the number of lines that were made in the commit call.
-    int linesCleared = cGameState.numLines() - oldLineCount;
-    Assert(linesCleared >= 0);
-    (void)linesCleared;
+    const GameState & newGameState = mGameState.open_r(tx);
 
-    Block & assignActiveBlock = mActiveBlock.open_rw(tx);
-    const GameState & newGameState = this->gameState(tx);
+    Assert(newGameState.numLines() - oldLineCount >= 0);
 
-    assignActiveBlock = CreateDefaultBlock(mBlockTypes.get(newGameState.id()), newGameState.grid().columnCount());
+    mActiveBlock.set(CreateDefaultBlock(mBlockTypes.get(newGameState.id()), newGameState.grid().columnCount()));
+
     return MoveResult_Committed;
+}
+
+
+int Game::firstOccupiedRow() const
+{
+    return stm::atomic<int>([=](stm::transaction & tx) { return mImpl->mGameState.open_rw(tx).firstOccupiedRow(); });
 }
 
 

@@ -8,8 +8,6 @@
 #include "Tetris/GameState.h"
 #include "Tetris/Grid.h"
 #include "Tetris/NodePtr.h"
-#include "Futile/STMSupport.h"
-#include "stm.hpp"
 #include <boost/noncopyable.hpp>
 #include <boost/signals2.hpp>
 #include <boost/scoped_ptr.hpp>
@@ -77,7 +75,7 @@ public:
         MoveResult_Committed
     };
 
-    virtual MoveResult move(stm::transaction & tx, Direction inDirection);
+    virtual MoveResult move(Direction inDirection);
 
     MoveResult rotate();
 
@@ -85,52 +83,21 @@ public:
 
     void dropAndCommit();
 
-    int firstOccupiedRow(stm::transaction & tx) const
-    { return gameState(tx).firstOccupiedRow(); }
-
-    int firstOccupiedRow() const { return stm::atomic<int>([this](stm::transaction & tx){ return firstOccupiedRow(tx); }); }
-
-    void setStartingLevel(stm::transaction & tx, int inLevel);
-
-    const Grid & gameGrid(stm::transaction & tx) const;
-
     BlockTypes getFutureBlocks(std::size_t inCount);
 
-    virtual void applyLinePenalty(stm::transaction & tx, std::size_t inLineCount);
+    int firstOccupiedRow() const;
 
-    const GameState & gameState(stm::transaction & tx) const;
+    void setStartingLevel(int inLevel);
+
+    Grid gameGrid() const;
+
+    virtual void applyLinePenalty(std::size_t inLineCount);
+
+    GameState gameState() const;
 
 private:
-    void commit(stm::transaction & tx, const Block & inBlock);
-    void setGrid(const Grid & inGrid);
-    std::vector<BlockType> getGarbageRow(stm::transaction & tx);
-
-    class CircularBlockTypes
-    {
-    public:
-        CircularBlockTypes(unsigned n);
-
-        BlockType get(std::size_t inIndex) const
-        {
-            return mBlockTypes[inIndex % mBlockTypes.size()];
-        }
-
-        BlockTypes::size_type size() const
-        {
-            return mBlockTypes.size();
-        }
-
-    private:
-        BlockTypes mBlockTypes;
-    };
-
-    const CircularBlockTypes mBlockTypes;
-    const CircularBlockTypes mGarbage;
-    stm::shared<BlockTypes::size_type> mGarbageIndex;
-    stm::shared<Block> mActiveBlock;
-    stm::shared<int> mStartingLevel;
-    stm::shared<bool> mPaused;
-    stm::shared<GameState> mGameState;
+    struct Impl;
+    Impl * mImpl;
 };
 
 
