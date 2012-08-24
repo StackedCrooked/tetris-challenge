@@ -430,8 +430,6 @@ Game::MoveResult Game::Impl::move(stm::transaction & tx, Direction inDirection)
     // Count the number of lines that were made in the commit call.
     const GameState & newGameState = mGameState.open_r(tx);
 
-    Assert(newGameState.numLines() - oldLineCount >= 0);
-
     mActiveBlock.set(CreateDefaultBlock(mBlockTypes.get(newGameState.id()), newGameState.grid().columnCount()));
 
     return MoveResult_Committed;
