@@ -48,9 +48,9 @@ public:
 
     unsigned gameStateId() const;
 
-    void setPaused(bool inPause) { Futile::STM::set(mPaused, inPause); }
+    void setPaused(bool inPause);
 
-    bool isPaused() const { return Futile::STM::get(mPaused); }
+    bool isPaused() const;
 
     bool isGameOver() const;
 
@@ -58,7 +58,7 @@ public:
 
     Grid grid() const;
 
-    Block activeBlock() const { return Futile::STM::get(mActiveBlock); }
+    Block activeBlock() const;
 
     int rowCount() const;
 

@@ -72,6 +72,18 @@ Game::~Game()
 }
 
 
+void Game::setPaused(bool inPause)
+{
+    Futile::STM::set(mPaused, inPause);
+}
+
+
+bool Game::isPaused() const
+{
+    return Futile::STM::get(mPaused);
+}
+
+
 unsigned Game::gameStateId() const
 {
 	// open_rw => eternal loop in 'Computer::Impl::move()' 
@@ -79,10 +91,17 @@ unsigned Game::gameStateId() const
 }
 
 
+Block Game::activeBlock() const
+{
+    return Futile::STM::get(mActiveBlock);
+}
+
+
 GameStateStats Game::stats() const
 {
     return stm::atomic<GameStateStats>([&](stm::transaction & tx) { return mGameState.open_r(tx).stats(); });
 }
+
 
 bool Game::isGameOver() const
 {
