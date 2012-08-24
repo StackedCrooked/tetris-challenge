@@ -17,16 +17,20 @@ v Improve encapsulation by obeying the Law of Demeter
 
 
 STM Notes
----------
-- stm::shared<std::string> s(std::string()); // a little weird
-- Uncertainty (maybe due to lack of experience) If you open an object for reading, then later open it for writing and modify it, then will I need to perform open_r again to get the new value. Or does the transaction first need to complete?
-- Lot's of experimentation required in order to find which idioms/practices work well.
-- Law of demeter is important when trying to hide away stm.
-- Pimpl helps to avoid exposing stm.
+--------
+- Memory is not the only resource. The biggest realization is that not all resources are memory. Access to streams, thread-schedulers, require old fashioned locking. This leads to sitations where I have to "jump through hoops" to keep the locking outside of the transactions. Logging is a simple example. Also in Computer.cpp I recall a few thing. I have to check for concrete examples.
+- Uncertainty. This may be due to lack of experience. If you open an object for reading, then later re-open it within the same transaction but  writing and modify and commit it. Will the original object that was opened for reading be updated. The answer is, iirc, no. This makes me sometimes feel uncertain if my code is correct.
+- Lot's of experimentation required in order to find which idioms/practices work well. Currently I've settled on these:
+    . Nested transactions seem to be the way to go.
+    . Extensive use of the "Law of demeter"
+    . Pimpl to avoid exposing stm in the public header files.
 
-@StackedCrooked btw, if you need something like a condition variable in the STM lib,
-simply open the variables you want to wait for changes in, check their value, and
-call transaction::retry(). In an ideal world, it'd then suspend the thread until
-one of your opened variables is modified. In the current implementation, it's basically
-a busy loop, so much less efficient, but the effect is the same :)
+
+- This feature could be helpful:
+    @StackedCrooked btw, if you need something like a condition variable in the STM lib,
+    simply open the variables you want to wait for changes in, check their value, and
+    call transaction::retry(). In an ideal world, it'd then suspend the thread until
+    one of your opened variables is modified. In the current implementation, it's basically
+    a busy loop, so much less efficient, but the effect is the same :)
+
 
