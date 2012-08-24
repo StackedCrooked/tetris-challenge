@@ -64,13 +64,13 @@ struct Computer::Impl : boost::noncopyable
     typedef GameStateList Preliminaries;
 
     Game & mGame;
-    mutable stm::shared<Precalculated> mPrecalculated;
-    mutable stm::shared<unsigned> mNumMovesPerSecond;
-    mutable stm::shared<unsigned> mSearchDepth;
-    mutable stm::shared<unsigned> mSearchWidth;
-    mutable stm::shared<unsigned> mWorkerCount;
-    mutable stm::shared<bool> mSyncError;
-    mutable stm::shared<const Evaluator*> mEvaluator;
+    stm::shared<Precalculated> mPrecalculated;
+    stm::shared<unsigned> mNumMovesPerSecond;
+    stm::shared<unsigned> mSearchDepth;
+    stm::shared<unsigned> mSearchWidth;
+    stm::shared<unsigned> mWorkerCount;
+    stm::shared<bool> mSyncError;
+    stm::shared<const Evaluator*> mEvaluator;
     Worker mWorker;
     WorkerPool mWorkerPool;
     boost::shared_ptr<NodeCalculator> mNodeCalculator;
