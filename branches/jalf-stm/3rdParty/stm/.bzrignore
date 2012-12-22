@@ -1,0 +1,8 @@
+*.instr.vsps
+ipch
+src.sdf
+src.opensdf
+.DS_Store
+bin
+obj
+src.v11.suo
