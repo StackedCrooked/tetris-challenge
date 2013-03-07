@@ -11,7 +11,7 @@ include_directories(SYSTEM
     ${SOLUTIONDIR}3rdParty/Poco/Foundation/include)
 
 
-add_executable(TetrisTest src/STMTest.cpp)
+add_executable(TetrisTest src/quick_stm_test.cpp)
 
 #    src/WorkerPoolTest.cpp
 #    src/WorkerTest.cpp
