@@ -213,12 +213,12 @@ MakeTetrises::MakeTetrises() :
           GameHeightFactor(-2),
           LastBlockHeightFactor(-2),
           NumHolesFactor(-8),
-          NumSinglesFactor(-6),
-          NumDoublesFactor(-12),
-          NumTriplesFactor(-24),
-          NumTetrisesFactor(+4),
-          SearchDepth(10),
-          SearchWidth(3),
+          NumSinglesFactor(-8),
+          NumDoublesFactor(-16),
+          NumTriplesFactor(-32),
+          NumTetrisesFactor(+32),
+          SearchDepth(12),
+          SearchWidth(2),
           MoveDownBehavior_MoveDown)
 {
 }
