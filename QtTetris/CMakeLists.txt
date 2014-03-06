@@ -1,7 +1,10 @@
 cmake_minimum_required(VERSION 2.8)
 project(QtTetris)
-FIND_PACKAGE(Qt4 REQUIRED)
 
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+#set(CMAKE_AUTOMOC ON)
+find_package(Qt5Widgets)
+find_package(Qt5 COMPONENTS Core Gui Widgets)
 
 #
 # Check TETRIS_BUILD_TYPE environment variable
@@ -49,7 +52,7 @@ set(SOLUTIONDIR "${QtTetris_SOURCE_DIR}/../")
 #
 set(OUTDIR ${CMAKE_BUILD_TYPE})
 
-
+set (CMAKE_CXX_FLAGS "-std=c++11 -stdlib=libc++ -g3 -Wall -O0")
 #
 # Compile flags
 #
@@ -59,10 +62,10 @@ if(WIN32)
     set(FINAL_COMPILE_FLAGS "${CXX_FLAGS_${CMAKE_BUILD_TYPE}} /D FUTILE_EVENTLOOP /D POCO_STATIC /D POCO_NO_AUTOMATIC_LIBS /D BOOST_ALL_NO_LIB /D _HAS_ITERATOR_DEBUGGING=0 /D _SECURE_SCL=0 /D _SECURE_SCL_THROWS=0")
 else()
     set(CMAKE_INCLUDE_SYSTEM_FLAG_CXX "-isystem ")
-    set(CXX_FLAGS         "${CXX_FLAGS} -std=c++0x -DTETRIS_QT=1 ")
-    if(${CMAKE_CXX_COMPILER} MATCHES ".*clang.*")
-        set(CXX_FLAGS     "${CXX_FLAGS} -stdlib=libc++ -Wno-self-assign -Wno-reserved-user-defined-literal -Qunused-arguments ")
-    endif()
+    set(CXX_FLAGS         "${CXX_FLAGS} -std=c++11 -stdlib=libc++ -DTETRIS_QT=1 ")
+#    if(${CMAKE_CXX_COMPILER} MATCHES ".*clang.*")
+#        set(CXX_FLAGS     "${CXX_FLAGS} -stdlib=libc++ -Wno-self-assign -Wno-reserved-user-defined-literal -Qunused-arguments ")
+#    endif()
     set(WARNING_OPTIONS_STM " -Wall -Wextra -Werror ")
     set(WARNING_OPTIONS          " ${WARNING_OPTIONS_STM} ")
     set(CXX_FLAGS_Debug          " ${WARNING_OPTIONS} ${CXX_FLAGS} -ggdb3 ")
@@ -87,7 +90,6 @@ endif()
 #
 add_subdirectory(${SOLUTIONDIR}Tetris ${OUTDIR}/Tetris)
 add_subdirectory(${SOLUTIONDIR}Futile ${OUTDIR}/Futile)
-add_subdirectory(${SOLUTIONDIR}Tetris/testing ${OUTDIR}/testing)
 
 
 #
@@ -95,9 +97,8 @@ add_subdirectory(${SOLUTIONDIR}Tetris/testing ${OUTDIR}/testing)
 #
 include_directories(SYSTEM
     ${QtSDK}/include
-    ${SOLUTIONDIR}3rdParty/Boost
     ${SOLUTIONDIR}3rdParty/stm
-    ${SOLUTIONDIR}3rdParty/Poco/Foundation/include)
+    /opt/local/include)
 
 set(CMAKE_INCLUDE_SYSTEM_FLAG_CXX "-isystem ")
 
@@ -130,14 +131,14 @@ set(QtTetris_HEADERS ${QtTetris_QT_HEADERS} ${QtTetris_REGULAR_HEADERS})
 # Qt resources
 #
 
-QT4_ADD_RESOURCES(QtTetris_Resources "QtTetris.qrc")
+QT5_ADD_RESOURCES(QtTetris_Resources "QtTetris.qrc")
 
 
 #
 # Special settings to make CMake and Qt work together
 #
-QT4_WRAP_CPP(QtTetris_HEADERS_MOC ${QtTetris_QT_HEADERS})
-include(${QT_USE_FILE})
+QT5_WRAP_CPP(QtTetris_HEADERS_MOC ${QtTetris_QT_HEADERS})
+#include(${QT_USE_FILE})
 add_definitions(${QT_DEFINITIONS})
 
 
@@ -156,8 +157,7 @@ endif()
 # Set the executable. On Mac we want a bundle.
 #
 add_executable(QtTetris   ${EXECUTABLE_OPTIONS} ${QtTetris_SOURCES} ${QtTetris_HEADERS_MOC} ${QtTetris_Resources})
-
-
+qt5_use_modules(QtTetris Widgets)
 
 
 #
@@ -186,14 +186,7 @@ set(CLANG_LIBCPP "")
 endif()
 
 
-target_link_libraries(QtTetris ${QT_LIBRARIES}
-                               Tetris
-                               Futile
-                               ${EXTRA_LIBS}
-                               ${SOLUTIONDIR}3rdParty/Boost/lib/${PLATFORM}/${ARCH}/libboost_thread.${LIBEXT}
-                               ${SOLUTIONDIR}3rdParty/Poco/lib/${PLATFORM}/${ARCH}/libPocoFoundation.${LIBEXT}
-                               ${CLANG_LIBCPP})
-
+target_link_libraries(QtTetris -lc++ ${QT_LIBRARIES} /opt/local/lib/libboost_thread-mt.a Tetris Futile ${EXTRA_LIBS} -L/opt/local/lib -lPocoFoundation  /opt/local/lib/libboost_system-mt.a    )
 
 
 #

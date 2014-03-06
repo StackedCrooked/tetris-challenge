@@ -7,7 +7,7 @@
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread/recursive_mutex.hpp>
-#include <boost/thread/thread.hpp>
+#include <thread>
 #include <memory>
 #include <set>
 #include <vector>

@@ -149,7 +149,6 @@ private:
     int mSquareHeight;
     int mStatItemHeight;
     int mAvatarWidth;
-    int mSpacing;
     int mMargin;
     unsigned int mFrameCount;
     Futile::Stopwatch mFPSStopwatch;

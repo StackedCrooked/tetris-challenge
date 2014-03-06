@@ -1,12 +1,12 @@
 include_directories(
-    ${SOLUTIONDIR}Futile/include
-    ${SOLUTIONDIR}3rdParty/Boost)
+    ${SOLUTIONDIR}Futile/include)
 
 set(CMAKE_INCLUDE_SYSTEM_FLAG_CXX "-isystem ")
 
 include_directories(SYSTEM
-    ${SOLUTIONDIR}3rdParty/Boost
-    ${SOLUTIONDIR}3rdParty/stm)
+    ${SOLUTIONDIR}3rdParty/stm
+    /opt/local/include)
+
 
 add_library(Futile
     include/Futile/Array.h

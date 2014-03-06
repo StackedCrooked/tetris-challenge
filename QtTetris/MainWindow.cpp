@@ -10,9 +10,8 @@
 #include "Futile/Logging.h"
 #include "Futile/MakeString.h"
 #include "Poco/Environment.h"
-#include <QtGui/QLayout>
-#include <QtGui/QLabel>
-#include <QtCore/QTimer>
+#include <QtWidgets>
+#include <QWidget>
 #include <boost/noncopyable.hpp>
 #include <algorithm>
 #include <iomanip>
@@ -66,6 +65,8 @@ MainWindow::MainWindow(QWidget *parent, Model & inModel) :
     mShowLog(false),
     mGameOver(false)
 {
+    this->move(qApp->desktop()->rect().right() - width(), 0);
+
     setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum));
     setWindowTitle("QtTetris");
 

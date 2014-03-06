@@ -62,7 +62,6 @@ AbstractWidget::AbstractWidget(int inSquareWidth, int inSquareHeight) :
     mSquareHeight(inSquareHeight),
     mStatItemHeight(45),
     mAvatarWidth(80),
-    mSpacing(5),
     mMargin(2),
     mFrameCount(0),
     mFPSStopwatch(),

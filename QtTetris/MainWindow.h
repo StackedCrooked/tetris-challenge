@@ -17,7 +17,7 @@
 #endif // QT_NO_STL
 
 
-#include <QtGui/QtGui>
+#include <QtGui>
 #include "Model.h"
 #include "TetrisWidget.h"
 #include "Tetris/SimpleGame.h"

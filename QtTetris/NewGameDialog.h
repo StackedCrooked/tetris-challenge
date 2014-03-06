@@ -17,7 +17,10 @@
 #endif // QT_NO_STL
 
 
-#include <QtGui/QtGui>
+#include <QtGui>
+#include <QtWidgets>
+
+
 
 
 class NewGameDialog : public QDialog

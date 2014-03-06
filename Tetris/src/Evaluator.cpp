@@ -211,14 +211,14 @@ Survival::Survival() :
 MakeTetrises::MakeTetrises() :
     Super("Make Tetrises",
           GameHeightFactor(-2),
-          LastBlockHeightFactor(-1),
-          NumHolesFactor(-4),
-          NumSinglesFactor(-4),
-          NumDoublesFactor(-8),
-          NumTriplesFactor(-32),
-          NumTetrisesFactor(1),
-          SearchDepth(8),
-          SearchWidth(4),
+          LastBlockHeightFactor(-2),
+          NumHolesFactor(-8),
+          NumSinglesFactor(-6),
+          NumDoublesFactor(-12),
+          NumTriplesFactor(-24),
+          NumTetrisesFactor(+4),
+          SearchDepth(10),
+          SearchWidth(3),
           MoveDownBehavior_MoveDown)
 {
 }
@@ -245,9 +245,14 @@ int MakeTetrises::evaluate(const GameState & inGameState) const
             Assert(c >= 0 && c < int(grid.columnCount()));
             if (grid.get(r, c))
             {
-                // Penalty for occupying the last column,
-                // which is reserved for making tetrises.
-                return int(0.5 + result + Evaluator::evaluate(inGameState) - 4);
+                if (result < 0)
+                {
+                    result *= 2;
+                }
+                else
+                {
+                    result *= 0.5;
+                }
             }
         }
     }

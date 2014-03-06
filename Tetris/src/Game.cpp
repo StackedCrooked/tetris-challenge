@@ -85,7 +85,7 @@ struct Game::Impl : boost::noncopyable
         mGarbage(1),
         mGarbageIndex(0),
         mActiveBlock(CreateDefaultBlock(mBlockTypes.get(0), inColumnCount)),
-        mStartingLevel(0),
+        mStartingLevel(1),
         mPaused(false),
         mGameState(GameState(inRowCount, inColumnCount))
     {
