@@ -3,9 +3,7 @@
 #include "Futile/AutoPtrSupport.h"
 #include "Futile/Logging.h"
 #include "Futile/Threading.h"
-#include <QtGui/QApplication>
-#include <QtGui/QColor>
-#include <QtGui/QKeyEvent>
+#include <QtWidgets>
 #include <boost/noncopyable.hpp>
 #include <stdexcept>
 #include <iostream>

@@ -2,6 +2,7 @@
 #include "Futile/Logging.h"
 #include "Futile/MakeString.h"
 #include <boost/thread.hpp>
+#include <thread>
 
 
 //

@@ -2,7 +2,7 @@
 #define QT_NO_STL
 
 
-#include <QtGui/QApplication>
+#include <QApplication>
 #include "MainWindow.h"
 #include "Model.h"
 #include "Tetris/PlayerType.h"

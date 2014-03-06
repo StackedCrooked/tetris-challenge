@@ -8,3 +8,5 @@ Futile/include
 3rdParty/STM
 /Users/francis/QtSDK/Desktop/Qt/4.8.0/gcc/include
 /usr/include/c++/v1
+/Users/francis/Qt/5.2.0/clang_64/lib/QtGui.framework/Versions/5/Headers
+/Users/francis/Qt/5.2.0/clang_64/lib/QtWidgets.framework/Versions/5/Headers

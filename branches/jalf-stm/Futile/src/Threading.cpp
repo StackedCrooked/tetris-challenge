@@ -10,7 +10,7 @@ namespace Futile {
 
 void Sleep(UInt64 inMilliseconds)
 {
-    boost::this_thread::sleep(boost::posix_time::milliseconds(inMilliseconds));
+    std::this_thread::sleep_for(std::chrono::milliseconds(inMilliseconds));
 }
 
 

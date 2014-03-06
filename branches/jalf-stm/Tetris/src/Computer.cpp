@@ -23,11 +23,11 @@ using namespace Futile;
 
 struct Computer::Impl : boost::noncopyable
 {
-    static const int cDefaultNumMovesPerSecond = 50;
+    static const int cDefaultNumMovesPerSecond = 200;
     static const int cDefaultSearchDepth = 8;
     static const int cDefaultSearchWidth = 2;
     static const int cDefaultWorkerCount = 1;
-    static const int cSurvivalModeTreshold = 18;
+    static const int cSurvivalModeTreshold = 11;
 
     Impl(Game & inGame) :
         mGame(inGame),
@@ -56,7 +56,7 @@ struct Computer::Impl : boost::noncopyable
 
     void move();
 
-    Game::MoveResult move(Game & ioGame, const Block & targetBlock, const Evaluator & inEvaluator);
+    Game::MoveResult move(Game & ioGame, const Block & targetBlock, const Evaluator & inEvaluator, bool force);
 
     void coordinate();
 
@@ -213,7 +213,7 @@ void Computer::Impl::coordinate()
 }
 
 
-Game::MoveResult Computer::Impl::move(Game & ioGame, const Block & targetBlock, const Evaluator & inEvaluator)
+Game::MoveResult Computer::Impl::move(Game & ioGame, const Block & targetBlock, const Evaluator & inEvaluator, bool /*force*/)
 {
     Block block = ioGame.activeBlock();
     Assert(block.type() == targetBlock.type());
@@ -328,8 +328,9 @@ void Computer::Impl::move()
             return;
         }
 
+        auto max_depth = mEvaluator.open_r(tx)->recommendedSearchDepth();
         auto oldId = mGame.gameStateId();
-        move(mGame, prec.front().originalBlock(), *mEvaluator.open_r(tx));
+        move(mGame, prec.front().originalBlock(), *mEvaluator.open_r(tx), int(prec.size()) == int(max_depth));
         auto newId = mGame.gameStateId();
         Assert(oldId == newId || oldId + 1 == newId);
         if (oldId + 1 == newId)

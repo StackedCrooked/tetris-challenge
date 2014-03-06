@@ -15,8 +15,7 @@
 #include "Futile/MainThread.h"
 #include "Futile/Timer.h"
 #include "Futile/Threading.h"
-#include <QtGui/QPainter>
-#include <QtGui/QWidget>
+#include <QtWidgets>
 #include <boost/signals2.hpp>
 #include <memory>
 #include <set>
