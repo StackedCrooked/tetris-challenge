@@ -85,12 +85,13 @@ public:
 
     virtual const GameState & gameState() const = 0;
 
-    // For multiplayer crazyness
+    // Multiplayer feature: add 1, 2 or 4 penalty lines after
+    // an opponent cleared a combo of 2, 3 or 4 lines respectively.
     virtual void applyLinePenalty(std::size_t inLineCount);
-    //virtual void setActiveBlock(const Block & inBlock);
+    
+    // Set the grid of this player.
+    // Can be used for bonus or penalty features.
     virtual void setGrid(const Grid & inGrid) = 0;
-    //void swapGrid(Game & other);
-    //void swapActiveBlock(Game & other);
 
 protected:
     static int GetRowDelta(MoveDirection inDirection);
