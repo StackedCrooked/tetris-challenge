@@ -5,6 +5,7 @@ include_directories(
 set(CMAKE_INCLUDE_SYSTEM_FLAG_CXX "-isystem ")
 
 include_directories(SYSTEM
+    /usr/local/include
     /opt/local/include
     ${SOLUTIONDIR}3rdParty/stm)
 

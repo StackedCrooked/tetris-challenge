@@ -5,7 +5,8 @@ set(CMAKE_INCLUDE_SYSTEM_FLAG_CXX "-isystem ")
 
 include_directories(SYSTEM
     ${SOLUTIONDIR}3rdParty/stm
-    /opt/local/include)
+    /opt/local/include
+    /usr/local/include)
 
 
 add_library(Futile

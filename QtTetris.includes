@@ -1,7 +1,6 @@
 QtTetris
 Tetris/testsuite/src
 Tetris/include
-Futile/include
 3rdParty/Boost
 3rdParty/GTest/include
 3rdParty/Poco/Foundation/include
@@ -10,3 +9,5 @@ Futile/include
 /usr/include/c++/v1
 /Users/francis/Qt/5.2.0/clang_64/lib/QtGui.framework/Versions/5/Headers
 /Users/francis/Qt/5.2.0/clang_64/lib/QtWidgets.framework/Versions/5/Headers
+/usr/local/include
+/usr/local/Cellar/boost/1.55.0/include

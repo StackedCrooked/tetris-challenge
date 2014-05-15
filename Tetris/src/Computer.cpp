@@ -23,10 +23,10 @@ using namespace Futile;
 
 struct Computer::Impl : boost::noncopyable
 {
-    static const int cDefaultNumMovesPerSecond = 200;
-    static const int cDefaultSearchDepth = 8;
+    static const int cDefaultNumMovesPerSecond = 100;
+    static const int cDefaultSearchDepth = 16;
     static const int cDefaultSearchWidth = 2;
-    static const int cDefaultWorkerCount = 1;
+    static const int cDefaultWorkerCount = 8;
     static const int cSurvivalModeTreshold = 11;
 
     Impl(Game & inGame) :

@@ -115,20 +115,20 @@ namespace {
 #endif
 
 
-unsigned CalculateOptimalWorkerCount(std::size_t numComputerPlayers)
-{
-#if FORCE_TETRIS_WORKER_COUNT != 0
-    (void)numComputerPlayers;
-    return FORCE_TETRIS_WORKER_COUNT;
-#else
-    if (numComputerPlayers == 0)
-    {
-        throw std::invalid_argument("numComputerPlayers == 0");
-    }
+//unsigned CalculateOptimalWorkerCount(std::size_t numComputerPlayers)
+//{
+//#if FORCE_TETRIS_WORKER_COUNT != 0
+//    (void)numComputerPlayers;
+//    return FORCE_TETRIS_WORKER_COUNT;
+//#else
+//    if (numComputerPlayers == 0)
+//    {
+//        throw std::invalid_argument("numComputerPlayers == 0");
+//    }
 
-    return std::max<unsigned>(Poco::Environment::processorCount() / numComputerPlayers, 2) - 1;
-#endif
-}
+//    return std::max<unsigned>(Poco::Environment::processorCount() / numComputerPlayers, 2) - 1;
+//#endif
+//}
 
 
 } // anonymous namespace
@@ -174,13 +174,13 @@ void Model::newGame(const PlayerTypes & inPlayerTypes, std::size_t inRowCount, s
         }
     }
 
-    const unsigned cComputerPlayerCount = mMultiplayerGame->playerCount(PlayerType_Computer);
+    //const unsigned cComputerPlayerCount = mMultiplayerGame->playerCount(PlayerType_Computer);
     for (PlayerPtr player : mMultiplayerGame->getPlayers())
     {
         if (ComputerPlayer * computerPlayer = dynamic_cast<ComputerPlayer*>(player.get()))
         {
-            computerPlayer->setMoveSpeed(allComputer ? 40 : 10);
-            computerPlayer->setWorkerCount(CalculateOptimalWorkerCount(cComputerPlayerCount));
+            computerPlayer->setMoveSpeed(allComputer ? 100 : 10);
+            computerPlayer->setWorkerCount(7);//CalculateOptimalWorkerCount(cComputerPlayerCount));
         }
     }
 }
