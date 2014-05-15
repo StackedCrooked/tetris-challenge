@@ -41,7 +41,7 @@ struct RefreshTimer
 {
     enum
     {
-        cRefreshRate = 60, // fps
+        cRefreshRate = 100, // fps
         cTimerInterval = 1000 / cRefreshRate
     };
 

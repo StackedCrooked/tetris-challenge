@@ -8,6 +8,7 @@ include_directories(SYSTEM
     ${SOLUTIONDIR}3rdParty/Boost
     ${SOLUTIONDIR}3rdParty/GTest/include
     ${SOLUTIONDIR}3rdParty/stm
+    /opt/local/include
     ${SOLUTIONDIR}3rdParty/Poco/Foundation/include)
 
 
@@ -37,7 +38,7 @@ endif()
 
 
 target_link_libraries(TetrisTest Tetris Futile pthread
-                                 ${SOLUTIONDIR}3rdParty/Boost/lib/${PLATFORM}/${ARCH}/libboost_thread.a
+                                 /opt/local/lib/libboost_thread-mt.a
                                  ${SOLUTIONDIR}3rdParty/Poco/lib/${PLATFORM}/${ARCH}/libPocoFoundation.a
                                  ${SOLUTIONDIR}3rdParty/GTest/lib/${PLATFORM}/${ARCH}/libgtest.a
                                  ${CLANG_LIBCPP})

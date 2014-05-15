@@ -211,12 +211,12 @@ Survival::Survival() :
 MakeTetrises::MakeTetrises() :
     Super("Make Tetrises",
           GameHeightFactor(-2),
-          LastBlockHeightFactor(-2),
-          NumHolesFactor(-8),
-          NumSinglesFactor(-8),
-          NumDoublesFactor(-16),
-          NumTriplesFactor(-32),
-          NumTetrisesFactor(+32),
+          LastBlockHeightFactor(-1),
+          NumHolesFactor(-4),
+          NumSinglesFactor(-4),
+          NumDoublesFactor(-8),
+          NumTriplesFactor(-16),
+          NumTetrisesFactor(100),
           SearchDepth(12),
           SearchWidth(2),
           MoveDownBehavior_MoveDown)
@@ -226,37 +226,7 @@ MakeTetrises::MakeTetrises() :
 
 int MakeTetrises::evaluate(const GameState & inGameState) const
 {
-    const Grid & grid = inGameState.grid();
-
-    double result = std::pow(inGameState.firstOccupiedRow(), 0.5);
-
-
-    int c = grid.columnCount() - 1;
-    if (grid.rowCount() >= 4)
-    {
-        int r = 0;
-        if (inGameState.firstOccupiedRow() > 4)
-        {
-            r = inGameState.firstOccupiedRow() - 4;
-        }
-        for (; r < int(grid.rowCount()); ++r)
-        {
-            Assert(r >= 0 && r < int(grid.rowCount()));
-            Assert(c >= 0 && c < int(grid.columnCount()));
-            if (grid.get(r, c))
-            {
-                if (result < 0)
-                {
-                    result *= 2;
-                }
-                else
-                {
-                    result *= 0.5;
-                }
-            }
-        }
-    }
-    return int(0.5 + result + Evaluator::evaluate(inGameState));
+    return Evaluator::evaluate(inGameState);
 }
 
 
