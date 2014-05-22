@@ -52,7 +52,7 @@ set(SOLUTIONDIR "${QtTetris_SOURCE_DIR}/../")
 #
 set(OUTDIR ${CMAKE_BUILD_TYPE})
 
-set (CMAKE_CXX_FLAGS "-std=c++11 -stdlib=libc++ -g3 -Wall -O0")
+set (CMAKE_CXX_FLAGS "-std=c++11 -g3 -Wall -O0")
 #
 # Compile flags
 #
@@ -62,7 +62,7 @@ if(WIN32)
     set(FINAL_COMPILE_FLAGS "${CXX_FLAGS_${CMAKE_BUILD_TYPE}} /D FUTILE_EVENTLOOP /D POCO_STATIC /D POCO_NO_AUTOMATIC_LIBS /D BOOST_ALL_NO_LIB /D _HAS_ITERATOR_DEBUGGING=0 /D _SECURE_SCL=0 /D _SECURE_SCL_THROWS=0")
 else()
     set(CMAKE_INCLUDE_SYSTEM_FLAG_CXX "-isystem ")
-    set(CXX_FLAGS         "${CXX_FLAGS} -std=c++11 -stdlib=libc++ -DTETRIS_QT=1 ")
+    set(CXX_FLAGS         "${CXX_FLAGS} -std=c++11 -DTETRIS_QT=1 ")
 #    if(${CMAKE_CXX_COMPILER} MATCHES ".*clang.*")
 #        set(CXX_FLAGS     "${CXX_FLAGS} -stdlib=libc++ -Wno-self-assign -Wno-reserved-user-defined-literal -Qunused-arguments ")
 #    endif()
@@ -98,7 +98,7 @@ add_subdirectory(${SOLUTIONDIR}Futile ${OUTDIR}/Futile)
 include_directories(SYSTEM
     ${QtSDK}/include
     ${SOLUTIONDIR}3rdParty/stm
-    /opt/local/include)
+    /usr/include)
 
 set(CMAKE_INCLUDE_SYSTEM_FLAG_CXX "-isystem ")
 
@@ -186,8 +186,7 @@ set(CLANG_LIBCPP "")
 endif()
 
 
-target_link_libraries(QtTetris -lc++ ${QT_LIBRARIES} /opt/local/lib/libboost_thread-mt.a Tetris Futile ${EXTRA_LIBS} -L/opt/local/lib -lPocoFoundation  /opt/local/lib/libboost_system-mt.a    )
-
+target_link_libraries(QtTetris -lc++ ${QT_LIBRARIES} Tetris Futile ${EXTRA_LIBS} -L/usr/lib -lPocoFoundation /usr/lib/x86_64-linux-gnu/libboost_thread.a /usr/lib/x86_64-linux-gnu/libboost_system.a) 
 
 #
 # Post build step: make a symbolic link to the last build directory
