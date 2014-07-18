@@ -11,9 +11,11 @@
 #include "Futile/Logging.h"
 #include "Futile/MakeString.h"
 #include "Poco/Environment.h"
-#include <QtGui/QLayout>
-#include <QtGui/QLabel>
+#include <QLayout>
+#include <QLabel>
 #include <QtCore/QTimer>
+#include <QPainter>
+#include <QMenuBar>
 #include <boost/noncopyable.hpp>
 #include <algorithm>
 #include <iostream>

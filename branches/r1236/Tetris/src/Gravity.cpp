@@ -29,7 +29,6 @@ static const int sIntervals[] =
 };
 
 
-const std::size_t cIntervalCount = sizeof(sIntervals)/sizeof(int);
 extern const std::size_t cMaxLevel = sizeof(sIntervals)/sizeof(int) - 1;
 
 
@@ -126,7 +125,6 @@ void Gravity::Impl::onTimerEvent()
         }
         if (mLevel != oldLevel)
         {
-            Assert(mLevel < cIntervalCount);
             mGravity->mTimer->setInterval(sIntervals[mLevel]);
         }
     }
