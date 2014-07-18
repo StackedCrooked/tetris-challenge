@@ -1,8 +1,8 @@
 include_directories(
     ${SOLUTIONDIR}Futile/include
     ${SOLUTIONDIR}Tetris/include
-    ${SOLUTIONDIR}3rdParty/Boost
-    ${SOLUTIONDIR}3rdParty/GTest/include)
+    SYSTEM ${SOLUTIONDIR}3rdParty/Boost
+    SYSTEM ${SOLUTIONDIR}3rdParty/GTest/include)
 
 add_executable(TetrisTest
     src/main.cpp

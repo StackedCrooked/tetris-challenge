@@ -8,7 +8,7 @@
 #include "Futile/AutoPtrSupport.h"
 #include "Futile/MainThread.h"
 #include <boost/bind.hpp>
-#include <boost/signals.hpp>
+#include <boost/signals2.hpp>
 #include <boost/weak_ptr.hpp>
 #include <set>
 #include <stdexcept>
@@ -56,7 +56,7 @@ struct SimpleGame::Impl : boost::enable_shared_from_this<SimpleGame::Impl>
     {
     }
 
-    virtual void onGameStateChanged(Game * inGame)
+    virtual void onGameStateChanged(Game *)
     {
         // This method is triggered in a worker thread. Dispatch to main thread.
         boost::weak_ptr<Impl> weakSelf(shared_from_this());
@@ -116,7 +116,7 @@ struct SimpleGame::Impl : boost::enable_shared_from_this<SimpleGame::Impl>
     PlayerType mPlayerType;
     boost::scoped_ptr<Gravity> mGravity;
     std::size_t mCenterColumn;
-    typedef boost::signals::scoped_connection ScopedConnection;
+    typedef boost::signals2::scoped_connection ScopedConnection;
     ScopedConnection mGameStateChanged;
     ScopedConnection mLinesCleared;
     EventHandlers mEventHandlers;

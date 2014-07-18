@@ -11,7 +11,7 @@
 #include "Futile/Threading.h"
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
-#include <boost/signals.hpp>
+#include <boost/signals2.hpp>
 #include <memory>
 #include <set>
 
@@ -46,8 +46,8 @@ protected:
 public:
     virtual ~Game();
 
-    boost::signal<void(Game *)> GameStateChanged;
-    boost::signal<void(Game *, int)> LinesCleared;
+    boost::signals2::signal<void(Game *)> GameStateChanged;
+    boost::signals2::signal<void(Game *, int)> LinesCleared;
 
     void setPaused(bool inPause);
 

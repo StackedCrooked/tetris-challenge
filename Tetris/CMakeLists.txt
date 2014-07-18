@@ -1,8 +1,6 @@
 include_directories(
     ${SOLUTIONDIR}Futile/include
-    ${SOLUTIONDIR}Tetris/include
-    ${SOLUTIONDIR}3rdPary/Boost
-    ${SOLUTIONDIR}3rdPary/Poco/Foundation/include)
+    ${SOLUTIONDIR}Tetris/include)
 
 
 add_library(Tetris

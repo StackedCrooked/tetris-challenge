@@ -8,8 +8,8 @@
 #include "Tetris/AbstractWidget.h"
 #include "Futile/MainThread.h"
 #include "Futile/Threading.h"
-#include <QtGui/QPainter>
-#include <QtGui/QWidget>
+#include <QPainter>
+#include <QWidget>
 #include <QtCore/QMutex>
 #include <set>
 

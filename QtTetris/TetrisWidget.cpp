@@ -3,10 +3,10 @@
 #include "Futile/AutoPtrSupport.h"
 #include "Futile/Logging.h"
 #include "Futile/Threading.h"
-#include <QtGui/QApplication>
-#include <QtGui/QColor>
-#include <QtGui/QKeyEvent>
-#include <QtGui/QPainter>
+#include <QApplication>
+#include <QColor>
+#include <QKeyEvent>
+#include <QPainter>
 #include <QtCore/QMutexLocker>
 #include <QtCore/QTimer>
 #include <boost/noncopyable.hpp>
