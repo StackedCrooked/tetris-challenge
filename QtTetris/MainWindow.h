@@ -62,7 +62,7 @@ private Q_SLOTS:
 private:
     void onNewGame(const Tetris::PlayerTypes & inPlayerTypes);
 
-    void timerEvent();
+    void onTimerEventImpl();
 
 private:
     Model & mModel;
