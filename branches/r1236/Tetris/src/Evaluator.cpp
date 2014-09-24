@@ -207,11 +207,11 @@ MakeTetrises::MakeTetrises() :
               LastBlockHeightFactor(-1),
               NumHolesFactor(-4),
               NumSinglesFactor(-4),
-              NumDoublesFactor(-8),
+              NumDoublesFactor(-10),
               NumTriplesFactor(-8),
               NumTetrisesFactor(16),
-              SearchDepth(8),
-              SearchWidth(5))
+              SearchDepth(12),
+              SearchWidth(2))
 {
 }
 
