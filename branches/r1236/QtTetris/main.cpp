@@ -1,7 +1,7 @@
 #define QT_NO_KEYWORDS
 
 
-#include <QApplication>
+#include <QtGui/QApplication>
 #include "Model.h"
 #include "MainWindow.h"
 #include "Tetris/PlayerType.h"

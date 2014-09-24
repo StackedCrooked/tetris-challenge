@@ -1,6 +1,7 @@
 include_directories(
     ${SOLUTIONDIR}Futile/include
-    ${SOLUTIONDIR}Tetris/include)
+    ${SOLUTIONDIR}Tetris/include
+    ${SOLUTIONDIR}3rdParty/Boost)
 
 add_library(Futile
     include/Futile/Array.h

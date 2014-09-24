@@ -1,8 +1,8 @@
 include_directories(
     ${SOLUTIONDIR}Futile/include
     ${SOLUTIONDIR}Tetris/include
-    SYSTEM ${SOLUTIONDIR}3rdParty/Boost
-    SYSTEM ${SOLUTIONDIR}3rdParty/GTest/include)
+    ${SOLUTIONDIR}3rdParty/Boost
+    ${SOLUTIONDIR}3rdParty/GTest/include)
 
 add_executable(TetrisTest
     src/main.cpp
@@ -19,7 +19,6 @@ target_link_libraries(TetrisTest
     Tetris
     Futile
     PocoFoundation
-    ${EXTRA_LIBS}
-    "${SOLUTIONDIR}3rdParty/Boost/lib/${PLATFORM}/${ARCH}/libboost_signals.a"
+	${EXTRA_LIBS}
     "${SOLUTIONDIR}3rdParty/Boost/lib/${PLATFORM}/${ARCH}/libboost_thread.a"
     ${SOLUTIONDIR}3rdParty/GTest/lib/${PLATFORM}/${ARCH}/libgtest.a)

@@ -11,11 +11,9 @@
 #include "Futile/Logging.h"
 #include "Futile/MakeString.h"
 #include "Poco/Environment.h"
-#include <QLayout>
-#include <QLabel>
+#include <QtGui/QLayout>
+#include <QtGui/QLabel>
 #include <QtCore/QTimer>
-#include <QPainter>
-#include <QMenuBar>
 #include <boost/noncopyable.hpp>
 #include <algorithm>
 #include <iostream>
@@ -38,7 +36,7 @@ void MainWindow::onTimerEvent()
 {
     try
     {
-        onTimerEventImpl();
+        onTimeEventImpl();
     }
     catch (const std::exception & exc)
     {
@@ -47,7 +45,7 @@ void MainWindow::onTimerEvent()
 }
 
 
-void MainWindow::onTimerEventImpl()
+void MainWindow::onTimeEventImpl()
 {
     // We already know about the GameOver event.
     // No longer interested.

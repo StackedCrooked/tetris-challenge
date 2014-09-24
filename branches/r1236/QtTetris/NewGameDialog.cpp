@@ -1,7 +1,4 @@
 #include "NewGameDialog.h"
-#include <QVBoxLayout>
-#include <QGroupBox>
-#include <QPushButton>
 #include <stdexcept>
 
 
