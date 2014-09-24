@@ -30,7 +30,7 @@ namespace Tetris {
 using namespace Futile;
 
 
-static const unsigned cDefaultWorkerCount = 1;
+static const unsigned cDefaultWorkerCount = 2;
 
 
 struct ComputerPlayer::Impl : boost::noncopyable
@@ -45,8 +45,8 @@ public:
         mWorkerPool("ComputerPlayer: WorkerPool", cDefaultWorkerCount),
         mEvaluator(&MakeTetrises::Instance()),
         mBlockMover(),
-        mSearchDepth(6),
-        mSearchWidth(4),
+        mSearchDepth(12),
+        mSearchWidth(2),
         mWorkerCount(cDefaultWorkerCount),
         mGameDepth(0),
         mStop(false),
