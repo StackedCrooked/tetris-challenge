@@ -143,8 +143,8 @@ const Evaluator & Model::updateAIParameters(const Player & inPlayer,
     // Tactics adjustment
     if (currentHeight < 10)
     {
-        outSearchDepth = 22;
-        outSearchWidth = 2;
+        outSearchDepth = 10;
+        outSearchWidth = 3;
         outMoveDownBehavior = BlockMover::MoveDownBehavior_Move;
         return MakeTetrises::Instance();
     }
