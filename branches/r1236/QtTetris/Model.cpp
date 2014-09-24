@@ -124,13 +124,15 @@ const Evaluator & Model::updateAIParameters(const Player & inPlayer,
                                             int & outSearchDepth,
                                             int & outSearchWidth,
                                             int & outWorkerCount,
-                                            int & /*outMoveSpeed*/,
+                                            int & outMoveSpeed,
                                             BlockMover::MoveDownBehavior & outMoveDownBehavior)
 {
     if (!inPlayer.game())
     {
         throw std::runtime_error("GameState is null!");
     }
+
+    outMoveSpeed = 100;
 
     const SimpleGame & game = *inPlayer.game();
 
@@ -141,8 +143,8 @@ const Evaluator & Model::updateAIParameters(const Player & inPlayer,
     // Tactics adjustment
     if (currentHeight < 10)
     {
-        outSearchDepth = 8;
-        outSearchWidth = 4;
+        outSearchDepth = 22;
+        outSearchWidth = 2;
         outMoveDownBehavior = BlockMover::MoveDownBehavior_Move;
         return MakeTetrises::Instance();
     }
