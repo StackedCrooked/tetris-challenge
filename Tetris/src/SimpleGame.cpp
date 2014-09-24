@@ -52,11 +52,11 @@ struct SimpleGame::Impl : boost::enable_shared_from_this<SimpleGame::Impl>
         }
     }
 
-    ~Impl()
+    virtual ~Impl()
     {
     }
 
-    virtual void onGameStateChanged(Game *)
+    virtual void onGameStateChanged(Game * inGame)
     {
         // This method is triggered in a worker thread. Dispatch to main thread.
         boost::weak_ptr<Impl> weakSelf(shared_from_this());
@@ -84,7 +84,7 @@ struct SimpleGame::Impl : boost::enable_shared_from_this<SimpleGame::Impl>
         }
     }
 
-    virtual void onLinesCleared(Game * inGame, std::size_t inLineCount)
+    void onLinesCleared(Game * inGame, std::size_t inLineCount)
     {
         (void)inGame;
         // This method is triggered in a worker thread. Dispatch to main thread.

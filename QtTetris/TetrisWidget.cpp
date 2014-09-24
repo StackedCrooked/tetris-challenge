@@ -3,10 +3,10 @@
 #include "Futile/AutoPtrSupport.h"
 #include "Futile/Logging.h"
 #include "Futile/Threading.h"
-#include <QApplication>
-#include <QColor>
-#include <QKeyEvent>
-#include <QPainter>
+#include <QtGui/QApplication>
+#include <QtGui/QColor>
+#include <QtGui/QKeyEvent>
+#include <QtGui/QPainter>
 #include <QtCore/QMutexLocker>
 #include <QtCore/QTimer>
 #include <boost/noncopyable.hpp>
@@ -245,7 +245,7 @@ void TetrisWidget::paintImage(const Tetris::Rect & inRect, const std::string & i
 }
 
 
-void TetrisWidget::drawLine(int x1, int y1, int x2, int y2, int /*inPenWidth*/, const RGBColor & inColor)
+void TetrisWidget::drawLine(int x1, int y1, int x2, int y2, int inPenWidth, const RGBColor & inColor)
 {
     if (!mPainter.get())
     {
@@ -254,7 +254,6 @@ void TetrisWidget::drawLine(int x1, int y1, int x2, int y2, int /*inPenWidth*/, 
     RestorePainter restorePainter(*mPainter);
 
     mPainter->setPen(QColor(inColor.red(), inColor.green(), inColor.blue()));
-
     mPainter->drawLine(x1, y1, x2, y2);
 }
 

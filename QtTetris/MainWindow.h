@@ -2,13 +2,10 @@
 #define MAINWINDOW_H
 
 
-//#define QT_NO_KEYWORDS
+#define QT_NO_KEYWORDS
 
 
-#include <QtGui>
-#include <QMainWindow>
-#include <QHBoxLayout>
-#include <QTextEdit>
+#include <QtGui/QtGui>
 #include "Model.h"
 #include "TetrisWidget.h"
 #include "Tetris/SimpleGame.h"
@@ -65,7 +62,7 @@ private Q_SLOTS:
 private:
     void onNewGame(const Tetris::PlayerTypes & inPlayerTypes);
 
-    void onTimerEventImpl();
+    void onTimeEventImpl();
 
 private:
     Model & mModel;

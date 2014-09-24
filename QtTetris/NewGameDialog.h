@@ -5,10 +5,7 @@
 #define QT_NO_KEYWORDS
 
 
-#include <QtGui>
-#include <QDialog>
-#include <QRadioButton>
-#include <QDialogButtonBox>
+#include <QtGui/QtGui>
 
 
 class NewGameDialog : public QDialog
