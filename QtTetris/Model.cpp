@@ -132,7 +132,7 @@ const Evaluator & Model::updateAIParameters(const Player & inPlayer,
         throw std::runtime_error("GameState is null!");
     }
 
-    outMoveSpeed = 100;
+    outMoveSpeed = 120;
 
     const SimpleGame & game = *inPlayer.game();
 
