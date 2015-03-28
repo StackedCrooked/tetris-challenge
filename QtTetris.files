@@ -707,3 +707,7 @@
 ./Tetris/include/Tetris/BlockFactory.h
 ./Tetris/include/Tetris/GameOver.h
 ./Tetris/CMakeLists.txt
+./Futile/CMakeLists.txt
+./QtTetris/CMakeLists.txt
+./Tetris/CMakeLists.txt
+./Tetris/testing/CMakeLists.txt
