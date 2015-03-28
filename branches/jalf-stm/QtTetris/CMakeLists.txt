@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+﻿cmake_minimum_required(VERSION 2.8)
 project(QtTetris)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -186,7 +186,7 @@ set(CLANG_LIBCPP "")
 endif()
 
 
-target_link_libraries(QtTetris -lc++ ${QT_LIBRARIES} Tetris Futile ${EXTRA_LIBS} -L/usr/lib -lPocoFoundation /usr/lib/x86_64-linux-gnu/libboost_thread.a /usr/lib/x86_64-linux-gnu/libboost_system.a) 
+target_link_libraries(QtTetris -lc++ ${QT_LIBRARIES} Tetris Futile ${EXTRA_LIBS} -L/usr/local/lib -lPocoFoundation -lboost_system-mt -lboost_thread-mt)
 
 #
 # Post build step: make a symbolic link to the last build directory
