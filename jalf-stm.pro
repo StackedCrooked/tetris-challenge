@@ -14,9 +14,9 @@ TEMPLATE = app
 INCLUDEPATH += 3rdParty/stm Tetris/include Futile/include /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1
 
 MAKEFLAGS = -j11
-QMAKE_CXXFLAGS += -std=c++11 -isystem /usr/local/include
+QMAKE_CXXFLAGS += -std=c++11 -isystem /usr/local/include -O3 -march=native -flto
 
-QMAKE_LFLAGS +=  -L/usr/local/lib -lPocoFoundation -ltbb -lboost_system-mt -lboost_thread-mt
+QMAKE_LFLAGS +=  -L/usr/local/lib -lPocoFoundation -ltbb -lboost_system-mt -lboost_thread-mt -flto
 
 HEADERS += \
     Futile/include/Futile/Array.h \
