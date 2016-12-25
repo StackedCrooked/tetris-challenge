@@ -28,7 +28,7 @@ public:
 
     /// Starts the timer.
     /// Throws std::runtime_error if the timer was already started.
-    void start(const Action & inAction);
+    void start(const Action& inAction);
 
     /// Stops the timer and waits for the current action to finish.
     void stop();

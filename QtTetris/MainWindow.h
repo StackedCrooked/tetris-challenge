@@ -27,13 +27,13 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(QWidget * inParent, Model & inModel);
+    MainWindow(QWidget * inParent, Model& inModel);
 
     ~MainWindow();
 
     virtual bool event(QEvent * inEvent);
 
-    void logMessage(const std::string & inMessage);
+    void logMessage(const std::string& inMessage);
 
 protected:
     void closeEvent(QCloseEvent*);
@@ -60,12 +60,12 @@ private Q_SLOTS:
     void onTimerEvent();
 
 private:
-    void onNewGame(const Tetris::PlayerTypes & inPlayerTypes);
+    void onNewGame(const Tetris::PlayerTypes& inPlayerTypes);
 
     void onTimeEventImpl();
 
 private:
-    Model & mModel;
+    Model& mModel;
     typedef std::vector<TetrisWidget *> TetrisWidgets;
     QHBoxLayout * mTetrisWidgetHolder;
     TetrisWidgets mTetrisWidgets;

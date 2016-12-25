@@ -201,7 +201,7 @@ void NodeCalculatorTest::testInterrupt(Depth inDepth, Width inWidth, WorkerCount
     }
 
     NodePtr resultPtr = nodeCalculator.result();
-    GameStateNode & result(*resultPtr);
+    GameStateNode& result(*resultPtr);
     ASSERT_TRUE(result.depth() == rootNode->depth() + 1);
     ASSERT_TRUE(result.gameState().originalBlock().type() == blockTypes[0]);
 
@@ -232,7 +232,7 @@ TEST_F(NodeCalculatorTest, Destroy)
 }
 
 
-void NodeCalculatorTest::testDestroy(Worker & inMainWorker, WorkerPool & inWorkerPool)
+void NodeCalculatorTest::testDestroy(Worker& inMainWorker, WorkerPool& inWorkerPool)
 {
     const int cWidth = 6;
     const int cDepth = 6;

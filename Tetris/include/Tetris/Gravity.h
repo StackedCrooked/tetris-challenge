@@ -23,7 +23,7 @@ class Gravity;
 class Gravity
 {
 public:
-    Gravity(const Futile::ThreadSafe<Game> & inGame);
+    Gravity(const Futile::ThreadSafe<Game>& inGame);
 
     ~Gravity();
 
@@ -34,7 +34,7 @@ public:
 
 private:
     Gravity(const Gravity &);
-    Gravity & operator=(const Gravity &);
+    Gravity& operator=(const Gravity &);
 
     void onTimerEvent();
 

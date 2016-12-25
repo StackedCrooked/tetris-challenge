@@ -45,7 +45,7 @@ struct SimpleGame::Impl : boost::enable_shared_from_this<SimpleGame::Impl>
         mGravity(new Gravity(mGame)),
         mCenterColumn(static_cast<std::size_t>(0.5 + inColumnCount / 2.0))
     {
-        FUTILE_LOCK(Game & game, mGame)
+        FUTILE_LOCK(Game& game, mGame)
         {
             game.GameStateChanged.connect(boost::bind(&Impl::onGameStateChanged, this, _1));
             game.LinesCleared.connect(boost::bind(&Impl::onLinesCleared, this, _1, _2));
@@ -174,7 +174,7 @@ bool SimpleGame::isPaused() const
 GameStateStats SimpleGame::stats() const
 {
     const Locker<Game> locker(gameImpl());
-    const GameState & gameState = locker->gameState();
+    const GameState& gameState = locker->gameState();
     return GameStateStats(gameState.numLines(),
                           gameState.numSingles(),
                           gameState.numDoubles(),
@@ -216,7 +216,7 @@ void SimpleGame::move(MoveDirection inDirection)
 
 void SimpleGame::rotate()
 {
-    gameImpl().lock()->rotate();
+    gameImpl().lock()->rotateBlock();
 }
 
 

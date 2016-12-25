@@ -31,13 +31,13 @@ std::string ConvertLogLevelToString(LogLevel inLogLevel)
 }
 
 
-std::string GetMessage(LogLevel inLogLevel, const std::string & inMessage)
+std::string GetMessage(LogLevel inLogLevel, const std::string& inMessage)
 {
     return ConvertLogLevelToString(inLogLevel) + ": " + inMessage;
 }
 
 
-void Logger::setLogHandler(const LogHandler & inHandler)
+void Logger::setLogHandler(const LogHandler& inHandler)
 {
     mHandler = inHandler;
 }
@@ -49,7 +49,7 @@ void Logger::flush()
 
     // We don't want to perform the logging during the lock.
     // Therefore we make a local copy of the messages.
-    FUTILE_LOCK(MessageList & messageList, mMessageList)
+    FUTILE_LOCK(MessageList& messageList, mMessageList)
     {
         items = messageList;
         messageList.clear();
@@ -63,7 +63,7 @@ void Logger::flush()
 }
 
 
-void Logger::log(LogLevel inLogLevel, const std::string & inMessage)
+void Logger::log(LogLevel inLogLevel, const std::string& inMessage)
 {
     mMessageList.lock()->push_back(GetMessage(inLogLevel, inMessage));
 }

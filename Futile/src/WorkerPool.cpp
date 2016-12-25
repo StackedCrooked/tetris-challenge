@@ -8,7 +8,7 @@
 namespace Futile {
 
 
-WorkerPool::WorkerPool(const std::string & inName, std::size_t inSize) :
+WorkerPool::WorkerPool(const std::string& inName, std::size_t inSize) :
     mName(inName),
     mRotation(0),
     mWorkers(),
@@ -28,7 +28,7 @@ WorkerPool::~WorkerPool()
 }
 
 
-void WorkerPool::schedule(const Worker::Task & inTask)
+void WorkerPool::schedule(const Worker::Task& inTask)
 {
     ScopedLock lock(mMutex);
     mRotation = (mRotation + 1) % mWorkers.size();
@@ -67,7 +67,7 @@ void WorkerPool::wait()
     ScopedLock lock(mMutex);
     for (std::size_t idx = 0; idx != mWorkers.size(); ++idx)
     {
-        Worker & worker = *mWorkers[idx];
+        Worker& worker = *mWorkers[idx];
         worker.wait();
     }
 }
@@ -82,7 +82,7 @@ void WorkerPool::interruptRange(std::size_t inBegin, std::size_t inCount)
     //
     for (std::size_t idx = inBegin; idx != inBegin + inCount; ++idx)
     {
-        Worker & worker = *mWorkers[idx];
+        Worker& worker = *mWorkers[idx];
         locker.lock(worker.mQueueMutex);
 
         // Keep queue locked for now.
@@ -93,7 +93,7 @@ void WorkerPool::interruptRange(std::size_t inBegin, std::size_t inCount)
     //
     for (std::size_t idx = inBegin; idx != inBegin + inCount; ++idx)
     {
-        Worker & worker = *mWorkers[idx];
+        Worker& worker = *mWorkers[idx];
 
         worker.mQueue.clear();
         worker.interrupt(false);
@@ -106,7 +106,7 @@ void WorkerPool::interruptRange(std::size_t inBegin, std::size_t inCount)
     //
     for (std::size_t idx = inBegin; idx != inBegin + inCount; ++idx)
     {
-        Worker & worker = *mWorkers[idx];
+        Worker& worker = *mWorkers[idx];
         ScopedLock statusLock(worker.mStatusMutex);
         if (worker.mStatus == WorkerStatus_Working)
         {
@@ -129,7 +129,7 @@ int WorkerPool::getActiveWorkerCount() const
     int activeWorkerCount = 0;
     for (std::size_t idx = 0; idx != mWorkers.size(); ++idx)
     {
-        const Worker & worker = *mWorkers[idx];
+        const Worker& worker = *mWorkers[idx];
         if (worker.status() == WorkerStatus_Working)
         {
             activeWorkerCount++;

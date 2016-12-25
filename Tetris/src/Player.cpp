@@ -12,8 +12,8 @@ using namespace Futile;
 struct Player::Impl
 {
     Impl(PlayerType inPlayerType,
-         const TeamName & inTeamName,
-         const PlayerName & inPlayerName,
+         const TeamName& inTeamName,
+         const PlayerName& inPlayerName,
          std::size_t inRowCount,
          std::size_t inColumnCount) :
         mRowCount(inRowCount),
@@ -40,8 +40,8 @@ struct Player::Impl
 
 
 PlayerPtr Player::Create(PlayerType inPlayerType,
-                         const TeamName & inTeamName,
-                         const PlayerName & inPlayerName,
+                         const TeamName& inTeamName,
+                         const PlayerName& inPlayerName,
                          std::size_t inRowCount,
                          std::size_t inColumnCount)
 {
@@ -58,8 +58,8 @@ PlayerPtr Player::Create(PlayerType inPlayerType,
 
 
 Player::Player(PlayerType inPlayerType,
-               const TeamName & inTeamName,
-               const PlayerName & inPlayerName,
+               const TeamName& inTeamName,
+               const PlayerName& inPlayerName,
                std::size_t inRowCount,
                std::size_t inColumnCount) :
     mImpl(new Impl(inPlayerType,
@@ -83,13 +83,13 @@ PlayerType Player::type() const
 }
 
 
-const std::string & Player::teamName() const
+const std::string& Player::teamName() const
 {
     return mImpl->mTeamName;
 }
 
 
-const std::string & Player::playerName() const
+const std::string& Player::playerName() const
 {
     return mImpl->mPlayerName;
 }
@@ -107,8 +107,8 @@ SimpleGame * Player::game()
 }
 
 
-PlayerPtr HumanPlayer::Create(const TeamName & inTeamName,
-                              const PlayerName & inPlayerName,
+PlayerPtr HumanPlayer::Create(const TeamName& inTeamName,
+                              const PlayerName& inPlayerName,
                               std::size_t inRowCount,
                               std::size_t inColumnCount)
 {
@@ -117,8 +117,8 @@ PlayerPtr HumanPlayer::Create(const TeamName & inTeamName,
 }
 
 
-HumanPlayer::HumanPlayer(const TeamName & inTeamName,
-                         const PlayerName & inPlayerName,
+HumanPlayer::HumanPlayer(const TeamName& inTeamName,
+                         const PlayerName& inPlayerName,
                          std::size_t inRowCount,
                          std::size_t inColumnCount) :
     Player(PlayerType_Human,

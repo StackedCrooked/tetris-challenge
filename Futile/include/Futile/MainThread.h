@@ -39,7 +39,7 @@ private:
  * This is achieved by pushing a (platform specific) "post message" on the main message loop.
  * This can only be used in applications that have a message loop (usually GUI applications).
  */
-inline void InvokeLater(const Action & inAction)
+inline void InvokeLater(const Action& inAction)
 {
     MainThread::Instance().postAction(inAction);
 }

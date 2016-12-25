@@ -26,11 +26,11 @@ class NodeCalculatorImpl
 {
 public:
     NodeCalculatorImpl(std::auto_ptr<GameStateNode> inNode,
-                       const BlockTypes & inBlockTypes,
-                       const std::vector<int> & inWidths,
-                       const Evaluator & inEvaluator,
-                       Futile::Worker & inMainWorker,
-                       Futile::WorkerPool & inWorkerPool);
+                       const BlockTypes& inBlockTypes,
+                       const std::vector<int>& inWidths,
+                       const Evaluator& inEvaluator,
+                       Futile::Worker& inMainWorker,
+                       Futile::WorkerPool& inWorkerPool);
 
     virtual ~NodeCalculatorImpl() = 0;
 
@@ -63,8 +63,8 @@ protected:
     void setStatus(int inStatus);
 
     void populateNodesRecursively(NodePtr ioNode,
-                                  const BlockTypes & inBlockTypes,
-                                  const std::vector<int> & inWidths,
+                                  const BlockTypes& inBlockTypes,
+                                  const std::vector<int>& inWidths,
                                   std::size_t inIndex,
                                   std::size_t inMaxIndex);
 
@@ -76,7 +76,7 @@ protected:
     class TreeRowInfo
     {
     public:
-        TreeRowInfo(const Evaluator & inEvaluator) :
+        TreeRowInfo(const Evaluator& inEvaluator) :
             mBestNode(),
             mBestScore(0),
             mEvaluator(&inEvaluator),
@@ -122,7 +122,7 @@ protected:
     class TreeRowInfos
     {
     public:
-        TreeRowInfos(const Evaluator & inEvaluator, std::size_t inMaxDepth) :
+        TreeRowInfos(const Evaluator& inEvaluator, std::size_t inMaxDepth) :
             mInfos(),
             mMaxDepth(inMaxDepth),
             mEvaluator(&inEvaluator),
@@ -205,14 +205,14 @@ protected:
 
     BlockTypes mBlockTypes;
     std::vector<int> mWidths;
-    const Evaluator & mEvaluator;
+    const Evaluator& mEvaluator;
 
     int mStatus;
     mutable Futile::Mutex mStatusMutex;
     std::string mErrorMessage;
 
-    Futile::Worker & mMainWorker;
-    Futile::WorkerPool & mWorkerPool;
+    Futile::Worker& mMainWorker;
+    Futile::WorkerPool& mWorkerPool;
 };
 
 

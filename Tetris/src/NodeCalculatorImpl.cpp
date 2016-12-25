@@ -26,7 +26,7 @@ using namespace Futile;
 namespace { // anonymous
 
 
-std::size_t calculateMaxNodeCount(const std::vector<int> & inWidths)
+std::size_t calculateMaxNodeCount(const std::vector<int>& inWidths)
 {
     std::vector<std::size_t> results;
     for (std::size_t idx = 0; idx < inWidths.size(); ++idx)
@@ -54,11 +54,11 @@ std::size_t calculateMaxNodeCount(const std::vector<int> & inWidths)
 
 
 NodeCalculatorImpl::NodeCalculatorImpl(std::auto_ptr<GameStateNode> inNode,
-                                       const BlockTypes & inBlockTypes,
-                                       const std::vector<int> & inWidths,
-                                       const Evaluator & inEvaluator,
-                                       Worker & inMainWorker,
-                                       WorkerPool & inWorkerPool) :
+                                       const BlockTypes& inBlockTypes,
+                                       const std::vector<int>& inWidths,
+                                       const Evaluator& inEvaluator,
+                                       Worker& inMainWorker,
+                                       WorkerPool& inWorkerPool) :
     mNode(inNode.release()),
     mResult(),
     mNodeMutex(),
@@ -154,8 +154,8 @@ void NodeCalculatorImpl::setStatus(int inStatus)
 
 void NodeCalculatorImpl::populateNodesRecursively(
     NodePtr ioNode,
-    const BlockTypes & inBlockTypes,
-    const std::vector<int> & inWidths,
+    const BlockTypes& inBlockTypes,
+    const std::vector<int>& inWidths,
     std::size_t inIndex,
     std::size_t inMaxIndex)
 {
@@ -320,7 +320,7 @@ void NodeCalculatorImpl::startImpl()
         calculateResult();
         setStatus(NodeCalculator::Status_Finished);
     }
-    catch (const std::exception & inException)
+    catch (const std::exception& inException)
     {
         mErrorMessage = inException.what();
         setStatus(NodeCalculator::Status_Error);

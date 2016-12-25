@@ -24,9 +24,9 @@ class GameStateNode
 public:
     static std::auto_ptr<GameStateNode> CreateRootNode(std::size_t inNumRows, std::size_t inNumColumns);
 
-    GameStateNode(NodePtr inParent, GameState * inGameState, const Evaluator & inEvaluator);
+    GameStateNode(NodePtr inParent, GameState * inGameState, const Evaluator& inEvaluator);
 
-    GameStateNode(GameState * inGameState, const Evaluator & inEvaluator);
+    GameStateNode(GameState * inGameState, const Evaluator& inEvaluator);
 
     ~GameStateNode();
 
@@ -36,7 +36,7 @@ public:
     // Each node is produced by a unique combination of the current block's column and rotation.
     int identifier() const;
 
-    const Evaluator & evaluator() const;
+    const Evaluator& evaluator() const;
 
     // Distance from the root node.
     int depth() const;
@@ -47,10 +47,10 @@ public:
 
     void makeRoot();
 
-    const ChildNodes & children() const;
+    const ChildNodes& children() const;
 
     // yeah
-    ChildNodes & children();
+    ChildNodes& children();
 
     void clearChildren();
 
@@ -60,7 +60,7 @@ public:
 
     GameStateNode * endNode();
 
-    const GameState & gameState() const;
+    const GameState& gameState() const;
 
     int quality() const;
 

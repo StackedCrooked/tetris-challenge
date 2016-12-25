@@ -6,7 +6,7 @@
 namespace Tetris {
 
 
-std::string ToString(const BlockType & inBlockType)
+std::string ToString(const BlockType& inBlockType)
 {
     switch (inBlockType)
     {

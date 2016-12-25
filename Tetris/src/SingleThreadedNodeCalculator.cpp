@@ -19,11 +19,11 @@ using namespace Futile;
 
 
 SingleThreadedNodeCalculator::SingleThreadedNodeCalculator(std::auto_ptr<GameStateNode> inNode,
-                                                           const BlockTypes & inBlockTypes,
-                                                           const std::vector<int> & inWidths,
-                                                           const Evaluator & inEvaluator,
-                                                           Worker & inMainWorker,
-                                                           WorkerPool & inWorkerPool) :
+                                                           const BlockTypes& inBlockTypes,
+                                                           const std::vector<int>& inWidths,
+                                                           const Evaluator& inEvaluator,
+                                                           Worker& inMainWorker,
+                                                           WorkerPool& inWorkerPool) :
     NodeCalculatorImpl(inNode, inBlockTypes, inWidths, inEvaluator, inMainWorker, inWorkerPool)
 {
 }

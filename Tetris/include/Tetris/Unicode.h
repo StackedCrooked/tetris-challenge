@@ -8,9 +8,9 @@
 namespace Tetris {
 
 
-std::string ToUTF8(const std::wstring & inText);
+std::string ToUTF8(const std::wstring& inText);
 
-std::wstring ToUTF16(const std::string & inText);
+std::wstring ToUTF16(const std::string& inText);
 
 
 } // namespace Tetris

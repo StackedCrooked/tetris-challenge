@@ -41,7 +41,7 @@ int Tetris_GetSquareHeight()
 }
 
 
-int RunGUI(int argc, char *argv[], Model & model)
+int RunGUI(int argc, char *argv[], Model& model)
 {
     QApplication a(argc, argv);
     a.setApplicationName("QtTetris");
@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
         // Enter application scope.
         return RunApp(argc, argv);
     }
-    catch (const std::exception & exc)
+    catch (const std::exception& exc)
     {
         std::cerr << "Exception caught in main: " << exc.what() << std::endl;
     }

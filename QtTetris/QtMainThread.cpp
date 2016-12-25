@@ -53,7 +53,7 @@ void QtAction::invokeAction()
         {
             mAction();
         }
-        catch (const std::exception & exc)
+        catch (const std::exception& exc)
         {
             Futile::LogError(std::string("QtAction::invokeAction(): caught exception: ") + exc.what());
         }

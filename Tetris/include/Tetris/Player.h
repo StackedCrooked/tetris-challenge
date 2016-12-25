@@ -30,8 +30,8 @@ class Player : public boost::enable_shared_from_this<Player>,
 {
 public:
     static PlayerPtr Create(PlayerType inPlayerType,
-                            const TeamName & inTeamName,
-                            const PlayerName & inPlayerName,
+                            const TeamName& inTeamName,
+                            const PlayerName& inPlayerName,
                             std::size_t inRowCount,
                             std::size_t inColumnCount);
 
@@ -39,9 +39,9 @@ public:
 
     PlayerType type() const;
 
-    const std::string & teamName() const;
+    const std::string& teamName() const;
 
-    const std::string & playerName() const;
+    const std::string& playerName() const;
 
     const SimpleGame * game() const;
 
@@ -49,14 +49,14 @@ public:
 
 protected:
     Player(PlayerType inPlayerType,
-           const TeamName & inTeamName,
-           const PlayerName & inPlayerName,
+           const TeamName& inTeamName,
+           const PlayerName& inPlayerName,
            std::size_t inRowCount,
            std::size_t inColumnCount);
 
 private:
-    friend bool operator==(const Player & lhs, const Player & rhs);
-    friend bool operator<(const Player & lhs, const Player & rhs);
+    friend bool operator==(const Player& lhs, const Player& rhs);
+    friend bool operator<(const Player& lhs, const Player& rhs);
 
     struct Impl;
     boost::scoped_ptr<Impl> mImpl;
@@ -66,16 +66,16 @@ private:
 class HumanPlayer : public Player
 {
 public:
-    static PlayerPtr Create(const TeamName & inTeamName,
-                            const PlayerName & inPlayerName,
+    static PlayerPtr Create(const TeamName& inTeamName,
+                            const PlayerName& inPlayerName,
                             std::size_t inRowCount,
                             std::size_t inColumnCount);
 
     virtual ~HumanPlayer();
 
 private:
-    HumanPlayer(const TeamName & inTeamName,
-                const PlayerName & inPlayerName,
+    HumanPlayer(const TeamName& inTeamName,
+                const PlayerName& inPlayerName,
                 std::size_t inRowCount,
                 std::size_t inColumnCount);
 };

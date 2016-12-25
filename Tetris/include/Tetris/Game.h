@@ -63,7 +63,7 @@ public:
 
     virtual bool move(MoveDirection inDirection) = 0;
 
-    bool rotate();
+    bool rotateBlock();
 
     void dropWithoutCommit();
 
@@ -73,30 +73,30 @@ public:
 
     void setStartingLevel(int inLevel);
 
-    const Block & activeBlock() const;
+    const Block& activeBlock() const;
 
-    const Grid & gameGrid() const;
+    const Grid& gameGrid() const;
 
     std::size_t currentBlockIndex() const;
 
-    void getFutureBlocks(std::size_t inCount, BlockTypes & outBlocks) const;
+    void getFutureBlocks(std::size_t inCount, BlockTypes& outBlocks) const;
 
-    void getFutureBlocksWithOffset(std::size_t inOffset, std::size_t inCount, BlockTypes & outBlocks) const;
+    void getFutureBlocksWithOffset(std::size_t inOffset, std::size_t inCount, BlockTypes& outBlocks) const;
 
-    virtual const GameState & gameState() const = 0;
+    virtual const GameState& gameState() const = 0;
 
     // For multiplayer crazyness
     virtual void applyLinePenalty(std::size_t inLineCount);
-    //virtual void setActiveBlock(const Block & inBlock);
-    virtual void setGrid(const Grid & inGrid) = 0;
-    //void swapGrid(Game & other);
-    //void swapActiveBlock(Game & other);
+    //virtual void setActiveBlock(const Block& inBlock);
+    virtual void setGrid(const Grid& inGrid) = 0;
+    //void swapGrid(Game& other);
+    //void swapActiveBlock(Game& other);
 
 protected:
     static int GetRowDelta(MoveDirection inDirection);
     static int GetColumnDelta(MoveDirection inDirection);
 
-    virtual GameState & gameState() = 0;
+    virtual GameState& gameState() = 0;
 
     void onChanged();
     void onLinesCleared(std::size_t inLineCount);
@@ -127,7 +127,7 @@ protected:
      */
     struct ScopedMute : boost::noncopyable
     {
-        ScopedMute(bool & value) :
+        ScopedMute(bool& value) :
             mValue(value)
         {
             mValue = true;
@@ -138,7 +138,7 @@ protected:
             mValue = false;
         }
 
-        bool & mValue;
+        bool& mValue;
     };
 
 private:
@@ -158,9 +158,9 @@ public:
 
     virtual bool move(MoveDirection inDirection);
 
-    const GameState & gameState() const;
+    const GameState& gameState() const;
 
-    virtual void setGrid(const Grid & inGrid);
+    virtual void setGrid(const Grid& inGrid);
 
 protected:
     // Friendship required for constructor.
@@ -168,9 +168,9 @@ protected:
 
     HumanGame(std::size_t inNumRows, std::size_t inNumCols);
 
-    HumanGame(const Game & inGame);
+    HumanGame(const Game& inGame);
 
-    GameState & gameState();
+    GameState& gameState();
 
 private:
     boost::scoped_ptr<GameState> mGameState;
@@ -199,9 +199,9 @@ public:
 
     void clearPrecalculatedNodes();
 
-    const GameState & gameState() const;
+    const GameState& gameState() const;
 
-    virtual void setGrid(const Grid & inGrid);
+    virtual void setGrid(const Grid& inGrid);
 
 protected:
     // Friendship required for constructor.
@@ -209,9 +209,9 @@ protected:
 
     ComputerGame(std::size_t inNumRows, std::size_t inNumCols);
 
-    ComputerGame(const Game & inGame);
+    ComputerGame(const Game& inGame);
 
-    GameState & gameState();
+    GameState& gameState();
 
 private:
     void setCurrentNode(NodePtr inCurrentNode);

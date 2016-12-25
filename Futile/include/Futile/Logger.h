@@ -28,9 +28,9 @@ class Logger : public Singleton<Logger>
 public:
     typedef boost::function<void(const std::string &)> LogHandler;
 
-    void setLogHandler(const LogHandler & inHandler);
+    void setLogHandler(const LogHandler& inHandler);
 
-    void log(LogLevel inLogLevel, const std::string & inMessage);
+    void log(LogLevel inLogLevel, const std::string& inMessage);
 
     // MessageList posted from worker threads are stored in a queue.
     // The actual logging is delayed until:
@@ -48,7 +48,7 @@ protected:
 private:
     friend class Singleton<Logger>;
 
-    void logImpl(const std::string & inMessage);
+    void logImpl(const std::string& inMessage);
 
     LogHandler mHandler;
     typedef std::vector<std::string> MessageList;

@@ -14,8 +14,6 @@ namespace Tetris {
 class Game;
 class BlockMover;
 
-typedef boost::function<void(BlockMover *)> BlockMoverCallback;
-
 
 /**
  * BlockMover
@@ -36,20 +34,13 @@ public:
 
     int actualSpeed() const;
 
-    enum MoveDownBehavior
-    {
-        MoveDownBehavior_Null,
-        MoveDownBehavior_Move,
-        MoveDownBehavior_Drop
-    };
+    void setNervous(bool value);
 
-    void setMoveDownBehavior(MoveDownBehavior inMoveDownBehavior);
-
-    MoveDownBehavior moveDownBehavior() const;
+    bool isNervous() const;
 
 private:
     BlockMover(const BlockMover &);
-    BlockMover & operator=(const BlockMover&);
+    BlockMover& operator=(const BlockMover&);
 
     struct Impl;
     boost::scoped_ptr<Impl> mImpl;

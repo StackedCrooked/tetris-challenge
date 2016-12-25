@@ -17,27 +17,27 @@ class GameState
 public:
     GameState(std::size_t inNumRows, std::size_t inNumColumns);
 
-    const Grid & grid() const;
+    const Grid& grid() const;
 
     // Modifies the grid bypassing Tetris rules.
     // This is required to enable certain multiplayer features.
-    void setGrid(const Grid & inGrid);
+    void setGrid(const Grid& inGrid);
 
     // Returns true if setGrid() has been called on this object.
     bool tainted() const;
 
     // The Block that was used in the commit(...) call.
-    const Block & originalBlock() const;
+    const Block& originalBlock() const;
 
     bool isGameOver() const;
 
     // Checks if a Block can be placed at a given location
     // without overlapping with previously placed blocks.
-    bool checkPositionValid(const Block & inBlock, std::size_t inRowIdx, std::size_t inColIdx) const;
+    bool checkPositionValid(const Block& inBlock, std::size_t inRowIdx, std::size_t inColIdx) const;
 
     // Creates a copy of the current gamestate with the given active block committed.
     // Use inGameOver = true to mark the new gamestate as "game over".
-    std::auto_ptr<GameState> commit(const Block & inBlock, GameOver inGameOver) const;
+    std::auto_ptr<GameState> commit(const Block& inBlock, GameOver inGameOver) const;
 
 
     // Statistics
@@ -53,7 +53,7 @@ public:
     void updateCache();
 
 private:
-    void solidifyBlock(const Block & inBlock);
+    void solidifyBlock(const Block& inBlock);
     void clearLines();
 
     Grid mGrid;
@@ -77,9 +77,9 @@ public:
 
     ~EvaluatedGameState();
 
-    const GameState & gameState() const;
+    const GameState& gameState() const;
 
-    GameState & gameState();
+    GameState& gameState();
 
     int quality() const;
 

@@ -19,15 +19,15 @@ class GenericGrid
 public:
     GenericGrid(std::size_t inRowCount, std::size_t inColumnCount);
 
-    GenericGrid(std::size_t inRowCount, std::size_t inColumnCount, const T & inInitialValue);
+    GenericGrid(std::size_t inRowCount, std::size_t inColumnCount, const T& inInitialValue);
 
     std::size_t rowCount() const;
 
     std::size_t columnCount() const;
 
-    const T & get(std::size_t inRow, std::size_t inColumn) const;
+    const T& get(std::size_t inRow, std::size_t inColumn) const;
 
-    void set(std::size_t inRow, std::size_t inColumn, const T & inValue);
+    void set(std::size_t inRow, std::size_t inColumn, const T& inValue);
 
 private:
     typedef std::vector<T> Data;
@@ -50,7 +50,7 @@ GenericGrid<T>::GenericGrid(std::size_t inRowCount, std::size_t inColumnCount) :
 
 
 template<class T>
-GenericGrid<T>::GenericGrid(std::size_t inRowCount, std::size_t inColumnCount, const T & inInitialValue) :
+GenericGrid<T>::GenericGrid(std::size_t inRowCount, std::size_t inColumnCount, const T& inInitialValue) :
     mData(inRowCount * inColumnCount, inInitialValue),
     mRowCount(inRowCount),
     mColumnCount(inColumnCount)
@@ -73,14 +73,14 @@ std::size_t GenericGrid<T>::columnCount() const
 
 
 template<class T>
-const T & GenericGrid<T>::get(std::size_t inRow, std::size_t inColumn) const
+const T& GenericGrid<T>::get(std::size_t inRow, std::size_t inColumn) const
 {
     return mData[inRow * mColumnCount + inColumn];
 }
 
 
 template<class T>
-void GenericGrid<T>::set(std::size_t inRow, std::size_t inColumn, const T & inValue)
+void GenericGrid<T>::set(std::size_t inRow, std::size_t inColumn, const T& inValue)
 {
     mData[inRow * mColumnCount + inColumn] = inValue;
 }

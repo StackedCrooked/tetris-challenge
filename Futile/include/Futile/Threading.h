@@ -49,7 +49,7 @@ public:
 
     ~LockMany();
 
-    void lock(MutexType & inMutex);
+    void lock(MutexType& inMutex);
 
     void unlockAll();
 
@@ -74,7 +74,7 @@ LockMany<MutexType>::~LockMany()
 
 
 template<class MutexType>
-void LockMany<MutexType>::lock(MutexType & inMutex)
+void LockMany<MutexType>::lock(MutexType& inMutex)
 {
     inMutex.lock();
     mMutexes.push_back(&inMutex);
@@ -136,17 +136,17 @@ public:
 
     Locker<Variable> lock();
 
-    bool operator== (const ThreadSafe<Variable> & rhs) const
+    bool operator== (const ThreadSafe<Variable>& rhs) const
     {
         return mImpl.get() == rhs.mImpl.get();
     }
 
-    bool operator!= (const ThreadSafe<Variable> & rhs) const
+    bool operator!= (const ThreadSafe<Variable>& rhs) const
     {
         return !(*this == rhs);
     }
 
-    bool compare(const ThreadSafe<Variable> & inOther) const
+    bool compare(const ThreadSafe<Variable>& inOther) const
     {
         return mImpl < inOther.mImpl;
     }
@@ -160,7 +160,7 @@ private:
     friend class Locker<Variable>;
     friend class LockerBase;
 
-    Mutex & getMutex() const
+    Mutex& getMutex() const
     {
         return mImpl->mMutex;
     }
@@ -198,7 +198,7 @@ private:
 
 
 template<class Variable>
-bool operator< (const ThreadSafe<Variable> & lhs, const ThreadSafe<Variable> & rhs)
+bool operator< (const ThreadSafe<Variable>& lhs, const ThreadSafe<Variable>& rhs)
 {
     return lhs.compare(rhs);
 }
@@ -224,7 +224,7 @@ public:
     }
 
     // Allow copy to enable move semantics
-    Locker(const Locker & rhs) :
+    Locker(const Locker& rhs) :
         mThreadSafe(rhs.mThreadSafe)
     {
         rhs.invalidate();
@@ -260,7 +260,7 @@ public:
 
 private:
     // disallow assignment
-    Locker & operator=(const Locker &);
+    Locker& operator=(const Locker &);
 
     void invalidate() const
     {
@@ -313,16 +313,16 @@ struct CamelionType
 
 
 template<class T>
-Futile::Locker<T> Lock(const Futile::ThreadSafe<T> & inTSV)
+Futile::Locker<T> Lock(const Futile::ThreadSafe<T>& inTSV)
 {
     return Futile::Locker<T>(inTSV);
 }
 
 
 template<class T>
-T & Unwrap(const LockerBase & inLockerBase, const Identity< ThreadSafe<T> > &)
+T& Unwrap(const LockerBase& inLockerBase, const Identity< ThreadSafe<T> > &)
 {
-    const T * result = static_cast< const Locker<T> & >(inLockerBase).get();
+    const T * result = static_cast< const Locker<T>& >(inLockerBase).get();
     return const_cast<T &>(*result);
 }
 
@@ -353,13 +353,13 @@ T & Unwrap(const LockerBase & inLockerBase, const Identity< ThreadSafe<T> > &)
  *   ThreadSafe<Foo> theFoo(new Foo);
  *
  *   // Atomic scope
- *   FUTILE_LOCK(Foo & foo, theFoo)
+ *   FUTILE_LOCK(Foo& foo, theFoo)
  *   {
  *       foo.bar();
  *   }
  */
 #define FUTILE_LOCK(DECL, TSV) \
-    FUTILE_FOR_BLOCK(const Futile::LockerBase & theLockerBase = Futile::Helper::Lock(TSV)) \
+    FUTILE_FOR_BLOCK(const Futile::LockerBase& theLockerBase = Futile::Helper::Lock(TSV)) \
         FUTILE_FOR_BLOCK(DECL = Futile::Helper::Unwrap(theLockerBase, FUTILE_ENCODEDTYPEOF(TSV)))
 
 

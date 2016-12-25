@@ -38,7 +38,7 @@ struct Timer::Impl : boost::noncopyable
         mStop = true;
     }
 
-    void start(const Action & inAction)
+    void start(const Action& inAction)
     {
         if (mMainWorker.status() != WorkerStatus_Idle)
         {
@@ -85,7 +85,7 @@ struct Timer::Impl : boost::noncopyable
         {
             // OK
         }
-        catch (const std::exception & exc)
+        catch (const std::exception& exc)
         {
             LogError(SS() << "Timer poll throws: " << exc.what());
         }
@@ -152,14 +152,14 @@ Timer::~Timer()
         mImpl->stop();
         mImpl.reset();
     }
-    catch (const std::exception & exc)
+    catch (const std::exception& exc)
     {
         LogError(SS() << "~Timer throws: " << exc.what());
     }
 }
 
 
-void Timer::start(const Action & inAction)
+void Timer::start(const Action& inAction)
 {
     mImpl->start(inAction);
 }

@@ -87,13 +87,13 @@ Player * Model::getPlayer(std::size_t inIndex)
 }
 
 
-const MultiplayerGame & Model::multiplayerGame() const
+const MultiplayerGame& Model::multiplayerGame() const
 {
     return *mMultiplayerGame;
 }
 
 
-MultiplayerGame & Model::multiplayerGame()
+MultiplayerGame& Model::multiplayerGame()
 {
     if (!mMultiplayerGame)
     {
@@ -120,12 +120,12 @@ unsigned CalculateOptimalWorkerCount(std::size_t numComputerPlayers)
 } // anonymous namespace
 
 
-const Evaluator & Model::updateAIParameters(const Player & inPlayer,
-                                            int & outSearchDepth,
-                                            int & outSearchWidth,
-                                            int & outWorkerCount,
-                                            int & outMoveSpeed,
-                                            BlockMover::MoveDownBehavior & outMoveDownBehavior)
+const Evaluator& Model::updateAIParameters(const Player& inPlayer,
+                                            int& outSearchDepth,
+                                            int& outSearchWidth,
+                                            int& outWorkerCount,
+                                            int& outMoveSpeed,
+                                            bool& outNervous)
 {
     if (!inPlayer.game())
     {
@@ -134,7 +134,7 @@ const Evaluator & Model::updateAIParameters(const Player & inPlayer,
 
     outMoveSpeed = 120;
 
-    const SimpleGame & game = *inPlayer.game();
+    const SimpleGame& game = *inPlayer.game();
 
     outWorkerCount = CalculateOptimalWorkerCount(computerPlayerCount());
 
@@ -145,20 +145,20 @@ const Evaluator & Model::updateAIParameters(const Player & inPlayer,
     {
         outSearchDepth = 10;
         outSearchWidth = 3;
-        outMoveDownBehavior = BlockMover::MoveDownBehavior_Move;
+        outNervous = false;
         return MakeTetrises::Instance();
     }
     else
     {
         outSearchDepth = 4;
         outSearchWidth = 4;
-        outMoveDownBehavior = BlockMover::MoveDownBehavior_Drop;
+        outNervous = true;
         return Survival::Instance();
     }
 }
 
 
-void Model::newGame(const PlayerTypes & inPlayerTypes, std::size_t inRowCount, std::size_t inColumnCount)
+void Model::newGame(const PlayerTypes& inPlayerTypes, std::size_t inRowCount, std::size_t inColumnCount)
 {
     mMultiplayerGame.reset();
     mMultiplayerGame.reset(new MultiplayerGame(inRowCount, inColumnCount));

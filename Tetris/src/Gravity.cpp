@@ -66,7 +66,7 @@ struct Gravity::Impl : boost::noncopyable
 };
 
 
-Gravity::Gravity(const ThreadSafe<Game> & inThreadSafeGame) :
+Gravity::Gravity(const ThreadSafe<Game>& inThreadSafeGame) :
     mImpl(new Impl(this, inThreadSafeGame)),
     mTimer()
 {
@@ -85,7 +85,7 @@ Gravity::~Gravity()
         mTimer->stop();
         mImpl.reset();
     }
-    catch (const std::exception & exc)
+    catch (const std::exception& exc)
     {
         // Log any errors.
         LogError(SS() << "~Gravity throws: " << exc.what());
@@ -95,7 +95,7 @@ Gravity::~Gravity()
 
 void Gravity::onTimerEvent()
 {
-    FUTILE_LOCK(Impl & impl, mImpl)
+    FUTILE_LOCK(Impl& impl, mImpl)
     {
         impl.onTimerEvent();
     }
@@ -128,7 +128,7 @@ void Gravity::Impl::onTimerEvent()
             mGravity->mTimer->setInterval(sIntervals[mLevel]);
         }
     }
-    catch (const std::exception & inException)
+    catch (const std::exception& inException)
     {
         LogError(inException.what());
     }

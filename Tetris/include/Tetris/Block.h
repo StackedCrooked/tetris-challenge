@@ -29,9 +29,9 @@ class Block
 public:
     Block(BlockType inType, Rotation inRotation, Row inRow, Column inColumn);
 
-    Block(const Block & inBlock);
+    Block(const Block& inBlock);
 
-    Block & operator=(const Block & inBlock);
+    Block& operator=(const Block& inBlock);
 
     ~Block();
 
@@ -40,7 +40,7 @@ public:
     BlockType type() const;
 
     // Get the grid associated with this block
-    const Grid & grid() const;
+    const Grid& grid() const;
 
     std::size_t row() const;
 
@@ -76,7 +76,7 @@ std::size_t GetBlockPositionCount(BlockType inType, std::size_t inNumColumns);
 int GetBlockIdentifier(BlockType inType, int inRotation);
 
 // Gets the Grid object that is associated with a block identifier
-const Grid & GetGrid(int inBlockIdentifier);
+const Grid& GetGrid(int inBlockIdentifier);
 
 
 } // namespace Tetris

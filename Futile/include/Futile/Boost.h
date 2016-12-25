@@ -34,7 +34,7 @@ public:
     {
     }
 
-    shared_ptr(const shared_ptr & rhs) :
+    shared_ptr(const shared_ptr& rhs) :
         mImpl(rhs.mImpl)
     {
         mImpl->mRefCount++;
@@ -48,13 +48,13 @@ public:
         }
     }
 
-    shared_ptr & operator=(shared_ptr rhs) // by value(!)
+    shared_ptr& operator=(shared_ptr rhs) // by value(!)
     {
         swap(rhs);
         return *this;
     }
 
-    void swap(shared_ptr & rhs)
+    void swap(shared_ptr& rhs)
     {
         std::swap(mImpl, rhs.mImpl);
     }
@@ -79,9 +79,9 @@ public:
         shared_ptr<T>(inValue).swap(this);
     }
 
-    const T & operator* () const { return *mImpl->mValue; }
+    const T& operator* () const { return *mImpl->mValue; }
 
-    T & operator* () { return *mImpl->mValue; }
+    T& operator* () { return *mImpl->mValue; }
 
     const T * operator-> () const { return mImpl->mValue; }
 
@@ -109,14 +109,14 @@ private:
 
 
 template<class T>
-inline bool operator==(const shared_ptr<T> & lhs, const shared_ptr<T> & rhs)
+inline bool operator==(const shared_ptr<T>& lhs, const shared_ptr<T>& rhs)
 {
     return lhs.mImpl == rhs.mImpl;
 }
 
 
 template<class T>
-inline bool operator<(const shared_ptr<T> & lhs, const shared_ptr<T> & rhs)
+inline bool operator<(const shared_ptr<T>& lhs, const shared_ptr<T>& rhs)
 {
     typedef typename shared_ptr<T>::Impl Impl;
     return std::less<Impl*>()(lhs.mImpl, rhs.mImpl);

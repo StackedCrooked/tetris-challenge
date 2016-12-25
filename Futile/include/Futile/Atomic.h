@@ -25,19 +25,19 @@ public:
         return mValue;
     }
 
-    void set(const T & inValue)
+    void set(const T& inValue)
     {
         ScopedLock lock(mMutex);
         mValue = inValue;
     }
 
-    void increment(const T & inValue)
+    void increment(const T& inValue)
     {
         ScopedLock lock(mMutex);
         mValue += inValue;
     }
 
-    void decrement(const T & inValue)
+    void decrement(const T& inValue)
     {
         ScopedLock lock(mMutex);
         mValue -= inValue;

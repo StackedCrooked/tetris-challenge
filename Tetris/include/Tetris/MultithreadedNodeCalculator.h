@@ -13,11 +13,11 @@ class MultithreadedNodeCalculator : public NodeCalculatorImpl
 {
 public:
     MultithreadedNodeCalculator(std::auto_ptr<GameStateNode> inNode,
-                                const BlockTypes & inBlockTypes,
-                                const std::vector<int> & inWidths,
-                                const Evaluator & inEvaluator,
-                                Futile::Worker & inMainWorker,
-                                Futile::WorkerPool & inWorkerPool);
+                                const BlockTypes& inBlockTypes,
+                                const std::vector<int>& inWidths,
+                                const Evaluator& inEvaluator,
+                                Futile::Worker& inMainWorker,
+                                Futile::WorkerPool& inWorkerPool);
 
     virtual ~MultithreadedNodeCalculator();
 
@@ -30,8 +30,8 @@ private:
                             int inWidth);
 
     void populateNodes(NodePtr ioNode,
-                       const BlockTypes & inBlockTypes,
-                       const std::vector<int> & inWidths,
+                       const BlockTypes& inBlockTypes,
+                       const std::vector<int>& inWidths,
                        std::size_t inIndex,
                        std::size_t inEndIndex);
 };

@@ -38,7 +38,7 @@ void MainWindow::onTimerEvent()
     {
         onTimeEventImpl();
     }
-    catch (const std::exception & exc)
+    catch (const std::exception& exc)
     {
         LogError(exc.what());
     }
@@ -56,7 +56,7 @@ void MainWindow::onTimeEventImpl()
 }
 
 
-MainWindow::MainWindow(QWidget *parent, Model & inModel) :
+MainWindow::MainWindow(QWidget *parent, Model& inModel) :
     QMainWindow(parent),
     mModel(inModel),
     mTetrisWidgetHolder(0),
@@ -121,7 +121,7 @@ MainWindow::~MainWindow()
 }
 
 
-void MainWindow::logMessage(const std::string & inMessage)
+void MainWindow::logMessage(const std::string& inMessage)
 {
     if (mLogField)
     {
@@ -145,7 +145,7 @@ bool MainWindow::event(QEvent * inEvent)
 }
 
 
-void MainWindow::onNewGame(const PlayerTypes & inPlayerTypes)
+void MainWindow::onNewGame(const PlayerTypes& inPlayerTypes)
 {
     if (inPlayerTypes.size() > mTetrisWidgets.size())
     {
@@ -168,7 +168,7 @@ void MainWindow::onNewGame(const PlayerTypes & inPlayerTypes)
     mModel.newGame(inPlayerTypes, Tetris_RowCount(), Tetris_ColumnCount());
 
     // Add the players.
-    MultiplayerGame & mgame = mModel.multiplayerGame();
+    MultiplayerGame& mgame = mModel.multiplayerGame();
     for (std::size_t idx = 0; idx < mgame.playerCount(); ++idx)
     {
         Player * player = mgame.getPlayer(idx);
@@ -258,7 +258,7 @@ void MainWindow::on2v2Game()
 
 void MainWindow::onPaused()
 {
-    MultiplayerGame & mgame = mModel.multiplayerGame();
+    MultiplayerGame& mgame = mModel.multiplayerGame();
     for (std::size_t idx = 0; idx < mgame.playerCount(); ++idx)
     {
         Player * player = mgame.getPlayer(idx);
@@ -270,7 +270,7 @@ void MainWindow::onPaused()
 
 void MainWindow::onPenalty()
 {
-    MultiplayerGame & mgame = mModel.multiplayerGame();
+    MultiplayerGame& mgame = mModel.multiplayerGame();
     for (std::size_t idx = 0; idx < mgame.playerCount(); ++idx)
     {
         Player * player = mgame.getPlayer(idx);

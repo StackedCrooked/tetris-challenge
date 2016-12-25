@@ -30,7 +30,7 @@ struct BlockMover::Impl
             mNumMovesPerSecond(1),
             mMoveCount(0),
             mActualSpeed(0),
-            mMoveDownBehavior(MoveDownBehavior_Move)
+            mNervous(false)
         {
             mStopwatch.start();
         }
@@ -39,7 +39,7 @@ struct BlockMover::Impl
         unsigned mNumMovesPerSecond;
         unsigned mMoveCount;
         unsigned mActualSpeed;
-        MoveDownBehavior mMoveDownBehavior;
+        bool mNervous;
     };
 
     Impl(ThreadSafe<Game> inGame) :
@@ -55,14 +55,14 @@ struct BlockMover::Impl
 
     void onTimerEvent();
 
-    static unsigned GetTimerIntervalMs(unsigned & inNumMovesPerSecond)
+    static unsigned GetTimerIntervalMs(unsigned& inNumMovesPerSecond)
     {
         return static_cast<unsigned>(0.5 + 1000.0 / static_cast<double>(inNumMovesPerSecond));
     }
 
     void setNumMovesPerSecond(unsigned n)
     {
-        FUTILE_LOCK(Data & data, mData)
+        FUTILE_LOCK(Data& data, mData)
         {
             data.mNumMovesPerSecond = n;
         }
@@ -79,20 +79,20 @@ struct BlockMover::Impl
         return mData.lock()->mActualSpeed;
     }
 
-    void setMoveDownBehavior(MoveDownBehavior inMoveDownBehavior)
+    void setNervous(bool inNervous)
     {
-        FUTILE_LOCK(Data & data, mData)
+        FUTILE_LOCK(Data& data, mData)
         {
-            data.mMoveDownBehavior = inMoveDownBehavior;
+            data.mNervous = inNervous;
         }
     }
 
-    MoveDownBehavior moveDownBehavior() const
+    bool isNervous() const
     {
-        return mData.lock()->mMoveDownBehavior;
+        return mData.lock()->mNervous;
     }
 
-    void move(Data & data);
+    void move(Data& data);
 
     ThreadSafe<Game> mGame;
     Futile::Timer mTimer;
@@ -117,7 +117,7 @@ BlockMover::~BlockMover()
         mImpl->mTimer.stop();
         mImpl.reset();
     }
-    catch (const std::exception & exc)
+    catch (const std::exception& exc)
     {
         LogError(SS() << "~BlockMover throws: " << exc.what());
     }
@@ -153,15 +153,15 @@ int BlockMover::actualSpeed() const
 }
 
 
-void BlockMover::setMoveDownBehavior(MoveDownBehavior inMoveDownBehavior)
+void BlockMover::setNervous(bool value)
 {
-    mImpl->setMoveDownBehavior(inMoveDownBehavior);
+    mImpl->setNervous(value);
 }
 
 
-BlockMover::MoveDownBehavior BlockMover::moveDownBehavior() const
+bool BlockMover::isNervous() const
 {
-    return mImpl->moveDownBehavior();
+    return mImpl->isNervous();
 }
 
 
@@ -169,7 +169,7 @@ void BlockMover::Impl::onTimerEvent()
 {
     try
     {
-        FUTILE_LOCK(Data & data, mData)
+        FUTILE_LOCK(Data& data, mData)
         {
             move(data);
             ++data.mMoveCount;
@@ -182,39 +182,39 @@ void BlockMover::Impl::onTimerEvent()
             }
         }
     }
-    catch (const std::exception & inException)
+    catch (const std::exception& inException)
     {
         LogError(SS() << "Unanticipated exception thrown in Impl::move(). Details: " << inException.what());
     }
 }
 
 
-void BlockMover::Impl::move(Data & data)
+void BlockMover::Impl::move(Data& data)
 {
     Locker<Game> wGame(mGame);
-    ComputerGame & game = dynamic_cast<ComputerGame&>(*wGame.get());
+    ComputerGame& game = dynamic_cast<ComputerGame&>(*wGame.get());
     if (game.isPaused())
     {
         return;
     }
 
-    const ChildNodes & children = game.currentNode()->children();
+    const ChildNodes& children = game.currentNode()->children();
     if (children.empty())
     {
         return;
     }
 
-    GameStateNode & firstChild = **children.begin();
+    GameStateNode& firstChild = **children.begin();
 
-    const Block & block = game.activeBlock();
-    const Block & targetBlock = firstChild.gameState().originalBlock();
+    const Block& block = game.activeBlock();
+    const Block& targetBlock = firstChild.gameState().originalBlock();
 
     Assert(block.type() == targetBlock.type());
 
     // Try rotation first, if it fails then skip rotation and try horizontal move
     if (block.rotation() != targetBlock.rotation())
     {
-        if (game.rotate())
+        if (game.rotateBlock())
         {
             return;
         }
@@ -247,7 +247,7 @@ void BlockMover::Impl::move(Data & data)
     // Retry rotation again. If it fails here then drop the block.
     if (block.rotation() != targetBlock.rotation())
     {
-        if (!game.rotate())
+        if (!game.rotateBlock())
         {
             game.dropAndCommit();
         }
@@ -258,17 +258,17 @@ void BlockMover::Impl::move(Data & data)
     // If we get arrive here then horizontal position and rotation are OK.
     // Start lowering the block.
     //
-    if (data.mMoveDownBehavior == BlockMover::MoveDownBehavior_Move)
+    if (data.mNervous == false)
     {
         game.move(MoveDirection_Down);
     }
-    else if (data.mMoveDownBehavior == BlockMover::MoveDownBehavior_Drop)
+    else if (data.mNervous == true)
     {
         game.dropAndCommit();
     }
     else
     {
-        throw std::logic_error(SS() << "MoveDownBehavior: invalid enum value: " << data.mMoveDownBehavior);
+        throw std::logic_error(SS() << "Nervous: invalid enum value: " << data.mNervous);
     }
 }
 

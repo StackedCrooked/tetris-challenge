@@ -28,9 +28,9 @@ GameState::GameState(std::size_t inNumRows, std::size_t inNumColumns) :
 }
 
 
-bool GameState::checkPositionValid(const Block & inBlock, std::size_t inRowIdx, std::size_t inColIdx) const
+bool GameState::checkPositionValid(const Block& inBlock, std::size_t inRowIdx, std::size_t inColIdx) const
 {
-    const Grid & blockGrid(inBlock.grid());
+    const Grid& blockGrid(inBlock.grid());
 
     if (inColIdx < blockGrid.columnCount() && (inRowIdx + blockGrid.rowCount()) < mFirstOccupiedRow)
     {
@@ -68,9 +68,9 @@ bool GameState::checkPositionValid(const Block & inBlock, std::size_t inRowIdx, 
 }
 
 
-void GameState::solidifyBlock(const Block & inBlock)
+void GameState::solidifyBlock(const Block& inBlock)
 {
-    const Grid & grid = inBlock.grid();
+    const Grid& grid = inBlock.grid();
     for (std::size_t r = 0; r != grid.rowCount(); ++r)
     {
         for (std::size_t c = 0; c != grid.columnCount(); ++c)
@@ -173,13 +173,13 @@ bool GameState::isGameOver() const
 }
 
 
-const Grid & GameState::grid() const
+const Grid& GameState::grid() const
 {
     return mGrid;
 }
 
 
-void GameState::setGrid(const Grid & inGrid)
+void GameState::setGrid(const Grid& inGrid)
 {
     Assert(mGrid.rowCount() == inGrid.rowCount() && mGrid.columnCount() == inGrid.columnCount());
     mGrid = inGrid;
@@ -220,13 +220,13 @@ int GameState::score() const
            1200 * mNumTetrises;
 }
 
-const Block & GameState::originalBlock() const
+const Block& GameState::originalBlock() const
 {
     return mOriginalBlock;
 }
 
 
-std::auto_ptr<GameState> GameState::commit(const Block & inBlock, GameOver inGameOver) const
+std::auto_ptr<GameState> GameState::commit(const Block& inBlock, GameOver inGameOver) const
 {
     std::auto_ptr<GameState> result(new GameState(*this));
     result->mIsGameOver = inGameOver;
@@ -254,13 +254,13 @@ EvaluatedGameState::~EvaluatedGameState()
 }
 
 
-const GameState & EvaluatedGameState::gameState() const
+const GameState& EvaluatedGameState::gameState() const
 {
     return *mGameState;
 }
 
 
-GameState & EvaluatedGameState::gameState()
+GameState& EvaluatedGameState::gameState()
 {
     return *mGameState;
 }

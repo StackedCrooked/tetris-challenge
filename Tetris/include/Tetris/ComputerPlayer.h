@@ -26,16 +26,16 @@ public:
          * Gets updated parameters from the tweaker object.
          * This message will be called in the main thread.
          */
-        virtual const Evaluator & updateAIParameters(const Player & inPlayer,
-                                                     int & outSearchDepth,
-                                                     int & outSearchWidth,
-                                                     int & outWorkerCount,
-                                                     int & outMoveSpeed,
-                                                     BlockMover::MoveDownBehavior & outMoveDownBehavior) = 0;
+        virtual const Evaluator& updateAIParameters(const Player& inPlayer,
+                                                     int& outSearchDepth,
+                                                     int& outSearchWidth,
+                                                     int& outWorkerCount,
+                                                     int& outMoveSpeed,
+                                                     bool& outNervous) = 0;
     };
 
-    static PlayerPtr Create(const TeamName & inTeamName,
-                            const PlayerName & inPlayerName,
+    static PlayerPtr Create(const TeamName& inTeamName,
+                            const PlayerName& inPlayerName,
                             std::size_t inRowCount,
                             std::size_t inColumnCount);
 
@@ -64,8 +64,8 @@ public:
     void setWorkerCount(int inWorkerCount);
 
 private:
-    ComputerPlayer(const TeamName & inTeamName,
-                   const PlayerName & inPlayerName,
+    ComputerPlayer(const TeamName& inTeamName,
+                   const PlayerName& inPlayerName,
                    std::size_t inRowCount,
                    std::size_t inColumnCount);
 

@@ -69,8 +69,8 @@ public:
     static void UpdateComputerBlockMoveSpeed(boost::weak_ptr<Player> weakPlayer) {
         if (PlayerPtr playerPtr = weakPlayer.lock())
         {
-            ComputerPlayer & cp = dynamic_cast<ComputerPlayer&>(*playerPtr);
-            cp.mImpl.lock()->updateComputerBlockMoveSpeed();
+            ComputerPlayer& cp = dynamic_cast<ComputerPlayer&>(*playerPtr);
+            cp.mImpl.lock().get()->updateComputerBlockMoveSpeed();
         }
     }
 
@@ -102,8 +102,8 @@ public:
 
 
 
-PlayerPtr ComputerPlayer::Create(const TeamName & inTeamName,
-                                 const PlayerName & inPlayerName,
+PlayerPtr ComputerPlayer::Create(const TeamName& inTeamName,
+                                 const PlayerName& inPlayerName,
                                  std::size_t inRowCount,
                                  std::size_t inColumnCount)
 {
@@ -112,15 +112,15 @@ PlayerPtr ComputerPlayer::Create(const TeamName & inTeamName,
 }
 
 
-ComputerPlayer::ComputerPlayer(const TeamName & inTeamName,
-                               const PlayerName & inPlayerName,
+ComputerPlayer::ComputerPlayer(const TeamName& inTeamName,
+                               const PlayerName& inPlayerName,
                                std::size_t inRowCount,
                                std::size_t inColumnCount) :
     Player(PlayerType_Computer, inTeamName, inPlayerName, inRowCount, inColumnCount),
     mImpl(new Impl()),
     mTimer(new Futile::Timer(10))
 {
-    FUTILE_LOCK(Impl & impl, mImpl)
+    FUTILE_LOCK(Impl& impl, mImpl)
     {
         impl.mComputerPlayer = this;
         impl.mBlockMover.reset(new BlockMover(game()->gameImpl()));
@@ -134,7 +134,7 @@ ComputerPlayer::ComputerPlayer(const TeamName & inTeamName,
 ComputerPlayer::~ComputerPlayer()
 {
     mTimer->stop();
-    FUTILE_LOCK(Impl & impl, mImpl)
+    FUTILE_LOCK(Impl& impl, mImpl)
     {
         impl.mQuitFlag = true;
         impl.mBlockMover.reset();
@@ -146,7 +146,7 @@ void ComputerPlayer::onTimerEvent()
 {
     try
     {
-        FUTILE_LOCK(Impl & impl, mImpl)
+        FUTILE_LOCK(Impl& impl, mImpl)
         {
             if (!impl.mQuitFlag)
             {
@@ -154,7 +154,7 @@ void ComputerPlayer::onTimerEvent()
             }
         }
     }
-    catch (const std::exception & exc)
+    catch (const std::exception& exc)
     {
         LogError(SS() << "Exception caught during ComputerPlayer timerEvent. Details: " << exc.what());
     }
@@ -163,7 +163,7 @@ void ComputerPlayer::onTimerEvent()
 
 void ComputerPlayer::setTweaker(Tweaker *inTweaker)
 {
-    FUTILE_LOCK(Impl & impl, mImpl)
+    FUTILE_LOCK(Impl& impl, mImpl)
     {
         impl.mTweaker = inTweaker;
     }
@@ -178,7 +178,7 @@ int ComputerPlayer::searchDepth() const
 
 void ComputerPlayer::setSearchDepth(int inSearchDepth)
 {
-    FUTILE_LOCK(Impl & impl, mImpl)
+    FUTILE_LOCK(Impl& impl, mImpl)
     {
         impl.mSearchDepth = inSearchDepth;
     }
@@ -193,7 +193,7 @@ int ComputerPlayer::searchWidth() const
 
 void ComputerPlayer::setSearchWidth(int inSearchWidth)
 {
-    FUTILE_LOCK(Impl & impl, mImpl)
+    FUTILE_LOCK(Impl& impl, mImpl)
     {
         impl.mSearchWidth = inSearchWidth;
     }
@@ -202,7 +202,7 @@ void ComputerPlayer::setSearchWidth(int inSearchWidth)
 
 int ComputerPlayer::depth() const
 {
-    FUTILE_LOCK(Impl & impl, mImpl)
+    FUTILE_LOCK(Impl& impl, mImpl)
     {
         if (impl.mNodeCalculator)
         {
@@ -221,7 +221,7 @@ int ComputerPlayer::moveSpeed() const
 
 void ComputerPlayer::setMoveSpeed(int inMoveSpeed)
 {
-    FUTILE_LOCK(Impl & impl, mImpl)
+    FUTILE_LOCK(Impl& impl, mImpl)
     {
         impl.mBlockMover->setSpeed(inMoveSpeed);
     }
@@ -236,7 +236,7 @@ int ComputerPlayer::workerCount() const
 
 void ComputerPlayer::setWorkerCount(int inWorkerCount)
 {
-    FUTILE_LOCK(Impl & impl, mImpl)
+    FUTILE_LOCK(Impl& impl, mImpl)
     {
         if (inWorkerCount == 0)
         {
@@ -255,7 +255,7 @@ void ComputerPlayer::Impl::updateComputerBlockMoveSpeed()
     // Consult the Tweaker for improved settings
     if (mTweaker)
     {
-        BlockMover::MoveDownBehavior moveDownBehavior = BlockMover::MoveDownBehavior_Null;
+        bool nervous = false;
         int moveSpeed = 0;
 
         mEvaluator = &mTweaker->updateAIParameters(*mComputerPlayer,
@@ -263,7 +263,7 @@ void ComputerPlayer::Impl::updateComputerBlockMoveSpeed()
                                                    mSearchWidth,
                                                    mWorkerCount,
                                                    moveSpeed,
-                                                   moveDownBehavior);
+                                                   nervous);
 
         if (mSearchDepth < 1 || mSearchDepth > 100)
         {
@@ -289,10 +289,7 @@ void ComputerPlayer::Impl::updateComputerBlockMoveSpeed()
             mBlockMover->setSpeed(moveSpeed);
         }
 
-        if (moveDownBehavior != BlockMover::MoveDownBehavior_Null)
-        {
-            mBlockMover->setMoveDownBehavior(moveDownBehavior);
-        }
+        mBlockMover->setNervous(nervous);
     }
 }
 
@@ -372,7 +369,7 @@ void ComputerPlayer::Impl::startNodeCalculator()
     // Critical section
     {
         Locker<Game> rgame(mComputerPlayer->game()->gameImpl());
-        const ComputerGame & constComputerGame(dynamic_cast<const ComputerGame&>(*rgame.get()));
+        const ComputerGame& constComputerGame(dynamic_cast<const ComputerGame&>(*rgame.get()));
 
 
         if (constComputerGame.numPrecalculatedMoves() > 8)
@@ -397,7 +394,7 @@ void ComputerPlayer::Impl::startNodeCalculator()
         //
         // Create the list of future blocks
         //
-        ComputerGame & computerGame(dynamic_cast<ComputerGame&>(*rgame.get()));
+        ComputerGame& computerGame(dynamic_cast<ComputerGame&>(*rgame.get()));
         computerGame.getFutureBlocksWithOffset(endNode->depth(), mSearchDepth, futureBlocks);
     }
 
@@ -442,7 +439,7 @@ void ComputerPlayer::Impl::onStarted()
 void ComputerPlayer::Impl::onWorking()
 {
     Locker<Game> wgame(mComputerPlayer->game()->gameImpl());
-    const ComputerGame & game(dynamic_cast<const ComputerGame&>(*wgame.get()));
+    const ComputerGame& game(dynamic_cast<const ComputerGame&>(*wgame.get()));
 
     if (mGameDepth < game.endNode()->depth())
     {
@@ -479,7 +476,7 @@ void ComputerPlayer::Impl::onFinished()
     }
 
     Locker<Game> wgame(mComputerPlayer->game()->gameImpl());
-    ComputerGame & game(dynamic_cast<ComputerGame&>(*wgame.get()));
+    ComputerGame& game(dynamic_cast<ComputerGame&>(*wgame.get()));
 
     // Check for sync problems.
     if (resultNode->depth() != game.endNode()->depth() + 1)

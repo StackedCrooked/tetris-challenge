@@ -44,7 +44,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OUTDIR}bin/)
 set(WARNING_OPTIONS         " -Wall -Werror ")
 set(CXX_FLAGS         "${CXX_FLAGS} -DTETRIS_QT=1")
 set(CXX_FLAGS_Debug   "${CXX_FLAGS} ${WARNING_OPTIONS} -ggdb3")
-set(CXX_FLAGS_Release "${CXX_FLAGS} ${WARNING_OPTIONS} -O3 -DNDEBUG")
+set(CXX_FLAGS_Release "${CXX_FLAGS} ${WARNING_OPTIONS} -O3 -flto -DNDEBUG")
 set(FINAL_COMPILE_FLAGS "${CXX_FLAGS_${CMAKE_BUILD_TYPE}}")
 
 
@@ -63,7 +63,7 @@ include_directories(system /opt/local/include)
 
 
 #
-# Tetris & Futile dependencies
+# Tetris& Futile dependencies
 #
 add_subdirectory(${SOLUTIONDIR}Tetris ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Tetris)
 add_subdirectory(${SOLUTIONDIR}Futile ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Futile)
@@ -160,7 +160,7 @@ add_custom_command(TARGET ${EXECUTABLE}
                    COMMAND /bin/cp                  ARGS  "${SOLUTIONDIR}Tetris/res/Tetris.icns"
                                                           "${BUNDLE}/Contents/Resources/Tetris.icns"
                    COMMAND /usr/libexec/PlistBuddy  ARGS  "-c" \"Set :CFBundleIconFile Tetris\" "${BUNDLE}/Contents/Info.plist"
-				   COMMAND macdeployqt     ARGS  "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}QtTetris.app" "${MACDEPLOYQT_OPTIONS}"
+                   COMMAND macdeployqt     ARGS  "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}QtTetris.app" "${MACDEPLOYQT_OPTIONS}"
                    WORKING_DIRECTORY  ${BUILD_ROOT})
 endif(APPLE)
 
@@ -171,16 +171,18 @@ endif(APPLE)
 target_link_libraries(${EXECUTABLE}
     ${QT_LIBRARIES}
     Tetris
-	Futile
-	${EXTRA_LIBS}
-	/usr/local/lib/libPocoFoundation.dylib
-	/opt/local/lib/libboost_thread-mt.a
-	/opt/local/lib/libboost_system-mt.a)
+    Futile
+    ${EXTRA_LIBS}
+    /usr/local/lib/libPocoFoundation.dylib
+    /usr/local/lib/libboost_thread-mt.a
+    /usr/local/lib/libboost_system-mt.a)
 
 
 #
 # Target properties
 #
 set_target_properties(${EXECUTABLE}  PROPERTIES
-                      COMPILE_FLAGS  ${FINAL_COMPILE_FLAGS})
+                      COMPILE_FLAGS  ${FINAL_COMPILE_FLAGS}
+                      LINK_FLAGS -flto
+                      )
 
