@@ -138,7 +138,7 @@ const Evaluator& Model::updateAIParameters(const Player& inPlayer,
     outWorkerCount = CalculateOptimalWorkerCount(computerPlayerCount());
 
     int currentHeight = game.stats().currentHeight();
-    outMoveSpeed = std::max(40, std::min(3 * currentHeight, 300));
+    outMoveSpeed = std::max(60, std::min(3 * currentHeight, 300));
 
     // Tactics adjustment
     if (currentHeight < 10)
