@@ -21,6 +21,8 @@ namespace Tetris {
 class QtMainThread : public QObject,
                      public Futile::MainThreadImpl
 {
+    Q_OBJECT
+
 public:
     QtMainThread();
 
