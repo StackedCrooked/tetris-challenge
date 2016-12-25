@@ -188,30 +188,30 @@ Balanced::Balanced() :
 
 Survival::Survival() :
     Super("Survival",
-          GameHeightFactor(-2),
-          LastBlockHeightFactor(-1),
-          NumHolesFactor(-3),
-          NumSinglesFactor(1),
-          NumDoublesFactor(2),
-          NumTriplesFactor(4),
-              NumTetrisesFactor(8),
-              SearchDepth(5),
-              SearchWidth(3))
+    GameHeightFactor(-2),
+    LastBlockHeightFactor(-1),
+    NumHolesFactor(-3),
+    NumSinglesFactor(2),
+    NumDoublesFactor(4),
+    NumTriplesFactor(4),
+    NumTetrisesFactor(4),
+    SearchDepth(5),
+    SearchWidth(3))
 {
 }
 
 
 MakeTetrises::MakeTetrises() :
     Super("Make Tetrises",
-              GameHeightFactor(-2),
-              LastBlockHeightFactor(-1),
-              NumHolesFactor(-4),
-              NumSinglesFactor(-4),
-              NumDoublesFactor(-10),
-              NumTriplesFactor(-8),
-              NumTetrisesFactor(16),
-              SearchDepth(11),
-              SearchWidth(2))
+    GameHeightFactor(-2),
+    LastBlockHeightFactor(-1),
+    NumHolesFactor(-4),
+    NumSinglesFactor(-4),
+    NumDoublesFactor(-10),
+    NumTriplesFactor(-8),
+    NumTetrisesFactor(16),
+    SearchDepth(11),
+    SearchWidth(2))
 {
 }
 
