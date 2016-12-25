@@ -1,6 +1,7 @@
 #include "Futile/Threading.h"
-#include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <ctime>
+#include <chrono>
+#include <thread>
 
 
 namespace Futile {
@@ -8,15 +9,13 @@ namespace Futile {
 
 void Sleep(UInt64 inMilliseconds)
 {
-    boost::this_thread::sleep(boost::posix_time::milliseconds(inMilliseconds));
+    std::this_thread::sleep_for(std::chrono::milliseconds(inMilliseconds));
 }
 
 
 UInt64 GetCurrentTimeMs()
 {
-    boost::posix_time::ptime time = boost::posix_time::microsec_clock::local_time();
-    boost::posix_time::time_duration duration(time.time_of_day());
-    return static_cast<UInt64>(duration.total_milliseconds());
+	return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 }
 
 
