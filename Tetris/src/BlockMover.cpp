@@ -44,7 +44,7 @@ struct BlockMover::Impl
 
     Impl(ThreadSafe<Game> inGame) :
         mGame(inGame),
-        mTimer(10), // frequency is 100/s
+        mTimer(5), // frequency is 100/s
         mData(new Data)
     {
     }

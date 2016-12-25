@@ -195,8 +195,8 @@ Survival::Survival() :
           NumDoublesFactor(2),
           NumTriplesFactor(4),
               NumTetrisesFactor(8),
-              SearchDepth(6),
-              SearchWidth(4))
+              SearchDepth(5),
+              SearchWidth(3))
 {
 }
 
@@ -210,7 +210,7 @@ MakeTetrises::MakeTetrises() :
               NumDoublesFactor(-10),
               NumTriplesFactor(-8),
               NumTetrisesFactor(16),
-              SearchDepth(12),
+              SearchDepth(11),
               SearchWidth(2))
 {
 }

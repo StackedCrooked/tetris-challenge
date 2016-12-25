@@ -132,25 +132,25 @@ const Evaluator& Model::updateAIParameters(const Player& inPlayer,
         throw std::runtime_error("GameState is null!");
     }
 
-    outMoveSpeed = 120;
 
     const SimpleGame& game = *inPlayer.game();
 
     outWorkerCount = CalculateOptimalWorkerCount(computerPlayerCount());
 
     int currentHeight = game.stats().currentHeight();
+    outMoveSpeed = std::max(40, std::min(3 * currentHeight, 300));
 
     // Tactics adjustment
     if (currentHeight < 10)
     {
         outSearchDepth = 10;
-        outSearchWidth = 3;
+        outSearchWidth = 2;
         outNervous = false;
         return MakeTetrises::Instance();
     }
     else
     {
-        outSearchDepth = 4;
+        outSearchDepth = 5;
         outSearchWidth = 4;
         outNervous = true;
         return Survival::Instance();
