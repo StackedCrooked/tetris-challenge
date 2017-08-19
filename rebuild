@@ -2,4 +2,4 @@
 rm -rf Build
 TETRIS_BUILD_TYPE=Debug ./configure
 cd Build
-make -j10
+make -j6
