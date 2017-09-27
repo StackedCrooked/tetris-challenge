@@ -9,7 +9,7 @@
 namespace Tetris {
 
 
-Futile_Enum(PlayerType, 2, (Human, Computer));
+Futile_Enum(PlayerType, 2, (Human, Computer))
 typedef std::vector<PlayerType> PlayerTypes;
 
 
