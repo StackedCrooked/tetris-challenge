@@ -2,7 +2,9 @@
 #define NEWGAMEDIALOG_H
 
 
-#include <QtGui/QtGui>
+#include <QDialog>
+#include <QRadioButton>
+#include <QDialogButtonBox>
 
 
 class NewGameDialog : public QDialog

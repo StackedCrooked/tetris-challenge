@@ -3,7 +3,7 @@
 
 
 #include "Futile/MainThreadImpl.h"
-#include <QtCore/QtCore>
+#include <QtCore>
 
 
 namespace Tetris {

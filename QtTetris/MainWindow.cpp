@@ -12,9 +12,13 @@
 #include "Futile/Logging.h"
 #include "Futile/MakeString.h"
 #include "Poco/Environment.h"
-#include <QtGui/QLayout>
-#include <QtGui/QLabel>
-#include <QtCore/QTimer>
+#include <QAction>
+#include <QLabel>
+#include <QLayout>
+#include <QMenu>
+#include <QMenuBar>
+#include <QPushButton>
+#include <QTimer>
 #include <boost/noncopyable.hpp>
 #include <algorithm>
 #include <iostream>

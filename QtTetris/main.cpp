@@ -1,4 +1,4 @@
-#include <QtGui/QApplication>
+#include <QApplication>
 #include "Model.h"
 #include "MainWindow.h"
 #include "Tetris/PlayerType.h"

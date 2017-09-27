@@ -2,7 +2,10 @@
 #define MAINWINDOW_H
 
 
-#include <QtGui/QtGui>
+#include <QtGui>
+#include <QMainWindow>
+#include <QHBoxLayout>
+#include <QTextEdit>
 #include "Model.h"
 #include "TetrisWidget.h"
 #include "Tetris/Game.h"

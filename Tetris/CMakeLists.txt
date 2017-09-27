@@ -59,6 +59,3 @@ add_library(Tetris
     src/Player.cpp
     src/SingleThreadedNodeCalculator.cpp
     src/Unicode.cpp)
-
-set_target_properties(Tetris PROPERTIES COMPILE_FLAGS ${FINAL_COMPILE_FLAGS})
-
