@@ -47,30 +47,6 @@ int Tetris_GetSquareHeight();
 typedef Futile::Boost::shared_ptr<Game> GamePtr;
 
 
-void MainWindow::onTimerEvent()
-{
-    try
-    {
-        timerEvent();
-    }
-    catch (const std::exception & exc)
-    {
-        LogError(exc.what());
-    }
-}
-
-
-void MainWindow::timerEvent()
-{
-    // We already know about the GameOver event.
-    // No longer interested.
-    if (mGameOver)
-    {
-        return;
-    }
-}
-
-
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     mTetrisWidgetHolder(0),
@@ -118,10 +94,6 @@ MainWindow::MainWindow(QWidget *parent) :
         Logger::Instance().setLogHandler(boost::bind(&MainWindow::logMessage, this, _1));
         LogInfo(Poco::Path::current());
     }
-
-    QTimer * timer(new QTimer(this));
-    connect(timer, SIGNAL(timeout()), this, SLOT(onTimerEvent()));
-    timer->start(500);
 
     onNewComputerVsComputerGame();
 }

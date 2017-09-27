@@ -48,8 +48,6 @@ private slots:
 
     void onPenalty();
 
-    void onTimerEvent();
-
 private:
     friend class Futile::Singleton<MainWindow>;
 
@@ -58,8 +56,6 @@ private:
     ~MainWindow();
 
     void onNewGame(const Tetris::PlayerTypes & inPlayerTypes);
-
-    void timerEvent();
 
 private:
     typedef std::vector<TetrisWidget *> TetrisWidgets;

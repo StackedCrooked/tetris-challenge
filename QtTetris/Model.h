@@ -41,7 +41,7 @@ private:
 
     Model();
 
-    ~Model();
+    virtual ~Model();
 
     std::string GetHumanPlayerName();
 
