@@ -30,7 +30,7 @@ Futile_Enum(WorkerStatus, 5, ( \
     WorkerStatus_Scheduled,    \
     WorkerStatus_Working,      \
     WorkerStatus_FinishedOne   \
-));
+))
 
 
 /**

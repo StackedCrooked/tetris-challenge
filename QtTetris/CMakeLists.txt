@@ -11,9 +11,9 @@ find_package(Boost COMPONENTS system thread REQUIRED)
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 link_directories(${Boost_LIBRARY_DIR})
 
-get_target_property(QtCore_location Qt5::Core LOCATION)
-get_target_property(QtWidgets Qt5::Widgets LOCATION)
-get_target_property(QtGui_location Qt5::Gui LOCATION)
+#get_target_property(QtCore_location Qt5::Core LOCATION)
+#get_target_property(QtWidgets Qt5::Widgets LOCATION)
+#get_target_property(QtGui_location Qt5::Gui LOCATION)
 
 include_directories(SYSTEM ${Qt5Widgets_INCLUDE_DIRS})
 include_directories(SYSTEM ${Qt5Core_INCLUDE_DIRS})

@@ -39,7 +39,7 @@ void SetThreadName(DWORD inThreadId, const std::string & inThreadName)
     }
 }
 #else
-#define SetThreadName(...)
+#define SetThreadName(thread_id, thread_name)
 #endif
 
 
