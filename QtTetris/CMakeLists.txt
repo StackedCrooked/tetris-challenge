@@ -30,7 +30,7 @@ include_directories(SYSTEM ${Qt5Widgets_INCLUDE_DIRS})
 
 
 #
-# Use boost_system and boost_thread
+# Use Boost System and Thread libraries
 #
 set(Boost_USE_STATIC_LIBS ON)
 find_package(Boost COMPONENTS system thread REQUIRED)
@@ -38,6 +38,9 @@ include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 link_directories(${Boost_LIBRARY_DIR})
 
 
+#
+# Use Poco Foundation
+#
 set(Poco_USE_STATIC_LIBS ON)
 find_package(Poco COMPONENTS Foundation REQUIRED)
 include_directories(SYSTEM ${Poco_INCLUDE_DIR})
@@ -70,6 +73,4 @@ target_link_libraries(QtTetris
     Qt5::Gui
     Qt5::Widgets
     PocoFoundation
-    Futile
-    Tetris
     ${Boost_LIBRARIES})
