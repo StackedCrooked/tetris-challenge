@@ -6,9 +6,9 @@ which qmake || {
     exit 1
 }
 
-rm -rf build && mkdir build
-(cd build && cmake .. && make -j8)
+rm -rf Build && mkdir Build
+(cd Build && cmake .. && make -j8)
 
-[ -f build/QtTetris/QtTetris ] && {
-    echo "Build succeeded: build/QtTetris/QtTetris"
+[ -f Build/QtTetris/QtTetris ] && {
+    echo "Build succeeded: Build/QtTetris/QtTetris"
 }
