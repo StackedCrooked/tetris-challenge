@@ -1,7 +1,6 @@
 include_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/Futile/include
 )
-
 
 add_library(Futile
     include/Futile/Allocator.h

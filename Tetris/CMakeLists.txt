@@ -1,6 +1,6 @@
 include_directories(
-    ${PROJECT_SOURCE_DIR}/Futile/include
-    ${PROJECT_SOURCE_DIR}/Tetris/include
+    ${CMAKE_SOURCE_DIR}/Futile/include
+    ${CMAKE_SOURCE_DIR}/Tetris/include
 )
 
 

@@ -1,31 +1,51 @@
 cmake_minimum_required(VERSION 2.6)
 project(QtTetris)
 
+
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O2 -march=native -Wall -pedantic -Wno-sign-compare")
 
 
+#
+# Use QtCore
+#
 find_package(Qt5Core)
-find_package(Qt5Gui)
-find_package(Qt5Widgets)
 add_definitions(${Qt5Core_DEFINITIONS})
-add_definitions(${Qt5Gui_DEFINITIONS})
-add_definitions(${Qt5Widgets_DEFINITIONS})
 include_directories(SYSTEM ${Qt5Core_INCLUDE_DIRS})
+
+
+#
+# Use QtGui
+#
+find_package(Qt5Gui)
+add_definitions(${Qt5Gui_DEFINITIONS})
 include_directories(SYSTEM ${Qt5Gui_INCLUDE_DIRS})
+
+
+#
+# Use QtWidgets
+#
+find_package(Qt5Widgets)
+add_definitions(${Qt5Widgets_DEFINITIONS})
 include_directories(SYSTEM ${Qt5Widgets_INCLUDE_DIRS})
 
 
-# Using boost_system and boost_thread
+#
+# Use boost_system and boost_thread
+#
 set(Boost_USE_STATIC_LIBS ON)
 find_package(Boost COMPONENTS system thread REQUIRED)
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 link_directories(${Boost_LIBRARY_DIR})
 
 
-include_directories(../Futile/include)
-include_directories(../Tetris/include)
+#
+# Depend on Futile and Tetris
+#
+include_directories(
+    ${CMAKE_SOURCE_DIR}/Futile/include
+    ${CMAKE_SOURCE_DIR}/Tetris/include)
 
 
 add_executable(QtTetris
@@ -49,4 +69,3 @@ target_link_libraries(QtTetris
     Futile
     Tetris
     ${Boost_LIBRARIES})
-
