@@ -5,7 +5,7 @@ set -e
 # Check if Qt is installed 
 #
 which qmake || {
-    printf "$(basename "$0"): *** qmake not found using your PATH. Please install Qt and update your PATH if necessary.\n" 1>&2
+    printf "$(basename "$0"): *** qmake not found in your PATH. Please install Qt and update your PATH if necessary.\n" 1>&2
     exit 1
 }
 
