@@ -1,4 +1,11 @@
 #!/bin/sh
+
+# If Qt is not installed 
+which qmake || {
+    printf "$(basename "$0"): *** qmake not found using your PATH. Please install Qt and update your PATH if necessary.\n" 1>&2
+    exit 1
+}
+
 rm -rf build && mkdir build
 (cd build && cmake .. && make -j8)
 
