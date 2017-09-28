@@ -1,8 +1,7 @@
 include_directories(
-    ../Futile/include
-    ../Tetris/include
-    ../3rdPary/Boost
-    ../3rdPary/Poco/Foundation/include)
+    ${PROJECT_SOURCE_DIR}/Futile/include
+    ${PROJECT_SOURCE_DIR}/Tetris/include
+)
 
 
 add_library(Tetris

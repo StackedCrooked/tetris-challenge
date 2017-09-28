@@ -3,7 +3,6 @@ project(QtTetris)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
-set(SOLUTIONDIR "${QtTetris_SOURCE_DIR}/../")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O2 -march=native -Wall -pedantic -Wno-sign-compare")
 
 
@@ -18,11 +17,11 @@ include_directories(SYSTEM ${Qt5Gui_INCLUDE_DIRS})
 include_directories(SYSTEM ${Qt5Widgets_INCLUDE_DIRS})
 
 
-# Boost: system and thread
+# Using boost_system and boost_thread
+set(Boost_USE_STATIC_LIBS ON)
 find_package(Boost COMPONENTS system thread REQUIRED)
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 link_directories(${Boost_LIBRARY_DIR})
-
 
 
 include_directories(../Futile/include)

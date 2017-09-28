@@ -1,7 +1,6 @@
 include_directories(
-    ../Futile/include
-    ../3rdPary/Boost
-    ../3rdPary/Poco/Foundation/include)
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
 
 
 add_library(Futile
