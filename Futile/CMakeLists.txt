@@ -24,7 +24,6 @@ add_library(Futile
     include/Futile/TypedWrapper.h
     include/Futile/Worker.h
     include/Futile/WorkerPool.h
-    src/Enum.cpp
     src/LeakDetector.cpp
     src/Logger.cpp
     src/Logging.cpp
