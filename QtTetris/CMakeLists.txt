@@ -3,44 +3,36 @@ project(QtTetris)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
+set(SOLUTIONDIR "${QtTetris_SOURCE_DIR}/../")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O2 -march=native -Wall -pedantic -Wno-sign-compare")
+
+
 find_package(Qt5Widgets)
+include_directories(SYSTEM ${Qt5Widgets_INCLUDE_DIRS})
+add_definitions(${Qt5Widgets_DEFINITIONS})
+
+
 find_package(Qt5Core)
+include_directories(SYSTEM ${Qt5Core_INCLUDE_DIRS})
+add_definitions(${Qt5Core_DEFINITIONS})
+
+
 find_package(Qt5Gui)
+include_directories(SYSTEM ${Qt5Gui_INCLUDE_DIRS})
+add_definitions(${Qt5Gui_DEFINITIONS})
+
 
 find_package(Boost COMPONENTS system thread REQUIRED)
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 link_directories(${Boost_LIBRARY_DIR})
 
-#get_target_property(QtCore_location Qt5::Core LOCATION)
-#get_target_property(QtWidgets Qt5::Widgets LOCATION)
-#get_target_property(QtGui_location Qt5::Gui LOCATION)
-
-include_directories(SYSTEM ${Qt5Widgets_INCLUDE_DIRS})
-include_directories(SYSTEM ${Qt5Core_INCLUDE_DIRS})
-include_directories(SYSTEM ${Qt5Gui_INCLUDE_DIRS})
 
 
-add_definitions(${Qt5Widgets_DEFINITIONS})
-add_definitions(${Qt5Core_DEFINITIONS})
-add_definitions(${Qt5Gui_DEFINITIONS})
-
-
-
-
-set(SOLUTIONDIR "${QtTetris_SOURCE_DIR}/../")
-set(BUILD_ROOT ${SOLUTIONDIR}Build/)
-
-
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${BUILD_ROOT}lib/)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BUILD_ROOT}bin/)
-
-
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O2 -march=native -Wall -pedantic -Wno-sign-compare")
 
 
 include_directories(${SOLUTIONDIR}/Futile/include)
 include_directories(${SOLUTIONDIR}/Tetris/include)
+
 
 set(QtTetris_SOURCES
     ${SOLUTIONDIR}/Tetris/src/AbstractWidget.cpp
@@ -79,24 +71,11 @@ set(QtTetris_SOURCES
     QtMainThread.cpp)
 
 
-#
-# QtTetris header files
-#
-
-set(QtTetris_HEADERS MainWindow.h TetrisWidget.h NewGameDialog.h)
-
-
-#
-# Platform specific options for the creation of the executable
-#
-if(APPLE)
-    set(EXECUTABLE_OPTIONS MACOSX_BUNDLE)
-else()
-    set(EXECUTABLE_OPTIONS "")
-endif()
-
-
-add_executable(QtTetris ${QtTetris_SOURCES} ${QtTetris_HEADERS_MOC} QtTetris.qrc)
+add_executable(
+    QtTetris
+    ${QtTetris_SOURCES}
+    QtTetris.qrc
+)
 
 
 target_link_libraries(QtTetris
