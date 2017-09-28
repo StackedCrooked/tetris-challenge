@@ -56,7 +56,6 @@ include_directories(
 
 
 add_executable(QtTetris
-    ${QtTetris_SOURCES}
     main.cpp
     MainWindow.cpp
     Model.cpp
