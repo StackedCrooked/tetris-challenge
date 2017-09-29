@@ -18,7 +18,7 @@ mkdir Build
 cd Build
 cmake ..
 make -j10
-echo "=> Created binary: Build/Tetris/testing/TetrisTest"
+Tetris/testing/TetrisTest
 echo "=> Created binary: Build/QtTetris/QtTetris"
 
 
