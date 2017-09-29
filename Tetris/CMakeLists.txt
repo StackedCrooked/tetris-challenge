@@ -1,7 +1,6 @@
 include_directories(
     ${CMAKE_SOURCE_DIR}/Futile/include
-    ${CMAKE_SOURCE_DIR}/Tetris/include
-)
+    ${CMAKE_SOURCE_DIR}/Tetris/include)
 
 
 add_library(Tetris

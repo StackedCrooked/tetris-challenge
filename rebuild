@@ -14,6 +14,7 @@ which qmake || {
 # Build QtTetris first
 #
 rm -rf Build && mkdir Build && cd Build && cmake .. && make -j10 
+echo "=> Created binary: Build/Tetris/testing/TetrisTest"
 echo "=> Created binary: Build/QtTetris/QtTetris"
 
 
