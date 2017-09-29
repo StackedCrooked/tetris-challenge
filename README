@@ -1,0 +1,5 @@
+Building the application:
+    ./rebuild
+
+Running the application:
+    ./Build/QtTetris/QtTetris
