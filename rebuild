@@ -1,34 +1,16 @@
 #!/bin/sh
 set -e
 
-#
-# Check if Qt is installed 
-#
-which qmake || {
-    printf "$(basename "$0"): *** qmake not found in your PATH. Please install Qt and update your PATH if necessary.\n" 1>&2
-    exit 1
-}
-
-
-#
-# Build QtTetris first
-#
 rm -rf Build
 mkdir Build
 cd Build
 cmake ..
 make -j10
+
+
+# Run the unit tests
 Tetris/testing/TetrisTest
-echo "=> Created binary: Build/QtTetris/QtTetris"
 
 
-#
-# Create MacOS bundle
-#
-cd QtTetris
-rm -rf QtTetris.app
-mkdir -p QtTetris.app/Contents/Frameworks QtTetris.app/Contents/Resources QtTetris.app/Contents/MacOS
-cp ../../Tetris/res/Tetris.icns QtTetris.app/Contents/Resources/Tetris.icns
-/usr/libexec/PlistBuddy  -c "Add :CFBundleIconFile string Tetris" QtTetris.app/Contents/Info.plist >/dev/null
-cp QtTetris QtTetris.app/Contents/MacOS/
-echo "=> Created bundle: Build/QtTetris/QtTetris.app"
+# Run the application
+#QtTetris/QtTetris
