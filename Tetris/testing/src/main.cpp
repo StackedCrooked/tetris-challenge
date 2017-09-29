@@ -1,9 +1,18 @@
 #include <iostream>
+#include "gtest/gtest.h"
 
 
-int main()
+TEST(TetrisTest, Simple)
 {
-    std::cout << "All tests passed ;)" << std::endl;
+    ASSERT_LT(1, 2);
+    ASSERT_GT(2, 1);
+}
+
+
+int main(int argc, char** argv)
+{
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }
 
 
