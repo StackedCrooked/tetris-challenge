@@ -2,10 +2,45 @@
 #include "gtest/gtest.h"
 
 
-TEST(TetrisTest, Simple)
+TEST(TetrisTest, Benchmark)
 {
-    ASSERT_LT(1, 2);
-    ASSERT_GT(2, 1);
+    ASSERT_TRUE(true);
+}
+
+
+TEST(TetrisTest, ComputerPlayerTest)
+{
+    ASSERT_TRUE(true);
+}
+
+
+TEST(TetrisTest, NodeCalculatorTest)
+{
+    ASSERT_TRUE(true);
+}
+
+
+TEST(TetrisTest, STMTest)
+{
+    ASSERT_TRUE(true);
+}
+
+
+TEST(TetrisTest, TetrisTest)
+{
+    ASSERT_TRUE(true);
+}
+
+
+TEST(TetrisTest, WorkerPoolTest)
+{
+    ASSERT_TRUE(true);
+}
+
+
+TEST(TetrisTest, WorkerTest)
+{
+    ASSERT_TRUE(true);
 }
 
 
@@ -56,4 +91,3 @@ int main(int argc, char **argv)
     return RUN_ALL_TESTS();
 }
 #endif
-
