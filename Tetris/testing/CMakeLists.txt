@@ -9,4 +9,5 @@ add_executable(TetrisTest
 
 
 target_link_libraries(TetrisTest
-    gtest)
+    gtest
+    pthread)
