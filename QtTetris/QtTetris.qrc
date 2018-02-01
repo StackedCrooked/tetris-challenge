@@ -1,5 +1,6 @@
-<RCC>
-    <qresource prefix="/">
+<!DOCTYPE RCC>
+<RCC version="1.0">
+    <qresource>
         <file>resources/avatar/Chopper_80.gif</file>
         <file>resources/avatar/Luffy_80.gif</file>
         <file>resources/avatar/Nami_80.gif</file>
