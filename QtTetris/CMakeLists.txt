@@ -35,15 +35,6 @@ link_directories(${Boost_LIBRARY_DIR})
 
 
 #
-# Use Poco Foundation
-#
-set(Poco_USE_STATIC_LIBS ON)
-find_package(Poco COMPONENTS Foundation REQUIRED)
-include_directories(SYSTEM ${Poco_INCLUDE_DIR})
-link_directories(${Poco_LIBRARY_DIR})
-
-
-#
 # Depend on Futile and Tetris
 #
 include_directories(
