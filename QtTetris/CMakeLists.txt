@@ -2,10 +2,6 @@ cmake_minimum_required(VERSION 2.6)
 project(QtTetris)
 
 
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
-
-
 #
 # Use QtCore
 #
@@ -56,7 +52,13 @@ include_directories(
     ${CMAKE_SOURCE_DIR}/Tetris/include)
 
 
+qt5_wrap_cpp(MocFiles MainWindow.h TetrisWidget.h NewGameDialog.h)
+qt5_add_resources(QtResources QtTetris.qrc)
+
+
 add_executable(QtTetris
+    ${MocFiles}
+    ${QtResources}
     main.cpp
     MainWindow.cpp
     Model.cpp
