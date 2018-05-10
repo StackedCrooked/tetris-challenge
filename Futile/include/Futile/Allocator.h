@@ -92,7 +92,7 @@ public:
 
     ~Allocator_New();
 
-    void swap(const Allocator_New<T> & rhs);
+    void swap(Allocator_New<T> & rhs);
 
     T & get(std::size_t inIndex);
 
@@ -292,7 +292,7 @@ Allocator_New<T> & Allocator_New<T>::operator=(Allocator_New<T> rhs)
 
 
 template<class T>
-void Allocator_New<T>::swap(const Allocator_New<T> & rhs)
+void Allocator_New<T>::swap(Allocator_New<T> & rhs)
 {
     std::swap(mBuffer, rhs.mBuffer);
     std::swap(mSize, rhs.mSize);
