@@ -77,7 +77,7 @@ MainWindow::MainWindow(QWidget *parent) :
     vbox->addItem(mTetrisWidgetHolder);
     vbox->setAlignment(mTetrisWidgetHolder, Qt::AlignHCenter);
 
-    const std::string cCtrlKey = "Ctrl-N";
+    const std::string cCtrlKey = (Poco::Environment::osName() == "Darwin") ? "Command-N" : "Ctrl-N";
     vbox->addWidget(new QLabel(std::string("Press " + cCtrlKey + " to start a new game.").c_str()));
     mTetrisWidgetHolder->setSpacing(mSpacing);
     while (mTetrisWidgets.size() < 2)
