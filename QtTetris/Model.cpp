@@ -106,15 +106,9 @@ const Evaluator & Model::updateAIParameters(const Player & inPlayer,
     // Tactics adjustment
     if (currentHeight < 8)
     {
-        outSearchDepth = 6;
-        outSearchWidth = 6;
+        outSearchDepth = 20;
+        outSearchWidth = 2;
         return MakeTetrises::Instance();
-    }
-    else if (currentHeight < 14)
-    {
-        outSearchDepth = 5;
-        outSearchWidth = 5;
-        return Multiplayer::Instance();
     }
     else
     {
