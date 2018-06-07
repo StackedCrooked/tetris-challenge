@@ -1,11 +1,14 @@
 Make sure Qt is available:
     qmake --help
 
+
 Building the application:
     ./rebuild
 
+
 Running the application:
     ./Build/QtTetris/QtTetris
+
 
 Running the unit tests:
     ./Build/Tetris/testing/TetrisTest
