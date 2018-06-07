@@ -3,7 +3,6 @@
 #include "Tetris/BlockMover.h"
 #include "Tetris/ComputerPlayer.h"
 #include "Tetris/GameImpl.h"
-#include "Poco/Path.h"
 #include "Tetris/Utilities.h"
 #include "Futile/Assert.h"
 #include "Futile/AutoPtrSupport.h"
@@ -11,7 +10,6 @@
 #include "Futile/Logger.h"
 #include "Futile/Logging.h"
 #include "Futile/MakeString.h"
-#include "Poco/Environment.h"
 #include <QAction>
 #include <QLabel>
 #include <QLayout>
@@ -77,8 +75,7 @@ MainWindow::MainWindow(QWidget *parent) :
     vbox->addItem(mTetrisWidgetHolder);
     vbox->setAlignment(mTetrisWidgetHolder, Qt::AlignHCenter);
 
-    const std::string cCtrlKey = (Poco::Environment::osName() == "Darwin") ? "Command-N" : "Ctrl-N";
-    vbox->addWidget(new QLabel(std::string("Press " + cCtrlKey + " to start a new game.").c_str()));
+    vbox->addWidget(new QLabel("Press Ctrl-N to start a new game."));
     mTetrisWidgetHolder->setSpacing(mSpacing);
     while (mTetrisWidgets.size() < 2)
     {
@@ -92,7 +89,6 @@ MainWindow::MainWindow(QWidget *parent) :
         mLogField->setReadOnly(true);
         vbox->addWidget(mLogField, 1);
         Logger::Instance().setLogHandler(boost::bind(&MainWindow::logMessage, this, _1));
-        LogInfo(Poco::Path::current());
     }
 
     onNewComputerVsComputerGame();
