@@ -34,7 +34,6 @@ add_library(Tetris
     include/Tetris/PlayerType.h
     include/Tetris/SingleThreadedNodeCalculator.h
     include/Tetris/Tetris.h
-    include/Tetris/Unicode.h
     include/Tetris/Utilities.h
     src/AbstractWidget.cpp
     src/AISupport.cpp
@@ -56,4 +55,4 @@ add_library(Tetris
     src/NodeCalculatorImpl.cpp
     src/Player.cpp
     src/SingleThreadedNodeCalculator.cpp
-    src/Unicode.cpp)
+)
