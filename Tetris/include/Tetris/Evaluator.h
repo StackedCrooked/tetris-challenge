@@ -56,7 +56,7 @@ public:
     int recommendedSearchWidth() const;
 
 protected:
-    ~Evaluator() {}
+    virtual ~Evaluator() {}
 
     Evaluator(const std::string & inName,
               GameHeightFactor inGameHeightFactor,
@@ -99,7 +99,7 @@ protected:
                     SearchDepth inRecommendedSearchDepth,
                     SearchWidth inRecommendedSearchWidth);
 
-    ~CustomEvaluator() {}
+    virtual ~CustomEvaluator() {}
 };
 
 
@@ -137,7 +137,7 @@ protected:
     {
     }
 
-    ~ConcreteEvaluator() {}
+    virtual ~ConcreteEvaluator() {}
 };
 
 
@@ -148,7 +148,7 @@ protected:
     friend class ConcreteEvaluator<Balanced>;
 
     Balanced();
-    ~Balanced() {}
+    virtual ~Balanced() {}
 };
 
 
@@ -159,7 +159,7 @@ protected:
     friend class ConcreteEvaluator<Survival>;
 
     Survival();
-    ~Survival() {}
+    virtual ~Survival() {}
 };
 
 
@@ -173,7 +173,7 @@ protected:
     friend class ConcreteEvaluator<MakeTetrises>;
 
     MakeTetrises();
-    ~MakeTetrises() {}
+    virtual ~MakeTetrises() {}
 };
 
 
@@ -184,7 +184,7 @@ protected:
     friend class ConcreteEvaluator<Multiplayer>;
 
     Multiplayer();
-    ~Multiplayer() {}
+    virtual ~Multiplayer() {}
 };
 
 
@@ -195,7 +195,7 @@ protected:
     friend class ConcreteEvaluator<Depressed>;
 
     Depressed();
-    ~Depressed() {}
+    virtual ~Depressed() {}
 };
 
 
