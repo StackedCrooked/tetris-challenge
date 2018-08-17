@@ -17,14 +17,14 @@
 #include <boost/scoped_ptr.hpp>
 
 
-class MainWindow : public QMainWindow,
-                   public Futile::Singleton<MainWindow>
+class MainWindow final :
+    public QMainWindow,
+    public Futile::Singleton<MainWindow>
 {
     Q_OBJECT
 
 public:
-
-    virtual bool event(QEvent * inEvent);
+    virtual bool event(QEvent* inEvent) override;
 
     void logMessage(const std::string & inMessage);
 

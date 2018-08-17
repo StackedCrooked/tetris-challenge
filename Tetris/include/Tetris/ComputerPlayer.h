@@ -39,6 +39,8 @@ public:
                                                      int & outWorkerCount,
                                                      int & outMoveSpeed,
                                                      BlockMover::MoveDownBehavior & outMoveDownBehavior) = 0;
+    protected:
+        ~Tweaker() {}
     };
 
     ComputerPlayer(const TeamName & inTeamName,
