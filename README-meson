@@ -1,0 +1,11 @@
+Building with meson
+-------------------
+
+
+# Setting LD_LIBRARY_PATH for Qt fixes some linker errors.
+# See also: https://stackoverflow.com/questions/29455836/linkage-against-libqt5core
+# TODO: figure out how to avoid needing this
+export LD_LIBRARY_PATH="/home/francis/Qt5.9.3/5.9.3/gcc_64/lib:$LD_LIBRARY_PATH"
+
+rm -rf Build; mkdir Build; meson Build
+(cd Build && ninja)

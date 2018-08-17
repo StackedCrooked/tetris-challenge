@@ -1,0 +1,10 @@
+#!/bin/sh
+set -e
+
+rm -rf Build
+mkdir Build
+meson Build
+
+cd Build
+ninja 
+
