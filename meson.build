@@ -1,8 +1,7 @@
 project(
     'QtTetris',
     'cpp',
-    default_options: [ 'cpp_std=c++11' ],
-    extra_args: [ '-Winconsistent-missing-override' ]
+    default_options: [ 'cpp_std=c++11' ]
 )
 
 
