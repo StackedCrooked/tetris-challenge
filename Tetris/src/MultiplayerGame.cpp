@@ -13,8 +13,9 @@
 namespace Tetris {
 
 
-struct MultiplayerGame::Impl : public Game::EventHandler,
-                               boost::noncopyable
+struct MultiplayerGame::Impl final :
+    Game::EventHandler,
+    boost::noncopyable
 {
     Impl(std::size_t inRowCount, std::size_t inColumnCount) :
         mRowCount(inRowCount),
@@ -22,10 +23,7 @@ struct MultiplayerGame::Impl : public Game::EventHandler,
     {
     }
 
-    ~Impl()
-    {
-    }
-
+    virtual ~Impl() { }
 
     virtual void onGameStateChanged(Game * )
     {
