@@ -77,7 +77,7 @@ private:
 public:
 
     SmartPointer(MemoryPool<Value> & inMemoryPool) :
-        Base(NULL),
+        Base(nullptr),
         mMemoryPool(&inMemoryPool)
     {
     }
@@ -190,8 +190,8 @@ public:
     typedef ValueType Value;
 
     SharedPtr(MemoryPool<Value> & inMemoryPool) :
-        Base(inMemoryPool, NULL),
-        mValueWithRefCount(new ValueWithRefCount(NULL))
+        Base(inMemoryPool, nullptr),
+        mValueWithRefCount(new ValueWithRefCount(nullptr))
     {
     }
 
@@ -315,7 +315,7 @@ public:
         mData(sizeof(Value) * inItemCount),
         mItems(),
         mUsedItems(),
-        mFreeItems(inItemCount, NULL)
+        mFreeItems(inItemCount)
     {
         for (std::size_t idx = 0; idx < inItemCount; ++idx)
         {
