@@ -27,18 +27,17 @@ poco_dep = [
 ]
 
 
-
 qt5 = import('qt5')
-qt5_dep = dependency('qt5', modules: ['Core', 'Gui', 'Widgets'])
+qt5_dep = dependency(
+    'qt5',
+    modules: ['Core', 'Gui', 'Widgets']
+)
 
 moc_files = qt5.preprocess(
     moc_headers: [
         'QtTetris/MainWindow.h',
         'QtTetris/NewGameDialog.h',
         'QtTetris/TetrisWidget.h'
-    ],
-    moc_extra_arguments: [
-        '-DMAKES_MY_MOC_HEADER_COMPILE'
     ],
     include_directories: inc
 )
@@ -79,6 +78,7 @@ executable('QtTetris',
     'Tetris/src/Player.cpp',
     'Tetris/src/SingleThreadedNodeCalculator.cpp',
     'Tetris/src/Unicode.cpp',
+    moc_files,
     include_directories : inc,
     dependencies: [
         qt5_dep,
