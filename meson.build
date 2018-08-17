@@ -83,5 +83,6 @@ executable('QtTetris',
         qt5_dep,
         poco_dep,
         boost_dep
-    ]
+    ],
+    cpp_pch : ['pch/pch.h']
 )
