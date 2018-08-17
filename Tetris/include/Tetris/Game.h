@@ -45,6 +45,9 @@ public:
 
         virtual void onLinesCleared(Game * inGame, int inLineCount) = 0;
 
+    protected:
+        ~EventHandler(){}
+
     private:
         EventHandler(const EventHandler&);
         EventHandler& operator=(const EventHandler&);

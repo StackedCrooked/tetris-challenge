@@ -56,6 +56,8 @@ public:
     int recommendedSearchWidth() const;
 
 protected:
+    ~Evaluator(){}
+
     Evaluator(const std::string & inName,
               GameHeightFactor inGameHeightFactor,
               LastBlockHeightFactor inLastBlockHeightFactor,
