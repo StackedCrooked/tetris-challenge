@@ -42,6 +42,7 @@ moc_files = qt5.preprocess(
 )
 
 
+
 executable('QtTetris',
     'Futile/src/LeakDetector.cpp',
     'Futile/src/Logger.cpp',
@@ -76,9 +77,8 @@ executable('QtTetris',
     'Tetris/src/NodeCalculatorImpl.cpp',
     'Tetris/src/Player.cpp',
     'Tetris/src/SingleThreadedNodeCalculator.cpp',
-    'Tetris/src/Unicode.cpp',
     moc_files,
-    include_directories : inc,
+    include_directories: inc,
     dependencies: [
         qt5_dep,
         poco_dep,
