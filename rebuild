@@ -1,9 +1,0 @@
-#!/bin/sh
-set -e
-
-rm -rf Build
-mkdir Build
-cd Build
-cmake ..
-make -j8
-

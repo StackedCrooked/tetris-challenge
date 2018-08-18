@@ -2,10 +2,10 @@
 set -e
 
 export CXXFLAGS=" -Wno-inconsistent-missing-override $CXXFLAGS"
-rm -rf Build
-mkdir Build
-meson Build
+rm -rf Build-meson
+mkdir Build-meson
+meson Build-meson
 
-cd Build
+cd Build-meson
 ninja 
 
