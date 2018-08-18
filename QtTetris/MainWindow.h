@@ -29,7 +29,7 @@ public:
     void logMessage(const std::string & inMessage);
 
 protected:
-    void closeEvent(QCloseEvent*);
+    void closeEvent(QCloseEvent*) override;
 
 private slots:
     void onNew();
