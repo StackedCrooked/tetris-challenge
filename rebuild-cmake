@@ -5,5 +5,5 @@ rm -rf Build-cmake
 mkdir Build-cmake
 cd Build-cmake
 cmake ..
-make -j8
+make -j10 "$@"
 
