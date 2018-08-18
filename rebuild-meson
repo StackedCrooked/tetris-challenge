@@ -1,6 +1,7 @@
 #!/bin/sh
 set -e
 
+export CXXFLAGS=" -Wno-inconsistent-missing-override $CXXFLAGS"
 rm -rf Build
 mkdir Build
 meson Build
