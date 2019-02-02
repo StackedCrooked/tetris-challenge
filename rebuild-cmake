@@ -3,12 +3,14 @@ set -e
 
 rm -rf Build-cmake
 mkdir Build-cmake
-
 cd Build-cmake
 
+
+# Install the conan dependencies.
 MAKEFLAGS=${MAKEFLAGS:--j7} conan install .. --build=missing 
 cmake ..
-make VERBOSE=1 -j7
+make -j7
+
 
 # HACK:
 # The binary needs to know where to find the Qt libs.
@@ -17,6 +19,7 @@ make VERBOSE=1 -j7
 QT_LIB_DIR="$(dirname "$(dirname $(which moc))")/lib"
 install_name_tool -add_rpath $QT_LIB_DIR bin/QtTetris
 
+
 # Run the unit tests 
-Build-cmake/bin/TetrisTest
+./bin/TetrisTest
 
