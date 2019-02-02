@@ -1,9 +1,12 @@
 cmake_minimum_required(VERSION 3.0)
+set(CONAN_SYSTEM_INCLUDES ON)
 
 
-# Global g++ flags:
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O2 -march=native -Wall -pedantic -Wno-sign-compare -Wno-deprecated-declarations")
-set(CMAKE_LD_FLAGS "${CMAKE_LD_FLAGS} -pthread")
+add_definitions("-std=c++11 -Wall -Wextra -pedantic-errors")
+
+include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+conan_basic_setup(KEEP_RPATHS)
+conan_basic_setup()
 
 
 add_subdirectory(3rdParty/gtest)

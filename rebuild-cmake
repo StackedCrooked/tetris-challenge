@@ -1,9 +1,17 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 
 rm -rf Build-cmake
 mkdir Build-cmake
 cd Build-cmake
+conan install .. --build=missing
 cmake ..
-make -j10 "$@"
+make VERBOSE=1 -j7
+
+# FR: Setting rpath so that the executable knows where to find the Qt libs
+QT_LIB_DIR="$(dirname $(dirname $(which moc)))/lib"
+install_name_tool -add_rpath $QT_LIB_DIR bin/QtTetris
+
+# Remove this
+bin/QtTetris
 
