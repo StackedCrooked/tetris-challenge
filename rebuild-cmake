@@ -8,7 +8,7 @@ cd Build-cmake
 
 # Install the conan dependencies.
 MAKEFLAGS=${MAKEFLAGS:--j7} conan install .. --build=missing 
-cmake ..
+cmake .. -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
 make -j7
 
 
