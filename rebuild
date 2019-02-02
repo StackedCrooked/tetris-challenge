@@ -1,9 +1,9 @@
 #!/bin/bash
 set -e
 
-rm -rf Build-cmake
-mkdir Build-cmake
-cd Build-cmake
+rm -rf Build
+mkdir Build
+cd Build
 
 
 # Install the conan dependencies.
