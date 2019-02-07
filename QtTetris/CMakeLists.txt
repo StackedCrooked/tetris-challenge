@@ -50,9 +50,4 @@ add_executable(QtTetris
 
 
 target_link_libraries(QtTetris
-    Tetris
-    Futile
-    Qt5::Core
-    Qt5::Gui
-    Qt5::Widgets
-    ${CONAN_LIBS})
+    PRIVATE Tetris Qt5::Core Qt5::Gui Qt5::Widgets ${CONAN_LIBS})

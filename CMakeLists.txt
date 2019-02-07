@@ -9,7 +9,7 @@ conan_basic_setup()
 
 
 add_subdirectory(3rdParty/gtest)
-add_subdirectory(Futile)
 add_subdirectory(Tetris)
+add_subdirectory(Futile)
 add_subdirectory(Tetris/testing)
 add_subdirectory(QtTetris)

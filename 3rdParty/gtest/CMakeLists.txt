@@ -1,7 +1,4 @@
-include_directories(
-    ${CMAKE_SOURCE_DIR}/3rdParty/gtest/include
-    ${CMAKE_SOURCE_DIR}/3rdParty/gtest
-)
-
-add_library(gtest
+add_library(GTest
     src/gtest-all.cc)
+
+target_include_directories(GTest PUBLIC include PRIVATE "")

@@ -1,6 +1,3 @@
-include_directories(
-    ${CMAKE_SOURCE_DIR}/Futile/include
-)
 
 add_library(Futile
     include/Futile/Allocator.h
@@ -32,3 +29,5 @@ add_library(Futile
     src/Worker.cpp
     src/WorkerPool.cpp
 )
+
+target_include_directories(Futile PUBLIC include PRIVATE src)

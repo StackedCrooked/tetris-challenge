@@ -1,7 +1,3 @@
-include_directories(
-    ${CMAKE_SOURCE_DIR}/Futile/include
-    ${CMAKE_SOURCE_DIR}/Tetris/include)
-
 
 add_library(Tetris
     include/Tetris/AbstractWidget.h
@@ -54,5 +50,7 @@ add_library(Tetris
     src/NodeCalculator.cpp
     src/NodeCalculatorImpl.cpp
     src/Player.cpp
-    src/SingleThreadedNodeCalculator.cpp
-)
+    src/SingleThreadedNodeCalculator.cpp)
+
+target_include_directories(Tetris PUBLIC include PRIVATE src)
+target_link_libraries(Tetris PUBLIC Futile)
