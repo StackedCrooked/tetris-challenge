@@ -1,0 +1,1 @@
+cd Build && make clean
