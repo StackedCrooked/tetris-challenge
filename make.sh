@@ -1,7 +1,10 @@
 #!/bin/bash
 set -e
 
-[ ! -d Build ] && ./configure.sh
+[ ! -d Build ] && {
+    echo "Please run ./configure.sh first" >&1
+    exit 1
+}
 
 cd Build
 make -j7
