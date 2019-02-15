@@ -1,3 +1,5 @@
+find_package(boost)
+find_package(Poco)
 
 add_library(Tetris
     include/Tetris/AbstractWidget.h

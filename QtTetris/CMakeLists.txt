@@ -1,4 +1,6 @@
 project(QtTetris)
+find_package(boost)
+find_package(Poco)
 
 
 #
