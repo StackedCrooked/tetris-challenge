@@ -30,6 +30,5 @@ add_library(Futile
     src/WorkerPool.cpp
 )
 
-target_include_directories(Futile
-    PUBLIC include
-    PRIVATE src)
+target_include_directories(Futile PUBLIC include PRIVATE src)
+target_link_libraries(Futile PRIVATE Poco::Poco boost::boost)

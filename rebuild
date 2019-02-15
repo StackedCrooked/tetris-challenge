@@ -7,19 +7,12 @@ cd Build
 
 
 # Install the conan dependencies.
-MAKEFLAGS=${MAKEFLAGS:--j7} conan install .. --build=missing 
-cmake .. -DCMAKE_CXX_COMPILER_LAUNCHER=ccache 
+MAKEFLAGS="${MAKEFLAGS:--j7}" conan install .. --build=missing 
+cmake .. -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_MODULE_PATH="$(pwd)"
 make -j7 VERBOSE=1
 
 
-# HACK:
-# The binary needs to know where to find the Qt libs.
-# We tell it to find look for the frameworks in the
-# Qt installation directory where we found "moc".
-QT_LIB_DIR="$(dirname "$(dirname "$(which moc)")")/lib"
-install_name_tool -add_rpath $QT_LIB_DIR bin/QtTetris
-
 
 # Run the unit tests 
-./bin/TetrisTest
+Tetris/testing/TetrisTest
 

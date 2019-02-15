@@ -48,4 +48,5 @@ target_link_libraries(QtTetris
     Qt5::Core
     Qt5::Gui
     Qt5::Widgets
-    ${CONAN_LIBS})
+    Poco::Poco
+    boost::boost)

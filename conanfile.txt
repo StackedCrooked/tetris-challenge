@@ -30,4 +30,4 @@ Poco:cxx_14=True
 
 
 [generators]
-cmake
+cmake_find_package
