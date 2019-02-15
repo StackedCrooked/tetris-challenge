@@ -53,4 +53,4 @@ add_library(Tetris
     src/SingleThreadedNodeCalculator.cpp)
 
 target_include_directories(Tetris PUBLIC include PRIVATE src)
-target_link_libraries(Tetris PUBLIC Futile)
+target_link_libraries(Tetris PRIVATE Futile)

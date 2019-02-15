@@ -25,14 +25,6 @@ add_definitions(${Qt5Widgets_DEFINITIONS})
 include_directories(SYSTEM ${Qt5Widgets_INCLUDE_DIRS})
 
 
-#
-# Depend on Futile and Tetris
-#
-include_directories(
-    ${CMAKE_SOURCE_DIR}/Futile/include
-    ${CMAKE_SOURCE_DIR}/Tetris/include)
-
-
 qt5_wrap_cpp(MocFiles MainWindow.h TetrisWidget.h NewGameDialog.h)
 qt5_add_resources(QtResources QtTetris.qrc)
 
@@ -50,4 +42,10 @@ add_executable(QtTetris
 
 
 target_link_libraries(QtTetris
-    PRIVATE Tetris Qt5::Core Qt5::Gui Qt5::Widgets ${CONAN_LIBS})
+    PRIVATE
+    Tetris
+    Futile
+    Qt5::Core
+    Qt5::Gui
+    Qt5::Widgets
+    ${CONAN_LIBS})
