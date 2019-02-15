@@ -140,7 +140,7 @@ protected:
     static void OnChangedImpl(GameImpl * inGame);
     static void OnLinesClearedImpl(GameImpl * inGame, int inLineCount);
 
-    static std::auto_ptr<Block> CreateDefaultBlock(BlockType inBlockType, std::size_t inNumColumns);
+    static std::unique_ptr<Block> CreateDefaultBlock(BlockType inBlockType, std::size_t inNumColumns);
     void reserveBlocks(std::size_t inCount);
     void supplyBlocks();
 

@@ -25,7 +25,7 @@ using Futile::WorkerPool;
 namespace Tetris {
 
 
-NodeCalculatorImpl::NodeCalculatorImpl(std::auto_ptr<GameStateNode> inNode,
+NodeCalculatorImpl::NodeCalculatorImpl(std::unique_ptr<GameStateNode> inNode,
                                        const BlockTypes & inBlockTypes,
                                        const std::vector<int> & inWidths,
                                        const Evaluator & inEvaluator,

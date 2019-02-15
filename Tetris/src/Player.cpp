@@ -40,13 +40,13 @@ struct Player::Impl
 };
 
 
-std::auto_ptr<Player> Player::Create(PlayerType inPlayerType,
+std::unique_ptr<Player> Player::Create(PlayerType inPlayerType,
                                      const TeamName & inTeamName,
                                      const PlayerName & inPlayerName,
                                      std::size_t inRowCount,
                                      std::size_t inColumnCount)
 {
-    std::auto_ptr<Player> result;
+    std::unique_ptr<Player> result;
     if (inPlayerType == Computer)
     {
         result.reset(new ComputerPlayer(inTeamName, inPlayerName, inRowCount, inColumnCount));

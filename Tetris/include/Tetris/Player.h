@@ -21,7 +21,7 @@ Futile_TypedWrapper(PlayerName, std::string);
 class Player
 {
 public:
-    static std::auto_ptr<Player> Create(PlayerType inPlayerType,
+    static std::unique_ptr<Player> Create(PlayerType inPlayerType,
                                         const TeamName & inTeamName,
                                         const PlayerName & inPlayerName,
                                         std::size_t inRowCount,

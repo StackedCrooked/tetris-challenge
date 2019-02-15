@@ -20,12 +20,12 @@ using Futile::WorkerPool;
 namespace Tetris {
 
 
-SingleThreadedNodeCalculator::SingleThreadedNodeCalculator(std::auto_ptr<GameStateNode> inNode,
+SingleThreadedNodeCalculator::SingleThreadedNodeCalculator(std::unique_ptr<GameStateNode> inNode,
                                                            const BlockTypes & inBlockTypes,
                                                            const std::vector<int> & inWidths,
                                                            const Evaluator & inEvaluator,
                                                            WorkerPool & inWorkerPool) :
-    NodeCalculatorImpl(inNode, inBlockTypes, inWidths, inEvaluator, inWorkerPool)
+    NodeCalculatorImpl(std::move(inNode), inBlockTypes, inWidths, inEvaluator, inWorkerPool)
 {
 }
 

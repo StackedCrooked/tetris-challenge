@@ -54,9 +54,9 @@ struct GameStateNode::Impl
 };
 
 
-std::auto_ptr<GameStateNode> GameStateNode::CreateRootNode(std::size_t inNumRows, std::size_t inNumColumns)
+std::unique_ptr<GameStateNode> GameStateNode::CreateRootNode(std::size_t inNumRows, std::size_t inNumColumns)
 {
-    return std::auto_ptr<GameStateNode>(new GameStateNode(
+    return std::unique_ptr<GameStateNode>(new GameStateNode(
         new GameState(inNumRows, inNumColumns),
         Balanced::Instance()));
 }
@@ -80,10 +80,10 @@ GameStateNode::~GameStateNode()
 }
 
 
-std::auto_ptr<GameStateNode> GameStateNode::clone() const
+std::unique_ptr<GameStateNode> GameStateNode::clone() const
 {
     NodePtr parent = mImpl->mParent.lock();
-    std::auto_ptr<GameStateNode> result(parent ? new GameStateNode(parent, new GameState(mImpl->mEvaluatedGameState->gameState()), mImpl->mEvaluator)
+    std::unique_ptr<GameStateNode> result(parent ? new GameStateNode(parent, new GameState(mImpl->mEvaluatedGameState->gameState()), mImpl->mEvaluator)
                                                : new GameStateNode(new GameState(mImpl->mEvaluatedGameState->gameState()), mImpl->mEvaluator));
     result->mImpl->mDepth = mImpl->mDepth;
 

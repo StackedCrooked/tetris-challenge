@@ -18,7 +18,7 @@ class BlockImpl
 public:
     BlockImpl(BlockType inType, Rotation inRotation, Row inRow, Column inColumn);
 
-    std::auto_ptr<BlockImpl> clone() const;
+    std::unique_ptr<BlockImpl> clone() const;
 
     BlockType type() const;
 
@@ -64,7 +64,7 @@ BlockImpl::BlockImpl(BlockType inType, Rotation inRotation, Row inRow, Column in
 }
 
 
-std::auto_ptr<BlockImpl> BlockImpl::clone() const
+std::unique_ptr<BlockImpl> BlockImpl::clone() const
 {
     return Create<BlockImpl>(*this);
 }

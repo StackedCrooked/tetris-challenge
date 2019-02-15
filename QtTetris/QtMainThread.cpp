@@ -10,9 +10,9 @@ namespace Futile {
 
 
 // Used in MainThread.cpp.
-std::auto_ptr<MainThreadImpl> CreateMainThreadImpl()
+std::unique_ptr<MainThreadImpl> CreateMainThreadImpl()
 {
-    std::auto_ptr<MainThreadImpl> result;
+    std::unique_ptr<MainThreadImpl> result;
     result.reset(new Tetris::QtMainThread);
     return result;
 }

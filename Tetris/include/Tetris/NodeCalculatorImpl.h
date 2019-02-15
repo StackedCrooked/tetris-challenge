@@ -23,7 +23,7 @@ namespace Tetris {
 class NodeCalculatorImpl
 {
 public:
-    NodeCalculatorImpl(std::auto_ptr<GameStateNode> inNode,
+    NodeCalculatorImpl(std::unique_ptr<GameStateNode> inNode,
                        const BlockTypes & inBlockTypes,
                        const std::vector<int> & inWidths,
                        const Evaluator & inEvaluator,

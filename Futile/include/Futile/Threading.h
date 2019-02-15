@@ -103,7 +103,7 @@ class ThreadSafe
 {
 public:
     // Constructor that takes an autoptr object.
-    explicit ThreadSafe(std::auto_ptr<Variable> inVariable) :
+    explicit ThreadSafe(std::unique_ptr<Variable> inVariable) :
         mImpl(new Impl(inVariable))
     {
     }
@@ -153,7 +153,7 @@ private:
 
     struct Impl : boost::noncopyable
     {
-        Impl(std::auto_ptr<Variable> inVariable) :
+        Impl(std::unique_ptr<Variable> inVariable) :
             mVariable(inVariable.release())
         {
             Assert(mVariable);

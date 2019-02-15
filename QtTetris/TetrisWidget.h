@@ -48,7 +48,7 @@ private:
     virtual QSize minimumSizeHint() const;
 
     QSize mMinSize;
-    std::auto_ptr<QPainter> mPainter;
+    std::unique_ptr<QPainter> mPainter;
 
     friend void Futile::InvokeLater(const Futile::Action &);
 

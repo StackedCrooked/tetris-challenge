@@ -8,11 +8,11 @@ namespace Futile {
 
 
 // This function must be defined in platform-specific code (Qt, Win32, Mac OS X, etc...)
-std::auto_ptr<MainThreadImpl> CreateMainThreadImpl();
+std::unique_ptr<MainThreadImpl> CreateMainThreadImpl();
 
 
 MainThread::MainThread() :
-    mImpl(CreateMainThreadImpl())
+    mImpl(CreateMainThreadImpl().release())
 {
 
 }

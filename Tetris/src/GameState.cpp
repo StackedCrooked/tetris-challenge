@@ -226,9 +226,9 @@ const Block & GameState::originalBlock() const
 }
 
 
-std::auto_ptr<GameState> GameState::commit(const Block & inBlock, GameOver inGameOver) const
+std::unique_ptr<GameState> GameState::commit(const Block & inBlock, GameOver inGameOver) const
 {
-    std::auto_ptr<GameState> result(new GameState(*this));
+    std::unique_ptr<GameState> result(new GameState(*this));
     result->mIsGameOver = inGameOver.get();
     result->mTainted = false; // a new generation, a new start
     if (!inGameOver.get())
