@@ -5,12 +5,14 @@
 #
 # TODO: how do use Conan dependencies in a modern way?
 
+
 cmake_minimum_required(VERSION 3.0)
+
+
 set(CONAN_SYSTEM_INCLUDES ON)
 
 
-add_definitions("-std=c++11 -Wall -pedantic-errors -O2 -march=native ")
-
+add_compile_options(-std=c++11 -Wall -pedantic-errors -O2 -march=native)
 
 
 add_subdirectory(3rdParty/gtest)
