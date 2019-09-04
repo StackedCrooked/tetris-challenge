@@ -4,16 +4,13 @@
 #  - Relevant pages: slide 38 to 43
 #
 # TODO: how do use Conan dependencies in a modern way?
-
-
 cmake_minimum_required(VERSION 3.0)
 
+# CMake modules should be searched in the build directory. That's where conan will put them.
+set(CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR})
 
 set(CONAN_SYSTEM_INCLUDES ON)
-
-
 add_compile_options(-std=c++11 -Wall -pedantic-errors -O2 -march=native)
-
 
 add_subdirectory(3rdParty/gtest)
 add_subdirectory(Tetris)
