@@ -6,10 +6,17 @@
 # TODO: how do use Conan dependencies in a modern way?
 cmake_minimum_required(VERSION 3.0)
 
-# CMake modules should be searched in the build directory. That's where conan will put them.
+# CMake modules should be searched in the build directory because that's where conan will put them.
 set(CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR})
 
+# Enable ccache.
+set(CMAKE_CXX_COMPILER_LAUNCHER "ccache")
+
+# Conan libraries will use "-isystem" so they don't generate compiler warnings. 
+# This way we don't get compiler warnings from third party code.
 set(CONAN_SYSTEM_INCLUDES ON)
+
+
 add_compile_options(-std=c++11 -Wall -pedantic-errors -O2 -march=native)
 
 add_subdirectory(3rdParty/gtest)
