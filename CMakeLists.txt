@@ -17,7 +17,7 @@ set(CMAKE_CXX_COMPILER_LAUNCHER "ccache")
 set(CONAN_SYSTEM_INCLUDES ON)
 
 
-add_compile_options(-std=c++11 -Wall -pedantic-errors -O2 -march=native)
+add_compile_options(-std=c++11 -Wall -Wno-sign-compare -pedantic-errors -O2 -march=native)
 
 add_subdirectory(3rdParty/gtest)
 add_subdirectory(Tetris)
