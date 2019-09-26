@@ -1,3 +1,10 @@
+PRESENTATION TODO
+-----------------
+- CMakeFile should specify which boost libraries we want to link against.
+    . Currently we link with all boost libraries.
+    . This is not nice for a demo.
+
+
 TODO
 ----
 - Meson: also build unit tests (we need a realistic demo)
