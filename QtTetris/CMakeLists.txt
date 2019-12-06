@@ -1,29 +1,17 @@
-project(QtTetris)
+#project(QtTetris)
 find_package(boost)
 find_package(Poco)
 
 
-#
-# Use QtCore
-#
+# Using QtCore, QtGui and QtWidgets
 find_package(Qt5Core)
-add_definitions(${Qt5Core_DEFINITIONS})
-include_directories(SYSTEM ${Qt5Core_INCLUDE_DIRS})
-
-
-#
-# Use QtGui
-#
 find_package(Qt5Gui)
-add_definitions(${Qt5Gui_DEFINITIONS})
-include_directories(SYSTEM ${Qt5Gui_INCLUDE_DIRS})
-
-
-#
-# Use QtWidgets
-#
 find_package(Qt5Widgets)
+add_definitions(${Qt5Core_DEFINITIONS})
+add_definitions(${Qt5Gui_DEFINITIONS})
 add_definitions(${Qt5Widgets_DEFINITIONS})
+include_directories(SYSTEM ${Qt5Core_INCLUDE_DIRS})
+include_directories(SYSTEM ${Qt5Gui_INCLUDE_DIRS})
 include_directories(SYSTEM ${Qt5Widgets_INCLUDE_DIRS})
 
 
