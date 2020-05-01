@@ -104,20 +104,39 @@ const Evaluator& Model::updateAIParameters(const Player& inPlayer,
         outMoveDownBehavior = BlockMover::MoveDownBehavior_Drop;
     }
 
+    if (0)
+    {
+        // Tactics adjustment
+        if (currentHeight < 10)
+        {
+            outSearchDepth = 20;
+            outSearchWidth = 4;
+            outMoveSpeed = 60;
+            return Confused::Instance();
+        }
+        else
+        {
+            outSearchDepth = 20;
+            outSearchWidth = 4;
+            outMoveSpeed = 60;
+            return Confused::Instance();
+        }
+    }
+
     // Tactics adjustment
-    if (currentHeight < 10)
+    if (currentHeight < 12)
     {
         outSearchDepth = 20;
-        outSearchWidth = 6;
-        outMoveSpeed = 60;
-        return Confused::Instance();
+        outSearchWidth = 2;
+        outMoveSpeed = 1000;
+        return MakeTetrises::Instance();
     }
     else
     {
-        outSearchDepth = 20;
-        outSearchWidth = 6;
-        outMoveSpeed = 60;
-        return Confused::Instance();
+        outSearchDepth = 6;
+        outSearchWidth = 4;
+        outMoveSpeed = 1000;
+        return Survival::Instance();
     }
 }
 
