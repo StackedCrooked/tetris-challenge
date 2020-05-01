@@ -3,7 +3,6 @@
 #include "Poco/Environment.h"
 #include <algorithm>
 #include <chrono>
-#include <random>
 
 
 namespace Tetris {
@@ -13,16 +12,15 @@ Model::Model() :
     mNames(),
     mNamesIndex(0),
     mCPUCount(Poco::Environment::processorCount()),
-    mGameOver(true)
+    mGameOver(true),
+    mRandomEngine(std::chrono::system_clock::now().time_since_epoch().count())
 {
     mNames.push_back("Zoro");
     mNames.push_back("Luffy");
     mNames.push_back("Nami");
     mNames.push_back("Sanji");
     mNames.push_back("Chopper");
-
-    std::default_random_engine random_engine(std::chrono::system_clock::now().time_since_epoch().count());
-    std::shuffle(mNames.begin(), mNames.end(), random_engine);
+    std::shuffle(mNames.begin(), mNames.end(), mRandomEngine);
 }
 
 
@@ -176,8 +174,7 @@ std::string Model::GetPlayerName(PlayerType)
     if (mNamesIndex >= mNames.size())
     {
         mNamesIndex = 0;
-        std::default_random_engine random_engine(std::chrono::system_clock::now().time_since_epoch().count());
-        std::shuffle(mNames.begin(), mNames.end(), random_engine);
+        std::shuffle(mNames.begin(), mNames.end(), mRandomEngine);
     }
 
     return result;

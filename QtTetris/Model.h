@@ -10,7 +10,7 @@
 #include "Futile/Singleton.h"
 #include <string>
 #include <vector>
-
+#include <random>
 
 namespace Tetris {
 
@@ -53,6 +53,8 @@ private:
 
     int mCPUCount;
     bool mGameOver;
+
+    std::default_random_engine mRandomEngine;
 };
 
 
