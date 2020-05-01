@@ -62,12 +62,12 @@ public:
         return mImpl != 0;
     }
 
-    T * get()
+    T* get()
     {
         return mImpl->mValue;
     }
 
-    const T * get() const
+    const T* get() const
     {
         return mImpl->mValue;
     }
@@ -88,7 +88,7 @@ public:
         return *mImpl->mValue;
     }
 
-    T * operator-> () const
+    T* operator-> () const
     {
         return mImpl->mValue;
     }
@@ -102,7 +102,7 @@ private:
         {
         }
         int mRefCount;
-        T * mValue;
+        T* mValue;
     };
 
     inline void unref()

@@ -60,12 +60,12 @@ private:
         sInstance = 0;
     }
 
-    static T * sInstance;
+    static T* sInstance;
 };
 
 
 template<class T>
-T * Singleton<T>::sInstance(0);
+T* Singleton<T>::sInstance(0);
 
 
 } // namespace Futile

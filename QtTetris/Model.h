@@ -21,7 +21,7 @@ class Model : public Futile::Singleton<Model>,
 public:
     bool IsGameOver();
 
-    Player * getPlayer(std::size_t inIndex);
+    Player* getPlayer(std::size_t inIndex);
 
     const MultiplayerGame& multiplayerGame() const;
 

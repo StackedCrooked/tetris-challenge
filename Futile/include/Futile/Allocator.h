@@ -68,7 +68,7 @@ public:
     std::size_t size() const;
 
 private:
-    T * mBuffer;
+    T* mBuffer;
     std::size_t mSize;
 };
 
@@ -103,7 +103,7 @@ public:
     std::size_t size() const;
 
 private:
-    T * mBuffer;
+    T* mBuffer;
     std::size_t mSize;
 };
 

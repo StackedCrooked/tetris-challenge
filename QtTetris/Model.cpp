@@ -39,7 +39,7 @@ bool Model::IsGameOver()
 
     for (std::size_t idx = 0; idx < mMultiplayerGame->playerCount(); ++idx)
     {
-        Player * player = mMultiplayerGame->getPlayer(idx);
+        Player* player = mMultiplayerGame->getPlayer(idx);
         if (player->simpleGame()->isGameOver())
         {
             mGameOver = true;
@@ -49,7 +49,7 @@ bool Model::IsGameOver()
 }
 
 
-Player * Model::getPlayer(std::size_t inIndex)
+Player* Model::getPlayer(std::size_t inIndex)
 {
     return mMultiplayerGame->getPlayer(inIndex);
 }
@@ -142,7 +142,7 @@ void Model::newGame(const PlayerTypes& inPlayerTypes, std::size_t inRowCount, st
             teamName = "Team 2";
         }
 
-        Player * player(0);
+        Player* player(0);
         PlayerType playerType = inPlayerTypes[idx];
         if (playerType == Human)
         {
@@ -154,7 +154,7 @@ void Model::newGame(const PlayerTypes& inPlayerTypes, std::size_t inRowCount, st
             player = mMultiplayerGame->addComputerPlayer(TeamName(teamName),
                                                          PlayerName(GetPlayerName(inPlayerTypes[idx])),
                                                          this);
-            if (ComputerPlayer * computerPlayer = dynamic_cast<ComputerPlayer*>(player))
+            if (ComputerPlayer* computerPlayer = dynamic_cast<ComputerPlayer*>(player))
             {
                 computerPlayer->setMoveSpeed(allComputer ? 60 : 20);
             }

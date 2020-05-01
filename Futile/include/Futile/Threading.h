@@ -296,7 +296,7 @@ Futile::Locker<T> Lock(const Futile::ThreadSafe<T>& inTSV)
 template<class T>
 T& Unwrap(const LockerBase& inLockerBase, const Identity< ThreadSafe<T> > &)
 {
-    const T * result = static_cast< const Locker<T>& >(inLockerBase).get();
+    const T* result = static_cast< const Locker<T>& >(inLockerBase).get();
     return const_cast<T &>(*result);
 }
 
