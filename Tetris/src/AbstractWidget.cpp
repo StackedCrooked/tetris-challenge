@@ -270,7 +270,7 @@ Rect AbstractWidget::avatarRect() const
 {
     Rect theStatsRect = statsRect();
     int x = theStatsRect.x();
-    int y = theStatsRect.bottom() + margin();
+    int y = std::max(gameRect().bottom(), theStatsRect.bottom() + margin());
     int width = mAvatarWidth;
     int height = mAvatarWidth;
     return Rect(x, y, width, height);
