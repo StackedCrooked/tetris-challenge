@@ -85,9 +85,12 @@ const Evaluator& Model::updateAIParameters(const Player& inPlayer,
 
     const Game& game = *inPlayer.simpleGame();
 
-    static const auto num_cpus = Poco::Environment::processorCount();
+    // This program may use all available CPUs minus one (in order to avoid hanging the system.)
+    static const auto available_cpu_count = Poco::Environment::processorCount() - 1;
 
-    outWorkerCount = std::max(1, static_cast<int>((num_cpus - 2) / 2));
+    const auto num_cpus_per_player = available_cpu_count / multiplayerGame().playerCount();
+
+    outWorkerCount = std::max(1, static_cast<int>(num_cpus_per_player));
 
     int currentHeight = game.stats().currentHeight();
 
