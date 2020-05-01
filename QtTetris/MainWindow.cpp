@@ -75,7 +75,7 @@ MainWindow::MainWindow(QWidget *parent) :
     vbox->addItem(mTetrisWidgetHolder);
     vbox->setAlignment(mTetrisWidgetHolder, Qt::AlignHCenter);
 
-    vbox->addWidget(new QLabel("Press Ctrl-N to start a new game."));
+    //vbox->addWidget(new QLabel("Press Ctrl-N to start a new game."));
     mTetrisWidgetHolder->setSpacing(mSpacing);
     while (mTetrisWidgets.size() < 2)
     {

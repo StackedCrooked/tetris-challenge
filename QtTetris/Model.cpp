@@ -9,7 +9,6 @@ namespace Tetris {
 Model::Model() :
     mNames(),
     mNamesIndex(0),
-    mHumanName(),
     mCPUCount(Poco::Environment::processorCount()),
     mGameOver(true)
 {
@@ -166,29 +165,10 @@ void Model::newGame(const PlayerTypes& inPlayerTypes, std::size_t inRowCount, st
 }
 
 
-std::string Model::GetHumanPlayerName()
+std::string Model::GetPlayerName(PlayerType )
 {
-    return "Luffy";
-}
-
-
-std::string Model::GetPlayerName(PlayerType inPlayerType)
-{
-    if (inPlayerType == Human)
-    {
-        if (mHumanName.empty())
-        {
-            mHumanName = GetHumanPlayerName();
-        }
-        return mHumanName;
-    }
-    else
-    {
-        mNamesIndex = (mNamesIndex + 1) % mNames.size();
-        return mNames[mNamesIndex];
-    }
+    return mNames[mNamesIndex++ % mNames.size()];
 }
 
 
 } // namespace Tetris
-

@@ -43,9 +43,7 @@ private:
 
     virtual ~Model();
 
-    std::string GetHumanPlayerName();
-
-    std::string GetPlayerName(PlayerType inPlayerType);
+    std::string GetPlayerName(PlayerType);
 
     boost::scoped_ptr<MultiplayerGame> mMultiplayerGame;
 
@@ -53,7 +51,6 @@ private:
     Names mNames;
     Names::size_type mNamesIndex;
 
-    std::string mHumanName;
     int mCPUCount;
     bool mGameOver;
 };
