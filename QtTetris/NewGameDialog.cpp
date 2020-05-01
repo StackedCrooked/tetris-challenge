@@ -17,14 +17,14 @@ NewGameDialog::NewGameDialog(QWidget *inParent) :
     this->setWindowTitle("New");
     setLayout(new QVBoxLayout);
 
-    QGroupBox * groupBox = new QGroupBox("Start a new game:", this);
+    QGroupBox* groupBox = new QGroupBox("Start a new game:", this);
     mNewHumanSinglePlayerGame = new QRadioButton("Human", groupBox);
     mNewComputerSinglePlayerGame = new QRadioButton("Computer", groupBox);
     mNewHumanVsComputerMultiplayerGame = new QRadioButton("Human vs Computer", groupBox);
     mNewComputerVsComputerMultiplayerGame = new QRadioButton("Computer vs Computer", groupBox);
     mNewHumanSinglePlayerGame->setChecked(true);
 
-    QVBoxLayout * groupLayout = new QVBoxLayout;
+    QVBoxLayout* groupLayout = new QVBoxLayout;
     groupLayout->addWidget(mNewHumanSinglePlayerGame);
     groupLayout->addWidget(mNewComputerSinglePlayerGame);
     groupLayout->addWidget(mNewHumanVsComputerMultiplayerGame);

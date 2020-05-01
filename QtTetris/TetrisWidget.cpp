@@ -355,7 +355,7 @@ void TetrisWidget::drawTextRightAligned(const Rect& inRect, const std::string& i
 }
 
 
-void TetrisWidget::paintEvent(QPaintEvent * )
+void TetrisWidget::paintEvent(QPaintEvent*)
 {
     if (!simpleGame())
     {

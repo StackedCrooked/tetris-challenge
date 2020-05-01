@@ -78,8 +78,8 @@ void GameState::solidifyBlock(const Block& inBlock)
         {
             if (grid.get(r, c) != BlockType_Nil)
             {
-				std::size_t gridRow = inBlock.row() + r;
-				std::size_t gridCol = inBlock.column() + c;
+                std::size_t gridRow = inBlock.row() + r;
+                std::size_t gridCol = inBlock.column() + c;
                 mGrid.set(gridRow, gridCol, inBlock.type());
                 if (gridRow < mFirstOccupiedRow)
                 {
@@ -93,11 +93,11 @@ void GameState::solidifyBlock(const Block& inBlock)
 
 void GameState::clearLines()
 {
-	std::size_t numLines = 0;
-	int rowIndex = mOriginalBlock.row() + mOriginalBlock.rowCount() - 1;
+    std::size_t numLines = 0;
+    int rowIndex = mOriginalBlock.row() + mOriginalBlock.rowCount() - 1;
     for (; rowIndex >= static_cast<int>(mFirstOccupiedRow); --rowIndex)
     {
-		std::size_t colIndex = 0;
+        std::size_t colIndex = 0;
         bool line = true;
         for (; colIndex < mGrid.columnCount(); ++colIndex)
         {
@@ -124,7 +124,7 @@ void GameState::clearLines()
 
     if (numLines > 0)
     {
-        BlockType * gridBegin = const_cast<BlockType*>(&(mGrid.get(mFirstOccupiedRow, 0)));
+        BlockType* gridBegin = const_cast<BlockType*>(&(mGrid.get(mFirstOccupiedRow, 0)));
         memset(&gridBegin[0], 0, numLines * mGrid.columnCount());
     }
 
