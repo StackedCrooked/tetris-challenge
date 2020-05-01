@@ -228,7 +228,7 @@ Rect AbstractWidget::userInfoRect() const
     int x = margin();
     int y = theGameRect.bottom() + margin();
     int width = std::max(min_size.width(), theGameRect.width());
-    int height = min_size.height(); //avatarRect().bottom() - y;
+    int height = std::max(min_size.height(), avatarRect().bottom() - y);
     return Rect(x, y, width, height);
 }
 
@@ -270,7 +270,7 @@ Rect AbstractWidget::avatarRect() const
 {
     Rect theStatsRect = statsRect();
     int x = theStatsRect.x();
-    int y = std::max(gameRect().bottom(), theStatsRect.bottom()) + margin();
+    int y = theStatsRect.bottom() + margin();
     int width = mAvatarWidth;
     int height = mAvatarWidth;
     return Rect(x, y, width, height);
