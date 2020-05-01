@@ -188,14 +188,17 @@ protected:
 };
 
 
-class Depressed : public ConcreteEvaluator<Depressed>
+class Confused : public ConcreteEvaluator<Confused>
 {
 protected:
-    typedef ConcreteEvaluator<Depressed> Super;
-    friend class ConcreteEvaluator<Depressed>;
+    typedef ConcreteEvaluator<Confused> Super;
+    friend class ConcreteEvaluator<Confused>;
 
-    Depressed();
-    virtual ~Depressed() {}
+    Confused();
+    virtual ~Confused() {}
+
+private:
+    int evaluate(const GameState& inGameState) const final;
 };
 
 

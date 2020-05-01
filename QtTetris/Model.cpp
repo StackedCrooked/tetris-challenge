@@ -105,19 +105,19 @@ const Evaluator& Model::updateAIParameters(const Player& inPlayer,
     }
 
     // Tactics adjustment
-    if (currentHeight < 8)
+    if (currentHeight < 10)
     {
         outSearchDepth = 20;
-        outSearchWidth = 2;
-        outMoveSpeed = 1000;
-        return MakeTetrises::Instance();
+        outSearchWidth = 6;
+        outMoveSpeed = 60;
+        return Confused::Instance();
     }
     else
     {
-        outSearchDepth = 4;
-        outSearchWidth = 4;
-        outMoveSpeed = 1000;
-        return Survival::Instance();
+        outSearchDepth = 20;
+        outSearchWidth = 6;
+        outMoveSpeed = 60;
+        return Confused::Instance();
     }
 }
 

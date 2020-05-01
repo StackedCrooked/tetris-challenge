@@ -196,9 +196,9 @@ Survival::Survival() :
           NumSinglesFactor(1),
           NumDoublesFactor(2),
           NumTriplesFactor(4),
-              NumTetrisesFactor(8),
-              SearchDepth(6),
-              SearchWidth(4))
+          NumTetrisesFactor(8),
+          SearchDepth(6),
+          SearchWidth(4))
 {
 }
 
@@ -255,18 +255,33 @@ Multiplayer::Multiplayer() :
 }
 
 
-Depressed::Depressed() :
+Confused::Confused() :
     Super("Depressed",
-              GameHeightFactor(0),
-              LastBlockHeightFactor(0),
-              NumHolesFactor(0),
-              NumSinglesFactor(0),
-              NumDoublesFactor(0),
-              NumTriplesFactor(0),
-              NumTetrisesFactor(0),
-              SearchDepth(1),
-              SearchWidth(1))
+    GameHeightFactor(-2),
+    LastBlockHeightFactor(-2),  // Height is not OK.
+    NumHolesFactor(1),          // But holes are desirable!
+    NumSinglesFactor(1),
+    NumDoublesFactor(2),
+    NumTriplesFactor(4),
+    NumTetrisesFactor(64),
+    SearchDepth(20),
+    SearchWidth(4))
 {
+}
+
+
+int Confused::evaluate(const GameState& inGameState) const
+{
+    int result = 0;
+
+    auto current_height = inGameState.currentHeight();
+
+    if (current_height > 4)
+    {
+        result -= current_height * current_height;
+    }
+
+    return Evaluator::evaluate(inGameState) + result;
 }
 
 
