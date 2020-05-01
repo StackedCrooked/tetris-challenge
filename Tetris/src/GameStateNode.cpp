@@ -23,7 +23,7 @@ static int GetIdentifier(const GameState& inGameState)
 
 struct GameStateNode::Impl
 {
-    Impl(NodePtr inParent, GameState *  inGameState, const Evaluator& inEvaluator) :
+    Impl(NodePtr inParent, GameState*  inGameState, const Evaluator& inEvaluator) :
         mParent(inParent),
         mIdentifier(GetIdentifier(*inGameState)),
         mDepth(inParent->depth() + 1),
@@ -34,7 +34,7 @@ struct GameStateNode::Impl
         mEvaluatedGameState.reset(new EvaluatedGameState(inGameState, inEvaluator.evaluate(*inGameState)));
     }
 
-    Impl(GameState *  inGameState, const Evaluator& inEvaluator) :
+    Impl(GameState* inGameState, const Evaluator& inEvaluator) :
         mParent(),
         mIdentifier(GetIdentifier(*inGameState)),
         mDepth(0),
@@ -62,13 +62,13 @@ std::unique_ptr<GameStateNode> GameStateNode::CreateRootNode(std::size_t inNumRo
 }
 
 
-GameStateNode::GameStateNode(GameState *  inGameState, const Evaluator&  inEvaluator) :
+GameStateNode::GameStateNode(GameState*  inGameState, const Evaluator&  inEvaluator) :
     mImpl(new Impl(inGameState, inEvaluator))
 {
 }
 
 
-GameStateNode::GameStateNode(NodePtr inParent, GameState *  inGameState, const Evaluator&  inEvaluator) :
+GameStateNode::GameStateNode(NodePtr inParent, GameState*  inGameState, const Evaluator&  inEvaluator) :
     mImpl(new Impl(inParent, inGameState, inEvaluator))
 {
 }

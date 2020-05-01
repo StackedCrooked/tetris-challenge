@@ -60,7 +60,7 @@ struct Game::Impl : public GameImpl::EventHandler
         EventHandlers::iterator it = mEventHandlers.begin(), end = mEventHandlers.end();
         for (; it != end; ++it)
         {
-            Game::EventHandler * eventHandler(*it);
+            Game::EventHandler* eventHandler(*it);
             eventHandler->onGameStateChanged(mBackPtr);
         }
     }
@@ -70,7 +70,7 @@ struct Game::Impl : public GameImpl::EventHandler
         EventHandlers::iterator it = mEventHandlers.begin(), end = mEventHandlers.end();
         for (; it != end; ++it)
         {
-            Game::EventHandler * eventHandler(*it);
+            Game::EventHandler* eventHandler(*it);
             eventHandler->onLinesCleared(mBackPtr, inLineCount);
         }
     }

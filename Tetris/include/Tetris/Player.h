@@ -41,9 +41,9 @@ public:
 
     const std::string& playerName() const;
 
-    const Game * simpleGame() const;
+    const Game* simpleGame() const;
 
-    Game * simpleGame();
+    Game* simpleGame();
 
 private:
     Player(const Player&);

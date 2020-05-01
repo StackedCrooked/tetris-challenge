@@ -234,9 +234,9 @@ public:
 
     void appendPrecalculatedNode(NodePtr inNode);
 
-    const GameStateNode * currentNode() const;
+    const GameStateNode* currentNode() const;
 
-    const GameStateNode * endNode() const;
+    const GameStateNode* endNode() const;
 
     bool navigateNodeDown();
 

@@ -57,20 +57,20 @@ MainWindow::MainWindow(QWidget *parent) :
     setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum));
     setWindowTitle("QtTetris");
 
-    QMenu * tetrisMenu = menuBar()->addMenu("Tetris");
-    QAction * newGame = tetrisMenu->addAction("New");
+    QMenu* tetrisMenu = menuBar()->addMenu("Tetris");
+    QAction* newGame = tetrisMenu->addAction("New");
     newGame->setShortcut(QKeySequence("Ctrl+N"));
 
     connect(newGame, SIGNAL(triggered()), this, SLOT(onNew()));
 
-    QAction * pauseGame = tetrisMenu->addAction("Pause");
+    QAction* pauseGame = tetrisMenu->addAction("Pause");
     connect(pauseGame, SIGNAL(triggered()), this, SLOT(onPaused()));
     pauseGame->setShortcut(QKeySequence("Ctrl+P"));
 
-    QWidget * theCentralWidget(new QWidget);
+    QWidget* theCentralWidget(new QWidget);
     setCentralWidget(theCentralWidget);
 
-    QVBoxLayout * vbox = new QVBoxLayout(theCentralWidget);
+    QVBoxLayout* vbox = new QVBoxLayout(theCentralWidget);
     mTetrisWidgetHolder = new QHBoxLayout;
     vbox->addItem(mTetrisWidgetHolder);
     vbox->setAlignment(mTetrisWidgetHolder, Qt::AlignHCenter);
@@ -137,7 +137,7 @@ void MainWindow::onNewGame(const PlayerTypes& inPlayerTypes)
     // Unset all widgets.
     for (TetrisWidgets::size_type idx = 0; idx < mTetrisWidgets.size(); ++idx)
     {
-        TetrisWidget * tetrisWidget = mTetrisWidgets[idx];
+        TetrisWidget* tetrisWidget = mTetrisWidgets[idx];
         tetrisWidget->setPlayer(NULL);
         tetrisWidget->releaseKeyboard();
         tetrisWidget->hide();
@@ -150,8 +150,8 @@ void MainWindow::onNewGame(const PlayerTypes& inPlayerTypes)
     MultiplayerGame& mgame = Model::Instance().multiplayerGame();
     for (std::size_t idx = 0; idx < mgame.playerCount(); ++idx)
     {
-        Player * player = mgame.getPlayer(idx);
-        TetrisWidget * tetrisWidget = mTetrisWidgets[idx];
+        Player* player = mgame.getPlayer(idx);
+        TetrisWidget* tetrisWidget = mTetrisWidgets[idx];
         tetrisWidget->setPlayer(player);
         tetrisWidget->show();
         if (player->type() == Human)
@@ -240,7 +240,7 @@ void MainWindow::onPaused()
     MultiplayerGame& mgame = Model::Instance().multiplayerGame();
     for (std::size_t idx = 0; idx < mgame.playerCount(); ++idx)
     {
-        Player * player = mgame.getPlayer(idx);
+        Player* player = mgame.getPlayer(idx);
         bool isPaused = player->simpleGame()->isPaused();
         player->simpleGame()->setPaused(!isPaused);
     }
@@ -252,7 +252,7 @@ void MainWindow::onPenalty()
     MultiplayerGame& mgame = Model::Instance().multiplayerGame();
     for (std::size_t idx = 0; idx < mgame.playerCount(); ++idx)
     {
-        Player * player = mgame.getPlayer(idx);
+        Player* player = mgame.getPlayer(idx);
         player->simpleGame()->applyLinePenalty(4);
         break;
     }

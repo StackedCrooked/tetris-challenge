@@ -85,13 +85,13 @@ public:
 
     void setPlayer(Player* inPlayer);
 
-    const Game * simpleGame() const;
+    const Game* simpleGame() const;
 
-    Game * simpleGame();
+    Game* simpleGame();
 
-    const Player * player() const;
+    const Player* player() const;
 
-    Player * player();
+    Player* player();
 
     int fps() const;
 
@@ -156,7 +156,7 @@ private:
 
     enum { FontSize = 12 };
 
-    Tetris::Player * mPlayer;
+    Tetris::Player* mPlayer;
     int mSquareWidth;
     int mSquareHeight;
     int mStatItemHeight;

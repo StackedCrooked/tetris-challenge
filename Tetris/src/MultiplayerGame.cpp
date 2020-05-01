@@ -25,12 +25,12 @@ struct MultiplayerGame::Impl final :
 
     virtual ~Impl() { }
 
-    virtual void onGameStateChanged(Game * )
+    virtual void onGameStateChanged(Game* )
     {
         // Not interested.
     }
 
-    Player * addPlayer(PlayerType inPlayerType, const TeamName& inTeamName, const PlayerName& inPlayerName);
+    Player* addPlayer(PlayerType inPlayerType, const TeamName& inTeamName, const PlayerName& inPlayerName);
 
     Player& findPlayer(Game* inGame) const
     {
@@ -89,7 +89,7 @@ Player* MultiplayerGame::Impl::addPlayer(PlayerType inPlayerType,
                                       inPlayerName,
                                       mRowCount,
                                       mColumnCount).release());
-    Player * player = mPlayers.back();
+    Player* player = mPlayers.back();
     Game::RegisterEventHandler(player->simpleGame(), this);
     return player;
 }
@@ -106,7 +106,7 @@ Player* MultiplayerGame::addComputerPlayer(const TeamName& inTeamName,
                                             const PlayerName& inPlayerName,
                                             ComputerPlayer::Tweaker* inTweaker)
 {
-    Player * result = mImpl->addPlayer(Computer, inTeamName, inPlayerName);
+    Player* result = mImpl->addPlayer(Computer, inTeamName, inPlayerName);
     ComputerPlayer& computerPlayer = dynamic_cast<ComputerPlayer&>(*result);
     computerPlayer.setTweaker(inTweaker);
     return result;

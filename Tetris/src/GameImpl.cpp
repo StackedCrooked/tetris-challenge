@@ -142,7 +142,7 @@ void GameImpl::OnChangedImpl(GameImpl* inGame)
     EventHandlers::iterator it = inGame->mEventHandlers.begin(), end = inGame->mEventHandlers.end();
     for (; it != end; ++it)
     {
-        GameImpl::EventHandler * eventHandler(*it);
+        GameImpl::EventHandler* eventHandler(*it);
         if (!EventHandler::Exists(eventHandler))
         {
             return;
@@ -179,7 +179,7 @@ void GameImpl::OnLinesClearedImpl(GameImpl* inGame, int inLineCount)
     EventHandlers::iterator it = inGame->mEventHandlers.begin(), end = inGame->mEventHandlers.end();
     for (; it != end; ++it)
     {
-        GameImpl::EventHandler * eventHandler(*it);
+        GameImpl::EventHandler* eventHandler(*it);
         if (!EventHandler::Exists(eventHandler))
         {
             LogWarning("OnLinesClearedImpl: This event handler no longer exists.");
@@ -655,7 +655,7 @@ void ComputerGame::setCurrentNode(NodePtr inCurrentNode)
 std::size_t ComputerGame::numPrecalculatedMoves() const
 {
     std::size_t countMovesAhead = 0;
-    const GameStateNode * tmp = mCurrentNode.get();
+    const GameStateNode* tmp = mCurrentNode.get();
     while (!tmp->children().empty())
     {
         tmp = tmp->children().begin()->get();

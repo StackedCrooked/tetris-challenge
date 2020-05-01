@@ -56,9 +56,9 @@ public:
 
     void addChild(NodePtr inChildNode);
 
-    const GameStateNode * endNode() const;
+    const GameStateNode* endNode() const;
 
-    GameStateNode * endNode();
+    GameStateNode* endNode();
 
     const GameState& gameState() const;
 

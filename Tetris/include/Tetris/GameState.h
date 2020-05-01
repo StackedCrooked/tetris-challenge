@@ -73,7 +73,7 @@ class EvaluatedGameState
 {
 public:
     // Takes ownership of the GameState object
-    EvaluatedGameState(GameState *  inGameState, int inQuality);
+    EvaluatedGameState(GameState*  inGameState, int inQuality);
 
     ~EvaluatedGameState();
 
