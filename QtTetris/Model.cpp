@@ -74,7 +74,7 @@ const Evaluator & Model::updateAIParameters(const Player & inPlayer,
                                             int & outSearchDepth,
                                             int & outSearchWidth,
                                             int & outWorkerCount,
-                                            int & /*outMoveSpeed*/,
+                                            int & outMoveSpeed,
                                             BlockMover::MoveDownBehavior & outMoveDownBehavior)
 {
     if (!inPlayer.simpleGame())
@@ -84,11 +84,9 @@ const Evaluator & Model::updateAIParameters(const Player & inPlayer,
 
     const Game & game = *inPlayer.simpleGame();
 
-    outWorkerCount = Poco::Environment::processorCount();
-    if (outWorkerCount > 1)
-    {
-        outWorkerCount /= 2;
-    }
+    static const auto num_cpus = Poco::Environment::processorCount();
+
+    outWorkerCount = std::max(1, static_cast<int>((num_cpus - 2) / 2));
 
     int currentHeight = game.stats().currentHeight();
 
@@ -102,18 +100,19 @@ const Evaluator & Model::updateAIParameters(const Player & inPlayer,
         outMoveDownBehavior = BlockMover::MoveDownBehavior_Drop;
     }
 
-
     // Tactics adjustment
     if (currentHeight < 8)
     {
         outSearchDepth = 20;
         outSearchWidth = 2;
+        outMoveSpeed = 1000;
         return MakeTetrises::Instance();
     }
     else
     {
         outSearchDepth = 4;
         outSearchWidth = 4;
+        outMoveSpeed = 1000;
         return Survival::Instance();
     }
 }
@@ -192,3 +191,4 @@ std::string Model::GetPlayerName(PlayerType inPlayerType)
 
 
 } // namespace Tetris
+
