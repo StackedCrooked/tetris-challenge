@@ -133,7 +133,7 @@ const Evaluator& Model::updateAIParameters(const Player& inPlayer,
     }
     else
     {
-        outSearchDepth = 6;
+        outSearchDepth = 4;
         outSearchWidth = 4;
         outMoveSpeed = 1000;
         return Survival::Instance();
