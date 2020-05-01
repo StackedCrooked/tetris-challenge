@@ -53,7 +53,7 @@ BlockFactory::BlockFactory(int inBagSize) :
     mThreadSafeImpl(new Impl(inBagSize))
 {
     Locker<Impl> rwImpl(mThreadSafeImpl);
-    Impl * mImpl(rwImpl.get());
+    Impl* mImpl(rwImpl.get());
     srand(mImpl->mSeed);
 
     std::size_t totalSize = mImpl->mBagSize * cBlockTypeCount;
@@ -75,7 +75,7 @@ BlockFactory::~BlockFactory()
 BlockType BlockFactory::getNext() const
 {
     Locker<Impl> rwImpl(mThreadSafeImpl);
-    Impl * mImpl(rwImpl.get());
+    Impl* mImpl(rwImpl.get());
     if (mImpl->mCurrentIndex >= mImpl->mBag.size())
     {
         // Reshuffle the bag.

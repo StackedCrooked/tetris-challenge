@@ -26,11 +26,11 @@ public:
     Selection selection() const;
 
 private:
-    QRadioButton * mNewHumanSinglePlayerGame;
-    QRadioButton * mNewComputerSinglePlayerGame;
-    QRadioButton * mNewHumanVsComputerMultiplayerGame;
-    QRadioButton * mNewComputerVsComputerMultiplayerGame;
-    QDialogButtonBox * mDialogButtonBox;
+    QRadioButton* mNewHumanSinglePlayerGame;
+    QRadioButton* mNewComputerSinglePlayerGame;
+    QRadioButton* mNewHumanVsComputerMultiplayerGame;
+    QRadioButton* mNewComputerVsComputerMultiplayerGame;
+    QDialogButtonBox* mDialogButtonBox;
 };
 
 

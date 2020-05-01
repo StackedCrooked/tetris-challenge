@@ -80,7 +80,7 @@ struct Game::Impl : public GameImpl::EventHandler
     PlayerType mPlayerType;
     boost::scoped_ptr<Gravity> mGravity;
     std::size_t mCenterColumn;
-    Game * mBackPtr;
+    Game* mBackPtr;
     typedef std::set<Game::EventHandler*> EventHandlers;
     EventHandlers mEventHandlers;
 };

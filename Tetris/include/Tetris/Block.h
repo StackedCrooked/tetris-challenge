@@ -63,7 +63,7 @@ public:
     void setRotation(std::size_t inRotation);
 
 private:
-    BlockImpl * mImpl;
+    BlockImpl* mImpl;
 };
 
 

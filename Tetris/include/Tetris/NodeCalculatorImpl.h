@@ -107,7 +107,7 @@ protected:
     private:
         NodePtr mBestNode;
         int mBestScore;
-        const Evaluator * mEvaluator;
+        const Evaluator* mEvaluator;
         std::size_t mNodeCount;
         bool mFinished;
     };
@@ -179,7 +179,7 @@ protected:
     private:
         std::vector<TreeRowInfo> mInfos;
         int mMaxDepth;
-        const Evaluator * mEvaluator;
+        const Evaluator* mEvaluator;
         mutable Futile::Mutex mMutex;
     };
 

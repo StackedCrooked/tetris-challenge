@@ -57,7 +57,7 @@ protected:
     }
 
 private:
-    Value * mValue;
+    Value* mValue;
 };
 
 
@@ -237,11 +237,11 @@ private:
     {
         ValueWithRefCount(Value* inValue) : mValue(inValue), mRefCount(1) { }
 
-        Value * mValue;
+        Value* mValue;
         std::size_t mRefCount;
     };
 
-    ValueWithRefCount * mValueWithRefCount;
+    ValueWithRefCount* mValueWithRefCount;
 };
 
 
@@ -420,7 +420,7 @@ private:
         {
         }
 
-        Value * mValue;
+        Value* mValue;
         std::size_t mIndex;
     };
 

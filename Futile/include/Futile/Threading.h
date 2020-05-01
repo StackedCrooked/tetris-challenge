@@ -170,7 +170,7 @@ private:
             delete mVariable;
         }
 
-        mutable Variable * mVariable;
+        mutable Variable* mVariable;
         Mutex mMutex;
     };
 

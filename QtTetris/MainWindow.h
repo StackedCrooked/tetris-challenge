@@ -59,10 +59,10 @@ private:
 
 private:
     typedef std::vector<TetrisWidget *> TetrisWidgets;
-    QHBoxLayout * mTetrisWidgetHolder;
+    QHBoxLayout* mTetrisWidgetHolder;
     TetrisWidgets mTetrisWidgets;
     int mSpacing;
-    QTextEdit * mLogField;
+    QTextEdit* mLogField;
     bool mShowLog;
     bool mGameOver;
     Poco::Stopwatch mStopwatch;

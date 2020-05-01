@@ -77,12 +77,12 @@ public:
     void onFinished();
     void onError();
 
-    ComputerPlayer * mComputerPlayer;
-    Tweaker * mTweaker;
+    ComputerPlayer* mComputerPlayer;
+    Tweaker* mTweaker;
 
     WorkerPool mWorkerPool;
     boost::scoped_ptr<NodeCalculator> mNodeCalculator;
-    const Evaluator * mEvaluator;
+    const Evaluator* mEvaluator;
     boost::scoped_ptr<BlockMover> mBlockMover;
     int mSearchDepth;
     int mSearchWidth;

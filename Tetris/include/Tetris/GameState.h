@@ -87,7 +87,7 @@ private:
     EvaluatedGameState(const EvaluatedGameState &);
     EvaluatedGameState& operator=(const EvaluatedGameState&);
 
-    GameState * mGameState;
+    GameState* mGameState;
     int mQuality;
 };
 

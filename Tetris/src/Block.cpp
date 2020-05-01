@@ -49,7 +49,7 @@ private:
     std::size_t mRotation;
     std::size_t mRow;
     std::size_t mColumn;
-    const Grid * mGrid;
+    const Grid* mGrid;
 };
 
 

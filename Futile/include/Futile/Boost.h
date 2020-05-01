@@ -115,7 +115,7 @@ private:
         }
     }
 
-    Impl * mImpl;
+    Impl* mImpl;
 };
 
 
