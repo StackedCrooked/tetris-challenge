@@ -1,6 +1,9 @@
 #include "Model.h"
 #include "Futile/AutoPtrSupport.h"
 #include "Poco/Environment.h"
+#include <algorithm>
+#include <chrono>
+#include <random>
 
 
 namespace Tetris {
@@ -12,13 +15,14 @@ Model::Model() :
     mCPUCount(Poco::Environment::processorCount()),
     mGameOver(true)
 {
-    mNames.push_back("Luffy");
     mNames.push_back("Zoro");
+    mNames.push_back("Luffy");
     mNames.push_back("Nami");
     mNames.push_back("Sanji");
     mNames.push_back("Chopper");
-    srand(static_cast<unsigned int>(time(0)));
-    std::random_shuffle(mNames.begin(), mNames.end());
+
+    std::default_random_engine random_engine(std::chrono::system_clock::now().time_since_epoch().count());
+    std::shuffle(mNames.begin(), mNames.end(), random_engine);
 }
 
 
@@ -165,9 +169,18 @@ void Model::newGame(const PlayerTypes& inPlayerTypes, std::size_t inRowCount, st
 }
 
 
-std::string Model::GetPlayerName(PlayerType )
+std::string Model::GetPlayerName(PlayerType)
 {
-    return mNames[mNamesIndex++ % mNames.size()];
+    std::string result = mNames[mNamesIndex++ % mNames.size()];
+
+    if (mNamesIndex >= mNames.size())
+    {
+        mNamesIndex = 0;
+        std::default_random_engine random_engine(std::chrono::system_clock::now().time_since_epoch().count());
+        std::shuffle(mNames.begin(), mNames.end(), random_engine);
+    }
+
+    return result;
 }
 
 
