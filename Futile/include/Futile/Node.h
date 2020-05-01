@@ -52,7 +52,7 @@ struct ContainerPolicy_Vector
 template <class PointeeType>
 struct PointerPolicy_Normal_NoOwnership
 {
-    typedef PointeeType * PointerType;
+    typedef PointeeType* PointerType;
 
     static PointeeType * getRaw(PointerType p)
     {
@@ -66,7 +66,7 @@ struct PointerPolicy_Normal_NoOwnership
 template <class PointeeType>
 struct PointerPolicy_Normal_WithOwnership
 {
-    typedef PointeeType * PointerType;
+    typedef PointeeType* PointerType;
 
     static PointeeType * getRaw(PointerType p)
     {

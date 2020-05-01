@@ -80,7 +80,7 @@ MultiplayerGame::~MultiplayerGame()
 }
 
 
-Player * MultiplayerGame::Impl::addPlayer(PlayerType inPlayerType,
+Player* MultiplayerGame::Impl::addPlayer(PlayerType inPlayerType,
                                           const TeamName& inTeamName,
                                           const PlayerName& inPlayerName)
 {
@@ -95,14 +95,14 @@ Player * MultiplayerGame::Impl::addPlayer(PlayerType inPlayerType,
 }
 
 
-Player * MultiplayerGame::addHumanPlayer(const TeamName& inTeamName,
+Player* MultiplayerGame::addHumanPlayer(const TeamName& inTeamName,
                                          const PlayerName& inPlayerName)
 {
     return mImpl->addPlayer(Human, inTeamName, inPlayerName);
 }
 
 
-Player * MultiplayerGame::addComputerPlayer(const TeamName& inTeamName,
+Player* MultiplayerGame::addComputerPlayer(const TeamName& inTeamName,
                                             const PlayerName& inPlayerName,
                                             ComputerPlayer::Tweaker* inTweaker)
 {
@@ -131,13 +131,13 @@ std::size_t MultiplayerGame::playerCount() const
 }
 
 
-const Player * MultiplayerGame::getPlayer(std::size_t inIndex) const
+const Player* MultiplayerGame::getPlayer(std::size_t inIndex) const
 {
     return mImpl->mPlayers[inIndex];
 }
 
 
-Player * MultiplayerGame::getPlayer(std::size_t inIndex)
+Player* MultiplayerGame::getPlayer(std::size_t inIndex)
 {
     return mImpl->mPlayers[inIndex];
 }

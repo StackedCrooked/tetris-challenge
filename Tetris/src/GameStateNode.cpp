@@ -172,7 +172,7 @@ void GameStateNode::makeRoot()
 }
 
 
-const GameStateNode * GameStateNode::endNode() const
+const GameStateNode* GameStateNode::endNode() const
 {
     if (mImpl->mChildren.empty())
     {
@@ -182,7 +182,7 @@ const GameStateNode * GameStateNode::endNode() const
 }
 
 
-GameStateNode * GameStateNode::endNode()
+GameStateNode* GameStateNode::endNode()
 {
     if (mImpl->mChildren.empty())
     {

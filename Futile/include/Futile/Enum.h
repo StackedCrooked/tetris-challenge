@@ -127,7 +127,7 @@
         typedef const EnumType Values[Size];                                                      \
         static const Values& values();                                                           \
                                                                                                   \
-        typedef const char * Names[Size];                                                         \
+        typedef const char* Names[Size];                                                         \
         static const Names& names();                                                             \
                                                                                                   \
         static int size() { return Size; }                                                        \
@@ -147,7 +147,7 @@
             throw std::runtime_error("Invalid enumerator name: " + inName);                       \
         }                                                                                         \
                                                                                                   \
-        static const char * ToString(EnumType inValue)                                            \
+        static const char* ToString(EnumType inValue)                                            \
         {                                                                                         \
             for (int idx = 0; idx < size(); ++idx)                                                \
             {                                                                                     \

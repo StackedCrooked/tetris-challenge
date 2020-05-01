@@ -671,13 +671,13 @@ void ComputerGame::clearPrecalculatedNodes()
 }
 
 
-const GameStateNode * ComputerGame::currentNode() const
+const GameStateNode* ComputerGame::currentNode() const
 {
     return mCurrentNode.get();
 }
 
 
-const GameStateNode * ComputerGame::endNode() const
+const GameStateNode* ComputerGame::endNode() const
 {
     return mCurrentNode->endNode();
 }

@@ -70,7 +70,7 @@ void QtMainThread::postAction(Action inAction)
 
 bool QtMainThread::event(QEvent* inEvent)
 {
-    if (QtAction * Action = dynamic_cast<QtAction*>(inEvent))
+    if (QtAction* Action = dynamic_cast<QtAction*>(inEvent))
     {
         Action->invokeAction();
         return true;

@@ -127,7 +127,7 @@ void AbstractWidget::setPlayer(Player* inPlayer)
 }
 
 
-const Game * AbstractWidget::simpleGame() const
+const Game* AbstractWidget::simpleGame() const
 {
     if (!mPlayer)
     {
@@ -137,7 +137,7 @@ const Game * AbstractWidget::simpleGame() const
 }
 
 
-Game * AbstractWidget::simpleGame()
+Game* AbstractWidget::simpleGame()
 {
     if (!mPlayer)
     {
@@ -147,13 +147,13 @@ Game * AbstractWidget::simpleGame()
 }
 
 
-const Player * AbstractWidget::player() const
+const Player* AbstractWidget::player() const
 {
     return mPlayer;
 }
 
 
-Player * AbstractWidget::player()
+Player* AbstractWidget::player()
 {
     return mPlayer;
 }

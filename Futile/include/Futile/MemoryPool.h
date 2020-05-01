@@ -450,7 +450,7 @@ MovePtr<ValueType> AcquireAndDefaultConstruct(MemoryPool<ValueType>& pool)
  * Example:
  *
  *   // Factory function
- *   static Foo * Create(void * placement, const std::string& arg0, const std::string& arg1)
+ *   static Foo* Create(void * placement, const std::string& arg0, const std::string& arg1)
  *   {
  *     return new (placement) Foo(arg0, arg1)
  *   }
