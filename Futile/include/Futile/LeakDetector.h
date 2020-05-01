@@ -24,13 +24,13 @@ class LeakDetector : public Singleton<LeakDetector>
 {
 public:
     template<class T>
-    void insert(CountedInstance<T> * inObject)
+    void insert(CountedInstance<T>* inObject)
     {
         mTypeInfos.insert(std::make_pair(inObject, &typeid(T)));
     }
 
     template<class T>
-    void erase(CountedInstance<T> * inObject)
+    void erase(CountedInstance<T>* inObject)
     {
         TypeInfos::iterator it = mTypeInfos.find(inObject);
         if (it == mTypeInfos.end())

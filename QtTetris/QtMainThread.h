@@ -19,7 +19,7 @@ public:
 
     virtual void postAction(Futile::Action inAction);
 
-    virtual bool event(QEvent * inEvent);
+    virtual bool event(QEvent* inEvent);
 };
 
 

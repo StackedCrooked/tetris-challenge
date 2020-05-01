@@ -11,7 +11,7 @@ class NewGameDialog : public QDialog
 {
     Q_OBJECT
 public:
-    explicit NewGameDialog(QWidget * inParent);
+    explicit NewGameDialog(QWidget* inParent);
 
     virtual ~NewGameDialog();
 

@@ -68,7 +68,7 @@ void QtMainThread::postAction(Action inAction)
 }
 
 
-bool QtMainThread::event(QEvent * inEvent)
+bool QtMainThread::event(QEvent* inEvent)
 {
     if (QtAction * Action = dynamic_cast<QtAction*>(inEvent))
     {

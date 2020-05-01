@@ -22,7 +22,7 @@
  * Names names();
  * Returns an array containing the strings for the enumerators.
  *
- * int size();
+* int size();
  * Returns the size of the values and names array.
  *
  * EnumType first();
@@ -71,7 +71,7 @@
  *
  *
  * LIMITATIONS:
- * 
+ *
  *  - The enumerators always start at value zero and are incremented by 1.
  *    There is currently now way to change this.
  *

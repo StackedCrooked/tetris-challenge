@@ -41,9 +41,9 @@ public:
     public:
         EventHandler() {}
 
-        virtual void onGameStateChanged(Game * inGame) = 0;
+        virtual void onGameStateChanged(Game* inGame) = 0;
 
-        virtual void onLinesCleared(Game * inGame, int inLineCount) = 0;
+        virtual void onLinesCleared(Game* inGame, int inLineCount) = 0;
 
     protected:
         ~EventHandler(){}
@@ -57,11 +57,11 @@ public:
 
     ~Game();
 
-    static void RegisterEventHandler(Game * inGame, EventHandler * inEventHandler);
+    static void RegisterEventHandler(Game* inGame, EventHandler* inEventHandler);
 
-    static void UnregisterEventHandler(Game * inGame, EventHandler * inEventHandler);
+    static void UnregisterEventHandler(Game* inGame, EventHandler* inEventHandler);
 
-    static bool Exists(Game * inGame);
+    static bool Exists(Game* inGame);
 
     PlayerType playerType() const;
 

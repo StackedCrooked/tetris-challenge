@@ -79,11 +79,11 @@ public:
 
     virtual ~AbstractWidget();
 
-    virtual void onGameStateChanged(Game * inGame);
+    virtual void onGameStateChanged(Game* inGame);
 
-    virtual void onLinesCleared(Game * inGame, int inLineCount);
+    virtual void onLinesCleared(Game* inGame, int inLineCount);
 
-    void setPlayer(Player * inPlayer);
+    void setPlayer(Player* inPlayer);
 
     const Game * simpleGame() const;
 
@@ -137,6 +137,7 @@ protected:
                                   const RGBColor& inColor) = 0;
     virtual void drawTextRightAligned(const Rect& inRect, const std::string& inText, int inFontSize, const RGBColor& inColor) = 0;
 
+    virtual Size getMinimumSizeForTextBox(const std::string& text, int inFontSize) const = 0;
 
 private:
     void paintGrid(int x, int y, const Grid& inGrid);
@@ -150,6 +151,10 @@ private:
     void paintFutureBlocks(const Rect& inRect, int inSpacing, const std::vector<BlockType>& inBlockTypes);
 
     void recalculateFPS();
+
+    std::string getUserInfoText() const;
+
+    enum { FontSize = 12 };
 
     Tetris::Player * mPlayer;
     int mSquareWidth;

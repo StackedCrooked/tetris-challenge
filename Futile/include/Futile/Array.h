@@ -10,8 +10,8 @@ namespace Futile {
 
 
 /**
- * Array<T> is a wrapper around std::vector<T*> and takes ownership of the stored objects.
- * The public interface is mostly similar to std::vector.
+* Array<T> is a wrapper around std::vector<T*> and takes ownership of the stored objects.
+* The public interface is mostly similar to std::vector.
  */
 template<class T>
 class Array : boost::noncopyable
@@ -52,17 +52,17 @@ public:
         return mData.end();
     }
 
-    T * operator [] (typename Data::size_type inIndex)
+    T* operator [] (typename Data::size_type inIndex)
     {
         return mData[inIndex];
     }
 
-    const T * operator[](typename Data::size_type inIndex) const
+    const T* operator[](typename Data::size_type inIndex) const
     {
         return mData[inIndex];
     }
 
-    void push_back(T * inValue)
+    void push_back(T* inValue)  
     {
         mData.push_back(inValue);
     }
@@ -85,12 +85,12 @@ public:
         mData.resize(inNewSize);
     }
 
-    const T * back() const
+    const T* back() const
     {
         return mData.back();
     }
 
-    T * back()
+    T* back()
     {
         return mData.back();
     }

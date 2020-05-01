@@ -88,7 +88,7 @@ void Gravity::Impl::onTimerEvent(Poco::Timer& )
     try
     {
         int oldLevel = mLevel;
-        if (mStopwatch.elapsed() > 1000  * interval())
+        if (mStopwatch.elapsed() > 1000 * interval())
         {
             mStopwatch.restart();
             Locker<GameImpl> wGame(mThreadSafeGame);

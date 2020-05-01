@@ -49,7 +49,7 @@ struct Game::Impl : public GameImpl::EventHandler
         GameImpl::UnregisterEventHandler(mGameImpl, this);
     }
 
-    void init(Game * inGame)
+    void init(Game* inGame)
     {
         mBackPtr = inGame;
         GameImpl::RegisterEventHandler(mGameImpl, this);
@@ -110,7 +110,7 @@ PlayerType Game::playerType() const
 }
 
 
-void Game::RegisterEventHandler(Game * inGame, EventHandler * inEventHandler)
+void Game::RegisterEventHandler(Game* inGame, EventHandler* inEventHandler)
 {
     if (sInstances.find(inGame) == sInstances.end())
     {
@@ -122,7 +122,7 @@ void Game::RegisterEventHandler(Game * inGame, EventHandler * inEventHandler)
 }
 
 
-void Game::UnregisterEventHandler(Game * inGame, EventHandler * inEventHandler)
+void Game::UnregisterEventHandler(Game* inGame, EventHandler* inEventHandler)
 {
     if (sInstances.find(inGame) == sInstances.end())
     {
@@ -134,7 +134,7 @@ void Game::UnregisterEventHandler(Game * inGame, EventHandler * inEventHandler)
 }
 
 
-bool Game::Exists(Game * inGame)
+bool Game::Exists(Game* inGame)
 {
     return sInstances.find(inGame) != sInstances.end();
 }

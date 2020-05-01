@@ -50,7 +50,7 @@ public:
 
     virtual ~ComputerPlayer();
 
-    void setTweaker(Tweaker * inTweaker);
+    void setTweaker(Tweaker* inTweaker);
 
     int searchDepth() const;
 

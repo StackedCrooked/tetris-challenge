@@ -142,7 +142,7 @@ public:
         return mChildren.end();
     }
 
-    void insert(This * inItem)
+    void insert(This* inItem)
     {
         ChildPtr item(inItem);
         ContainerPolicy<ChildPtr>::insert(mChildren, item);

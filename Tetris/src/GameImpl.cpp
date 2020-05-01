@@ -48,7 +48,7 @@ GameImpl::EventHandler::~EventHandler()
 }
 
 
-bool GameImpl::EventHandler::Exists(GameImpl::EventHandler * inEventHandler)
+bool GameImpl::EventHandler::Exists(GameImpl::EventHandler* inEventHandler)
 {
     return sInstances.find(inEventHandler) != sInstances.end();
 }
@@ -92,7 +92,7 @@ bool GameImpl::Exists(const GameImpl& inGame)
 }
 
 
-void GameImpl::RegisterEventHandler(ThreadSafe<GameImpl> inGame, EventHandler * inEventHandler)
+void GameImpl::RegisterEventHandler(ThreadSafe<GameImpl> inGame, EventHandler* inEventHandler)
 {
     FUTILE_LOCK(GameImpl& game, inGame)
     {
@@ -104,7 +104,7 @@ void GameImpl::RegisterEventHandler(ThreadSafe<GameImpl> inGame, EventHandler * 
 }
 
 
-void GameImpl::UnregisterEventHandler(ThreadSafe<GameImpl> inGame, EventHandler * inEventHandler)
+void GameImpl::UnregisterEventHandler(ThreadSafe<GameImpl> inGame, EventHandler* inEventHandler)
 {
     FUTILE_LOCK(GameImpl& game, inGame)
     {
@@ -126,13 +126,13 @@ void GameImpl::onChanged()
 }
 
 
-bool GameImpl::Exists(GameImpl * inGame)
+bool GameImpl::Exists(GameImpl* inGame)
 {
     return sInstances.find(inGame) != sInstances.end();
 }
 
 
-void GameImpl::OnChangedImpl(GameImpl * inGame)
+void GameImpl::OnChangedImpl(GameImpl* inGame)
 {
     if (!Exists(inGame))
     {
@@ -163,7 +163,7 @@ void GameImpl::onLinesCleared(int inLineCount)
 }
 
 
-void GameImpl::OnLinesClearedImpl(GameImpl * inGame, int inLineCount)
+void GameImpl::OnLinesClearedImpl(GameImpl* inGame, int inLineCount)
 {
     //
     // This code runs in the main thread.

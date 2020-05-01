@@ -83,7 +83,7 @@ AbstractWidget::~AbstractWidget()
 }
 
 
-void AbstractWidget::onGameStateChanged(Game * inGame)
+void AbstractWidget::onGameStateChanged(Game* inGame)
 {
     if (!mPlayer || mPlayer->simpleGame() != inGame)
     {
@@ -94,7 +94,7 @@ void AbstractWidget::onGameStateChanged(Game * inGame)
 }
 
 
-void AbstractWidget::onLinesCleared(Game * inGame, int )
+void AbstractWidget::onLinesCleared(Game* inGame, int )
 {
     if (!mPlayer || mPlayer->simpleGame() != inGame)
     {
@@ -105,7 +105,7 @@ void AbstractWidget::onLinesCleared(Game * inGame, int )
 }
 
 
-void AbstractWidget::setPlayer(Player * inPlayer)
+void AbstractWidget::setPlayer(Player* inPlayer)
 {
     // Stop listing to the events from the old player.
     if (mPlayer && Game::Exists(mPlayer->simpleGame()))
@@ -223,14 +223,14 @@ Rect AbstractWidget::gameRect() const
 
 Rect AbstractWidget::userInfoRect() const
 {
+    Size min_size = getMinimumSizeForTextBox(getUserInfoText(), FontSize);
     Rect theGameRect = gameRect();
     int x = margin();
     int y = theGameRect.bottom() + margin();
-    int width = theGameRect.width();
-    int height = avatarRect().bottom() - y;
+    int width = std::max(min_size.width(), theGameRect.width());
+    int height = min_size.height(); //avatarRect().bottom() - y;
     return Rect(x, y, width, height);
 }
-
 
 
 Rect AbstractWidget::futureBlocksRect() const
@@ -368,7 +368,9 @@ void AbstractWidget::paintUserInfo()
 {
     Rect theuserInfoRect = userInfoRect();
     fillRect(theuserInfoRect, RGBColor(255, 255, 255));
-    drawTextRightAligned(theuserInfoRect, player()->teamName() + ": " + player()->playerName(), 12, RGBColor(0, 255, 255));
+
+
+    drawTextRightAligned(theuserInfoRect, player()->teamName() + ": " + player()->playerName(), FontSize, RGBColor(0, 255, 255));
 }
 
 
@@ -496,6 +498,12 @@ void AbstractWidget::recalculateFPS()
         mFrameCount = 0;
         mFPSStopwatch.restart();
     }
+}
+
+
+std::string AbstractWidget::getUserInfoText() const
+{
+    return player()->teamName() + ": " + player()->playerName();
 }
 
 

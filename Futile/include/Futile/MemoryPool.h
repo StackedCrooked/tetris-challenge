@@ -28,7 +28,7 @@ template<typename ValueType> class MemoryPool;
 template<class Value>
 struct WrappedPointer
 {
-    WrappedPointer(Value * inValue) :
+    WrappedPointer(Value* inValue) :
         mValue(inValue)
     {
     }
@@ -51,7 +51,7 @@ struct WrappedPointer
     inline Value& operator*() { return *get(); }
 
 protected:
-    void setValue(Value * inValue)
+    void setValue(Value* inValue)
     {
         mValue = inValue;
     }
@@ -82,7 +82,7 @@ public:
     {
     }
 
-    SmartPointer(MemoryPool<Value>& inMemoryPool, Value * inValue) :
+    SmartPointer(MemoryPool<Value>& inMemoryPool, Value* inValue) :
         Base(inValue),
         mMemoryPool(&inMemoryPool)
     {
@@ -94,7 +94,7 @@ public:
         std::swap(mMemoryPool, rhs.mMemoryPool);
     }
 
-    void reset(Value * inValue)
+    void reset(Value* inValue)
     {
         destroy();
         setValue(inValue);
@@ -128,7 +128,7 @@ private:
 public:
     typedef ValueType Value;
 
-    MovePtr(MemoryPool<Value>& inMemoryPool, Value * inValue) :
+    MovePtr(MemoryPool<Value>& inMemoryPool, Value* inValue) :
         Base(inMemoryPool, inValue),
         mOwns(true)
     {
@@ -170,7 +170,7 @@ private:
  * MovePtr factory function
  */
 template<typename ValueType>
-MovePtr<ValueType> Move(MemoryPool<ValueType>& pool, ValueType * inValue)
+MovePtr<ValueType> Move(MemoryPool<ValueType>& pool, ValueType* inValue)
 {
     return MovePtr<ValueType>(pool, inValue);
 }
@@ -195,7 +195,7 @@ public:
     {
     }
 
-    SharedPtr(MemoryPool<Value>& inMemoryPool, Value * inValue) :
+    SharedPtr(MemoryPool<Value>& inMemoryPool, Value* inValue) :
         Base(inMemoryPool, inValue),
         mValueWithRefCount(new ValueWithRefCount(inValue))
     {
@@ -235,7 +235,7 @@ public:
 private:
     struct ValueWithRefCount : boost::noncopyable
     {
-        ValueWithRefCount(Value * inValue) : mValue(inValue), mRefCount(1) { }
+        ValueWithRefCount(Value* inValue) : mValue(inValue), mRefCount(1) { }
 
         Value * mValue;
         std::size_t mRefCount;
@@ -249,7 +249,7 @@ private:
 * "Share" is a factory function for creating SharedPtr objects.
  */
 template<typename ValueType>
-SharedPtr<ValueType> Share(MemoryPool<ValueType>& pool, ValueType * inValue)
+SharedPtr<ValueType> Share(MemoryPool<ValueType>& pool, ValueType* inValue)
 {
     return SharedPtr<ValueType>(pool, inValue);
 }
@@ -276,7 +276,7 @@ private:
 public:
     typedef ValueType Value;
 
-    ScopedPtr(MemoryPool<Value>& inMemoryPool, Value * inValue) :
+    ScopedPtr(MemoryPool<Value>& inMemoryPool, Value* inValue) :
         Base(inMemoryPool, inValue)
     {
     }
@@ -312,7 +312,7 @@ public:
     typedef ValueType Value;
 
     MemoryPool(std::size_t inItemCount) :
-        mData(sizeof(Value) * inItemCount),
+        mData(sizeof(Value)* inItemCount),
         mItems(),
         mUsedItems(),
         mFreeItems(inItemCount)
@@ -348,7 +348,7 @@ public:
         return mUsedItems.size();
     }
 
-    std::size_t indexOf(const Value * inValue) const
+    std::size_t indexOf(const Value* inValue) const
     {
         return inValue - reinterpret_cast<const Value*>(mData.data());
     }
@@ -358,7 +358,7 @@ public:
         return indexOf(inWrappedPointer.get());
     }
 
-    std::size_t offsetOf(const Value * inValue) const
+    std::size_t offsetOf(const Value* inValue) const
     {
         return indexOf(inValue) * sizeof(Value);
     }
@@ -393,7 +393,7 @@ public:
     /**
      * Release the pointer. The object is assuemd to be destructed already!
      */
-    void release(const Value * inValue)
+    void release(const Value* inValue)
     {
         for (std::size_t usedIdx = mUsedItems.size() - 1; usedIdx != std::size_t(-1); --usedIdx)
         {
@@ -414,7 +414,7 @@ private:
     class Item
     {
     public:
-        Item(Value * inValue, std::size_t inIndex) :
+        Item(Value* inValue, std::size_t inIndex) :
             mValue(inValue),
             mIndex(inIndex)
         {

@@ -114,7 +114,7 @@ void MainWindow::closeEvent(QCloseEvent*)
 }
 
 
-bool MainWindow::event(QEvent * inEvent)
+bool MainWindow::event(QEvent* inEvent)
 {
     if (inEvent->type() == QEvent::Paint)
     {

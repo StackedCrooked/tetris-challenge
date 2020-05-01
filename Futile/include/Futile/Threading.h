@@ -109,7 +109,7 @@ public:
     }
 
     // Constructor that takes the new object.
-    explicit ThreadSafe(Variable * inVariable) :
+    explicit ThreadSafe(Variable* inVariable) :
         mImpl(new Impl(inVariable))
     {
     }
@@ -159,7 +159,7 @@ private:
             Assert(mVariable);
         }
 
-        Impl(Variable * inVariable) :
+        Impl(Variable* inVariable) :
             mVariable(inVariable)
         {
             Assert(mVariable);

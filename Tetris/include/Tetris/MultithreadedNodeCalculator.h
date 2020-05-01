@@ -24,7 +24,7 @@ private:
     virtual void populate();
 
     void generateChildNodes(NodePtr ioNode,
-                            const Evaluator * inEvaluator,
+                            const Evaluator* inEvaluator,
                             BlockType inBlockType,
                             int inDepth,
                             int inWidth);

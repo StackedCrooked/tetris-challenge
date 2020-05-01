@@ -48,7 +48,7 @@ struct RestorePainter : boost::noncopyable
 } // anomymous namespace
 
 
-TetrisWidget::TetrisWidget(QWidget * inParent, int inSquareWidth, int inSquareHeight) :
+TetrisWidget::TetrisWidget(QWidget* inParent, int inSquareWidth, int inSquareHeight) :
     QWidget(inParent),
     AbstractWidget(inSquareWidth, inSquareHeight),
     mMinSize(),
@@ -72,7 +72,7 @@ void TetrisWidget::refresh()
 }
 
 
-void TetrisWidget::keyPressEvent(QKeyEvent * inEvent)
+void TetrisWidget::keyPressEvent(QKeyEvent* inEvent)
 {
     if (!simpleGame() ||
          simpleGame()->isPaused() ||
@@ -244,6 +244,30 @@ void TetrisWidget::paintImage(const Tetris::Rect& inRect, const std::string& inF
         painter.fillRect(rectF, QColor(255, 255, 255));
         painter.drawImage(rectF, *mImage);
     }
+}
+
+
+Tetris::Size TetrisWidget::getMinimumSizeForTextBox(const std::string& text, int inFontSize) const
+{
+    if (!mPainter.get())
+    {
+        throw std::logic_error("Painter is not set.");
+    }
+
+    RestorePainter restorePainter(*mPainter);
+
+    QPainter& painter(*mPainter);
+
+    // Paint the stats title
+    QFont textFont(painter.font());
+    textFont.setPointSize(inFontSize);
+    textFont.setBold(true);
+    painter.setFont(textFont);
+
+    int textWidth = painter.fontMetrics().width(text.c_str());
+    int textHeight = painter.fontMetrics().height();
+
+    return Size(textWidth, textHeight);
 }
 
 

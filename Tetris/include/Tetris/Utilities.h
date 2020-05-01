@@ -8,7 +8,7 @@ namespace Tetris {
 template<class T>
 static T DivideByTwo(T inValue)
 {
-    return static_cast<int>(0.5 + 0.5 * inValue);
+    return static_cast<int>(0.5 + 0.5* inValue);
 }
 
 

@@ -25,7 +25,7 @@ template<class T>
 class shared_ptr
 {
 public:
-    shared_ptr(T * inValue = 0) :
+    shared_ptr(T* inValue = 0) :
         mImpl(new Impl(inValue))
     {
     }
@@ -77,7 +77,7 @@ public:
         unref();
     }
 
-    void reset(T * inValue)
+    void reset(T* inValue)
     {
         unref();
         mImpl = new Impl(inValue);
@@ -96,7 +96,7 @@ public:
 private:
     struct Impl
     {
-        Impl(T * inValue) :
+        Impl(T* inValue) :
             mRefCount(1),
             mValue(inValue)
         {

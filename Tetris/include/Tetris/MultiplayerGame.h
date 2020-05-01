@@ -26,9 +26,9 @@ public:
     // Creates the player object and retains ownership
     Player * addComputerPlayer(const TeamName& inTeamName,
                                const PlayerName& inPlayerName,
-                               ComputerPlayer::Tweaker * inTweaker);
+                               ComputerPlayer::Tweaker* inTweaker);
 
-    void removePlayer(Player * inPlayer);
+    void removePlayer(Player* inPlayer);
 
     std::size_t playerCount() const;
 

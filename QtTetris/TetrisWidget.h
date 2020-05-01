@@ -22,11 +22,11 @@ class TetrisWidget : public QWidget,
 {
     Q_OBJECT
 public:
-    explicit TetrisWidget(QWidget * inParent, int inSquareWidth, int inSquareHeight);
+    explicit TetrisWidget(QWidget* inParent, int inSquareWidth, int inSquareHeight);
 
     virtual ~TetrisWidget();
 
-    virtual void keyPressEvent(QKeyEvent * inKeyEvent);
+    virtual void keyPressEvent(QKeyEvent* inKeyEvent);
 
     virtual void refresh();
 
@@ -42,6 +42,8 @@ protected:
     virtual void paintSquare(const Tetris::Rect& inRect, const Tetris::RGBColor& inColor);
     virtual void paintStatItem(const Tetris::Rect& inRect, const std::string& inName, const std::string& inValue);
     virtual void paintImage(const Tetris::Rect& inRect, const std::string& inFileName);
+
+    virtual Tetris::Size getMinimumSizeForTextBox(const std::string& text, int inFontSize) const;
 
 private:
     virtual void paintEvent(QPaintEvent * event);

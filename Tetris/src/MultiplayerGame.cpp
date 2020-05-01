@@ -32,7 +32,7 @@ struct MultiplayerGame::Impl final :
 
     Player * addPlayer(PlayerType inPlayerType, const TeamName& inTeamName, const PlayerName& inPlayerName);
 
-    Player& findPlayer(Game * inGame) const
+    Player& findPlayer(Game* inGame) const
     {
         Players::const_iterator it = mPlayers.begin(), end = mPlayers.end();
         for (; it != end; ++it)
@@ -46,7 +46,7 @@ struct MultiplayerGame::Impl final :
         throw std::runtime_error("Player not found!");
     }
 
-    virtual void onLinesCleared(Game * inGame, int inLineCount)
+    virtual void onLinesCleared(Game* inGame, int inLineCount)
     {
         // If number of lines >= 2 then apply a line penalty to each non-allied player.
         Player& activePlayer(findPlayer(inGame));
@@ -104,7 +104,7 @@ Player * MultiplayerGame::addHumanPlayer(const TeamName& inTeamName,
 
 Player * MultiplayerGame::addComputerPlayer(const TeamName& inTeamName,
                                             const PlayerName& inPlayerName,
-                                            ComputerPlayer::Tweaker * inTweaker)
+                                            ComputerPlayer::Tweaker* inTweaker)
 {
     Player * result = mImpl->addPlayer(Computer, inTeamName, inPlayerName);
     ComputerPlayer& computerPlayer = dynamic_cast<ComputerPlayer&>(*result);
@@ -113,7 +113,7 @@ Player * MultiplayerGame::addComputerPlayer(const TeamName& inTeamName,
 }
 
 
-void MultiplayerGame::removePlayer(Player * inPlayer)
+void MultiplayerGame::removePlayer(Player* inPlayer)
 {
     Game::UnregisterEventHandler(inPlayer->simpleGame(), mImpl.get());
     Players::iterator it = std::find(mImpl->mPlayers.begin(), mImpl->mPlayers.end(), inPlayer);

@@ -44,7 +44,7 @@ MultithreadedNodeCalculator::~MultithreadedNodeCalculator()
 
 
 void MultithreadedNodeCalculator::generateChildNodes(NodePtr ioNode,
-                                                     const Evaluator * inEvaluator,
+                                                     const Evaluator* inEvaluator,
                                                      BlockType inBlockType,
                                                      int inDepth,
                                                      int inWidth)

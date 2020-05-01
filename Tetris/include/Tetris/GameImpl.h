@@ -56,7 +56,7 @@ public:
         virtual ~EventHandler();
 
         // Check if the give EventHandler object still exists
-        static bool Exists(EventHandler * inEventHandler);
+        static bool Exists(EventHandler* inEventHandler);
 
         // Notifies that the game state has changed.
         // This method arrives in the main thread.
@@ -64,9 +64,9 @@ public:
         // The GameImpl* pointer is unlocked at this moment. The
         // user is responsible for locking the corresponding
         // ThreadSafe<Game> object!
-        virtual void onGameStateChanged(GameImpl * inGame) = 0;
+        virtual void onGameStateChanged(GameImpl* inGame) = 0;
 
-        virtual void onLinesCleared(GameImpl * inGame, int inLineCount) = 0;
+        virtual void onLinesCleared(GameImpl* inGame, int inLineCount) = 0;
 
     private:
         EventHandler(const EventHandler&);
@@ -76,9 +76,9 @@ public:
         static Instances sInstances;
     };
 
-    static void RegisterEventHandler(ThreadSafe<GameImpl> inGame, EventHandler * inEventHandler);
+    static void RegisterEventHandler(ThreadSafe<GameImpl> inGame, EventHandler* inEventHandler);
 
-    static void UnregisterEventHandler(ThreadSafe<GameImpl> inGame, EventHandler * inEventHandler);
+    static void UnregisterEventHandler(ThreadSafe<GameImpl> inGame, EventHandler* inEventHandler);
 
     void setPaused(bool inPause);
 
@@ -136,9 +136,9 @@ protected:
     void onChanged();
     void onLinesCleared(int inLineCount);
 
-    static bool Exists(GameImpl * inGame);
-    static void OnChangedImpl(GameImpl * inGame);
-    static void OnLinesClearedImpl(GameImpl * inGame, int inLineCount);
+    static bool Exists(GameImpl* inGame);
+    static void OnChangedImpl(GameImpl* inGame);
+    static void OnLinesClearedImpl(GameImpl* inGame, int inLineCount);
 
     static std::unique_ptr<Block> CreateDefaultBlock(BlockType inBlockType, std::size_t inNumColumns);
     void reserveBlocks(std::size_t inCount);
