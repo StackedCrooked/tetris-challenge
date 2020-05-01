@@ -48,7 +48,7 @@ struct Gravity::Impl : boost::noncopyable
     {
     }
 
-    void onTimerEvent(Poco::Timer & timer);
+    void onTimerEvent(Poco::Timer& timer);
 
     int interval() const
     {
@@ -67,7 +67,7 @@ struct Gravity::Impl : boost::noncopyable
 };
 
 
-Gravity::Gravity(const ThreadSafe<GameImpl> & inThreadSafeGame) :
+Gravity::Gravity(const ThreadSafe<GameImpl>& inThreadSafeGame) :
     mImpl(new Impl(inThreadSafeGame))
 {
     Locker<GameImpl> rgame(mImpl->mThreadSafeGame);
@@ -83,7 +83,7 @@ Gravity::~Gravity()
 }
 
 
-void Gravity::Impl::onTimerEvent(Poco::Timer & )
+void Gravity::Impl::onTimerEvent(Poco::Timer& )
 {
     try
     {
@@ -110,7 +110,7 @@ void Gravity::Impl::onTimerEvent(Poco::Timer & )
             mTimer.setPeriodicInterval(sIntervals[mLevel]);
         }
     }
-    catch (const std::exception & inException)
+    catch (const std::exception& inException)
     {
         LogError(inException.what());
     }

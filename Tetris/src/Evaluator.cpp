@@ -13,7 +13,7 @@ using Futile::ScopedLock;
 namespace Tetris {
 
 
-Evaluator::Evaluator(const std::string & inName,
+Evaluator::Evaluator(const std::string& inName,
                      GameHeightFactor inGameHeightFactor,
                      LastBlockHeightFactor inLastBlockHeightFactor,
                      NumHolesFactor inNumHolesFactor,
@@ -97,9 +97,9 @@ int Evaluator::recommendedSearchWidth() const
 }
 
 
-int Evaluator::evaluate(const GameState & inGameState) const
+int Evaluator::evaluate(const GameState& inGameState) const
 {
-    const Grid & grid = inGameState.grid();
+    const Grid& grid = inGameState.grid();
     std::size_t top = grid.rowCount();
     bool foundTop = false;
     int numHoles = 0;
@@ -109,7 +109,7 @@ int Evaluator::evaluate(const GameState & inGameState) const
     {
         for (std::size_t colIdx = 0; colIdx != grid.columnCount(); ++colIdx)
         {
-            const int & value = grid.get(rowIdx, colIdx);
+            const int& value = grid.get(rowIdx, colIdx);
             if (value != BlockType_Nil)
             {
                 if (!foundTop)
@@ -218,9 +218,9 @@ MakeTetrises::MakeTetrises() :
 }
 
 
-int MakeTetrises::evaluate(const GameState & inGameState) const
+int MakeTetrises::evaluate(const GameState& inGameState) const
 {
-    const Grid & grid = inGameState.grid();
+    const Grid& grid = inGameState.grid();
 
     std::size_t c = grid.columnCount() - 1;
     if (grid.rowCount() >= 4)

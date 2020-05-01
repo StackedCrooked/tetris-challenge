@@ -32,7 +32,7 @@ Futile_TypedWrapper(SearchWidth, int);
 class Evaluator
 {
 public:
-    virtual int evaluate(const GameState & inGameState) const;
+    virtual int evaluate(const GameState& inGameState) const;
 
     // Return by value to prevent race conditions.
     std::string name() const;
@@ -58,7 +58,7 @@ public:
 protected:
     virtual ~Evaluator() {}
 
-    Evaluator(const std::string & inName,
+    Evaluator(const std::string& inName,
               GameHeightFactor inGameHeightFactor,
               LastBlockHeightFactor inLastBlockHeightFactor,
               NumHolesFactor inNumHolesFactor,
@@ -107,14 +107,14 @@ template<class SubType>
 class ConcreteEvaluator : public Evaluator
 {
 public:
-    static SubType & Instance()
+    static SubType& Instance()
     {
         static SubType fInstance;
         return fInstance;
     }
 
 protected:
-    ConcreteEvaluator(const std::string & inName,
+    ConcreteEvaluator(const std::string& inName,
                       GameHeightFactor inGameHeightFactor,
                       LastBlockHeightFactor inLastBlockHeightFactor,
                       NumHolesFactor inNumHolesFactor,
@@ -166,7 +166,7 @@ protected:
 class MakeTetrises : public ConcreteEvaluator<MakeTetrises>
 {
 public:
-    virtual int evaluate(const GameState & inGameState) const;
+    virtual int evaluate(const GameState& inGameState) const;
 
 protected:
     typedef ConcreteEvaluator<MakeTetrises> Super;

@@ -8,7 +8,7 @@
 namespace testing {
 
 
-std::string GetEnv(const std::string & name, const std::string & def = "");
+std::string GetEnv(const std::string& name, const std::string& def = "");
 
 
 class TetrisTest : public Test

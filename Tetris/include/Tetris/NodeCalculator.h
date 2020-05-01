@@ -22,10 +22,10 @@ class NodeCalculator
 {
 public:
     NodeCalculator(std::unique_ptr<GameStateNode> inNode,
-                   const BlockTypes & inBlockTypes,
-                   const std::vector<int> & inWidths,
-                   const Evaluator & inEvaluator,
-                   Futile::WorkerPool & inWorkerPool);
+                   const BlockTypes& inBlockTypes,
+                   const std::vector<int>& inWidths,
+                   const Evaluator& inEvaluator,
+                   Futile::WorkerPool& inWorkerPool);
 
     ~NodeCalculator();
 
@@ -59,7 +59,7 @@ public:
 private:
     // non-copyable
     NodeCalculator(const NodeCalculator &);
-    NodeCalculator & operator=(const NodeCalculator &);
+    NodeCalculator& operator=(const NodeCalculator &);
 
 	boost::scoped_ptr<NodeCalculatorImpl> mImpl;
 };

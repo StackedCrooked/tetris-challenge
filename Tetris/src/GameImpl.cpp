@@ -86,7 +86,7 @@ GameImpl::~GameImpl()
 }
 
 
-bool GameImpl::Exists(const GameImpl & inGame)
+bool GameImpl::Exists(const GameImpl& inGame)
 {
     return sInstances.find(&inGame) != sInstances.end();
 }
@@ -94,7 +94,7 @@ bool GameImpl::Exists(const GameImpl & inGame)
 
 void GameImpl::RegisterEventHandler(ThreadSafe<GameImpl> inGame, EventHandler * inEventHandler)
 {
-    FUTILE_LOCK(GameImpl & game, inGame)
+    FUTILE_LOCK(GameImpl& game, inGame)
     {
         if (Exists(game)) // The game may have ended by the time this event arrives.
         {
@@ -106,7 +106,7 @@ void GameImpl::RegisterEventHandler(ThreadSafe<GameImpl> inGame, EventHandler * 
 
 void GameImpl::UnregisterEventHandler(ThreadSafe<GameImpl> inGame, EventHandler * inEventHandler)
 {
-    FUTILE_LOCK(GameImpl & game, inGame)
+    FUTILE_LOCK(GameImpl& game, inGame)
     {
         if (Exists(game)) // The game may have ended by the time this event arrives.
         {
@@ -267,7 +267,7 @@ void GameImpl::applyLinePenalty(int inLineCount)
 
     // Check if the active block has been caught in the penalty lines that were added.
     // If yes then we need to commit the current gamestate.
-    const Block & block(activeBlock());
+    const Block& block(activeBlock());
     if (!gameState().checkPositionValid(block, block.row(), block.column()))
     {
         // Commit the game state.
@@ -376,7 +376,7 @@ bool GameImpl::canMove(MoveDirection inDirection)
         return false;
     }
 
-    Block & block = *mActiveBlock;
+    Block& block = *mActiveBlock;
     std::size_t newRow = block.row()    + GetRowDelta(inDirection);
     std::size_t newCol = block.column() + GetColumnDelta(inDirection);
     return gameState().checkPositionValid(block, newRow, newCol);
@@ -392,20 +392,20 @@ void GameImpl::reserveBlocks(std::size_t inCount)
 }
 
 
-const Block & GameImpl::activeBlock() const
+const Block& GameImpl::activeBlock() const
 {
     Assert(mActiveBlock);
     return *mActiveBlock;
 }
 
 
-const Grid & GameImpl::gameGrid() const
+const Grid& GameImpl::gameGrid() const
 {
     return gameState().grid();
 }
 
 
-void GameImpl::getFutureBlocks(std::size_t inCount, BlockTypes & outBlocks)
+void GameImpl::getFutureBlocks(std::size_t inCount, BlockTypes& outBlocks)
 {
     // Make sure we have all blocks we need.
     while (mBlocks.size() < mCurrentBlockIndex + inCount)
@@ -420,7 +420,7 @@ void GameImpl::getFutureBlocks(std::size_t inCount, BlockTypes & outBlocks)
 }
 
 
-void GameImpl::getFutureBlocksWithOffset(std::size_t inOffset, std::size_t inCount, BlockTypes & outBlocks)
+void GameImpl::getFutureBlocksWithOffset(std::size_t inOffset, std::size_t inCount, BlockTypes& outBlocks)
 {
     // Make sure we have all blocks we need.
     while (mBlocks.size() < inOffset + inCount)
@@ -460,7 +460,7 @@ bool GameImpl::rotate()
         return false;
     }
 
-    Block & block = *mActiveBlock;
+    Block& block = *mActiveBlock;
     std::size_t oldRotation = block.rotation();
     block.rotate();
     if (!gameState().checkPositionValid(block, block.row(), block.column()))
@@ -521,14 +521,14 @@ HumanGame::HumanGame(std::size_t inNumRows, std::size_t inNumCols) :
 }
 
 
-HumanGame::HumanGame(const GameImpl & inGame) :
+HumanGame::HumanGame(const GameImpl& inGame) :
     GameImpl(inGame.rowCount(), inGame.columnCount()),
     mGameState(new GameState(inGame.gameState()))
 {
 }
 
 
-GameState & HumanGame::gameState()
+GameState& HumanGame::gameState()
 {
     if (!mGameState.get())
     {
@@ -538,7 +538,7 @@ GameState & HumanGame::gameState()
 }
 
 
-const GameState & HumanGame::gameState() const
+const GameState& HumanGame::gameState() const
 {
     if (!mGameState.get())
     {
@@ -548,7 +548,7 @@ const GameState & HumanGame::gameState() const
 }
 
 
-void HumanGame::setGrid(const Grid & inGrid)
+void HumanGame::setGrid(const Grid& inGrid)
 {
     mGameState->setGrid(inGrid);
     onChanged();
@@ -562,7 +562,7 @@ bool HumanGame::move(MoveDirection inDirection)
         return false;
     }
 
-    Block & block = *mActiveBlock;
+    Block& block = *mActiveBlock;
     std::size_t newRow = block.row() + GetRowDelta(inDirection);
     std::size_t newCol = block.column() + GetColumnDelta(inDirection);
     if (gameState().checkPositionValid(block, newRow, newCol))
@@ -612,26 +612,26 @@ ComputerGame::ComputerGame(std::size_t inNumRows, std::size_t inNumCols) :
 }
 
 
-ComputerGame::ComputerGame(const GameImpl & inGame) :
+ComputerGame::ComputerGame(const GameImpl& inGame) :
     GameImpl(inGame.rowCount(), inGame.columnCount()),
     mCurrentNode(new GameStateNode(new GameState(inGame.gameState()), Balanced::Instance()))
 {
 }
 
 
-GameState & ComputerGame::gameState()
+GameState& ComputerGame::gameState()
 {
     return const_cast<GameState&>(mCurrentNode->gameState());
 }
 
 
-const GameState & ComputerGame::gameState() const
+const GameState& ComputerGame::gameState() const
 {
     return mCurrentNode->gameState();
 }
 
 
-void ComputerGame::setGrid(const Grid & inGrid)
+void ComputerGame::setGrid(const Grid& inGrid)
 {
     mCurrentNode->clearChildren();
     gameState().setGrid(inGrid);
@@ -719,7 +719,7 @@ bool ComputerGame::move(MoveDirection inDirection)
         return false;
     }
 
-    Block & block = *mActiveBlock;
+    Block& block = *mActiveBlock;
     size_t newRow = block.row() + GetRowDelta(inDirection);
     size_t newCol = block.column() + GetColumnDelta(inDirection);
     if (mCurrentNode->gameState().checkPositionValid(block, newRow, newCol))
@@ -746,8 +746,8 @@ bool ComputerGame::move(MoveDirection inDirection)
     // we planned.
     if (!mCurrentNode->children().empty())
     {
-        const GameStateNode & precalculatedChild = **mCurrentNode->children().begin();
-        const Block & nextBlock = precalculatedChild.gameState().originalBlock();
+        const GameStateNode& precalculatedChild = **mCurrentNode->children().begin();
+        const Block& nextBlock = precalculatedChild.gameState().originalBlock();
 
         if (!currentNode()->gameState().tainted())
         {

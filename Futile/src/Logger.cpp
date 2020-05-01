@@ -30,13 +30,13 @@ std::string ToString(LogLevel inLogLevel)
 }
 
 
-std::string GetMessage(LogLevel inLogLevel, const std::string & inMessage)
+std::string GetMessage(LogLevel inLogLevel, const std::string& inMessage)
 {
     return ToString(inLogLevel) + ": " + inMessage;
 }
 
 
-void Logger::setLogHandler(const LogHandler & inHandler)
+void Logger::setLogHandler(const LogHandler& inHandler)
 {
     mHandler = inHandler;
 }
@@ -68,7 +68,7 @@ void Logger::flush()
 }
 
 
-void Logger::logImpl(const std::string & inMessage)
+void Logger::logImpl(const std::string& inMessage)
 {
     if (mHandler)
     {
@@ -77,7 +77,7 @@ void Logger::logImpl(const std::string & inMessage)
 }
 
 
-void Logger::log(LogLevel inLogLevel, const std::string & inMessage)
+void Logger::log(LogLevel inLogLevel, const std::string& inMessage)
 {
     Locker<Queue> queue(mProtectedQueue);
     queue->push_back(GetMessage(inLogLevel, inMessage));

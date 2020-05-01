@@ -76,7 +76,7 @@ std::unique_ptr<MainThreadImpl> CreateMainThreadImpl()
 } // namespace Futile
 
 
-void Print(const std::string & msg)
+void Print(const std::string& msg)
 {
     std::cout << msg << std::endl;
 }
@@ -85,7 +85,7 @@ void Print(const std::string & msg)
 int main(int argc, char **argv)
 {
     Logger::ScopedInitializer initLogger;
-    Logger & logger = Logger::Instance();
+    Logger& logger = Logger::Instance();
     logger.addLogHandler(Print);
     InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();

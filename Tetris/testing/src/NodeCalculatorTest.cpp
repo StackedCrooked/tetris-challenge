@@ -215,7 +215,7 @@ TEST_F(NodeCalculatorTest, Destroy)
 }
 
 
-void NodeCalculatorTest::testDestroy(Worker & inMainWorker, WorkerPool & inWorkerPool)
+void NodeCalculatorTest::testDestroy(Worker& inMainWorker, WorkerPool& inWorkerPool)
 {
     const int cWidth = 6;
     const int cDepth = 6;

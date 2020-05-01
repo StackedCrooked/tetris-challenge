@@ -12,10 +12,10 @@ class SingleThreadedNodeCalculator : public NodeCalculatorImpl
 {
 public:
     SingleThreadedNodeCalculator(std::unique_ptr<GameStateNode> inNode,
-                                 const BlockTypes & inBlockTypes,
-                                 const std::vector<int> & inWidths,
-                                 const Evaluator & inEvaluator,
-                                 Futile::WorkerPool & inWorkerPool);
+                                 const BlockTypes& inBlockTypes,
+                                 const std::vector<int>& inWidths,
+                                 const Evaluator& inEvaluator,
+                                 Futile::WorkerPool& inWorkerPool);
 
     virtual ~SingleThreadedNodeCalculator();
 

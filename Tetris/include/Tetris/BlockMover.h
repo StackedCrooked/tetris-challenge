@@ -49,7 +49,7 @@ public:
 
 private:
     BlockMover(const BlockMover &);
-    BlockMover & operator=(const BlockMover&);
+    BlockMover& operator=(const BlockMover&);
 
     struct Impl;
     boost::scoped_ptr<Impl> mImpl;

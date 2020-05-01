@@ -105,7 +105,7 @@ public:
 
     int statsItemCount() const;
 
-    virtual const RGBColor & getColor(BlockType inBlockType) const;
+    virtual const RGBColor& getColor(BlockType inBlockType) const;
 
     virtual void refresh() = 0;
 
@@ -120,34 +120,34 @@ public:
     virtual Rect futureBlocksRect() const;
 
 protected:
-    virtual void setMinSize(const Size & inMinSize) = 0;
+    virtual void setMinSize(const Size& inMinSize) = 0;
     virtual Size getMinSize() const = 0;
 
-    void coordinateRepaint(Game & inGame);
-    virtual void paintSquare(const Rect & inRect, const RGBColor & inColor) = 0;
-    virtual void paintStatItem(const Tetris::Rect & inRect, const std::string & inName, const std::string & inValue) = 0;
-    virtual void paintImage(const Tetris::Rect & inRect, const std::string & inFileName) = 0;
-    virtual void drawRect(const Rect & inRect, const RGBColor & inColor) = 0;
-    virtual void fillRect(const Rect & inRect, const RGBColor & inColor) = 0;
-    virtual void drawLine(int x1, int y1, int x2, int y2, int inPenWidth, const RGBColor & inColor) = 0;
-    virtual void drawText(int x, int y, const std::string & inText) = 0;
-    virtual void drawTextCentered(const Rect & inRect,
-                                  const std::string & inText,
+    void coordinateRepaint(Game& inGame);
+    virtual void paintSquare(const Rect& inRect, const RGBColor& inColor) = 0;
+    virtual void paintStatItem(const Tetris::Rect& inRect, const std::string& inName, const std::string& inValue) = 0;
+    virtual void paintImage(const Tetris::Rect& inRect, const std::string& inFileName) = 0;
+    virtual void drawRect(const Rect& inRect, const RGBColor& inColor) = 0;
+    virtual void fillRect(const Rect& inRect, const RGBColor& inColor) = 0;
+    virtual void drawLine(int x1, int y1, int x2, int y2, int inPenWidth, const RGBColor& inColor) = 0;
+    virtual void drawText(int x, int y, const std::string& inText) = 0;
+    virtual void drawTextCentered(const Rect& inRect,
+                                  const std::string& inText,
                                   int inFontSize,
-                                  const RGBColor & inColor) = 0;
-    virtual void drawTextRightAligned(const Rect & inRect, const std::string & inText, int inFontSize, const RGBColor & inColor) = 0;
+                                  const RGBColor& inColor) = 0;
+    virtual void drawTextRightAligned(const Rect& inRect, const std::string& inText, int inFontSize, const RGBColor& inColor) = 0;
 
 
 private:
-    void paintGrid(int x, int y, const Grid & inGrid);
-    void paintGrid(int x, int y, const Grid & inGrid, const RGBColor & inColor);
+    void paintGrid(int x, int y, const Grid& inGrid);
+    void paintGrid(int x, int y, const Grid& inGrid, const RGBColor& inColor);
     void paintUserInfo();
-    void paintGameGrid(const Grid & inGrid);
+    void paintGameGrid(const Grid& inGrid);
     void paintGameOver();
-    void paintAvatar(const Game & inGame);
-    void paintActiveBlockShadow(const Game & inGame);
-    void paintStats(const Rect & inRect, const GameStateStats & inStats);
-    void paintFutureBlocks(const Rect & inRect, int inSpacing, const std::vector<BlockType> & inBlockTypes);
+    void paintAvatar(const Game& inGame);
+    void paintActiveBlockShadow(const Game& inGame);
+    void paintStats(const Rect& inRect, const GameStateStats& inStats);
+    void paintFutureBlocks(const Rect& inRect, int inSpacing, const std::vector<BlockType>& inBlockTypes);
 
     void recalculateFPS();
 

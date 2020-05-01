@@ -24,13 +24,14 @@ class WorkerPool;
  *  - EnumInfo<WorkerStatus>::ToString(inWorkerStatus);
  *   -EnumInfo<WorkerStatus>::FromString(inWorkerStatus);
  */
-Futile_Enum(WorkerStatus, 5, ( \
-    WorkerStatus_Initial,      \
-    WorkerStatus_Waiting,      \
-    WorkerStatus_Scheduled,    \
-    WorkerStatus_Working,      \
-    WorkerStatus_FinishedOne   \
-))
+enum WorkerStatus
+{
+    WorkerStatus_Initial,
+    WorkerStatus_Waiting,
+    WorkerStatus_Scheduled,
+    WorkerStatus_Working,
+    WorkerStatus_FinishedOne
+};
 
 
 /**
@@ -40,21 +41,21 @@ class Worker
 {
 public:
     // Creates a new thread and starts waiting for tasks.
-    Worker(const std::string & inName);
+    Worker(const std::string& inName);
 
     // If a task is running during destruction then we send
     // it an interrupt signal and wait for it to return.
     // Any remaining tasks are erased and the thread is destroyed.
     ~Worker();
 
-    inline const std::string & name() const { return mName; }
+    inline const std::string& name() const { return mName; }
 
     typedef boost::function<void()> Task;
 
     // Adds a task to the queue.
     // The task should be interruptable. This can be achieved by letting it
     // periodically call the boost::this_thread::interruption_point() function.
-    void schedule(const Task & inTask);
+    void schedule(const Task& inTask);
 
     // Returns the number of pending tasks.
     std::size_t size() const;

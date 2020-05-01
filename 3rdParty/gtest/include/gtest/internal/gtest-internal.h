@@ -334,13 +334,13 @@ class FloatingPoint {
   const Bits &bits() const { return u_.bits_; }
 
   // Returns the exponent bits of this number.
-  Bits exponent_bits() const { return kExponentBitMask & u_.bits_; }
+  Bits exponent_bits() const { return kExponentBitMask& u_.bits_; }
 
   // Returns the fraction bits of this number.
-  Bits fraction_bits() const { return kFractionBitMask & u_.bits_; }
+  Bits fraction_bits() const { return kFractionBitMask& u_.bits_; }
 
   // Returns the sign bit of this number.
-  Bits sign_bit() const { return kSignBitMask & u_.bits_; }
+  Bits sign_bit() const { return kSignBitMask& u_.bits_; }
 
   // Returns true iff this is NAN (not a number).
   bool is_nan() const {
@@ -387,7 +387,7 @@ class FloatingPoint {
   // Read http://en.wikipedia.org/wiki/Signed_number_representations
   // for more details on signed number representations.
   static Bits SignAndMagnitudeToBiased(const Bits &sam) {
-    if (kSignBitMask & sam) {
+    if (kSignBitMask& sam) {
       // sam represents a negative number.
       return ~sam + 1;
     } else {
@@ -432,7 +432,7 @@ template <typename T>
 class TypeIdHelper {
  public:
   // dummy_ must not have a const type.  Otherwise an overly eager
-  // compiler (e.g. MSVC 7.1 & 8.0) may try to merge
+  // compiler (e.g. MSVC 7.1& 8.0) may try to merge
   // TypeIdHelper<T>::dummy_ for different Ts as an "optimization".
   static bool dummy_;
 };

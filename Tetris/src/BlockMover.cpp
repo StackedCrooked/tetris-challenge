@@ -45,17 +45,17 @@ struct BlockMover::Impl
             mTimer->stop();
             mTimer.reset();
         }
-        catch (Poco::Exception & exc)
+        catch (Poco::Exception& exc)
         {
             std::cerr << exc.what();
         }
-        catch (const std::exception & exc)
+        catch (const std::exception& exc)
         {
             std::cerr << exc.what();
         }
     }
 
-    void onTimer(Poco::Timer & inTimer);
+    void onTimer(Poco::Timer& inTimer);
 
     int periodicInterval() const
     {
@@ -154,7 +154,7 @@ void BlockMover::Impl::onTimer(Poco::Timer &)
             mStopwatch.restart();
         }
     }
-    catch (const std::exception & inException)
+    catch (const std::exception& inException)
     {
         LogError(MakeString() << "Unanticipated exception thrown in Impl::move(). Details: " << inException.what());
     }
@@ -164,22 +164,22 @@ void BlockMover::Impl::onTimer(Poco::Timer &)
 void BlockMover::Impl::move()
 {
     Locker<GameImpl> wGame(mGame);
-    ComputerGame & game = dynamic_cast<ComputerGame&>(*wGame.get());
+    ComputerGame& game = dynamic_cast<ComputerGame&>(*wGame.get());
     if (game.isPaused())
     {
         return;
     }
 
-    const ChildNodes & children = game.currentNode()->children();
+    const ChildNodes& children = game.currentNode()->children();
     if (children.empty())
     {
         return;
     }
 
-    GameStateNode & firstChild = **children.begin();
+    GameStateNode& firstChild = **children.begin();
 
-    const Block & block = game.activeBlock();
-    const Block & targetBlock = firstChild.gameState().originalBlock();
+    const Block& block = game.activeBlock();
+    const Block& targetBlock = firstChild.gameState().originalBlock();
 
     Assert(block.type() == targetBlock.type());
 

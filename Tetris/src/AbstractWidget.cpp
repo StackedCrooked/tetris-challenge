@@ -195,7 +195,7 @@ int AbstractWidget::statsItemCount() const
 }
 
 
-const RGBColor & AbstractWidget::getColor(BlockType inBlockType) const
+const RGBColor& AbstractWidget::getColor(BlockType inBlockType) const
 {
     static const RGBColor fColors[] =
     {
@@ -277,7 +277,7 @@ Rect AbstractWidget::avatarRect() const
 }
 
 
-void AbstractWidget::coordinateRepaint(Game & inGame)
+void AbstractWidget::coordinateRepaint(Game& inGame)
 {
     Tetris::Size minSize = getMinSize();
     fillRect(Rect(0, 0, minSize.width(), minSize.height()), RGBColor(0, 50, 100));
@@ -304,7 +304,7 @@ void AbstractWidget::coordinateRepaint(Game & inGame)
     paintStats(statsRect(), inGame.stats());
 
     // Paint active block
-    const Block & activeBlock(inGame.activeBlock());
+    const Block& activeBlock(inGame.activeBlock());
     Rect theGameRect(gameRect());
     paintGrid(theGameRect.left() + activeBlock.column() * mSquareWidth,
               theGameRect.top() + activeBlock.row() * mSquareHeight,
@@ -324,7 +324,7 @@ void AbstractWidget::coordinateRepaint(Game & inGame)
 }
 
 
-void AbstractWidget::paintGrid(int x, int y, const Grid & inGrid)
+void AbstractWidget::paintGrid(int x, int y, const Grid& inGrid)
 {
     for (std::size_t c = 0; c < inGrid.columnCount(); ++c)
     {
@@ -344,7 +344,7 @@ void AbstractWidget::paintGrid(int x, int y, const Grid & inGrid)
 }
 
 
-void AbstractWidget::paintGrid(int x, int y, const Grid & inGrid, const RGBColor & inColor)
+void AbstractWidget::paintGrid(int x, int y, const Grid& inGrid, const RGBColor& inColor)
 {
     for (std::size_t c = 0; c < inGrid.columnCount(); ++c)
     {
@@ -372,7 +372,7 @@ void AbstractWidget::paintUserInfo()
 }
 
 
-void AbstractWidget::paintGameGrid(const Grid & inGrid)
+void AbstractWidget::paintGameGrid(const Grid& inGrid)
 {
     Rect theGameRect = gameRect();
     fillRect(theGameRect, RGBColor(222, 255, 255));
@@ -396,14 +396,14 @@ void AbstractWidget::paintGameOver()
 }
 
 
-void AbstractWidget::paintAvatar(const Game & inGame)
+void AbstractWidget::paintAvatar(const Game& inGame)
 {
     Rect theAvatarRect = avatarRect();
     paintImage(theAvatarRect, player()->playerName() + "_80.gif");
 }
 
 
-void AbstractWidget::paintActiveBlockShadow(const Game & inGame)
+void AbstractWidget::paintActiveBlockShadow(const Game& inGame)
 {
     std::size_t colIdx(0);
     std::size_t rowIdx(0);
@@ -412,9 +412,9 @@ void AbstractWidget::paintActiveBlockShadow(const Game & inGame)
     // Critical section. Minimize scope.
     {
         Locker<GameImpl> rgame(inGame.gameImpl());
-        const GameImpl & game = *rgame.get();
-        const Block & block = game.activeBlock();
-        const GameState & gameState = game.gameState();
+        const GameImpl& game = *rgame.get();
+        const Block& block = game.activeBlock();
+        const GameState& gameState = game.gameState();
 
         colIdx = block.column();
         gridPtr.reset(new Grid(block.grid()));
@@ -434,7 +434,7 @@ void AbstractWidget::paintActiveBlockShadow(const Game & inGame)
     }
 
 
-    Grid & grid = *gridPtr;
+    Grid& grid = *gridPtr;
 
     Rect theGameRect(gameRect());
 
@@ -446,7 +446,7 @@ void AbstractWidget::paintActiveBlockShadow(const Game & inGame)
 }
 
 
-void AbstractWidget::paintStats(const Rect & inRect, const GameStateStats & inStats)
+void AbstractWidget::paintStats(const Rect& inRect, const GameStateStats& inStats)
 {
     Rect rect = Rect(inRect.x(), inRect.y(), inRect.width(), mStatItemHeight);
     fillRect(rect, RGBColor(255, 255, 255));
@@ -467,7 +467,7 @@ void AbstractWidget::paintStats(const Rect & inRect, const GameStateStats & inSt
 }
 
 
-void AbstractWidget::paintFutureBlocks(const Rect & inRect, int inSpacing, const BlockTypes & inBlockTypes)
+void AbstractWidget::paintFutureBlocks(const Rect& inRect, int inSpacing, const BlockTypes& inBlockTypes)
 {
     if (inBlockTypes.empty())
     {
@@ -478,7 +478,7 @@ void AbstractWidget::paintFutureBlocks(const Rect & inRect, int inSpacing, const
 
     for (BlockTypes::size_type i = 0; i < inBlockTypes.size(); ++i)
     {
-        const Grid & grid(GetGrid(GetBlockIdentifier(inBlockTypes[i], 0)));
+        const Grid& grid(GetGrid(GetBlockIdentifier(inBlockTypes[i], 0)));
         int x = inRect.left() + (inRect.width() - (grid.columnCount() * squareWidth()))/2;
         int y = margin() + inRect.top() + (i * 3 * squareHeight());
         paintGrid(x, y, grid);

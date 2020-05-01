@@ -7,7 +7,7 @@
 #include <unistd.h>
 
 
-std::atomic<bool> & stop_flag()
+std::atomic<bool>& stop_flag()
 {
     static std::atomic<bool> fStop;
     return fStop;
@@ -28,7 +28,7 @@ struct Globals
 };
 
 
-Globals & globals()
+Globals& globals()
 {
     static Globals fGlobals;
     return fGlobals;
@@ -38,13 +38,13 @@ Globals & globals()
 void increment_a()
 {
     stm::atomic([&](stm::transaction& tx) {
-    int & a = globals().a.open_rw(tx);
+    int& a = globals().a.open_rw(tx);
     a++;
 
-    int & sum_ab = globals().sum_ab.open_rw(tx);
+    int& sum_ab = globals().sum_ab.open_rw(tx);
     sum_ab = a + globals().b.open_r(tx);
 
-    int & sum_ac = globals().sum_ac.open_rw(tx);
+    int& sum_ac = globals().sum_ac.open_rw(tx);
     sum_ac = a + globals().c.open_r(tx);
     });
 }
@@ -53,13 +53,13 @@ void increment_a()
 void increment_b()
 {
     stm::atomic([&](stm::transaction& tx) {
-    int & b = globals().b.open_rw(tx);
+    int& b = globals().b.open_rw(tx);
     b++;
 
-    int & sum_ab = globals().sum_ab.open_rw(tx);
+    int& sum_ab = globals().sum_ab.open_rw(tx);
     sum_ab = globals().a.open_r(tx) + b;
 
-    int & sum_bc = globals().sum_bc.open_rw(tx);
+    int& sum_bc = globals().sum_bc.open_rw(tx);
     sum_bc = b + globals().c.open_r(tx);
     });
 }
@@ -68,13 +68,13 @@ void increment_b()
 void increment_c()
 {
     stm::atomic([&](stm::transaction& tx) {
-    int & c = globals().c.open_rw(tx);
+    int& c = globals().c.open_rw(tx);
     c++;
 
-    int & sum_ac = globals().sum_ac.open_rw(tx);
+    int& sum_ac = globals().sum_ac.open_rw(tx);
     sum_ac = globals().a.open_r(tx) + c;
 
-    int & sum_bc = globals().sum_bc.open_rw(tx);
+    int& sum_bc = globals().sum_bc.open_rw(tx);
     sum_bc = globals().b.open_r(tx) + c;
     });
 }
@@ -91,7 +91,7 @@ void assertTrue(bool b)
 
 void check()
 {
-    stm::atomic([&](stm::transaction & tx) {
+    stm::atomic([&](stm::transaction& tx) {
         assertTrue(globals().a.open_r(tx) + globals().b.open_r(tx) == globals().sum_ab.open_r(tx));
         assertTrue(globals().a.open_r(tx) + globals().c.open_r(tx) == globals().sum_ac.open_r(tx));
         assertTrue(globals().b.open_r(tx) + globals().c.open_r(tx) == globals().sum_bc.open_r(tx));
@@ -107,40 +107,40 @@ struct STMTest : std::thread
     {
         while (!stop_flag())
         {
-            stm::atomic([&](stm::transaction & ) {
+            stm::atomic([&](stm::transaction& ) {
                 increment_a();
             });
             check();
 
-            stm::atomic([&](stm::transaction & ) {
+            stm::atomic([&](stm::transaction& ) {
                 increment_b();
             });
             check();
 
-            stm::atomic([&](stm::transaction & ) {
+            stm::atomic([&](stm::transaction& ) {
                 increment_c();
             });
             check();
 
-            stm::atomic([&](stm::transaction & ) {
+            stm::atomic([&](stm::transaction& ) {
                 increment_a();
                 increment_b();
             });
             check();
 
-            stm::atomic([&](stm::transaction & ) {
+            stm::atomic([&](stm::transaction& ) {
                 increment_b();
                 increment_c();
             });
             check();
 
-            stm::atomic([&](stm::transaction & ) {
+            stm::atomic([&](stm::transaction& ) {
                 increment_a();
                 increment_c();
             });
             check();
 
-            stm::atomic([&](stm::transaction & ) {
+            stm::atomic([&](stm::transaction& ) {
                 increment_a();
                 increment_b();
                 increment_c();
@@ -154,7 +154,7 @@ struct STMTest : std::thread
 typedef std::vector<int> Values;
 
 
-Values getValues(stm::transaction & tx)
+Values getValues(stm::transaction& tx)
 {
     Values results;
     results.push_back(globals().a.open_r(tx));
@@ -169,7 +169,7 @@ Values getValues(stm::transaction & tx)
 
 void printValues()
 {
-    Values values = stm::atomic<Values>([&](stm::transaction & tx) { return getValues(tx); });
+    Values values = stm::atomic<Values>([&](stm::transaction& tx) { return getValues(tx); });
     for (Values::size_type idx = 0; idx < values.size(); ++idx)
     {
         if (idx != 0)

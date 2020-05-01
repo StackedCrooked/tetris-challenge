@@ -33,18 +33,18 @@ public:
          *
          * WARNING: This callback will be received in a worker thread!
          */
-        virtual const Evaluator & updateAIParameters(const Player & inPlayer,
-                                                     int & outSearchDepth,
-                                                     int & outSearchWidth,
-                                                     int & outWorkerCount,
-                                                     int & outMoveSpeed,
-                                                     BlockMover::MoveDownBehavior & outMoveDownBehavior) = 0;
+        virtual const Evaluator& updateAIParameters(const Player& inPlayer,
+                                                     int& outSearchDepth,
+                                                     int& outSearchWidth,
+                                                     int& outWorkerCount,
+                                                     int& outMoveSpeed,
+                                                     BlockMover::MoveDownBehavior& outMoveDownBehavior) = 0;
     protected:
         ~Tweaker() {}
     };
 
-    ComputerPlayer(const TeamName & inTeamName,
-                   const PlayerName & inPlayerName,
+    ComputerPlayer(const TeamName& inTeamName,
+                   const PlayerName& inPlayerName,
                    std::size_t inRowCount,
                    std::size_t inColumnCount);
 
@@ -74,9 +74,9 @@ public:
 
 private:
     ComputerPlayer(const ComputerPlayer &);
-    ComputerPlayer & operator= (const ComputerPlayer&);
+    ComputerPlayer& operator= (const ComputerPlayer&);
 
-    void onTimerEvent(Poco::Timer & );
+    void onTimerEvent(Poco::Timer& );
 
     struct Impl;
     boost::scoped_ptr<Impl> mImpl;

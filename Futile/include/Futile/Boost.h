@@ -30,7 +30,7 @@ public:
     {
     }
 
-    shared_ptr(const shared_ptr & rhs) :
+    shared_ptr(const shared_ptr& rhs) :
         mImpl(rhs.mImpl)
     {
         mImpl->mRefCount++;
@@ -41,7 +41,7 @@ public:
         unref();
     }
 
-    shared_ptr & operator=(const shared_ptr & rhs)
+    shared_ptr& operator=(const shared_ptr& rhs)
     {
         if (this != &rhs)
         {
@@ -52,7 +52,7 @@ public:
         return *this;
     }
 
-    bool operator==(const shared_ptr & rhs)
+    bool operator==(const shared_ptr& rhs)
     {
         return mImpl == rhs.mImpl;
     }
@@ -83,7 +83,7 @@ public:
         mImpl = new Impl(inValue);
     }
 
-    T & operator* () const
+    T& operator* () const
     {
         return *mImpl->mValue;
     }

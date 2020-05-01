@@ -11,17 +11,17 @@ template<class ValueType>
 struct ContainerPolicy_Set
 {
     typedef std::set<ValueType> Container;
-    static void insert(Container & ioContainer, const ValueType & inValue)
+    static void insert(Container& ioContainer, const ValueType& inValue)
     {
         ioContainer.insert(inValue);
     }
 
-    static size_t size(const Container & ioContainer)
+    static size_t size(const Container& ioContainer)
     {
         return ioContainer.size();
     }
 
-    static bool empty(const Container & ioContainer)
+    static bool empty(const Container& ioContainer)
     {
         return ioContainer.empty();
     }
@@ -32,17 +32,17 @@ template<class ValueType>
 struct ContainerPolicy_Vector
 {
     typedef std::vector<ValueType> Container;
-    static void insert(Container & ioContainer, const ValueType & inValue)
+    static void insert(Container& ioContainer, const ValueType& inValue)
     {
         ioContainer.push_back(inValue);
     }
 
-    static size_t size(const Container & ioContainer)
+    static size_t size(const Container& ioContainer)
     {
         return ioContainer.size();
     }
 
-    static bool empty(const Container & ioContainer)
+    static bool empty(const Container& ioContainer)
     {
         return ioContainer.empty();
     }
@@ -104,7 +104,7 @@ public:
 
     GenericNode() { }
 
-    GenericNode(const DataType & inData) : mData(inData) { }
+    GenericNode(const DataType& inData) : mData(inData) { }
 
     typedef GenericNode<DataType, ContainerPolicy, PointerPolicy> This;
     typedef typename PointerPolicy<This>::PointerType ChildPtr;
@@ -158,17 +158,17 @@ public:
         return ContainerPolicy<ChildPtr>::empty(mChildren);
     }
 
-    DataType & data()
+    DataType& data()
     {
         return mData;
     }
 
-    const DataType & data() const
+    const DataType& data() const
     {
         return mData;
     }
 
-    void setData(const DataType & inData)
+    void setData(const DataType& inData)
     {
         mData = inData;
     }
@@ -182,7 +182,7 @@ private:
 template<class T,
          template<class> class C,
          template<class> class P>
-bool HasCycles(const GenericNode<T, C, P> & inNode,
+bool HasCycles(const GenericNode<T, C, P>& inNode,
                std::vector<const T*> inPreviousNodes)
 {
     typedef GenericNode<T, C, P> Node;
@@ -195,7 +195,7 @@ bool HasCycles(const GenericNode<T, C, P> & inNode,
              it != end;
              ++it)
         {
-            GenericNode<T, C, P> & child = **it;
+            GenericNode<T, C, P>& child = **it;
             if (std::find(inPreviousNodes.begin(), inPreviousNodes.end(), &child.data()) != inPreviousNodes.end())
             {
                 return true;
@@ -220,7 +220,7 @@ bool HasCycles(const GenericNode<T, C, P> & inNode,
 template<class T,
          template<class> class C,
          template<class> class P>
-bool HasCycles(const GenericNode<T, C, P> & inNode)
+bool HasCycles(const GenericNode<T, C, P>& inNode)
 {
     return HasCycles(inNode, std::vector<const T*>());
 }

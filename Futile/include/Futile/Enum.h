@@ -125,10 +125,10 @@
         static const char * name() { return #EnumType_; }                                         \
                                                                                                   \
         typedef const EnumType Values[Size];                                                      \
-        static const Values & values();                                                           \
+        static const Values& values();                                                           \
                                                                                                   \
         typedef const char * Names[Size];                                                         \
-        static const Names & names();                                                             \
+        static const Names& names();                                                             \
                                                                                                   \
         static int size() { return Size; }                                                        \
                                                                                                   \
@@ -136,12 +136,12 @@
                                                                                                   \
         static EnumType last() { return cLast; }                                                  \
                                                                                                   \
-        static EnumType FromString(const std::string & inName)                                    \
+        static EnumType FromString(const std::string& inName)                                    \
         {                                                                                         \
             for (int idx = 0; idx < size(); ++idx)                                                \
             {                                                                                     \
-                const Names & theNames = names();                                                 \
-                const Values & theValues = values();                                              \
+                const Names& theNames = names();                                                 \
+                const Values& theValues = values();                                              \
                 if (theNames[idx] == inName) return theValues[idx];                               \
             }                                                                                     \
             throw std::runtime_error("Invalid enumerator name: " + inName);                       \
@@ -151,14 +151,14 @@
         {                                                                                         \
             for (int idx = 0; idx < size(); ++idx)                                                \
             {                                                                                     \
-                const Names & theNames = names();                                                 \
-                const Values & theValues = values();                                              \
+                const Names& theNames = names();                                                 \
+                const Values& theValues = values();                                              \
                 if (theValues[idx] == inValue) return theNames[idx];                              \
             }                                                                                     \
             throw std::invalid_argument(boost::lexical_cast<std::string>(inValue));               \
         }                                                                                         \
     };                                                                                            \
-    inline const EnumInfo<EnumType_>::Values & EnumInfo<EnumType_>::values()                      \
+    inline const EnumInfo<EnumType_>::Values& EnumInfo<EnumType_>::values()                      \
     {                                                                                             \
         static Values fValues = {                                                                 \
             BOOST_PP_LIST_ENUM(                                                                   \
@@ -166,7 +166,7 @@
         };                                                                                        \
         return fValues;                                                                           \
     }                                                                                             \
-    inline const EnumInfo<EnumType_>::Names & EnumInfo<EnumType_>::names()                        \
+    inline const EnumInfo<EnumType_>::Names& EnumInfo<EnumType_>::names()                        \
     {                                                                                             \
         static Names fNames =                                                                     \
         {                                                                                         \

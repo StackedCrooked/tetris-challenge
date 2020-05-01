@@ -22,14 +22,14 @@ class Player
 {
 public:
     static std::unique_ptr<Player> Create(PlayerType inPlayerType,
-                                        const TeamName & inTeamName,
-                                        const PlayerName & inPlayerName,
+                                        const TeamName& inTeamName,
+                                        const PlayerName& inPlayerName,
                                         std::size_t inRowCount,
                                         std::size_t inColumnCount);
 
     Player(PlayerType inPlayerType,
-           const TeamName & inTeamName,
-           const PlayerName & inPlayerName,
+           const TeamName& inTeamName,
+           const PlayerName& inPlayerName,
            std::size_t inRowCount,
            std::size_t inColumnCount);
 
@@ -37,9 +37,9 @@ public:
 
     PlayerType type() const;
 
-    const std::string & teamName() const;
+    const std::string& teamName() const;
 
-    const std::string & playerName() const;
+    const std::string& playerName() const;
 
     const Game * simpleGame() const;
 
@@ -49,8 +49,8 @@ private:
     Player(const Player&);
     Player& operator=(const Player&);
 
-    friend bool operator==(const Player & lhs, const Player & rhs);
-    friend bool operator<(const Player & lhs, const Player & rhs);
+    friend bool operator==(const Player& lhs, const Player& rhs);
+    friend bool operator<(const Player& lhs, const Player& rhs);
 
     struct Impl;
     boost::scoped_ptr<Impl> mImpl;
@@ -63,8 +63,8 @@ typedef Futile::Array<Player> Players;
 class HumanPlayer : public Player
 {
 public:
-    HumanPlayer(const TeamName & inTeamName,
-                const PlayerName & inPlayerName,
+    HumanPlayer(const TeamName& inTeamName,
+                const PlayerName& inPlayerName,
                 std::size_t inRowCount,
                 std::size_t inColumnCount);
 

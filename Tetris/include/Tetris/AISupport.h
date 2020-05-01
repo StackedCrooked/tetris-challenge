@@ -24,17 +24,17 @@ class GameState;
  */
 void CarveBestPath(NodePtr startNode, NodePtr endNode);
 
-bool IsGameOver(const GameState & inGameState, BlockType inBlockType, int inRotation);
+bool IsGameOver(const GameState& inGameState, BlockType inBlockType, int inRotation);
 
 void GenerateOffspring(NodePtr ioGameStateNode,
                        BlockTypes inBlockTypes,
                        std::size_t inOffset,
-                       const Evaluator & inEvaluator);
+                       const Evaluator& inEvaluator);
 
 void GenerateOffspring(NodePtr ioGameStateNode,
                        BlockType inBlockType,
-                       const Evaluator & inEvaluator,
-                       ChildNodes & outChildNodes);
+                       const Evaluator& inEvaluator,
+                       ChildNodes& outChildNodes);
 
 
 } // namespace Tetris

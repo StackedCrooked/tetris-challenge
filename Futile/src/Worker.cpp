@@ -11,7 +11,7 @@
 //
 #if defined(_WIN32) && !defined(__MINGW32__)
 #include <windows.h>
-void SetThreadName(DWORD inThreadId, const std::string & inThreadName)
+void SetThreadName(DWORD inThreadId, const std::string& inThreadName)
 {
     #pragma pack(push,8)
     typedef struct tagTHREADNAME_INFO
@@ -46,7 +46,7 @@ void SetThreadName(DWORD inThreadId, const std::string & inThreadName)
 namespace Futile {
 
 
-Worker::Worker(const std::string & inName) :
+Worker::Worker(const std::string& inName) :
     mName(inName),
     mStatus(WorkerStatus_Initial),
     mQuitFlag(false)
@@ -159,10 +159,14 @@ void Worker::interruptAndClearQueue(bool inJoin)
 }
 
 
-void Worker::schedule(const Worker::Task & inTask)
+void Worker::schedule(const Worker::Task& inTask)
 {
+    std::list<Task> list(1, inTask);
+
     ScopedLock lock(mQueueMutex);
-    mQueue.push_back(inTask);
+
+    mQueue.splice(mQueue.end(), std::move(list));
+
     {
         ScopedLock statusLock(mStatusMutex);
         if (mStatus <= WorkerStatus_Waiting)
@@ -170,6 +174,7 @@ void Worker::schedule(const Worker::Task & inTask)
             mStatus = WorkerStatus_Scheduled;
         }
     }
+
     mQueueCondition.notify_all();
 }
 
@@ -219,7 +224,7 @@ void Worker::run()
             processTask();
         }
     }
-    catch (const std::exception & inExc)
+    catch (const std::exception& inExc)
     {
         LogError(MakeString() << "Exception caught in Worker::run. Detail: " << inExc.what());
     }

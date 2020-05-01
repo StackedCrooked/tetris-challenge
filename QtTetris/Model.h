@@ -23,18 +23,18 @@ public:
 
     Player * getPlayer(std::size_t inIndex);
 
-    const MultiplayerGame & multiplayerGame() const;
+    const MultiplayerGame& multiplayerGame() const;
 
-    MultiplayerGame & multiplayerGame();
+    MultiplayerGame& multiplayerGame();
 
-    virtual const Evaluator & updateAIParameters(const Player & inPlayer,
-                                                 int & outSearchDepth,
-                                                 int & outSearchWidth,
-                                                 int & outWorkerCount,
-                                                 int & /*outMoveSpeed*/,
-                                                 BlockMover::MoveDownBehavior & outMoveDownBehavior);
+    virtual const Evaluator& updateAIParameters(const Player& inPlayer,
+                                                 int& outSearchDepth,
+                                                 int& outSearchWidth,
+                                                 int& outWorkerCount,
+                                                 int& /*outMoveSpeed*/,
+                                                 BlockMover::MoveDownBehavior& outMoveDownBehavior);
 
-    void newGame(const PlayerTypes & inPlayerTypes, std::size_t inRowCount, std::size_t inColumnCount);
+    void newGame(const PlayerTypes& inPlayerTypes, std::size_t inRowCount, std::size_t inColumnCount);
 
 private:
     friend class Futile::Singleton<Model>;

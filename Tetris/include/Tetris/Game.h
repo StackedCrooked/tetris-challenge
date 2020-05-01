@@ -109,8 +109,8 @@ public:
 
 private:
     // non-copyable
-    Game(const Game & );
-    Game & operator=(const Game&);
+    Game(const Game& );
+    Game& operator=(const Game&);
 
     typedef Futile::Locker<GameImpl> Locker;
 

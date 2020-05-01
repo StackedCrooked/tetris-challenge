@@ -21,7 +21,7 @@ class MakeString
 {
 public:
     template <typename T>
-    MakeString & operator<<(const T & datum)
+    MakeString& operator<<(const T& datum)
     {
         mBuffer << datum;
         return *this;

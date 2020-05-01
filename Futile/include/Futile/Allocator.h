@@ -23,13 +23,13 @@ public:
 
     Allocator_Vector(std::size_t inSize);
 
-    Allocator_Vector(std::size_t inSize, const T & inInitialValue);
+    Allocator_Vector(std::size_t inSize, const T& inInitialValue);
 
-    T & get(std::size_t inIndex);
+    T& get(std::size_t inIndex);
 
-    const T & get(std::size_t inIndex) const;
+    const T& get(std::size_t inIndex) const;
 
-    void set(std::size_t inIndex, const T & inValue);
+    void set(std::size_t inIndex, const T& inValue);
 
     typename std::vector<T>::size_type size() const;
 
@@ -49,21 +49,21 @@ public:
 
     Allocator_Malloc(std::size_t inSize);
 
-    Allocator_Malloc(std::size_t inSize, const T & inInitialValue);
+    Allocator_Malloc(std::size_t inSize, const T& inInitialValue);
 
     Allocator_Malloc(const Allocator_Malloc&);
 
-    Allocator_Malloc& operator=(Allocator_Malloc rhs); // rhs by value! (copy & swap idiom)
+    Allocator_Malloc& operator=(Allocator_Malloc rhs); // rhs by value! (copy& swap idiom)
 
     ~Allocator_Malloc();
 
-    void swap(Allocator_Malloc<T> & rhs);
+    void swap(Allocator_Malloc<T>& rhs);
 
-    T & get(std::size_t inIndex);
+    T& get(std::size_t inIndex);
 
-    const T & get(std::size_t inIndex) const;
+    const T& get(std::size_t inIndex) const;
 
-    void set(std::size_t inIndex, const T & inValue);
+    void set(std::size_t inIndex, const T& inValue);
 
     std::size_t size() const;
 
@@ -84,21 +84,21 @@ public:
 
     Allocator_New(std::size_t inSize);
 
-    Allocator_New(std::size_t inSize, const T & inInitialValue);
+    Allocator_New(std::size_t inSize, const T& inInitialValue);
 
-    Allocator_New(const Allocator_New & rhs);
+    Allocator_New(const Allocator_New& rhs);
 
-    Allocator_New & operator=(Allocator_New rhs); // rhs by value! (copy & swap idiom)
+    Allocator_New& operator=(Allocator_New rhs); // rhs by value! (copy& swap idiom)
 
     ~Allocator_New();
 
-    void swap(Allocator_New<T> & rhs);
+    void swap(Allocator_New<T>& rhs);
 
-    T & get(std::size_t inIndex);
+    T& get(std::size_t inIndex);
 
-    const T & get(std::size_t inIndex) const;
+    const T& get(std::size_t inIndex) const;
 
-    void set(std::size_t inIndex, const T & inValue);
+    void set(std::size_t inIndex, const T& inValue);
 
     std::size_t size() const;
 
@@ -126,28 +126,28 @@ Allocator_Vector<T>::Allocator_Vector(std::size_t inSize) :
 
 
 template<class T>
-Allocator_Vector<T>::Allocator_Vector(std::size_t inSize, const T & inInitialValue) :
+Allocator_Vector<T>::Allocator_Vector(std::size_t inSize, const T& inInitialValue) :
     mVector(inSize, inInitialValue)
 {
 }
 
 
 template<class T>
-T & Allocator_Vector<T>::get(std::size_t inIndex)
+T& Allocator_Vector<T>::get(std::size_t inIndex)
 {
     return mVector[inIndex];
 }
 
 
 template<class T>
-const T & Allocator_Vector<T>::get(std::size_t inIndex) const
+const T& Allocator_Vector<T>::get(std::size_t inIndex) const
 {
     return mVector[inIndex];
 }
 
 
 template<class T>
-void Allocator_Vector<T>::set(std::size_t inIndex, const T & inValue)
+void Allocator_Vector<T>::set(std::size_t inIndex, const T& inValue)
 {
     Assert(inIndex <= size());
     mVector[inIndex] = inValue;
@@ -178,7 +178,7 @@ Allocator_Malloc<T>::Allocator_Malloc(std::size_t inSize) :
 
 
 template<class T>
-Allocator_Malloc<T>::Allocator_Malloc(std::size_t inSize, const T & inInitialValue) :
+Allocator_Malloc<T>::Allocator_Malloc(std::size_t inSize, const T& inInitialValue) :
     mBuffer(reinterpret_cast<T*>(malloc(sizeof(T) * inSize))),
     mSize(inSize)
 {
@@ -187,7 +187,7 @@ Allocator_Malloc<T>::Allocator_Malloc(std::size_t inSize, const T & inInitialVal
 
 
 template<class T>
-Allocator_Malloc<T>::Allocator_Malloc(const Allocator_Malloc & rhs) :
+Allocator_Malloc<T>::Allocator_Malloc(const Allocator_Malloc& rhs) :
     mBuffer(reinterpret_cast<T*>(malloc(sizeof(T) * rhs.mSize))),
     mSize(rhs.mSize)
 {
@@ -196,7 +196,7 @@ Allocator_Malloc<T>::Allocator_Malloc(const Allocator_Malloc & rhs) :
 
 
 template<class T>
-Allocator_Malloc<T> & Allocator_Malloc<T>::operator=(Allocator_Malloc rhs)
+Allocator_Malloc<T>& Allocator_Malloc<T>::operator=(Allocator_Malloc rhs)
 {
     swap(rhs);
     return *this;
@@ -211,7 +211,7 @@ Allocator_Malloc<T>::~Allocator_Malloc()
 
 
 template<class T>
-void Allocator_Malloc<T>::swap(Allocator_Malloc<T> & rhs)
+void Allocator_Malloc<T>::swap(Allocator_Malloc<T>& rhs)
 {
     std::swap(mBuffer, rhs.mBuffer);
     std::swap(mSize, rhs.mSize);
@@ -219,7 +219,7 @@ void Allocator_Malloc<T>::swap(Allocator_Malloc<T> & rhs)
 
 
 template<class T>
-T & Allocator_Malloc<T>::get(std::size_t inIndex)
+T& Allocator_Malloc<T>::get(std::size_t inIndex)
 {
     Assert(inIndex <= size());
     return mBuffer[inIndex];
@@ -227,7 +227,7 @@ T & Allocator_Malloc<T>::get(std::size_t inIndex)
 
 
 template<class T>
-const T & Allocator_Malloc<T>::get(std::size_t inIndex) const
+const T& Allocator_Malloc<T>::get(std::size_t inIndex) const
 {
     Assert(inIndex <= size());
     return mBuffer[inIndex];
@@ -235,7 +235,7 @@ const T & Allocator_Malloc<T>::get(std::size_t inIndex) const
 
 
 template<class T>
-void Allocator_Malloc<T>::set(std::size_t inIndex, const T & inValue)
+void Allocator_Malloc<T>::set(std::size_t inIndex, const T& inValue)
 {
     Assert(inIndex <= size());
     mBuffer[inIndex] = inValue;
@@ -266,7 +266,7 @@ Allocator_New<T>::Allocator_New(std::size_t inSize) :
 
 
 template<class T>
-Allocator_New<T>::Allocator_New(std::size_t inSize, const T & inInitialValue) :
+Allocator_New<T>::Allocator_New(std::size_t inSize, const T& inInitialValue) :
     mBuffer(new T[inSize]),
     mSize(inSize)
 {
@@ -275,7 +275,7 @@ Allocator_New<T>::Allocator_New(std::size_t inSize, const T & inInitialValue) :
 
 
 template<class T>
-Allocator_New<T>::Allocator_New(const Allocator_New & rhs) :
+Allocator_New<T>::Allocator_New(const Allocator_New& rhs) :
     mBuffer(new T[rhs.mSize]),
     mSize(rhs.mSize)
 {
@@ -284,7 +284,7 @@ Allocator_New<T>::Allocator_New(const Allocator_New & rhs) :
 
 
 template<class T>
-Allocator_New<T> & Allocator_New<T>::operator=(Allocator_New<T> rhs)
+Allocator_New<T>& Allocator_New<T>::operator=(Allocator_New<T> rhs)
 {
     swap(rhs);
     return *this;
@@ -292,7 +292,7 @@ Allocator_New<T> & Allocator_New<T>::operator=(Allocator_New<T> rhs)
 
 
 template<class T>
-void Allocator_New<T>::swap(Allocator_New<T> & rhs)
+void Allocator_New<T>::swap(Allocator_New<T>& rhs)
 {
     std::swap(mBuffer, rhs.mBuffer);
     std::swap(mSize, rhs.mSize);
@@ -307,21 +307,21 @@ Allocator_New<T>::~Allocator_New()
 
 
 template<class T>
-T & Allocator_New<T>::get(std::size_t inIndex)
+T& Allocator_New<T>::get(std::size_t inIndex)
 {
     return mBuffer[inIndex];
 }
 
 
 template<class T>
-const T & Allocator_New<T>::get(std::size_t inIndex) const
+const T& Allocator_New<T>::get(std::size_t inIndex) const
 {
     return mBuffer[inIndex];
 }
 
 
 template<class T>
-void Allocator_New<T>::set(std::size_t inIndex, const T & inValue)
+void Allocator_New<T>::set(std::size_t inIndex, const T& inValue)
 {
     Assert(inIndex <= size());
     mBuffer[inIndex] = inValue;

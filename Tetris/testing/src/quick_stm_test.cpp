@@ -29,7 +29,7 @@ public:
     
     Snapshot get_snapshot() const
     {
-        return stm::atomic<Snapshot>([this](stm::transaction & tx) {
+        return stm::atomic<Snapshot>([this](stm::transaction& tx) {
             return std::make_tuple(first.open_r(tx), second.open_r(tx), sum.open_r(tx));
         });
     }

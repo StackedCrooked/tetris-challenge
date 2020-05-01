@@ -37,10 +37,10 @@ void CarveBestPath(NodePtr startNode, NodePtr dst)
 }
 
 
-bool IsGameOver(const GameState & inGameState, BlockType inBlockType, int inRotation)
+bool IsGameOver(const GameState& inGameState, BlockType inBlockType, int inRotation)
 {
-    const Grid & blockGrid = GetGrid(GetBlockIdentifier(inBlockType, inRotation));
-    const Grid & gameGrid = inGameState.grid();
+    const Grid& blockGrid = GetGrid(GetBlockIdentifier(inBlockType, inRotation));
+    const Grid& gameGrid = inGameState.grid();
     std::size_t initialColumn = DivideByTwo(inGameState.grid().columnCount() - blockGrid.columnCount());
     for (std::size_t row = 0; row < blockGrid.rowCount(); ++row)
     {
@@ -59,7 +59,7 @@ bool IsGameOver(const GameState & inGameState, BlockType inBlockType, int inRota
 void GenerateOffspring(NodePtr ioGameStateNode,
                        BlockTypes inBlockTypes,
                        std::size_t inOffset,
-                       const Evaluator & inEvaluator)
+                       const Evaluator& inEvaluator)
 {
     Assert(inOffset < inBlockTypes.size());
     Assert(ioGameStateNode->children().empty());
@@ -87,12 +87,12 @@ void GenerateOffspring(NodePtr ioGameStateNode,
 
 void GenerateOffspring(NodePtr inNode,
                        BlockType inBlockType,
-                       const Evaluator & inEvaluator,
-                       ChildNodes & outChildNodes)
+                       const Evaluator& inEvaluator,
+                       ChildNodes& outChildNodes)
 {
     Assert(outChildNodes.empty());
-    const GameState & gameState = inNode->gameState();
-    const Grid & gameGrid = gameState.grid();
+    const GameState& gameState = inNode->gameState();
+    const Grid& gameGrid = gameState.grid();
 
     // Is this a "game over" situation?
     // If yes then append the final "broken" game state as only child.

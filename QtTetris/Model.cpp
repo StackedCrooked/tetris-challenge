@@ -54,13 +54,13 @@ Player * Model::getPlayer(std::size_t inIndex)
 }
 
 
-const MultiplayerGame & Model::multiplayerGame() const
+const MultiplayerGame& Model::multiplayerGame() const
 {
     return *mMultiplayerGame;
 }
 
 
-MultiplayerGame & Model::multiplayerGame()
+MultiplayerGame& Model::multiplayerGame()
 {
     if (!mMultiplayerGame)
     {
@@ -70,19 +70,19 @@ MultiplayerGame & Model::multiplayerGame()
 }
 
 
-const Evaluator & Model::updateAIParameters(const Player & inPlayer,
-                                            int & outSearchDepth,
-                                            int & outSearchWidth,
-                                            int & outWorkerCount,
-                                            int & outMoveSpeed,
-                                            BlockMover::MoveDownBehavior & outMoveDownBehavior)
+const Evaluator& Model::updateAIParameters(const Player& inPlayer,
+                                            int& outSearchDepth,
+                                            int& outSearchWidth,
+                                            int& outWorkerCount,
+                                            int& outMoveSpeed,
+                                            BlockMover::MoveDownBehavior& outMoveDownBehavior)
 {
     if (!inPlayer.simpleGame())
     {
         throw std::runtime_error("GameState is null!");
     }
 
-    const Game & game = *inPlayer.simpleGame();
+    const Game& game = *inPlayer.simpleGame();
 
     static const auto num_cpus = Poco::Environment::processorCount();
 
@@ -118,7 +118,7 @@ const Evaluator & Model::updateAIParameters(const Player & inPlayer,
 }
 
 
-void Model::newGame(const PlayerTypes & inPlayerTypes, std::size_t inRowCount, std::size_t inColumnCount)
+void Model::newGame(const PlayerTypes& inPlayerTypes, std::size_t inRowCount, std::size_t inColumnCount)
 {
     mMultiplayerGame.reset();
     mMultiplayerGame.reset(new MultiplayerGame(inRowCount, inColumnCount));

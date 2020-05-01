@@ -26,7 +26,7 @@ namespace { // anonymous namespace
 
 struct RestorePainter : boost::noncopyable
 {
-    RestorePainter(QPainter & inPainter) :
+    RestorePainter(QPainter& inPainter) :
         mPainter(inPainter),
         mFont(inPainter.font()),
         mPen(inPainter.pen())
@@ -39,7 +39,7 @@ struct RestorePainter : boost::noncopyable
         mPainter.setPen(mPen);
     }
 
-    QPainter & mPainter;
+    QPainter& mPainter;
     QFont mFont;
     QPen mPen;
 };
@@ -119,7 +119,7 @@ void TetrisWidget::keyPressEvent(QKeyEvent * inEvent)
 }
 
 
-void TetrisWidget::setMinSize(const Tetris::Size & inSize)
+void TetrisWidget::setMinSize(const Tetris::Size& inSize)
 {
     mMinSize = QSize(inSize.width(), inSize.height());
 }
@@ -131,7 +131,7 @@ Tetris::Size TetrisWidget::getMinSize() const
 }
 
 
-void TetrisWidget::fillRect(const Tetris::Rect & inRect, const Tetris::RGBColor & inColor)
+void TetrisWidget::fillRect(const Tetris::Rect& inRect, const Tetris::RGBColor& inColor)
 {
     if (!mPainter.get())
     {
@@ -148,7 +148,7 @@ void TetrisWidget::fillRect(const Tetris::Rect & inRect, const Tetris::RGBColor 
 }
 
 
-void TetrisWidget::drawRect(const Tetris::Rect & inRect, const Tetris::RGBColor & inColor)
+void TetrisWidget::drawRect(const Tetris::Rect& inRect, const Tetris::RGBColor& inColor)
 {
     if (!mPainter.get())
     {
@@ -167,7 +167,7 @@ void TetrisWidget::drawRect(const Tetris::Rect & inRect, const Tetris::RGBColor 
 }
 
 
-void TetrisWidget::paintSquare(const Rect & inRect, const RGBColor & inColor)
+void TetrisWidget::paintSquare(const Rect& inRect, const RGBColor& inColor)
 {
     if (!mPainter.get())
     {
@@ -194,7 +194,7 @@ void TetrisWidget::paintSquare(const Rect & inRect, const RGBColor & inColor)
 }
 
 
-void TetrisWidget::paintStatItem(const Tetris::Rect & inRect, const std::string & inName, const std::string & inValue)
+void TetrisWidget::paintStatItem(const Tetris::Rect& inRect, const std::string& inName, const std::string& inValue)
 {
     if (!mPainter.get())
     {
@@ -202,7 +202,7 @@ void TetrisWidget::paintStatItem(const Tetris::Rect & inRect, const std::string 
     }
     RestorePainter restorePainter(*mPainter);
 
-    QPainter & painter(*mPainter);
+    QPainter& painter(*mPainter);
     QFont oldFont(painter.font());
 
     // Paint the stats title
@@ -226,7 +226,7 @@ void TetrisWidget::paintStatItem(const Tetris::Rect & inRect, const std::string 
 }
 
 
-void TetrisWidget::paintImage(const Tetris::Rect & inRect, const std::string & inFileName)
+void TetrisWidget::paintImage(const Tetris::Rect& inRect, const std::string& inFileName)
 {
     if (!mImage || mImageFileName != inFileName)
     {
@@ -237,7 +237,7 @@ void TetrisWidget::paintImage(const Tetris::Rect & inRect, const std::string & i
 
     if (!mImage->isNull())
     {
-        QPainter & painter(*mPainter);
+        QPainter& painter(*mPainter);
         RestorePainter restorePainter(*mPainter);
 
         QRectF rectF(inRect.left(), inRect.top(), inRect.width(), inRect.height());
@@ -247,7 +247,7 @@ void TetrisWidget::paintImage(const Tetris::Rect & inRect, const std::string & i
 }
 
 
-void TetrisWidget::drawLine(int x1, int y1, int x2, int y2, int inPenWidth, const RGBColor & inColor)
+void TetrisWidget::drawLine(int x1, int y1, int x2, int y2, int inPenWidth, const RGBColor& inColor)
 {
     if (!mPainter.get())
     {
@@ -260,7 +260,7 @@ void TetrisWidget::drawLine(int x1, int y1, int x2, int y2, int inPenWidth, cons
 }
 
 
-void TetrisWidget::drawText(int x, int y, const std::string & inText)
+void TetrisWidget::drawText(int x, int y, const std::string& inText)
 {
     if (!mPainter.get())
     {
@@ -268,14 +268,14 @@ void TetrisWidget::drawText(int x, int y, const std::string & inText)
     }
 
     RestorePainter restorePainter(*mPainter);
-    QPainter & painter(*mPainter);
+    QPainter& painter(*mPainter);
 
     painter.setPen(QColor(0, 0, 0));
     painter.drawText(QRect(x, y, simpleGame()->gameGrid().columnCount() * squareWidth(), squareHeight()), inText.c_str());
 }
 
 
-void TetrisWidget::drawTextCentered(const Rect & inRect, const std::string & inText, int inFontSize, const RGBColor & inColor)
+void TetrisWidget::drawTextCentered(const Rect& inRect, const std::string& inText, int inFontSize, const RGBColor& inColor)
 {
     if (!mPainter.get())
     {
@@ -283,7 +283,7 @@ void TetrisWidget::drawTextCentered(const Rect & inRect, const std::string & inT
     }
 
     RestorePainter restorePainter(*mPainter);
-    QPainter & painter(*mPainter);
+    QPainter& painter(*mPainter);
 
     // Set the new pen
     painter.setPen(QColor(inColor.red(), inColor.green(), inColor.blue()));
@@ -304,7 +304,7 @@ void TetrisWidget::drawTextCentered(const Rect & inRect, const std::string & inT
 }
 
 
-void TetrisWidget::drawTextRightAligned(const Rect & inRect, const std::string & inText, int inFontSize, const RGBColor & inColor)
+void TetrisWidget::drawTextRightAligned(const Rect& inRect, const std::string& inText, int inFontSize, const RGBColor& inColor)
 {
     if (!mPainter.get())
     {
@@ -312,7 +312,7 @@ void TetrisWidget::drawTextRightAligned(const Rect & inRect, const std::string &
     }
 
     RestorePainter restorePainter(*mPainter);
-    QPainter & painter(*mPainter);
+    QPainter& painter(*mPainter);
 
     painter.setPen(QColor(inColor.red(), inColor.green(), inColor.blue()));
 

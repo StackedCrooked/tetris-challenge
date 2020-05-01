@@ -26,7 +26,7 @@ public:
 
     std::size_t numRotations() const;
 
-    const Grid & grid() const;
+    const Grid& grid() const;
 
     std::size_t row() const;
 
@@ -88,7 +88,7 @@ std::size_t BlockImpl::numRotations() const
 }
 
 
-const Grid & BlockImpl::grid() const
+const Grid& BlockImpl::grid() const
 {
     return *mGrid;
 }
@@ -149,13 +149,13 @@ Block::Block(BlockType inType, Rotation inRotation, Row inRow, Column inColumn) 
 }
 
 
-Block::Block(const Block & rhs) :
+Block::Block(const Block& rhs) :
     mImpl(rhs.mImpl->clone().release())
 {
 }
 
 
-Block & Block::operator=(const Block & rhs)
+Block& Block::operator=(const Block& rhs)
 {
     if (&rhs != this)
     {
@@ -197,7 +197,7 @@ std::size_t Block::numRotations() const
 }
 
 
-const Grid & Block::grid() const
+const Grid& Block::grid() const
 {
     return mImpl->grid();
 }
@@ -282,7 +282,7 @@ std::size_t GetBlockPositionCount(BlockType inType, std::size_t inNumColumns)
     std::size_t numRotations = GetBlockRotationCount(inType);
     for (std::size_t idx = 0; idx != numRotations; ++idx)
     {
-        const Grid & grid = GetGrid(GetBlockIdentifier(inType, idx));
+        const Grid& grid = GetGrid(GetBlockIdentifier(inType, idx));
         result += inNumColumns - grid.columnCount() + 1;
     }
     return result;
@@ -298,7 +298,7 @@ Grid GetTGrid(int rotation);
 Grid GetZGrid(int rotation);
 
 
-const Grid & GetGrid(int inId)
+const Grid& GetGrid(int inId)
 {
     if (inId < 0 || inId >= 28)
     {

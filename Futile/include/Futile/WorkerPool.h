@@ -17,13 +17,13 @@ namespace Futile {
 class WorkerPool
 {
 public:
-    WorkerPool(const std::string & inName, std::size_t inSize);
+    WorkerPool(const std::string& inName, std::size_t inSize);
 
     ~WorkerPool();
 
-    const std::string & name() const { return mName; }
+    const std::string& name() const { return mName; }
 
-    void schedule(const Worker::Task & inTask);
+    void schedule(const Worker::Task& inTask);
 
     // Returns the number of workers.
     std::size_t size() const;

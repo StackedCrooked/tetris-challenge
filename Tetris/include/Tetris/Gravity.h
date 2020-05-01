@@ -22,7 +22,7 @@ class Gravity;
 class Gravity
 {
 public:
-    Gravity(const Futile::ThreadSafe<GameImpl> & inGame);
+    Gravity(const Futile::ThreadSafe<GameImpl>& inGame);
 
     ~Gravity();
 
@@ -33,7 +33,7 @@ public:
 
 private:
     Gravity(const Gravity &);
-    Gravity & operator=(const Gravity &);
+    Gravity& operator=(const Gravity &);
 
     struct Impl;
     boost::scoped_ptr<Impl> mImpl;

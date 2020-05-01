@@ -26,10 +26,10 @@ namespace Tetris {
 
 
 NodeCalculatorImpl::NodeCalculatorImpl(std::unique_ptr<GameStateNode> inNode,
-                                       const BlockTypes & inBlockTypes,
-                                       const std::vector<int> & inWidths,
-                                       const Evaluator & inEvaluator,
-                                       WorkerPool & inWorkerPool) :
+                                       const BlockTypes& inBlockTypes,
+                                       const std::vector<int>& inWidths,
+                                       const Evaluator& inEvaluator,
+                                       WorkerPool& inWorkerPool) :
     mNode(inNode.release()),
     mResult(),
     mNodeMutex(),
@@ -111,8 +111,8 @@ void NodeCalculatorImpl::setStatus(int inStatus)
 
 void NodeCalculatorImpl::populateNodesRecursively(
     NodePtr ioNode,
-    const BlockTypes & inBlockTypes,
-    const std::vector<int> & inWidths,
+    const BlockTypes& inBlockTypes,
+    const std::vector<int>& inWidths,
     std::size_t inIndex,
     std::size_t inMaxIndex)
 {
@@ -267,7 +267,7 @@ void NodeCalculatorImpl::startImpl()
         calculateResult();
         setStatus(NodeCalculator::Status_Finished);
     }
-    catch (const std::exception & inException)
+    catch (const std::exception& inException)
     {
         mErrorMessage = inException.what();
         setStatus(NodeCalculator::Status_Error);

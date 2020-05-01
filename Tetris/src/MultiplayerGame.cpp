@@ -30,14 +30,14 @@ struct MultiplayerGame::Impl final :
         // Not interested.
     }
 
-    Player * addPlayer(PlayerType inPlayerType, const TeamName & inTeamName, const PlayerName & inPlayerName);
+    Player * addPlayer(PlayerType inPlayerType, const TeamName& inTeamName, const PlayerName& inPlayerName);
 
-    Player & findPlayer(Game * inGame) const
+    Player& findPlayer(Game * inGame) const
     {
         Players::const_iterator it = mPlayers.begin(), end = mPlayers.end();
         for (; it != end; ++it)
         {
-            Player & player(**it);
+            Player& player(**it);
             if (player.simpleGame() == inGame)
             {
                 return player;
@@ -49,12 +49,12 @@ struct MultiplayerGame::Impl final :
     virtual void onLinesCleared(Game * inGame, int inLineCount)
     {
         // If number of lines >= 2 then apply a line penalty to each non-allied player.
-        Player & activePlayer(findPlayer(inGame));
+        Player& activePlayer(findPlayer(inGame));
 
         Players::iterator it = mPlayers.begin(), end = mPlayers.end();
         for (; it != end; ++it)
         {
-            Player & player(**it);
+            Player& player(**it);
             if (player.teamName() != activePlayer.teamName())
             {
                 player.simpleGame()->applyLinePenalty(inLineCount);
@@ -81,8 +81,8 @@ MultiplayerGame::~MultiplayerGame()
 
 
 Player * MultiplayerGame::Impl::addPlayer(PlayerType inPlayerType,
-                                          const TeamName & inTeamName,
-                                          const PlayerName & inPlayerName)
+                                          const TeamName& inTeamName,
+                                          const PlayerName& inPlayerName)
 {
     mPlayers.push_back(Player::Create(inPlayerType,
                                       inTeamName,
@@ -95,19 +95,19 @@ Player * MultiplayerGame::Impl::addPlayer(PlayerType inPlayerType,
 }
 
 
-Player * MultiplayerGame::addHumanPlayer(const TeamName & inTeamName,
-                                         const PlayerName & inPlayerName)
+Player * MultiplayerGame::addHumanPlayer(const TeamName& inTeamName,
+                                         const PlayerName& inPlayerName)
 {
     return mImpl->addPlayer(Human, inTeamName, inPlayerName);
 }
 
 
-Player * MultiplayerGame::addComputerPlayer(const TeamName & inTeamName,
-                                            const PlayerName & inPlayerName,
+Player * MultiplayerGame::addComputerPlayer(const TeamName& inTeamName,
+                                            const PlayerName& inPlayerName,
                                             ComputerPlayer::Tweaker * inTweaker)
 {
     Player * result = mImpl->addPlayer(Computer, inTeamName, inPlayerName);
-    ComputerPlayer & computerPlayer = dynamic_cast<ComputerPlayer&>(*result);
+    ComputerPlayer& computerPlayer = dynamic_cast<ComputerPlayer&>(*result);
     computerPlayer.setTweaker(inTweaker);
     return result;
 }

@@ -161,7 +161,7 @@ bool Game::isPaused() const
 GameStateStats Game::stats() const
 {
     const Locker locker(gameImpl());
-    const GameState & gameState = locker->gameState();
+    const GameState& gameState = locker->gameState();
     return GameStateStats(gameState.numLines(),
                           gameState.numSingles(),
                           gameState.numDoubles(),

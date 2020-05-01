@@ -26,7 +26,7 @@ class MainWindow final :
 public:
     virtual bool event(QEvent* inEvent) override;
 
-    void logMessage(const std::string & inMessage);
+    void logMessage(const std::string& inMessage);
 
 protected:
     void closeEvent(QCloseEvent*) override;
@@ -55,7 +55,7 @@ private:
 
     ~MainWindow();
 
-    void onNewGame(const Tetris::PlayerTypes & inPlayerTypes);
+    void onNewGame(const Tetris::PlayerTypes& inPlayerTypes);
 
 private:
     typedef std::vector<TetrisWidget *> TetrisWidgets;

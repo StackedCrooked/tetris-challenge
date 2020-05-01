@@ -33,7 +33,7 @@ struct WrappedPointer
     {
     }
 
-    void swap(WrappedPointer & rhs)
+    void swap(WrappedPointer& rhs)
     {
         std::swap(mValue, rhs.mValue);
     }
@@ -46,9 +46,9 @@ struct WrappedPointer
 
     inline Value * operator->() { return get(); }
 
-    inline const Value & operator*() const { return *get(); }
+    inline const Value& operator*() const { return *get(); }
 
-    inline Value & operator*() { return *get(); }
+    inline Value& operator*() { return *get(); }
 
 protected:
     void setValue(Value * inValue)
@@ -76,19 +76,19 @@ private:
 
 public:
 
-    SmartPointer(MemoryPool<Value> & inMemoryPool) :
+    SmartPointer(MemoryPool<Value>& inMemoryPool) :
         Base(nullptr),
         mMemoryPool(&inMemoryPool)
     {
     }
 
-    SmartPointer(MemoryPool<Value> & inMemoryPool, Value * inValue) :
+    SmartPointer(MemoryPool<Value>& inMemoryPool, Value * inValue) :
         Base(inValue),
         mMemoryPool(&inMemoryPool)
     {
     }
 
-    void swap(SmartPointer & rhs)
+    void swap(SmartPointer& rhs)
     {
         Base::swap(rhs);
         std::swap(mMemoryPool, rhs.mMemoryPool);
@@ -128,13 +128,13 @@ private:
 public:
     typedef ValueType Value;
 
-    MovePtr(MemoryPool<Value> & inMemoryPool, Value * inValue) :
+    MovePtr(MemoryPool<Value>& inMemoryPool, Value * inValue) :
         Base(inMemoryPool, inValue),
         mOwns(true)
     {
     }
 
-    MovePtr(const MovePtr & rhs) :
+    MovePtr(const MovePtr& rhs) :
         Base(rhs),
         mOwns(true)
     {
@@ -159,8 +159,8 @@ private:
     friend class ScopedPtr<Value>;
 
     // Disable assignment and swap
-    MovePtr & operator=(const MovePtr & rhs);
-    void swap(This & rhs);
+    MovePtr& operator=(const MovePtr& rhs);
+    void swap(This& rhs);
 
     mutable bool mOwns;
 };
@@ -170,7 +170,7 @@ private:
  * MovePtr factory function
  */
 template<typename ValueType>
-MovePtr<ValueType> Move(MemoryPool<ValueType> & pool, ValueType * inValue)
+MovePtr<ValueType> Move(MemoryPool<ValueType>& pool, ValueType * inValue)
 {
     return MovePtr<ValueType>(pool, inValue);
 }
@@ -189,19 +189,19 @@ private:
 public:
     typedef ValueType Value;
 
-    SharedPtr(MemoryPool<Value> & inMemoryPool) :
+    SharedPtr(MemoryPool<Value>& inMemoryPool) :
         Base(inMemoryPool, nullptr),
         mValueWithRefCount(new ValueWithRefCount(nullptr))
     {
     }
 
-    SharedPtr(MemoryPool<Value> & inMemoryPool, Value * inValue) :
+    SharedPtr(MemoryPool<Value>& inMemoryPool, Value * inValue) :
         Base(inMemoryPool, inValue),
         mValueWithRefCount(new ValueWithRefCount(inValue))
     {
     }
 
-    SharedPtr(const SharedPtr & rhs) :
+    SharedPtr(const SharedPtr& rhs) :
         Base(rhs),
         mValueWithRefCount(rhs.mValueWithRefCount)
     {
@@ -212,13 +212,13 @@ public:
     /**
      * Assignment operator
      */
-    SharedPtr & operator=(SharedPtr rhs)
+    SharedPtr& operator=(SharedPtr rhs)
     {
         This::swap(rhs);
         return *this;
     }
 
-    void swap(SharedPtr & rhs)
+    void swap(SharedPtr& rhs)
     {
         Base::swap(rhs);
         std::swap(mValueWithRefCount, rhs.mValueWithRefCount);
@@ -249,7 +249,7 @@ private:
 * "Share" is a factory function for creating SharedPtr objects.
  */
 template<typename ValueType>
-SharedPtr<ValueType> Share(MemoryPool<ValueType> & pool, ValueType * inValue)
+SharedPtr<ValueType> Share(MemoryPool<ValueType>& pool, ValueType * inValue)
 {
     return SharedPtr<ValueType>(pool, inValue);
 }
@@ -276,12 +276,12 @@ private:
 public:
     typedef ValueType Value;
 
-    ScopedPtr(MemoryPool<Value> & inMemoryPool, Value * inValue) :
+    ScopedPtr(MemoryPool<Value>& inMemoryPool, Value * inValue) :
         Base(inMemoryPool, inValue)
     {
     }
 
-    ScopedPtr(const MovePtr<Value> & rhs) :
+    ScopedPtr(const MovePtr<Value>& rhs) :
         Base(rhs)
     {
         rhs.mOwns = false;
@@ -294,8 +294,8 @@ public:
 
 private:
     // Disable swap and assignment operator
-    void swap(ScopedPtr & rhs);
-    ScopedPtr & operator=(ScopedPtr rhs);
+    void swap(ScopedPtr& rhs);
+    ScopedPtr& operator=(ScopedPtr rhs);
 };
 
 
@@ -353,7 +353,7 @@ public:
         return inValue - reinterpret_cast<const Value*>(mData.data());
     }
 
-    std::size_t indexOf(const WrappedPointer<Value> & inWrappedPointer) const
+    std::size_t indexOf(const WrappedPointer<Value>& inWrappedPointer) const
     {
         return indexOf(inWrappedPointer.get());
     }
@@ -363,7 +363,7 @@ public:
         return indexOf(inValue) * sizeof(Value);
     }
 
-    std::size_t offsetOf(const WrappedPointer<Value> & inWrappedPointer) const
+    std::size_t offsetOf(const WrappedPointer<Value>& inWrappedPointer) const
     {
         return offsetOf(inWrappedPointer.get());
     }
@@ -438,7 +438,7 @@ private:
  * Acquire and call the default constructor
  */
 template<class ValueType>
-MovePtr<ValueType> AcquireAndDefaultConstruct(MemoryPool<ValueType> & pool)
+MovePtr<ValueType> AcquireAndDefaultConstruct(MemoryPool<ValueType>& pool)
 {
     return Move(pool, new (pool.acquire()) ValueType());
 }
@@ -450,7 +450,7 @@ MovePtr<ValueType> AcquireAndDefaultConstruct(MemoryPool<ValueType> & pool)
  * Example:
  *
  *   // Factory function
- *   static Foo * Create(void * placement, const std::string & arg0, const std::string & arg1)
+ *   static Foo * Create(void * placement, const std::string& arg0, const std::string& arg1)
  *   {
  *     return new (placement) Foo(arg0, arg1)
  *   }
@@ -459,7 +459,7 @@ MovePtr<ValueType> AcquireAndDefaultConstruct(MemoryPool<ValueType> & pool)
  *
  */
 template<class ValueType, typename FactoryFunction>
-MovePtr<ValueType> AcquireAndConstructWithFactory(MemoryPool<ValueType> & pool, FactoryFunction function)
+MovePtr<ValueType> AcquireAndConstructWithFactory(MemoryPool<ValueType>& pool, FactoryFunction function)
 {
     return Move(pool, function(pool.acquire()));
 }
@@ -469,7 +469,7 @@ MovePtr<ValueType> AcquireAndConstructWithFactory(MemoryPool<ValueType> & pool, 
  * Destructs hte object and releases the pointer from the pool.
  */
 template<class ValueType>
-void DestructAndRelease(MemoryPool<ValueType> & pool, const ValueType * value)
+void DestructAndRelease(MemoryPool<ValueType>& pool, const ValueType * value)
 {
     value->~ValueType();
     pool.release(value);

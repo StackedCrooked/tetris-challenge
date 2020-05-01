@@ -35,7 +35,7 @@ public:
         ~ScopedInitializer() { This::DestroyInstance(); }
     };
 
-    static T & Instance()
+    static T& Instance()
     {
         Assert(sInstance);
         return *sInstance;

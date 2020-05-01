@@ -64,7 +64,7 @@ void PerformBenchmark(unsigned inWidth, unsigned inDepth)
 }
 
 
-void Print(const std::exception & exc)
+void Print(const std::exception& exc)
 {
     std::cout << "Anticipated exception: " << exc.what() << std::endl;
 }
@@ -75,9 +75,9 @@ void Print(const std::exception & exc)
 
 TEST_F(Benchmark, Quick)
 {
-    try { PerformBenchmark(0, 0); } catch (const std::exception & exc) { Print(exc); }
-    try { PerformBenchmark(0, 1); } catch (const std::exception & exc) { Print(exc); }
-    try { PerformBenchmark(1, 0); } catch (const std::exception & exc) { Print(exc); }
+    try { PerformBenchmark(0, 0); } catch (const std::exception& exc) { Print(exc); }
+    try { PerformBenchmark(0, 1); } catch (const std::exception& exc) { Print(exc); }
+    try { PerformBenchmark(1, 0); } catch (const std::exception& exc) { Print(exc); }
 
     PerformBenchmark(1, 1);
     PerformBenchmark(2, 2);

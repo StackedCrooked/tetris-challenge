@@ -2329,7 +2329,7 @@ inline int FileNo(FILE* file) { return _fileno(file); }
 inline int Stat(const char* path, StatStruct* buf) { return _stat(path, buf); }
 inline int RmDir(const char* dir) { return _rmdir(dir); }
 inline bool IsDir(const StatStruct& st) {
-  return (_S_IFDIR & st.st_mode) != 0;
+  return (_S_IFDIR& st.st_mode) != 0;
 }
 # endif  // GTEST_OS_WINDOWS_MOBILE
 

@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
         Tetris::Model::ScopedInitializer initModel;
         return run(argc, argv);
     }
-    catch (const std::exception & exc)
+    catch (const std::exception& exc)
     {
         std::cerr << "Exception caught in main: " << exc.what() << std::endl;
     }

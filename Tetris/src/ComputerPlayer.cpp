@@ -96,8 +96,8 @@ public:
 };
 
 
-ComputerPlayer::ComputerPlayer(const TeamName & inTeamName,
-                               const PlayerName & inPlayerName,
+ComputerPlayer::ComputerPlayer(const TeamName& inTeamName,
+                               const PlayerName& inPlayerName,
                                std::size_t inRowCount,
                                std::size_t inColumnCount) :
     Player(Computer, inTeamName, inPlayerName, inRowCount, inColumnCount),
@@ -121,7 +121,7 @@ ComputerPlayer::~ComputerPlayer()
 }
 
 
-void ComputerPlayer::onTimerEvent(Poco::Timer & )
+void ComputerPlayer::onTimerEvent(Poco::Timer& )
 {
     try
     {
@@ -131,7 +131,7 @@ void ComputerPlayer::onTimerEvent(Poco::Timer & )
             mImpl->timerEvent();
         }
     }
-    catch (const std::exception & exc)
+    catch (const std::exception& exc)
     {
         LogError(MakeString() << "Exception caught during ComputerPlayer timerEvent. Details: " << exc.what());
     }
@@ -340,7 +340,7 @@ void ComputerPlayer::Impl::startNodeCalculator()
     // Critical section
     {
         Locker<GameImpl> rgame(mComputerPlayer->simpleGame()->gameImpl());
-        const ComputerGame & constComputerGame(dynamic_cast<const ComputerGame&>(*rgame.get()));
+        const ComputerGame& constComputerGame(dynamic_cast<const ComputerGame&>(*rgame.get()));
 
 
         if (constComputerGame.numPrecalculatedMoves() > 8)
@@ -365,7 +365,7 @@ void ComputerPlayer::Impl::startNodeCalculator()
         //
         // Create the list of future blocks
         //
-        ComputerGame & computerGame(dynamic_cast<ComputerGame&>(*rgame.get()));
+        ComputerGame& computerGame(dynamic_cast<ComputerGame&>(*rgame.get()));
         computerGame.getFutureBlocksWithOffset(endNode->depth(), mSearchDepth, futureBlocks);
     }
 
@@ -409,7 +409,7 @@ void ComputerPlayer::Impl::onStarted()
 void ComputerPlayer::Impl::onWorking()
 {
     Locker<GameImpl> wgame(mComputerPlayer->simpleGame()->gameImpl());
-    const ComputerGame & game(dynamic_cast<const ComputerGame&>(*wgame.get()));
+    const ComputerGame& game(dynamic_cast<const ComputerGame&>(*wgame.get()));
 
     if (mGameDepth < game.endNode()->depth())
     {
@@ -446,7 +446,7 @@ void ComputerPlayer::Impl::onFinished()
     }
 
     Locker<GameImpl> wgame(mComputerPlayer->simpleGame()->gameImpl());
-    ComputerGame & game(dynamic_cast<ComputerGame&>(*wgame.get()));
+    ComputerGame& game(dynamic_cast<ComputerGame&>(*wgame.get()));
 
     // Check for sync problems.
     if (resultNode->depth() != game.endNode()->depth() + 1)
