@@ -118,7 +118,7 @@ const Evaluator& Model::updateAIParameters(const Player& inPlayer,
         {
             outSearchDepth = 20;
             outSearchWidth = 4;
-            outMoveSpeed = 60;
+            outMoveSpeed = 40;
             return Confused::Instance();
         }
     }
@@ -128,14 +128,14 @@ const Evaluator& Model::updateAIParameters(const Player& inPlayer,
     {
         outSearchDepth = 20;
         outSearchWidth = 2;
-        outMoveSpeed = 1000;
+        outMoveSpeed = 60;
         return MakeTetrises::Instance();
     }
     else
     {
         outSearchDepth = 4;
         outSearchWidth = 4;
-        outMoveSpeed = 1000;
+        outMoveSpeed = 60;
         return Survival::Instance();
     }
 }
