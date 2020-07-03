@@ -6,8 +6,20 @@ mkdir Build
 cd Build
 
 
+# Force our preferred compilers to be detected by conan when generating a new profile (see below)
+export CXX=/usr/local/bin/g++-9
+export CC=/usr/local/bin/gcc-9
+
+# Generate a conan profile based on environment
+conan profile new --detect ./auto-generated-conan-profile
+
+# Specify that we want to use the new C++11 ABI (libstdc++11)
+conan profile update settings.compiler.libcxx=libstdc++11 ./auto-generated-conan-profile
+
 # Install the conan dependencies.
-MAKEFLAGS="${MAKEFLAGS:--j7}" conan install .. --build=missing 
+MAKEFLAGS="${MAKEFLAGS:--j7}" conan install ../ --profile ./auto-generated-conan-profile  --build=missing
+
+
 cmake ..
 make -j7
 
