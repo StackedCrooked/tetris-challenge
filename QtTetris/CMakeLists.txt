@@ -4,9 +4,7 @@ find_package(Poco)
 
 
 # Using QtCore, QtGui and QtWidgets
-find_package(Qt5Core)
-find_package(Qt5Gui)
-find_package(Qt5Widgets)
+find_package(Qt5 REQUIRED COMPONENTS Gui Widgets Core)
 add_definitions(${Qt5Core_DEFINITIONS} ${Qt5Gui_DEFINITIONS} ${Qt5Widgets_DEFINITIONS})
 include_directories(SYSTEM ${Qt5Core_INCLUDE_DIRS} ${Qt5Gui_INCLUDE_DIRS} ${Qt5Widgets_INCLUDE_DIRS})
 
