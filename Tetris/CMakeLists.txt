@@ -54,5 +54,7 @@ add_library(Tetris
     src/Player.cpp
     src/SingleThreadedNodeCalculator.cpp)
 
+add_subdirectory(testing)
+
 target_include_directories(Tetris PUBLIC include PRIVATE src) 
 target_link_libraries(Tetris PUBLIC Futile Poco::Poco boost::boost)

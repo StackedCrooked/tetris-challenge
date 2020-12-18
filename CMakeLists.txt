@@ -22,5 +22,4 @@ add_compile_options(-std=c++11 -Wall -Wno-sign-compare -pedantic-errors -g -O2 -
 add_subdirectory(3rdParty/gtest)
 add_subdirectory(Tetris)
 add_subdirectory(Futile)
-add_subdirectory(Tetris/testing)
 add_subdirectory(QtTetris)
