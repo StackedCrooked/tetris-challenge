@@ -1,6 +1,6 @@
 [requires]
 zlib/1.2.11@conan/stable
-boost/1.69.0@conan/stable
+boost/1.74.0
 Poco/1.9.0@pocoproject/stable
 
 

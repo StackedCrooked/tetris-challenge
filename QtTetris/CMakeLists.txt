@@ -1,5 +1,5 @@
 project(QtTetris)
-find_package(boost)
+find_package(Boost)
 find_package(Poco)
 
 
@@ -33,4 +33,4 @@ target_link_libraries(QtTetris
     Qt5::Gui
     Qt5::Widgets
     Poco::Poco
-    boost::boost)
+    Boost::thread)

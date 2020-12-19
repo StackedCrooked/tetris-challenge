@@ -88,7 +88,7 @@ MainWindow::MainWindow(QWidget *parent) :
         mLogField = new QTextEdit(theCentralWidget);
         mLogField->setReadOnly(true);
         vbox->addWidget(mLogField, 1);
-        Logger::Instance().setLogHandler(boost::bind(&MainWindow::logMessage, this, _1));
+        Logger::Instance().setLogHandler(std::bind(&MainWindow::logMessage, this, std::placeholders::_1));
     }
 
     onNewComputerVsComputerGame();

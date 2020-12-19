@@ -1,4 +1,4 @@
-find_package(boost)
+find_package(Boost)
 find_package(Poco)
 
 add_library(Futile
@@ -33,4 +33,4 @@ add_library(Futile
 )
 
 target_include_directories(Futile PUBLIC include PRIVATE src)
-target_link_libraries(Futile PUBLIC Poco::Poco boost::boost)
+target_link_libraries(Futile PUBLIC Poco::Poco Boost::boost)
