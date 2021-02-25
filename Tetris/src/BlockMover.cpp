@@ -14,7 +14,7 @@
 #include "Poco/Stopwatch.h"
 #include "Poco/Timer.h"
 #include <iostream>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 
 
 using Futile::LogError;

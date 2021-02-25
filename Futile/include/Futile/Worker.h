@@ -4,7 +4,7 @@
 
 #include "Futile/Enum.h"
 #include "Futile/Threading.h"
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <boost/function.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <list>

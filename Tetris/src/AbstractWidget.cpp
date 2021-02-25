@@ -5,7 +5,7 @@
 #include "Tetris/Game.h"
 #include "Futile/MakeString.h"
 #include "Futile/Threading.h"
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 
 
 using Futile::Locker;

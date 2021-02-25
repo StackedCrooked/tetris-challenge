@@ -7,7 +7,7 @@
 #include "Futile/Logging.h"
 #include "Futile/Threading.h"
 #include "Futile/AutoPtrSupport.h"
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <set>
 #include <stdexcept>
 

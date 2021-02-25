@@ -18,7 +18,7 @@
 #include "Futile/Assert.h"
 #include "Poco/Environment.h"
 #include "Poco/Timer.h"
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <boost/noncopyable.hpp>
 #include <set>
 
