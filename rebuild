@@ -16,7 +16,7 @@ conan profile update settings.compiler.libcxx=libstdc++11 ./auto-generated-conan
 MAKEFLAGS="${MAKEFLAGS:--j7}" conan install ../ --profile ./auto-generated-conan-profile  --build=missing
 
 
-cmake ..
+cmake .. -DCMAKE_BUILD_TYPE=Release
 make -j7
 
 

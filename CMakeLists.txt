@@ -1,3 +1,8 @@
+
+# Override the RELEASE build type
+set(CMAKE_USER_MAKE_RULES_OVERRIDE_CXX ${CMAKE_CURRENT_SOURCE_DIR}/cxx_flag_overrides.cmake)
+
+
 project("Tetris")
 # NOTE: using "Modern CMake" practices
 #  - Youtube: https://www.youtube.com/watch?v=ztrnb-bVVPo&t=30m42s
@@ -18,7 +23,7 @@ set(CMAKE_CXX_COMPILER_LAUNCHER "ccache")
 set(CONAN_SYSTEM_INCLUDES ON)
 
 
-add_compile_options(-std=c++11 -Wall -Wno-sign-compare -pedantic-errors -g -O2 -march=native)
+add_compile_options(-std=c++11 -Wall -Wno-sign-compare -pedantic-errors)
 
 add_subdirectory(3rdParty/gtest)
 add_subdirectory(Tetris)
