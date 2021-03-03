@@ -271,7 +271,7 @@ Tetris::Size TetrisWidget::getMinimumSizeForTextBox(const std::string& text, int
 }
 
 
-void TetrisWidget::drawLine(int x1, int y1, int x2, int y2, int inPenWidth, const RGBColor& inColor)
+void TetrisWidget::drawLine(int x1, int y1, int x2, int y2, int /*inPenWidth*/, const RGBColor& inColor)
 {
     if (!mPainter.get())
     {

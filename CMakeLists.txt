@@ -20,10 +20,10 @@ set(CMAKE_CXX_COMPILER_LAUNCHER "ccache")
 
 # Conan libraries will use "-isystem" so they don't generate compiler warnings.
 # This way we don't get compiler warnings from third party code.
-set(CONAN_SYSTEM_INCLUDES ON)
+#set(CONAN_SYSTEM_INCLUDES ON)
 
 
-add_compile_options(-std=c++11 -Wall -Wno-sign-compare -pedantic-errors)
+add_compile_options(-std=c++11 -Wall -Wextra -Wno-sign-compare -pedantic-errors)
 
 add_subdirectory(3rdParty/gtest)
 add_subdirectory(Tetris)

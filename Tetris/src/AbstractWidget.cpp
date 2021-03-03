@@ -398,7 +398,7 @@ void AbstractWidget::paintGameOver()
 }
 
 
-void AbstractWidget::paintAvatar(const Game& inGame)
+void AbstractWidget::paintAvatar(const Game&)
 {
     Rect theAvatarRect = avatarRect();
     paintImage(theAvatarRect, player()->playerName() + "_80.gif");
@@ -469,7 +469,7 @@ void AbstractWidget::paintStats(const Rect& inRect, const GameStateStats& inStat
 }
 
 
-void AbstractWidget::paintFutureBlocks(const Rect& inRect, int inSpacing, const BlockTypes& inBlockTypes)
+void AbstractWidget::paintFutureBlocks(const Rect& inRect, int /*inSpacing*/, const BlockTypes& inBlockTypes)
 {
     if (inBlockTypes.empty())
     {
