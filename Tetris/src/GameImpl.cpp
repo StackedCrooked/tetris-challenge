@@ -273,6 +273,7 @@ void GameImpl::applyLinePenalty(int inLineCount)
         // Commit the game state.
         bool result = move(MoveDirection_Down);
         Assert(!result); // verify commit
+        (void)result;
     }
 
     onChanged();
@@ -481,6 +482,7 @@ void GameImpl::dropAndCommit()
         dropWithoutCommit();
         bool result = move(MoveDirection_Down);
         Assert(!result); // check commit
+        (void)result;
     }
     onChanged();
 }
@@ -495,6 +497,7 @@ void GameImpl::dropWithoutCommit()
         {
             bool result = move(MoveDirection_Down);
             Assert(result); // no commit
+            (void)result;
         }
     }
     onChanged();
