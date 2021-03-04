@@ -243,13 +243,13 @@ void GameImpl::applyLinePenalty(int inLineCount)
 
     std::vector<BlockType> garbageRow;
 
-    for (int r = newFirstOccupiedRow; r < grid.rowCount(); ++r)
+    for (int r = newFirstOccupiedRow; r < static_cast<int>(grid.rowCount()); ++r)
     {
         if (r >= garbageStart)
         {
             garbageRow = getGarbageRow();
         }
-        for (int c = 0; c < grid.columnCount(); ++c)
+        for (int c = 0; c < static_cast<int>(grid.columnCount()); ++c)
         {
             if (r < garbageStart)
             {

@@ -166,7 +166,7 @@ protected:
         inline bool finished() const
         {
             Futile::ScopedLock lock(mMutex);
-            return mInfos.size() == mMaxDepth && mInfos.back().finished();
+            return static_cast<int>(mInfos.size()) == mMaxDepth && mInfos.back().finished();
         }
 
         inline void setFinished()

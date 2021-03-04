@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.0)
 project("Tetris")
 
-add_compile_options(-std=c++11 -Wall -Wextra -Wno-sign-compare -pedantic-errors)
+add_compile_options(-std=c++11 -Wall -Wextra -pedantic-errors)
 
 add_subdirectory(3rdParty/gtest)
 add_subdirectory(Tetris)

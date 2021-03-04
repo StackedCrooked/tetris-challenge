@@ -146,8 +146,7 @@ void BlockMover::Impl::onTimer(Poco::Timer &)
         move();
         ++mMoveCount;
 
-        static const Poco::UInt64 cOneSecond = 1000 * 1000;
-        if (mStopwatch.elapsed() >= 4 * cOneSecond)
+        if (mStopwatch.elapsed() >= 4 * 1000 * 1000)
         {
             mActualSpeed = mMoveCount / 4;
             mMoveCount = 0;

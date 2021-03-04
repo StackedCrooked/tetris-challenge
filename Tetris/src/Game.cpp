@@ -258,7 +258,7 @@ std::vector<Block> Game::getNextBlocks()
 
     gameImpl().lock()->getFutureBlocks(1 + numFutureBlocks, blockTypes);
 
-    if (blockTypes.size() != (1 + numFutureBlocks))
+    if (static_cast<int64_t>(blockTypes.size()) != (1 + numFutureBlocks))
     {
         throw std::logic_error("Failed to get the next block from the factory.");
     }
