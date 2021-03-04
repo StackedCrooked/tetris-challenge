@@ -17,8 +17,4 @@ MAKEFLAGS="${MAKEFLAGS:--j7}" conan install ../ --profile ./auto-generated-conan
 
 
 cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_MODULE_PATH="$(pwd)" -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
-make -j7
-
-
-# Run the unit tests 
-Tetris/testing/TetrisTest
+make -j7 VERBOSE=1
