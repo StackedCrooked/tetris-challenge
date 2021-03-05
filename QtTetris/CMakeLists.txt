@@ -3,18 +3,12 @@ find_package(Boost)
 find_package(Poco)
 
 
-# Using QtCore, QtGui and QtWidgets
 find_package(Qt5 REQUIRED COMPONENTS Gui Widgets Core)
-add_definitions(${Qt5Core_DEFINITIONS} ${Qt5Gui_DEFINITIONS} ${Qt5Widgets_DEFINITIONS})
-include_directories(SYSTEM ${Qt5Core_INCLUDE_DIRS} ${Qt5Gui_INCLUDE_DIRS} ${Qt5Widgets_INCLUDE_DIRS})
-
-
-qt5_wrap_cpp(MocFiles MainWindow.h TetrisWidget.h NewGameDialog.h)
+set(CMAKE_AUTOMOC ON)
 qt5_add_resources(QtResources QtTetris.qrc)
 
 
 add_executable(QtTetris
-    ${MocFiles}
     ${QtResources}
     main.cpp
     MainWindow.cpp
