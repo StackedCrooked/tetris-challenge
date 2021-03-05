@@ -9,12 +9,18 @@ cd Build
 # Generate a conan profile based on environment
 conan profile new --detect ./auto-generated-conan-profile
 
+
 # Specify that we want to use the new C++11 ABI (libstdc++11)
 conan profile update settings.compiler.libcxx=libstdc++11 ./auto-generated-conan-profile
 
+
 # Install the conan dependencies.
-MAKEFLAGS="${MAKEFLAGS:--j7}" conan install ../ --profile ./auto-generated-conan-profile  --build=missing
+MAKEFLAGS="${MAKEFLAGS:--j7}" conan install .. --profile ./auto-generated-conan-profile  --build=missing
 
 
-cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_MODULE_PATH="$(pwd)" -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+cmake .. \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_MODULE_PATH="$(pwd)" \
+    -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+
 make -j7 VERBOSE=1
