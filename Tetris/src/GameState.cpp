@@ -128,7 +128,7 @@ void GameState::clearLines()
         memset(&gridBegin[0], 0, numLines * mGrid.columnCount());
     }
 
-    Assert(mFirstOccupiedRow + numLines <= static_cast<int>(mGrid.rowCount()));
+    Assert(static_cast<int>(mFirstOccupiedRow + numLines) <= static_cast<int>(mGrid.rowCount()));
     mFirstOccupiedRow += numLines;
     mNumLines += numLines;
 
