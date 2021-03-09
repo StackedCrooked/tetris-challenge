@@ -23,4 +23,4 @@ cmake .. \
     -DCMAKE_MODULE_PATH="$(pwd)" \
     -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
 
-make -j7 VERBOSE=1
+make
