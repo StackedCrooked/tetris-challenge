@@ -7,6 +7,6 @@ project("Tetris")
 
 add_compile_options(-std=c++11 -Wall -Wextra -pedantic)
 
-add_subdirectory(Tetris)
 add_subdirectory(Futile)
+add_subdirectory(Tetris)
 add_subdirectory(QtTetris)
